@@ -263,50 +263,73 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     return xmlStringUnderConstruction
 
   #________________________________________________________________________________
+  @insertParagraphText: (xmlString, reducedXmlString) ->
+      returnXmlString = ''
+      for line in reducedXmlString.split('\n')
+        trimmedLine = line.trim()
+        if trimmedLine.length > 0
+          returnXmlString += '<p>\n'
+          returnXmlString += trimmedLine
+          returnXmlString += '</p>\n'
+      return returnXmlString
+
+  #________________________________________________________________________________
   @parseForCheckbox: (xmlString) ->
     # try to parse the supplied string to find a checkbox problem
     # return the string unmodified if this is not a checkbox problem
     isCheckboxType = false
-
-    returnXmlString =  '    <choiceresponse>\n'
-    returnXmlString += '        <checkboxgroup direction="vertical">\n'
+    returnXmlString = ''
+    reducedXmlString = ''
+    CHECKBOX_MARKER_PATTERN = /(\s+\[\s*x?\s*\])(.+)[^\n]+/   # expression searches for the checkbox [...] pattern
 
     for line in xmlString.split('\n')
-      hintText = ''
-      correctnessText = ''
-      itemText = ''
-      choiceMatches = line.match( /\s+\[\s*x?\s*\][^\n]+/ )
-      if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
+      choiceMatches = line.match( CHECKBOX_MARKER_PATTERN )
+      if choiceMatches              # this line includes '(...)' so it must be a checkbox item
         isCheckboxType = true
-        hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-        if hintMatches
-          matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-          hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
-          line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+      else
+        reducedXmlString += line    # this line is not an item line, add it to reduced lines string
 
-        itemMatches = line.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
-        if itemMatches
-          correctnessText = 'False'
-          if itemMatches[1].match(/X/i)
-            correctnessText = 'True'
-          correctnessTextList = correctnessText
-          itemText = itemMatches[2].trim()
+    if isCheckboxType
+      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
 
-        returnXmlString += '          <choice  correct="' + correctnessText + '">'
-        returnXmlString += '              ' + itemText + '\n'
-        if hintText
-          returnXmlString += '               <choicehint>' + hintText + '\n'
-          returnXmlString += '               </choicehint>\n'
-        returnXmlString += '          </choice>\n'
+      returnXmlString +=  '    <choiceresponse>\n'
+      returnXmlString += '        <checkboxgroup direction="vertical">\n'
 
-    returnXmlString += '        </checkboxgroup>\n'
+      for line in xmlString.split('\n')
+        hintText = ''
+        correctnessText = ''
+        itemText = ''
+        choiceMatches = line.match( /\s+\[\s*x?\s*\][^\n]+/ )
+        if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
+          isCheckboxType = true
+          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+          if hintMatches
+            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
+            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
+            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
 
-    MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
-    returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+          itemMatches = line.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+          if itemMatches
+            correctnessText = 'False'
+            if itemMatches[1].match(/X/i)
+              correctnessText = 'True'
+            correctnessTextList = correctnessText
+            itemText = itemMatches[2].trim()
 
-    returnXmlString += '    </choiceresponse>\n'
+          returnXmlString += '          <choice  correct="' + correctnessText + '">'
+          returnXmlString += '              ' + itemText + '\n'
+          if hintText
+            returnXmlString += '               <choicehint>' + hintText + '\n'
+            returnXmlString += '               </choicehint>\n'
+          returnXmlString += '          </choice>\n'
 
-    if not isCheckboxType
+      returnXmlString += '        </checkboxgroup>\n'
+
+      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
+      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+
+      returnXmlString += '    </choiceresponse>\n'
+    else
       returnXmlString = xmlString
 
     return returnXmlString
@@ -316,58 +339,60 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     # try to parse the supplied string to find a multiple choice problem
     # return the string unmodified if this is not a multiple choice problem
     isMultipleChoiceType = false
-
-    returnXmlString =  '    <multiplechoiceresponse>\n'
-    returnXmlString += '        <choicegroup>\n'
+    returnXmlString = ''
+    reducedXmlString = ''
+    MULTIPLE_CHOICE_MARKER_PATTERN = /\s+\(\s*x?\s*\)[^\n]+/   # expression searches for the multiple choice (...) pattern
 
     for line in xmlString.split('\n')
-      hintText = ''
-      correctnessText = ''
-      itemText = ''
-      choiceMatches = line.match( /\s+\(\s*x?\s*\)[^\n]+/ )
-      if choiceMatches                          # this line includes '(...)' so it must be a multiple choice item
+      choiceMatches = line.match( MULTIPLE_CHOICE_MARKER_PATTERN )
+      if choiceMatches              # this line includes '(...)' so it must be a multiple choice item
         isMultipleChoiceType = true
-        hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-        if hintMatches
-          matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-          hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
-          line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+      else
+        reducedXmlString += line    # this line is not a choice item line, add it to reduced lines string
 
-        itemMatches = line.match( /(\s+\(\s*x?\s*\))(.+)[^\n]+/ )
-        if itemMatches
-          correctnessText = 'False'
-          if itemMatches[1].match(/X/i)
-            correctnessText = 'True'
-          correctnessTextList = correctnessText
-          itemText = itemMatches[2].trim()
+    if isMultipleChoiceType
+      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
 
-        returnXmlString += '          <choice  correct="' + correctnessText + '">'
-        returnXmlString += '              ' + itemText + '\n'
-        if hintText
-          returnXmlString += '               <choicehint>' + hintText + '\n'
-          returnXmlString += '               </choicehint>\n'
-        returnXmlString += '          </choice>\n'
+      returnXmlString +=  '    <multiplechoiceresponse>\n'
+      returnXmlString += '        <choicegroup>\n'
 
-    returnXmlString += '        </choicegroup>\n'
+      for line in xmlString.split('\n')
+        hintText = ''
+        correctnessText = ''
+        itemText = ''
+        choiceMatches = line.match( MULTIPLE_CHOICE_MARKER_PATTERN )
+        if choiceMatches                          # this line includes '(...)' so it must be a multiple choice item
+          isMultipleChoiceType = true
+          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+          if hintMatches
+            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
+            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
+            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
 
-    MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
-    returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+          itemMatches = line.match( /(\s+\(\s*x?\s*\))(.+)[^\n]+/ )
+          if itemMatches
+            correctnessText = 'False'
+            if itemMatches[1].match(/X/i)
+              correctnessText = 'True'
+            correctnessTextList = correctnessText
+            itemText = itemMatches[2].trim()
 
-    returnXmlString += '    </multiplechoiceresponse>\n'
+          returnXmlString += '          <choice  correct="' + correctnessText + '">'
+          returnXmlString += '              ' + itemText + '\n'
+          if hintText
+            returnXmlString += '               <choicehint>' + hintText + '\n'
+            returnXmlString += '               </choicehint>\n'
+          returnXmlString += '          </choice>\n'
 
-    if not isMultipleChoiceType
+      returnXmlString += '        </choicegroup>\n'
+
+      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
+      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+      returnXmlString += '    </multiplechoiceresponse>\n'
+    else
       returnXmlString = xmlString
 
     return returnXmlString
-
-  #________________________________________________________________________________
-  @insertParagraphText: (xmlString, reducedXmlString) ->
-      returnXmlString = ''
-      for line in reducedXmlString.split('\n')
-        returnXmlString += '<p>\n'
-        returnXmlString += line
-        returnXmlString += '</p>\n'
-      return returnXmlString
 
   #________________________________________________________________________________
   @parseForDropdown: (xmlString) ->
@@ -464,8 +489,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
-      xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
 debugger;
+      xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
       xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
 
