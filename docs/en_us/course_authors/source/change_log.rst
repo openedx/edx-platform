@@ -13,6 +13,8 @@ July, 2014
 
    * - Date
      - Change
+   * - 07/15/14
+     - Added the :ref:`Discussions for Students and Staff` chapter.
    * - 07/11/14
      - Added :ref:`Track Student Activity` to the :ref:`Student Data`
        chapter.
