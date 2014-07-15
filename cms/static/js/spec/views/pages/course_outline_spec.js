@@ -245,6 +245,22 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
             describe("Section", function() {
                 it('can be deleted', function() {
+                    var promptSpy = view_helpers.createPromptSpy(), requestCount;
+                    createCourseOutlinePage(this, createMockCourseJSON('mock-course', 'Mock Course', [
+                        createMockSectionJSON('mock-section', 'Mock Section', []),
+                        createMockSectionJSON('mock-section-2', 'Mock Section 2', [])
+                    ]));
+                    outlinePage.$('.outline-item-section .delete-button').first().click();
+                    view_helpers.confirmPrompt(promptSpy);
+                    requestCount = requests.length;
+                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
+                    create_sinon.respondWithJson(requests, {});
+                    expect(requests.length).toBe(requestCount); // No fetch should be performed
+                    expect(outlinePage.$('[data-locator="mock-section"]')).not.toExist();
+                    expect(outlinePage.$('[data-locator="mock-section-2"]')).toExist();
+                });
+
+                it('can be deleted if it is the only section', function() {
                     var promptSpy = view_helpers.createPromptSpy();
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     outlinePage.$('.outline-item-section .delete-button').click();
