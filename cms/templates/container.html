@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 <%
 main_xblock_info = {
     'id': str(xblock_locator),
