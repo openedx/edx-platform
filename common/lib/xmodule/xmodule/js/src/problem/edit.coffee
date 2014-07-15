@@ -318,7 +318,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     isMultipleChoiceType = false
 
     returnXmlString =  '    <multiplechoiceresponse>\n'
-    returnXmlString += '        <choicegroup direction="vertical">\n'
+    returnXmlString += '        <choicegroup>\n'
 
     for line in xmlString.split('\n')
       hintText = ''
@@ -360,6 +360,67 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     return returnXmlString
 
+  #________________________________________________________________________________
+  @parseForDropdown: (xmlString) ->
+    # try to parse the supplied string to find a drop down problem
+    # return the string unmodified if this is not a drop down problem
+    dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
+    if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
+      returnXmlString =  '    <optionresponse>\n'
+      returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
+
+      optionsString = ''
+      delimiter = ''
+      for line in dropdownMatches[1].split('\n')    # split the string between [[..]] brackets into single lines
+        line = line.trim()
+        if line.length > 0
+          hintText = ''
+          correctnessText = ''
+          itemText = ''
+
+          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+          if hintMatches
+            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
+            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
+            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+
+          correctChoiceMatch = line.match( /^\s*\(([^)]+)\)/ )  # try to match a parenthetical string: '(...)'
+          if correctChoiceMatch                          # matched so this must be the correct answer
+            correctnessText = 'True'
+            itemText = correctChoiceMatch[1]
+            returnXmlString = returnXmlString.replace('CORRECT_PLACEHOLDER', itemText)  # poke the correct value in
+            optionsString += delimiter + '(' + itemText + ')'
+          else
+            correctnessText = 'False'
+            itemText = line
+            optionsString += delimiter + itemText.trim()
+
+          if itemText[itemText.length-1] == ','     # check for an end-of-line comma
+            itemText = itemText.slice(0, itemText.length-1) # suppress it
+          itemText = itemText.trim()
+
+          returnXmlString += '              <option  correct="' + correctnessText + '">'
+          returnXmlString += '                  ' + itemText + '\n'
+          if hintText
+            returnXmlString += '                   <optionhint>' + hintText + '\n'
+            returnXmlString += '                   </optionhint>\n'
+          returnXmlString += '              </option>\n'
+
+          delimiter = ', '
+      returnXmlString += '        </optioninput>\n'
+
+      returnXmlString = returnXmlString.replace('OPTIONS_PLACEHOLDER', optionsString)  # poke the options in
+
+      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString);  # pull out any compound condition hints
+      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString);
+
+      returnXmlString += '    </optionresponse>\n'
+
+    else
+      returnXmlString = xmlString
+
+    return returnXmlString
+
 
 
 
@@ -392,6 +453,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
       xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
+      xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
 
 //      // group multiple choice answers
