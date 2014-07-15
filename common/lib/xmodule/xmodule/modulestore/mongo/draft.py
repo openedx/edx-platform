@@ -20,6 +20,7 @@ from xmodule.modulestore.mongo.base import (
     DIRECT_ONLY_CATEGORIES, SORT_REVISION_FAVOR_DRAFT
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
+from uuid import uuid4
 
 log = logging.getLogger(__name__)
 
@@ -303,35 +304,6 @@ class DraftModuleStore(MongoModuleStore):
         return wrap_draft(
             super(DraftModuleStore, self).create_xmodule(location, definition_data, metadata, runtime, fields)
         )
-
-    def create_item(self, user_id, location=None, parent_location=None, **kwargs):
-        """
-        Creates and saves a new item.
-        Either location or (category, parent_location) or both must be provided.
-        If parent_location is provided, a new item of the given category is added as a child.
-        If location is not provided, a new item with the given category and given block_id
-          is added to the parent_location.  If the block_id is not provided, a unique name
-          is automatically generated.
-
-        Returns the newly created item.
-
-        :param user_id: ID of the user creating and saving the xmodule
-        :param location: a Location--must have a category
-        :param parent_location: optional parameter, specifying the Location of the parent item
-        :param category: optional parameter for the category of the new item
-        :param block_id: a unique identifier for the new item
-        """
-        location = compute_location_from_args(location, parent_location, **kwargs)
-        xblock = self.create_xmodule(location, **kwargs)
-        self.update_item(xblock, user_id, allow_not_found=True)
-
-        # attach to parent if given
-        if parent_location is not None and not 'detached' in xblock._class_tags:
-            parent = self.get_item(parent_location)
-            parent.children.append(location)
-            self.update_item(parent, user_id)
-
-        return xblock
 
     def get_items(self, course_key, settings=None, content=None, revision=None, **kwargs):
         """

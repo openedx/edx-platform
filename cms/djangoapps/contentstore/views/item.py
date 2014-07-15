@@ -287,7 +287,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            existing_item = store.create_item(user.id, usage_key)
+            existing_item = store.create_item(user.id, usage_key.course_key, usage_key.block_type, usage_key.block_id)
         else:
             raise
     except InvalidLocationError:

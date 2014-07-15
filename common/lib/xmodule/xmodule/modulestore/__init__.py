@@ -368,6 +368,25 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
+    def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
+        """
+        Creates and saves a new item in a course.
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            course_key: A :class:`~opaque_keys.edx.CourseKey` identifying which course to create
+                this item in
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+            fields (dict): A dictionary specifying initial values for some or all fields
+                in the newly created block
+        """
+        pass
+
+    @abstractmethod
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
         Sets up source_course_id to point a course with the same content as the desct_course_id. This
@@ -561,54 +580,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
-    def create_item(self, user_id, location, parent_location=None, category=None, **kwargs):
-        """
-        Creates and saves a new item.
-        Either location or (category, parent_location) or both must be provided.
-        If parent_location is provided, a new item of the given category is added as a child.
-        If location is not provided, a new item with the given category and given block_id
-          is added to the parent_location.  If the block_id is not provided, a unique name
-          is automatically generated.
-
-        Returns the newly created item.
-
-        :param user_id: ID of the user creating and saving the xmodule
-        :param location: a Location--must have a category
-        :param parent_location: optional parameter, specifying the Location of the parent item
-        :param category: optional parameter for the category of the new item
-        :param block_id: a unique identifier for the new item
-        """
-        raise NotImplementedError
-
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
-        """
-        Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
-        should save with the update if it has that ability.
-
-        :param allow_not_found: whether this method should raise an exception if the given xblock
-        has not been persisted before.
-        :param force: fork the structure and don't update the course draftVersion if there's a version
-        conflict (only applicable to version tracking and conflict detecting persistence stores)
-
-        :raises VersionConflictError: if org, course, run, and version_guid given and the current
-        version head != version_guid and force is not True. (only applicable to version tracking stores)
-        """
-        raise NotImplementedError
-
-    def delete_item(self, location, user_id, force=False):
-        """
-        Delete an item from persistence. Pass the user's unique id which the persistent store
-        should save with the update if it has that ability.
-
-        :param user_id: ID of the user deleting the item
-        :param force: fork the structure and don't update the course draftVersion if there's a version
-        conflict (only applicable to version tracking and conflict detecting persistence stores)
-
-        :raises VersionConflictError: if org, course, run, and version_guid given and the current
-        version head != version_guid and force is not True. (only applicable to version tracking stores)
-        """
-        raise NotImplementedError
-
     def clone_course(self, source_course_id, dest_course_id, user_id):
         """
         This base method just copies the assets. The lower level impls must do the actual cloning of
@@ -638,6 +609,27 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         if self.contentstore:
             self.contentstore._drop_database()  # pylint: disable=protected-access
         super(ModuleStoreWriteBase, self)._drop_database()  # pylint: disable=protected-access
+
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, fields=None, **kwargs):
+        """
+        Creates and saves a new xblock that as a child of the specified block
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifing the
+                block that this item should be parented under
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+            fields (dict): A dictionary specifying initial values for some or all fields
+                in the newly created block
+        """
+        item = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields, **kwargs)
+        parent = self.get_item(parent_usage_key)
+        parent.children.append(item.location)
+        self.update_item(parent, user_id)
 
     @contextmanager
     def bulk_write_operations(self, course_id):

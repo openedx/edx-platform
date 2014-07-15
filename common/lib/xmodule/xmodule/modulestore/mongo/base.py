@@ -975,6 +975,55 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         xmodule.save()
         return xmodule
 
+    def create_item(self, user_id, course_key, block_type, block_id=None, **kwargs):
+        """
+        Creates and saves a new item in a course.
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            course_key: A :class:`~opaque_keys.edx.CourseKey` identifying which course to create
+                this item in
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+        """
+        if not self.has_course(course_key):
+            raise ItemNotFoundError
+
+        if block_id is None:
+            block_id = uuid4().hex
+
+        location = course_key.make_usage_key(block_type, block_id)
+        xblock = self.create_xmodule(location, **kwargs)
+        self.update_item(xblock, user_id, allow_not_found=True)
+
+        return xblock
+
+    def create_child(self, user_id, parent_usage_key, block_type, block_id=None, **kwargs):
+        """
+        Creates and saves a new xblock that as a child of the specified block
+
+        Returns the newly created item.
+
+        Args:
+            user_id: ID of the user creating and saving the xmodule
+            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifing the
+                block that this item should be parented under
+            block_type: The typo of block to create
+            block_id: a unique identifier for the new item. If not supplied,
+                a new identifier will be generated
+        """
+        xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id)
+        # attach to parent if given
+        if 'detached' not in xblock._class_tags:
+            parent = self.get_item(parent_usage_key)
+            parent.children.append(xblock.location)
+            self.update_item(parent, user_id)
+
+        return xblock
+
     def _get_course_for_item(self, location, depth=0):
         '''
         for a given Xmodule, return the course that it belongs to
