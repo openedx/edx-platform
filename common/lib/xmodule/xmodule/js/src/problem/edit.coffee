@@ -361,26 +361,23 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     return returnXmlString
 
   #________________________________________________________________________________
+  @insertParagraphText: (xmlString, reducedXmlString) ->
+      returnXmlString = ''
+      for line in reducedXmlString.split('\n')
+        returnXmlString += '<p>\n'
+        returnXmlString += line
+        returnXmlString += '</p>\n'
+      return returnXmlString
+
+  #________________________________________________________________________________
   @parseForDropdown: (xmlString) ->
     # try to parse the supplied string to find a drop down problem
     # return the string unmodified if this is not a drop down problem
     dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
 
     if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
-
-
-      returnXmlString = ''
       reducedXmlString = xmlString.replace(dropdownMatches[0], '')
-      for line in reducedXmlString.split('\n')
-        returnXmlString += '<p>\n'
-        returnXmlString += line
-        returnXmlString += '</p>\n'
-
-
-
-
-
-
+      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
       returnXmlString +=  '    <optionresponse>\n'
       returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
 
