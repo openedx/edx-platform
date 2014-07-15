@@ -8,6 +8,8 @@ from __future__ import absolute_import
 
 from importlib import import_module
 from django.conf import settings
+if not settings.configured:
+    settings.configure()
 from django.core.cache import get_cache, InvalidCacheBackendError
 import django.utils
 
@@ -24,6 +26,8 @@ try:
     HAS_REQUEST_CACHE = True
 except ImportError:
     HAS_REQUEST_CACHE = False
+
+ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
 
 def load_function(path):
