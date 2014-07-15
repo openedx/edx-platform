@@ -13,6 +13,7 @@
       initFn = window[initFnName]
       if( initFn == undefined ) {
         console.log('ERROR: window["{#initFnName}"] not defined. Are you using "use strict"; in your javascript code?  If so, try removing it.')
+        # maybe a throw would be better since we will get an exception in the next line of code
       }
       block = initFn(runtime, element) ? {}
       block.runtime = runtime
