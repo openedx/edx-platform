@@ -18,7 +18,8 @@ log = logging.getLogger("mitx.module_tree_reset")
 
 
 class TreeNode(object):
-    def __init__(self, module, level, student):
+    def __init__(self, course_id, module, level, student):
+        self.course_id = course_id
         self.module = module
         self.level = level
         self.student = student
@@ -26,6 +27,7 @@ class TreeNode(object):
         if self.module.category in ['randomize', 'problem', 'problemset']:
             try:
                 self.smstate = StudentModule.objects.get(
+                    course_id=self.course_id,
                     module_state_key=str(self.module.location),
                     student=student)
             except StudentModule.DoesNotExist:
@@ -52,7 +54,7 @@ class TreeNodeSet(list):
         self.get_modules_to_reset()
 
     def get_tree(self, module, ms, level=1):
-        self.append(TreeNode(module, level, self.student))
+        self.append(TreeNode(self.course_id, module, level, self.student))
         for child in getattr(module, 'children', []):
             m = ms.get_instance(self.course_id, child)
             if m is not None:
@@ -197,6 +199,7 @@ class ProctorModuleInfo(object):
             try:
                 sm = StudentModule.objects.get(
                     module_state_key=str(rpmod.ra_rand.location),
+                    course_id=self.course.id,
                     student=student)  # randomize state
             except StudentModule.DoesNotExist:
                 sm = StateInfo()
@@ -204,6 +207,7 @@ class ProctorModuleInfo(object):
             try:
                 ps_sm = StudentModule.objects.get(
                     module_state_key=str(rpmod.ra_ps.location),
+                    course_id=self.course.id,
                     student=student)  # problemset state
             except StudentModule.DoesNotExist:
                 ps_sm = StateInfo()
