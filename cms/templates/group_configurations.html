@@ -11,7 +11,7 @@
 <%block name="bodyclass">is-signedin course view-group-configurations</%block>
 
 <%block name="header_extras">
-% for template_name in ["group-configuration-details", "no-group-configurations", "basic-modal", "modal-button"]:
+% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "basic-modal", "modal-button"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -20,14 +20,16 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-require(["!domReady", "js/collections/group_configuration", "js/views/pages/group_configurations"],
-function(doc, GroupConfigurationCollection, GroupConfigurationsPage, xmoduleLoader) {
+require(["domReady!", "js/collections/group_configuration", "js/views/pages/group_configurations"],
+function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
   % if configurations is not None:
-    var view = new GroupConfigurationsPage({
-        el: $('.content-primary'),
-        collection: new GroupConfigurationCollection(${json.dumps(configurations)}, { url: "${group_configuration_url}" })
-    });
-    view.render();
+    var collection = new GroupConfigurationCollection(${json.dumps(configurations)});
+
+    collection.url = "${group_configuration_url}";
+    new GroupConfigurationsPage({
+        el: $('#content'),
+        collection: collection
+    }).render();
   % endif
 });
 </script>
@@ -40,6 +42,14 @@ function(doc, GroupConfigurationCollection, GroupConfigurationsPage, xmoduleLoad
         <small class="subtitle">${_("Settings")}</small>
         <span class="sr">&gt; </span>${_("Group Configurations")}
       </h1>
+      <nav class="nav-actions">
+        <h3 class="sr">${_("Page Actions")}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Group Configuration")}</a>
+          </li>
+        </ul>
+      </nav>
     </header>
   </div>
 

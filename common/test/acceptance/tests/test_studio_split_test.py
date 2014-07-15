@@ -58,29 +58,7 @@ class SplitTest(ContainerBase):
         self.user = course_fix.user
 
     def verify_groups(self, container, active_groups, inactive_groups, verify_missing_groups_not_present=True):
-        """
-        Check that the groups appear and are correctly categorized as to active and inactive.
-
-        Also checks that the "add missing groups" button/link is not present unless a value of False is passed
-        for verify_missing_groups_not_present.
-        """
-        def wait_for_xblocks_to_render():
-            # First xblock is the container for the page, subtract 1.
-            return (len(active_groups) + len(inactive_groups) == len(container.xblocks) - 1, len(active_groups))
-
-        Promise(wait_for_xblocks_to_render, "Number of xblocks on the page are incorrect").fulfill()
-
-        def check_xblock_names(expected_groups, actual_blocks):
-            self.assertEqual(len(expected_groups), len(actual_blocks))
-            for idx, expected in enumerate(expected_groups):
-                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
-
-        check_xblock_names(active_groups, container.active_xblocks)
-        check_xblock_names(inactive_groups, container.inactive_xblocks)
-
-        # Verify inactive xblocks appear after active xblocks
-        check_xblock_names(active_groups + inactive_groups, container.xblocks[1:])
-
+        super(SplitTest, self).verify_groups(container, active_groups, inactive_groups)
         if verify_missing_groups_not_present:
             self.verify_add_missing_groups_button_not_present(container)
 
@@ -231,33 +209,33 @@ class SettingsMenuTest(UniqueCourseTest):
 
 
 @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsTest(UniqueCourseTest):
+class GroupConfigurationsTest(ContainerBase):
     """
     Tests that Group Configurations page works correctly with previously
     added configurations in Studio
     """
+    __test__ = True
 
-    def setUp(self):
-        super(GroupConfigurationsTest, self).setUp()
-
+    def setup_fixtures(self):
         course_fix = CourseFixture(**self.course_info)
         course_fix.add_advanced_settings({
             u"advanced_modules": {"value": ["split_test"]},
         })
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        ).install()
 
-        course_fix.install()
+        self.course_fix = course_fix
+
         self.course_fix = course_fix
         self.user = course_fix.user
 
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=course_fix.user.get('username'),
-            email=course_fix.user.get('email'),
-            password=course_fix.user.get('password')
-        )
-        self.auth_page.visit()
-
+    def setUp(self):
+        super(GroupConfigurationsTest, self).setUp()
         self.page = GroupConfigurationsPage(
             self.browser,
             self.course_info['org'],
@@ -298,6 +276,7 @@ class GroupConfigurationsTest(UniqueCourseTest):
         config = self.page.group_configurations()[0]
         self.assertIn("Name of the Group Configuration", config.name)
         self.assertEqual(config.id, '0')
+        # Expand the configuration
         config.toggle()
         self.assertIn("Description of the group configuration.", config.description)
         self.assertEqual(len(config.groups), 2)
@@ -308,8 +287,111 @@ class GroupConfigurationsTest(UniqueCourseTest):
         config = self.page.group_configurations()[1]
         self.assertIn("Name of second Group Configuration", config.name)
         self.assertEqual(len(config.groups), 0)  # no groups when the partition is collapsed
+        # Expand the configuration
         config.toggle()
         self.assertEqual(len(config.groups), 3)
 
         self.assertEqual("Beta", config.groups[1].name)
         self.assertEqual("33%", config.groups[1].allocation)
+
+    def test_can_create_group_configuration(self):
+        """
+        Ensure that the group configuration can be created correctly.
+        """
+        self.page.visit()
+
+        self.assertEqual(len(self.page.group_configurations()), 0)
+        # Create new group configuration
+        self.page.create()
+
+        config = self.page.group_configurations()[0]
+        config.name = "New Group Configuration Name"
+        config.description = "New Description of the group configuration."
+        # Save the configuration
+        config.save()
+
+        self.assertEqual(config.mode, 'details')
+        self.assertIn("New Group Configuration Name", config.name)
+        self.assertTrue(config.id)
+        # Expand the configuration
+        config.toggle()
+        self.assertIn("New Description of the group configuration.", config.description)
+        self.assertEqual(len(config.groups), 2)
+
+        self.assertEqual("Group A", config.groups[0].name)
+        self.assertEqual("Group B", config.groups[1].name)
+        self.assertEqual("50%", config.groups[0].allocation)
+
+    def test_use_group_configuration(self):
+        """
+        Create and use group configuration
+        """
+        self.page.visit()
+        self.assertEqual(len(self.page.group_configurations()), 0)
+        # Create new group configuration
+        self.page.create()
+
+        config = self.page.group_configurations()[0]
+        config.name = "New Group Configuration Name"
+        config.description = "New Description of the group configuration."
+        # Save the configuration
+        config.save()
+
+        unit = self.go_to_unit_page(make_draft=True)
+        add_advanced_component(unit, 0, 'split_test')
+        container = self.go_to_container_page()
+        container.edit()
+        component_editor = ComponentEditorView(self.browser, container.locator)
+        component_editor.set_select_value_and_save('Group Configuration', 'New Group Configuration Name')
+        self.verify_groups(container, ['Group A', 'Group B'], [])
+
+    def test_can_cancel_creation_of_group_configuration(self):
+        """
+        Ensure that creation of the group configuration can be canceled correctly.
+        """
+        self.page.visit()
+
+        self.assertEqual(len(self.page.group_configurations()), 0)
+        # Create new group configuration
+        self.page.create()
+
+        config = self.page.group_configurations()[0]
+        config.name = "Name of the Group Configuration"
+        config.description = "Description of the group configuration."
+        # Cancel the configuration
+        config.cancel()
+
+        self.assertEqual(len(self.page.group_configurations()), 0)
+
+    def test_group_configuration_validation(self):
+        """
+        Ensure that validation of the group configuration works correctly.
+        """
+        self.page.visit()
+
+        # Create new group configuration
+        self.page.create()
+        # Leave empty required field
+        config = self.page.group_configurations()[0]
+        config.description = "Description of the group configuration."
+        # Try to save
+        config.save()
+        # Verify that configuration is still in editing mode
+        self.assertEqual(config.mode, 'edit')
+        # Verify error message
+        self.assertEqual(
+            "Group Configuration name is required",
+            config.validation_message
+        )
+        # Set required field
+        config.name = "Name of the Group Configuration"
+        # Save the configuration
+        config.save()
+        # Verify the configuration is saved and it is shown in `details` mode.
+        self.assertEqual(config.mode, 'details')
+        # Verify the configuration for the data correctness
+        self.assertIn("Name of the Group Configuration", config.name)
+        self.assertTrue(config.id)
+        # Expand the configuration
+        config.toggle()
+        self.assertIn("Description of the group configuration.", config.description)
