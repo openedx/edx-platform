@@ -259,7 +259,7 @@ class TestCourseOutline(CourseTestCase):
     def test_course_outline_initial_state(self):
         course_module = modulestore().get_item(self.course.location)
         course_structure = create_xblock_info(
-           course_module,
+            course_module,
             include_child_info=True,
             include_children_predicate=lambda xblock: not xblock.category == 'vertical'
         )
