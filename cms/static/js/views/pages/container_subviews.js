@@ -32,8 +32,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         var PreviewActionController = UnitStateListenerView.extend({
 
             render: function() {
-                var previewAction = this.$el.find('.preview-button'),
-                    viewLiveAction = this.$el.find('.view-button');
+                var previewAction = this.$el.find('.button-preview'),
+                    viewLiveAction = this.$el.find('.button-view');
                 if (this.model.get('published')) {
                     viewLiveAction.removeClass(disabledCss);
                 }
