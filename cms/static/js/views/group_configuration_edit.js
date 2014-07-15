@@ -1,8 +1,8 @@
 define([
     'js/views/baseview', 'underscore', 'jquery', 'gettext',
-    'js/views/group_edit'
+    'js/views/group_edit', 'js/views/utils/view_utils'
 ],
-function(BaseView, _, $, gettext, GroupEdit) {
+function(BaseView, _, $, gettext, GroupEdit, ViewUtils) {
     'use strict';
     var GroupConfigurationEdit = BaseView.extend({
         tagName: 'div',
@@ -112,7 +112,7 @@ function(BaseView, _, $, gettext, GroupEdit) {
                 return false;
             }
 
-            this.runOperationShowingMessage(
+            ViewUtils.runOperationShowingMessage(
                 gettext('Saving') + '&hellip;',
                 function () {
                     var dfd = $.Deferred();
