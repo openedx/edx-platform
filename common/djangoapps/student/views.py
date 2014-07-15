@@ -8,6 +8,8 @@ import uuid
 import time
 from collections import defaultdict
 from pytz import UTC
+from pytz import timezone
+import json
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -57,7 +59,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
-from courseware.courses import get_courses, sort_by_announcement
+from courseware.courses import get_courses, sort_by_announcement, get_course_about_section
 from courseware.access import has_access
 from courseware.models import CoursePreference
 
@@ -682,7 +684,11 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
-
+        
+        # notify the user of the enrollment via email
+        enrollment_email_result = json.loads(notify_enrollment_by_email(course, user, request).content)
+        if ('is_success' in enrollment_email_result and not enrollment_email_result['is_success']):
+            return HttpResponseBadRequest(_(enrollment_email_result['error']))
         return HttpResponse()
 
     elif action == "add_to_cart":
@@ -705,6 +711,52 @@ def change_enrollment(request):
         return HttpResponse()
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
+
+def notify_enrollment_by_email(course, user, request):
+    """
+    Updates the user about the course enrollment by email.
+
+    If the Course has already started, use post_enrollment_email
+    If the Course has not yet started, use pre_enrollment_email
+    """
+
+    if (not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')) and course.enable_enrollment_email):
+        from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+        try:
+            if (not course.enable_default_enrollment_email):
+
+                # Check if the course has already started and set subject & message accordingly
+                if (course.has_started):
+                    subject = get_course_about_section(course, 'post_enrollment_email_subject')
+                    message = get_course_about_section(course, 'post_enrollment_email')
+                else:
+                    subject = get_course_about_section(course, 'pre_enrollment_email_subject')
+                    message = get_course_about_section(course, 'pre_enrollment_email')
+
+            else:
+
+                # If not default, use the default emailing template
+                course_url = reverse('info', args=(course.id.to_deprecated_string(),))
+                context = {
+                    'course':course,
+                    'full_name':user.profile.name,
+                    'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+                    'course_url':request.build_absolute_uri(course_url),
+                }
+                subject = render_to_string('emails/enroll_email_enrolledsubject.txt', context)
+                message = render_to_string('emails/enroll_email_enrolledmessage.txt', context)
+
+            subject = ''.join(subject.splitlines())
+
+            user.email_user(subject, message, from_address)
+        except Exception:
+            log.error('unable to send course enrollment verification email to user from "{from_address}"'.format(
+                        from_address=from_address), exc_info = True)
+            return JsonResponse({"is_success": False, "error": _("Could not send enrollment email to the user"),})
+        return JsonResponse({"is_success": True, "subject": subject, "message": message})
+    else:
+        return JsonResponse({"email_did_fire": False})
 
 
 def _check_can_enroll_in_course(user, course_key, access_type="enroll"):

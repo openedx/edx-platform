@@ -202,6 +202,23 @@
             display: inline-block;
           }
         }
+
+        .list-actions {
+          padding-top:  ($baseline/2);
+  
+          .action-primary {
+            @include blue-button();
+            @extend %t-action3;
+            font-weight: 600;
+
+            [class^="icon-"] {
+              @extend %t-icon5;
+              display: inline-block;
+              vertical-align: middle;
+              margin-top: -3px;
+            }
+          }
+        }
       }
 
       .field-group {
@@ -395,6 +412,32 @@
     #field-course-overview {
 
       #course-overview {
+        height: ($baseline*20);
+      }
+
+      //adds back in CodeMirror border removed due to Unit page styling of component editors
+      .CodeMirror {
+        border: 1px solid $gray-l2;
+      }
+    }
+
+    // specific fields - pre-enrollment email
+    #field-pre-enrollment-email {
+
+      #pre-enrollment-email {
+        height: ($baseline*20);
+      }
+
+      //adds back in CodeMirror border removed due to Unit page styling of component editors
+      .CodeMirror {
+        border: 1px solid $gray-l2;
+      }
+    }
+
+    // specific fields - post-enrollment email
+    #field-post-enrollment-email {
+
+      #post-enrollment-email {
         height: ($baseline*20);
       }
 

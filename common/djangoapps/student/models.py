@@ -791,6 +791,9 @@ class CourseEnrollment(models.Model):
                may include "audit", "verified_id", etc. Please don't use it
                until we have these mapped out.
 
+        'should_send_email' is a boolean that specifies if a course enrollment 
+        email should be sent to the given user. 
+
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
