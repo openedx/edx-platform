@@ -180,13 +180,13 @@ class TestMixedModuleStore(unittest.TestCase):
 
         def create_sub_tree(parent, block_info):
             block = self.store.create_item(
-                self.user_id, parent_location=parent.location,
+                self.user_id, parent_location=parent.location.version_agnostic(),
                 category=block_info.category, block_id=block_info.display_name
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
             # reload the block to update its children field
-            block = self.store.get_item(block.location)
+            block = self.store.get_item(block.location.version_agnostic())
             setattr(self, block_info.field_name, block)
 
         for tree in trees:
@@ -633,6 +633,38 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
+    @ddt.data('draft', 'split')
+    def test_unpublish(self, default_ms):
+        """
+        Test calling unpublish
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+        # publish
+        self.store.publish(self.course.location, self.user_id)
+        published_xblock = self.store.get_item(
+            self.vertical_x1a.location.replace(branch=None),
+            revision=ModuleStoreEnum.RevisionOption.published_only
+        )
+        self.assertIsNotNone(published_xblock)
+
+        # unpublish
+        self.store.unpublish(self.vertical_x1a.location, self.user_id)
+
+        with self.assertRaises(ItemNotFoundError):
+            self.store.get_item(
+                self.vertical_x1a.location.replace(branch=None),
+                revision=ModuleStoreEnum.RevisionOption.published_only
+            )
+
+        draft_xblock_from_get_item = self.store.get_item(
+            self.vertical_x1a.location.replace(branch=None),
+            revision=ModuleStoreEnum.RevisionOption.draft_only
+        )
+        self.assertEquals(
+            published_xblock.location.version_agnostic().replace(branch=None),
+            draft_xblock_from_get_item.location.version_agnostic().replace(branch=None)
+        )
 
 #=============================================================================================================
 # General utils for not using django settings

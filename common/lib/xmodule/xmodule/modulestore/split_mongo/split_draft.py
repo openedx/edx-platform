@@ -41,6 +41,20 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         for branch in branches_to_delete:
             SplitMongoModuleStore.delete_item(self, location.for_branch(branch), user_id, **kwargs)
 
+    def get_item(self, usage_key, depth=0, revision=None):
+        """
+        Returns the item identified by usage_key and revision.
+        """
+        def for_branch(branch_state):
+            if usage_key.branch is not None and usage_key.branch is not branch_state:
+                raise ValueError('{} already has a branch.'.format(usage_key))
+            return usage_key.for_branch(branch_state)
+        if revision == ModuleStoreEnum.RevisionOption.published_only:
+            usage_key = for_branch(ModuleStoreEnum.BranchName.published)
+        elif revision == ModuleStoreEnum.RevisionOption.draft_only:
+            usage_key = for_branch(ModuleStoreEnum.BranchName.draft)
+        return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth)
+
     def get_parent_location(self, location, revision=None, **kwargs):
         # NAATODO - support draft_preferred
         return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
@@ -77,7 +91,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Deletes the published version of the item.
         Returns the newly unpublished item.
         """
-        self.delete_item(location.for_branch(ModuleStoreEnum.BranchName.published), user_id)
+        self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft))
 
     def revert_to_published(self, location, user_id):
