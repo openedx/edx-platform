@@ -17,11 +17,12 @@ def click_css(page, css, source_index=0, require_notification=True):
     #set_trace()
     css_for_button_that_we_care_about = '{css}:nth-of-type({source_index})'.format(source_index=source_index+1, css=css)
     #print css_for_button_that_we_care_about
-    page.wait_for_element_presence(css_for_button_that_we_care_about, "Target not visible")
-    target = page.q(css=css_for_button_that_we_care_about)
+    page.wait_for_element_presence(css, "Target not visible")
+    #target = page.q(css=css_for_button_that_we_care_about)
+    #target.click()
+    buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
+    target = buttons[source_index]
     target.click()
-    #buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
-    #target = buttons[source_index]
     #from selenium.webdriver.common.action_chains import ActionChains
     #ActionChains(page.browser).click(target).release().perform()
     if require_notification:
