@@ -375,6 +375,8 @@ class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
     """
+    __test__ = True
+
     PUBLISHED_STATUS = "Publishing Status\nPublished"
     DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
 
