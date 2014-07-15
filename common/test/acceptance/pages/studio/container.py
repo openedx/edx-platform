@@ -102,7 +102,7 @@ class ContainerPage(PageObject):
 
         Switches the browser to the newly opened LMS window.
         """
-        self.q(css='.view-button').first.click()
+        self.q(css='.button-view').first.click()
         self._switch_to_lms()
 
     def preview(self):
@@ -111,7 +111,7 @@ class ContainerPage(PageObject):
 
         Switches the browser to the newly opened LMS window.
         """
-        self.q(css='.preview-button').first.click()
+        self.q(css='.button-preview').first.click()
         self._switch_to_lms()
 
     def _switch_to_lms(self):

@@ -62,8 +62,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             describe("PreviewActionController", function () {
-                var viewPublishedCss = '.view-button',
-                    previewCss = '.preview-button';
+                var viewPublishedCss = '.button-view',
+                    previewCss = '.button-preview';
 
                 it('renders correctly for private unit', function () {
                     renderContainerPage(mockContainerXBlockHtml, this);
