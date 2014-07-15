@@ -94,8 +94,8 @@ urlpatterns += patterns(
 
 if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):
     urlpatterns += patterns('contentstore.views',
-        url(r'^group_configurations/(?P<course_key_string>[^/]+)$', 'group_configurations_list_handler'),
-        url(r'^group_configurations/(?P<course_key_string>[^/]+)/(?P<group_configuration_id>\d+)/?$',
+        url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
+        url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)/?$'.format(settings.COURSE_KEY_PATTERN),
             'group_configurations_detail_handler'),
     )
 
