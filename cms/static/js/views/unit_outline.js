@@ -10,6 +10,7 @@ define(['js/views/xblock_outline'],
             // takes XBlockInfo as a model
 
             templateName: 'unit-outline',
+            className: 'group-configurations-list',
 
             render: function() {
                 XBlockOutlineView.prototype.render.call(this);
@@ -23,7 +24,7 @@ define(['js/views/xblock_outline'],
                     previousAncestor = null;
                 if (this.model.get('ancestor_info')) {
                     ancestors = this.model.get('ancestor_info').ancestors;
-                    listElement = this.$('.sortable-list');
+                    listElement = this.getListElement();
                     // Note: the ancestors are processed in reverse order because the tree wants to
                     // start at the root, but the ancestors are ordered by closeness to the unit,
                     // i.e. subsection and then section.
@@ -33,7 +34,7 @@ define(['js/views/xblock_outline'],
                         ancestorView.render();
                         listElement.append(ancestorView.$el);
                         previousAncestor = ancestor;
-                        listElement = ancestorView.$('.sortable-list');
+                        listElement = ancestorView.getListElement();
                     }
                 }
                 return ancestorView;
