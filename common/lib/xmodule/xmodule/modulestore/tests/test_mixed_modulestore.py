@@ -718,7 +718,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # Draft WITH changes
         item.display_name = 'new name'
-        self.store.update_item(item, self.user_id)
+        item = self.store.update_item(item, self.user_id)
         self.assertTrue(self.store.has_changes(item.location))
         self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
 
