@@ -11,7 +11,8 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
         var XBlockStringFieldEditor = BaseView.extend({
             events: {
                 'click .xblock-field-value-edit': 'showInput',
-                'click button[type=submit]': 'onClickSubmit',
+                'click button[name=submit]': 'onClickSubmit',
+                'click button[name=cancel]': 'onClickCancel',
                 'change .xblock-field-input': 'updateField',
                 'focusout .xblock-field-input': 'onInputFocusLost',
                 'keyup .xblock-field-input': 'handleKeyUp'
@@ -29,7 +30,7 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
 
             render: function() {
                 this.$el.append(this.template({
-                    value: this.model.get(this.fieldName),
+                    value: this.model.escape(this.fieldName),
                     fieldName: this.fieldName,
                     fieldDisplayName: this.fieldDisplayName
                 }));
@@ -54,6 +55,11 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
             onClickSubmit: function(event) {
                 event.preventDefault();
                 this.updateField();
+            },
+
+            onClickCancel: function(event) {
+                event.preventDefault();
+                this.cancelInput();
             },
 
             onChangeField: function() {

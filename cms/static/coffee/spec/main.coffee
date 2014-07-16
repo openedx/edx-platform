@@ -226,6 +226,7 @@ define([
     "js/spec/views/unit_outline_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",
+    "js/spec/views/xblock_string_field_editor_spec",
 
     "js/spec/views/pages/container_spec",
     "js/spec/views/pages/container_subviews_spec",
