@@ -882,7 +882,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         Args:
             user_id: ID of the user creating and saving the xmodule
-            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifing the
+            parent_usage_key: a :class:`~opaque_key.edx.UsageKey` identifying the
                 block that this item should be parented under
             block_type: The typo of block to create
             block_id: a unique identifier for the new item. If not supplied,

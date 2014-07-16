@@ -7,22 +7,24 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 
 import logging
 from contextlib import contextmanager
-from opaque_keys import InvalidKeyError
+import itertools
 
-from . import ModuleStoreWriteBase
-from xmodule.modulestore import ModuleStoreEnum, compute_location_from_args
-from xmodule.modulestore.django import create_modulestore_instance
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-import itertools
-from xmodule.modulestore.split_migrator import SplitMigrator
+
+from . import ModuleStoreWriteBase
+from . import ModuleStoreEnum
+from .django import create_modulestore_instance
+from .exceptions import ItemNotFoundError
+from .draft_and_published import ModuleStoreDraftAndPublished
+from .split_migrator import SplitMigrator
 
 
 log = logging.getLogger(__name__)
 
 
-class MixedModuleStore(ModuleStoreWriteBase):
+class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
@@ -468,6 +470,15 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(location.course_key, 'convert_to_draft')
         return store.convert_to_draft(location, user_id)
+
+    def has_changes(self, usage_key):
+        """
+        Checks if the given block has unpublished changes
+        :param usage_key: the block to check
+        :return: True if the draft and published versions differ
+        """
+        store = self._verify_modulestore_support(usage_key.course_key, 'has_changes')
+        return store.has_changes(usage_key)
 
     def _verify_modulestore_support(self, course_key, method):
         """

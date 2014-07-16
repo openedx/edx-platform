@@ -688,25 +688,40 @@ class TestMixedModuleStore(unittest.TestCase):
         course_location = self.course_locations[self.MONGO_COURSEID]
         self.store.publish(course_location, self.user_id)
 
+        # start off as Private
         item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')
         item_location = item.location.version_agnostic()
         self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
 
+        # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
         self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
 
+        # Public -> Private
         self.store.unpublish(item_location, self.user_id)
         item = self.store.get_item(item_location)
         self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
 
+        # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
         self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
 
+        # Public -> Draft with NO changes
         self.store.convert_to_draft(item_location, self.user_id)
         item = self.store.get_item(item_location)
+        self.assertEquals(
+            self.store.compute_publish_state(item),
+            PublishState.draft if default_ms == 'draft' else PublishState.public
+        )
+
+        # Draft WITH changes
+        item.display_name = 'new name'
+        self.store.update_item(item, self.user_id)
+        self.assertTrue(self.store.has_changes(item.location))
         self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
+
 
 #=============================================================================================================
 # General utils for not using django settings
