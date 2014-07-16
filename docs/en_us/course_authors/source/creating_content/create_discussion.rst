@@ -44,10 +44,21 @@ Private Units`.
    .. image:: ../Images/Disc_Create_Edit.png
     :alt: Image of the discussion component with the Edit button circled
 
-#. When the Discussion component editor opens, follow the guidelines in the editor to fill in the **Category**, **Display Name**, and **Subcategory** fields.
+#. When the Discussion component editor opens, follow the guidelines in the
+   editor to fill in the **Category**, the optional **Display Name**, and the 
+   **Subcategory** fields.
    
    .. image:: ../Images/DiscussionComponentEditor.png
-    :alt: Image of the discussion component editor
+    :alt: Image of the discussion component editor with a category of "Getting Graded" and a subcategory of "Answering More Than Once"
+
+   The value in the **Display Name** field identifies the discussion in the
+   course content. The values in the **Category** and **Subcategory** fields
+   appear in the list of discussion topics on the **Discussion** page. To
+   uniquely identify the discussion in your course, each **Category** /
+   **Subcategory** pair that you supply should be unique.
+
+   .. image:: ../Images/Discussion_category_subcategory.png
+    :alt: The list of discussions with the "Answering More Than Once" topic indented under "Getting Graded"
   
 #. Click **Save**.
 
@@ -83,7 +94,7 @@ components:
 In the **Discussion** tab at the top of the page, students can find the category
 and subcategory of the discussion in the left pane.
 
-.. image:: ../Images/DiscussionComponent_Forum.png
- :alt: Image of the discussion page from a student's point of view
+.. image:: ../Images/Discussion_category_subcategory.png
+ :alt: Image of the Discussion page from a student's point of view
 
 
