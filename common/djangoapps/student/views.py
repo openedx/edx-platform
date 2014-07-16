@@ -1087,7 +1087,7 @@ def _do_create_account(post_vars):
     profile.level_of_education = post_vars.get('level_of_education')
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
-    profile.city = post_vars.get('city')
+#    profile.city = post_vars.get('city')
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
 
@@ -1927,4 +1927,4 @@ def student_handler(request):
     result = utils.verify_academic_student(cedula)
     if result:
         data.update(result)
-    return HttpResponse(json.dumps(data))
+    return JsonResponse(data)
