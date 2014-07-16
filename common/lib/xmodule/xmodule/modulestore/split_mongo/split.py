@@ -754,21 +754,16 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             serial += 1
         return category + str(serial)
 
-    # DHM: Should I rewrite this to take a new xblock instance rather than to construct it? That is, require the
-    # caller to use XModuleDescriptor.load_from_json thus reducing similar code and making the object creation and
-    # validation behavior a responsibility of the model layer rather than the persistence layer.
     def create_item(
         self, user_id, course_key, block_type, block_id=None,
         definition_locator=None, fields=None,
         force=False, continue_version=False, **kwargs
     ):
         """
-        Add a descriptor to persistence as the last child of the optional parent_location or just as an element
-        of the course (if no parent provided). Return the resulting post saved version with populated locators.
+        Add a descriptor to persistence as an element
+        of the course. Return the resulting post saved version with populated locators.
 
-        :param course_or_parent_locator: If BlockUsageLocator, then it's assumed to be the parent.
-        If it's a CourseLocator, then it's
-        merely the containing course. If it has a version_guid and a course org + course + run + branch, this
+        :param course_key: If it has a version_guid and a course org + course + run + branch, this
         method ensures that the version is the head of the given course branch before making the change.
 
         raises InsufficientSpecificationError if there is no course locator.
@@ -895,24 +890,28 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
         """
-        structure = self._lookup_course(parent_usage_key.course_key)['structure']
-        xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields, **kwargs)
+        xblock = self.create_item(
+            user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
+            continue_version=continue_version,
+            **kwargs)
 
-        # copy the structure and modify the new one
-        if continue_version:
-            new_structure = structure
-        else:
-            new_structure = self._version_structure(structure, user_id)
+        # don't version the structure as create_item handled that already.
+        new_structure = self._lookup_course(parent_usage_key.course_key)['structure']
 
         # if given parent, add new block as child and update parent's version
         encoded_block_id = encode_key_for_mongo(parent_usage_key.block_id)
         parent = new_structure['blocks'][encoded_block_id]
         parent['fields'].setdefault('children', []).append(xblock.location)
-        if not continue_version or parent['edit_info']['update_version'] != structure['_id']:
-            parent['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-            parent['edit_info']['edited_by'] = user_id
-            parent['edit_info']['previous_version'] = parent['edit_info']['update_version']
-            parent['edit_info']['update_version'] = new_structure['_id']
+
+        if continue_version:
+            # db update
+            self.db_connection.update_structure(new_structure)
+            # clear cache so things get refetched and inheritance recomputed
+            self._clear_cache(new_structure['_id'])
+        else:
+            self.db_connection.insert_structure(new_structure)
+
+        # don't need to update the index b/c create_item did it for this version
 
         return xblock
 
