@@ -126,10 +126,10 @@ class TestMixedModuleStore(unittest.TestCase):
         self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
         self.writable_chapter_location = self.course.id.make_usage_key('chapter', 'Overview').version_agnostic()
         block_id = self.writable_chapter_location.name
-        chapter = self.store.create_item(
+        chapter = self.store.create_child(
             # don't use course_location as it may not be the repr
-            self.user_id, self.writable_chapter_location,
-            parent_location=self.course.location, block_id=block_id
+            self.user_id, self.course.location,
+            self.writable_chapter_location.block_type, block_id=block_id
         )
         if isinstance(self.course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = self.course.location.version_agnostic()
@@ -179,9 +179,9 @@ class TestMixedModuleStore(unittest.TestCase):
         ]
 
         def create_sub_tree(parent, block_info):
-            block = self.store.create_item(
-                self.user_id, parent_location=parent.location.version_agnostic(),
-                category=block_info.category, block_id=block_info.display_name
+            block = self.store.create_child(
+                self.user_id, parent.location.version_agnostic(),
+                block_info.category, block_id=block_info.display_name
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
@@ -326,14 +326,14 @@ class TestMixedModuleStore(unittest.TestCase):
             self.store.get_item(self.writable_chapter_location.version_agnostic())
 
         # create and delete a private vertical with private children
-        private_vert = self.store.create_item(
+        private_vert = self.store.create_child(
             # don't use course_location as it may not be the repr
-            self.user_id, parent_location=self.course_locations[self.MONGO_COURSEID],
-            category='vertical', block_id='private'
+            self.user_id, self.course_locations[self.MONGO_COURSEID],
+            'vertical', block_id='private'
         )
-        private_leaf = self.store.create_item(
+        private_leaf = self.store.create_child(
             # don't use course_location as it may not be the repr
-            self.user_id, parent_location=private_vert.location, category='html', block_id='private_leaf'
+            self.user_id, private_vert.location, 'html', block_id='private_leaf'
         )
 
         # verify pre delete state (just to verify that the test is valid)
@@ -600,7 +600,12 @@ class TestMixedModuleStore(unittest.TestCase):
         ]
 
         for location in (orphan_locations + detached_locations):
-            self.store.create_item(self.user_id, location)
+            self.store.create_item(
+                self.user_id,
+                location.course_key,
+                location.block_type,
+                block_id=location.block_id
+            )
 
         found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(set(found_orphans), set(orphan_locations))
@@ -612,9 +617,11 @@ class TestMixedModuleStore(unittest.TestCase):
         new location for the child
         """
         self.initdb(default_ms)
-        self.store.create_item(
-            self.user_id, parent_location=self.course_locations[self.MONGO_COURSEID],
-            category='problem', block_id='orphan'
+        self.store.create_child(
+            self.user_id,
+            self.course_locations[self.MONGO_COURSEID],
+            'problem',
+            block_id='orphan'
         )
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))

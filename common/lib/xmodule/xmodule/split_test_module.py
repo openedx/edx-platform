@@ -571,14 +571,16 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         A mutable modulestore is needed to call this method (will need to update after mixed
         modulestore work, currently relies on mongo's create_item method).
         """
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
+        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_child'), \
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
         metadata = {'display_name': group.name}
-        modulestore.create_item(
+        modulestore.create_child(
             user_id,
-            dest_usage_key,
+            self.location,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
             runtime=self.system,

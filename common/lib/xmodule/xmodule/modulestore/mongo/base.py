@@ -904,7 +904,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 ]))
 
         location = course_id.make_usage_key('course', course_id.run)
-        course = self.create_item(user_id, location, fields=fields, **kwargs)
+        course = self.create_xmodule(
+            location,
+            fields=fields,
+            **kwargs
+        )
+        self.update_item(course, user_id, allow_not_found=True)
 
         # clone a default 'about' overview module as well
         about_location = location.replace(
@@ -914,7 +919,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         overview_template = AboutDescriptor.get_template('overview.yaml')
         self.create_item(
             user_id,
-            about_location,
+            about_location.course_key,
+            about_location.block_type,
+            block_id=about_location.block_id,
             definition_data=overview_template.get('data'),
             runtime=course.system
         )
@@ -1015,7 +1022,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             block_id: a unique identifier for the new item. If not supplied,
                 a new identifier will be generated
         """
-        xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id)
+        xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id, **kwargs)
         # attach to parent if given
         if 'detached' not in xblock._class_tags:
             parent = self.get_item(parent_usage_key)

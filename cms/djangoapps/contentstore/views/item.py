@@ -417,9 +417,11 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    created_block = store.create_item(
+    created_block = store.create_child(
         request.user.id,
-        dest_usage_key,
+        usage_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=data,
         metadata=metadata,
         runtime=parent.runtime,
@@ -468,7 +470,9 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
 
     dest_module = store.create_item(
         user.id,
-        dest_usage_key,
+        dest_usage_key.course_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
         runtime=source_item.runtime,
@@ -556,7 +560,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
-            module = store.create_item(user.id, usage_key)
+            module = store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
         else:
             raise
 

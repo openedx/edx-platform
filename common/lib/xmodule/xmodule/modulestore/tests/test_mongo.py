@@ -391,12 +391,27 @@ class TestMongoModuleStore(unittest.TestCase):
             course = self.draft_store.get_course(course_key)
             # can't use item factory as it depends on django settings
             p1ele = self.draft_store.create_item(
-                99, course.id.make_usage_key('problem', 'p1'), runtime=course.runtime)
+                99,
+                course_key,
+                'problem',
+                block_id='p1',
+                runtime=course.runtime
+            )
             p2ele = self.draft_store.create_item(
-                99, course.id.make_usage_key('problem', 'p2'), runtime=course.runtime)
+                99,
+                course_key,
+                'problem',
+                block_id='p2',
+                runtime=course.runtime
+            )
             self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
             self.draft_store.create_item(
-                99,self.refloc,  runtime=course.runtime, fields={
+                99,
+                self.refloc.course_key,
+                self.refloc.block_type,
+                block_id=self.refloc.block_id,
+                runtime=course.runtime,
+                fields={
                     'reference_link': p1ele.location,
                     'reference_list': [p1ele.location, p2ele.location],
                     'reference_dict': {'p1': p1ele.location, 'p2': p2ele.location},
@@ -501,8 +516,18 @@ class TestMongoModuleStore(unittest.TestCase):
         chapter_location = Location('edx', 'direct', '2012_Fall', 'chapter', 'test_chapter')
 
         # Create dummy direct only xblocks
-        self.draft_store.create_item(self.dummy_user, course_location)
-        self.draft_store.create_item(self.dummy_user, chapter_location)
+        self.draft_store.create_item(
+            self.dummy_user,
+            course_location.course_key,
+            course_location.block_type,
+            block_id=course_location.block_id
+        )
+        self.draft_store.create_item(
+            self.dummy_user,
+            chapter_location.course_key,
+            chapter_location.block_type,
+            block_type=chapter_location.block_id
+        )
 
         # Check that neither xblock has changes
         self.assertFalse(self.draft_store.has_changes(course_location))
@@ -515,7 +540,12 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'changes', '2012_Fall', 'vertical', 'test_vertical')
 
         # Create a dummy component to test against
-        self.draft_store.create_item(self.dummy_user, location)
+        self.draft_store.create_item(
+            self.dummy_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
 
         # Not yet published, so changes are present
         self.assertTrue(self.draft_store.has_changes(location))
@@ -541,7 +571,12 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'missing', '2012_Fall', 'sequential', 'parent')
 
         # Create the parent and point it to a fake child
-        parent = self.draft_store.create_item(self.dummy_user, location)
+        parent = self.draft_store.create_item(
+            self.dummy_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
         parent.children += [Location('edX', 'missing', '2012_Fall', 'vertical', 'does_not_exist')]
         self.draft_store.update_item(parent, self.dummy_user)
 
@@ -570,7 +605,12 @@ class TestMongoModuleStore(unittest.TestCase):
         }
 
         for key in locations:
-            self.draft_store.create_item(user_id, locations[key])
+            self.draft_store.create_item(
+                user_id,
+                locations[key].course_key,
+                locations[key].block_type,
+                block_id=locations[key].block_id
+            )
 
         grandparent = self.draft_store.get_item(locations['grandparent'])
         grandparent.children += [locations['parent_sibling'], locations['parent']]
@@ -663,10 +703,12 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Create a new child and attach it to parent
         new_child_location = Location('edX', 'tree', 'has_changes_add_remove_child', 'vertical', 'new_child')
-        self.draft_store.create_item(self.dummy_user, new_child_location)
-        parent = self.draft_store.get_item(locations['parent'])
-        parent.children += [new_child_location]
-        self.draft_store.update_item(parent, user_id=self.dummy_user)
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations['parent'],
+            new_child_location.block_type,
+            block_id=new_child_location.block_id
+        )
 
         # Verify that the ancestors now have changes
         self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
@@ -688,10 +730,18 @@ class TestMongoModuleStore(unittest.TestCase):
         parent_location = Location('edX', 'test', 'non_direct_only_children', 'vertical', 'parent')
         child_location = Location('edX', 'test', 'non_direct_only_children', 'html', 'child')
 
-        parent = self.draft_store.create_item(self.dummy_user, parent_location)
-        child = self.draft_store.create_item(self.dummy_user, child_location)
-        parent.children += [child_location]
-        self.draft_store.update_item(parent, user_id=self.dummy_user)
+        parent = self.draft_store.create_item(
+            self.dummy_user,
+            parent_location.course_key,
+            parent_location.block_type,
+            block_id=parent_location.block_id
+        )
+        child = self.draft_store.create_child(
+            self.dummy_user,
+            parent_location,
+            child_location.block_type,
+            block_id=child_location.block_id
+        )
         self.draft_store.publish(parent_location, self.dummy_user)
 
         # Verify that there are no changes
@@ -760,7 +810,12 @@ class TestMongoModuleStore(unittest.TestCase):
         location = Location('edX', 'editInfoTest', '2012_Fall', 'html', 'test_html')
 
         # Create a dummy component to test against
-        self.draft_store.create_item(self.dummy_user, location)
+        self.draft_store.create_item(
+            self.dummy_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
 
         # Store the current edit time and verify that dummy_user created the component
         component = self.draft_store.get_item(location)
@@ -785,7 +840,12 @@ class TestMongoModuleStore(unittest.TestCase):
         publish_user = 456
 
         # Create a dummy component to test against
-        self.draft_store.create_item(create_user, location)
+        self.draft_store.create_item(
+            create_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
 
         # Store the current time, then publish
         old_time = datetime.now(UTC)

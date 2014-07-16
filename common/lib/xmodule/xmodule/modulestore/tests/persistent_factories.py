@@ -73,8 +73,8 @@ class ItemFactory(SplitFactory):
         :param definition_locator (optional): the DescriptorLocator for the definition this uses or branches
         """
         modulestore = kwargs.pop('modulestore')
-        return modulestore.create_item(
-            user_id, category=category, parent_location=parent_location, defintion_locator=definition_locator,
+        return modulestore.create_child(
+            user_id, parent_location, category, defintion_locator=definition_locator,
             force=force, continue_version=continue_version, **kwargs
         )
 

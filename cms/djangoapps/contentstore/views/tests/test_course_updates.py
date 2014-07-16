@@ -130,7 +130,12 @@ class CourseUpdateTest(CourseTestCase):
         '''
         # get the updates and populate 'data' field with some data.
         location = self.course.id.make_usage_key('course_info', 'updates')
-        course_updates = modulestore().create_item(self.user.id, location)
+        course_updates = modulestore().create_item(
+            self.user.id,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
         update_date = u"January 23, 2014"
         update_content = u"Hello world!"
         update_data = u"<ol><li><h2>" + update_date + "</h2>" + update_content + "</li></ol>"
@@ -204,7 +209,12 @@ class CourseUpdateTest(CourseTestCase):
         '''Test trying to add to a saved course_update which is not an ol.'''
         # get the updates and set to something wrong
         location = self.course.id.make_usage_key('course_info', 'updates')
-        modulestore().create_item(self.user.id, location)
+        modulestore().create_item(
+            self.user.id,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
         course_updates = modulestore().get_item(location)
         course_updates.data = 'bad news'
         modulestore().update_item(course_updates, self.user.id)
