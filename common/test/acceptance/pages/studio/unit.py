@@ -73,6 +73,14 @@ class UnitPage(PageObject):
         self.q(css='select[name="visibility-select"] option[value="{}"]'.format(visibility)).first.click()
         self.wait_for_ajax()
 
+        selector = '.edit-button'
+        if visibility == 'private':
+            check_func = lambda: self.q(css=selector).visible
+        elif visibility == 'public':
+            check_func = lambda: not self.q(css=selector).visible
+
+        EmptyPromise(check_func, 'Unit Visibility is {}'.format(visibility)).fulfill()
+
 
 COMPONENT_BUTTONS = {
     'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
