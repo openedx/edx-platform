@@ -896,23 +896,19 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             **kwargs)
 
         # don't version the structure as create_item handled that already.
-        new_structure = self._lookup_course(parent_usage_key.course_key)['structure']
+        new_structure = self._lookup_course(xblock.location.course_key)['structure']
 
         # if given parent, add new block as child and update parent's version
         encoded_block_id = encode_key_for_mongo(parent_usage_key.block_id)
         parent = new_structure['blocks'][encoded_block_id]
-        parent['fields'].setdefault('children', []).append(xblock.location)
+        parent['fields'].setdefault('children', []).append(xblock.location.block_id)
 
-        if continue_version:
-            # db update
-            self.db_connection.update_structure(new_structure)
-            # clear cache so things get refetched and inheritance recomputed
-            self._clear_cache(new_structure['_id'])
-        else:
-            self.db_connection.insert_structure(new_structure)
+        # db update
+        self.db_connection.update_structure(new_structure)
+        # clear cache so things get refetched and inheritance recomputed
+        self._clear_cache(new_structure['_id'])
 
         # don't need to update the index b/c create_item did it for this version
-
         return xblock
 
     def clone_course(self, source_course_id, dest_course_id, user_id):

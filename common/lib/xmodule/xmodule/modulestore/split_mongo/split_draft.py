@@ -42,14 +42,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         Maps RevisionOptions to BranchNames, inserting them into the key
         """
-        def for_branch(branch_state):
-            if key.branch is not None and key.branch is not branch_state:
-                raise ValueError('{} already has a branch.'.format(key))
-            return key.for_branch(branch_state)
         if revision == ModuleStoreEnum.RevisionOption.published_only:
-            return for_branch(ModuleStoreEnum.BranchName.published)
+            return key.for_branch(ModuleStoreEnum.BranchName.published)
         elif revision == ModuleStoreEnum.RevisionOption.draft_only:
-            return for_branch(ModuleStoreEnum.BranchName.draft)
+            return key.for_branch(ModuleStoreEnum.BranchName.draft)
         else:
             return key
 
