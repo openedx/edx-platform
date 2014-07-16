@@ -16,8 +16,7 @@ import ddt
 import itertools
 import random
 from contextlib import contextmanager, nested
-from functools import partial
-from unittest import TestCase
+from unittest import SkipTest
 from shutil import rmtree
 from tempfile import mkdtemp
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -46,9 +45,23 @@ class MemoryCache(object):
         self._data = {}
 
     def get(self, key, default=None):
+        """
+        Get a key from the cache.
+
+        Args:
+            key: The key to update.
+            default: The value to return if the key hasn't been set previously.
+        """
         return self._data.get(key, default)
 
     def set(self, key, value):
+        """
+        Set a key in the cache.
+
+        Args:
+            key: The key to update.
+            value: The value change the key to.
+        """
         self._data[key] = value
 
 
@@ -113,6 +126,8 @@ class VersioningModulestoreBuilder(object):
             contentstore: The contentstore that this modulestore should use to store
                 all of its assets.
         """
+        # pylint: disable=unreachable
+        raise SkipTest("DraftVersioningModuleStore doesn't yet support the same interface as the rest of the modulestores")
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='split_module',
@@ -141,6 +156,7 @@ class VersioningModulestoreBuilder(object):
 
     def __repr__(self):
         return 'SplitModulestoreBuilder()'
+
 
 class MixedModulestoreBuilder(object):
     """
@@ -221,6 +237,7 @@ MODULESTORE_SETUPS = (
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = ('toy', 'test_unicode')
 
+
 @ddt.ddt
 class CrossStoreXMLRoundtrip(CourseComparisonTest):
     """
@@ -242,7 +259,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
     ))
     @ddt.unpack
     def test_round_trip(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
-        self.maxDiff = None
         source_course_key = SlashSeparatedCourseKey('source', 'course', 'key')
         dest_course_key = SlashSeparatedCourseKey('dest', 'course', 'key')
 

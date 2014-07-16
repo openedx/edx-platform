@@ -176,6 +176,12 @@ class CourseComparisonTest(unittest.TestCase):
         self.field_exclusions.add((usage_id, field_name))
 
     def ignore_asset_key(self, key_name):
+        """
+        Add an asset key to the list of keys to be ignored when comparing assets.
+
+        Args:
+            key_name: The name of the key to ignore.
+        """
         self.ignored_asset_keys.add(key_name)
 
     def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
@@ -253,6 +259,9 @@ class CourseComparisonTest(unittest.TestCase):
                 self.assertEqual(expected_children, actual_item.children)
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
+        """
+        Assert that two assets are equal, allowing for differences related to their being from different courses.
+        """
         for key in self.ignored_asset_keys:
             if key in expected_asset:
                 del expected_asset[key]
@@ -270,7 +279,10 @@ class CourseComparisonTest(unittest.TestCase):
         self.assertEqual(actual_key.to_deprecated_string(), actual_filename)
         self.assertEqual(expected_asset, actual_asset)
 
-    def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):
+    def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):  # pylint: disable=invalid-name
+        """
+        Private helper method for assertAssetsEqual
+        """
         self.assertEqual(len(expected_assets), len(actual_assets))
 
         actual_assets_map = {asset['asset_key']: asset for asset in actual_assets}
