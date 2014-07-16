@@ -12,14 +12,6 @@ db.collection_name
 ```
 as in ```db.location_map.ensureIndex({'course_id': 1}{background: true})```
 
-location_map:
-=============
-
-```
-ensureIndex({'org': 1, 'offering': 1})
-ensureIndex({'schema': 1})
-```
-
 fs.files:
 =========
 
