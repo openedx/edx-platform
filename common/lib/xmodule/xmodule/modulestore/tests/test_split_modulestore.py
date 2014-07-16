@@ -444,7 +444,7 @@ class SplitModuleTest(unittest.TestCase):
             }
         },
     }
-    
+
     @staticmethod
     def bootstrapDB(split_store):
         '''
@@ -984,7 +984,7 @@ class TestItemCrud(SplitModuleTest):
         premod_history = modulestore().get_course_history_info(premod_course.location)
         # add minimal one w/o a parent
         category = 'sequential'
-        new_module = modulestore().create_child(
+        new_module = modulestore().create_item(
             'user123', locator, category,
             fields={'display_name': 'new sequential'}
         )
@@ -1173,7 +1173,7 @@ class TestItemCrud(SplitModuleTest):
 
         # add new child to old parent in continued (leave off version_guid)
         course_module_locator = new_course.location.version_agnostic()
-        new_ele = modulestore().create_create(
+        new_ele = modulestore().create_child(
             user, course_module_locator, 'chapter',
             fields={'display_name': 'chapter 4'},
             continue_version=True
@@ -1368,7 +1368,7 @@ class TestItemCrud(SplitModuleTest):
         """
         if not category_queue:
             return
-        node = modulestore().create_course(
+        node = modulestore().create_child(
             'deleting_user', parent.version_agnostic(), category_queue[0]
         )
         node_loc = node.location.map_into_course(parent.course_key)
@@ -1613,7 +1613,7 @@ class TestPublish(SplitModuleTest):
             modulestore().get_parent_location(pub_module.location).block_id, chapter1.block_id
         )
         # ensure intentionally orphaned blocks work (e.g., course_info)
-        new_module = modulestore().create_child(
+        new_module = modulestore().create_item(
             self.user_id, source_course, "course_info", block_id="handouts"
         )
         # publish it

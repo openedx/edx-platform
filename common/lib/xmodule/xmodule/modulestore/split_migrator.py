@@ -83,7 +83,7 @@ class SplitMigrator(object):
                 # NOTE: the below auto populates the children when it migrates the parent; so,
                 # it doesn't need the parent as the first arg. That is, it translates and populates
                 # the 'children' field as it goes.
-                _new_module = self.split_modulestore.create_child(
+                _new_module = self.split_modulestore.create_item(
                     user_id,
                     course_version_locator,
                     module.location.block_type,
