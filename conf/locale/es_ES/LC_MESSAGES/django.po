@@ -29,6 +29,7 @@
 # juanan <juanan@diariolinux.com>, 2014
 # juanan <juanan@diariolinux.com>, 2014
 # juditseb <juditseb@hotmail.com>, 2014
+# leosamu <leosamu@gmail.com>, 2014
 # Marta, 2014
 # valenciaupv <valenciaupv@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
@@ -53,6 +54,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@hmltda.com>, 2013
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Marta, 2014
+# Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # Natalia, 2013
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # Tesaur <pablo15892@hotmail.com>, 2014

@@ -16,6 +16,8 @@
 # juditseb <juditseb@hotmail.com>, 2014
 # Luis Carlos Contreras <jinchuika@gmail.com>, 2014
 # luistrenado <luistrenado@yahoo.es>, 2014
+# mercefan <mercefan@gmail.com>, 2014
+# Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # valenciaupv <valenciaupv@gmail.com>, 2014
 # Vanesa Lopez- Roman Perez <vanesalrp@gmail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
@@ -31,7 +33,9 @@
 # Javier Orts <jorts@upv.es>, 2013-2014
 # juanan <juanan@diariolinux.com>, 2014
 # juanan <juanan@diariolinux.com>, 2014
+# leosamu <leosamu@gmail.com>, 2014
 # mcolomer <mcmlilhity@gmail.com>, 2014
+# Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX

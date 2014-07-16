@@ -4,10 +4,12 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# anna.ghetti <anna.ghetti@student.unife.it>, 2014
 # AleksandraS. <a_serafimovska@hotmail.com>, 2014
 # gianmarco <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # gianmarco <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # Giulio Gratta, 2014
+# mZakk <ingmazk@gmail.com>, 2014
 # maurimonti <maurimonti@msn.com>, 2014
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
 # Monica Maria Crapanzano <m.crapanzano@estartup.it>, 2013
@@ -43,6 +45,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# anna.ghetti <anna.ghetti@student.unife.it>, 2014
 # gianmarco <gianmarco.bonavolonta@tlc.uniroma3.it>, 2014
 # Giulio Gratta, 2014
 # kathjal, 2013

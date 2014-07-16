@@ -15,6 +15,7 @@
 # 
 # Translators:
 # inessa_alaverdyan <inessalaverdyan@gmail.com>, 2014
+# NarekDshkhunyan <ndshkhunyan@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -34,7 +35,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-07-11 16:03-0400\n"
-"PO-Revision-Date: 2014-07-13 11:21+0000\n"
+"PO-Revision-Date: 2014-07-15 21:11+0000\n"
 "Last-Translator: inessa_alaverdyan <inessalaverdyan@gmail.com>\n"
 "Language-Team: Armenian (Armenia) (http://www.transifex.com/projects/p/edx-platform/language/hy_AM/)\n"
 "MIME-Version: 1.0\n"

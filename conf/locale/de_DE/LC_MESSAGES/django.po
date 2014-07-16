@@ -5,7 +5,7 @@
 # 
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013
-# Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013
+# Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013-2014
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # Arno <transifex@senlogik.de>, 2013
 # Arno <transifex@senlogik.de>, 2013

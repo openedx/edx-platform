@@ -32,6 +32,7 @@
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@edx.org>, 2014
+# matata <sina_meftah@yahoo.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX

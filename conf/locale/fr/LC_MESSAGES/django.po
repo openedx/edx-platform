@@ -11,6 +11,7 @@
 # Françoise Docq, 2014
 # Françoise Docq, 2014
 # Françoise Docq, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
 # Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
 # Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
 # Jeremie Sicsic <jsicsic@gmail.com>, 2013

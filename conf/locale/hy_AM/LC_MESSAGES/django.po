@@ -28,6 +28,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# emma_saroyan <Emma_Saroyan@aybschool.am>, 2014
 # inessa_alaverdyan <inessalaverdyan@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -5888,21 +5889,23 @@ msgstr "Ներբեռնումն ավարտված է"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Video"
-msgstr ""
+msgstr "տեսահոլովակ"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
-msgstr ""
+msgstr "դատարկ"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
 msgstr ""
+"Հատուկ նշանները թույլատրված չեն կառուցվածքում, դասընթացի համարում և "
+"դասընթացում:"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -6028,7 +6031,7 @@ msgstr ""
 
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
-msgstr ""
+msgstr "Սխալ ձևաչափ '{name}' դաշտի համար. {detailed_message}"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html

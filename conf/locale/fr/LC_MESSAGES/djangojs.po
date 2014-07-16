@@ -70,7 +70,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2014-07-11 16:03-0400\n"
-"PO-Revision-Date: 2014-07-14 13:01+0000\n"
+"PO-Revision-Date: 2014-07-14 16:01+0000\n"
 "Last-Translator: Gérard Vidal <Gerard.Vidal@ens-lyon.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -2296,7 +2296,7 @@ msgstr ""
 
 #: cms/templates/js/checklist.underscore
 msgid "{number}% of checklists completed"
-msgstr ""
+msgstr "{number}% o de listes de vérification traitées"
 
 #: cms/templates/js/checklist.underscore
 msgid "Tasks Completed:"

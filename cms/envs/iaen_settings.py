@@ -4,8 +4,6 @@ FEATURES['ENABLE_CREATOR_GROUP'] = True
 TIME_ZONE = 'America/Guayaquil'
 LANGUAGE_CODE = 'es-419'
 
-PLATFORM_NAME = 'MOOC UPEx'
-
 INSTALLED_APPS += ('cities',)
 
 DELTA_YEAR = 12

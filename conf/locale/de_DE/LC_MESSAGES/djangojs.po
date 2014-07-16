@@ -24,6 +24,7 @@
 # 
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013
+# Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2014
 # s6lidaem <linda.daemmer@web.de>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # Neithen, 2014

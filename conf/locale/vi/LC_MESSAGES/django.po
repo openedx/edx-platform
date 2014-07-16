@@ -12,6 +12,7 @@
 # Hoàng Văn Quân, 2014
 # Hoàng Văn Quân, 2014
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
+# minhtuev <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
@@ -6298,7 +6299,7 @@ msgstr ""
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
-msgstr ""
+msgstr "Tóm lược chung về-{platform_name}"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -6313,20 +6314,20 @@ msgstr "Hướng dẫn"
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Thu Gọn Hướng Dẫn"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr ""
+msgstr "Thảo Luận Theo Hướng Dẫn"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ẩn Chú thích"
 
 #: lms/templates/contact.html lms/templates/static_templates/about.html
 #: lms/templates/static_templates/about.html
 msgid "Vision"
-msgstr ""
+msgstr "Tầm nhìn"
 
 #: lms/templates/contact.html
 msgid "Faq"
@@ -6345,7 +6346,7 @@ msgstr "Liên hệ"
 
 #: lms/templates/contact.html
 msgid "Class Feedback"
-msgstr ""
+msgstr "Phản Hồi về Lớp Học"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6354,10 +6355,14 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
+"Chúng tôi luôn tìm kiếm thông tin phản hồi để cải thiện các khóa học của "
+"mình. Nếu bạn là một học sinh đã ghi danh và có thắc mắc, ý kiến ​​phản hồi,"
+" góp ý, hay bất kỳ vấn đề cụ thể nào liên quan đến một lớp học cụ thể, xin "
+"vui lòng đăng lên diễn đàn thảo luận của lớp đó."
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
-msgstr ""
+msgstr "Thắc Mắc Chung và Phản Hồi"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6370,7 +6375,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
-msgstr ""
+msgstr "Thắc Mắc Kỹ Thuật và Phản Hồi"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6392,6 +6397,9 @@ msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
+"Vui lòng truy cập {link_start}trang truyền thông/báo chí{link_end} để biết "
+"thêm thông tin. Nếu có câu hỏi gì về truyền thông hay báo chí, xin vui lòng "
+"liên hệ qua email {email}."
 
 #: lms/templates/contact.html
 msgid "Universities"
@@ -6476,7 +6484,7 @@ msgstr "Đặt Lại Mật Khẩu"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr ""
+msgstr "Những Khóa Học Đang Mở"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -6492,7 +6500,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Lỗi khi tải khóa học"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -8895,7 +8903,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
-msgstr ""
+msgstr "Điểm tổng kết của bạn:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -8994,7 +9002,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr ""
+msgstr "Khóa Học Đã Kết Thúc - {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
@@ -10861,10 +10869,13 @@ msgid ""
 "e-mail programs will sometimes split it into two lines. If you still have "
 "issues, e-mail us to let us know what happened at {email}."
 msgstr ""
+"Có lỗi. Hãy kiểm tra để chắc chắn địa chỉ URL bạn mở là chính xác -- các "
+"chương trình e-mail đôi khi tách địa chỉ thành hai dòng. Nếu bạn vẫn còn gặp"
+" vấn đề trên, hãy thông báo cho chúng tôi qua email {email}."
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Hoặc bạn có thể quay lại {link_start}trang chủ{link_end}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-14 09:10-0400\n"
-"PO-Revision-Date: 2014-07-14 13:11:26.464876\n"
+"POT-Creation-Date: 2014-07-18 17:45+0000\n"
+"PO-Revision-Date: 2014-07-18 17:47:47.904176\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -53,7 +53,6 @@ msgstr "ÖK Ⱡ'#"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
-#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
@@ -825,7 +824,6 @@ msgid "Reply"
 msgstr "Réplý Ⱡ'σяєм ι#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -1019,13 +1017,6 @@ msgstr "Prévïéw #"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
-#. Translators: "Distribution" refers to a grade distribution. This error
-#. message appears when there is an error getting the data on grade
-#. distribution.;
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-msgid "Error fetching distribution."
-msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
-
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Unavailable metric display."
 msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
@@ -1091,12 +1082,6 @@ msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
-
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2151,7 +2136,6 @@ msgid "Adding&hellip;"
 msgstr "Àddïng&hellip; #"
 
 #: cms/static/js/views/modals/base_modal.js
-#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -2336,10 +2320,6 @@ msgstr "Nümßér öf Dröppäßlé Ⱡ'σя#"
 #: cms/templates/js/course_grade_policy.underscore
 msgid "total exercises that won't be graded"
 msgstr "tötäl éxérçïsés thät wön't ßé grädéd Ⱡ'σяєм ιρ#"
-
-#: cms/templates/js/course_info_handouts.underscore
-msgid "Course Handouts"
-msgstr "Çöürsé Händöüts Ⱡ'#"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
