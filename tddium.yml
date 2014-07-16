@@ -1,0 +1,101 @@
+tddium:
+  :firefox: 25.0.1
+  :timeout: 3600
+  :timeout_hook: 900
+  :tool_config:
+    git:
+      :version: "1.8.5.5"
+  :hooks:
+    :pre_setup: "virtualenv $HOME/python-env && $HOME/python-env/bin/pip install -r requirements/edx/paver.txt && $HOME/python-env/bin/pip install -r requirements/edx/pre.txt && $HOME/python-env/bin/pip install -r requirements/edx/base.txt && $HOME/python-env/bin/pip install -r requirements/edx/github.txt && $HOME/python-env/bin/pip install -r requirements/edx/local.txt && $HOME/python-env/bin/pip install -r requirements/edx/post.txt"
+    :post_build: 'for i in $(find test_root/log -name *.png); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; echo "copying file $i"; done'
+    # :post_build: "paver coverage; paver bokchoy_coverage; for i in $(find reports -name cover); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; done"
+  :cache:
+    :key_paths:
+      - requirements/edx/paver.txt
+      - requirements/edx/pre.txt
+      - requirements/edx/base.txt
+      - requirements/edx/github.txt
+      - requirements/edx/local.txt
+      - requirements/edx/post.txt
+      - package.json
+  :mongodb:
+    :version: "2.4.7"
+  :mysql:
+    :version: "5.5"
+  :python:
+    :python_version: "2.7"
+  :headless: true
+  :java:
+    :java_version: "java-7-openjdk"
+  :test_pattern: 'none'
+  :tests:
+    - :type: custom
+      :command: paver run_quality
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/diff_quality/diff_quality_pylint.html"
+    - :type: junit
+      :mode: basic
+      :command: "mkdir -p jscover-dist && wget http://files.edx.org/testeng/JSCover-1.0.2.zip -P jscover-dist && unzip jscover-dist/JSCover-1.0.2.zip -d jscover-dist/ && cp jscover-dist/target/dist/JSCover-all.jar jscover-dist && export JSCOVER_JAR=$PWD/jscover-dist/JSCover-all.jar && paver test"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/cms/nosetests.xml"
+      - "reports/common/lib/capa/nosetests.xml"
+      - "reports/common/lib/calc/nosetests.xml"
+      - "reports/common/lib/chem/nosetests.xml"
+      - "reports/common/lib/sandbox-packages/nosetests.xml"
+      - "reports/common/lib/symmath/nosetests.xml"
+      - "reports/common/lib/xmodule/nosetests.xml"
+      - "reports/lms/nosetests.xml"
+      - "reports/javascript/javascript_xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/lms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_2"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/lms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/cms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_2"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/cms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_3"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/cms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a '!shard_1'"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"
