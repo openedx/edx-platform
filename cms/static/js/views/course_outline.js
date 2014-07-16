@@ -9,8 +9,9 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils",
-        "js/models/xblock_outline_info"],
-    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo) {
+        "js/models/xblock_outline_info",
+        "js/views/modals/edit_section_in_outline"],
+    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, EditSectionXBlockModal) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
@@ -137,6 +138,25 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     expanded_locators: [ locator ],
                     scroll_offset: scrollOffset || 0
                 };
+            },
+
+           isEditable: function() {
+                return _.contains(['sequential', 'chapter'], this.model.get('category'));
+            },
+
+            editXBlock: function() {
+                var modal;
+                modal = new EditSectionXBlockModal(this.model);
+                modal.show();
+            },
+
+            addButtonActions: function(element) {
+                XBlockOutlineView.prototype.addButtonActions.call(this, element);
+                var self = this;
+                element.find('.configure-button').click(function(event) {
+                    event.preventDefault();
+                    self.editXBlock($(event.target));
+                });
             }
         });
 
