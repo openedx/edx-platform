@@ -5,10 +5,6 @@ This file contains helper functions for configuring module_store_setting setting
 import warnings
 
 
-# Python 2.7 by default suppresses DeprecationWarnings. Make sure we show these, always.
-warnings.simplefilter('once', DeprecationWarning)
-
-
 def convert_module_store_setting_if_needed(module_store_setting):
     """
     Converts old-style module_store_setting configuration settings to the new format.
