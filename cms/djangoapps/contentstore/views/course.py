@@ -282,7 +282,7 @@ def course_outline_initial_state(locator_to_show, course_structure):
         """
         if xblock_info['id'] == locator:
             return xblock_info
-        children = xblock_info['child_info']['children'] if xblock_info['child_info'] else None
+        children = xblock_info['child_info']['children'] if xblock_info.get('child_info', None) else None
         if children:
             for child_xblock_info in children:
                 result = find_xblock_info(child_xblock_info, locator)
@@ -295,7 +295,7 @@ def course_outline_initial_state(locator_to_show, course_structure):
         Collect all the locators for an xblock and its children.
         """
         locators.append(xblock_info['id'])
-        children = xblock_info['child_info']['children'] if xblock_info['child_info'] else None
+        children = xblock_info['child_info']['children'] if xblock_info.get('child_info', None) else None
         if children:
             for child_xblock_info in children:
                 collect_all_locators(locators, child_xblock_info)
