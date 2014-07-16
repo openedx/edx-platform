@@ -132,6 +132,63 @@ class CoursePagesTest(UniqueCourseTest):
             page.visit()
 
 
+class CourseAdvancedComponentsTest(UniqueCourseTest):
+    """
+    Tests that advanced components available on unit edit page when added in course advanced settings.
+    """
+
+    COURSE_ID_SEPARATOR = "."
+
+    def setUp(self):
+        """
+        Install a course with advanced settings and with no content using a fixture.
+        """
+        super(CourseAdvancedComponentsTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True).visit()
+        self.course_outline_page = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
+        # Install a course with sections/problems, tabs, updates, and handouts
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+        course_fix.add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit")
+                )
+            )
+        ).install()
+
+        self.advanced_settings = AdvancedSettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        advanced_settings = self.advanced_settings.visit()
+        advanced_settings.set("Advanced Module List", '["graphical_slider_tool"]')
+
+        cop = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        cop.visit()
+        self.unit = cop.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit').go_to()
+        self.unit.set_unit_visibility('private')
+
+    def test_advanced_components(self):
+        """
+        Check that advanced modules display name visible in "Advanced" components
+        """
+        self.assertEqual(self.unit.q(css="ul.new-component-type li a").first.text[0], u'Advanced')
+        self.unit.q(css="ul.new-component-type li a").first.click()
+        self.assertEqual(self.unit.q(css="div.new-component-advanced li").first.text[0], u'Graphic slider tool')
+
+
 class CourseSectionTest(UniqueCourseTest):
     """
     Tests that verify the sections name editable only inside headers in Studio Course Outline that you can get to
