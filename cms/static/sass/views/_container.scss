@@ -25,14 +25,15 @@
           font-weight: 600;
         }
 
+        // TODO: abstract out
         .is-editable {
 
           .incontext-editor-input {
             @extend %t-title4;
-            background: none repeat scroll 0 0 white;
+            @extend %t-strong;
+            background: none repeat scroll 0 0 $white;
             border: 0;
             box-shadow: 0 0 2px 2px $shadow inset;
-            font-weight: 600;
           }
         }
       }
