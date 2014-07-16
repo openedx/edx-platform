@@ -187,6 +187,10 @@ native Coffeescript features that break the extraction from the .js files:
     # Translators: this won't get to the translators!
     message = gettext("Welcome, #{student_name}!")  # This won't work!
     
+    # YES like this:
+    `// Translators: this will get to the translators.`
+    message = gettext("This works")
+
     ###
     Translators: This will work, but takes three lines :(
     ###
@@ -425,6 +429,11 @@ which is now invalid Javascript.  This can be avoided by using double-quotes
 for the Javascript string.  The better solution is to use a filtering function
 that properly escapes the string for Javascript use::
 
+    <%!
+        from django.utils.translation import ugettext as _
+        from django.utils.html import escapejs
+    %>
+    ...
     <script>
     var feeling = '${escapejs(_("I love you."))}';
     </script>
