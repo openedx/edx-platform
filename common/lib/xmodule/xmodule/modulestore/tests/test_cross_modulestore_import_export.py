@@ -235,7 +235,7 @@ MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
-COURSE_DATA_NAMES = ('toy', 'test_unicode')
+COURSE_DATA_NAMES = ('toy', 'manual-testing-complete')
 
 
 @ddt.ddt

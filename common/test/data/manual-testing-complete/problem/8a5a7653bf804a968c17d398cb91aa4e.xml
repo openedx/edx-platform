@@ -1,0 +1,17 @@
+<problem display_name="Image Mapped Input" markdown="null">
+  <p>
+    An image mapped input problem presents an image for the student.
+    Input is given by the location of mouse clicks on the image.
+    Correctness of input can be evaluated based on expected dimensions of a rectangle.
+  </p>
+  <p>Which animal shown below is a kitten?</p>
+  <imageresponse>
+    <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)"/>
+  </imageresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>The animal on the right is a kitten. The animal on the left is a puppy, not a kitten.</p>
+    </div>
+  </solution>
+</problem>

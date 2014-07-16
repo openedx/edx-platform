@@ -239,7 +239,7 @@ class CourseComparisonTest(unittest.TestCase):
                 self.assertEqual(
                     exp_value,
                     actual_value,
-                    "Field {} doesn't match between usages {} and {}: {!r} != {!r}".format(
+                    "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
                         field_name,
                         expected_item.scope_ids.usage_id,
                         actual_item.scope_ids.usage_id,
