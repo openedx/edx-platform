@@ -12,7 +12,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import PublishState
+from xmodule.modulestore import LegacyPublishState
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -123,7 +123,7 @@ def subsection_handler(request, usage_key_string):
         subsection_units = item.get_children()
         for unit in subsection_units:
             state = compute_publish_state(unit)
-            if state in (PublishState.public, PublishState.draft):
+            if state in (LegacyPublishState.public, LegacyPublishState.draft):
                 can_view_live = True
                 break
 

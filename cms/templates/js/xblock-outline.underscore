@@ -1,5 +1,5 @@
 <% if (parentInfo) { %>
-<li class="outline-item outline-item-<%= xblockType %> <%= includesChildren ? 'is-collapsible' : '' %> is-draggable <%= isCollapsed ? 'collapsed' : '' %>"
+<li class="outline-item outline-item-<%= xblockType %> <%= includesChildren ? 'is-collapsible' : '' %> is-draggable <%= isCollapsed ? 'is-collapsed' : 'is-expanded' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
     <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon-caret-right"></i></span>
 

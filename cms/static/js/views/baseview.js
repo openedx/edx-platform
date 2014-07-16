@@ -16,6 +16,10 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
                 "click .ui-toggle-expansion": "toggleExpandCollapse"
             },
 
+            options: {
+                collapsedClass: 'collapsed'
+            },
+
             //override the constructor function
             constructor: function(options) {
                 _.bindAll(this, 'beforeRender', 'render', 'afterRender');
@@ -48,7 +52,7 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
                 // this element, e.g. clicking on the element of a child view container in a parent.
                 event.stopPropagation();
                 event.preventDefault();
-                ViewUtils.toggleExpandCollapse(target);
+                ViewUtils.toggleExpandCollapse(target, this.options.collapsedClass);
             },
 
             /**

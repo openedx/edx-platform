@@ -89,11 +89,11 @@ class ModuleStoreEnum(object):
         # user ID to use for tests that do not have a django user available
         test = -3
 
-class PublishState(object):
-    """
-    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
 
-    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
+class LegacyPublishState(object):
+    """
+    The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
+    are no longer used in Studio directly, but are still referenced in a few places.
     """
     draft = 'draft'
     private = 'private'
@@ -522,7 +522,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         Returns PublishState.public since this is a read-only store.
         """
-        return PublishState.public
+        return LegacyPublishState.public
 
     def heartbeat(self):
         """
