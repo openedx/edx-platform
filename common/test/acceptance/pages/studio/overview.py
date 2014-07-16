@@ -113,7 +113,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         click_css(
             self,
-            self._bounded_selector(".add-xblock-component a.add-button"),
+            self._bounded_selector(".add-item a.button-new"),
             require_notification=require_notification,
         )
 
@@ -125,7 +125,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
-            add_button = self.q(css=self._bounded_selector('> .add-xblock-component a.add-button')).first.results
+            add_button = self.q(css=self._bounded_selector('> .outline-content > .add-item a.button-new')).first.results
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
@@ -171,8 +171,8 @@ class CourseOutlineUnit(CourseOutlineChild):
     PageObject that wraps a unit link on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-unit'
-    NAME_SELECTOR = '.xblock-title a'
+    BODY_SELECTOR = '.outline-unit'
+    NAME_SELECTOR = '.unit-title a'
 
     def go_to(self):
         """
@@ -188,7 +188,9 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
     url = None
 
-    BODY_SELECTOR = '.outline-item-subsection'
+    BODY_SELECTOR = '.outline-subsection'
+    NAME_SELECTOR = '.subsection-title'
+    NAME_FIELD_WRAPPER_SELECTOR = '.subsection-header .wrapper-xblock-field'
     CHILD_CLASS = CourseOutlineUnit
 
     def unit(self, title):
@@ -221,7 +223,9 @@ class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
     :class`.PageObject` that wraps a section block on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-section'
+    BODY_SELECTOR = '.outline-section'
+    NAME_SELECTOR = '.section-title'
+    NAME_FIELD_WRAPPER_SELECTOR = '.section-header .wrapper-xblock-field'
     CHILD_CLASS = CourseOutlineSubsection
 
     def subsection(self, title):
@@ -265,7 +269,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     url_path = "course"
     CHILD_CLASS = CourseOutlineSection
     EXPAND_COLLAPSE_CSS = '.toggle-button-expand-collapse'
-    BOTTOM_ADD_SECTION_BUTTON = '.course-outline > .add-xblock-component .add-button'
+    BOTTOM_ADD_SECTION_BUTTON = '.outline > .add-section .button-new'
 
     def is_browser_on_page(self):
         return self.q(css='body.view-outline').present
@@ -299,7 +303,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Clicks the button for adding a section which resides at the top of the screen.
         """
-        click_css(self, '.wrapper-mast nav.nav-actions .add-button')
+        click_css(self, '.wrapper-mast nav.nav-actions .button-new')
 
     def add_section_from_bottom_button(self):
         """

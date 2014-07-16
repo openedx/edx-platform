@@ -8,14 +8,18 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             // takes XBlockInfo as a model
 
             events: {
-                "click .toggle-button-expand-collapse": "toggleExpandCollapse"
+                "click .button-toggle-expand-collapse": "toggleExpandCollapse"
+            },
+
+            options: {
+                collapsedClass: 'is-collapsed'
             },
 
             initialize: function() {
                 var self = this;
                 this.initialState = this.options.initialState;
                 BasePage.prototype.initialize.call(this);
-                this.$('.add-button').click(function(event) {
+                this.$('.button-new').click(function(event) {
                     self.outlineView.handleAddEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
@@ -23,19 +27,18 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             setCollapseExpandVisibility: function() {
                 var has_content = this.hasContent(),
-                    collapseExpandButton = $('.toggle-button-expand-collapse');
+                    collapseExpandButton = $('.button-toggle-expand-collapse');
                 if (has_content) {
-                    collapseExpandButton.show();
+                    collapseExpandButton.removeClass('is-hidden');
                 } else {
-                    collapseExpandButton.hide();
+                    collapseExpandButton.addClass('is-hidden');
                 }
             },
 
             renderPage: function() {
-                var locatorToShow;
                 this.setCollapseExpandVisibility();
                 this.outlineView = new CourseOutlineView({
-                    el: this.$('.course-outline'),
+                    el: this.$('.outline'),
                     model: this.model,
                     isRoot: true,
                     initialState: this.initialState
@@ -50,19 +53,16 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             },
 
             toggleExpandCollapse: function(event) {
-                var toggleButton = this.$('.toggle-button-expand-collapse'),
+                var toggleButton = this.$('.button-toggle-expand-collapse'),
                     collapse = toggleButton.hasClass('collapse-all');
                 event.preventDefault();
                 toggleButton.toggleClass('collapse-all expand-all');
-                this.$('.course-outline  > ol > li').each(function(index, domElement) {
-                    var element = $(domElement),
-                        expandCollapseElement = element.find('.expand-collapse').first();
+                this.$('.list-sections > li').each(function(index, domElement) {
+                    var element = $(domElement);
                     if (collapse) {
-                        expandCollapseElement.removeClass('expand').addClass('collapse');
-                        element.addClass('collapsed');
+                        element.addClass('is-collapsed');
                     } else {
-                        expandCollapseElement.addClass('expand').removeClass('collapse');
-                        element.removeClass('collapsed');
+                        element.removeClass('is-collapsed');
                     }
                 });
             }
