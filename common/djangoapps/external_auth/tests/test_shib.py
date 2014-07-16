@@ -402,8 +402,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                     '?course_id=MITx/999/course/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course'))
-            reg_response = course_specific_register(login_request, SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course'))
+            login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
+            reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
 
             if "shib" in domain:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
@@ -437,8 +437,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                     '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, SlashSeparatedCourseKey('DNE', 'DNE', 'DNE'))
-            reg_response = course_specific_register(login_request, SlashSeparatedCourseKey('DNE', 'DNE', 'DNE'))
+            login_response = course_specific_login(login_request, 'DNE/DNE/DNE')
+            reg_response = course_specific_register(login_request, 'DNE/DNE/DNE')
 
             self.assertIsInstance(login_response, HttpResponseRedirect)
             self.assertEqual(login_response['Location'],

@@ -708,7 +708,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
