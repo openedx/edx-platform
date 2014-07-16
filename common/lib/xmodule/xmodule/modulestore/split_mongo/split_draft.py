@@ -157,7 +157,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if xblock.location.branch is None:
             raise ValueError(u'{} is not in a branch; so, this is nonsensical'.format(xblock.location))
         if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
-            other = get_head(ModuleStoreEnum.BranchName.published)
+            try:
+                other = get_head(ModuleStoreEnum.BranchName.published)
+            except ItemNotFoundError:
+                return PublishState.private
         elif xblock.location.branch == ModuleStoreEnum.BranchName.published:
             other = get_head(ModuleStoreEnum.BranchName.draft)
         else:

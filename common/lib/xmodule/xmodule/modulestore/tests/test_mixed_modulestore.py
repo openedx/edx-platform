@@ -132,7 +132,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # create chapter
         chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
-        self.writable_chapter_location = chapter.location
+        self.writable_chapter_location = chapter.location.version_agnostic()
 
     def _create_block_hierarchy(self):
         """
@@ -318,7 +318,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.delete_item(self.writable_chapter_location, self.user_id)
         # verify it's gone
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.writable_chapter_location.version_agnostic())
+            self.store.get_item(self.writable_chapter_location)
 
         # create and delete a private vertical with private children
         private_vert = self.store.create_child(
@@ -457,7 +457,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, new_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft')
@@ -683,8 +683,13 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        item_location = self.vertical_x1a
-        item = self.store.get_item(item_location)
+        # TODO - Remove this call to explicitly Publish the course once LMS-2869 is implemented
+        # For now, we need this since we can't publish a child item without its course already been published
+        course_location = self.course_locations[self.MONGO_COURSEID]
+        self.store.publish(course_location, self.user_id)
+
+        item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')
+        item_location = item.location.version_agnostic()
         self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
 
         self.store.publish(item_location, self.user_id)
