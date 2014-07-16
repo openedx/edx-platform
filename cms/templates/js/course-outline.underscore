@@ -22,7 +22,7 @@
 
             <div class="item-actions">
                 <ul class="actions-list">
-                    <% if (isEditable) { %>
+                    <% if (isSectionOrSubsection) { %>
                         <li class="action-item action-configure">
                             <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
                                 <i class="icon-gear"></i>
@@ -52,7 +52,7 @@
                     <% if (xblockInfo.get('due_date')) { %>
                         <i class="icon-time"></i>
                         <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
-                        <%= gettext('Policy:') %> <%= xblockInfo.get('format') %>
+                        <%= gettext('Policy:') %> <%= xblockInfo.get('format')  ? xblockInfo.get('format')  : 'notgraded' %>
                     <% } %>
                 </div>
             <% } %>
