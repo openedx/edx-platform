@@ -47,13 +47,13 @@ from contentstore.utils import reverse_usage_url
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="toggle-button toggle-button-expand-collapse collapse-all is-hidden">
+                    <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
                         <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
                         <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="button view-button add-button" data-category="chapter" data-parent="${context_course.location}" data-default-name="Section">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="Section">
                         <i class="icon-plus"></i>${_('New Section')}
                     </a>
                 </li>
@@ -72,7 +72,7 @@ from contentstore.utils import reverse_usage_url
                 <%
                 course_locator = context_course.location
                 %>
-                <article class="course-outline" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
+                <article class="outline" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
                 </article>
             </div>
             <div class="ui-loading">

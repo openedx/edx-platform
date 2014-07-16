@@ -69,7 +69,7 @@ def i_add_a_section(step):
 
 @step(u'I press the "section" delete icon')
 def i_press_the_section_delete_icon(step):
-    delete_locator = 'section .outline-item-section > .wrapper-xblock-header a.delete-button'
+    delete_locator = 'section .outline-section > .wrapper-xblock-header a.delete-button'
     world.css_click(delete_locator)
 
 
@@ -110,9 +110,9 @@ def i_click_the_collapse_expand_all_span(step, text):
 @step(u'I ([^"]*) the first section$')
 def i_collapse_expand_a_section(step, text):
     if text == "collapse":
-        locator = 'section .outline-item-section .ui-toggle-expansion'
+        locator = 'section .outline-section .ui-toggle-expansion'
     elif text == "expand":
-        locator = 'section .outline-item-section .ui-toggle-expansion'
+        locator = 'section .outline-section .ui-toggle-expansion'
     world.css_click(locator)
 
 

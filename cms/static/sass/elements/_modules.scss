@@ -318,7 +318,7 @@ $outline-indent-width: $baseline;
     border-left-color: $color-live;
   }
 
-  // CASE: has staff-only content
+  // CASE: is presented for staff only
   &.is-staff-only {
     border-left-color: $color-staff-only;
   }

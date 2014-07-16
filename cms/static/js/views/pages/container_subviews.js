@@ -7,7 +7,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         var disabledCss = "is-disabled";
 
         /**
-         * A view that calls render when "has_changes" or "published" values in XBlockInfo have changed
+         * A view that refreshes the view when certain values in the XBlockInfo have changed
          * after a server sync operation.
          */
         var ContainerStateListenerView = BaseView.extend({
@@ -53,19 +53,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
          */
         var PreviewActionController = ContainerStateListenerView.extend({
             shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['has_changes', 'published']);
+                return ViewUtils.hasChangedAttributes(model, ['edited_on', 'published_on', 'publish_state']);
             },
 
             render: function() {
                 var previewAction = this.$el.find('.button-preview'),
-                    viewLiveAction = this.$el.find('.button-view');
-                if (this.model.get('published')) {
+                    viewLiveAction = this.$el.find('.button-view'),
+                    publishState = this.model.get('publish_state');
+                if (publishState !== 'unscheduled') {
                     viewLiveAction.removeClass(disabledCss);
                 }
                 else {
                     viewLiveAction.addClass(disabledCss);
                 }
-                if (this.model.get('has_changes') || !this.model.get('published')) {
+                if (publishState !== 'live' && publishState !== 'ready') {
                     previewAction.removeClass(disabledCss);
                 }
                 else {
@@ -98,25 +99,22 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, [
-                    'has_changes', 'published', 'edited_on', 'edited_by', 'visible_to_staff_only'
-                ])) {
+                if (ViewUtils.hasChangedAttributes(model, [ 'edited_on', 'published_on', 'publish_state' ])) {
                    this.render();
                 }
             },
 
             render: function () {
                 this.$el.html(this.template({
-                    hasChanges: this.model.get('has_changes'),
-                    published: this.model.get('published'),
+                    publishState: this.model.get('publish_state'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
+                    published: this.model.get('published'),
                     publishedOn: this.model.get('published_on'),
                     publishedBy: this.model.get('published_by'),
                     releasedToStudents: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
-                    releaseDateFrom: this.model.get('release_date_from'),
-                    visibleToStaffOnly: this.model.get('visible_to_staff_only')
+                    releaseDateFrom: this.model.get('release_date_from')
                 }));
 
                 return this;
@@ -138,7 +136,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             discardChanges: function (e) {
-                var xblockInfo = this.model, that=this, renderPage = this.renderPage;
+                var xblockInfo = this.model, renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
@@ -164,7 +162,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = !xblockInfo.get('visible_to_staff_only');
+                enableStaffLock = xblockInfo.get('publish_state') !== 'staff_only';
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);
@@ -223,7 +221,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, ['published', 'published_on', 'published_by'])) {
+                if (ViewUtils.hasChangedAttributes(model, ['published_on'])) {
                    this.render();
                 }
             },

@@ -156,10 +156,10 @@ def compute_publish_state(xblock):
     Returns whether this xblock is draft, public, or private.
 
     Returns:
-        PublishState.draft - content is in the process of being edited, but still has a previous
+        LegacyPublishState.draft - content is in the process of being edited, but still has a previous
             version deployed to LMS
-        PublishState.public - content is locked and deployed to LMS
-        PublishState.private - content is editable and not deployed to LMS
+        LegacyPublishState.public - content is locked and deployed to LMS
+        LegacyPublishState.private - content is editable and not deployed to LMS
     """
 
     return modulestore().compute_publish_state(xblock)

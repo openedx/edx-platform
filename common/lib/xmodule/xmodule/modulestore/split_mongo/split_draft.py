@@ -4,7 +4,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 
 from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore, EXCLUDE_ALL
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum, LegacyPublishState
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 
@@ -251,10 +251,11 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Returns whether this xblock is draft, public, or private.
 
         Returns:
-            PublishState.draft - published exists and is different from draft
-            PublishState.public - published exists and is the same as draft
-            PublishState.private - no published version exists
+            LegacyPublishState.draft - published exists and is different from draft
+            LegacyPublishState.public - published exists and is the same as draft
+            LegacyPublishState.private - no published version exists
         """
+        # TODO figure out what to say if xblock is not from the HEAD of its branch
         def get_head(branch):
             course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
             return self._get_block_from_structure(course_structure, xblock.location.block_id)
@@ -271,13 +272,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
         if not published_head:
             # published version does not exist
-            return PublishState.private
+            return LegacyPublishState.private
         elif get_version(draft_head) == get_version(published_head):
             # published and draft versions are equal
-            return PublishState.public
+            return LegacyPublishState.public
         else:
             # published and draft versions differ
-            return PublishState.draft
+            return LegacyPublishState.draft
 
     def convert_to_draft(self, location, user_id):
         """
