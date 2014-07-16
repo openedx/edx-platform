@@ -91,11 +91,11 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
          * @param newValue The new value for the field.
          * @returns {jQuery promise} A promise representing the updating of the field.
          */
-        updateXBlockFields = function(xblockInfo, metadata) {
+        updateXBlockFields = function(xblockInfo, metadata, silent) {
             return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                 function() {
                     var processedData = xblockInfo.preprocessFieldNames(metadata);
-                    return xblockInfo.save(processedData, { patch: true });
+                    return xblockInfo.save(processedData, { patch: true, silent: silent});
                 });
         };
 

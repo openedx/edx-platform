@@ -23,13 +23,13 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 modalSize: 'med'
             }),
 
-            initialize: function(xblockInfo) {
+            initialize: function() {
                 BaseModal.prototype.initialize.call(this);
                 this.events = _.extend({}, BaseModal.prototype.events, this.events);
                 this.template = this.loadTemplate('edit-section-xblock-modal');
-                this.xblockInfo = xblockInfo;
+                this.xblockInfo = this.options.model;
                 this.date = date;
-                this.graderTypes = new CourseGraderCollection(JSON.parse(xblockInfo.get('course_graders')), {parse:true});
+                this.graderTypes = new CourseGraderCollection(JSON.parse(this.xblockInfo.get('course_graders')), {parse:true});
                 this.SelectGraderView = OverviewAssignmentGrader.extend({
                    selectGradeType : function(e) {
                       e.preventDefault();
@@ -111,11 +111,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     metadata.due_date = dueDatetime
                     // metadata.grade_format = ...
                 }
-                var self = this;
-                XBlockViewUtils.updateXBlockFields(this.xblockInfo, metadata).done(function () {
-                       // self.xblockInfo.fetch();  // It feels safe, if server can change other fields upon value of changed field.
-                        // also, it should refresh the page.
-                    });
+                XBlockViewUtils.updateXBlockFields(this.xblockInfo, metadata, true).done(this.options.onSave);
                 this.hide()
             },
 
