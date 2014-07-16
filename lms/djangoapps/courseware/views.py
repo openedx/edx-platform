@@ -48,6 +48,7 @@ from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from instructor.enrollment import uses_shib
 
 log = logging.getLogger("edx.courseware")
 
@@ -655,6 +656,8 @@ def course_about(request, course_id):
     # - Student cannot enroll in course
     active_reg_button = not(registered or is_course_full or not can_enroll)
 
+    is_shib_course = uses_shib(course)
+
     return render_to_response('courseware/course_about.html', {
         'course': course,
         'staff_access': staff_access,
@@ -669,6 +672,7 @@ def course_about(request, course_id):
         'can_enroll': can_enroll,
         'invitation_only': invitation_only,
         'active_reg_button': active_reg_button,
+        'is_shib_course': is_shib_course,
     })
 
 
