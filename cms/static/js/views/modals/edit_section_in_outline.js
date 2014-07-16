@@ -44,7 +44,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             getDateTime: function(datetime) {
                 var formatted_date, formatted_time;
 
-                formatted_date = this.date.parse(datetime.split(' at ')[0]).toString('mm/dd/yy');
+                formatted_date = this.date.parse(datetime.split(' at ')[0]).toString('MM/dd/yy');
                 formatted_time = this.date.parse(datetime.split(' at ')[1].split('UTC')[0]).toString('hh:mm');
 
                 return {
