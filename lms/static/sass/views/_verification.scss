@@ -1253,11 +1253,11 @@
       border-color: $m-blue-d1;
 
       .wrapper-copy {
-        width: flex-grid(5,8);
+        width: flex-grid(8,8);
       }
 
       .list-actions {
-        width: flex-grid(3,8);
+        width: flex-grid(8,8);
       }
 
       .action-select input {
@@ -1282,7 +1282,6 @@
       .list-actions {
         margin: ($baseline/2) 0;
         border-top: ($baseline/10) solid $m-gray-t1;
-        padding-top: $baseline;
       }
 
       .action-intro, .action-select {
