@@ -449,7 +449,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, old_parent_location, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, old_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
         ])
 
         # publish the course again
