@@ -87,6 +87,10 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
             * Course graders
             **/
             "course_graders": null,
+            /**
+            *
+            **/
+            "graded": null,
         },
 
         parse: function(response) {

@@ -109,6 +109,12 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     metadata.due_date = dueDatetime;
                     format = $('.edit-section-modal .gradable .gradable-status .status-label')[0].firstChild.textContent;
                     metadata.format = format;
+                    if (format === "Not Graded") {
+                        metadata.graded = false;
+                    } else {
+                        metadata.graded = true;
+                    };
+
                 }
                 XBlockViewUtils.updateXBlockFields(this.xblockInfo, {metadata: metadata}, true).done(
                     this.options.onSave
