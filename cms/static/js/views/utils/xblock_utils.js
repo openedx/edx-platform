@@ -79,8 +79,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             var requestData = createUpdateRequestData(fieldName, newValue);
             return ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
                 function() {
-                    var processedData = xblockInfo.preprocessFieldNames(requestData);
-                    return xblockInfo.save(processedData, { patch: true });
+                    return xblockInfo.save(requestData, { patch: true });
                 });
         };
 

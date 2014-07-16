@@ -92,31 +92,30 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
 
             save: function(event) {
+                var releaseDatetime, metadata, dueDatetime, graderType, objectToSave;
                 event.preventDefault();
-                var releaseDatetime = DateUtils(
+                releaseDatetime = DateUtils(
                     $('.edit-section-modal #start_date'),
                     $('.edit-section-modal #start_time')
                 );
                 // Check releaseDatetime and dueDatetime for sanity?
-                 var metadata = {
+                 metadata = {
                      'release_date': releaseDatetime,
                 };
+                objectToSave =  {metadata: metadata};
                 if (this.xblockInfo.get('category') === 'sequential') {
                     var dueDatetime = DateUtils(
                         $('.edit-section-modal #due_date'),
                         $('.edit-section-modal #due_time')
                     );
                     metadata.due_date = dueDatetime;
-                    format = $('.edit-section-modal .gradable .gradable-status .status-label')[0].firstChild.textContent;
-                    metadata.format = format;
-                    if (format === "Not Graded") {
-                        metadata.graded = false;
-                    } else {
-                        metadata.graded = true;
-                    };
-
+                    graderType = $('.edit-section-modal .gradable .gradable-status .status-label')[0].firstChild.textContent;
+                    if (graderType === "Not Graded") {
+                        graderType = "notgraded";
+                    }
+                    objectToSave =  {metadata: metadata, graderType: graderType}
                 }
-                XBlockViewUtils.updateXBlockFields(this.xblockInfo, {metadata: metadata}, true).done(
+                XBlockViewUtils.updateXBlockFields(this.xblockInfo, objectToSave, true).done(
                     this.options.onSave
                 );
                 this.hide()
