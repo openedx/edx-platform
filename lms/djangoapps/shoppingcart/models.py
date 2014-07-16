@@ -320,12 +320,20 @@ class CourseRegistrationCode(models.Model):
     This table contains registration codes
     With registration code, a user can register for a course for free
     """
-    code = models.CharField(max_length=32, db_index=True)
+    code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
-    redeemed_by = models.ForeignKey(User, null=True, related_name='redeemed_by_user')
+
+
+class RegistrationCodeRedemption(models.Model):
+    """
+    This model contains the registration-code redemption info
+    """
+    order = models.ForeignKey(Order, db_index=True)
+    registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
+    redeemed_by = models.ForeignKey(User, db_index=True)
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
 
 
