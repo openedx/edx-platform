@@ -948,20 +948,20 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/application.css',
+            'sass/application.scss',
             'sass/ie.css'
         ],
         'output_filename': 'css/lms-style-app.css',
     },
     'style-app-extend1': {
         'source_filenames': [
-            'sass/application-extend1.css',
+            'sass/application-extend1.scss',
         ],
         'output_filename': 'css/lms-style-app-extend1.css',
     },
     'style-app-extend2': {
         'source_filenames': [
-            'sass/application-extend2.css',
+            'sass/application-extend2.scss',
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
@@ -975,7 +975,7 @@ PIPELINE_CSS = {
     },
     'style-course': {
         'source_filenames': [
-            'sass/course.css',
+            'sass/course.scss',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
@@ -1076,12 +1076,19 @@ if os.path.isdir(DATA_DIR):
                 os.system("coffee -c %s" % (js_dir / filename))
 
 
-PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_CSS_COMPRESSOR = "pipeline.compressors.cssmin.CSSMinCompressor"
+PIPELINE_CSS_CSSMIN_BINARY = "node_modules/.bin/cssmin"
+
 PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
+    PROJECT_ROOT / "static" / "sass" / "*",
+    COMMON_ROOT / "static" / "sass" / "*",
+    PROJECT_ROOT / "static" / "coffee" / "*",
+    COMMON_ROOT / "static" / "coffee" / "*",
     "sass/*",
     "coffee/*",
+
 
     # Symlinks used by js-test-tool
     "xmodule_js",
@@ -1093,6 +1100,29 @@ PIPELINE_YUI_BINARY = 'yui-compressor'
 # Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.sass.SASSCompiler',
+#    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+)
+
+# TODO will need to update settings in aws.py as well
+# since that overrides the THEME_PATH 
+# TODO do this in studio as well.
+EDX_PIPELINE_THEME_PATH=""
+if FEATURES.get('USE_CUSTOM_THEME'):
+    EDX_PIPELINE_THEME_PATH=ENV_ROOT / "themes" / THEME_NAME
+
+PIPELINE_SASS_ARGUMENTS = "--style compressed --sourcemap --cache-location {cache} --load-path {load_paths} --update -E utf-8 {update_paths}".format(
+        cache="/tmp/sass-cache",
+        load_paths=" ".join([
+            COMMON_ROOT / 'static' / 'sass',
+            COMMON_ROOT / 'static',
+            PROJECT_ROOT / 'static' / 'sass',
+            EDX_PIPELINE_THEME_PATH]),
+        update_paths=" ".join([ PROJECT_ROOT / 'static',  EDX_PIPELINE_THEME_PATH]),
+)
+
+PIPELINE_COFFEE_SCRIPT_ARGUMENTS = ""
 ################################# CELERY ######################################
 
 # Message configuration

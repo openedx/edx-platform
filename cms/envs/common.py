@@ -355,19 +355,19 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/style-app.css',
+            'sass/style-app.scss',
         ],
         'output_filename': 'css/cms-style-app.css',
     },
     'style-app-extend1': {
         'source_filenames': [
-            'sass/style-app-extend1.css',
+            'sass/style-app-extend1.scss',
         ],
         'output_filename': 'css/cms-style-app-extend1.css',
     },
     'style-xmodule': {
         'source_filenames': [
-            'sass/style-xmodule.css',
+            'sass/style-xmodule.scss',
         ],
         'output_filename': 'css/cms-style-xmodule.css',
     },
@@ -389,7 +389,26 @@ PIPELINE_JS = {
 
 PIPELINE_COMPILERS = (
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
+    'pipeline.compilers.sass.SASSCompiler',
 )
+
+# TODO will need to update settings in aws.py as well
+# since that overrides the THEME_PATH 
+# TODO do this in studio as well.
+EDX_PIPELINE_THEME_PATH=""
+if FEATURES.get('USE_CUSTOM_THEME'):
+    EDX_PIPELINE_THEME_PATH=ENV_ROOT / "themes" / THEME_NAME
+
+PIPELINE_SASS_ARGUMENTS = "--style compressed --sourcemap --cache-location {cache} --load-path {load_paths} --update -E utf-8 {update_paths}".format(
+        cache="/tmp/sass-cache",
+        load_paths=" ".join([
+            COMMON_ROOT / 'static' / 'sass',
+            COMMON_ROOT / 'static',
+            PROJECT_ROOT / 'static' / 'sass',
+            EDX_PIPELINE_THEME_PATH]),
+        update_paths=" ".join([ PROJECT_ROOT / 'static',  EDX_PIPELINE_THEME_PATH]),
+)
+
 
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None

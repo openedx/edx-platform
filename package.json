@@ -2,6 +2,7 @@
     "name": "edx",
     "version": "0.1.0",
     "dependencies": {
-      "coffee-script": "1.6.X"
+      "coffee-script": "1.6.X",
+      "cssmin": "0.4.1"
     }
 }

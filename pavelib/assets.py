@@ -163,7 +163,7 @@ def collect_assets(systems, settings):
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
+        sh(django_cmd(sys, settings, "collectstatic -v 0 --noinput"))
 
 
 @task
@@ -227,7 +227,7 @@ def update_assets(args):
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
-    compile_sass(args.debug)
+    #compile_sass(args.debug)
 
     if args.collect:
         collect_assets(args.system, args.settings)
