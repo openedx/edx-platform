@@ -12,6 +12,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
 
+            options: {
+                collapsedClass: 'is-collapsed'
+            },
+
             view: 'container_preview',
 
             initialize: function(options) {
