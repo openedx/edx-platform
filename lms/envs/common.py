@@ -259,6 +259,9 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Log session related activities like sessions of requests, session creation and deletion etc.
+    'ENABLE_VERBOSE_LOGGING_FOR_SESSIONS': True,
 }
 
 # Used for A/B testing
@@ -806,7 +809,7 @@ MIDDLEWARE_CLASSES = (
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'sessions.middleware.SessionMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',

@@ -78,6 +78,9 @@ choice for most environments but you may be happy with the trade-offs of the
 
 """
 
+import logging
+
+from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import User
 from django.contrib.auth.middleware import AuthenticationMiddleware
@@ -85,14 +88,34 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from .model import cache_model
 
 
+AUDIT_LOG = logging.getLogger(__name__)
+
+
 class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
     def __init__(self):
         cache_model(User)
 
     def process_request(self, request):
+        user_cached = False
         try:
             # Try and construct a User instance from data stored in the cache
             request.user = User.get_cached(request.session[SESSION_KEY])
+            user_cached = True
         except:
             # Fallback to constructing the User from the database.
             super(CacheBackedAuthenticationMiddleware, self).process_request(request)
+
+        if settings.FEATURES.get("ENABLE_VERBOSE_LOGGING_FOR_SESSIONS", False):
+            last_login = None
+            if request.user.is_authenticated():
+                last_login = request.user.last_login
+
+            country_code = request.session.get('country_code')
+
+            log_message = ("User:{user} LastLogin:{last_login} UserCached:{user_cached} SessionKey:{session_key} "
+                           "SessionExpiry:{session_expiry} CountryCode:{country_code}")
+            AUDIT_LOG.info(log_message.format(
+                user=request.user, last_login=last_login, user_cached=user_cached,
+                session_key=request.session.session_key, session_expiry=request.session.get_expiry_date(),
+                country_code=country_code)
+            )
