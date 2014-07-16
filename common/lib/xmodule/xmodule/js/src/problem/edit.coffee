@@ -309,7 +309,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       if choiceMatches              # this line includes '(...)' so it must be a checkbox item
         isCheckboxType = true
       else
-        reducedXmlString += line    # this line is not an item line, add it to reduced lines string
+        reducedXmlString += line + '\n'    # this line is not an item line, add it to reduced lines string
 
     if isCheckboxType
       returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
@@ -333,10 +333,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           correctnessText = 'False'
           if choiceMatches[1].match(/X/i)
             correctnessText = 'True'
-          itemText = choiceMatches[2].trim()
 
           returnXmlString += '          <choice  correct="' + correctnessText + '">'
-          returnXmlString += '              ' + itemText + '\n'
+          returnXmlString += '              ' + line + '\n'
           if hintText
             returnXmlString += '               <choicehint>' + hintText + '\n'
             returnXmlString += '               </choicehint>\n'
