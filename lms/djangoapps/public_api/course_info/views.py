@@ -15,7 +15,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from courseware.courses import get_course_about_section
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment, User
 
