@@ -18,7 +18,6 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import skip_if_browser
 
 
-
 VIDEO_SOURCE_PORT = 8777
 YOUTUBE_STUB_PORT = 9080
 YOUTUBE_STUB_URL = 'http://127.0.0.1:{}/'.format(YOUTUBE_STUB_PORT)
@@ -498,7 +497,13 @@ class YouTubeVideoTest(VideoBaseTest):
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_exist('download_transcript'))
 
-    @skip("Consistently failing on master BLD-1190  Disabled 11 July 2014")
+    def _verify_caption_text(self, text):
+        self.video._wait_for(
+            lambda: (text in self.video.captions_text()),
+            u'Captions contain "{}" text'.format(text),
+            timeout=5
+        )
+
     def test_video_language_menu_working(self):
         """
         Scenario: Language menu works correctly in Video component
@@ -526,10 +531,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.select_language('zh')
 
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text())
+        self._verify_caption_text(unicode_text)
 
         self.video.select_language('en')
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
+        self._verify_caption_text('Hi, welcome to Edx.')
 
     def test_multiple_videos_in_sequentials_load_and_work(self):
         """
