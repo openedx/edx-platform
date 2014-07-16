@@ -12,8 +12,8 @@ class ModuleStoreDraftAndPublished(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, **kwargs):
-        super(ModuleStoreDraftAndPublished, self).__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ModuleStoreDraftAndPublished, self).__init__(*args, **kwargs)
         self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
 
     @abstractmethod

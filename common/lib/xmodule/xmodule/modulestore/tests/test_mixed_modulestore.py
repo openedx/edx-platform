@@ -581,6 +581,9 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         course_id = self.course_locations[self.MONGO_COURSEID].course_key
 
+        # create parented children
+        self._create_block_hierarchy()
+
         # orphans
         orphan_locations = [
             course_id.make_usage_key('chapter', 'OrphanChapter'),

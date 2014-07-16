@@ -13,13 +13,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
-    def __init__(self, **kwargs):
-        super(DraftVersioningModuleStore, self).__init__(**kwargs)
-
     def create_course(self, org, course, run, user_id, **kwargs):
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         return super(DraftVersioningModuleStore, self).create_course(
-            org, course, run, user_id, master_branch, **kwargs
+            org, course, run, user_id, master_branch=master_branch, **kwargs
         )
 
     def get_courses(self):
@@ -84,7 +81,17 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         )
 
     def get_parent_location(self, location, revision=None, **kwargs):
-        # NAATODO - support draft_preferred
+        '''
+        Returns the given location's parent location in this course.
+        Args:
+            revision:
+                None - uses the branch setting for the revision
+                ModuleStoreEnum.RevisionOption.published_only
+                    - return only the PUBLISHED parent if it exists, else returns None
+                ModuleStoreEnum.RevisionOption.draft_preferred
+                    - return either the DRAFT or PUBLISHED parent, preferring DRAFT, if parent(s) exists,
+                        else returns None
+        '''
         if revision == ModuleStoreEnum.RevisionOption.draft_preferred:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         location = self._map_revision_to_branch(location, revision=revision)
@@ -158,7 +165,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         elif xblock.location.branch == ModuleStoreEnum.BranchName.published:
             other = get_head(ModuleStoreEnum.BranchName.draft)
         else:
-            raise ValueError(u'{} is not in a branch other than draft or published; so, this is nonsensical'.format(xblock.location))
+            raise ValueError(u'{} is in a branch other than draft or published; so, this is nonsensical'.format(xblock.location))
 
         if not other:
             if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
