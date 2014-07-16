@@ -660,7 +660,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['child_info'] = _create_xblock_child_info(
             xblock, include_children_predicate=include_children_predicate
         )
-    if xblock.graded and xblock.category == u'sequential' and not is_unit(xblock):
+    if xblock.category == u'sequential' and not is_unit(xblock):
+        xblock_info['graded'] = xblock.graded
         xblock_info['due_date'] = get_default_time_display(xblock.due)
         xblock_info['grading_format'] = xblock.format
         xblock_info['course_graders'] =  json.dumps(CourseGradingModel.fetch(xblock.location.course_key).graders)
