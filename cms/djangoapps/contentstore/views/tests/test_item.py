@@ -1,7 +1,7 @@
 """Tests for items views."""
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import ddt
 
 from mock import patch
@@ -1248,3 +1248,82 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
+
+
+class TestXBlockPublishingInfo(ItemTest):
+    """
+    Unit tests for XBlock's outline handling.
+    """
+    def _create_child(self, parent, category, display_name, publish_item=False):
+        return ItemFactory.create(
+            parent_location=parent.location, category=category, display_name=display_name,
+            user_id=self.user.id, publish_item=publish_item
+        )
+
+    def get_child(self, xblock_info, index):
+        """
+        Returns the child at the specified index.
+        """
+        children = xblock_info['child_info']['children']
+        self.assertTrue(len(children) > index)
+        return children[index]
+
+    def test_empty_chapter_publishing_info(self):
+        empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
+        xblock_info = create_xblock_info(
+            modulestore().get_item(empty_chapter.location),
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_publishing_info(xblock_info)
+
+    def test_empty_section_publishing_info(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        self._create_child(chapter, 'sequential', "Empty Sequential")
+        xblock_info = create_xblock_info(
+            modulestore().get_item(chapter.location),
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_publishing_info(xblock_info)
+        self.validate_publishing_info(self.get_child(xblock_info, 0))
+
+    def test_published_unit_publishing_info(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        xblock_info = create_xblock_info(
+            modulestore().get_item(chapter.location),
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_publishing_info(xblock_info, fully_published=True)
+        sequential_child_info = self.get_child(xblock_info, 0)
+        self.validate_publishing_info(sequential_child_info, fully_published=True)
+        unit_child_info = self.get_child(sequential_child_info, 0)
+        self.validate_publishing_info(unit_child_info, fully_published=True)
+
+    def test_released_unit_publishing_info(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        unit = self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        chapter_block = modulestore().get_item(chapter.location)
+        chapter_block.start = datetime.now(UTC) - timedelta(days=1)
+        self.store.publish(unit.location, self.user.id)
+        xblock_info = create_xblock_info(
+            chapter_block,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.validate_publishing_info(xblock_info, fully_visible_to_students=True, fully_published=True)
+        sequential_child_info = self.get_child(xblock_info, 0)
+        self.validate_publishing_info(sequential_child_info, fully_visible_to_students=True, fully_published=True)
+        unit_child_info = self.get_child(sequential_child_info, 0)
+        self.validate_publishing_info(unit_child_info, fully_visible_to_students=True, fully_published=True)
+
+    def validate_publishing_info(self, xblock_info, fully_visible_to_students=False, fully_published=False,
+                                 is_staff_only=False, release_date=None):
+        self.assertEqual(xblock_info.get('fully_published', False), fully_published)
+        self.assertEqual(xblock_info.get('fully_visible_to_students', False), fully_visible_to_students)
+        self.assertEqual(xblock_info.get('visible_to_staff_only', False), is_staff_only)
+        self.assertEqual(xblock_info.get('release_date', False), release_date)

@@ -606,10 +606,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
     """
-    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
-    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 
     def safe_get_username(user_id):
         """
@@ -628,12 +626,27 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
         return None
 
+    # Compute the child info first so it can be included in aggregate information for the parent
+    if include_child_info and xblock.has_children:
+        child_info = _create_xblock_child_info(
+            xblock, include_children_predicate=include_children_predicate
+        )
+    else:
+        child_info = None
+
+    visible_to_staff_only = _is_visible_to_staff_only(xblock, child_info)
+    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+    currently_visible_to_students = is_currently_visible_to_students(xblock)
+    fully_visible_to_students = currently_visible_to_students
+    if fully_visible_to_students and not visible_to_staff_only and child_info:
+        fully_visible_to_students = all(
+            (info['fully_visible_to_students'] or info['visible_to_staff_only']) for info in child_info['children']
+        )
+
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
-        "has_changes": modulestore().has_changes(xblock.location),
-        "published": published,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "edited_by": safe_get_username(xblock.subtree_edited_by),
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
@@ -642,8 +655,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
         "release_date_from": _get_release_date_from(xblock) if release_date else None,
-        "visible_to_staff_only": xblock.visible_to_staff_only,
-        "currently_visible_to_students": is_currently_visible_to_students(xblock),
+        "visible_to_staff_only": visible_to_staff_only,
+        "currently_visible_to_students": currently_visible_to_students,
+        "fully_published": _is_fully_published(xblock, child_info),
+        "fully_visible_to_students": fully_visible_to_students,
+        "has_unpublished_content": not visible_to_staff_only and _has_unpublished_content(xblock, child_info),
     }
     if data is not None:
         xblock_info["data"] = data
@@ -651,11 +667,51 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info["metadata"] = metadata
     if include_ancestor_info:
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
-    if include_child_info and xblock.has_children:
-        xblock_info['child_info'] = _create_xblock_child_info(
-            xblock, include_children_predicate=include_children_predicate
-        )
+    if child_info:
+        xblock_info['child_info'] = child_info
     return xblock_info
+
+
+def _is_visible_to_staff_only(xblock, child_info):
+    """
+    Returns true if the specified xblock and all of its children are shown to staff only.
+    """
+    if xblock.visible_to_staff_only:
+        return True
+    elif child_info and len(child_info['children']) > 0:
+        return all(info['visible_to_staff_only'] for info in child_info['children'])
+    return False
+
+
+def _has_unpublished_content(xblock, child_info):
+    """
+    Returns true if the xblock or its children have unpublished content (that is not staff only)
+    """
+    if is_unit(xblock):
+        return modulestore().has_changes(xblock.location)
+    elif child_info:
+        return any(info['has_unpublished_content'] for info in child_info['children'])
+    else:
+        return False
+
+
+def _is_fully_published(xblock, child_info):
+    """
+    Returns true if the specified xblock and all of its children are published (or marked as staff only).
+    """
+    if is_unit(xblock):
+        return (
+            modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+            if is_unit(xblock)
+            else False
+        )
+    elif child_info and len(child_info['children']) > 0:
+        return all(
+            (info['fully_published'] or info['visible_to_staff_only']) for info in child_info['children']
+        )
+    else:
+        return False
+
 
 
 def _create_xblock_ancestor_info(xblock):

@@ -129,9 +129,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             describe('Initial display', function() {
                 it('can render itself', function() {
                     createCourseOutlinePage(this, mockCourseJSON);
-                    expect(outlinePage.$('.sortable-course-list')).toExist();
-                    expect(outlinePage.$('.sortable-section-list')).toExist();
-                    expect(outlinePage.$('.sortable-subsection-list')).toExist();
+                    expect(outlinePage.$('.list-sections')).toExist();
+                    expect(outlinePage.$('.list-subsections')).toExist();
+                    expect(outlinePage.$('.list-units')).toExist();
                 });
 
                 it('shows a loading indicator', function() {
@@ -144,16 +144,16 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('shows subsections initially collapsed', function() {
                     var subsectionElement;
                     createCourseOutlinePage(this, mockCourseJSON);
-                    subsectionElement = outlinePage.$('.outline-item-subsection');
+                    subsectionElement = outlinePage.$('.outline-subsection');
                     expect(subsectionElement).toHaveClass('collapsed');
-                    expect(outlinePage.$('.outline-item-unit')).not.toExist();
+                    expect(outlinePage.$('.outline-unit')).not.toExist();
                 });
             });
 
             describe("Button bar", function() {
                 it('can add a section', function() {
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
-                    outlinePage.$('.nav-actions .add-button').click();
+                    outlinePage.$('.nav-actions .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
@@ -166,13 +166,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
-                    expect(outlinePage.$('.sortable-course-list li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
                 });
 
                 it('can add a second section', function() {
                     var sectionElements;
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    outlinePage.$('.nav-actions .add-button').click();
+                    outlinePage.$('.nav-actions .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
@@ -186,7 +186,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section-2');
                     create_sinon.respondWithJson(requests,
                         createMockSectionJSON('mock-section-2', 'Mock Section 2', []));
-                    sectionElements = outlinePage.$('.sortable-course-list .outline-item-section');
+                    sectionElements = outlinePage.$('.list-sections .outline-section');
                     expect(sectionElements.length).toBe(2);
                     expect($(sectionElements[0]).data('locator')).toEqual('mock-section');
                     expect($(sectionElements[1]).data('locator')).toEqual('mock-section-2');
@@ -195,9 +195,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can expand and collapse all sections', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.nav-actions .toggle-button-expand-collapse').click();
-                    expect(outlinePage.$('.outline-item-section')).toHaveClass('collapsed');
+                    expect(outlinePage.$('.outline-section')).toHaveClass('collapsed');
                     outlinePage.$('.nav-actions .toggle-button-expand-collapse').click();
-                    expect(outlinePage.$('.outline-item-section')).not.toHaveClass('collapsed');
+                    expect(outlinePage.$('.outline-section')).not.toHaveClass('collapsed');
                 });
             });
 
@@ -205,12 +205,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('shows an empty course message initially', function() {
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toHaveClass('is-hidden');
-                    expect(outlinePage.$('.no-content .add-button')).toExist();
+                    expect(outlinePage.$('.no-content .button-new')).toExist();
                 });
 
                 it('can add a section', function() {
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
-                    $('.no-content .add-button').click();
+                    $('.no-content .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
@@ -223,13 +223,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
-                    expect(outlinePage.$('.sortable-course-list li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
                 });
 
                 it('remains empty if an add fails', function() {
                     var requestCount;
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
-                    $('.no-content .add-button').click();
+                    $('.no-content .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
@@ -239,7 +239,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.respondWithError(requests);
                     expect(requests.length).toBe(requestCount); // No additional requests should be made
                     expect(outlinePage.$('.no-content')).not.toHaveClass('is-hidden');
-                    expect(outlinePage.$('.no-content .add-button')).toExist();
+                    expect(outlinePage.$('.no-content .button-new')).toExist();
                 });
             });
 
@@ -247,7 +247,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 var getDisplayNameWrapper;
 
                 getDisplayNameWrapper = function() {
-                    return getHeaderElement('.outline-item-section').find('.wrapper-xblock-field').first();
+                    return getHeaderElement('.outline-section').find('.wrapper-xblock-field').first();
                 };
 
                 it('can be deleted', function() {
@@ -256,7 +256,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         createMockSectionJSON('mock-section', 'Mock Section', []),
                         createMockSectionJSON('mock-section-2', 'Mock Section 2', [])
                     ]));
-                    outlinePage.$('.outline-item-section .delete-button').first().click();
+                    outlinePage.$('.outline-section .delete-button').first().click();
                     view_helpers.confirmPrompt(promptSpy);
                     requestCount = requests.length;
                     create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
@@ -269,32 +269,32 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can be deleted if it is the only section', function() {
                     var promptSpy = view_helpers.createPromptSpy();
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    outlinePage.$('.outline-item-section .delete-button').click();
+                    outlinePage.$('.outline-section .delete-button').click();
                     view_helpers.confirmPrompt(promptSpy);
                     create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
                     create_sinon.respondWithJson(requests, {});
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     create_sinon.respondWithJson(requests, mockEmptyCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toHaveClass('is-hidden');
-                    expect(outlinePage.$('.no-content .add-button')).toExist();
+                    expect(outlinePage.$('.no-content .button-new')).toExist();
                 });
 
                 it('remains visible if its deletion fails', function() {
                     var promptSpy = view_helpers.createPromptSpy(),
                         requestCount;
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
-                    outlinePage.$('.outline-item-section .delete-button').click();
+                    outlinePage.$('.outline-section .delete-button').click();
                     view_helpers.confirmPrompt(promptSpy);
                     create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
                     requestCount = requests.length;
                     create_sinon.respondWithError(requests);
                     expect(requests.length).toBe(requestCount); // No additional requests should be made
-                    expect(outlinePage.$('.sortable-course-list li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
                 });
 
                 it('can add a subsection', function() {
                     createCourseOutlinePage(this, mockCourseJSON);
-                    outlinePage.$('.outline-item-section > .add-xblock-component .add-button').click();
+                    outlinePage.$('.outline-section > .add-xblock-component .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'sequential',
                         'display_name': 'Subsection',
@@ -329,9 +329,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
                 it('can be expanded and collapsed', function() {
                     createCourseOutlinePage(this, mockCourseJSON);
-                    collapseAndVerifyState('.outline-item-section');
-                    expandAndVerifyState('.outline-item-section');
-                    collapseAndVerifyState('.outline-item-section');
+                    collapseAndVerifyState('.outline-section');
+                    expandAndVerifyState('.outline-section');
+                    collapseAndVerifyState('.outline-section');
                 });
             });
 
@@ -339,13 +339,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 var getDisplayNameWrapper;
 
                 getDisplayNameWrapper = function() {
-                    return getHeaderElement('.outline-item-subsection').find('.wrapper-xblock-field').first();
+                    return getHeaderElement('.outline-subsection').find('.wrapper-xblock-field').first();
                 };
 
                 it('can be deleted', function() {
                     var promptSpy = view_helpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
-                    getHeaderElement('.outline-item-subsection').find('.delete-button').click();
+                    getHeaderElement('.outline-subsection').find('.delete-button').click();
                     view_helpers.confirmPrompt(promptSpy);
                     create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-subsection');
                     create_sinon.respondWithJson(requests, {});
@@ -358,7 +358,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     var redirectSpy;
                     createCourseOutlinePage(this, mockCourseJSON);
                     redirectSpy = spyOn(ViewUtils, 'redirect');
-                    outlinePage.$('.outline-item-subsection > .add-xblock-component .add-button').click();
+                    outlinePage.$('.outline-subsection > .add-xblock-component .button-new').click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'vertical',
                         'display_name': 'Unit',
@@ -387,7 +387,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             createMockSubsectionJSON('mock-subsection', updatedDisplayName, [])
                         ]));
                     // Find the display name again in the refreshed DOM and verify it
-                    displayNameWrapper = getHeaderElement('.outline-item-subsection').find('.wrapper-xblock-field').first();
+                    displayNameWrapper = getHeaderElement('.outline-subsection').find('.wrapper-xblock-field').first();
                     view_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     subsectionModel = outlinePage.model.get('child_info').children[0].get('child_info').children[0];
                     expect(subsectionModel.get('display_name')).toBe(updatedDisplayName);
@@ -396,11 +396,11 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can be expanded and collapsed', function() {
                     var subsectionElement;
                     createCourseOutlinePage(this, mockCourseJSON);
-                    subsectionElement = outlinePage.$('.outline-item-subsection');
+                    subsectionElement = outlinePage.$('.outline-subsection');
                     expect(subsectionElement).toHaveClass('collapsed');
-                    expandAndVerifyState('.outline-item-subsection');
-                    collapseAndVerifyState('.outline-item-subsection');
-                    expandAndVerifyState('.outline-item-subsection');
+                    expandAndVerifyState('.outline-subsection');
+                    collapseAndVerifyState('.outline-subsection');
+                    expandAndVerifyState('.outline-subsection');
                 });
             });
 
@@ -409,8 +409,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can be deleted', function() {
                     var promptSpy = view_helpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
-                    expandAndVerifyState('.outline-item-subsection');
-                    getHeaderElement('.outline-item-unit').find('.delete-button').click();
+                    expandAndVerifyState('.outline-subsection');
+                    getHeaderElement('.outline-unit').find('.delete-button').click();
                     view_helpers.confirmPrompt(promptSpy);
                     create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-unit');
                     create_sinon.respondWithJson(requests, {});
@@ -422,10 +422,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('has a link to the unit page', function() {
                     var anchor;
                     createCourseOutlinePage(this, mockCourseJSON);
-                    expandAndVerifyState('.outline-item-subsection');
-                    anchor = outlinePage.$('.outline-item-unit .xblock-title a');
+                    expandAndVerifyState('.outline-subsection');
+                    anchor = outlinePage.$('.outline-unit .xblock-title a');
                     expect(anchor.attr('href')).toBe('/container/mock-unit');
                 });
+            });
+
+            describe("Publishing State", function() {
+
             });
         });
     });

@@ -108,7 +108,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             render: function () {
                 this.$el.html(this.template({
                     hasChanges: this.model.get('has_changes'),
-                    published: this.model.get('published'),
+                    published: this.model.get('fully_published'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
                     publishedOn: this.model.get('published_on'),
@@ -138,7 +138,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             discardChanges: function (e) {
-                var xblockInfo = this.model, that=this, renderPage = this.renderPage;
+                var xblockInfo = this.model, renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }

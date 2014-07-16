@@ -1,3 +1,32 @@
+<%
+var publishClasses = "";
+var title = gettext("Draft (Never published)");
+var published = xblockInfo.get('published');
+var hasChanges = xblockInfo.get('has_changes');
+var visibleToStaffOnly = false;
+if (xblockInfo.get('published_on')) {
+    if (xblockInfo.get('has_changes')) {
+        publishClasses = publishClasses + " has-changes";
+    }
+    publishClasses = publishClasses + " is-published";
+}
+if (xblockInfo.get('released_to_students')) {
+    publishClasses = publishClasses + " is-released";
+}
+if (visibleToStaffOnly) {
+    publishClasses = publishClasses + " is-staff-only";
+}
+
+
+var listType = 'list-for-' + xblockType;
+if (xblockType === 'course') {
+    listType = 'list-subsections';
+} else if (xblockType === 'section') {
+    listType = 'list-subsections';
+} else if (xblockType === 'subsection') {
+    listType = 'list-units';
+}
+%>
 <% if (parentInfo) { %>
 <li class="outline-item outline-item-<%= xblockType %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
@@ -10,8 +39,10 @@
     </div>
 <% } %>
 
-        <ol class="sortable-list sortable-<%= xblockType %>-list">
-        </ol>
+        <div class="<%= xblockType %>-content outline-content">
+            <ol class="<%= listType %> is-sortable">
+            </ol>
+        </div>
 
         <% if (childType) { %>
             <div class="add-xblock-component">

@@ -77,9 +77,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
             it('can render itself', function() {
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
-                expect(unitOutlineView.$('.sortable-course-list')).toExist();
-                expect(unitOutlineView.$('.sortable-section-list')).toExist();
-                expect(unitOutlineView.$('.sortable-subsection-list')).toExist();
+                expect(unitOutlineView.$('.list-sections')).toExist();
+                expect(unitOutlineView.$('.list-subsections')).toExist();
+                expect(unitOutlineView.$('.list-units')).toExist();
             });
 
             it('can add a unit', function() {

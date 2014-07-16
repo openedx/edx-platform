@@ -31,9 +31,19 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "has_changes": null,
             /**
-             * True iff a published version of the xblock exists.
+             * True if either:
+             * 1) The block itself has never been published.
+             * 2) At least one of the block's children has never been published.
              */
-            "published": null,
+            "has_unpublished_content": null,
+            /**
+             * True iff the xblock and all of its children are published (excluding staff-only items)
+             */
+            "fully_published": null,
+            /**
+             * True iff the xblock and all of its children are visible to students (excluding staff-only items)
+             */
+            "fully_visible_to_students": null,
             /**
              * If true, only course staff can see the xblock regardless of publish status or
              * release date status.

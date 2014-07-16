@@ -2,16 +2,19 @@
 var publishClasses = "";
 var title = gettext("Draft (Never published)");
 if (published) {
-    if (published && hasChanges) {
-        publishClasses = publishClasses + " is-draft";
+    publishClasses = publishClasses + " is-published";
+    if (hasChanges) {
+        publishClasses = publishClasses + " has-changes";
         title = gettext("Draft (Unpublished changes)");
     } else {
-        publishClasses = publishClasses + " is-published";
         title = gettext("Published");
     }
 }
 if (releaseDate) {
     publishClasses = publishClasses + " is-scheduled";
+}
+if (releasedToStudents) {
+    publishClasses = publishClasses + " is-released";
 }
 if (visibleToStaffOnly) {
     publishClasses = publishClasses + " is-staff-only";
