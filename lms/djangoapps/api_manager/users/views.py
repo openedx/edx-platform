@@ -852,16 +852,16 @@ class UsersPreferences(SecureAPIView):
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
-            return Response({}, status.HTTP_404_NOT_FOUND)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         if not len(request.DATA):
-            return Response({}, status.HTTP_400_BAD_REQUEST)
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         # do a quick inspection to make sure we're only getting strings as values
         for key in request.DATA.keys():
             value = request.DATA[key]
             if not isinstance(value, basestring):
-                return Response({}, status.HTTP_400_BAD_REQUEST)
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         status_code = status.HTTP_200_OK
         for key in request.DATA.keys():
@@ -883,6 +883,44 @@ class UsersPreferences(SecureAPIView):
                 status_code = status.HTTP_201_CREATED
 
         return Response({}, status_code)
+
+class UsersPreferencesDetail(SecureAPIView):
+    """
+    ### The UsersPreferencesDetail view allows clients to interact with the User's preferences
+    - URI: ```/api/users/{user_id}/preferences/{preference_id}```
+    - DELETE: Removes the specified preference from the user's record
+    ### Use Cases/Notes:
+    * Use DELETE to remove the last-visited course for a user (for example)
+    """
+
+    def get(self, request, user_id, preference_id):  # pylint: disable=W0613
+        """
+        GET returns the specified preference for the specified user
+        """
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        response_data = {}
+        try:
+            response_data[preference_id] = user.preferences.get(key=preference_id).value
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        return Response(response_data)
+
+    def delete(self, request, user_id, preference_id):  # pylint: disable=W0613
+        """
+        DELETE /api/users/{user_id}/preferences/{preference_id}
+        """
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        for preference in user.preferences.all():
+            if preference.key == preference_id:
+                UserPreference.objects.get(user_id=user_id, key=preference.key).delete()
+                break
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 class UsersOrganizationsList(SecureListAPIView):

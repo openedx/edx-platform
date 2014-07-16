@@ -931,12 +931,12 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_user_preferences_user_not_found(self):
+    def test_user_preferences_user_list_get_not_found(self):
         test_uri = '/api/users/{}/preferences'.format('999999')
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_user_preferences_default(self):
+    def test_user_preferences_list_get_default(self):
         # By default newly created users will have one initial preference settings:
         # 'pref-lang' = 'en'
         user_id = self._create_test_user()
@@ -946,12 +946,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data['pref-lang'], 'en')
 
-    def test_post_user_preferences_user_not_found(self):
+    def test_user_preferences_list_post_user_not_found(self):
         test_uri = '/api/users/{}/preferences'.format('999999')
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 404)
 
-    def test_post_user_preferences_bad_request(self):
+    def test_user_preferences_list_post_bad_request(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {})
@@ -966,7 +966,7 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, {"a_boolean": False})
         self.assertEqual(response.status_code, 400)
 
-    def test_post_user_preferences(self):
+    def test_user_preferences_list_post(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
@@ -977,7 +977,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'bar')
 
-    def test_update_user_preferences(self):
+    def test_user_preferences_list_update(self):
         user_id = self._create_test_user()
         test_uri = '/api/users/{}/preferences'.format(user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
@@ -989,6 +989,39 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data['pref-lang'], 'en')
         self.assertEqual(response.data['foo'], 'updated')
+
+    def test_user_preferences_detail_get(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}/{}'.format(test_uri, 'foo')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['foo'], 'bar')
+
+    def test_user_preferences_detail_get_invalid_user(self):
+        test_uri = '/api/users/12345/preferences/foo'
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_preferences_detail_delete(self):
+        user_id = self._create_test_user()
+        test_uri = '/api/users/{}/preferences'.format(user_id)
+        response = self.do_post(test_uri, {"foo": "bar"})
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}/{}'.format(test_uri, 'foo')
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_preferences_detail_delete_invalid_user(self):
+        test_uri = '/api/users/12345/preferences/foo'
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 404)
 
     def test_course_grades(self):
         test_uri = '/api/users'
