@@ -648,18 +648,21 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         # Test XML wikis
-        course_locations = self.store.get_courses_for_wiki('toy')
-        self.assertEqual(len(course_locations), 1)
-        self.assertIn(self.course_locations[self.XML_COURSEID1], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('toy')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertIn(self.course_locations[self.XML_COURSEID1].course_key, wiki_courses)
 
-        course_locations = self.store.get_courses_for_wiki('simple')
-        self.assertEqual(len(course_locations), 1)
-        self.assertIn(self.course_locations[self.XML_COURSEID2], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('simple')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertIn(self.course_locations[self.XML_COURSEID2].course_key, wiki_courses)
 
         # Test Mongo wiki
-        course_locations = self.store.get_courses_for_wiki('999')
-        self.assertEqual(len(course_locations), 1)
-        self.assertIn(self.course_locations[self.MONGO_COURSEID], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('999')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),  # Branch agnostic
+            wiki_courses
+        )
 
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
@@ -744,7 +747,6 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertTrue(self.store.has_changes(item.location))
         self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
 
-
     @ddt.data('draft', 'split')
     def test_get_courses_for_wiki_shared(self, default_ms):
         """
@@ -753,8 +755,11 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
 
         # verify initial state - initially, we should have a wiki for the Mongo course
-        course_locations = self.store.get_courses_for_wiki('999')
-        self.assertEqual([self.course_locations[self.MONGO_COURSEID]], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('999')
+        self.assertIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),  # Branch agnostic
+            wiki_courses
+        )
 
         # set Mongo course to share the wiki with simple course
         mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
@@ -762,23 +767,40 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.update_item(mongo_course, self.user_id)
 
         # now mongo_course should not be retrievable with old wiki_slug
-        course_locations = self.store.get_courses_for_wiki('999')
-        self.assertEqual(len(course_locations), 0)
+        wiki_courses = self.store.get_courses_for_wiki('999')
+        self.assertEqual(len(wiki_courses), 0)
 
         # but there should be two courses with wiki_slug 'simple'
-        course_locations = self.store.get_courses_for_wiki('simple')
-        self.assertEqual(len(course_locations), 2)
-        for cid in [self.MONGO_COURSEID, self.XML_COURSEID2]:
-            self.assertIn(self.course_locations[cid], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('simple')
+        self.assertEqual(len(wiki_courses), 2)
+        self.assertIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            wiki_courses
+        )
+        self.assertIn(self.course_locations[self.XML_COURSEID2].course_key, wiki_courses)
 
         # configure mongo course to use unique wiki_slug.
         mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
         mongo_course.wiki_slug = 'MITx.999.2013_Spring'
         self.store.update_item(mongo_course, self.user_id)
         # it should be retrievable with its new wiki_slug
-        course_locations = self.store.get_courses_for_wiki('MITx.999.2013_Spring')
-        self.assertEqual(len(course_locations), 1)
-        self.assertIn(self.course_locations[self.MONGO_COURSEID], course_locations)
+        wiki_courses = self.store.get_courses_for_wiki('MITx.999.2013_Spring')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            wiki_courses
+        )
+        # and NOT retriveable with its old wiki_slug
+        wiki_courses = self.store.get_courses_for_wiki('simple')
+        self.assertEqual(len(wiki_courses), 1)
+        self.assertNotIn(
+            self.course_locations[self.MONGO_COURSEID].course_key.replace(branch=None),
+            wiki_courses
+        )
+        self.assertIn(
+            self.course_locations[self.XML_COURSEID2].course_key,
+            wiki_courses
+        )
 
 
 #=============================================================================================================

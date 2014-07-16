@@ -815,7 +815,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         :return: list of course locations
         """
         courses = self.get_courses()
-        return [course.location for course in courses if (course.wiki_slug == wiki_slug)]
+        return [course.location.course_key for course in courses if (course.wiki_slug == wiki_slug)]
 
     def heartbeat(self):
         """

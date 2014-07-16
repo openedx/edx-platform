@@ -108,8 +108,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     SCHEMA_VERSION = 1
     reference_type = Locator
-    # a list of field name to store in course index search_targets. Note, this will
-    # only record one value per key. If the draft and published disagree, the last one set wins.
+    # a list of field names to store in course index search_targets. Note, this will
+    # only record one value per key. If branches disagree, the last one set wins.
     # It won't recompute the value on operations such as update_course_index (e.g., to revert to a prev
     # version) but those functions will have an optional arg for setting these.
     SEARCH_TARGET_DICT = ['wiki_slug']
@@ -996,6 +996,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         master_branch: the tag (key) for the version name in the dict which is the DRAFT version. Not the actual
         version guid, but what to call it.
+
+        search_targets: a dict of search key and value. For example, wiki_slug. Add any fields whose edits
+        should change the search targets to SplitMongoModuleStore.SEARCH_TARGET dict
 
         versions_dict: the starting version ids where the keys are the tags such as DRAFT and PUBLISHED
         and the values are structure guids. If provided, the new course will reuse this version (unless you also
@@ -1887,13 +1890,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         Find all the courses which cached that they have the given field with the given value.
 
-        Returns: list of course_keys
+        Returns: list of branch-agnostic course_keys
         """
         entries = self.db_connection.find_matching_course_indexes(
             {'search_targets.{}'.format(field_name): field_value}
         )
         return [
-            CourseLocator(entry['org'], entry['course'], entry['run'])  # which branch? TODO
+            CourseLocator(entry['org'], entry['course'], entry['run'])  # Branch agnostic
             for entry in entries
         ]
 
@@ -1901,7 +1904,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
-        :return: list of course locations
+        :return: list of course keys
         """
         return self.find_courses_by_search_target('wiki_slug', wiki_slug)
 
