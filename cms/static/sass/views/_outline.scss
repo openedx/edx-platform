@@ -507,314 +507,80 @@
     }
   }
 
+  // modal - edit outline item settings
+  // ------------------------
+  .edit-outline-item-modal {
 
+    .list-fields {
+      margin-bottom: $baseline;
 
-  // modal to edit section publish settings
-  // basic non-backbone modal-window set-up
-  // .wrapper-modal-window {
-  //   @extend %ui-depth4;
-  //   @include transition(all $tmg-f2 ease-in-out);
-  //   visibility: hidden;
-  //   pointer-events: none;
-  //   display: none;
-  //   position: fixed;
-  //   top: 0;
-  //   overflow: scroll;
-  //   background: $black-t2;
-  //   width: 100%;
-  //   height: 100%;
-  //   text-align: center;
-
-  //   &:before {
-  //     content: '';
-  //     display: inline-block;
-  //     height: 100%;
-  //     vertical-align: middle;
-  //     margin-right: -0.25em; /* Adjusts for spacing */
-  //   }
-
-  //   .modal-window {
-  //     -webkit-transform: translate(-50%, -50%);
-  //     transform: translate(-50%, -50%);
-  //     position: absolute;
-  //     top: 50%;
-  //     left: 50%;
-  //     opacity: 0;
-  //   }
-  // }
-
-  // modal-window showing/hiding
-  // &.modal-window-is-shown {
-  //   overflow: hidden;
-
-  //   .wrapper-modal-window.is-shown {
-  //     visibility: visible;
-  //     pointer-events: auto;
-  //     display: block;
-
-  //     .modal-window {
-  //       opacity: 1.0;
-  //     }
-  //   }
-  // }
-
-   .wrapper-modal-window {
-      .scheduled-date-input,
-      .due-date-input {
-        @include clearfix;
-
-        .date-input,
-        .time-input {
-          display: inline-block;
-          width: 100px;
-        }
-
-        .inherits-check {
-          label {
-            font-size: 13px;
-          }
-        }
-
-        .notice {
-          @extend %t-copy-sub2;
-          margin-top: 6px;
-          color: #999;
-        }
+      // CASE: last child
+      &:last-child {
+        margin-bottom: 0;
       }
-
-      .due-date-input {
-        label {
-          display: inline-block !important;
-          margin-right: 10px;
-        }
-
-        a {
-          font-size: 11px;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-
-        .date-setter {
-          @include clearfix;
-          display: block;
-        }
-
-        .remove-date {
-          display: block;
-          margin-top: ($baseline/4);
-        }
-      }
-
-      .gradable {
-
-      label {
-        // @extend %t-title8;
-        display: inline-block;
-        vertical-align: top;
-      }
-
-      .gradable-status {
-        position: relative;
-        top: -4px;
-        display: inline-block;
-        margin-left: 10px;
-        width: 65%;
-
-        .status-label {
-          margin: 0;
-          padding: 0;
-          background: transparent;
-          color: $blue;
-          border: none;
-          font-size: 11px;
-          font-weight: bold;
-          text-transform: uppercase;
-        }
-
-        .menu-toggle {
-          z-index: 100;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 20px;
-          background: transparent;
-
-          &:hover, &.is-active {
-                  color: $blue;
-          }
-        }
-
-      .menu {
-        @include transition(opacity $tmg-f2 linear 0s);
-        z-index: 1;
-        position: absolute;
-        top: -12px;
-        left: -7px;
-        display: none;
-        width: 100%;
-        margin: 0;
-        padding: 8px 12px;
-        opacity: 0.0;
-        background: $white;
-        border: 1px solid $mediumGrey;
-        font-size: 12px;
-        border-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-
-
-        li {
-          margin-bottom: 3px;
-          padding-bottom: 3px;
-          border-bottom: 1px solid $lightGrey;
-
-          &:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border: none;
-          }
-        }
-
-        a {
-
-          &.is-selected {
-            font-weight: bold;
-          }
-        }
-      }
-
-      // dropdown state
-      &.is-active {
-
-        .menu {
-          z-index: 10000;
-          display: block;
-          opacity: 1.0;
-        }
-
-        .menu-toggle {
-          z-index: 1000;
-        }
-      }
-
-      // set state
-      &.is-set {
-
-        .menu-toggle {
-          color: $blue;
-        }
-
-        .status-label {
-          display: block;
-          color: $blue;
-        }
-      }
-    }
-  }
-   }
-
-  .edit-section-publish-settings {
-
-    .picker {
-      @include clearfix();
-
 
       .field {
-        float: left;
-        margin: 0 ($baseline/2) ($baseline/2);
+        display: inline-block;
+        vertical-align: top;
+        margin-right: ($baseline/2);
 
-        label,
-        input {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
           display: block;
-          text-align: left;
         }
 
         label {
           @extend %t-copy-sub1;
-          margin-bottom: ($baseline/4);
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
           font-weight: 600;
+
+          &.is-focused {
+            color: $blue;
+          }
         }
 
-        input[type="text"] {
-          @extend %t-copy-sub1;
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: long length
+          &.short {
+            width: 25%;
+          }
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          margin-right: ($baseline/2);
         }
       }
     }
-  }
 
+    // UI: grading settings
+    .edit-settings-grading {
 
-
-  // UI: DnD - specific elems/cases - section
-  .courseware-section {
-
-    .draggable-drop-indicator-before {
-      top: -($baseline/2);
-      left: 0;
-    }
-
-    .draggable-drop-indicator-after {
-      bottom: -13px;
-      left: 0;
-    }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-      background-color: $ui-update-color;
-    }
-  }
-
-  // UI: DnD - specific elems/cases - subsection
-  .courseware-subsection {
-
-    .draggable-drop-indicator-before {
-      top: 0;
-    }
-
-    .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
+      .grading-type {
+        margin-bottom: $baseline;
       }
     }
-  }
-
-  // UI: DnD - specific elems/cases - unit
-  .courseware-unit {
-
-    .draggable-drop-indicator-before {
-      top: 0;
-    }
-
-    .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
-      }
-    }
-  }
-
-  // UI: DnD - specific elems/cases - empty parents splint
-  .ui-splint-indicator {
-    position: relative;
   }
 }

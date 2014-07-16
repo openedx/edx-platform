@@ -334,3 +334,38 @@
     filter: alpha(opacity=50);
   }
 }
+
+// applications of modal
+// ------------------------
+.modal-window {
+
+  .modal-section {
+    margin-bottom: $baseline;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .modal-section-title {
+    @extend %t-title6;
+    margin: 0 0 ($baseline*0.75) 0;
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+    color: $gray-d2;
+    font-weight: 600;
+  }
+
+  .modal-section-content {
+
+    .list-fields, .list-actions {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .list-actions {
+      @extend %actions-list;
+      margin-left: ($baseline/4);
+    }
+  }
+}

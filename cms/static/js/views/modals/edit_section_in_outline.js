@@ -19,7 +19,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
                 addSaveButton: true,
-                modalSize: 'med'
+                modalSize: 'large'
             }),
 
             initialize: function() {
