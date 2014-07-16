@@ -239,8 +239,8 @@ class CourseUpdateTest(CourseTestCase):
         """
         Test that a user can successfully post on course updates and handouts of a course
         """
-        course_key = SlashSeparatedCourseKey('Org1', 'Course_1', 'Run_1')
-        course_update_url = self.create_update_url(course_key=course_key)
+        #course_key = SlashSeparatedCourseKey('Org1', 'Course_1', 'Run_1')
+        course_update_url = self.create_update_url(course_key=self.course.id)
 
         # create a course via the view handler
         self.client.ajax_post(course_update_url)
