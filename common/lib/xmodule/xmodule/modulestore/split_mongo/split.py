@@ -895,9 +895,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
         """
+        structure = self._lookup_course(parent_usage_key.course_key)['structure']
         xblock = self.create_item(user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields, **kwargs)
 
-        structure = self._lookup_course(parent_usage_key.course_key)['structure']
         # copy the structure and modify the new one
         if continue_version:
             new_structure = structure

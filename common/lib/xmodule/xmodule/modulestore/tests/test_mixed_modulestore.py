@@ -123,24 +123,21 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
+        # create course
         self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
-        self.writable_chapter_location = self.course.id.make_usage_key('chapter', 'Overview').version_agnostic()
-        block_id = self.writable_chapter_location.name
-        chapter = self.store.create_child(
-            # don't use course_location as it may not be the repr
-            self.user_id, self.course.location,
-            self.writable_chapter_location.block_type, block_id=block_id
-        )
         if isinstance(self.course.id, CourseLocator):
             self.course_locations[self.MONGO_COURSEID] = self.course.location.version_agnostic()
         else:
             self.assertEqual(self.course.id, course_key)
-            self.assertEqual(chapter.location, self.writable_chapter_location)
+
+        # create chapter
+        chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
+        self.writable_chapter_location = chapter.location
 
     def _create_block_hierarchy(self):
         """
         Creates a hierarchy of blocks for testing
-        Each block is assigned as a field of the class and can be easily accessed
+        Each block's (version_agnostic) location is assigned as a field of the class and can be easily accessed
         """
         BlockInfo = namedtuple('BlockInfo', 'field_name, category, display_name, sub_tree')
 
@@ -185,9 +182,7 @@ class TestMixedModuleStore(unittest.TestCase):
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
-            # reload the block to update its children field
-            block = self.store.get_item(block.location.version_agnostic())
-            setattr(self, block_info.field_name, block)
+            setattr(self, block_info.field_name, block.location.version_agnostic())
 
         for tree in trees:
             create_sub_tree(self.course, tree)
@@ -420,14 +415,13 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(parent, self.course_locations[self.XML_COURSEID1])
 
     def verify_get_parent_locations_results(self, expected_results):
-        # expected_results should be a list of (child, parent, revision)
-        for test in expected_results:
+        for child_location, parent_location, revision in expected_results:
             self.assertEqual(
-                test[1].location if test[1] else None,
-                self.store.get_parent_location(test[0].location, revision=test[2])
+                parent_location,
+                self.store.get_parent_location(child_location, revision=revision)
             )
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_get_parent_locations_moved_child(self, default_ms):
         self.initdb(default_ms)
         self._create_block_hierarchy()
@@ -436,30 +430,34 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.publish(self.course.location, self.user_id)
 
         # make drafts of verticals
-        self.store.convert_to_draft(self.vertical_x1a.location, self.user_id)
-        self.store.convert_to_draft(self.vertical_y1a.location, self.user_id)
+        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+        self.store.convert_to_draft(self.vertical_y1a, self.user_id)
 
         # move child problem_x1a_1 to vertical_y1a
-        child_to_move = self.problem_x1a_1
-        old_parent = self.vertical_x1a
-        new_parent = self.vertical_y1a
-        old_parent.children.remove(child_to_move.location)
-        new_parent.children.append(child_to_move.location)
+        child_to_move_location = self.problem_x1a_1
+        new_parent_location = self.vertical_y1a
+        old_parent_location = self.vertical_x1a
+
+        old_parent = self.store.get_item(old_parent_location)
+        old_parent.children.remove(child_to_move_location.replace(version_guid=old_parent.location.version_guid))
         self.store.update_item(old_parent, self.user_id)
+
+        new_parent = self.store.get_item(new_parent_location)
+        new_parent.children.append(child_to_move_location.replace(version_guid=new_parent.location.version_guid))
         self.store.update_item(new_parent, self.user_id)
 
         self.verify_get_parent_locations_results([
-            (child_to_move, new_parent, None),
-            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move, old_parent, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, new_parent_location, None),
+            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_move_location, old_parent_location, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
-            (child_to_move, new_parent, None),
-            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move, new_parent, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, new_parent_location, None),
+            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft')
@@ -471,28 +469,27 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.publish(self.course.location, self.user_id)
 
         # make draft of vertical
-        self.store.convert_to_draft(self.vertical_y1a.location, self.user_id)
+        self.store.convert_to_draft(self.vertical_y1a, self.user_id)
 
         # delete child problem_y1a_1
-        child_to_delete = self.problem_y1a_1
-        old_parent = self.vertical_y1a
-        self.store.delete_item(child_to_delete.location, self.user_id)
+        child_to_delete_location = self.problem_y1a_1
+        old_parent_location = self.vertical_y1a
+        self.store.delete_item(child_to_delete_location, self.user_id)
 
         self.verify_get_parent_locations_results([
-            (child_to_delete, old_parent, None),
+            (child_to_delete_location, old_parent_location, None),
             # Note: The following could be an unexpected result, but we want to avoid an extra database call
-            (child_to_delete, old_parent, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_delete, old_parent, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_delete_location, old_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_delete_location, old_parent_location, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
-            (child_to_delete, None, None),
-            (child_to_delete, None, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_delete, None, ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_delete_location, None, None),
+            (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.draft_preferred),
+            (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
-
 
     @ddt.data('draft')
     def test_revert_to_published_root_draft(self, default_ms):
@@ -501,23 +498,25 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        vertical_children_num = len(self.vertical_x1a.children)
+
+        vertical = self.store.get_item(self.vertical_x1a)
+        vertical_children_num = len(vertical.children)
 
         self.store.publish(self.course.location, self.user_id)
 
         # delete leaf problem (will make parent vertical a draft)
-        self.store.delete_item(self.problem_x1a_1.location, self.user_id)
+        self.store.delete_item(self.problem_x1a_1, self.user_id)
 
-        draft_parent = self.store.get_item(self.vertical_x1a.location)
+        draft_parent = self.store.get_item(self.vertical_x1a)
         self.assertEqual(vertical_children_num - 1, len(draft_parent.children))
         published_parent = self.store.get_item(
-            self.vertical_x1a.location,
+            self.vertical_x1a,
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.assertEqual(vertical_children_num, len(published_parent.children))
 
-        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
-        reverted_parent = self.store.get_item(self.vertical_x1a.location)
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)
+        reverted_parent = self.store.get_item(self.vertical_x1a)
         self.assertEqual(vertical_children_num, len(published_parent.children))
         self.assertEqual(reverted_parent, published_parent)
 
@@ -530,14 +529,15 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
         self.store.publish(self.course.location, self.user_id)
 
-        orig_display_name = self.problem_x1a_1.display_name
+        problem = self.store.get_item(self.problem_x1a_1)
+        orig_display_name = problem.display_name
 
         # Change display name of problem and update just it (so parent remains published)
-        self.problem_x1a_1.display_name = "updated before calling revert"
-        self.store.update_item(self.problem_x1a_1, self.user_id)
-        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+        problem.display_name = "updated before calling revert"
+        self.store.update_item(problem, self.user_id)
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)
 
-        reverted_problem = self.store.get_item(self.problem_x1a_1.location)
+        reverted_problem = self.store.get_item(self.problem_x1a_1)
         self.assertEqual(orig_display_name, reverted_problem.display_name)
 
     @ddt.data('draft')
@@ -549,9 +549,9 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
         self.store.publish(self.course.location, self.user_id)
 
-        orig_vertical = self.vertical_x1a
-        self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
-        reverted_vertical = self.store.get_item(self.vertical_x1a.location)
+        orig_vertical = self.store.get_item(self.vertical_x1a)
+        self.store.revert_to_published(self.vertical_x1a, self.user_id)
+        reverted_vertical = self.store.get_item(self.vertical_x1a)
         self.assertEqual(orig_vertical, reverted_vertical)
 
     @ddt.data('draft')
@@ -562,7 +562,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
         with self.assertRaises(InvalidVersionError):
-            self.store.revert_to_published(self.vertical_x1a.location, self.user_id)
+            self.store.revert_to_published(self.vertical_x1a, self.user_id)
 
     @ddt.data('draft')
     def test_revert_to_published_direct_only(self, default_ms):
@@ -571,8 +571,8 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
-        self.store.revert_to_published(self.sequential_x1.location, self.user_id)
-        reverted_parent = self.store.get_item(self.sequential_x1.location)
+        self.store.revert_to_published(self.sequential_x1, self.user_id)
+        reverted_parent = self.store.get_item(self.sequential_x1)
         # It does not discard the child vertical, even though that child is a draft (with no published version)
         self.assertEqual(1, len(reverted_parent.children))
 
@@ -650,31 +650,58 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
+
         # publish
         self.store.publish(self.course.location, self.user_id)
         published_xblock = self.store.get_item(
-            self.vertical_x1a.location.replace(branch=None),
+            self.vertical_x1a,
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.assertIsNotNone(published_xblock)
 
         # unpublish
-        self.store.unpublish(self.vertical_x1a.location, self.user_id)
+        self.store.unpublish(self.vertical_x1a, self.user_id)
 
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(
-                self.vertical_x1a.location.replace(branch=None),
+                self.vertical_x1a,
                 revision=ModuleStoreEnum.RevisionOption.published_only
             )
 
-        draft_xblock_from_get_item = self.store.get_item(
-            self.vertical_x1a.location.replace(branch=None),
+        # make sure draft version still exists
+        draft_xblock = self.store.get_item(
+            self.vertical_x1a,
             revision=ModuleStoreEnum.RevisionOption.draft_only
         )
-        self.assertEquals(
-            published_xblock.location.version_agnostic().replace(branch=None),
-            draft_xblock_from_get_item.location.version_agnostic().replace(branch=None)
-        )
+        self.assertIsNotNone(draft_xblock)
+
+    @ddt.data('draft', 'split')
+    def test_compute_publish_state(self, default_ms):
+        """
+        Test the compute_publish_state method
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        item_location = self.vertical_x1a
+        item = self.store.get_item(item_location)
+        self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+
+        self.store.publish(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+
+        self.store.unpublish(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+
+        self.store.publish(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+
+        self.store.convert_to_draft(item_location, self.user_id)
+        item = self.store.get_item(item_location)
+        self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
 
 #=============================================================================================================
 # General utils for not using django settings
