@@ -10,6 +10,7 @@
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2014
 # hoad, 2013
 # HoaD, 2013
+# minhtuev <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
@@ -25,6 +26,7 @@
 # Đoàn Trần Hoàng <dthoang92@gmail.com>, 2014
 # Nguyen Quang Huy <huynq23091@gmail.com>, 2013-2014
 # hoad, 2013
+# minhtuev <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
@@ -47,8 +49,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 10:28-0400\n"
-"PO-Revision-Date: 2014-07-07 14:30+0000\n"
+"POT-Creation-Date: 2014-07-11 16:03-0400\n"
+"PO-Revision-Date: 2014-07-10 19:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +65,7 @@ msgstr ""
 #: cms/static/js/views/modals/edit_xblock.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: cms/static/coffee/src/views/tabs.js cms/static/js/base.js
 #: cms/static/js/views/asset.js cms/static/js/views/baseview.js
@@ -320,7 +322,7 @@ msgstr "Phát"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Fill browser"
-msgstr ""
+msgstr "Chế độ toàn màn hình"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Exit full browser"
@@ -431,8 +433,14 @@ msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
+#: common/templates/js/image-modal.underscore
+#, fuzzy
 msgid "Close"
-msgstr "Đóng"
+msgstr ""
+"#-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#\n"
+"Đóng\n"
+"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
+"Thoát"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
@@ -630,16 +638,16 @@ msgstr ""
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr ""
+msgstr "%s trước"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
-msgstr ""
+msgstr "%s kể từ nay"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "chưa đến một phút"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
@@ -779,6 +787,7 @@ msgid "Reply"
 msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -826,7 +835,7 @@ msgstr "Loại bỏ"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid "Chosen %s"
-msgstr ""
+msgstr "%s đã được chọn"
 
 #: lms/static/admin/js/SelectFilter2.js
 msgid ""
@@ -854,6 +863,8 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Bạn chưa lưu thay đổi trong các mục chỉnh sửa cá nhân. Nếu bạn chạy một tác "
+"vụ, những thay đổi  chưa lưu sẽ bị mất."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -861,6 +872,8 @@ msgid ""
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Bạn đã chọn một tác vụ, nhưng bạn chưa lưu những thay đổi của bạn trong mục "
+"cá nhân. Hãy nhấn OK để lưu. Bạn sẽ cần chạy lại tác vụ."
 
 #: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
 msgid ""
@@ -1445,7 +1458,7 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr ""
+msgstr "Trợ Giúp Chỉnh Sửa Markdown"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
@@ -1473,15 +1486,15 @@ msgstr "Hình Ảnh (Ctrl+G)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
-msgstr ""
+msgstr "Danh Sách Đánh Số (Ctrl+O)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
-msgstr ""
+msgstr "Danh Sách Gạch Đầu dòng (Ctrl+U)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading (Ctrl+H)"
-msgstr ""
+msgstr "Tiêu đề (Ctrl+H)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
@@ -1489,15 +1502,15 @@ msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr ""
+msgstr "Hoàn tác (Ctrl+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr ""
+msgstr "Làm lại thao tác (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr ""
+msgstr "Làm lại thao tác (Ctrl+Shift+Z)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"
@@ -1525,11 +1538,11 @@ msgstr "nhập code ở đây"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
-msgstr ""
+msgstr "Liệt kê các mục"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading"
-msgstr ""
+msgstr "Tiêu đề"
 
 #: lms/static/js/ajax-error.js
 msgid "You have been logged out of your edX account. "
@@ -1692,6 +1705,22 @@ msgstr ""
 msgid "You must specify a name"
 msgstr "Bạn phải xác định một tên"
 
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr ""
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -1813,6 +1842,13 @@ msgstr ""
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr "Đang lưu"
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] ""
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -1959,6 +1995,10 @@ msgstr ""
 msgid "Editing: %(title)s"
 msgstr "Đang chỉnh sửa: %(title)s"
 
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -1999,7 +2039,7 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Fullscreen"
-msgstr ""
+msgstr "Toàn màn hình"
 
 #: common/templates/js/image-modal.underscore
 msgid "Large"
@@ -2007,11 +2047,11 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom In"
-msgstr ""
+msgstr "Nhỏ lại"
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
-msgstr ""
+msgstr "phóng to ra"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
@@ -2123,6 +2163,10 @@ msgid "total exercises that won't be graded"
 msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr ""
 
@@ -2194,6 +2238,10 @@ msgstr ""
 msgid "Add a Chapter"
 msgstr ""
 
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr ""
+
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
@@ -2220,6 +2268,10 @@ msgstr ""
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
+msgstr ""
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
 msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
@@ -2250,6 +2302,10 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

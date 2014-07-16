@@ -240,12 +240,12 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
+#    city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     cedula = models.CharField(max_length=132, blank=True, null=True)
-    city = models.ForeignKey(City, default=None, blank=True, null=True)
+    city = models.ForeignKey('cities.City', default=None, blank=True, null=True)
 
     def get_meta(self):
         js_str = self.meta

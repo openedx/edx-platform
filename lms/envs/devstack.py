@@ -3,7 +3,6 @@ Specific overrides to the base prod settings to make development easier.
 """
 
 from .aws import * # pylint: disable=wildcard-import, unused-wildcard-import
-from .iaen_settings import *
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
@@ -88,3 +87,9 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+
+PLATFORM_NAME = 'MOOC UPEx'
+SITE_NAME = 'upex.edu.ec'

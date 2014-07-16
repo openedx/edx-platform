@@ -56,9 +56,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 10:28-0400\n"
-"PO-Revision-Date: 2014-07-07 14:30+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-07-11 16:03-0400\n"
+"PO-Revision-Date: 2014-07-17 05:51+0000\n"
+"Last-Translator: may <may@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,6 +83,7 @@ msgstr "حسناً"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
@@ -724,7 +725,7 @@ msgstr "تمّ الإسقاط على الهدف"
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr "من %s ثانية مضت"
+msgstr "من %s ثانية"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
@@ -898,6 +899,7 @@ msgid "Reply"
 msgstr "الرد"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -1904,6 +1906,22 @@ msgstr "هل تبحث عن مساعدة في نظام استوديو Studio؟"
 msgid "You must specify a name"
 msgstr "ينبغي أن تقوم بتحديد إسم"
 
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr ""
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -2031,6 +2049,18 @@ msgstr "الرجاء اختيار ملف PDF ليتم تحميله. "
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr "حفظ"
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -2173,6 +2203,7 @@ msgid "Adding&hellip;"
 msgstr "الإضافة والمساعدة؛ Adding&hellip؛"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -2185,6 +2216,10 @@ msgstr "العنصر"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "تعديل: %(title)s"
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
+msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -2355,6 +2390,10 @@ msgid "total exercises that won't be graded"
 msgstr "إجمالي التمارين التي لن يتمّ تقييمها"
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr "لم يتم تحديد أوراق موزّعة "
 
@@ -2429,6 +2468,10 @@ msgstr "المعلومات الخاصة بالفصل"
 msgid "Add a Chapter"
 msgstr "إضافة فصل"
 
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr ""
+
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
@@ -2456,6 +2499,10 @@ msgstr "استبدال"
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "تنزيل"
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -2486,6 +2533,10 @@ msgstr "عرض مباشر"
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "تمّ تحميل الملف بنجاح"
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
+msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"
