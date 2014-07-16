@@ -215,3 +215,114 @@ def reverse_usage_url(handler_name, usage_key, kwargs=None):
     Creates the URL for handlers that use usage_keys as URL parameters.
     """
     return reverse_url(handler_name, 'usage_key_string', usage_key, kwargs)
+
+
+class BulkSettingsUtil():
+    """
+    Utility class that hold functions for bulksettings operations
+    """
+
+    COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+
+    SECTION_SETTING_TYPES = ['start']
+    SUBSECTION_SETTING_TYPES = ['start', 'due', 'format']
+    UNIT_SETTING_TYPES = []
+    PROBLEM_SETTING_TYPES = ['max_attempts', 'weight', 'rerandomize', 'showanswer', 'submission_wait_seconds']
+    SECTION_SETTING_MAP = {'start': 'Release Date'}
+    SUBSECTION_SETTING_MAP = {'start': 'Release', 'due': 'Due', 'format': 'Type'}
+    CATEGORY_SETTING_MAP = {
+        "chapter": SECTION_SETTING_TYPES,
+        "sequential": SUBSECTION_SETTING_TYPES,
+        "vertical": UNIT_SETTING_TYPES,
+        "problem": PROBLEM_SETTING_TYPES,
+    }
+
+    @classmethod
+    def get_settings_dict_for_category(cls, category, child, parent):
+        """
+        Returns the settings dictionary for the given child of given category.
+
+        Parent is required since .parent nor .get_parent() work.
+        """
+
+        settings_dict = {}
+        settings_dict['name'] = child.display_name
+        settings_dict['children'] = []
+        settings_dict['url'] = cls.get_settings_url_for_category(category, child, parent)
+
+        for setting_type in cls.CATEGORY_SETTING_MAP[category]:
+            value = getattr(child, setting_type)
+            if isinstance(value, datetime):
+                value = value.strftime('%m/%d/%Y')
+
+            settings_dict[setting_type] = value
+
+        if category == 'vertical':
+            settings_dict['ispublic'] = compute_publish_state(child)
+
+        return settings_dict
+
+    @classmethod
+    def get_settings_url_for_category(cls, category, child, parent):
+        """
+        Returns the URLs that the user needs to go to in order to change settings.
+
+        Chapters and Problems need urls that match for their parents:
+            - Chapters: Course url
+            - Problems: Unit url
+        """
+    
+        if category == "chapter":
+            return reverse('contentstore.views.course_handler',
+                            kwargs={'course_key_string': unicode(parent.id)})
+
+        elif category == "sequential":
+            return reverse('contentstore.views.subsection_handler',
+                            kwargs={'usage_key_string': unicode(child.location)})
+
+        elif category == "unit":
+            return reverse('contentstore.views.unit_handler',
+                            kwargs={'usage_key_string': unicode(child.location)})
+
+        else:
+            return reverse('contentstore.views.unit_handler',
+                            kwargs={'usage_key_string': unicode(parent.location)})
+
+    @classmethod
+    def get_bulksettings_metadata(cls, course):
+        """
+        Returns a list of settings metadata for all sections, subsections, units, and problems.
+        Each block (section, subsection, unit or problem) settings metadata is saved as a dictionary:
+            settings_data =  {
+                'name' = name of the block
+                'key' = opaquekey. Used for link generation
+                'children' = List of children_settings_data
+            }
+
+        """
+
+        settings_data = []
+
+        for section in course.get_children():
+            section_setting = cls.get_settings_dict_for_category('chapter', section, course)
+
+            for subsection in section.get_children():
+                subsection_setting = cls.get_settings_dict_for_category('sequential', subsection, section)
+
+                for unit in subsection.get_children():
+                    unit_setting = cls.get_settings_dict_for_category('vertical', unit, subsection)
+
+                    for component in unit.get_children():
+
+                        if component.location.category == 'problem':
+                            curr_problem_settings = cls.get_settings_dict_for_category('problem', component, unit)
+                            unit_setting['children'].append(curr_problem_settings)
+
+                    if unit_setting['children']:
+                        subsection_setting['children'].append(unit_setting)
+                if subsection_setting['children']:
+                    section_setting['children'].append(subsection_setting)
+            if section_setting['children']:
+                settings_data.append(section_setting)
+
+        return settings_data
