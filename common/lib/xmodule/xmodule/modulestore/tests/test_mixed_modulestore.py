@@ -9,7 +9,7 @@ from pytz import UTC
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum, LegacyPublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
@@ -991,22 +991,22 @@ class TestMixedModuleStore(unittest.TestCase):
         item_location = item.location.version_agnostic()
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
-            self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+            self.assertEquals(self.store.compute_publish_state(item), LegacyPublishState.private)
 
         # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+        self.assertEquals(self.store.compute_publish_state(item), LegacyPublishState.public)
 
         # Public -> Private
         self.store.unpublish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+        self.assertEquals(self.store.compute_publish_state(item), LegacyPublishState.private)
 
         # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+        self.assertEquals(self.store.compute_publish_state(item), LegacyPublishState.public)
 
         # Public -> Draft with NO changes
         # Note: This is where Split and Mongo differ
@@ -1014,14 +1014,14 @@ class TestMixedModuleStore(unittest.TestCase):
         item = self.store.get_item(item_location)
         self.assertEquals(
             self.store.compute_publish_state(item),
-            PublishState.draft if default_ms == 'draft' else PublishState.public
+            LegacyPublishState.draft if default_ms == 'draft' else LegacyPublishState.public
         )
 
         # Draft WITH changes
         item.display_name = 'new name'
         item = self.store.update_item(item, self.user_id)
         self.assertTrue(self.store.has_changes(item.location))
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
+        self.assertEquals(self.store.compute_publish_state(item), LegacyPublishState.draft)
 
     @ddt.data('draft', 'split')
     def test_auto_publish(self, default_ms):

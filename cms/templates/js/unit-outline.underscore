@@ -1,27 +1,50 @@
+<%
+var publishState = xblockInfo.get('publish_state');
+var publishClass = '';
+if (publishState === 'staff_only') {
+    publishClass = 'is-staff-only';
+} else if (publishState === 'live') {
+    publishClass = 'is-live';
+} else if (publishState === 'ready') {
+    publishClass = 'is-ready';
+} else if (publishState === 'has_unpublished_content') {
+    publishClass = 'has_warnings';
+}
+
+var listType = 'list-for-' + xblockType;
+if (xblockType === 'course') {
+    listType = 'list-sections';
+} else if (xblockType === 'section') {
+    listType = 'list-subsections';
+} else if (xblockType === 'subsection') {
+    listType = 'list-units';
+}
+%>
 <% if (parentInfo) { %>
-<li class="outline-item outline-item-<%= xblockType %>"
-    data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
-    <div class="wrapper-xblock-header">
-        <div class="wrapper-xblock-header-primary">
-            <h3 class="xblock-title">
-                <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+    <li class="outline-item outline-<%= xblockType %> <%= publishClass %>"
+        data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
+        <div class="<%= xblockType %>-header">
+            <h3 class="<%= xblockType %>-header-details">
+                <span class="unit-title item-title">
+                    <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                </span>
             </h3>
         </div>
-    </div>
 <% } %>
 
-        <ol class="sortable-list sortable-<%= xblockType %>-list">
-        </ol>
-
-        <% if (childType) { %>
-            <div class="add-xblock-component">
-                <a href="#" class="add-button" data-category="<%= childCategory %>"
-                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
-                    <i class="icon-plus"></i><%= addChildLabel %>
-                </a>
-            </div>
-        <% } %>
+        <div class="<%= xblockType %>-content outline-content">
+            <ol class="<%= listType %>">
+            </ol>
+            <% if (childType) { %>
+                <div class="add-<%= childType %> add-item">
+                    <a href="#" class="button button-new" data-category="<%= childCategory %>"
+                       data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                        <i class="icon icon-plus"></i><%= addChildLabel %>
+                    </a>
+                </div>
+            <% } %>
+        </div>
 
 <% if (parentInfo) { %>
-</li>
+    </li>
 <% } %>
