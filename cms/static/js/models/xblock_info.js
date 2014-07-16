@@ -82,7 +82,7 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
             /**
             * Grading policy for xblock
             **/
-            "grading_format": null,
+            "format": null,
             /**
             * Course graders
             **/

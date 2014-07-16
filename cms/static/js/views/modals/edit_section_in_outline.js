@@ -98,20 +98,21 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                     $('.edit-section-modal #start_time')
                 );
                 // Check releaseDatetime and dueDatetime for sanity?
-                var metadata = {
-                    metadata:  {
+                 var metadata = {
                      'release_date': releaseDatetime,
-                    }
-                }
-                if (this.xblockInfo.category === 'sequential') {
+                };
+                if (this.xblockInfo.get('category') === 'sequential') {
                     var dueDatetime = DateUtils(
                         $('.edit-section-modal #due_date'),
                         $('.edit-section-modal #due_time')
                     );
-                    metadata.due_date = dueDatetime
-                    // metadata.grade_format = ...
+                    metadata.due_date = dueDatetime;
+                    format = $('.edit-section-modal .gradable .gradable-status .status-label')[0].firstChild.textContent;
+                    metadata.format = format;
                 }
-                XBlockViewUtils.updateXBlockFields(this.xblockInfo, metadata, true).done(this.options.onSave);
+                XBlockViewUtils.updateXBlockFields(this.xblockInfo, {metadata: metadata}, true).done(
+                    this.options.onSave
+                );
                 this.hide()
             },
 

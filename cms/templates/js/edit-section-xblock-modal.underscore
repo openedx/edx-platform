@@ -38,7 +38,7 @@
         <div class="gradable">
             <p><b><%= gettext('Grading') %></b></p>
             <span> <%= gettext('Grade as:') %></span>
-            <div class="gradable-status" data-initial-status="<%= xblockInfo.get('grading_format')  ? xblockInfo.get('grading_format')  : 'notgraded' %>"></div>
+            <div class="gradable-status" data-initial-status="<%= xblockInfo.get('format')  ? xblockInfo.get('format')  : 'notgraded' %>"></div>
         </div>
         <div class="due-date-input">
             <div class="datepair date-setter">

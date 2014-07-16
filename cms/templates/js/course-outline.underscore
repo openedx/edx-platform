@@ -52,7 +52,7 @@
                     <% if (xblockInfo.get('due_date')) { %>
                         <i class="icon-time"></i>
                         <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
-                        <%= gettext('Policy:') %> <%= xblockInfo.get('grading_format') %>
+                        <%= gettext('Policy:') %> <%= xblockInfo.get('format') %>
                     <% } %>
                 </div>
             <% } %>
