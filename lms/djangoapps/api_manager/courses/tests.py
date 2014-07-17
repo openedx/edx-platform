@@ -870,6 +870,56 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
+    def test_courses_users_list_get_filter_by_orgs(self):
+        # create 5 users
+        users = []
+        for i in xrange(1, 6):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post('/api/users', data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        # create 3 organizations each one having one user
+        org_ids = []
+        for i in xrange(1, 4):
+            data = {
+                'name': '{} {}'.format('Test Organization', i),
+                'display_name': '{} {}'.format('Test Org Display Name', i),
+                'users': [users[i]]
+            }
+            response = self.do_post('/api/organizations/', data)
+            self.assertEqual(response.status_code, 201)
+            self.assertGreater(response.data['id'], 0)
+            org_ids.append(response.data['id'])
+
+        # enroll all users in course
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        for user in users:
+            data = {'user_id': user}
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # retrieve all users enrolled in the course
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 5)
+
+        # retrieve users by organization
+        response = self.do_get('{}?organizations={}'.format(test_uri, org_ids[0]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 1)
+
+        # retrieve all users enrolled in the course
+        response = self.do_get('{}?organizations={},{},{}'.format(test_uri, org_ids[0], org_ids[1], org_ids[2]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 3)
+
     def test_courses_users_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
         test_user_uri = '/api/users'
