@@ -500,56 +500,6 @@ class LoncapaResponse(object):
         """True if the response has an answer-pool transformation."""
         return hasattr(self, '_has_answerpool')
 
-class LoncapaResponseChoice(LoncapaResponse):
-    """
-    An intermediate class to be supertype to the two types of "choice" problem. This
-    class allows both ChoiceResponse and MultipleChoiceResponse to use a common
-    function 'get_single_choice_hints'.
-    """
-    def __int__(self):
-        super(LoncapaResponseChoice, self).__init__(self, xml, inputfields, context, system)
-
-    def get_single_choice_hints(self, new_cmap, student_answers):
-        '''
-        Check the XML for any hints which should be delivered to the student based
-        on the answer choices made.
-
-        :param new_cmap:        the 'correct map' to which applicable hints will be
-                                added for display by downstream code
-        :param student_answers: the set of answer choices made by the student
-        :return:                nothing
-        '''
-        for problem in student_answers:
-            student_answer_list = student_answers[problem]
-            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-                student_answer_list = [student_answer_list]     # cast it as a true list
-
-            for student_answer in student_answer_list:
-                attribute_test = '[@name="' + student_answer + '"]'
-                choice = self.xml.xpath('//choice' + attribute_test)[0]
-                choice_correctness = choice.get("correct")
-
-                choicehint_list = self.xml.xpath('//choice' + attribute_test + '/choicehint')
-                for choice_hint in choicehint_list:
-                    choice_hint_text = choice_hint.text.strip()
-                    if len(choice_hint_text) > 0:
-                        choice_hint_label = choice_hint.get('label')
-
-                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
-                        if choice.get('correct'):
-                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
-
-                        if choice_hint_label:
-                            correctness_string = choice_hint_label + ': '
-                        else:
-                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-                            if choice.get('correct') == 'True':
-                                correctness_string = 'CORRECT: '
-
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
-                            '<div class="' + message_style_class + '">' \
-                            + correctness_string + choice_hint_text + '</div>'
-
 #-----------------------------------------------------------------------------
 @registry.register
 class JavascriptResponse(LoncapaResponse):
@@ -756,7 +706,7 @@ class JavascriptResponse(LoncapaResponse):
 
 #-----------------------------------------------------------------------------
 @registry.register
-class ChoiceResponse(LoncapaResponseChoice):
+class ChoiceResponse(LoncapaResponse):
     """
     This response type is used when the student chooses from a discrete set of
     choices. Currently, to be marked correct, all "correct" choices must be
@@ -819,6 +769,58 @@ class ChoiceResponse(LoncapaResponseChoice):
         self.correct_choices = set([choice.get(
             'name') for choice in correct_xml])
 
+
+
+
+
+
+
+
+    def get_single_choice_hints(self, new_cmap, student_answers):
+        '''
+        Check the XML for any hints which should be delivered to the student based
+        on the answer choices made.
+
+        :param new_cmap:        the 'correct map' to which applicable hints will be
+                                added for display by downstream code
+        :param student_answers: the set of answer choices made by the student
+        :return:                nothing
+        '''
+        problem_hint_shown = False
+        for problem in student_answers:
+            student_answer_list = student_answers[problem]
+            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
+                student_answer_list = [student_answer_list]     # cast it as a true list
+
+            choice_list = self.xml.xpath('//choice')
+            for choice in choice_list:
+                choice_id = choice.get('name')
+                attribute_test = '[@name="' + choice_id + '"]'
+                if choice_id in student_answer_list:            # if this choice was selected by the student
+                    hint_test = '[@selected="True"]'
+                    xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+                else:                                           # else this choice was not selected by the student
+                    hint_test = '[@selected="False"]'
+                    xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+
+                hint_text_element = self.xml.xpath(xpath_string)
+                if hint_text_element:
+                    problem_hint_shown = True
+                    hint_text = hint_text_element[0].text.strip()
+                    new_cmap[problem]['msg'] += '<div class="question_hint_text ">' + hint_text + '</div>'
+
+            if problem_hint_shown:
+                if new_cmap[problem]['correctness'] == 'correct':
+                    correctness_string = 'CORRECT'
+                    div_class = 'question_hint_correct'
+                else:
+                    correctness_string = 'INCORRECT'
+                    div_class = 'question_hint_incorrect'
+
+                new_cmap[problem]['msg'] = '<div class="' + div_class + '">'\
+                                           + correctness_string \
+                                           + new_cmap[problem]['msg'] + '</div>'
+
     def assign_choice_names(self):
         """
         Initialize name attributes in <choice> tags for this response.
@@ -854,7 +856,6 @@ class ChoiceResponse(LoncapaResponseChoice):
         if self.correct_choices != None:
             answers = {self.answer_id: list(self.correct_choices)}
         return answers
-
 
     def get_compound_condition_hints(self, new_cmap, student_answers):
         """
@@ -906,7 +907,7 @@ class ChoiceResponse(LoncapaResponseChoice):
 
 
 @registry.register
-class MultipleChoiceResponse(LoncapaResponseChoice):
+class MultipleChoiceResponse(LoncapaResponse):
     """
     Multiple Choice Response
     The shuffle and answer-pool features on this class enable permuting and
@@ -949,6 +950,47 @@ class MultipleChoiceResponse(LoncapaResponseChoice):
             for choice in cxml
             if contextualize_text(choice.get('correct'), self.context) == "True"
         ]
+
+    def get_single_choice_hints(self, new_cmap, student_answers):
+        '''
+        Check the XML for any hints which should be delivered to the student based
+        on the answer choices made.
+
+        :param new_cmap:        the 'correct map' to which applicable hints will be
+                                added for display by downstream code
+        :param student_answers: the set of answer choices made by the student
+        :return:                nothing
+        '''
+        for problem in student_answers:
+            student_answer_list = student_answers[problem]
+            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
+                student_answer_list = [student_answer_list]     # cast it as a true list
+
+            for student_answer in student_answer_list:
+                attribute_test = '[@name="' + student_answer + '"]'
+                choice = self.xml.xpath('//choice' + attribute_test)[0]
+                choice_correctness = choice.get("correct")
+
+                choicehint_list = self.xml.xpath('//choice' + attribute_test + '/choicehint')
+                for choice_hint in choicehint_list:
+                    choice_hint_text = choice_hint.text.strip()
+                    if len(choice_hint_text) > 0:
+                        choice_hint_label = choice_hint.get('label')
+
+                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                        if choice.get('correct'):
+                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
+
+                        if choice_hint_label:
+                            correctness_string = choice_hint_label + ': '
+                        else:
+                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+                            if choice.get('correct') == 'True':
+                                correctness_string = 'CORRECT: '
+
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
+                            '<div class="' + message_style_class + '">' \
+                            + correctness_string + choice_hint_text + '</div>'
 
 
     def mc_setup_response(self):
