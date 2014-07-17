@@ -318,17 +318,27 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       returnXmlString += '        <checkboxgroup direction="vertical">\n'
 
       for line in xmlString.split('\n')
-        hintText = ''
+        hintTextSelected = ''
+        hintTextUnselected = ''
         correctnessText = ''
         itemText = ''
         choiceMatches = @matchCheckboxMarkerPattern( line )
         if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
+          line = line.replace(choiceMatches[1], '')  # remove the [..] phrase, else it will be displayed to student
           isCheckboxType = true
           hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
           if hintMatches
             matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
             line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+
+            combinedHintText = hintMatches[0].trim()
+            combinedHintText = combinedHintText.replace( /(selected:|s:)/i, "S:")
+            combinedHintText = combinedHintText.replace( /(unselected:|u:)/i, "U:")
+            selectedMatches = combinedHintText.match(/\s*\{\s*S:\s*([^}]+)/)
+            unselectedMatches = combinedHintText.match(/\s*\{\s*U:\s*([^}]+)/)
+            if selectedMatches and unselectedMatches
+              hintTextSelected = selectedMatches[1]
+              hintTextUnselected = unselectedMatches[1]
 
           correctnessText = 'False'
           if choiceMatches[1].match(/X/i)
@@ -336,8 +346,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
           returnXmlString += '          <choice  correct="' + correctnessText + '">'
           returnXmlString += '              ' + line + '\n'
-          if hintText
-            returnXmlString += '               <choicehint>' + hintText + '\n'
+          if hintTextSelected.length > 0 and hintTextUnselected.length > 0
+            returnXmlString += '               <choicehint selected="True">' + hintTextSelected + '\n'
+            returnXmlString += '               </choicehint>\n'
+            returnXmlString += '               <choicehint selected="False">' + hintTextUnselected + '\n'
             returnXmlString += '               </choicehint>\n'
           returnXmlString += '          </choice>\n'
 
