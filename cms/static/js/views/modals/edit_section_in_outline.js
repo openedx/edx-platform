@@ -76,7 +76,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 BaseModal.prototype.render.call(this);
                 this.$el.find('.date').datepicker({'dateFormat': 'm/d/yy'});
                 this.$el.find('.time').timepicker({'timeFormat' : 'H:i'});
-                $('.edit-outline-item-modal #grading_type').val(this.xblockInfo.get('format'))
+                this.$el.find('.edit-outline-item-modal #grading_type').val(this.xblockInfo.get('format'))
                 new this.SelectGraderView({
                     el : this.$el.find('.gradable-status'),
                     graders : this.graderTypes,
