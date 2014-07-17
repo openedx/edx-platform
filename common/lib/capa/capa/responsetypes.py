@@ -864,7 +864,7 @@ class ChoiceResponse(LoncapaResponseChoice):
         :param new_cmap:        the 'correct map' to which applicable hints will be
                                 added for display by downstream code
         :param student_answers: the set of answer choices made by the student
-        :return:                nothing
+        :return:                true if at least one compound condition hint matched
         """
         compound_hint_matched = False       # assume we won't find any matching rules
 
@@ -1612,7 +1612,7 @@ class StringResponse(LoncapaResponse):
         for el in self.xml.findall('additional_answer'):
             self.xml.remove(el)
 
-        # remove incorrect_answer from xml, otherwise they will be displayed
+        # remove incorrect_answer from xml, otherwise it will be displayed
         for el in self.xml.findall('incorrect_answer'):
             self.xml.remove(el)
 
