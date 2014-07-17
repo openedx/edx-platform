@@ -4,6 +4,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.x_module import XModuleDescriptor
 import factory
 from factory.helpers import lazy_attribute
+from opaque_keys.edx.keys import UsageKey
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232, C0111
 
@@ -73,10 +74,16 @@ class ItemFactory(SplitFactory):
         :param definition_locator (optional): the DescriptorLocator for the definition this uses or branches
         """
         modulestore = kwargs.pop('modulestore')
-        return modulestore.create_child(
-            user_id, parent_location, category, defintion_locator=definition_locator,
-            force=force, continue_version=continue_version, **kwargs
-        )
+        if isinstance(parent_location, UsageKey):
+            return modulestore.create_child(
+                user_id, parent_location, category, defintion_locator=definition_locator,
+                force=force, continue_version=continue_version, **kwargs
+            )
+        else:
+            return modulestore.create_item(
+                user_id, parent_location, category, defintion_locator=definition_locator,
+                force=force, continue_version=continue_version, **kwargs
+            )
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):

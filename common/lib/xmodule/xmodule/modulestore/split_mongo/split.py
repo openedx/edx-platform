@@ -621,7 +621,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Find the history of this block. Return as a VersionTree of each place the block changed (except
         deletion).
 
-        The block's history tracks its explicit changes but not the changes in its children.
+        The block's history tracks its explicit changes but not the changes in its children starting
+        from when the block was created.
 
         '''
         # course_agnostic means we don't care if the head and version don't align, trust the version
@@ -631,7 +632,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         all_versions_with_block = self.db_connection.find_matching_structures(
             {
                 'original_version': course_struct['original_version'],
-                update_version_field: {'$exists': True}
+                update_version_field: {'$exists': True},
             }
         )
         # find (all) root versions and build map {previous: {successors}..}
@@ -641,6 +642,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_payload = self._get_block_from_structure(version, block_id)
             if version['_id'] == block_payload['edit_info']['update_version']:
                 if block_payload['edit_info'].get('previous_version') is None:
+                    # this was when this block was created
                     possible_roots.append(block_payload['edit_info']['update_version'])
                 else:  # map previous to {update..}
                     result.setdefault(block_payload['edit_info']['previous_version'], set()).add(
@@ -902,6 +904,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         encoded_block_id = encode_key_for_mongo(parent_usage_key.block_id)
         parent = new_structure['blocks'][encoded_block_id]
         parent['fields'].setdefault('children', []).append(xblock.location.block_id)
+        parent['edit_info'] = {
+            'edited_on': datetime.datetime.now(UTC),
+            'edited_by': user_id,
+            'previous_version': parent['edit_info']['update_version'],
+            'update_version': new_structure['_id'],
+        }
 
         # db update
         self.db_connection.update_structure(new_structure)
