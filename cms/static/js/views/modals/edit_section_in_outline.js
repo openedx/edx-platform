@@ -19,7 +19,6 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
                 addSaveButton: true,
-                title: 'Subsection Settings',
                 modalSize: 'med'
             }),
 
@@ -64,6 +63,16 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
 
             render: function() {
+                switch(this.xblockInfo.get('category')){
+                    case 'chapter':
+                        this.options.title = 'Section Settings';
+                        break;
+                    case 'sequential':
+                        this.options.title = 'Subsection Settings';
+                        break;
+                    default:
+                        this.options.title = '';
+                }
                 BaseModal.prototype.render.call(this);
                 this.$el.find('.date').datepicker({'dateFormat': 'm/d/yy'});
                 this.$el.find('.time').timepicker({'timeFormat' : 'H:i'});
