@@ -3,7 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-
+from shoppingcart.models import PaidCourseRegistration, CouponRedemption
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 
@@ -11,7 +11,58 @@ import xmodule.graders as xmgraders
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
                     'level_of_education', 'mailing_address', 'goals')
+ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
+ORDER_FEATURES = ('purchase_time',)
+
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
+
+
+def purchase_transactions(course_id, features):
+    """
+    Return list of purchased transactions features as dictionaries.
+
+    purchase_transactions(course_id, ['username, email', unit_cost])
+    would return [
+        {'username': 'username1', 'email': 'email1', unit_cost:'cost1 in decimal'.}
+        {'username': 'username2', 'email': 'email2', unit_cost:'cost2 in decimal'.}
+        {'username': 'username3', 'email': 'email3', unit_cost:'cost3 in decimal'.}
+    ]
+    """
+
+    purchased_courses = PaidCourseRegistration.objects.filter(course_id=course_id, status='purchased')
+
+    def purchase_transactions_info(purchased_course, features):
+        """ convert purchase transactions to dictionary """
+        coupon_code_dict = dict()
+        student_features = [x for x in STUDENT_FEATURES if x in features]
+        order_features = [x for x in ORDER_FEATURES if x in features]
+        order_item_features = [x for x in ORDER_ITEM_FEATURES if x in features]
+
+        # Extracting user information
+        student_dict = dict((feature, getattr(purchased_course.user, feature))
+                            for feature in student_features)
+
+        # Extracting Order information
+        order_dict = dict((feature, getattr(purchased_course.order, feature))
+                          for feature in order_features)
+
+        # Extracting OrderItem information
+        order_item_dict = dict((feature, getattr(purchased_course, feature))
+                               for feature in order_item_features)
+        order_item_dict.update({"orderitem_id": getattr(purchased_course, 'id')})
+
+        try:
+            coupon_redemption = CouponRedemption.objects.select_related('coupon').get(order_id=purchased_course.order_id)
+        except CouponRedemption.DoesNotExist:
+            coupon_code_dict = {'coupon_code': 'None'}
+        else:
+            coupon_code_dict = {'coupon_code': coupon_redemption.coupon.code}
+
+        student_dict.update(dict(order_dict.items() + order_item_dict.items() + coupon_code_dict.items()))
+        student_dict.update({'course_id': course_id.to_deprecated_string()})
+        return student_dict
+
+    return [purchase_transactions_info(purchased_course, features) for purchased_course in purchased_courses]
 
 
 def enrolled_students_features(course_id, features):
