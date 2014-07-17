@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save
+from .utils import set_input_value_and_save, click_css
 
 
 class CourseOutlineItem(object):
@@ -54,7 +54,7 @@ class CourseOutlineItem(object):
         """
         Return whether this outline item's display name is in its editable form.
         """
-        return "is-hidden" not in self.q(self._bounded_selector(self.NAME_INPUT_SELECTOR)).first.attrs("class")
+        return "is-hidden" not in self.q(css=self._bounded_selector(self.NAME_INPUT_SELECTOR)).first.attrs("class")
 
 
 class CourseOutlineContainer(CourseOutlineItem):
@@ -82,7 +82,7 @@ class CourseOutlineContainer(CourseOutlineItem):
             ).attrs('data-locator')[0]
         )
 
-    def children(self, child_class):
+    def children(self, child_class=None):
         """
         Returns all the children page objects of class child_class.
         """
@@ -91,7 +91,7 @@ class CourseOutlineContainer(CourseOutlineItem):
 
         children = []
         for child_element in self.q(css=child_class.BODY_SELECTOR):
-            children.append(child_class(self.browser, child_element.attrs('data-locator')))
+            children.append(child_class(self.browser, child_element.get_attribute('data-locator')))
         return children
 
     def child_at(self, index, child_class=None):
@@ -102,13 +102,17 @@ class CourseOutlineContainer(CourseOutlineItem):
         if not child_class:
             child_class = self.CHILD_CLASS
 
-        return self.children()[index]
+        return self.children(child_class)[index]
 
-    def add_child_button(self):
+    def add_child(self, require_notification=True):
         """
-        Returns the clickable query object which will a new child.
+        Adds a child to this xblock, waiting for notifications.
         """
-        return self.q(css=self._bounded_selector(".add-xblock-component a.add-button")).first
+        click_css(
+            self,
+            self._bounded_selector(".add-xblock-component a.add-button"),
+            require_notification=require_notification,
+        )
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
@@ -175,8 +179,8 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
 
         return self
 
-    def add_unit_button(self):
-        self.add_child_button()
+    def add_unit(self):
+        self.add_child(require_notification=False)
 
 
 class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
@@ -196,8 +200,14 @@ class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
     def subsections(self):
         return self.children()
 
-    def add_subsection_button(self):
-        self.add_child_button()
+    def subsection_at(self, index):
+        """
+        Returns the :class`.CourseOutlineSubsection` at the specified index.
+        """
+        return self.child_at(index)
+
+    def add_subsection(self):
+        self.add_child()
 
 
 class CourseOutlinePage(CoursePage, CourseOutlineContainer):
@@ -228,16 +238,14 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         return self.children()
 
-    def top_create_section_button(self):
+    def add_section_from_top_button(self):
         """
-        Returns the :class: `BrowserQuery` button for adding a section which
-        resides at the top of the screen
+        Clicks the button for adding a section which resides at the top of the screen, waiting for notifications.
         """
-        return self.q(css='.wrapper-mast nav.nav-actions .add-button')
+        click_css(self, '.wrapper-mast nav.nav-actions .add-button')
 
-    def bottom_create_section_button(self):
+    def add_section_from_bottom_button(self):
         """
-        Returns the :class: `BrowserQuery` button for adding a section which
-        resides at the bottom of the screen
+        Clicks the button for adding a section which resides at the bottom of the screen, waiting for notifications.
         """
-        return self.q(css='.course-outline > .add-xblock-component .add-button')
+        click_css(self, '.course-outline > .add-xblock-component .add-button')

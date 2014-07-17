@@ -3,7 +3,7 @@ Acceptance tests for studio related to the outline page.
 """
 
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.outline import CourseOutlinePage
+from ...pages.studio.outline import CourseOutlinePage, ContainerPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from helpers import StudioCourseTest
@@ -27,17 +27,9 @@ class CourseOutlineTest(StudioCourseTest):
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
 
-
-
-    def installCourse(self):
-        # Install a course with sections/problems, tabs, updates, and handouts
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-        course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section')
-        ).install()
+    def populate_course_fixture(self, course_fixture):
+        """ Install a course with sections/problems, tabs, updates, and handouts """
+        course_fixture.add_children(XBlockFixtureDesc('chapter', 'Test Section'))
 
 
 class CourseSectionTest(CourseOutlineTest):
@@ -50,7 +42,6 @@ class CourseSectionTest(CourseOutlineTest):
         Check that section name is editable on course outline page.
         """
         self.course_outline_page.visit()
-        self.installCourse()
         new_name = u"Test Section New"
         section = self.course_outline_page.section_at(0)
         self.assertEqual(section.name, u"Test Section")
@@ -76,6 +67,11 @@ class CreateSectionsTest(CourseOutlineTest):
     """
     Feature: Create new sections/subsections/units
     """
+
+    def populate_course_fixture(self, course_fixture):
+        """ Start with a completely empty course to easily test adding things to it """
+        pass
+
     def test_create_new_section_from_top_button(self):
         """
         Scenario: Create new section from button at top of page
@@ -85,7 +81,7 @@ class CreateSectionsTest(CourseOutlineTest):
             And the display name is in its editable form.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.top_create_section_button().click()
+        self.course_outline_page.add_section_from_top_button()
         self.assertEqual(len(self.course_outline_page.sections()), 1)
         self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
 
@@ -98,7 +94,7 @@ class CreateSectionsTest(CourseOutlineTest):
             And the display name is in its editable form.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.bottom_create_section_button().click()
+        self.course_outline_page.add_section_from_bottom_button()
         self.assertEqual(len(self.course_outline_page.sections()), 1)
         self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
 
@@ -111,10 +107,10 @@ class CreateSectionsTest(CourseOutlineTest):
             And the display name is in its editable form.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.top_create_section_button().click()
+        self.course_outline_page.add_section_from_top_button()
         self.assertEqual(len(self.course_outline_page.sections()), 1)
-        self.course_outline_page.section_at(0).add_subsection_button().click()
-        subsections = self.course_outline_page.first_section().subsections()
+        self.course_outline_page.section_at(0).add_subsection()
+        subsections = self.course_outline_page.section_at(0).subsections()
         self.assertEqual(len(subsections), 1)
         self.assertTrue(subsections[0].in_editable_form())
 
@@ -128,10 +124,10 @@ class CreateSectionsTest(CourseOutlineTest):
             And the display name is in its editable form.
         """
         self.course_outline_page.visit()
-        self.course_outline_page.top_create_section_button().click()
+        self.course_outline_page.add_section_from_top_button()
         self.assertEqual(len(self.course_outline_page.sections()), 1)
-        self.course_outline_page.section_at(0).add_subsection_button().click()
-        self.assertEqual(len(self.course_outline_page.first_section().subsections()), 1)
-        self.course_outline_page.sections[0].subsections[0].add_unit_button().click()
-        unit_page = self.course_outline_page.sections[0].subsections[0].unit.go_to()
+        self.course_outline_page.section_at(0).add_subsection()
+        self.assertEqual(len(self.course_outline_page.section_at(0).subsections()), 1)
+        self.course_outline_page.section_at(0).subsection_at(0).add_unit()
+        unit_page = ContainerPage(self.browser, None)
         self.assertTrue(unit_page.display_name_in_editable_form())

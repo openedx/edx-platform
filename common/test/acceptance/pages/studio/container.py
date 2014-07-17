@@ -223,7 +223,7 @@ class ContainerPage(PageObject):
         """
         Return whether this container's display name is in its editable form.
         """
-        return "is-hidden" not in self.q(self.NAME_INPUT_SELECTOR).first.attrs("class")
+        return "is-hidden" not in self.q(css=self.NAME_INPUT_SELECTOR).first.attrs("class")
 
 
 class XBlockWrapper(PageObject):
