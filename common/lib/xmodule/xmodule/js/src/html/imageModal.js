@@ -1,6 +1,4 @@
-$(function() {
-  
-  // Set up on page load
+function setupFullScreenImage() {
   $("a.modal-content").each(function() {
     var smallImageObject = $(this).children();
     var largeImageSRC = $(this).attr('href');
@@ -106,4 +104,4 @@ $(function() {
       $(".wrapper-modal-image .image-content .image-controls .modal-ui-icon").toggleClass('is-disabled');
     }
   });
-});
+}
