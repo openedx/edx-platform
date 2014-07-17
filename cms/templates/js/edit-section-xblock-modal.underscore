@@ -54,12 +54,12 @@
           <ul class="list-fields list-input">
             <li class="field field-grading-type field-select">
               <label for="grading_type" class="label"><%= gettext('Grade as:') %></label>
-              <!-- NOTE: example markup only, please replace -->
               <select class="input" id="grading_type">
+                <option value="notgraded">Not Graded</option>
                 <option value="Participation">Participation</option>
-                  <option value="Exams">Exams</option>
-                  <option value="Labs">Labs</option>
-                  <option value="Homework" selected>Homework</option>
+                <option value="Exams">Exams</option>
+                <option value="Labs">Labs</option>
+                <option value="Homework" selected>Homework</option>
               </select>
             </li>
           </ul>

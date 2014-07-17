@@ -76,6 +76,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 BaseModal.prototype.render.call(this);
                 this.$el.find('.date').datepicker({'dateFormat': 'm/d/yy'});
                 this.$el.find('.time').timepicker({'timeFormat' : 'H:i'});
+                $('.edit-outline-item-modal #grading_type').val(this.xblockInfo.get('format'))
                 new this.SelectGraderView({
                     el : this.$el.find('.gradable-status'),
                     graders : this.graderTypes,
@@ -104,8 +105,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 var releaseDatetime, metadata, dueDatetime, graderType, objectToSave;
                 event.preventDefault();
                 releaseDatetime = DateUtils(
-                    $('.edit-section-modal #start_date'),
-                    $('.edit-section-modal #start_time')
+                    $('.edit-outline-item-modal #start_date'),
+                    $('.edit-outline-item-modal #start_time')
                 );
                 // Check releaseDatetime and dueDatetime for sanity?
                  metadata = {
@@ -114,11 +115,11 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 objectToSave =  {metadata: metadata};
                 if (this.xblockInfo.get('category') === 'sequential') {
                     var dueDatetime = DateUtils(
-                        $('.edit-section-modal #due_date'),
-                        $('.edit-section-modal #due_time')
+                        $('.edit-outline-item-modal #due_date'),
+                        $('.edit-outline-item-modal #due_time')
                     );
                     metadata.due_date = dueDatetime;
-                    graderType = $('.edit-section-modal .gradable .gradable-status .status-label')[0].firstChild.textContent;
+                    graderType = $('.edit-outline-item-modal #grading_type').val();
                     if (graderType === "Not Graded") {
                         graderType = "notgraded";
                     }
