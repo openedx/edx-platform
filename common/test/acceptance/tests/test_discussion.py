@@ -2,6 +2,8 @@
 Tests for discussion pages
 """
 
+import datetime
+from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
 
@@ -286,7 +288,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        CourseFixture(**self.course_info).add_children(
+        self.course_fix = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit").add_children(
@@ -300,7 +302,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
             )
         ).install()
 
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
@@ -333,6 +335,38 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def test_anonymous_to_peers_threads_as_peer(self):
         self.check_anonymous_to_peers(False)
+
+    def test_discussion_blackout_period(self):
+        now = datetime.datetime.now(UTC)
+        self.course_fix.add_advanced_settings(
+            {
+                u"discussion_blackouts": {
+                    "value": [
+                        [
+                            (now - datetime.timedelta(days=14)).isoformat(),
+                            (now + datetime.timedelta(days=2)).isoformat()
+                        ]
+                    ]
+                }
+            }
+        )
+        self.course_fix._add_advanced_settings()
+        self.browser.refresh()
+        thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.addResponse(
+            Response(id="response1"),
+            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))
+        self.assertFalse(self.discussion_page.element_exists(".new-post-btn"))
+        self.assertFalse(self.thread_page.has_add_response_button())
+        self.assertFalse(self.thread_page.is_response_editable("response1"))
+        self.assertFalse(self.thread_page.is_add_comment_visible("response1"))
+        self.assertFalse(self.thread_page.is_comment_editable("comment1"))
+        self.assertFalse(self.thread_page.is_comment_editable("comment2"))
+        self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
+        self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
 
 
 @attr('shard_1')

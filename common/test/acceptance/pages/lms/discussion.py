@@ -83,6 +83,10 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the response editor is present, false otherwise"""
         return self._is_element_visible(".response_{} .edit-post-body".format(response_id))
 
+    def is_response_editable(self, response_id):
+        """Returns true if the edit response button is present, false otherwise"""
+        return self._is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
         self._find_within(".response_{} .discussion-response .action-edit".format(response_id)).first.click()
@@ -251,6 +255,8 @@ class InlineDiscussionPage(PageObject):
     def get_num_displayed_threads(self):
         return len(self._find_within(".discussion-thread"))
 
+    def element_exists(self, selector):
+        return self.q(css=self._discussion_selector + " " + selector).present
 
 class InlineDiscussionThreadPage(DiscussionThreadPage):
     def __init__(self, browser, thread_id):
