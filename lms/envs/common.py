@@ -259,6 +259,11 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Analytics Data API (for active student count)
+    # Default to false here b/c dev environments won't have the api, will override in aws.py
+    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+
 }
 
 # Used for A/B testing
@@ -1653,3 +1658,7 @@ ADVANCED_SECURITY_CONFIG = {}
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
+
+### Analytics data api settings
+ANALYTICS_DATA_URL = ""
+ANALYTICS_DATA_TOKEN = ""
