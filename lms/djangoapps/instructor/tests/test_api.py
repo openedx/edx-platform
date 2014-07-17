@@ -42,6 +42,8 @@ import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from shoppingcart.models import Order, PaidCourseRegistration, Coupon
+from course_modes.models import CourseMode
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
 
@@ -1329,12 +1331,90 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
     def setUp(self):
         self.course = CourseFactory.create()
+        self.course_mode = CourseMode(course_id=self.course.id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=40)
+        self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        self.cart = Order.get_cart_for_user(self.instructor)
+        self.coupon_code = 'abcde'
+        self.coupon = Coupon(code=self.coupon_code, description='testing code', course_id=self.course.id,
+                             percentage_discount=10, created_by=self.instructor, is_active=True)
+        self.coupon.save()
 
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
+
+    def test_get_ecommerce_purchase_features_csv(self):
+        """
+        Test that the response from get_purchase_transaction is in csv format.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url + '/csv', {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+    def test_get_ecommerce_purchase_features_with_coupon_info(self):
+        """
+        Test that some minimum of information is formatted
+        correctly in the response to get_purchase_transaction.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        # using coupon code
+        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('students', res_json)
+
+        for res in res_json['students']:
+            self.validate_purchased_transaction_response(res, self.cart, self.instructor, self.coupon_code)
+
+    def test_get_ecommerce_purchases_features_without_coupon_info(self):
+        """
+        Test that some minimum of information is formatted
+        correctly in the response to get_purchase_transaction.
+        """
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        carts, instructors = ([] for i in range(2))
+
+        # purchasing the course by different users
+        for _ in xrange(3):
+            test_instructor = InstructorFactory(course_key=self.course.id)
+            self.client.login(username=test_instructor.username, password='test')
+            cart = Order.get_cart_for_user(test_instructor)
+            carts.append(cart)
+            instructors.append(test_instructor)
+            PaidCourseRegistration.add_to_order(cart, self.course.id)
+            cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('students', res_json)
+        for res, i in zip(res_json['students'], xrange(3)):
+            self.validate_purchased_transaction_response(res, carts[i], instructors[i], 'None')
+
+    def validate_purchased_transaction_response(self, res, cart, user, code):
+        """
+        validate purchased transactions attribute values with the response object
+        """
+        item = cart.orderitem_set.all().select_subclasses()[0]
+
+        self.assertEqual(res['coupon_code'], code)
+        self.assertEqual(res['username'], user.username)
+        self.assertEqual(res['email'], user.email)
+        self.assertEqual(res['list_price'], item.list_price)
+        self.assertEqual(res['unit_cost'], item.unit_cost)
+        self.assertEqual(res['order_id'], cart.id)
+        self.assertEqual(res['orderitem_id'], item.id)
 
     def test_get_students_features(self):
         """

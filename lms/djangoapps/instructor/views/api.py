@@ -550,6 +550,34 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+    """
+    return the summary of all purchased transactions for a particular course
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    query_features = [
+        'id', 'username', 'email', 'course_id', 'list_price', 'coupon_code',
+        'unit_cost', 'purchase_time', 'orderitem_id',
+        'order_id',
+    ]
+
+    student_data = analytics.basic.purchase_transactions(course_id, query_features)
+
+    if not csv:
+        response_payload = {
+            'course_id': course_id.to_deprecated_string(),
+            'students': student_data,
+            'queried_features': query_features
+        }
+        return JsonResponse(response_payload)
+    else:
+        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
+        return analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
     """
     Respond with json which contains a summary of all enrolled students profile information.

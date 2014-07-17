@@ -3,6 +3,12 @@
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 
+%if section_data['access']['finance_admin'] is True:
+  <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
+
+  <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchase")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
+%endif
+
 <div class="ecommerce-wrapper">
   <h2>${_("Coupons List")}
       %if section_data['total_amount'] is not None:

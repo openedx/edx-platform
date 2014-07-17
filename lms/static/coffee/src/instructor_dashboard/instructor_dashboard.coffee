@@ -156,6 +156,9 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.DataDownload
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
   ,
+    constructor: window.InstructorDashboard.sections.ECommerce
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#e-commerce"
+  ,
     constructor: window.InstructorDashboard.sections.Membership
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#membership"
   ,

@@ -59,6 +59,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         # Total amount html should render in e-commerce page, total amount will be 0
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
         self.assertTrue('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
+        self.assertTrue('Download All e-Commerce Purchase' in response.content)
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
@@ -67,6 +68,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course.id)
+        self.assertFalse('Download All e-Commerce Purchase' in response.content)
         self.assertFalse('<span>Total Amount: <span>$' + str(total_amount) + '</span></span>' in response.content)
 
     def test_add_coupon(self):
