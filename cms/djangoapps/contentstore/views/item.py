@@ -429,6 +429,7 @@ def _create_item(request):
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
     if category == 'static_tab':
+        display_name = display_name or _("Empty") # Prevent name being None
         course = store.get_course(dest_usage_key.course_key)
         course.tabs.append(
             StaticTab(

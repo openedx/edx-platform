@@ -248,6 +248,17 @@ class TestCreateItem(ItemTest):
         obj = self.get_item_from_modulestore(usage_key)
         self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=UTC))
 
+    def test_static_tabs_initialization(self):
+        """
+        Test that static tab display names are not being initialized as None.
+        """
+        # Add a new static tab with no explicit name
+        resp = self.create_xblock(category='static_tab')
+        usage_key = self.response_usage_key(resp)
+
+        # Check that its name is not None
+        new_tab = self.get_item_from_modulestore(usage_key)
+        self.assertEquals(new_tab.display_name, 'Empty') 
 
 class TestDuplicateItem(ItemTest):
     """
