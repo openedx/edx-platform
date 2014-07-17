@@ -405,6 +405,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
             self.ignore_write_events_on_courses.remove(course_id)
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
+    def _is_bulk_write_in_progress(self, course_id):
+        """
+        Returns whether a bulk write operation is in progress for the given course.
+        """
+        # check with branch set to None
+        return course_id in self.ignore_write_events_on_courses
+
     def _fill_in_run(self, course_key):
         if course_key.run is not None:
             return course_key
@@ -552,7 +559,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         If given a runtime, it replaces the cached_metadata in that runtime. NOTE: failure to provide
         a runtime may mean that some objects report old values for inherited data.
         """
-        if course_id not in self.ignore_write_events_on_courses:
+        if not self._is_bulk_write_in_progress(course_id):
             # below is done for side effects when runtime is None
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_id, force_refresh=True)
             if runtime:
@@ -1033,7 +1040,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
             # update subtree edited info for ancestors
             # don't update the subtree info for descendants of the publish root for efficiency
-            if (not isPublish) or (isPublish and is_publish_root):
+            if (
+                (not isPublish or (isPublish and is_publish_root)) and
+                not self._is_bulk_write_in_progress(xblock.location.course_key)
+            ):
                 ancestor_payload = {
                     'edit_info.subtree_edited_on': now,
                     'edit_info.subtree_edited_by': user_id
