@@ -45,6 +45,8 @@ from functools import total_ordering
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 
+from ratelimitbackend import admin
+
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -1047,6 +1049,9 @@ class CourseAccessRole(models.Model):
     def __unicode__(self):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
 
+
+class CourseAccessRoleAdmin(admin.ModelAdmin):
+    raw_id_fields = ("user",)
 
 #### Helper methods for use from python manage.py shell and other classes.
 
