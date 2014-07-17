@@ -320,7 +320,7 @@ class TestMixedModuleStore(unittest.TestCase):
         Delete should reject on r/o db and work on r/w one
         """
         self.initdb(default_ms)
-        # r/o try deleting the course (is here to ensure it can't be deleted)
+        # r/o try deleting the chapter (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
             self.store.delete_item(self.xml_chapter_location, self.user_id)
         self.store.delete_item(self.writable_chapter_location, self.user_id)
@@ -350,6 +350,7 @@ class TestMixedModuleStore(unittest.TestCase):
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
         self.assertIn(vert_loc, course.children)
 
+        # update the component to force it to draft w/o forcing the unit to draft
         # delete the vertical and ensure the course no longer points to it
         self.store.delete_item(vert_loc, self.user_id)
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
@@ -363,6 +364,26 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(vert_loc))
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
+
+        # NAATODO enable for split after your converge merge
+        if default_ms == 'split':
+            return
+
+        # reproduce bug STUD-1965
+        # create and delete a private vertical with private children
+        private_vert = self.store.create_item(
+            # don't use course_location as it may not be the repr
+            self.course_locations[self.MONGO_COURSEID], 'vertical', user_id=self.user_id, block_id='publish'
+        )
+        private_leaf = self.store.create_item(
+            private_vert.location, 'html', user_id=self.user_id, block_id='bug_leaf'
+        )
+
+        self.store.publish(private_vert.location, self.user_id)
+        private_leaf.display_name = 'change me'
+        private_leaf = self.store.update_item(private_leaf, self.user_id)
+        # test succeeds if delete succeeds w/o error
+        self.store.delete_item(private_leaf.location, self.user_id)
 
     @ddt.data('draft', 'split')
     def test_get_courses(self, default_ms):

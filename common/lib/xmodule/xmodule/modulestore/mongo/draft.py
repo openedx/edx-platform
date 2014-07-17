@@ -368,10 +368,11 @@ class DraftModuleStore(MongoModuleStore):
         Raises:
             InvalidVersionError: if the source can not be made into a draft
             ItemNotFoundError: if the source does not exist
-            DuplicateItemError: if the source or any of its descendants already has a draft copy
         """
+        # TODO (dhm) I don't think this needs to recurse anymore but can convert each unit on demand.
+        #     See if that's true.
         # delegating to internal b/c we don't want any public user to use the kwargs on the internal
-        self._convert_to_draft(location, user_id)
+        self._convert_to_draft(location, user_id, ignore_if_draft=True)
 
         # return the new draft item (does another fetch)
         # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
@@ -390,7 +391,8 @@ class DraftModuleStore(MongoModuleStore):
         Raises:
             InvalidVersionError: if the source can not be made into a draft
             ItemNotFoundError: if the source does not exist
-            DuplicateItemError: if the source or any of its descendants already has a draft copy
+            DuplicateItemError: if the source or any of its descendants already has a draft copy. Only
+                useful for unpublish b/c we don't want unpublish to overwrite any existing drafts.
         """
         # verify input conditions
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
