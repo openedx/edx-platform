@@ -47,16 +47,6 @@ class CoursesTest(ModuleStoreTestCase):
 
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):
     """Test methods related to the modulestore branch setting."""
-    def cleanup_branch_setting(self):
-        if hasattr(store_django._THREAD_CACHE, 'branch_setting'):
-            delattr(store_django._THREAD_CACHE, 'branch_setting')
-
-    def setUp(self):
-        self.cleanup_branch_setting()
-
-    def tearDown(self):
-        self.cleanup_branch_setting()
-
     @mock.patch(
         'xmodule.modulestore.django.get_current_request_hostname',
         mock.Mock(return_value='preview.localhost')

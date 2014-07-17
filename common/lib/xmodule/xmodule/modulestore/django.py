@@ -136,10 +136,6 @@ class ModuleI18nService(object):
         return strftime_localized(*args, **kwargs)
 
 
-# thread local cache
-_THREAD_CACHE = threading.local()
-
-
 def _get_modulestore_branch_setting():
     """
     Returns the branch setting for the module store from the current Django request if configured,
@@ -167,7 +163,6 @@ def _get_modulestore_branch_setting():
             branch = getattr(settings, 'MODULESTORE_BRANCH', None)
         return branch
 
-    # cache the branch setting for this thread so we don't have to recompute it each time
-    if not hasattr(_THREAD_CACHE, 'branch_setting'):
-        _THREAD_CACHE.branch_setting = get_branch_setting()
-    return _THREAD_CACHE.branch_setting
+    # leaving this in code structured in closure-friendly format b/c we might eventually cache this (again)
+    # using request_cache
+    return get_branch_setting()
