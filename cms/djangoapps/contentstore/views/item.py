@@ -280,8 +280,8 @@ def xblock_outline_handler(request, usage_key_string):
     a course.
     """
     usage_key = UsageKey.from_string(usage_key_string)
-    # if not has_course_access(request.user, usage_key.course_key):
-        # raise PermissionDenied()
+    if not has_course_access(request.user, usage_key.course_key):
+        raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
