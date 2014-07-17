@@ -78,7 +78,8 @@
           }
 
           // CASE: new/create button
-          &.new-button, &.button-new {
+          &.new-button,
+          &.button-new {
             @extend %btn-primary-green;
             @extend %sizing;
           }
@@ -87,11 +88,6 @@
           &.button-toggle {
             @extend %btn-secondary-gray;
             @extend %sizing;
-          }
-
-          // CASE: view live button
-          &.button-view, &.view-button {
-
           }
         }
       }
