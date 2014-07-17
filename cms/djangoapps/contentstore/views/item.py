@@ -305,7 +305,6 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
                 pass
         elif publish == 'create_draft':
             try:
-                # This recursively clones the item subtree and marks the copies as draft
                 store.convert_to_draft(existing_item.location, user.id)
             except DuplicateItemError:
                 pass
