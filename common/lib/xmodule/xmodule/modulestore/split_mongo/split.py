@@ -64,9 +64,7 @@ from opaque_keys.edx.locator import (
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
-from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, compute_location_from_args
-)
+from xmodule.modulestore import inheritance, ModuleStoreWriteBase, ModuleStoreEnum
 
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
@@ -118,7 +116,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         super(SplitMongoModuleStore, self).__init__(contentstore, **kwargs)
 
-        self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
         self.db_connection = MongoConnection(**doc_store_config)
         self.db = self.db_connection.database
 
@@ -288,15 +285,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param course_locator: any subclass of CourseLocator
         '''
         if course_locator.org and course_locator.course and course_locator.run:
-            if course_locator.branch is None:
-                # default it based on branch_setting
-                # NAATODO move this to your mixin
-                if self.branch_setting_func() == ModuleStoreEnum.Branch.draft_preferred:
-                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.draft)
-                elif self.branch_setting_func() == ModuleStoreEnum.Branch.published_only:
-                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.published)
-                else:
-                    raise InsufficientSpecificationError(course_locator)
             # use the course id
             index = self.db_connection.get_course_index(course_locator)
             if index is None:

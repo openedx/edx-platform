@@ -6,6 +6,7 @@ from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
@@ -13,6 +14,22 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
+    def _lookup_course(self, course_locator):
+        """
+        overrides this method in Split to check for branch settings.
+        """
+        if course_locator.org and course_locator.course and course_locator.run:
+            if course_locator.branch is None:
+                # default it based on branch_setting
+                if self.branch_setting_func() == ModuleStoreEnum.Branch.draft_preferred:
+                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.draft)
+                elif self.branch_setting_func() == ModuleStoreEnum.Branch.published_only:
+                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.published)
+                else:
+                    raise InsufficientSpecificationError(course_locator)
+        return super(DraftVersioningModuleStore, self)._lookup_course(course_locator)
+
+
     def create_course(self, org, course, run, user_id, **kwargs):
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         return super(DraftVersioningModuleStore, self).create_course(
