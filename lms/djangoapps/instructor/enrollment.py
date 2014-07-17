@@ -19,9 +19,6 @@ from student.models import anonymous_id_for_user
 
 from microsite_configuration import microsite
 
-# For determining if a shibboleth course
-SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-
 
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
@@ -361,4 +358,4 @@ def uses_shib(course):
 
     Returns a boolean indicating if Shibboleth authentication is set for this course.
     """
-    return course.enrollment_domain and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    return course.enrollment_domain and course.enrollment_domain.startswith(settings.SHIBBOLETH_DOMAIN_PREFIX)

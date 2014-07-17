@@ -2,10 +2,12 @@
 Test the about xblock
 """
 import mock
+from mock import patch
 import pytz
 import datetime
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from .helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -16,6 +18,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
 
 # HTML for registration button
 REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" action=\"/change_enrollment\">"
+SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -164,6 +167,46 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
         self.assertIn("Register for 999", resp.content)
 
         # Check that registration button is present
+        self.assertIn(REG_STR, resp.content)
+
+
+@patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
+    """
+    def setUp(self):
+        self.course = CourseFactory.create(enrollment_domain="shib:https://idp.stanford.edu/")
+
+        self.about = ItemFactory.create(
+            category="about", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="overview"
+        )
+
+    def test_logged_in_shib_course(self):
+        """
+        For shib courses, logged in users will see the register button, but get rejected once they click there
+        """
+        self.setup_user()
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertIn("Register for 999", resp.content)
+        self.assertIn(SHIB_ERROR_STR, resp.content)
+        self.assertIn(REG_STR, resp.content)
+
+    def test_anonymous_user_shib_course(self):
+        """
+        For shib courses, anonymous users will also see the register button
+        """
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertIn("Register for 999", resp.content)
+        self.assertIn(SHIB_ERROR_STR, resp.content)
         self.assertIn(REG_STR, resp.content)
 
 
