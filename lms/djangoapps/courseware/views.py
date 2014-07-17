@@ -6,6 +6,7 @@ import logging
 import urllib
 import json
 
+from datetime import datetime
 from collections import defaultdict
 from django.utils import translation
 from django.utils.translation import ugettext as _
@@ -16,6 +17,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
@@ -27,7 +29,7 @@ from functools import wraps
 from markupsafe import escape
 
 from courseware import grades
-from courseware.access import has_access
+from courseware.access import has_access, _adjust_start_date_for_beta_testers
 from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
@@ -337,6 +339,13 @@ def index(request, course_id, chapter=None, section=None,
             'reverifications': fetch_reverify_banner_info(request, course_key),
         }
 
+        now = datetime.now(UTC())
+        effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
+        if staff_access and now < effective_start:
+            # Disable student view button if user is staff and
+            # course is not yet visible to students.
+            context['disable_student_access'] = True
+
         has_content = course.has_children_at_depth(CONTENT_DEPTH)
         if not has_content:
             # Show empty courseware for a course with no units
@@ -589,6 +598,13 @@ def course_info(request, course_id):
         'show_enroll_banner': show_enroll_banner,
         'url_to_enroll': url_to_enroll,
     }
+
+    now = datetime.now(UTC())
+    effective_start = _adjust_start_date_for_beta_testers(request.user, course, course_key)
+    if staff_access and now < effective_start:
+        # Disable student view button if user is staff and
+        # course is not yet visible to students.
+        context['disable_student_access'] = True
 
     return render_to_response('courseware/info.html', context)
 
