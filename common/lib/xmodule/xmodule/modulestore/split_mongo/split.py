@@ -1099,7 +1099,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         course = self.get_course(locator)
         return self.update_item(course, user_id)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Save the descriptor's fields. it doesn't descend the course dag to save the children.
         Return the new descriptor (updated location).

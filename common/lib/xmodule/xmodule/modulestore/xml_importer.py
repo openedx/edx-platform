@@ -217,6 +217,7 @@ def import_from_xml(
                             module, store, user_id,
                             course_key,
                             dest_course_id,
+                            revision=ModuleStoreEnum.RevisionOption.published_only,
                             do_import_static=do_import_static
                         )
 
@@ -308,12 +309,10 @@ def import_from_xml(
                         user_id,
                         course_key,
                         dest_course_id,
+                        revision=ModuleStoreEnum.RevisionOption.published_only,
                         do_import_static=do_import_static,
                         runtime=course.runtime
                     )
-
-                # finally, publish the course
-                store.publish(course.location, user_id)
 
                 # now import any DRAFT items
                 _import_course_draft(
@@ -332,6 +331,7 @@ def import_from_xml(
 def _import_module_and_update_references(
         module, store, user_id,
         source_course_id, dest_course_id,
+        revision,
         do_import_static=True, runtime=None):
 
     logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
@@ -401,7 +401,8 @@ def _import_module_and_update_references(
                 setattr(new_module, field_name, value)
             else:
                 setattr(new_module, field_name, getattr(module, field_name))
-    return store.update_item(new_module, user_id, allow_not_found=True)
+
+    return store.update_item(new_module, user_id, revision=revision, allow_not_found=True)
 
 
 def _import_course_draft(
@@ -554,6 +555,7 @@ def _import_course_draft(
                             module, store, user_id,
                             source_course_id,
                             target_course_id,
+                            revision=ModuleStoreEnum.RevisionOption.draft_only,
                             runtime=mongo_runtime,
                         )
                         for child in module.get_children():

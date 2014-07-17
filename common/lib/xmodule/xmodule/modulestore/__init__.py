@@ -335,7 +335,7 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
