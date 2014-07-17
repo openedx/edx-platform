@@ -269,30 +269,27 @@ $outline-indent-width: $baseline;
 
 // UI: containing elements on a course outline (currently sections/subsections)
 %outline-container {
-  // STATE: is-collapsed
-  &.is-collapsed {
-    border-left: ($baseline/4) solid $color-draft;
-  }
+  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s);
+  border-left: ($baseline/4) solid $color-draft;
 
-  // CASE: is published by not released
+  // CASE: is published but not released
   &.is-published {
     border-left-color: $color-published;
 
-
-  &.is-published.is-released {
+    &.is-released {
       border-left-color: $color-released;
     }
   }
 
   // CASE: has staff-only content
-  &.has-staff-only {
+  &.is-staff-only {
     border-left-color: $color-staff-only;
   }
 
-  // CASE: has changes
-  &.is-published.is-released.has-changes, // needed for poor specificity
-  &.is-published.is-scheduled.has-changes, // needed for poor specificity
-  &.has-changes {
+  // CASE: has unpublished content
+  &.is-published.is-released.has-unpublished-content, // needed for poor specificity
+  &.is-published.is-scheduled.has-unpublished-content, // needed for poor specificity
+  &.has-unpublished-content {
     border-left-color: $color-warning;
   }
 
@@ -317,7 +314,7 @@ $outline-indent-width: $baseline;
   }
 
   // CASE: has staff-only content
-  &.has-staff-only {
+  &.is-staff-only {
 
     // aint the prettiest, but needed to make sure direct children only
     > .section-status,
@@ -330,10 +327,10 @@ $outline-indent-width: $baseline;
     }
   }
 
-  // CASE: has changes
-  &.is-published.is-released.has-changes, // needed for poor specificity
-  &.is-published.is-scheduled.has-changes, // needed for poor specificity
-  &.has-changes {
+  // CASE: has unpublished content
+  &.is-published.is-released.has-unpublished-content, // needed for poor specificity
+  &.is-published.is-scheduled.has-unpublished-content, // needed for poor specificity
+  &.has-unpublished-content {
 
     // aint the prettiest, but needed to make sure direct children only
     > .section-status .status-message,
@@ -365,9 +362,6 @@ $outline-indent-width: $baseline;
     > .subsection-status .status-message,
     > .unit-status .status-message {
 
-      .icon {
-        @include animation(pulse $tmg-s3 ease-in-out infinite);
-      }
     }
   }
 }
@@ -458,6 +452,7 @@ $outline-indent-width: $baseline;
   @extend %outline-container;
   margin-bottom: ($baseline/2);
   border: 1px solid $gray-l4;
+  border-left: ($baseline/4) solid $color-draft;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: ($baseline*0.75);
@@ -469,7 +464,7 @@ $outline-indent-width: $baseline;
 
   // STATE: is-collapsed
   &.is-collapsed {
-    border-left: ($baseline/4) solid $color-draft;
+
   }
 
   // header - title

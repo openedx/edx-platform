@@ -1,6 +1,21 @@
 // studio - views - course outline
 // ====================
 
+// view-specific utilities
+// --------------------
+%outline-item-header {
+  @include clearfix();
+  line-height: 0;
+}
+
+%outline-item-content-hidden {
+  display: none;
+}
+
+%outline-item-content-shown {
+  display: block;
+}
+
 .view-outline {
 
   // page structure
@@ -40,20 +55,30 @@
 
   // page header
   // --------------------
-  .toggle-button-sections {
-    @extend %t-copy-sub2;
-    position: relative;
-    display: none;
-    float: right;
-    margin-top: ($baseline/4);
-    color: $gray-l1;
+  .button-toggle-expand-collapse {
 
-    &.is-shown {
-      display: block;
+    // STATE: action will collapse all
+    &.collapse-all {
+
+      .expand-all {
+        display: none;
+      }
+
+      .collapse-all {
+        display: block;
+      }
     }
 
-    .label {
-      display: inline-block;
+    // STATE: action will expand all
+    &.expand-all {
+
+      .collapse-all {
+        display: none;
+      }
+
+      .expand-all {
+        display: block;
+      }
     }
   }
 
@@ -124,7 +149,7 @@
     .add-item {
       margin-top: ($baseline*0.75);
 
-      .action-add {
+      .button-new {
         @extend %ui-btn-flat-outline;
         padding: ($baseline/2) $baseline;
         display: block;
@@ -132,7 +157,7 @@
         .icon {
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/4);
+          margin-right: ($baseline/2);
         }
       }
     }
@@ -154,12 +179,13 @@
   .outline-item {
 
     // CASE: expand/collapse-able
-    &.is-collapsible .expand-collapse {
+    &.is-collapsible {
 
-      // STATE: hover/active
-      &:hover, &:active {
+      // only select the current item's toggle expansion controls
+      &:nth-child(1) .ui-toggle-expansion, &:nth-child(1) .item-title {
 
-        .item-title, .ui-toggle-expansion {
+        // STATE: hover/active
+        &:hover, &:active {
           color: $blue;
         }
       }
@@ -189,7 +215,7 @@
 
     // header
     .section-header {
-      @include clearfix();
+      @extend %outline-item-header;
     }
 
     .section-header-details {
@@ -207,7 +233,6 @@
 
       .wrapper-section-title {
         width: flex-grid(5, 6);
-        margin-top: -($baseline/4);
         line-height: 0;
       }
     }
@@ -215,7 +240,7 @@
     .section-header-actions {
       float: right;
       width: flex-grid(3, 9);
-      margin-top: -($baseline/2);
+      margin-top: -($baseline/4);
       text-align: right;
 
       .actions-list {
@@ -227,6 +252,36 @@
     // status
     .section-status {
       margin: 0 0 0 $outline-indent-width;
+    }
+
+    // content
+    .section-content {
+      @extend %outline-item-content-shown;
+    }
+
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
+
+      .ui-toggle-expansion {
+        @extend %t-icon3;
+        color: $gray-l3;
+      }
+    }
+
+    // STATE: is-expanded
+    &.is-expanded.is-expanded {
+      border-left-width: 1px;
+      border-left-color: $color-draft;
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left-width: ($baseline/4);
+
+      .section-content {
+        @extend %outline-item-content-hidden;
+      }
     }
   }
 
@@ -240,7 +295,7 @@
 
     // header
     .subsection-header {
-      @include clearfix();
+      @extend %outline-item-header;
     }
 
     .subsection-header-details {
@@ -280,6 +335,29 @@
     .subsection-status {
       margin: 0 0 0 $outline-indent-width;
     }
+
+    // content
+    .subsection-content {
+      @extend %outline-item-content-shown;
+    }
+
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
+
+      .ui-toggle-expansion {
+        @extend %t-icon4;
+        color: $gray-l3;
+      }
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+
+      .subsection-content {
+        @extend %outline-item-content-hidden;
+      }
+    }
   }
 
   // outline: units
@@ -293,8 +371,7 @@
 
     // header
     .unit-header {
-      @include clearfix();
-      // margin-bottom: ($baseline/4);
+      @extend %outline-item-header;
     }
 
     .unit-header-details {

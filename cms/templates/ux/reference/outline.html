@@ -22,16 +22,16 @@ from django.core.urlresolvers import reverse
           <li class="nav-item">
             <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all">
               <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span></span>
-              <span class="expand-all is-hidden"><i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span></span>
+              <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span></span>
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="button new-button" data-category="chapter" data-parent="" data-default-name="">
+            <a href="#" class="button button-new" data-category="chapter" data-parent="" data-default-name="">
               <i class="icon-plus"></i>Add Section
             </a>
           </li>
           <li class="nav-item">
-            <a href="" rel="external" class="button view-button button-view view-live-button" title="This link will open in a new browser window/tab">View Live</a>
+            <a href="" rel="external" class="button button-view view-live-button" title="This link will open in a new browser window/tab">View Live</a>
           </li>
         </ul>
       </nav>
@@ -82,9 +82,10 @@ from django.core.urlresolvers import reverse
                         </ol>
                         <!-- /list: units -->
                       </div>
-                      <!-- /subsection-content -->
 
                       <%include file="outline_add-unit.html" />
+
+                      <!-- /subsection-content -->
                     </li>
                     <!-- /subsection -->
 
@@ -123,10 +124,11 @@ from django.core.urlresolvers import reverse
                           </li>
                         </ol>
                         <!-- /list: units -->
+
+                        <%include file="outline_add-unit.html" />
+
                       </div>
                       <!-- /subsection-content -->
-
-                      <%include file="outline_add-unit.html" />
                     </li>
                     <!-- /subsection -->
                   </ol>
@@ -267,7 +269,7 @@ from django.core.urlresolvers import reverse
               <!-- /section: published + released + locked content -->
 
               <!-- section: locked content -->
-              <li class="outline-item outline-section is-collapsible is-draggable has-staff-only is-collapsed" data-parent="" data-locator="">
+              <li class="outline-item outline-section is-collapsible is-draggable is-staff-only is-collapsed" data-parent="" data-locator="">
 
                 <%include file="outline_section_header-collapsed.html" />
 
@@ -282,8 +284,8 @@ from django.core.urlresolvers import reverse
               </li>
               <!-- /section: locked content -->
 
-              <!-- section: published + released + has changes -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released has-changes is-collapsed" data-parent="" data-locator="">
+              <!-- section: published + released + has unpublished content -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-released has-unpublished-content is-collapsed" data-parent="" data-locator="">
 
                 <%include file="outline_section_header-collapsed.html" />
 
@@ -298,10 +300,10 @@ from django.core.urlresolvers import reverse
                   <!-- subsections + units here -->
                 </div>
               </li>
-              <!-- /section: published + released + has changes -->
+              <!-- /section: published + released + has unpublished content -->
 
-              <!-- section: published + scheduled + has changes -->
-              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+              <!-- section: published + scheduled + has unpublished content -->
+              <li class="outline-item outline-section is-collapsible is-draggable is-published is-scheduled has-unpublished-content is-collapsed" data-parent="" data-locator="">
 
                 <%include file="outline_section_header-collapsed.html" />
 
@@ -316,7 +318,7 @@ from django.core.urlresolvers import reverse
                   <!-- subsections + units here -->
                 </div>
               </li>
-              <!-- /section: published + scheduled + has changes -->
+              <!-- /section: published + scheduled + has unpublished content -->
 
               <!-- section: published + released + has error -->
               <li class="outline-item outline-section is-collapsible is-draggable is-published is-released has-errors is-collapsed" data-parent="" data-locator="">
@@ -559,7 +561,7 @@ from django.core.urlresolvers import reverse
                     <!-- /subsection: published + released + graded + due date + locked content -->
 
                     <!-- subsection: locked content -->
-                    <li class="outline-item outline-subsection has-staff-only is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
+                    <li class="outline-item outline-subsection is-staff-only is-collapsible is-draggable is-collapsed" data-parent="" data-locator="">
 
                       <%include file="outline_subsection_header-collapsed.html" />
 
@@ -574,8 +576,8 @@ from django.core.urlresolvers import reverse
                     </li>
                     <!-- /subsection: locked content -->
 
-                    <!-- /subsection: published + scheduled + has changes -->
-                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+                    <!-- subsection: published + scheduled + has unpublished content -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-scheduled has-unpublished-content is-collapsed" data-parent="" data-locator="">
 
                       <%include file="outline_subsection_header-collapsed.html" />
 
@@ -590,10 +592,10 @@ from django.core.urlresolvers import reverse
                       </div>
                       <!-- /subsection-content -->
                     </li>
-                    <!-- /subsection: published + scheduled + has changes -->
+                    <!-- /subsection: published + scheduled + has unpublished content -->
 
-                    <!-- subsection: published + released + has changes -->
-                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-changes is-collapsed" data-parent="" data-locator="">
+                    <!-- subsection: published + released + has unpublished content -->
+                    <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-unpublished-content is-collapsed" data-parent="" data-locator="">
 
                       <%include file="outline_subsection_header-collapsed.html" />
 
@@ -608,7 +610,7 @@ from django.core.urlresolvers import reverse
                       </div>
                       <!-- /subsection-content -->
                     </li>
-                    <!-- /subsection: published + released + has changes -->
+                    <!-- /subsection: published + released + has unpublished content -->
 
                     <!-- subsection: published + released + has error -->
                     <li class="outline-item outline-subsection is-collapsible is-draggable is-published is-released is-scheduled has-errors is-collapsed" data-parent="" data-locator="">
@@ -719,8 +721,8 @@ from django.core.urlresolvers import reverse
                           </li>
                           <!-- /unit: not published + locked content -->
 
-                          <!-- unit: published + has changes -->
-                          <li class="outline-item outline-unit is-draggable is-published has-changes" data-parent="" data-locator="">
+                          <!-- unit: published + has unpublished content -->
+                          <li class="outline-item outline-unit is-draggable is-published has-unpublished-content" data-parent="" data-locator="">
                             <%include file="outline_unit_header.html" />
 
                             <div class="unit-status">
@@ -728,10 +730,10 @@ from django.core.urlresolvers import reverse
                             </div>
                             <!-- /unit-status -->
                           </li>
-                          <!-- /unit: published + has changes -->
+                          <!-- /unit: published + has unpublished content -->
 
-                          <!-- unit: not published + has changes -->
-                          <li class="outline-item outline-unit is-draggable has-changes" data-parent="" data-locator="">
+                          <!-- unit: not published + has unpublished content -->
+                          <li class="outline-item outline-unit is-draggable has-unpublished-content" data-parent="" data-locator="">
                             <%include file="outline_unit_header.html" />
 
                             <div class="unit-status">
@@ -739,7 +741,7 @@ from django.core.urlresolvers import reverse
                             </div>
                             <!-- /unit-status -->
                           </li>
-                          <!-- /unit: not published + has changes -->
+                          <!-- /unit: not published + has unpublished content -->
 
                           <!-- unit: has error -->
                           <li class="outline-item outline-unit is-draggable has-errors" data-parent="" data-locator="">
@@ -753,15 +755,23 @@ from django.core.urlresolvers import reverse
                           <!-- /unit: has error -->
                         </ol>
                         <!-- /list: units -->
+
+                        <%include file="outline_add-unit.html" />
+
                       </div>
                       <!-- /subsection-content -->
                     </li>
                     <!-- /subsection: placeholder -->
                   </ol>
+
+                  <%include file="outline_add-subsection.html" />
+
                 </div>
               </li>
               <!-- /section: placeholder -->
             </ol>
+
+            <%include file="outline_add-section.html" />
           </article>
         </div>
 
