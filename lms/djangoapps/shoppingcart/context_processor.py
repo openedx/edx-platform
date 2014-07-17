@@ -19,5 +19,8 @@ def user_has_cart_context_processor(request):
         request.user.is_authenticated() and                                # user is logged in and
         settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings enable paid course reg and
         settings.FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
-        shoppingcart.models.Order.user_cart_has_items(request.user)        # user's cart has items
+        shoppingcart.models.Order.user_cart_has_items(
+            request.user,
+            shoppingcart.models.PaidCourseRegistration
+        )  # user's cart has PaidCourseRegistrations
     )}
