@@ -87,15 +87,17 @@ class Order(models.Model):
         return cart_order
 
     @classmethod
-    def user_cart_has_items(cls, user):
+    def user_cart_has_items(cls, user, item_type=None):
         """
         Returns true if the user (anonymous user ok) has
         a cart with items in it.  (Which means it should be displayed.
+        If a item_type is passed in, then we check to see if the cart has at least one of
+        those types of OrderItems
         """
         if not user.is_authenticated():
             return False
         cart = cls.get_cart_for_user(user)
-        return cart.has_items()
+        return cart.has_items(item_type)
 
     @property
     def total_cost(self):
@@ -105,11 +107,19 @@ class Order(models.Model):
         """
         return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=E1101
 
-    def has_items(self):
+    def has_items(self, item_type=None):
         """
         Does the cart have any items in it?
+        If an item_type is passed in then we check to see if there are any items of that class type
         """
-        return self.orderitem_set.exists()  # pylint: disable=E1101
+        if not item_type:
+            return self.orderitem_set.exists()  # pylint: disable=E1101
+        else:
+            items = self.orderitem_set.all().select_subclasses()
+            for item in items:
+                if isinstance(item, item_type):
+                    return True
+            return False
 
     def clear(self):
         """

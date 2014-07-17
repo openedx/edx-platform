@@ -52,6 +52,21 @@ class OrderTest(ModuleStoreTestCase):
         item = OrderItem(order=cart, user=self.user)
         item.save()
         self.assertTrue(Order.user_cart_has_items(self.user))
+        self.assertFalse(Order.user_cart_has_items(self.user, CertificateItem))
+        self.assertFalse(Order.user_cart_has_items(self.user, PaidCourseRegistration))
+
+    def test_user_cart_has_paid_course_registration_items(self):
+        cart = Order.get_cart_for_user(self.user)
+        item = PaidCourseRegistration(order=cart, user=self.user)
+        item.save()
+        self.assertTrue(Order.user_cart_has_items(self.user, PaidCourseRegistration))
+        self.assertFalse(Order.user_cart_has_items(self.user, CertificateItem))
+
+    def test_user_cart_has_certificate_items(self):
+        cart = Order.get_cart_for_user(self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
+        self.assertTrue(Order.user_cart_has_items(self.user, CertificateItem))
+        self.assertFalse(Order.user_cart_has_items(self.user, PaidCourseRegistration))
 
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
