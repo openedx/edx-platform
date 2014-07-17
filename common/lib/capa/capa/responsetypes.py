@@ -61,8 +61,7 @@ CORRECTMAP_PY = None
 
 QUESTION_HINT_CORRECT_STYLE = 'question_hint_correct'
 QUESTION_HINT_INCORRECT_STYLE = 'question_hint_incorrect'
-QUESTION_HINT_COMPOUND_STYLE = 'question_hint_compound_condiiton'
-PROBLEM_HINT_STYLE = 'problem_hint'
+QUESTION_HINT_TEXT_STYLE = 'question_hint_text'
 
 #-----------------------------------------------------------------------------
 # Exceptions
@@ -770,11 +769,27 @@ class ChoiceResponse(LoncapaResponse):
             'name') for choice in correct_xml])
 
 
+    def wrap_hints_correct_or_incorrect(self, new_cmap, problem, problem_hint_shown):
+        """
+        If any question hints have been added to the 'msg' string in 'new_cmap' wrap that
+        html text in a <div> element announcing the correct/incorrect status of the student's
+        response.
+        :param new_cmap:           The correct map under construction
+        :param problem:            The problem id
+        :param problem_hint_shown: True if at least one question hint was added that needs wrapping
+        :return:                   None
+        """
+        if problem_hint_shown:
+            if new_cmap[problem]['correctness'] == 'correct':
+                correctness_string = 'CORRECT'
+                div_class = 'question_hint_correct'
+            else:
+                correctness_string = 'INCORRECT'
+                div_class = 'question_hint_incorrect'
 
-
-
-
-
+            new_cmap[problem]['msg'] = '<div class="' + div_class + '">' \
+                                       + correctness_string \
+                                       + new_cmap[problem]['msg'] + '</div>'
 
     def get_single_choice_hints(self, new_cmap, student_answers):
         '''
@@ -786,8 +801,8 @@ class ChoiceResponse(LoncapaResponse):
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
         '''
-        problem_hint_shown = False
         for problem in student_answers:
+            problem_hint_shown = False
             student_answer_list = student_answers[problem]
             if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
                 student_answer_list = [student_answer_list]     # cast it as a true list
@@ -807,19 +822,11 @@ class ChoiceResponse(LoncapaResponse):
                 if hint_text_element:
                     problem_hint_shown = True
                     hint_text = hint_text_element[0].text.strip()
-                    new_cmap[problem]['msg'] += '<div class="question_hint_text ">' + hint_text + '</div>'
+                    new_cmap[problem]['msg'] += '<div class="' \
+                                                + QUESTION_HINT_TEXT_STYLE \
+                                                + '">' + hint_text + '</div>'
 
-            if problem_hint_shown:
-                if new_cmap[problem]['correctness'] == 'correct':
-                    correctness_string = 'CORRECT'
-                    div_class = 'question_hint_correct'
-                else:
-                    correctness_string = 'INCORRECT'
-                    div_class = 'question_hint_incorrect'
-
-                new_cmap[problem]['msg'] = '<div class="' + div_class + '">'\
-                                           + correctness_string \
-                                           + new_cmap[problem]['msg'] + '</div>'
+            self.wrap_hints_correct_or_incorrect(new_cmap, problem, problem_hint_shown)
 
     def assign_choice_names(self):
         """
@@ -870,6 +877,7 @@ class ChoiceResponse(LoncapaResponse):
         compound_hint_matched = False       # assume we won't find any matching rules
 
         for problem in student_answers:
+            problem_hint_shown = False
             selection_id_list = []              # create a list of all the student's selected id's
             for student_answer in student_answers[problem]:
                 choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
@@ -896,10 +904,12 @@ class ChoiceResponse(LoncapaResponse):
                     if boolean_hint_element.get('label'):
                         hint_label = boolean_hint_element.get('label') + ': '
 
-                    new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_COMPOUND_STYLE + '">' \
+                    new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_TEXT_STYLE + '">' \
                         + hint_label + boolean_hint_element.text.strip() + '</div>'
-
+                    problem_hint_shown = True
                     break
+
+            self.wrap_hints_correct_or_incorrect(new_cmap, problem, problem_hint_shown)
 
         return compound_hint_matched
 
