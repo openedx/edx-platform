@@ -1,3 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <h2>${_("Thanks For Registering!")}</h2>
-<p class='activation-message'>${_("Your account is not active yet. An activation link has been sent to {email}, along with instructions for activating your account.").format(email="<strong>{}</strong>".format(email))}</p>
+<p class='activation-message'>${_("Your account is not active yet. An activation link has been sent to {email}, along with instructions for activating your account. "
+    "If you don't see it within a couple of minutes, check your Spam filter. Also make sure that there aren't any typos in your email address - "
+    "if there are, click {link_start}here{link_end} to change your email address.").format(email="<strong>{}</strong>".format(email),
+    link_start='<a href="#change_email" rel="leanModal" class="edit-email">', link_end='</a>')}</p>
