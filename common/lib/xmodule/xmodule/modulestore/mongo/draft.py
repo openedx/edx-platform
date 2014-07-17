@@ -50,7 +50,8 @@ class DraftModuleStore(MongoModuleStore):
     def __init__(self, *args, **kwargs):
         """
         Args:
-            branch_setting_func: a function that returns the branch setting to use for this store's operations
+            branch_setting_func: a function that returns the branch setting to use for this store's operations.
+                This should be an attribute from ModuleStoreEnum.Branch
         """
         super(DraftModuleStore, self).__init__(*args, **kwargs)
         self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)

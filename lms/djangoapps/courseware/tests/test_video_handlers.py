@@ -66,10 +66,7 @@ def _clear_assets(location):
 
     assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
-        asset_location = AssetLocation._from_deprecated_son(
-            asset.get('content_son', asset["_id"]),
-            location.course_key.run
-        )
+        asset_location = asset['asset_key']
         del_cached_content(asset_location)
         store.delete(asset_location)
 

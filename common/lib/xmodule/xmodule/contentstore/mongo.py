@@ -146,9 +146,6 @@ class MongoContentStore(ContentStore):
         assets, __ = self.get_all_content_for_course(course_key)
 
         for asset in assets:
-            asset_id = asset.get('content_son', asset['_id'])
-            # assuming course_key's deprecated flag is controlling rather than presence or absence of 'run' in _id
-            asset_location = course_key.make_asset_key(asset_id['category'], asset_id['name'])
             # TODO: On 6/19/14, I had to put a try/except around this
             # to export a course. The course failed on JSON files in
             # the /static/ directory placed in it with an import.
@@ -157,10 +154,10 @@ class MongoContentStore(ContentStore):
             #
             # When debugging course exports, this might be a good place
             # to look. -- pmitros
-            self.export(asset_location, output_directory)
+            self.export(asset['asset_key'], output_directory)
             for attr, value in asset.iteritems():
-                if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize']:
-                    policy.setdefault(asset_location.name, {})[attr] = value
+                if attr not in ['_id', 'md5', 'uploadDate', 'length', 'chunkSize', 'asset_key']:
+                    policy.setdefault(asset['asset_key'].name, {})[attr] = value
 
         with open(assets_policy_file, 'w') as f:
             json.dump(policy, f)
@@ -175,23 +172,14 @@ class MongoContentStore(ContentStore):
 
     def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None):
         '''
-        Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
+        Returns a list of all static assets for a course. The return format is a list of asset data dictionary elements.
 
-            [
-
-            {u'displayname': u'profile.jpg', u'chunkSize': 262144, u'length': 85374,
-            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 183000), u'contentType': u'image/jpeg',
-            u'_id': {u'category': u'asset', u'name': u'profile.jpg', u'course': u'6.002x', u'tag': u'c4x',
-            u'org': u'MITx', u'revision': None}, u'md5': u'36dc53519d4b735eb6beba51cd686a0e'},
-
-            {u'displayname': u'profile.thumbnail.jpg', u'chunkSize': 262144, u'length': 4073,
-            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 196000), u'contentType': u'image/jpeg',
-            u'_id': {u'category': u'asset', u'name': u'profile.thumbnail.jpg', u'course': u'6.002x', u'tag': u'c4x',
-            u'org': u'MITx', u'revision': None}, u'md5': u'ff1532598830e3feac91c2449eaa60d6'},
-
-            ....
-
-            ]
+        The asset data dictionaries have the following keys:
+            asset_key (:class:`opaque_keys.edx.AssetKey`): The key of the asset
+            displayname: The human-readable name of the asset
+            uploadDate (datetime.datetime): The date and time that the file was uploadDate
+            contentType: The mimetype string of the asset
+            md5: An md5 hash of the asset content
         '''
         if maxresults > 0:
             items = self.fs_files.find(
@@ -203,7 +191,14 @@ class MongoContentStore(ContentStore):
                 query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail"), sort=sort
             )
         count = items.count()
-        return list(items), count
+        assets = list(items)
+
+        # We're constructing the asset key immediately after retrieval from the database so that
+        # callers are insulated from knowing how our identifiers are stored.
+        for asset in assets:
+            asset_id = asset.get('content_son', asset['_id'])
+            asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name'])
+        return assets, count
 
     def set_attr(self, asset_key, attr, value=True):
         """
