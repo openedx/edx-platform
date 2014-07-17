@@ -24,10 +24,12 @@
                 value="<%= xblockInfo.get('release_date') ? getDateTime(xblockInfo.get('release_date')).time : null %>"
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
-          <a href="#" data-tooltip="<%= gettext('Delete') %>" class="sync-date">
+          <% if (xblockInfo.get('category') != 'chapter') { %>
+            <a href="#" data-tooltip="<%= gettext('Delete') %>" class="sync-date">
                 <i class="icon-remove"></i>
                 <span class="sr"><%= gettext('Delete') %></span>
-        </a>
+            </a>
+            <% } %>
         </div>
       </div>
 
