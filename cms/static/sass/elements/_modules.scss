@@ -267,38 +267,68 @@
 // outline: utilities
 $outline-indent-width: $baseline;
 
-// UI: containing elements on a course outline (currently sections/subsections)
-%outline-container {
+// UI: section
+%outline-section {
+  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s);
+  border-left: 1px solid $color-draft;
+
   // STATE: is-collapsed
   &.is-collapsed {
-    border-left: ($baseline/4) solid $color-draft;
+    border-left-width: ($baseline/4);
+
+    // CASE: is ready to be live
+    &.is-ready {
+      border-left-color: $color-ready;
+    }
+
+    // CASE: is live
+    &.is-live {
+      border-left-color: $color-live;
+    }
+
+    // CASE: has staff-only content
+    &.is-staff-only {
+      border-left-color: $color-staff-only;
+    }
+
+    // CASE: has unpublished content
+    &.has-warnings {
+      border-left-color: $color-warning;
+    }
+
+    // CASE: has errors
+    &.has-errors {
+      border-left-color: $color-error;
+    }
+  }
+}
+
+// UI: subsection
+%outline-subsection {
+  @include transition(border-left-color $tmg-f2 linear 0s);
+  border-left: ($baseline/4) solid $color-draft;
+
+  // CASE: is ready to be live
+  &.is-ready {
+    border-left-color: $color-ready;
   }
 
-  // CASE: is published by not released
-  &.is-published {
-    border-left-color: $color-published;
-
-
-  &.is-published.is-released {
-      border-left-color: $color-released;
-    }
+  // CASE: is live
+  &.is-live {
+    border-left-color: $color-live;
   }
 
   // CASE: has staff-only content
-  &.has-staff-only {
+  &.is-staff-only {
     border-left-color: $color-staff-only;
   }
 
-  // CASE: has changes
-  &.is-published.is-released.has-changes, // needed for poor specificity
-  &.is-published.is-scheduled.has-changes, // needed for poor specificity
-  &.has-changes {
+  // CASE: has unpublished content
+  &.has-warnings {
     border-left-color: $color-warning;
   }
 
   // CASE: has errors
-  &.is-published.is-released.has-errors, // needed for poor specificity
-  &.is-published.is-scheduled.has-errors, // needed for poor specificity
   &.has-errors {
     border-left-color: $color-error;
   }
@@ -317,9 +347,9 @@ $outline-indent-width: $baseline;
   }
 
   // CASE: has staff-only content
-  &.has-staff-only {
+  &.is-staff-only {
 
-    // aint the prettiest, but needed to make sure direct children only
+    // needed to make sure direct children only
     > .section-status,
     > .subsection-status,
     > .unit-status {
@@ -330,12 +360,10 @@ $outline-indent-width: $baseline;
     }
   }
 
-  // CASE: has changes
-  &.is-published.is-released.has-changes, // needed for poor specificity
-  &.is-published.is-scheduled.has-changes, // needed for poor specificity
-  &.has-changes {
+  // CASE: has unpublished content
+  &.has-warnings {
 
-    // aint the prettiest, but needed to make sure direct children only
+    // needed to make sure direct children only
     > .section-status .status-message,
     > .subsection-status .status-message,
     > .unit-status .status-message {
@@ -347,11 +375,9 @@ $outline-indent-width: $baseline;
   }
 
   // CASE: has errors
-  &.is-published.is-released.has-errors, // needed for poor specificity
-  &.is-published.is-scheduled.has-errors, // needed for poor specificity
   &.has-errors {
 
-    // aint the prettiest, but needed to make sure direct children only
+    // needed to make sure direct children only
     > .section-status .status-message,
     > .subsection-status .status-message,
     > .unit-status .status-message,
@@ -359,15 +385,6 @@ $outline-indent-width: $baseline;
     > .subsection-status .status-message-copy,
     > .unit-status .status-message-copy {
       color: $color-error;
-    }
-
-    > .section-status .status-message,
-    > .subsection-status .status-message,
-    > .unit-status .status-message {
-
-      .icon {
-        @include animation(pulse $tmg-s3 ease-in-out infinite);
-      }
     }
   }
 }
@@ -387,7 +404,7 @@ $outline-indent-width: $baseline;
 .outline-section {
   @extend %ui-window;
   @extend %outline-item;
-  @extend %outline-container;
+  @extend %outline-section;
   margin-bottom: $baseline;
   padding: ($baseline*0.75) $baseline;
 
@@ -455,9 +472,10 @@ $outline-indent-width: $baseline;
 // outline: subsections
 .outline-subsection {
   @extend %outline-item;
-  @extend %outline-container;
+  @extend %outline-subsection;
   margin-bottom: ($baseline/2);
   border: 1px solid $gray-l4;
+  border-left: ($baseline/4) solid $color-draft;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: ($baseline*0.75);
@@ -469,7 +487,7 @@ $outline-indent-width: $baseline;
 
   // STATE: is-collapsed
   &.is-collapsed {
-    border-left: ($baseline/4) solid $color-draft;
+
   }
 
   // header - title

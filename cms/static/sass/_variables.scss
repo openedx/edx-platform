@@ -49,7 +49,6 @@ $gray-d3: shade($gray,60%);
 $gray-d4: shade($gray,80%);
 
 $blue: rgb(0, 159, 230);
-$blue-alt: rgb(88, 152, 219);
 $blue-l1: tint($blue,20%);
 $blue-l2: tint($blue,40%);
 $blue-l3: tint($blue,60%);
@@ -105,7 +104,6 @@ $red-u2: desaturate($red,30%);
 $red-u3: desaturate($red,45%);
 
 $green: rgb(37, 184, 90);
-$green-alt: rgb(48, 183, 94);
 $green-l1: tint($green,20%);
 $green-l2: tint($green,40%);
 $green-l3: tint($green,60%);
@@ -164,8 +162,8 @@ $shadow-d2: rgba($black, 0.6);
 
 // colors - application
 $color-draft: $gray-l3;
-$color-released: $blue;
-$color-published: $green;
+$color-live: $blue;
+$color-ready: $green;
 $color-warning: $orange-l2;
 $color-error: $red-l2;
 $color-staff-only: $black;
