@@ -267,7 +267,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param course_version_guid: if provided, clear only this entry
         """
         if course_version_guid:
-            del self.thread_cache.course_cache[course_version_guid]
+            try:
+                del self.thread_cache.course_cache[course_version_guid]
+            except KeyError:
+                pass
         else:
             self.thread_cache.course_cache = {}
 
@@ -904,12 +907,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         encoded_block_id = encode_key_for_mongo(parent_usage_key.block_id)
         parent = new_structure['blocks'][encoded_block_id]
         parent['fields'].setdefault('children', []).append(xblock.location.block_id)
-        parent['edit_info'] = {
-            'edited_on': datetime.datetime.now(UTC),
-            'edited_by': user_id,
-            'previous_version': parent['edit_info']['update_version'],
-            'update_version': new_structure['_id'],
-        }
+        if parent['edit_info']['update_version'] != new_structure['_id']:
+            # if the parent hadn't been previously changed in this bulk transaction, indicate that it's
+            # part of the bulk transaction
+            parent['edit_info'] = {
+                'edited_on': datetime.datetime.now(UTC),
+                'edited_by': user_id,
+                'previous_version': parent['edit_info']['update_version'],
+                'update_version': new_structure['_id'],
+            }
 
         # db update
         self.db_connection.update_structure(new_structure)
