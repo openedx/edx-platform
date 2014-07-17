@@ -17,6 +17,7 @@ import sys
 import logging
 import copy
 import re
+from uuid import uuid4
 
 from bson.son import SON
 from fs.osfs import OSFS
@@ -996,9 +997,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             block_id: a unique identifier for the new item. If not supplied,
                 a new identifier will be generated
         """
-        if not self.has_course(course_key):
-            raise ItemNotFoundError
-
         if block_id is None:
             block_id = uuid4().hex
 
@@ -1121,6 +1119,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
+            elif not self.has_course(xblock.location.course_key):
+                raise ItemNotFoundError
+
 
         return xblock
 
