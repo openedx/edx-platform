@@ -4,11 +4,20 @@
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 
 <div class="ecommerce-wrapper">
-  <h2>${_("Coupons List")}
-      %if section_data['total_amount'] is not None:
-           <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
-      %endif
-  </h2>
+
+%if section_data['access']['finance_admin'] is True:
+
+  <h2>${_("Transactions")}</h2>
+  %if section_data['total_amount'] is not None:
+       <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+  %endif
+
+  <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
+
+  <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
+%endif
+
+  <h2>${_("Coupons List")}</h2>
 
   <h3 class="coupon-errors" id="coupon-error"></h3>
   <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
