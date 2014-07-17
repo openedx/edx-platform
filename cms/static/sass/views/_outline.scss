@@ -276,6 +276,36 @@
         @extend %outline-item-content-hidden;
       }
     }
+
+    // content
+    .section-content {
+      @extend %outline-item-content-shown;
+    }
+
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
+
+      .ui-toggle-expansion {
+        @extend %t-icon3;
+        color: $gray-l3;
+      }
+    }
+
+    // STATE: is-expanded
+    &.is-expanded.is-expanded {
+      border-left-width: 1px;
+      border-left-color: $color-draft;
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left-width: ($baseline/4);
+
+      .section-content {
+        @extend %outline-item-content-hidden;
+      }
+    }
   }
 
   // outline: subsections
