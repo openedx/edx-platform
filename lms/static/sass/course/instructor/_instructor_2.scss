@@ -931,7 +931,7 @@ input[name="subject"] {
     }
   }
 
-  // coupon edit and add modals 
+  // coupon edit and add modals
   #add-coupon-modal, #edit-coupon-modal{
     .inner-wrapper {
       background: #fff;
@@ -1046,4 +1046,88 @@ input[name="subject"] {
       }
     }
   }
+
+}
+
+.profile-distribution-widget {
+  margin-bottom: $baseline * 2;
+
+  .display-text {}
+
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 250px;
+  }
+
+  .display-table {
+    .slickgrid {
+      height: 250px;
+    }
+  }
+}
+
+.grade-distributions-widget {
+  margin-bottom: $baseline * 2;
+
+  .last-updated {
+    line-height: 2.2em;
+    @include font-size(12);
+  }
+
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 200px;
+  }
+
+  .display-text {
+    line-height: 2em;
+  }
+}
+
+input[name="subject"] {
+  width:600px;
+}
+
+.enrollment-wrapper {
+  margin-bottom: $baseline * 2;
+
+  .count {
+    color: green;
+    font-weight: bold;
+  }
+}
+
+.ecommerce-wrapper{
+  h2{
+    height: 26px;
+    line-height: 26px;
+    span{
+      float: right;
+      font-size: 16px;
+      font-weight: bold;
+      span{
+        background: #ddd;
+        padding: 2px 9px;
+        border-radius: 2px;
+        float: none;
+        font-weight: 400;
+      }
+    }
+  }
+  span.tip{
+    padding: 10px 15px;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background: #f8f4ec;
+    color: #3c3c3c;
+    line-height: 30px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+      float: right;
+    }
+  }
+
 }
