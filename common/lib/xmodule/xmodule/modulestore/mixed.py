@@ -363,13 +363,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         return xblock
 
-    def update_item(self, xblock, user_id, allow_not_found=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
         """
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
         """
         store = self._verify_modulestore_support(xblock.location, 'update_item')
-        return store.update_item(xblock, user_id, allow_not_found)
+        return store.update_item(xblock, user_id, allow_not_found=allow_not_found, **kwargs)
 
     def delete_item(self, location, user_id, **kwargs):
         """

@@ -306,9 +306,6 @@ def import_from_xml(
                         runtime=course.runtime
                     )
 
-                # finally, publish the course
-                store.publish(course.location, user_id)
-
                 # now import any DRAFT items
                 _import_course_draft(
                     xml_module_store,
@@ -387,7 +384,9 @@ def _import_module_and_update_references(
                 setattr(new_module, field_name, value)
             else:
                 setattr(new_module, field_name, getattr(module, field_name))
-    store.update_item(new_module, user_id, allow_not_found=True)
+
+    # Pass published_only as the revision parameter to update_item since these are non-draft modules
+    store.update_item(new_module, user_id, revision=ModuleStoreEnum.RevisionOption.published_only, allow_not_found=True)
     return new_module
 
 
