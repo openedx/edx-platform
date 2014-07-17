@@ -4,11 +4,12 @@ The container page is used both for display units, and for
 displaying containers within units.
 """
 
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.outline import CourseOutlinePage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from unittest import skip
+from bok_choy.promise import Promise
 
-from ..helpers import UniqueCourseTest
+from ...fixtures.course import XBlockFixtureDesc
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.studio.outline import CourseOutlinePage
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.utils import add_discussion
 from ...pages.lms.courseware import CoursewarePage
@@ -18,8 +19,10 @@ from unittest import skip
 import datetime
 from bok_choy.promise import Promise
 
+from helpers import StudioCourseTest
 
-class ContainerBase(UniqueCourseTest):
+
+class ContainerBase(StudioCourseTest):
     """
     Base class for tests that do operations on the container page.
     """
@@ -38,21 +41,6 @@ class ContainerBase(UniqueCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
-
-        self.setup_fixtures()
-
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=self.user.get('username'),
-            email=self.user.get('email'),
-            password=self.user.get('password')
-        )
-
-        self.auth_page.visit()
-
-    def setup_fixtures(self):
-        pass
 
     def go_to_nested_container_page(self):
         """
@@ -136,10 +124,10 @@ class ContainerBase(UniqueCourseTest):
 class NestedVerticalTest(ContainerBase):
     __test__ = False
 
-    """
-    Sets up a course structure with nested verticals.
-    """
-    def setup_fixtures(self):
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with nested verticals.
+        """
         self.container_title = ""
         self.group_a = "Group A"
         self.group_b = "Group B"
@@ -163,14 +151,7 @@ class NestedVerticalTest(ContainerBase):
         self.duplicate_label = "Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
-        course_fix = CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        )
-
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
@@ -188,9 +169,7 @@ class NestedVerticalTest(ContainerBase):
                     )
                 )
             )
-        ).install()
-
-        self.user = course_fix.user
+        )
 
 
 class DragAndDropTest(NestedVerticalTest):
@@ -427,14 +406,15 @@ class UnitPublishingTest(ContainerBase):
     LOCKED_STATUS = "Publishing Status\nUnpublished (Staff only)"
     RELEASE_TITLE_RELEASED = "RELEASED:"
 
-    def setup_fixtures(self):
+    def populate_course_fixture(self, course_fixture):
         """
         Sets up a course structure with a unit and a single HTML child.
         """
+
         self.html_content = '<p><strong>Body of HTML Unit.</strong></p>'
         self.courseware = CoursewarePage(self.browser, self.course_id)
 
-        course_fix = CourseFixture(
+        course_fixture = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run'],
@@ -443,7 +423,7 @@ class UnitPublishingTest(ContainerBase):
         past_start_date = datetime.datetime(1974, 6, 22)
         self.past_start_date_text = "Jun 22, 1974 at 00:00 UTC"
 
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
@@ -465,9 +445,7 @@ class UnitPublishingTest(ContainerBase):
                     )
                 )
             )
-        ).install()
-
-        self.user = course_fix.user
+        )
 
     def test_publishing(self):
         """
