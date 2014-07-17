@@ -130,7 +130,7 @@ class SplitMigrator(object):
                 _new_module = self.split_modulestore.update_item(split_module, user_id)
             else:
                 # only a draft version (aka, 'private').
-                _new_module = self.split_modulestore.create_child(
+                _new_module = self.split_modulestore.create_item(
                     user_id, new_draft_course_loc,
                     new_locator.block_type,
                     block_id=new_locator.block_id,
