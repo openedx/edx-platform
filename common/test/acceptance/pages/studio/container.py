@@ -103,10 +103,21 @@ class ContainerPage(PageObject):
     def delete(self, source_index):
         """
         Delete the item with index source_index (based on vertical placement in page).
+        Only visible items are counted in the source_index.
+        The index of the first item is 0.
         """
+        # Click the delete button
         click_css(self, 'a.delete-button', source_index, require_notification=False)
+
+        # Wait for the warning prompt to appear
+        self.wait_for_element_visibility('#prompt-warning', 'Deletion warning prompt is visible')
+
+        # Make sure the delete button is there
+        confirmation_button_css = '#prompt-warning a.button.action-primary'
+        self.wait_for_element_visibility(confirmation_button_css, 'Confirmation dialog button is visible')
+
         # Click the confirmation dialog button
-        click_css(self, 'a.button.action-primary', 0)
+        click_css(self, confirmation_button_css, 0)
 
     def edit(self):
         """
@@ -125,6 +136,7 @@ class ContainerPage(PageObject):
     def add_missing_groups(self):
         """
         Click the "add missing groups" link.
+        Note that this does an ajax call.
         """
         self.q(css='.add-missing-groups-button').first.click()
 
