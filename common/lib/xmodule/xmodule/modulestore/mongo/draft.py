@@ -346,16 +346,20 @@ class DraftModuleStore(MongoModuleStore):
         # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
         return self.get_item(location)
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False):
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False, isPublish=False, revision=None):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
         direct-only and not already draft.
+        If revision is published_only, updates only the published version
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
 
         # if the xblock is direct-only, update the PUBLISHED version
-        if xblock.location.category in DIRECT_ONLY_CATEGORIES:
+        if (
+            xblock.location.category in DIRECT_ONLY_CATEGORIES or
+            (revision == ModuleStoreEnum.RevisionOption.published_only)
+        ):
             return super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
 
         draft_loc = as_draft(xblock.location)

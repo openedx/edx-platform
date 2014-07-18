@@ -18,6 +18,7 @@ import xblock
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.exceptions import InvalidLocationError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
+from xmodule.modulestore import ModuleStoreEnum
 
 log = logging.getLogger(__name__)
 
@@ -302,11 +303,9 @@ def import_from_xml(
                     course_key,
                     dest_course_id,
                     do_import_static=do_import_static,
-                    runtime=course.runtime
+                    runtime=course.runtime,
+                    revision=ModuleStoreEnum.RevisionOption.published_only
                 )
-
-            # finally, publish the course
-            store.publish(course.location, user_id)
 
             # now import any DRAFT items
             _import_course_draft(
@@ -325,7 +324,9 @@ def import_from_xml(
 def _import_module_and_update_references(
         module, store, user_id,
         source_course_id, dest_course_id,
-        do_import_static=True, runtime=None):
+        do_import_static=True, runtime=None,
+        revision=None
+):
 
     logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
 
@@ -386,7 +387,9 @@ def _import_module_and_update_references(
                 setattr(new_module, field_name, value)
             else:
                 setattr(new_module, field_name, getattr(module, field_name))
-    store.update_item(new_module, user_id, allow_not_found=True)
+
+    # Pass published_only as the revision parameter to update_item since these are non-draft modules
+    store.update_item(new_module, user_id, revision=revision, allow_not_found=True)
     return new_module
 
 

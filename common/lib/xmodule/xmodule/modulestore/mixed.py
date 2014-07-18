@@ -339,13 +339,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
 
         return xblock
 
-    def update_item(self, xblock, user_id, allow_not_found=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
         """
         Update the xblock persisted to be the same as the given for all types of fields
         (content, children, and metadata) attribute the change to the given user.
         """
         store = self._verify_modulestore_support(xblock.location, 'update_item')
-        return store.update_item(xblock, user_id, allow_not_found)
+        return store.update_item(xblock, user_id, allow_not_found=allow_not_found, **kwargs)
 
     def delete_item(self, location, user_id=None, **kwargs):
         """
@@ -497,8 +497,8 @@ def store_bulk_write_operations_on_course(store, course_id):
     # request comes in for the same course.
 
     # if the caller passed in the mixed modulestore, get a direct pointer to the underlying store
-    if hasattr(store, '_get_modulestore_by_course_id'):
-        store = store._get_modulestore_by_course_id(course_id)
+    if hasattr(store, '_get_modulestore_for_courseid'):
+        store = store._get_modulestore_for_courseid(course_id)
 
     try:
         if hasattr(store, 'begin_bulk_write_operation_on_course'):
