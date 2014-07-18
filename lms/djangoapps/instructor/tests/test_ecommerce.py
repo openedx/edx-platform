@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from course_modes.models import CourseMode
-from shoppingcart.models import Coupon, PaidCourseRegistration
+from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegistrationCode
 from mock import patch
 from student.roles import CourseFinanceAdminRole
 
@@ -95,6 +95,18 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('<td>ADSADASDSAD</td>' in response.content)
         self.assertTrue('<td>A2314</td>' in response.content)
         self.assertFalse('<td>111</td>' in response.content)
+
+        course_registration = CourseRegistrationCode(
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
+            transaction_group_name='Test Group', created_by=self.instructor
+        )
+        course_registration.save()
+
+        data['code'] = 'Vs23Ws4j'
+        response = self.client.post(add_coupon_url, data)
+        self.assertTrue("The code ({code}) that you have tried to define is already in use as a registration code"
+                        .format(code=data['code']) in response.content)
+
 
     def test_delete_coupon(self):
         """
@@ -193,3 +205,15 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         data = {'coupon_id': coupon.id, 'code': '11111', 'discount': '12'}
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon with the coupon id ({coupon_id}) already exist'.format(coupon_id=coupon.id) in response.content)
+
+        course_registration = CourseRegistrationCode(
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
+            transaction_group_name='Test Group', created_by=self.instructor
+        )
+        course_registration.save()
+
+        data = {'coupon_id': coupon.id, 'code': 'Vs23Ws4j',
+                'discount': '6', 'course_id': coupon.course_id.to_deprecated_string()}
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue("The code ({code}) that you have tried to define is already in use as a registration code".
+                        format(code=data['code']) in response.content)
