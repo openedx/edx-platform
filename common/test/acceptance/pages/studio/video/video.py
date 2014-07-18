@@ -25,6 +25,31 @@ BUTTON_SELECTORS = {
     'handout_clear': '.wrapper-comp-setting.file-uploader .setting-clear',
 }
 
+DISPLAY_NAME = "Component Display Name"
+
+DEFAULT_SETTINGS = [
+    # basic
+    [DISPLAY_NAME, 'Video', False],
+    ['Default Video URL', 'http://youtu.be/OEoXaMPEzfM, , ', False],
+
+    # advanced
+    [DISPLAY_NAME, 'Video', False],
+    ['Default Timed Transcript', '', False],
+    ['Download Transcript Allowed', 'False', False],
+    ['Downloadable Transcript URL', '', False],
+    ['Show Transcript', 'True', False],
+    ['Transcript Languages', '', False],
+    ['Upload Handout', '', False],
+    ['Video Download Allowed', 'False', False],
+    ['Video File URLs', '', False],
+    ['Video Start Time', '00:00:00', False],
+    ['Video Stop Time', '00:00:00', False],
+    ['YouTube ID', 'OEoXaMPEzfM', False],
+    ['YouTube ID for .75x speed', '', False],
+    ['YouTube ID for 1.25x speed', '', False],
+    ['YouTube ID for 1.5x speed', '', False]
+]
+
 
 @js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery', 'window.XModule', 'window.XBlock',
             'window.MathJax.isReady')
@@ -140,3 +165,117 @@ class VidoComponentPage(PageObject):
         # TODO! Remove .present below after bok-choy is updated to latest commit, Only .visible is enough
         return self.q(css=BUTTON_SELECTORS['handout_download']).present and self.q(
             css=BUTTON_SELECTORS['handout_download']).visible
+
+    def verify_settings(self):
+        """
+        Verify that video component has correct default settings.
+        """
+        query = '.wrapper-comp-setting'
+
+        settings = self.q(css=query).results
+
+        if len(DEFAULT_SETTINGS) != len(settings):
+            return False
+
+        for counter, setting in enumerate(settings):
+            is_verified = self._verify_setting_entry(setting,
+                                                        DEFAULT_SETTINGS[counter][0],
+                                                        DEFAULT_SETTINGS[counter][1],
+                                                        DEFAULT_SETTINGS[counter][2])
+            if is_verified is False:
+                return is_verified
+
+        return True
+
+
+    @staticmethod
+    def _verify_setting_entry(setting, field_name, field_value, explicitly_set):
+        """
+        Verify a `setting` entry.
+
+        Arguments:
+            setting (WebElement): Selenium WebElement
+            field_name (str): Name of field
+            field_value (str): Value of field
+
+        Returns:
+            bool: Is `setting` has correct value
+
+        """
+        if field_name != setting.find_element_by_class_name('setting-label').get_attribute('innerHTML'):
+            return False
+
+        # Get class attribute values
+        classes = setting.get_attribute('class').split()
+        list_type_classes = ['metadata-list-enum', 'metadata-dict', 'metadata-video-translations']
+        is_list_type = any(list_type in classes for list_type in list_type_classes)
+
+        if is_list_type:
+            current_value = ', '.join(
+                ele.get_attribute('value') for ele in setting.find_elements_by_class_name('list-settings-item'))
+        elif 'metadata-videolist-enum' in setting.get_attribute('class'):
+            current_value = ', '.join(item.find_element_by_tag_name('input').get_attribute('value') for item in
+                                      setting.find_elements_by_class_name('videolist-settings-item'))
+        else:
+            current_value = setting.find_element_by_class_name('setting-input').get_attribute('value')
+
+        if field_value != current_value:
+            return False
+
+        # Clear button should be visible(active class is present) for
+        # every setting that don't have 'metadata-videolist-enum' class
+        if 'metadata-videolist-enum' not in setting.get_attribute('class'):
+            setting_clear_button = setting.find_elements_by_class_name('setting-clear')[0]
+            if 'active' not in setting_clear_button.get_attribute('class'):
+                return False
+
+        return True
+
+    def set_field_value(self, field_name, field_value):
+        """
+        Set settings input `field` with `value`
+
+        Arguments:
+            field_name (str): Name of field
+            field_value (str): Name of value
+
+        """
+        query = '.wrapper-comp-setting > label:nth-child(1)'
+        field_id = ''
+
+        for index, setting in enumerate(self.q(css=query)):
+            if field_name in self.q(css=query).nth(index).text[0]:
+                field_id = self.q(css=query).nth(index).attrs('for')[0]
+                break
+
+        self.q(css='#{}'.format(field_id)).fill(field_value)
+
+    def verify_field_value(self, field_name, field_value):
+        """
+        Get settings value of `field_name`
+
+        Arguments:
+            field_name (str): Name of field
+            field_value (str): Name of value
+
+        Returns:
+            bool: If `field_name` has `field_value`
+
+        """
+        _, setting = self._get_setting_entry(field_name)
+        return self._verify_setting_entry(setting, field_name, field_value, True)
+
+    def _get_setting_entry(self, field_name):
+        """
+        Get setting entry of `field_name`
+
+        Arguments:
+            field_name (str): Name of field
+
+        Returns:
+            setting (WebElement): Selenium WebElement
+
+        """
+        for index, setting in enumerate(self.q(css='.wrapper-comp-setting').results):
+            if setting.find_element_by_class_name('setting-label').get_attribute('innerHTML') == field_name:
+                return index, setting
