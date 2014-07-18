@@ -17,7 +17,7 @@
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 
 # Our libraries:
--e git+https://github.com/FiloSottile/XBlock.git@a9158e9887217abe27e451d1ff82c0d9f98c0bd6#egg=XBlock  # TODO: put here the edx/XBlock#200 merge commit
+-e git+https://github.com/FiloSottile/XBlock.git@ee9aaa5e1cc267de62b0e9cb638461a55e630af9#egg=XBlock  # TODO: put here the edx/XBlock#200 merge commit
 -e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.5.0#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool

@@ -68,7 +68,10 @@ class Date(Field):
         """
         if value is None:
             return None
-        if isinstance(value, datetime.datetime):
+        if isinstance(value, time.struct_time):
+            # struct_times are always utc
+            return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
+        elif isinstance(value, datetime.datetime):
             if value.tzinfo is None or value.utcoffset().total_seconds() == 0:
                 # isoformat adds +00:00 rather than Z
                 return value.strftime('%Y-%m-%dT%H:%M:%SZ')
