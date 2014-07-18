@@ -1353,6 +1353,11 @@ class OptionResponse(LoncapaResponse):
                     if student_answer == clean_choice_string:   # if we have found the student's choice
                         choice_hint_text = choice_hint_element.text.strip()
                         if len(choice_hint_text) > 0:
+                            if choice_element.get('correct') == 'True':
+                                correctness_style = QUESTION_HINT_CORRECT_STYLE
+                            else:
+                                correctness_style = QUESTION_HINT_INCORRECT_STYLE
+
                             choice_hint_label = choice_hint_element.get('label')
                             if choice_hint_label:
                                 correctness_string = choice_hint_label + ': '
@@ -1361,7 +1366,7 @@ class OptionResponse(LoncapaResponse):
                                 if choice_element.get('correct') == 'True':
                                     correctness_string = 'CORRECT: '
 
-                            new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' \
+                            new_cmap[problem]['msg'] = '<div class="' + correctness_style + '">' \
                                 + correctness_string + choice_hint_text.strip() + '</div>'
 
 
