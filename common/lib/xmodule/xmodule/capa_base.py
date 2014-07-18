@@ -734,8 +734,6 @@ class CapaMixin(CapaFields):
         length_start = len(html)
         html = re.sub(r'</' + element_name + '>','~', html)
         html = re.sub(r'<' + element_name + '[^~]+~', '', html)
-        if len(html) != length_start:
-            print "     change size: " + str(len(html) - length_start) + " on " + element_name
         return html
 
     def _strip_hints_from_xml(self, html):
