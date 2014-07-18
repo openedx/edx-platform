@@ -1,5 +1,5 @@
 #
-# File:   courseware/capa/responsetypes.py
+# File:   courseware/capa/responsetypes.py  (post rebase)
 #
 """
 Problem response evaluation.  Handles checking of student responses,
