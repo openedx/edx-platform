@@ -15,6 +15,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..helpers import skip_if_browser
 
 
 VIDEO_SOURCE_PORT = 8777
@@ -496,6 +497,13 @@ class YouTubeVideoTest(VideoBaseTest):
         # menu "download_transcript" doesn't exist
         self.assertFalse(self.video.is_menu_exist('download_transcript'))
 
+    def _verify_caption_text(self, text):
+        self.video._wait_for(
+            lambda: (text in self.video.captions_text()),
+            u'Captions contain "{}" text'.format(text),
+            timeout=5
+        )
+
     def test_video_language_menu_working(self):
         """
         Scenario: Language menu works correctly in Video component
@@ -523,10 +531,10 @@ class YouTubeVideoTest(VideoBaseTest):
         self.video.select_language('zh')
 
         unicode_text = "好 各位同学".decode('utf-8')
-        self.assertIn(unicode_text, self.video.captions_text())
+        self._verify_caption_text(unicode_text)
 
         self.video.select_language('en')
-        self.assertIn('Hi, welcome to Edx.', self.video.captions_text())
+        self._verify_caption_text('Hi, welcome to Edx.')
 
     def test_multiple_videos_in_sequentials_load_and_work(self):
         """
@@ -917,3 +925,49 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('html5'))
 
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources()]))
+
+
+class YouTubeQualityTest(VideoBaseTest):
+    """ Test YouTube Video Quality Button """
+
+    def setUp(self):
+        super(YouTubeQualityTest, self).setUp()
+
+    @skip_if_browser('firefox')
+    def test_quality_button_visibility(self):
+        """
+        Scenario: Quality button appears on play.
+
+        Given the course has a Video component in "Youtube" mode
+        Then I see video button "quality" is hidden
+        And I click video button "play"
+        Then I see video button "quality" is visible
+        """
+        self.navigate_to_video()
+
+        self.assertFalse(self.video.is_quality_button_visible())
+
+        self.video.click_player_button('play')
+
+        self.assertTrue(self.video.is_quality_button_visible())
+
+    @skip_if_browser('firefox')
+    def test_quality_button_works_correctly(self):
+        """
+        Scenario: Quality button works correctly.
+
+        Given the course has a Video component in "Youtube" mode
+        And I click video button "play"
+        And I see video button "quality" is inactive
+        And I click video button "quality"
+        Then I see video button "quality" is active
+        """
+        self.navigate_to_video()
+
+        self.video.click_player_button('play')
+
+        self.assertFalse(self.video.is_quality_button_active())
+
+        self.video.click_player_button('quality')
+
+        self.assertTrue(self.video.is_quality_button_active())

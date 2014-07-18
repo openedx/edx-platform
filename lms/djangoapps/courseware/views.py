@@ -42,17 +42,20 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
+from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from instructor.enrollment import uses_shib
 
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
+
 
 def user_groups(user):
     """
@@ -338,12 +341,24 @@ def index(request, course_id, chapter=None, section=None,
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
+
             if section_descriptor is None:
                 # Specifically asked-for section doesn't exist
                 if masq == 'student':  # if staff is masquerading as student be kinder, don't 404
                     log.debug('staff masq as student: no section %s' % section)
                     return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
                 raise Http404
+
+            ## Allow chromeless operation
+            if section_descriptor.chrome:
+                chrome = [s.strip() for s in section_descriptor.chrome.lower().split(",")]
+                if 'accordion' not in chrome:
+                    context['disable_accordion'] = True
+                if 'tabs' not in chrome:
+                    context['disable_tabs'] = True
+
+            if section_descriptor.default_tab:
+                context['default_tab'] = section_descriptor.default_tab
 
             # cdodge: this looks silly, but let's refetch the section_descriptor with depth=None
             # which will prefetch the children more efficiently than doing a recursive load
@@ -353,6 +368,13 @@ def index(request, course_id, chapter=None, section=None,
             # html, which in general will need all of its children
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_key, user, section_descriptor, depth=None)
+
+            # Verify that position a string is in fact an int
+            if position is not None:
+                try:
+                    int(position)
+                except ValueError:
+                    raise Http404("Position {} is not an integer!".format(position))
 
             section_module = get_module_for_descriptor(
                 request.user,
@@ -370,7 +392,7 @@ def index(request, course_id, chapter=None, section=None,
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render('student_view')
+            context['fragment'] = section_module.render(STUDENT_VIEW)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -397,6 +419,12 @@ def index(request, course_id, chapter=None, section=None,
 
         result = render_to_response('courseware/courseware.html', context)
     except Exception as e:
+
+        # Doesn't bar Unicode characters from URL, but if Unicode characters do
+        # cause an error it is a graceful failure.
+        if isinstance(e, UnicodeEncodeError):
+            raise Http404("URL contains Unicode characters")
+
         if isinstance(e, Http404):
             # let it propagate
             raise
@@ -617,8 +645,18 @@ def course_about(request, course_id):
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
 
-    # see if we have already filled up all allowed enrollments
+    # Used to provide context to message to student if enrollment not allowed
+    can_enroll = has_access(request.user, 'enroll', course)
+    invitation_only = course.invitation_only
     is_course_full = CourseEnrollment.is_course_full(course)
+
+    # Register button should be disabled if one of the following is true:
+    # - Student is already registered for course
+    # - Course is already full
+    # - Student cannot enroll in course
+    active_reg_button = not(registered or is_course_full or not can_enroll)
+
+    is_shib_course = uses_shib(course)
 
     return render_to_response('courseware/course_about.html', {
         'course': course,
@@ -630,7 +668,11 @@ def course_about(request, course_id):
         'in_cart': in_cart,
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,
-        'is_course_full': is_course_full
+        'is_course_full': is_course_full,
+        'can_enroll': can_enroll,
+        'invitation_only': invitation_only,
+        'active_reg_button': active_reg_button,
+        'is_shib_course': is_shib_course,
     })
 
 
@@ -844,7 +886,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
     )
 
     logging.debug('course_module = {0}'.format(tab_module))
@@ -852,11 +894,11 @@ def get_static_tab_contents(request, course, tab):
     html = ''
     if tab_module is not None:
         try:
-            html = tab_module.render('student_view').content
+            html = tab_module.render(STUDENT_VIEW).content
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course={course}, tab={tab_url}".format(course=course,tab_url=tab['url_slug'])
+                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
             )
 
     return html

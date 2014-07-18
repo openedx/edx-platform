@@ -34,7 +34,9 @@ class ProfileDistributionWidget
     @reset_display()
 
     @get_profile_distributions @feature,
-      error: std_ajax_err => @show_error gettext("Error fetching distribution.")
+      error: std_ajax_err =>
+          `// Translators: "Distribution" refers to a grade distribution. This error message appears when there is an error getting the data on grade distribution.`
+          @show_error gettext("Error fetching distribution.")
       success: (data) =>
         feature_res = data.feature_results
         if feature_res.type is 'EASY_CHOICE'

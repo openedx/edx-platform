@@ -7,6 +7,8 @@ from django.http import Http404
 from edxmako.shortcuts import render_to_response
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.annotator_token import retrieve_token
+
 from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from notes.utils import notes_enabled_for_course
@@ -170,5 +172,7 @@ def html_index(request, course_id, book_index, chapter=None):
             'student': student,
             'staff_access': staff_access,
             'notes_enabled': notes_enabled,
+            'storage': course.annotation_storage_url,
+            'token': retrieve_token(student.email, course.annotation_token_secret),
         },
     )

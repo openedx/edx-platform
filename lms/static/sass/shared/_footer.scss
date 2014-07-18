@@ -84,63 +84,105 @@
     .references {
       margin: -10px 0 0 0;
       width: flex-grid(4,12);
-      float: right;
+      display: inline-block;
+    }
 
-      .nav-social {
-        margin: 0;
-        text-align: right;
+    .wrapper-logo {
+      margin: ($baseline*.75) 0;
 
-        li {
-          display: inline-block;
+      a {
+        display: inline-block;
 
-          &:last-child {
-            margin-right: 0;
-          }
-
-          a {
-            display: block;
-
-            &:hover, &:focus, &:active {
-              border: none;
-            }
-          }
-
-          img {
-            display: block;
-          }
-        }
-      }
-
-      .copyright {
-        margin: -2px 0 8px 0;
-        font-size: em(11);
-        color: tint($m-gray,50%);
-        text-align: right;
-      }
-
-      .nav-legal {
-        @include clearfix();
-        text-align: right;
-
-        li {
-          display: inline-block;
-          font-size: em(11);
-
-          a {
-            display: block;
-          }
-        }
-
-        .nav-legal-01 a {
-
-          &:after {
-            margin-left: 5px;
-            content: "-";
-          }
+        &:hover {
+          border-bottom: 0;
         }
       }
     }
 
+    .copyright {
+      margin: -2px 0 8px 0;
+      font-size: em(11);
+      color: $gray-l2;
+      text-align: left;
+    }
+
+    .nav-legal {
+      @include clearfix();
+      text-align: left;
+
+      li {
+        display: inline-block;
+        font-size: em(11);
+
+        a {
+          display: block;
+        }
+      }
+
+      .nav-legal-01 a {
+
+        &:after {
+          margin-left: 5px;
+          content: "-";
+        }
+      }
+    }
+
+    .nav-social {
+      margin: 0;
+      text-align: right;
+
+      li {
+        display: inline-block;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        a {
+          display: block;
+
+          &:hover, &:focus, &:active {
+            border: none;
+          }
+        }
+
+        img {
+          display: block;
+        }
+      }
+    }
+
+    // platform Open edX logo and link
+    .powered-by {
+      width: flex-grid(3,12);
+      display: inline-block;
+      vertical-align: bottom;
+      text-align: right;
+
+      a {
+        display: inline-block;
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  // edx theme overrides
+  &.edx-footer {
+
+    footer {
+
+      .copyright {
+        text-align: right;
+      }
+
+      .nav-legal {
+        text-align: right;
+      }
+    }
   }
 }
 

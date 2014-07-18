@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _
 
 from courseware.models import StudentModule
 from xmodule.fields import Date
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 from bulk_email.models import CourseAuthorization
@@ -59,7 +59,7 @@ def bulk_email_is_enabled_for_course(course_id):
     """
 
     bulk_email_enabled_globally = (settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] == True)
-    is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml)
     bulk_email_enabled_for_course = CourseAuthorization.instructor_email_enabled(course_id)
 
     if bulk_email_enabled_globally and is_studio_course and bulk_email_enabled_for_course:
@@ -173,13 +173,30 @@ def set_due_date_extension(course, unit, student, due_date):
                 course_id=course.id,
                 module_state_key=node.location
             )
-
             state = json.loads(student_module.state)
-            state['extended_due'] = DATE_FIELD.to_json(due_date)
-            student_module.state = json.dumps(state)
-            student_module.save()
+
         except StudentModule.DoesNotExist:
-            pass
+            # Normally, a StudentModule is created as a side effect of assigning
+            # a value to a property in an XModule or XBlock which has a scope
+            # of 'Scope.user_state'.  Here, we want to alter user state but
+            # can't use the standard XModule/XBlock machinery to do so, because
+            # it fails to take into account that the state being altered might
+            # belong to a student other than the one currently logged in.  As a
+            # result, in our work around, we need to detect whether the
+            # StudentModule has been created for the given student on the given
+            # unit and create it if it is missing, so we can use it to store
+            # the extended due date.
+            student_module = StudentModule.objects.create(
+                student_id=student.id,
+                course_id=course.id,
+                module_state_key=node.location,
+                module_type=node.category
+            )
+            state = {}
+
+        state['extended_due'] = DATE_FIELD.to_json(due_date)
+        student_module.state = json.dumps(state)
+        student_module.save()
 
         for child in node.get_children():
             set_due_date(child)

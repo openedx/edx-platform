@@ -1,0 +1,89 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from xmodule.split_test_module import ValidationMessageType %>
+
+<%
+split_test = context.get('split_test')
+user_partition = split_test.descriptor.get_selected_partition()
+messages = split_test.descriptor.validation_messages()
+%>
+
+% if is_root and not is_configured:
+    <div class="no-container-content">
+% else:
+    <div class="wrapper-xblock-message">
+% endif
+
+% if user_partition:
+    <div class="xblock-message information">
+        <p>
+            <span class="message-text">
+            ${_("This content experiment uses group configuration '{experiment_name}'.").format(experiment_name=user_partition.name)}
+            </span>
+        </p>
+    </div>
+% endif
+% if len(messages) > 0:
+    <%
+    def get_validation_icon(validation_type):
+        if validation_type == 'error':
+            return 'icon-exclamation-sign'
+        elif validation_type == 'warning':
+            return 'icon-warning-sign'
+        return None
+
+    error_messages = (message for message in messages if message.message_type==ValidationMessageType.error)
+    has_errors = next(error_messages, False)
+    aggregate_validation_class = 'has-errors' if has_errors else 'has-warnings'
+    aggregate_validation_type = 'error' if has_errors else 'warning'
+    %>
+    <div class="xblock-message validation ${aggregate_validation_class}">
+    % if is_configured:
+        <p class="${aggregate_validation_type}"><i class="${get_validation_icon(aggregate_validation_type)}"></i>
+        ${_("This content experiment has issues that affect content visibility.")}
+        </p>
+    % endif
+    % if is_root or not is_configured:
+        <ul class="xblock-message-list">
+        % for message in messages:
+            <%
+            message_type = message.message_type
+            message_type_display_name = ValidationMessageType.display_name(message_type) if message_type else None
+            %>
+                <li class="xblock-message-item ${message_type}">
+                    % if not is_configured:
+                        <i class="${get_validation_icon(message_type)}"></i>
+                    % endif
+                    <span class="message-text">
+                        % if message_type_display_name:
+                            <span class="sr">${message_type_display_name}:</span>
+                        % endif
+                        ${unicode(message)}
+
+                    % if message.action_class:
+                        <a href="#" class="button action-button ${message.action_class}">
+                            <span class="action-button-text">${message.action_label}</span>
+                        </a>
+                    % endif
+                    </span>
+                </li>
+        % endfor
+        </ul>
+    % endif
+    </div>
+% endif
+
+</div>
+
+% if is_root:
+    <div class="wrapper-groups is-active">
+        <h3 class="sr">${_("Active Groups")}</h3>
+        ${active_groups_preview}
+    </div>
+
+    % if inactive_groups_preview:
+        <div class="wrapper-groups is-inactive">
+            <h3 class="title">${_("Inactive Groups")}</h3>
+            ${inactive_groups_preview}
+        </div>
+    % endif
+% endif

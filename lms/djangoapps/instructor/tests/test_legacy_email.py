@@ -12,7 +12,7 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from bulk_email.models import CourseAuthorization
 
@@ -103,7 +103,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         # in `instructor/views/legacy.py` is doing the correct thing.
 
         with patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_modulestore_type') as mock_modulestore:
-            mock_modulestore.return_value = XML_MODULESTORE_TYPE
+            mock_modulestore.return_value = ModuleStoreEnum.Type.xml
 
             # Assert that the URL for the email view is not in the response
             response = self.client.get(self.url)

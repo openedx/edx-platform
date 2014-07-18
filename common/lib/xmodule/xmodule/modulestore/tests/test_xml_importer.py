@@ -8,7 +8,7 @@ from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.modulestore.xml_importer import import_module
+from xmodule.modulestore.xml_importer import _import_module_and_update_references
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.tests import DATA_DIR
 from uuid import uuid4
@@ -50,10 +50,8 @@ class ModuleStoreNoSettings(unittest.TestCase):
         """
         cleanup
         """
-        if modulestore:
-            connection = self.modulestore.database.connection
-            connection.drop_database(self.modulestore.database)
-            connection.close()
+        if self.modulestore:
+            self.modulestore._drop_database()  # pylint: disable=protected-access
 
     def setUp(self):
         """
@@ -85,6 +83,7 @@ def modulestore():
 
         # pylint: disable=W0142
         ModuleStoreNoSettings.modulestore = class_(
+            None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
             **options
         )
@@ -141,9 +140,10 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Move to different runtime w/ different course id
         target_location_namespace = SlashSeparatedCourseKey("org", "course", "run")
-        new_version = import_module(
+        new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),
+            999,
             self.xblock.location.course_key,
             target_location_namespace,
             do_import_static=False
@@ -177,9 +177,10 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = import_module(
+        new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),
+            999,
             self.xblock.location.course_key,
             target_location_namespace.course_key,
             do_import_static=False
@@ -208,9 +209,10 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
 
         # Remap the namespace
         target_location_namespace = Location("org", "course", "run", "category", "stubxblock")
-        new_version = import_module(
+        new_version = _import_module_and_update_references(
             self.xblock,
             modulestore(),
+            999,
             self.xblock.location.course_key,
             target_location_namespace.course_key,
             do_import_static=False

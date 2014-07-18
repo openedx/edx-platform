@@ -4,6 +4,7 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from django.utils.html import escapejs
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
@@ -16,8 +17,8 @@
 % endfor
 
 <script type="text/javascript">
-require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/settings/advanced"],
-        function(doc, $, AdvancedSettingsModel, AdvancedSettingsView) {
+require(["domReady!", "jquery", "gettext", "js/models/settings/advanced", "js/views/settings/advanced"],
+        function(doc, $, gettext, AdvancedSettingsModel, AdvancedSettingsView) {
   $("form :input").focus(function() {
     $("label[for='" + this.id + "']").addClass("is-focused");
   }).blur(function() {
@@ -33,6 +34,25 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
     model: advancedModel
   });
   editor.render();
+
+  $("#deprecated-settings").click(function() {
+      var $this = $(this);
+      var wrapperDeprecatedSetting = $('.wrapper-deprecated-setting');
+      var deprecatedSettingsLabel = $('.deprecated-settings-label');
+      if ($this.is(':checked')) {
+          wrapperDeprecatedSetting.addClass('is-set');
+          deprecatedSettingsLabel.text('${escapejs(_('Hide Deprecated Settings'))}');
+          editor.render_deprecated = true;
+      }
+      else {
+          wrapperDeprecatedSetting.removeClass('is-set');
+          deprecatedSettingsLabel.text('${escapejs(_('Show Deprecated Settings'))}');
+          editor.render_deprecated = false;
+      }
+
+      editor.render();
+  });
+
 });
 
 </script>
@@ -64,10 +84,17 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
         <section class="group-settings advanced-policies">
           <header>
             <h2 class="title-2">${_("Manual Policy Definition")}</h2>
-           
+
           </header>
 
           <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.")}</p>
+
+          <div class="wrapper-options">
+            <div class="wrapper-deprecated-setting">
+              <input id="deprecated-settings" class="deprecated-settings-toggle" type="checkbox" name="Show Deprecated">
+              <label for="deprecated-settings" class="deprecated-settings-label">${_("Show Deprecated Settings")}</label>
+            </div>
+          </div>
 
           <ul class="list-input course-advanced-policy-list enum">
 
@@ -99,6 +126,9 @@ require(["domReady!", "jquery", "js/models/settings/advanced", "js/views/setting
             <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+          % endif
           </ul>
         </nav>
       % endif

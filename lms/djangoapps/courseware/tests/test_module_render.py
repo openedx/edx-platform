@@ -22,7 +22,7 @@ from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import XModuleDescriptor, STUDENT_VIEW
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware import module_render as render
@@ -68,7 +68,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_get_module(self):
         self.assertEqual(
             None,
-            render.get_module('dummyuser', None, 'invalid location', None, None)
+            render.get_module('dummyuser', None, 'invalid location', None)
         )
 
     def test_module_render_with_jump_to_id(self):
@@ -90,11 +90,10 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             mock_request,
             self.course_key.make_usage_key('html', 'toyjumpto'),
             field_data_cache,
-            self.course_key
         )
 
         # get the rendered HTML output which should have the rewritten link
-        html = module.render('student_view').content
+        html = module.render(STUDENT_VIEW).content
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
@@ -160,6 +159,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
+        self.assertEquals('Unauthenticated', response.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -413,10 +413,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             wrap_xmodule_display=True,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
@@ -426,10 +425,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             wrap_xmodule_display=False,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
@@ -439,9 +437,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/foo_content'.format(
@@ -457,9 +454,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/_file.jpg'.format(
@@ -480,10 +476,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             static_asset_path="toy_course_dir",
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('href="/static/toy_course_dir', result_fragment.content)
 
     def test_course_image(self):
@@ -507,9 +502,8 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
 
         self.assertIn(
             '/courses/{course_id}/bar/content'.format(
@@ -545,7 +539,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
             self.request,
             location,
             field_data_cache,
-            course_id,
         )
 
     def setup_mongo_course(self, course_edit_method='Studio'):
@@ -590,14 +583,14 @@ class MongoViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_studio_course(self):
         """Regular Studio courses should see 'View in Studio' links."""
         self.setup_mongo_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_only_in_top_level_vertical(self):
         """Regular Studio courses should not see 'View in Studio' for child verticals of verticals."""
         self.setup_mongo_course()
         # Render the parent vertical, then check that there is only a single "View Unit in Studio" link.
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         # The single "View Unit in Studio" link should appear before the first xmodule vertical definition.
         parts = result_fragment.content.split('xmodule_VerticalModule')
         self.assertEqual(3, len(parts), "Did not find two vertical modules")
@@ -608,7 +601,7 @@ class MongoViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_xml_authored(self):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
         self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -622,19 +615,19 @@ class MixedViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_mongo_backed(self):
         """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
         self.setup_mongo_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_xml_authored(self):
         """Courses that change 'course_edit_method' setting can hide 'View in Studio' links."""
         self.setup_mongo_course(course_edit_method='XML')
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
     def test_view_in_studio_link_xml_backed(self):
         """Course in XML only modulestore should not see 'View in Studio' links."""
         self.setup_xml_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -648,7 +641,7 @@ class XmlViewInStudioTest(ViewInStudioTest):
     def test_view_in_studio_link_xml_backed(self):
         """Course in XML only modulestore should not see 'View in Studio' links."""
         self.setup_xml_course()
-        result_fragment = self.module.render('student_view')
+        result_fragment = self.module.render(STUDENT_VIEW)
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
@@ -692,9 +685,8 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Debug', result_fragment.content)
 
     def test_staff_debug_info_enabled(self):
@@ -703,9 +695,8 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
 
     @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
@@ -715,9 +706,8 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
-        result_fragment = module.render('student_view')
+        result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('histrogram', result_fragment.content)
 
     def test_histogram_enabled_for_unscored_xmodules(self):
@@ -739,9 +729,8 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 self.request,
                 html_descriptor.location,
                 field_data_cache,
-                self.course.id,
             )
-            module.render('student_view')
+            module.render(STUDENT_VIEW)
             self.assertFalse(mock_grade_histogram.called)
 
     def test_histogram_enabled_for_scored_xmodules(self):
@@ -762,9 +751,8 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 self.request,
                 self.location,
                 self.field_data_cache,
-                self.course.id,
             )
-            module.render('student_view')
+            module.render(STUDENT_VIEW)
             self.assertTrue(mock_grade_histogram.called)
 
 
@@ -928,7 +916,6 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             mock_request,
             self.problem.location,
             field_data_cache,
-            self.course.id
         )._xmodule
 
     def set_module_grade_using_publish(self, grade_dict):
@@ -977,7 +964,7 @@ class TestRebindModule(TestSubmittingProblems):
             mock_request,
             self.lti.location,
             field_data_cache,
-            self.course.id)._xmodule
+        )._xmodule
 
     def test_rebind_noauth_module_to_user_not_anonymous(self):
         """

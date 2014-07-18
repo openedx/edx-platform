@@ -1,1 +1,0 @@
-../scripts/acceptance-tests.sh

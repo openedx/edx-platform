@@ -4,9 +4,10 @@ Modulestore configuration for test cases.
 
 from uuid import uuid4
 from django.test import TestCase
-from xmodule.modulestore.django import (
-    editable_modulestore, clear_existing_modulestores, loc_mapper)
-from xmodule.contentstore.django import contentstore
+from django.contrib.auth.models import User
+from xmodule.contentstore.django import _CONTENTSTORE
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore import ModuleStoreEnum
 
 
 def mixed_store_config(data_dir, mappings):
@@ -25,7 +26,7 @@ def mixed_store_config(data_dir, mappings):
     where 'xml' and 'default' are the two options provided by this configuration,
     mapping (respectively) to XML-backed and Mongo-backed modulestores..
     """
-    mongo_config = mongo_store_config(data_dir)
+    draft_mongo_config = draft_mongo_store_config(data_dir)
     xml_config = xml_store_config(data_dir)
 
     store = {
@@ -33,40 +34,13 @@ def mixed_store_config(data_dir, mappings):
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': mappings,
-                'stores': {
-                    'default': mongo_config['default'],
-                    'xml': xml_config['default']
-                }
+                'stores': [
+                    draft_mongo_config['default'],
+                    xml_config['default']
+                ]
             }
         }
     }
-    store['direct'] = store['default']
-    return store
-
-
-def mongo_store_config(data_dir):
-    """
-    Defines default module store using MongoModuleStore.
-
-    Use of this config requires mongo to be running.
-    """
-    store = {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'DOC_STORE_CONFIG': {
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
-            },
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'fs_root': data_dir,
-                'render_template': 'edxmako.shortcuts.render_to_string'
-            }
-        }
-    }
-
-    store['direct'] = store['default']
     return store
 
 
@@ -83,6 +57,7 @@ def draft_mongo_store_config(data_dir):
 
     store = {
         'default': {
+            'NAME': 'draft',
             'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'DOC_STORE_CONFIG': {
                 'host': 'localhost',
@@ -93,7 +68,6 @@ def draft_mongo_store_config(data_dir):
         }
     }
 
-    store['direct'] = store['default']
     return store
 
 
@@ -103,53 +77,12 @@ def xml_store_config(data_dir):
     """
     store = {
         'default': {
+            'NAME': 'xml',
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
             'OPTIONS': {
                 'data_dir': data_dir,
                 'default_class': 'xmodule.hidden_module.HiddenDescriptor',
             }
-        }
-    }
-
-    store['direct'] = store['default']
-    return store
-
-
-def studio_store_config(data_dir):
-    """
-    Defines modulestore structure used by Studio tests.
-    """
-    store_config = {
-        'host': 'localhost',
-        'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
-    }
-    options = {
-        'default_class': 'xmodule.raw_module.RawDescriptor',
-        'fs_root': data_dir,
-        'render_template': 'edxmako.shortcuts.render_to_string',
-    }
-
-    store = {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-            'DOC_STORE_CONFIG': store_config,
-            'OPTIONS': options
-        },
-        'direct': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'DOC_STORE_CONFIG': store_config,
-            'OPTIONS': options
-        },
-        'draft': {
-            'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-            'DOC_STORE_CONFIG': store_config,
-            'OPTIONS': options
-        },
-        'split': {
-            'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-            'DOC_STORE_CONFIG': store_config,
-            'OPTIONS': options
         }
     }
 
@@ -194,49 +127,73 @@ class ModuleStoreTestCase(TestCase):
           `clear_existing_modulestores()` directly in
           your `setUp()` method.
     """
+    def setUp(self, **kwargs):
+        """
+        Creates a test User if `create_user` is True.
+        Returns the password for the test User.
 
-    @staticmethod
-    def update_course(course):
+        Args:
+            create_user - specifies whether or not to create a test User.  Default is True.
+        """
+        super(ModuleStoreTestCase, self).setUp()
+
+        self.store = modulestore()
+
+        uname = 'testuser'
+        email = 'test+courses@edx.org'
+        password = 'foo'
+
+        if kwargs.pop('create_user', True):
+            # Create the user so we can log them in.
+            self.user = User.objects.create_user(uname, email, password)
+
+            # Note that we do not actually need to do anything
+            # for registration if we directly mark them active.
+            self.user.is_active = True
+
+            # Staff has access to view all courses
+            self.user.is_staff = True
+            self.user.save()
+
+        return password
+
+    def create_non_staff_user(self):
+        """
+        Creates a non-staff test user.
+        Returns the non-staff test user and its password.
+        """
+        uname = 'teststudent'
+        password = 'foo'
+        nonstaff_user = User.objects.create_user(uname, 'test+student@edx.org', password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        nonstaff_user.is_active = True
+        nonstaff_user.is_staff = False
+        nonstaff_user.save()
+        return nonstaff_user, password
+
+    def update_course(self, course, user_id):
         """
         Updates the version of course in the modulestore
 
         'course' is an instance of CourseDescriptor for which we want
         to update metadata.
         """
-        store = editable_modulestore()
-        store.update_item(course, '**replace_user**')
-        updated_course = store.get_course(course.id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+            self.store.update_item(course, user_id)
+        updated_course = self.store.get_course(course.id)
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections(store_name='default'):
+    def drop_mongo_collections():
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
-
-        # This will return the mongo-backed modulestore
-        # even if we're using a mixed modulestore
-        store = editable_modulestore(store_name)
-        if hasattr(store, 'collection'):
-            connection = store.collection.database.connection
-            store.collection.drop()
-            connection.close()
-        elif hasattr(store, 'close_all_connections'):
-            store.close_all_connections()
-        elif hasattr(store, 'db'):
-            connection = store.db.connection
-            connection.drop_database(store.db.name)
-            connection.close()
-
-        if contentstore().fs_files:
-            db = contentstore().fs_files.database
-            db.connection.drop_database(db)
-            db.connection.close()
-
-        location_mapper = loc_mapper()
-        if location_mapper.db:
-            location_mapper.location_map.drop()
-            location_mapper.db.connection.close()
+        module_store = modulestore()
+        if hasattr(module_store, '_drop_database'):
+            module_store._drop_database()  # pylint: disable=protected-access
+        _CONTENTSTORE.clear()
 
     @classmethod
     def setUpClass(cls):
@@ -268,11 +225,11 @@ class ModuleStoreTestCase(TestCase):
 
     def _pre_setup(self):
         """
-        Flush the ModuleStore before each test.
+        Flush the ModuleStore.
         """
 
         # Flush the Mongo modulestore
-        ModuleStoreTestCase.drop_mongo_collections()
+        self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -281,7 +238,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore after each test.
         """
-        ModuleStoreTestCase.drop_mongo_collections()
+        self.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()

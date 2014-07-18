@@ -17,7 +17,8 @@ VIDEO_BUTTONS = {
     'pause': '.video_control.pause',
     'fullscreen': '.add-fullscreen',
     'download_transcript': '.video-tracks > a',
-    'speed': '.speeds'
+    'speed': '.speeds',
+    'quality': '.quality-control',
 }
 
 CSS_CLASS_NAMES = {
@@ -572,6 +573,10 @@ class VideoPage(PageObject):
 
         return True
 
+    def current_language(self, video_display_name=None):
+        selector = self.get_element_selector(video_display_name, VIDEO_MENUS["language"] + ' li.is-active')
+        return self.q(css=selector).first.attrs('data-lang-code')[0]
+
     def select_language(self, code, video_display_name=None):
         """
         Select captions for language `code`.
@@ -586,12 +591,17 @@ class VideoPage(PageObject):
         # mouse over to CC button
         cc_button_selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS["CC"])
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
-        hover = ActionChains(self.browser).move_to_element(element_to_hover_over)
-        hover.perform()
+        ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
 
         language_selector = VIDEO_MENUS["language"] + ' li[data-lang-code="{code}"]'.format(code=code)
         language_selector = self.get_element_selector(video_display_name, language_selector)
+        self._wait_for_element_visibility(language_selector, 'language menu is visible')
         self.q(css=language_selector).first.click()
+
+        # Sometimes language is not clicked correctly. So, if the current language code
+        # differs form the expected, we try to change it again.
+        if self.current_language(video_display_name) != code:
+            self.select_language(code, video_display_name)
 
         if 'is-active' != self.q(css=language_selector).attrs('class')[0]:
             return False
@@ -852,3 +862,33 @@ class VideoPage(PageObject):
             lambda: self.position(video_display_name) == position,
             'Position is {position}'.format(position=position)
         )
+
+    def is_quality_button_visible(self, video_display_name=None):
+        """
+        Get the visibility state of quality button
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            bool: visibility status
+
+        """
+        selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS['quality'])
+        return self.q(css=selector).visible
+
+    def is_quality_button_active(self, video_display_name=None):
+        """
+        Check if quality button is active or not.
+
+        Arguments:
+            video_display_name (str or None): Display name of a Video.
+
+        Returns:
+            bool: active status
+
+        """
+        selector = self.get_element_selector(video_display_name, VIDEO_BUTTONS['quality'])
+
+        classes = self.q(css=selector).attrs('class')[0].split()
+        return 'active' in classes

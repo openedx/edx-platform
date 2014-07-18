@@ -2,7 +2,7 @@
 <%!
 import json
 
-from contentstore.utils import PublishState
+from xmodule.modulestore import PublishState
 from contentstore.views.helpers import xblock_studio_url, EDITING_TEMPLATES
 from django.utils.translation import ugettext as _
 %>
@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <%block name="jsextra">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 <%
 main_xblock_info = {
     'id': str(xblock_locator),
@@ -32,19 +33,18 @@ main_xblock_info = {
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/xblock_info", "js/views/pages/container",
         "js/collections/component_template", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-            function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates) {
-                var view, mainXBlockInfo;
-
+            function(doc, $, XBlockInfo, ContainerPage, ComponentTemplates, xmoduleLoader) {
                 var templates = new ComponentTemplates(${component_templates | n}, {parse: true});
+                var mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
 
-                mainXBlockInfo = new XBlockInfo(${json.dumps(main_xblock_info) | n});
-
-                view = new ContainerPage({
-                    el: $('#content'),
-                    model: mainXBlockInfo,
-                    templates: templates
+                xmoduleLoader.done(function () {
+                    var view = new ContainerPage({
+                        el: $('#content'),
+                        model: mainXBlockInfo,
+                        templates: templates
+                    });
+                    view.render();
                 });
-                view.render();
             });
 </script>
 

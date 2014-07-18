@@ -20,11 +20,15 @@
 
 .. _Installing, Configuring, and Running the edX Platform: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/
 
+.. _Installing the edX Production Stack: http://edx.readthedocs.org/projects/edx-installing-configuring-and-running/en/latest/prodstack/install_prodstack.html
+
 .. _Creating Peer Assessments: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
 
-.. _edX Data Documentation: http://edx.readthedocs.org/projects/devdata/en/latest/
+.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 
-.. _edX Platform Developer Documentation: http://edx.readthedocs.org/projects/userdocs/en/latest/
+.. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
+
+.. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 
@@ -172,6 +176,10 @@
 
 
 .. _Review Grades for Enrolled Students (Small Courses): http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#gradebook
+
+.. _Video Table of Contents: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#video-toc
+
+.. _Download or view student data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#view-and-download-student-data
 
 .. DATA DOCUMENTATION
 

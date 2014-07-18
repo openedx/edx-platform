@@ -126,7 +126,7 @@ The following documentation is available:
   This is a new document that covers using Open Response Assessments 2.0.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
   
   Recent changes include:
 
@@ -147,7 +147,7 @@ The following documentation is available:
   This is a new document that covers installing and running Devstack.
 
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
   

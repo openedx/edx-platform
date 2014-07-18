@@ -132,17 +132,8 @@
 
             <div class="copy">
               <p>
-                <%
-                  browser_links = {
-                    "ff_a_start": '<a rel="{rel}" href="{url}">'.format(url="https://www.mozilla.org/en-US/firefox/new/", rel="external"),
-                    "chrome_a_start": '<a rel="{rel}" href="{url}">'.format(url="https://www.google.com/intl/en/chrome/browser/", rel="external"),
-                    "safari_a_start": '<a rel="{rel}" href="{url}">'.format(url="http://www.apple.com/safari/", rel="external"),
-                    "ie_a_start": '<a rel="{rel}" href="{url}">'.format(url="http://windows.microsoft.com/en-us/internet-explorer/download-ie", rel="external"),
-                    "a_end": '</a>'
-                  }
-                %>
                 <span class="copy-super">${_("A webcam and a modern browser")}</span>
-                <span class="copy-sub"><strong>${_("{ff_a_start}Firefox{a_end}, {chrome_a_start}Chrome{a_end}, {safari_a_start}Safari{a_end}, {ie_a_start}IE9+{a_end}").format(**browser_links)}</strong> - ${_("Please make sure your browser is updated to the most recent version possible")}
+                <span class="copy-sub"><strong><a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>, <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>, <a rel="external" href="http://www.apple.com/safari/">Safari</a>, <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">IE9+</a></strong> - ${_("Please make sure your browser is updated to the most recent version possible")}
                 </span>
               </p>
             </div>

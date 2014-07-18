@@ -59,12 +59,7 @@ class Command(BaseCommand):
             raise CommandError("course_id not specified")
 
         # Get the modulestore
-
-        try:
-            name = options['modulestore']
-            store = modulestore(name)
-        except KeyError:
-            raise CommandError("Unknown modulestore {}".format(name))
+        store = modulestore()
 
         # Get the course data
 

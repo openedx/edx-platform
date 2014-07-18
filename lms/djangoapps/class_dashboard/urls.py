@@ -3,17 +3,19 @@ Class Dashboard API endpoint urls.
 """
 
 from django.conf.urls import patterns, url
+from django.conf import settings
+COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 
 urlpatterns = patterns('',  # nopep8
     # Json request data for metrics for entire course
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/all_sequential_open_distrib$',
+    url(r'^{}/all_sequential_open_distrib$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.all_sequential_open_distrib', name="all_sequential_open_distrib"),
 
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/all_problem_grade_distribution$',
+    url(r'^{}/all_problem_grade_distribution$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.all_problem_grade_distribution', name="all_problem_grade_distribution"),
 
     # Json request data for metrics for particular section
-    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/problem_grade_distribution/(?P<section>\d+)$',
+    url(r'^{}/problem_grade_distribution/(?P<section>\d+)$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.section_problem_grade_distrib', name="section_problem_grade_distrib"),
 
     # For listing students that opened a sub-section

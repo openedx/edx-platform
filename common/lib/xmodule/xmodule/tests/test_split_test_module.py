@@ -9,6 +9,7 @@ from fs.memoryfs import MemoryFS
 from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, ValidationMessageType
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.partitions.test_partitions import StaticPartitionService, MemoryUserTagsService
@@ -113,7 +114,7 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
 
         self.assertIn(
             child_content,
-            self.module_system.render(self.split_test_module, 'student_view').content
+            self.module_system.render(self.split_test_module, STUDENT_VIEW).content
         )
 
     @ddt.data(('0',), ('1',))
@@ -159,34 +160,42 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
     Unit tests for how split test interacts with Studio.
     """
 
-    def test_render_studio_view(self):
+    def test_render_author_view(self):
         """
-        Test the rendering of the Studio view.
+        Test the rendering of the Studio author view.
         """
 
+        def create_studio_context(root_xblock):
+            """
+            Context for rendering the studio "author_view".
+            """
+            return {
+                'container_view': True,
+                'reorderable_items': set(),
+                'root_xblock': root_xblock,
+            }
+
         # The split_test module should render both its groups when it is the root
-        reorderable_items = set()
-        context = {
-            'runtime_type': 'studio',
-            'container_view': True,
-            'reorderable_items': reorderable_items,
-            'root_xblock': self.split_test_module,
-        }
-        html = self.module_system.render(self.split_test_module, 'student_view', context).content
+        context = create_studio_context(self.split_test_module)
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertIn('HTML FOR GROUP 0', html)
         self.assertIn('HTML FOR GROUP 1', html)
 
         # When rendering as a child, it shouldn't render either of its groups
-        reorderable_items = set()
-        context = {
-            'runtime_type': 'studio',
-            'container_view': True,
-            'reorderable_items': reorderable_items,
-            'root_xblock': self.course_sequence,
-        }
-        html = self.module_system.render(self.split_test_module, 'student_view', context).content
+        context = create_studio_context(self.course_sequence)
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertNotIn('HTML FOR GROUP 0', html)
         self.assertNotIn('HTML FOR GROUP 1', html)
+
+        # The "Create Missing Groups" button should be rendered when groups are missing
+        context = create_studio_context(self.split_test_module)
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition',
+                          [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'gamma')])
+        ]
+        html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
+        self.assertIn('HTML FOR GROUP 0', html)
+        self.assertIn('HTML FOR GROUP 1', html)
 
     def test_editable_settings(self):
         """
@@ -197,14 +206,8 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertNotIn(SplitTestDescriptor.due.name, editable_metadata_fields)
         self.assertNotIn(SplitTestDescriptor.user_partitions.name, editable_metadata_fields)
 
-        # user_partition_id will only appear in the editable settings if the value is the
-        # default "unselected" value. This split instance has user_partition_id = 0, so
-        # user_partition_id will not be editable.
-        self.assertNotIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
-
-        # Explicitly set user_partition_id to the default value. Now user_partition_id will be editable.
-        self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
-        editable_metadata_fields = self.split_test_module.editable_metadata_fields
+        # user_partition_id will always appear in editable_metadata_settings, regardless
+        # of the selected value.
         self.assertIn(SplitTestDescriptor.user_partition_id.name, editable_metadata_fields)
 
     def test_non_editable_settings(self):
@@ -223,6 +226,7 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual([], SplitTestDescriptor.user_partition_id.values)
 
         # user_partitions is empty, only the "Not Selected" item will appear.
+        self.split_test_module.user_partition_id = SplitTestFields.no_partition_selected['value']
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
         partitions = SplitTestDescriptor.user_partition_id.values
         self.assertEqual(1, len(partitions))
@@ -239,6 +243,67 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.assertEqual(0, partitions[1]['value'])
         self.assertEqual("first_partition", partitions[1]['display_name'])
 
+        # Try again with a selected partition and verify that there is no option for "No Selection"
+        self.split_test_module.user_partition_id = 0
+        self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
+        partitions = SplitTestDescriptor.user_partition_id.values
+        self.assertEqual(1, len(partitions))
+        self.assertEqual(0, partitions[0]['value'])
+        self.assertEqual("first_partition", partitions[0]['display_name'])
+
+        # Finally try again with an invalid selected partition and verify that "No Selection" is an option
+        self.split_test_module.user_partition_id = 999
+        self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
+        partitions = SplitTestDescriptor.user_partition_id.values
+        self.assertEqual(2, len(partitions))
+        self.assertEqual(SplitTestFields.no_partition_selected['value'], partitions[0]['value'])
+        self.assertEqual(0, partitions[1]['value'])
+        self.assertEqual("first_partition", partitions[1]['display_name'])
+
+    def test_active_and_inactive_children(self):
+        """
+        Tests the active and inactive children returned for different split test configurations.
+        """
+        split_test_module = self.split_test_module
+        children = split_test_module.get_children()
+
+        # Verify that a split test has no active children if it has no specified user partition.
+        split_test_module.user_partition_id = -1
+        [active_children, inactive_children] = split_test_module.active_and_inactive_children()
+        self.assertEqual(active_children, [])
+        self.assertEqual(inactive_children, children)
+
+        # Verify that all the children are returned as active for a correctly configured split_test
+        split_test_module.user_partition_id = 0
+        split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+        [active_children, inactive_children] = split_test_module.active_and_inactive_children()
+        self.assertEqual(active_children, children)
+        self.assertEqual(inactive_children, [])
+
+        # Verify that a split_test does not return inactive children in the active children
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha')])
+        ]
+        [active_children, inactive_children] = split_test_module.active_and_inactive_children()
+        self.assertEqual(active_children, [children[0]])
+        self.assertEqual(inactive_children, [children[1]])
+
+        # Verify that a split_test ignores misconfigured children
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("2", 'gamma')])
+        ]
+        [active_children, inactive_children] = split_test_module.active_and_inactive_children()
+        self.assertEqual(active_children, [children[0]])
+        self.assertEqual(inactive_children, [children[1]])
+
+        # Verify that a split_test referring to a non-existent user partition has no active children
+        self.split_test_module.user_partition_id = 2
+        [active_children, inactive_children] = split_test_module.active_and_inactive_children()
+        self.assertEqual(active_children, [])
+        self.assertEqual(inactive_children, children)
+
     def test_validation_message_types(self):
         """
         Test the behavior of validation message types.
@@ -249,46 +314,95 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
 
     def test_validation_messages(self):
         """
-        Test the validation messages produced for different split_test configurations.
+        Test the validation messages produced for different split test configurations.
         """
+        split_test_module = self.split_test_module
 
-        def verify_validation_message(split_test_module, expected_message, expected_message_type):
+        def verify_validation_message(message, expected_message, expected_message_type,
+                                      expected_action_class=None, expected_action_label=None):
             """
-            Verify that the module has the expected validation message and type.
+            Verify that the validation message has the expected validation message and type.
             """
-            (message, message_type) = split_test_module.validation_message()
-            self.assertEqual(message, expected_message)
-            self.assertEqual(message_type, expected_message_type)
+            self.assertEqual(unicode(message), expected_message)
+            self.assertEqual(message.message_type, expected_message_type)
+            self.assertEqual(message.action_class, expected_action_class)
+            self.assertEqual(message.action_label, expected_action_label)
 
-        # Verify the message for an unconfigured experiment
-        self.split_test_module.user_partition_id = -1
-        verify_validation_message(self.split_test_module,
-                                  u"You must select a group configuration for this content experiment.",
-                                  ValidationMessageType.warning)
+        # Verify the messages for an unconfigured user partition
+        split_test_module.user_partition_id = -1
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 1)
+        verify_validation_message(
+            messages[0],
+            u"The experiment is not associated with a group configuration.",
+            ValidationMessageType.warning,
+            'edit-button',
+            u"Select a Group Configuration",
+        )
 
-        # Verify the message for a correctly configured experiment
-        self.split_test_module.user_partition_id = 0
-        self.split_test_module.user_partitions = [
+        # Verify the messages for a correctly configured split_test
+        split_test_module.user_partition_id = 0
+        split_test_module.user_partitions = [
             UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
         ]
-        verify_validation_message(self.split_test_module,
-                                  u"This content experiment uses group configuration 'first_partition'.",
-                                  ValidationMessageType.information)
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 0)
 
-        # Verify the message for a block with the wrong number of groups
-        self.split_test_module.user_partitions = [
+        # Verify the messages for a split test with too few groups
+        split_test_module.user_partitions = [
             UserPartition(0, 'first_partition', 'First Partition',
                           [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'gamma')])
         ]
-        verify_validation_message(self.split_test_module,
-                                  u"This content experiment is in an invalid state and cannot be repaired. "
-                                  u"Please delete and recreate.",
-                                  ValidationMessageType.error)
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 1)
+        verify_validation_message(
+            messages[0],
+            u"The experiment does not contain all of the groups in the configuration.",
+            ValidationMessageType.error,
+            'add-missing-groups-button',
+            u"Add Missing Groups"
+        )
 
-        # Verify the message for a block referring to a non-existent experiment
-        self.split_test_module.user_partition_id = 2
-        verify_validation_message(self.split_test_module,
-                                  u"This content experiment will not be shown to students because it refers "
-                                  u"to a group configuration that has been deleted. "
-                                  u"You can delete this experiment or reinstate the group configuration to repair it.",
-                                  ValidationMessageType.error)
+        # Verify the messages for a split test with children that are not associated with any group
+        split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition',
+                          [Group("0", 'alpha')])
+        ]
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 1)
+        verify_validation_message(
+            messages[0],
+            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            ValidationMessageType.warning
+        )
+
+        # Verify the messages for a split test with both missing and inactive children
+        split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition',
+                          [Group("0", 'alpha'), Group("2", 'gamma')])
+        ]
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 2)
+        verify_validation_message(
+            messages[0],
+            u"The experiment does not contain all of the groups in the configuration.",
+            ValidationMessageType.error,
+            'add-missing-groups-button',
+            u"Add Missing Groups"
+        )
+        verify_validation_message(
+            messages[1],
+            u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.",
+            ValidationMessageType.warning
+        )
+
+        # Verify the messages for a split test referring to a non-existent user partition
+        split_test_module.user_partition_id = 2
+        messages = split_test_module.validation_messages()
+        self.assertEqual(len(messages), 1)
+        verify_validation_message(
+            messages[0],
+            u"The experiment uses a deleted group configuration. "
+            u"Select a valid group configuration or delete this experiment.",
+            ValidationMessageType.error
+        )

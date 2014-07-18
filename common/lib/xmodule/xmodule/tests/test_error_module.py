@@ -6,7 +6,7 @@ from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore.xml import CourseLocationGenerator
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.x_module import XModuleDescriptor, XModule
+from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, IdReader
 from xblock.field_data import FieldData
@@ -39,7 +39,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
         )
         self.assertIsInstance(descriptor, ErrorDescriptor)
         descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(descriptor, 'student_view').content
+        context_repr = self.system.render(descriptor, STUDENT_VIEW).content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(self.valid_xml), context_repr)
 
@@ -53,7 +53,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
             descriptor, self.error_msg)
         self.assertIsInstance(error_descriptor, ErrorDescriptor)
         error_descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(error_descriptor, 'student_view').content
+        context_repr = self.system.render(error_descriptor, STUDENT_VIEW).content
         self.assertIn(self.error_msg, context_repr)
         self.assertIn(repr(descriptor), context_repr)
 
@@ -80,7 +80,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
             CourseLocationGenerator(self.course_id)
         )
         descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(descriptor, 'student_view').content
+        context_repr = self.system.render(descriptor, STUDENT_VIEW).content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(repr(self.valid_xml), context_repr)
 
@@ -94,7 +94,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
             descriptor, self.error_msg)
         self.assertIsInstance(error_descriptor, ErrorDescriptor)
         error_descriptor.xmodule_runtime = self.system
-        context_repr = self.system.render(error_descriptor, 'student_view').content
+        context_repr = self.system.render(error_descriptor, STUDENT_VIEW).content
         self.assertNotIn(self.error_msg, context_repr)
         self.assertNotIn(str(descriptor), context_repr)
 

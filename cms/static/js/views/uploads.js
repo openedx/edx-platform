@@ -61,9 +61,15 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             },
 
             selectFile: function(e) {
+                var selectedFile = e.target.files[0] || null;
                 this.model.set({
-                    selectedFile: e.target.files[0] || null
+                    selectedFile: selectedFile
                 });
+                // This change event triggering necessary for FireFox, because the browser don't
+                // consider change of File object (file input field) as a change in model.
+                if (selectedFile && $.isEmptyObject(this.model.changed)){
+                    this.model.trigger('change');
+                }
             },
 
             upload: function(e) {

@@ -18,10 +18,9 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.video_module import transcripts_utils
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
@@ -76,7 +75,7 @@ class TestGenerateSubs(unittest.TestCase):
         )
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestSaveSubsToStore(ModuleStoreTestCase):
     """Tests for `save_subs_to_store` function."""
 
@@ -152,11 +151,9 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
     def tearDown(self):
         self.clear_subs_content()
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
 
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     """Tests for `download_youtube_subs` function."""
 
@@ -164,24 +161,31 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     number = '999'
     display_name = 'Test course'
 
+
+    def clear_sub_content(self, subs_id):
+        """
+        Remove, if subtitle content exists.
+        """
+        filename = 'subs_{0}.srt.sjson'.format(subs_id)
+        content_location = StaticContent.compute_location(self.course.id, filename)
+        try:
+            content = contentstore().find(content_location)
+            contentstore().delete(content.location)
+        except NotFoundError:
+            pass
+
     def clear_subs_content(self, youtube_subs):
-        """Remove, if subtitles content exists."""
+        """
+        Remove, if subtitles content exists.
+
+        youtube_subs: dict of '{speed: youtube_id}' format for different speeds.
+        """
         for subs_id in youtube_subs.values():
-            filename = 'subs_{0}.srt.sjson'.format(subs_id)
-            content_location = StaticContent.compute_location(self.course.id, filename)
-            try:
-                content = contentstore().find(content_location)
-                contentstore().delete(content.location)
-            except NotFoundError:
-                pass
+            self.clear_sub_content(subs_id)
 
     def setUp(self):
         self.course = CourseFactory.create(
             org=self.org, number=self.number, display_name=self.display_name)
-
-    def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
     def test_success_downloading_subs(self):
 
@@ -193,29 +197,22 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
                     <text start="5.43" dur="1.73">Test text 3.</text>
                 </transcript>
         """)
-        good_youtube_subs = {
-            0.5: 'good_id_1',
-            1.0: 'good_id_2',
-            2.0: 'good_id_3'
-        }
-        self.clear_subs_content(good_youtube_subs)
+        good_youtube_sub = 'good_id_2'
+        self.clear_sub_content(good_youtube_sub)
 
         with patch('xmodule.video_module.transcripts_utils.requests.get') as mock_get:
             mock_get.return_value = Mock(status_code=200, text=response, content=response)
             # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
-            transcripts_utils.download_youtube_subs(good_youtube_subs, self.course, settings)
+            transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
-        mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_1'})
         mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_2'})
-        mock_get.assert_any_call('http://video.google.com/timedtext', params={'lang': 'en', 'v': 'good_id_3'})
 
-        # Check assets status after importing subtitles.
-        for subs_id in good_youtube_subs.values():
-            filename = 'subs_{0}.srt.sjson'.format(subs_id)
-            content_location = StaticContent.compute_location(self.course.id, filename)
-            self.assertTrue(contentstore().find(content_location))
+        # Check asset status after import of transcript.
+        filename = 'subs_{0}.srt.sjson'.format(good_youtube_sub)
+        content_location = StaticContent.compute_location(self.course.id, filename)
+        self.assertTrue(contentstore().find(content_location))
 
-        self.clear_subs_content(good_youtube_subs)
+        self.clear_sub_content(good_youtube_sub)
 
     def test_subs_for_html5_vid_with_periods(self):
         """
@@ -235,25 +232,21 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
 
         mock_get.return_value = Mock(status_code=404, text='Error 404')
 
-        bad_youtube_subs = {
-            0.5: 'BAD_YOUTUBE_ID1',
-            1.0: 'BAD_YOUTUBE_ID2',
-            2.0: 'BAD_YOUTUBE_ID3'
-        }
-        self.clear_subs_content(bad_youtube_subs)
+        bad_youtube_sub = 'BAD_YOUTUBE_ID2'
+        self.clear_sub_content(bad_youtube_sub)
+
         with self.assertRaises(transcripts_utils.GetTranscriptsFromYouTubeException):
-            transcripts_utils.download_youtube_subs(bad_youtube_subs, self.course, settings)
+            transcripts_utils.download_youtube_subs(bad_youtube_sub, self.course, settings)
 
-        # Check assets status after importing subtitles.
-        for subs_id in bad_youtube_subs.values():
-            filename = 'subs_{0}.srt.sjson'.format(subs_id)
-            content_location = StaticContent.compute_location(
-                self.course.id, filename
-            )
-            with self.assertRaises(NotFoundError):
-                contentstore().find(content_location)
+        # Check asset status after import of transcript.
+        filename = 'subs_{0}.srt.sjson'.format(bad_youtube_sub)
+        content_location = StaticContent.compute_location(
+            self.course.id, filename
+        )
+        with self.assertRaises(NotFoundError):
+            contentstore().find(content_location)
 
-        self.clear_subs_content(bad_youtube_subs)
+        self.clear_sub_content(bad_youtube_sub)
 
     def test_success_downloading_chinese_transcripts(self):
 
@@ -262,13 +255,11 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
         # Re-enable when `requests.get` is patched using `mock.patch`
         raise SkipTest
 
-        good_youtube_subs = {
-            1.0: 'j_jEn79vS3g',  # Chinese, utf-8
-        }
-        self.clear_subs_content(good_youtube_subs)
+        good_youtube_sub = 'j_jEn79vS3g'  # Chinese, utf-8
+        self.clear_sub_content(good_youtube_sub)
 
         # Check transcripts_utils.GetTranscriptsFromYouTubeException not thrown
-        transcripts_utils.download_youtube_subs(good_youtube_subs, self.course, settings)
+        transcripts_utils.download_youtube_subs(good_youtube_sub, self.course, settings)
 
         # Check assets status after importing subtitles.
         for subs_id in good_youtube_subs.values():
@@ -278,7 +269,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
             )
             self.assertTrue(contentstore().find(content_location))
 
-        self.clear_subs_content(good_youtube_subs)
+        self.clear_sub_content(good_youtube_sub)
 
 
 class TestGenerateSubsFromSource(TestDownloadYoutubeSubs):

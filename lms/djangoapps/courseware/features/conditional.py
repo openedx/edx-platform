@@ -67,7 +67,6 @@ class ConditionalSteps(object):
             data='<html><div class="hidden-contents">Hidden Contents</p></html>'
         )
 
-
     def setup_problem_attempts(self, step, not_attempted=None):
         r'that the conditioned problem has (?P<not_attempted>not )?been attempted$'
         visit_scenario_item('CONDITION_SOURCE')

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-13 09:23-0400\n"
-"PO-Revision-Date: 2014-06-13 13:24:28.607488\n"
+"POT-Creation-Date: 2014-07-14 09:10-0400\n"
+"PO-Revision-Date: 2014-07-14 13:11:26.464876\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,7 @@ msgstr "ÖK Ⱡ'#"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
@@ -300,9 +301,9 @@ msgstr "Mäxïmüm #"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
-"VideoPlayer: Element corresponding to the given selector does not found."
+"VideoPlayer: Element corresponding to the given selector was not found."
 msgstr ""
-"VïdéöPläýér: Élémént çörréspöndïng tö thé gïvén séléçtör döés nöt föünd. "
+"VïdéöPläýér: Élémént çörréspöndïng tö thé gïvén séléçtör wäs nöt föünd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
@@ -381,6 +382,10 @@ msgstr "Türn ön çäptïöns Ⱡ'σ#"
 msgid "Turn off captions"
 msgstr "Türn öff çäptïöns Ⱡ'σ#"
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr "Çréätïng mïssïng gröüps&hellip; Ⱡ'σяєм#"
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -435,7 +440,6 @@ msgstr ""
 "∂σłσя#"
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -496,6 +500,10 @@ msgstr[0] "%(unread_count)s néw çömmént Ⱡ'#"
 msgstr[1] "%(unread_count)s néw çömménts Ⱡ'σ#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr "Séärçh Résülts Ⱡ'#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Löädïng thréäd lïst Ⱡ'σя#"
 
@@ -506,6 +514,14 @@ msgid ""
 msgstr ""
 "Nö résülts föünd för %(original_query)s. Shöwïng résülts för "
 "%(suggested_query)s. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr "Nö thréäds mätçhéd ýöür qüérý. Ⱡ'σяєм #"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
+msgstr "Shöw pösts ßý %(username)s. Ⱡ'σ#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
@@ -652,10 +668,12 @@ msgstr "dröppéd ïn slïdér Ⱡ'σ#"
 msgid "dropped on target"
 msgstr "dröppéd ön tärgét Ⱡ'σ#"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
 msgstr "%s ägö Ⱡ'σяєм ιρѕ#"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
 msgstr "%s fröm nöw Ⱡ#"
@@ -807,6 +825,7 @@ msgid "Reply"
 msgstr "Réplý Ⱡ'σяєм ι#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -1000,6 +1019,9 @@ msgstr "Prévïéw #"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
 msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
@@ -1021,6 +1043,7 @@ msgid "<%= num_students %> students scored."
 msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
 msgstr "Löädïng... Ⱡ#"
 
@@ -1069,7 +1092,8 @@ msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
 
-#. Translators: A rolename appears this sentence.;
+#. Translators: A rolename appears this sentence. A rolename is something like
+#. "staff" or "beta tester".;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
 msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
@@ -1207,7 +1231,9 @@ msgid "The following users are no longer enrolled in the course:"
 msgstr ""
 "Thé föllöwïng üsérs äré nö löngér énrölléd ïn thé çöürsé: Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#. Translators: A list of users appears after this sentence;
+#. Translators: A list of users appears after this sentence. This situation
+#. arises when a staff member tries to unenroll a user who is not currently
+#. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
@@ -1650,6 +1676,10 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr "Ýöü hävé ßéén löggéd öüt öf ýöür édX äççöünt.  Ⱡ'σяєм ιρѕυм #"
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr "Ûnknöwn Érrör Öççürréd. Ⱡ'σяє#"
@@ -1684,16 +1714,22 @@ msgid "Unable to retrieve data, please try again later."
 msgstr "Ûnäßlé tö rétrïévé dätä, pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "student(s) opened Subsection"
-msgstr "stüdént(s) öpénéd Süßséçtïön Ⱡ'σяєм #"
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] "%(num_students)s stüdént öpénéd Süßséçtïön Ⱡ'σяєм #"
+msgstr[1] "%(num_students)s stüdénts öpénéd Süßséçtïön Ⱡ'σяєм #"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "students"
-msgstr "stüdénts #"
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] "%(num_students)s stüdént Ⱡ#"
+msgstr[1] "%(num_students)s stüdénts Ⱡ#"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "questions"
-msgstr "qüéstïöns #"
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] "%(num_questions)s qüéstïön Ⱡ#"
+msgstr[1] "%(num_questions)s qüéstïöns Ⱡ'#"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1758,6 +1794,10 @@ msgstr ""
 msgid "Yes, delete this component"
 msgstr "Ýés, délété thïs çömpönént Ⱡ'σяєм#"
 
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr "ÖpénÀsséssmént Sävé Érrör Ⱡ'σяєм#"
+
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "Thïs lïnk wïll öpén ïn ä mödäl wïndöw Ⱡ'σяєм ιρѕ#"
@@ -1808,6 +1848,22 @@ msgstr "Löökïng för Hélp wïth Stüdïö? Ⱡ'σяєм #"
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr "Ýöü müst spéçïfý ä nämé Ⱡ'σяє#"
+
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr "Gröüp nämé ïs réqüïréd Ⱡ'σяє#"
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr "Gröüp Çönfïgürätïön nämé ïs réqüïréd Ⱡ'σяєм ιρ#"
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr "Pléäsé ädd ät léäst öné gröüp Ⱡ'σяєм #"
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr "Àll gröüps müst hävé ä nämé Ⱡ'σяєм#"
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -1942,6 +1998,14 @@ msgstr "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρ#"
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr "Sävïng Ⱡ'σяєм ιρѕ#"
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] "Çöntäïns %(count)s gröüp Ⱡ'σ#"
+msgstr[1] "Çöntäïns %(count)s gröüps Ⱡ'σя#"
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -2078,6 +2142,7 @@ msgid "Editor"
 msgstr "Édïtör Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/views/xblock_editor.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr "Séttïngs #"
 
@@ -2086,6 +2151,7 @@ msgid "Adding&hellip;"
 msgstr "Àddïng&hellip; #"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -2098,6 +2164,10 @@ msgstr "Çömpönént #"
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
 msgstr "Édïtïng: %(title)s Ⱡ#"
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
+msgstr "Ýöü hävé ünsävéd çhängés. Dö ýöü réällý wänt tö  Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -2169,6 +2239,10 @@ msgstr "Àdvänçéd #"
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
 msgstr "Àdd Néw Çömpönént Ⱡ'σ#"
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
+msgstr "Dépréçätéd Ⱡ#"
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
@@ -2264,6 +2338,10 @@ msgid "total exercises that won't be graded"
 msgstr "tötäl éxérçïsés thät wön't ßé grädéd Ⱡ'σяєм ιρ#"
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr "Çöürsé Händöüts Ⱡ'#"
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr "Ýöü hävé nö händöüts défïnéd Ⱡ'σяєм #"
 
@@ -2336,12 +2414,16 @@ msgstr ""
 "séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Chapter(s) information"
-msgstr "Çhäptér(s) ïnförmätïön Ⱡ'σяє#"
+msgid "Chapter information"
+msgstr "Çhäptér ïnförmätïön Ⱡ'σя#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "Àdd ä Çhäptér Ⱡ'#"
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr "ÌD Ⱡ'#"
 
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
@@ -2370,6 +2452,10 @@ msgstr "Répläçé #"
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
 msgstr "Döwnlöäd #"
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr "Ýöü hävén't çréätéd äný gröüp çönfïgürätïöns ýét. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -2400,6 +2486,10 @@ msgstr "Vïéw Lïvé #"
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "Fïlé üplöäd süççéédéd Ⱡ'σя#"
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
+msgstr "Gröüp Çönfïgürätïöns Ⱡ'σя#"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

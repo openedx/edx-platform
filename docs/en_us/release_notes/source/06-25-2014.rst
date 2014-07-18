@@ -1,0 +1,81 @@
+###################################
+June 25, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of June
+25, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+XBlocks that have been accepted into the edX platform can now be added to
+courses as either advanced problems or advanced components. As a result, **Peer
+Assessments** is now listed as a problem type on the **Advanced** tab in a
+Problem component. For more information, see `Creating Peer Assessments`_.
+
+***************************************
+edX Learning Management System
+***************************************
+   
+* In some courses, an error prevented the full output that is available from an
+  external grader for a coding problem from appearing. This error has been
+  corrected. (LMS-2852)
+
+* In Discussions, you can now search by username to access a list of the
+  discussion posts made by another user. (FOR-627)
+  
+.. ? https://github.com/edx/edx-platform/pull/4106 Video: fix seek tracking log
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  * Instructions for adding a table of contents for a video file are now
+    available in the `Video Table of Contents`_ section.  (BLD-933)
+
+  * The example report in the `Download or view student data`_ section now
+    includes the new User ID column.
+       
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+ 
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+A Preface that identifies resources for course teams,  developers,
+researchers, and students was added to `Building and Running an edX Course`_,
+the `edX Research Guide`_, and the `edX Developer's Guide`_ this week.
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

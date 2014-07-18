@@ -24,6 +24,9 @@
 
 DB_CACHE_DIR="common/test/db_cache"
 
+# Ensure the test database exists.
+echo "CREATE DATABASE IF NOT EXISTS test;" | mysql -u root
+
 # Clear out the test database
 ./manage.py lms --settings bok_choy reset_db --traceback --noinput
 

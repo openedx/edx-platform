@@ -39,7 +39,7 @@
   <div class="external-grader-message" aria-live="polite">
     ${msg|n}
   </div>
-  <div class="external-grader-message ungraded-matlab-result" aria-live="polite">
+  <div class="ungraded-matlab-result" aria-live="polite">
     ${queue_msg|n}
   </div>
 
@@ -51,6 +51,7 @@
 
   <script>
     $(function(){
+      var IntervalManager, PendingMatlabResult;
       var gentle_alert = function (parent_elt, msg) {
           if($(parent_elt).find('.capa_alert').length) {
               $(parent_elt).find('.capa_alert').remove();
@@ -58,10 +59,11 @@
           var alert_elem = $("<div>" + msg + "</div>");
           alert_elem.addClass('capa_alert').addClass('is-fading-in');
           $(parent_elt).find('.action').after(alert_elem);
-      }
+      };
 
       // hook up the plot button
       var plot = function(event) {
+          var matlab_result_task;
           var problem_elt = $(event.target).closest('.problems-wrapper');
           url = $(event.target).closest('.problems-wrapper').data('url');
           input_id = "${id}";
@@ -82,20 +84,29 @@
           // a chain of callbacks, each querying the server on success of the previous one
 
           var get_callback = function(response) {
-              var new_result_elem = $(response.html).find(".ungraded-matlab-result");
-              new_result_elem.addClass("is-fading-in");
+              var new_result_elem = $(response.html).find(".ungraded-matlab-result").html();
+              var external_grader_msg = $(response.html).find(".external-grader-message").html();
               result_elem = $(problem_elt).find(".ungraded-matlab-result");
-              result_elem.replaceWith(new_result_elem);
-              console.log(response.html);
-          }
+              result_elem.addClass("is-fading-in");
+              result_elem.html(new_result_elem);
+              external_grader_msg_elem = $(problem_elt).find(".external-grader-message");
+              external_grader_msg_elem.addClass("is-fading-in");
+              external_grader_msg_elem.html(external_grader_msg);
+              if (!external_grader_msg.trim()) {
+                  matlab_result_task.task_poller.stop();
+              } else {
+                  result_elem.html('');
+              }
+          };
 
           var plot_callback = function(response) {
               if(response.success) {
-                  $.postWithPrefix(url + "/problem_get", get_callback);
+                  matlab_result_task = new PendingMatlabResult(get_callback);
+                  matlab_result_task.task_poller.start();
               } else {
                   gentle_alert(problem_elt, response.message);
               }
-          }
+          };
 
           var save_callback = function(response) {
               if(response.success) {
@@ -106,12 +117,62 @@
               else {
                   gentle_alert(problem_elt, response.message);
               }
-          }
+          };
 
           // save the answer
           $.postWithPrefix(url + '/problem_save', answer, save_callback);
-      }
+      };
       $('#plot_${id}').click(plot);
+
+      // Copied from lms/static/coffee/src/instructor_dashboard/util.js
+      IntervalManager = (function() {
+
+        function IntervalManager(ms, fn) {
+          this.ms = ms;
+          this.fn = fn;
+          this.intervalID = null;
+        }
+
+        IntervalManager.prototype.start = function() {
+          this.fn();
+          if (this.intervalID === null) {
+            return this.intervalID = setInterval(this.fn, this.ms);
+          }
+        };
+
+        IntervalManager.prototype.stop = function() {
+          clearInterval(this.intervalID);
+          return this.intervalID = null;
+        };
+
+        return IntervalManager;
+
+      })();
+
+      PendingMatlabResult = (function() {
+        /* Pending Matlab Result Section
+        */
+
+        function PendingMatlabResult(get_callback) {
+          var MATLAB_RESULT_POLL_INTERVAL,
+            _this = this;
+          this.reload_matlab_result = function(get_callback) {
+            return PendingMatlabResult.prototype.reload_matlab_result.apply(_this, arguments);
+          };
+          MATLAB_RESULT_POLL_INTERVAL = 1000;
+          this.reload_matlab_result(get_callback);
+          this.task_poller = new IntervalManager(MATLAB_RESULT_POLL_INTERVAL, function() {
+            return _this.reload_matlab_result(get_callback);
+          });
+        }
+
+        PendingMatlabResult.prototype.reload_matlab_result = function(get_callback) {
+          return $.postWithPrefix(url + "/problem_get", get_callback)
+        };
+
+        return PendingMatlabResult;
+
+        })();
     });
   </script>
 </section>

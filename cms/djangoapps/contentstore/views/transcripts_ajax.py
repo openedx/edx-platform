@@ -402,7 +402,7 @@ def replace_transcripts(request):
         return error_response(response, 'YouTube id {} is not presented in request data.'.format(youtube_id))
 
     try:
-        download_youtube_subs({1.0: youtube_id}, item, settings)
+        download_youtube_subs(youtube_id, item, settings)
     except GetTranscriptsFromYouTubeException as e:
         return error_response(response, e.message)
 
@@ -532,12 +532,12 @@ def _get_item(request, data):
     Returns the item.
     """
     usage_key = UsageKey.from_string(data.get('locator'))
-
     # This is placed before has_course_access() to validate the location,
     # because has_course_access() raises  r if location is invalid.
     item = modulestore().get_item(usage_key)
 
-    if not has_course_access(request.user, usage_key.course_key):
+    # use the item's course_key, because the usage_key might not have the run
+    if not has_course_access(request.user, item.location.course_key):
         raise PermissionDenied()
 
     return item

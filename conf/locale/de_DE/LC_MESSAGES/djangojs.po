@@ -9,9 +9,11 @@
 # andreas.frey <andreas.frey@liip.ch>, 2014
 # dabang <inactive+dabang@transifex.com>, 2014
 # MasterCrumble <basti31@gmx.net>, 2014
+# berit.braun, 2014
 # s6lidaem <linda.daemmer@web.de>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
+# mrolappe <m_rolappe@gmx.net>, 2014
 # Neithen, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013-2014
@@ -25,6 +27,7 @@
 # s6lidaem <linda.daemmer@web.de>, 2014
 # Maximilian Kindshofer <maximilian@kindshofer.net>, 2014
 # Neithen, 2014
+# Ralf Hilgenstock <rh@dialoge.info>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -42,9 +45,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:23-0400\n"
-"PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2014-07-11 16:03-0400\n"
+"PO-Revision-Date: 2014-07-13 16:41+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -294,7 +297,7 @@ msgstr "Maximal"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
-"VideoPlayer: Element corresponding to the given selector does not found."
+"VideoPlayer: Element corresponding to the given selector was not found."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
@@ -372,6 +375,10 @@ msgstr "Untertitel einschalten"
 msgid "Turn off captions"
 msgstr "Untertitel ausschalten"
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr ""
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -423,7 +430,6 @@ msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -483,6 +489,10 @@ msgstr[0] "%(unread_count)s neuer Kommentar"
 msgstr[1] "%(unread_count)s neue Kommentare"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "Lade Themenliste"
 
@@ -490,6 +500,14 @@ msgstr "Lade Themenliste"
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -630,10 +648,12 @@ msgstr ""
 msgid "dropped on target"
 msgstr ""
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
 msgstr "%s her"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
 msgstr "%s von jetzt"
@@ -785,6 +805,7 @@ msgid "Reply"
 msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -972,6 +993,9 @@ msgstr "Vorschau"
 msgid "Post body"
 msgstr "Postkörper"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
 msgstr ""
@@ -1041,7 +1065,8 @@ msgstr ""
 msgid "Please enter a username or email."
 msgstr "Bitte geben sie einen Benutzernamen oder eine E-Mailadresse ein."
 
-#. Translators: A rolename appears this sentence.;
+#. Translators: A rolename appears this sentence. A rolename is something like
+#. "staff" or "beta tester".;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
 msgstr ""
@@ -1155,7 +1180,9 @@ msgstr ""
 msgid "The following users are no longer enrolled in the course:"
 msgstr ""
 
-#. Translators: A list of users appears after this sentence;
+#. Translators: A list of users appears after this sentence. This situation
+#. arises when a staff member tries to unenroll a user who is not currently
+#. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
@@ -1552,6 +1579,10 @@ msgstr "Listelement"
 msgid "Heading"
 msgstr "Überschrift"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -1586,16 +1617,22 @@ msgid "Unable to retrieve data, please try again later."
 msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "student(s) opened Subsection"
-msgstr ""
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "students"
-msgstr ""
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "questions"
-msgstr ""
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1658,6 +1695,10 @@ msgstr ""
 msgid "Yes, delete this component"
 msgstr "Ja, diese Komponente löschen"
 
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr ""
+
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "Dieser Link wird in einem Dialogfenster geöffnet"
@@ -1706,6 +1747,22 @@ msgstr "Suchen Sie Hilfe für Studio?"
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr "Sie müssen einen Namen aufführen"
+
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -1833,6 +1890,14 @@ msgstr ""
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr "Speichert"
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] ""
+msgstr[1] ""
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -1965,6 +2030,7 @@ msgid "Editor"
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr ""
 
@@ -1973,6 +2039,7 @@ msgid "Adding&hellip;"
 msgstr "Hinzufügen&hellip;"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -1984,6 +2051,10 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
+msgstr ""
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -2053,6 +2124,10 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2149,6 +2224,10 @@ msgid "total exercises that won't be graded"
 msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr ""
 
@@ -2213,11 +2292,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Chapter(s) information"
+msgid "Chapter information"
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
+msgstr ""
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
 msgstr ""
 
 #: cms/templates/js/metadata-dict-entry.underscore
@@ -2248,6 +2331,10 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr ""
+
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
 msgstr ""
@@ -2276,6 +2363,10 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

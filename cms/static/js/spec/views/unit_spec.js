@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/module_info",
+define(["jquery", "underscore.string", "jasmine", "coffee/src/views/unit", "js/models/module_info",
     "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers", "jasmine-stealth"],
-    function ($, _, jasmine, UnitEditView, ModuleModel, create_sinon, edit_helpers) {
+    function ($, str, jasmine, UnitEditView, ModuleModel, create_sinon, edit_helpers) {
         var requests, unitView, initialize, lastRequest, respondWithHtml, verifyComponents, i,
             mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
@@ -150,7 +150,7 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
             });
 
             describe("Disabled edit/publish links during ajax call", function() {
-                var link, i,
+                var link,
                     draft_states = [
                         {
                             state: "draft",
@@ -204,7 +204,7 @@ define(["jquery", "underscore", "jasmine", "coffee/src/views/unit", "js/models/m
                     expect(editButtons.length).toBe(2);
                     editButtons[1].click();
                     // Make sure that the correct xblock is requested to be edited
-                    expect(lastRequest().url.startsWith('/xblock/loc_2/studio_view')).toBeTruthy();
+                    expect(str.startsWith(lastRequest().url, '/xblock/loc_2/studio_view')).toBeTruthy();
                     create_sinon.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []

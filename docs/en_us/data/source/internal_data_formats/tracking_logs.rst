@@ -540,9 +540,12 @@ The browser emits these events when a user works with a video.
 ``play_video``, ``pause_video``
 ---------------------------------
 
-* The browser emits ``play_video`` events on video play. 
+* The browser emits ``play_video`` events when the user clicks the video
+  **play** control.
 
-* The browser emits  ``pause_video`` events on video pause. 
+* The browser emits  ``pause_video`` events when the user clicks the video
+  **pause** control. The browser also emits these events when the video player
+  reaches the end of the video file and play automatically stops.
 
 ``event`` **Member Fields**: These events have the same ``event`` fields.
 
@@ -567,11 +570,35 @@ The browser emits these events when a user works with a video.
      - string
      - Video speed in use: '0.75', '1.0', '1.25', '1.50'.
 
+``stop_video``
+--------------------
+
+The browser emits  ``stop_video`` events when the video player reaches the end
+of the video file and play automatically stops.
+
+**History**: Added 25 June 2014.
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``currentTime``
+     - float
+     - Time the video ended, in seconds. 
+
 ``seek_video``
 -----------------
 
 The browser emits ``seek_video`` events when a user clicks the playback bar or
 transcript to go to a different point in the video file.
+
+**History**: Prior to 25 Jun 2014, the ``old_time`` and ``new_time`` were set
+to the same value.
 
 ``event`` **Member Fields**: 
 
@@ -583,16 +610,16 @@ transcript to go to a different point in the video file.
      - Type
      - Details
    * - ``old_time``
-     - 
-     - The time in the video that the user chose to go to a different point in the file.
+     - integer
+     - The time in the video, in seconds, at which the user chose to go to a
+       different point in the file.
    * - ``new_time``
-     - 
-     - The time in the video that the user selected as the destination point.
+     - integer
+     - The time in the video, in seconds, that the user selected as the
+       destination point.
    * - ``type``
-     - 
+     - string
      - The navigational method used to change position within the video.
-
-.. need types
 
 ``speed_change_video`` 
 ------------------------
@@ -1927,13 +1954,14 @@ Forum Events
 ``edx.forum.searched``
 ----------------------------------
 
-After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.text_search`` event.
+After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.searched`` event.
 
 **Component**: Discussion Tab
 
 **Event Source**: Server
 
-**History**: Added 16 May 2014.  The ``corrected_text`` field was added on June 5 2014.
+**History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
+Jun 2014.
 
 ``event`` **Fields**:
 
@@ -1949,15 +1977,17 @@ After a user executes a text search in the navigation sidebar of the Discussion 
      - The text entered into the search box by the user.
    * - ``page``
      - integer
-     - Results are returned in sets of 20 per page. Identifies the page of results requested by the user.
+     - Results are returned in sets of 20 per page. Identifies the page of
+       results requested by the user.
    * - ``total_results``
      - integer
      - The total number of results matching the query.
    * - ``corrected_text``
      - string
-     - A re-spelling of the query, suggested by the search engine, which was automatically substituted for the original
-       one.  This happens only when there are no results for the original query, but the index contains matches for
-       a similar term or phrase.  Otherwise, this field is null.
+     - A re-spelling of the query, suggested by the search engine, which was
+       automatically substituted for the original one.  This happens only when
+       there are no results for the original query, but the index contains
+       matches for a similar term or phrase.  Otherwise, this field is null.
 
 .. _Instructor_Event_Types:
 

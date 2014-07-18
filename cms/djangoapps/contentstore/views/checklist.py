@@ -11,7 +11,7 @@ from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from contentstore.utils import get_modulestore, reverse_course_url
+from contentstore.utils import reverse_course_url
 
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor
@@ -47,7 +47,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
         # from the template.
         if not course_module.checklists:
             course_module.checklists = CourseDescriptor.checklists.default
-            get_modulestore(course_module.location).update_item(course_module, request.user.id)
+            modulestore().update_item(course_module, request.user.id)
 
         expanded_checklists = expand_all_action_urls(course_module)
         if json_request:
@@ -76,7 +76,7 @@ def checklists_handler(request, course_key_string, checklist_index=None):
             # not default
             course_module.checklists = course_module.checklists
             course_module.save()
-            get_modulestore(course_module.location).update_item(course_module, request.user.id)
+            modulestore().update_item(course_module, request.user.id)
             expanded_checklist = expand_checklist_action_url(course_module, persisted_checklist)
             return JsonResponse(localize_checklist_text(expanded_checklist))
         else:

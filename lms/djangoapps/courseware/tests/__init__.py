@@ -132,6 +132,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.assertTrue(all(self.login_statuses))
 
     def setUp(self):
+        super(BaseTestXmodule, self).setUp()
         self.setup_course()
         self.initialize_module(metadata=self.METADATA, data=self.DATA)
 

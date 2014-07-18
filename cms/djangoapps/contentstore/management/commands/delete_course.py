@@ -7,7 +7,7 @@ from contentstore.utils import delete_course_and_groups
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
+from xmodule.modulestore import ModuleStoreEnum
 
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
@@ -28,6 +28,6 @@ class Command(BaseCommand):
         if commit:
             print('Actually going to delete the course from DB....')
 
-        if query_yes_no("Deleting course {0}. Confirm?".format(course_key), default="no"):
-            if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
-                delete_course_and_groups(course_key, commit)
+            if query_yes_no("Deleting course {0}. Confirm?".format(course_key), default="no"):
+                if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
+                    delete_course_and_groups(course_key, ModuleStoreEnum.UserID.mgmt_command)

@@ -431,7 +431,8 @@ function (HTML5Video, Resizer) {
     // Reinitialized on a onSeek event.
     function onSeek(params) {
         var time = params.time,
-            type = params.type;
+            type = params.type,
+            oldTime = this.videoPlayer.currentTime;
 
         // After the user seeks, the video will start playing from
         // the sought point, and stop playing at the end.
@@ -441,11 +442,10 @@ function (HTML5Video, Resizer) {
         }
 
         this.videoPlayer.seekTo(time);
-
         this.videoPlayer.log(
             'seek_video',
             {
-                old_time: this.videoPlayer.currentTime,
+                old_time: oldTime,
                 new_time: time,
                 type: type
             }
@@ -506,6 +506,12 @@ function (HTML5Video, Resizer) {
 
     function onEnded() {
         var time = this.videoPlayer.duration();
+        this.videoPlayer.log(
+            'stop_video',
+            {
+                currentTime: this.videoPlayer.currentTime
+            }
+        );
 
         this.trigger('videoControl.pause', null);
         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {

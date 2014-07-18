@@ -249,7 +249,11 @@ class CapaMixin(CapaFields):
                 # e.g. in the CMS
                 msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
                 msg += u'<p><pre>{tb}</pre></p>'.format(
-                    tb=cgi.escape(traceback.format_exc()))
+                    # just the traceback, no message - it is already present above
+                    tb=cgi.escape(
+                        u''.join(['Traceback (most recent call last):\n'] +
+                        traceback.format_tb(sys.exc_info()[2])))
+                    )
                 # create a dummy problem with error message instead of failing
                 problem_text = (u'<problem><text><span class="inline-error">'
                                 u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
@@ -1182,9 +1186,8 @@ class CapaMixin(CapaFields):
 
             answer_response = None
             for response, responder in self.lcp.responders.iteritems():
-                for other_input_id in self.lcp.responder_answers[response]:
-                    if other_input_id == input_id:
-                        answer_response = responder
+                if input_id in responder.answer_ids:
+                    answer_response = responder
 
             if answer_response is None:
                 log.warning('Answer responder could not be found for input_id %s.', input_id)

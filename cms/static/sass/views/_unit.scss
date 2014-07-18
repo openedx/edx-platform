@@ -203,6 +203,16 @@ body.course.unit,
           padding-top: 0;
           color: $gray-l1;
         }
+
+        &.has-warnings {
+          border: 0;
+          border-top: 3px solid $orange;
+        }
+
+        &.has-errors {
+          border: 0;
+          border-top: 3px solid $red-l2;
+        }
       }
     }
 

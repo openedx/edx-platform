@@ -24,45 +24,31 @@ import os
 def seed():
     return os.getppid()
 
-# Suppress error message "Cannot determine primary key of logged in user"
-# from track.middleware that gets triggered when using an auto_auth workflow
-# This is an ERROR level warning so we need to set the threshold at CRITICAL
-logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+# Silence noisy logs
+LOG_OVERRIDES = [
+    ('track.middleware', logging.CRITICAL),
+    ('codejail.safe_exec', logging.ERROR),
+    ('edx.courseware', logging.ERROR),
+    ('edxmako.shortcuts', logging.ERROR),
+    ('audit', logging.ERROR),
+    ('contentstore.views.import_export', logging.CRITICAL),
+    ('xmodule.x_module', logging.CRITICAL),
+]
 
-# Suppress warning message "Cannot find corresponding link for name: <foo>"
-# from edxmako.shortcuts. We have no appropriate pages in the platform to
-# use, so these are not set up for TOS and PRIVACY
-logging.getLogger('edxmako.shortcuts').setLevel(logging.ERROR)
+for log_name, log_level in LOG_OVERRIDES:
+    logging.getLogger(log_name).setLevel(log_level)
 
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'acceptance_xmodule',
-    'collection': 'acceptance_modulestore_%s' % seed(),
-}
-
-MODULESTORE_OPTIONS = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
-    'fs_root': TEST_ROOT / "data",
-    'render_template': 'edxmako.shortcuts.render_to_string',
-}
-
-MODULESTORE = {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
+update_module_store_settings(
+    MODULESTORE,
+    doc_store_settings={
+        'db': 'acceptance_xmodule',
+        'collection': 'acceptance_modulestore_%s' % seed(),
     },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
-    },
-    'draft': {
-        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': MODULESTORE_OPTIONS
+    module_store_options={
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'fs_root': TEST_ROOT / "data",
     }
-}
+)
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -85,7 +71,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db"
+        'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
+        'OPTIONS': {
+            'timeout': 30,
+        },
     }
 }
 

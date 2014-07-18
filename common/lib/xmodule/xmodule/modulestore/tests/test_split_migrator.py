@@ -5,12 +5,9 @@ Tests for split_migrator
 import uuid
 import random
 import mock
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
-from xmodule.modulestore.split_migrator import SplitMigrator
-from xmodule.modulestore.mongo import draft
-from xmodule.modulestore.tests import test_location_mapper
-from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 from xblock.fields import Reference, ReferenceList, ReferenceValueDict
+from xmodule.modulestore.split_migrator import SplitMigrator
+from xmodule.modulestore.tests.test_split_w_old_mongo import SplitWMongoCourseBoostrapper
 
 
 class TestMigration(SplitWMongoCourseBoostrapper):
@@ -20,15 +17,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
 
     def setUp(self):
         super(TestMigration, self).setUp()
-        # pylint: disable=W0142
-        self.loc_mapper = LocMapperStore(test_location_mapper.TrivialCache(), **self.db_config)
-        self.split_mongo.loc_mapper = self.loc_mapper
-        self.migrator = SplitMigrator(self.split_mongo, self.old_mongo, self.draft_mongo, self.loc_mapper)
-
-    def tearDown(self):
-        dbref = self.loc_mapper.db
-        dbref.drop_collection(self.loc_mapper.location_map)
-        super(TestMigration, self).tearDown()
+        self.migrator = SplitMigrator(self.split_mongo, self.draft_mongo)
 
     def _create_course(self):
         """
@@ -63,7 +52,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
         self.create_random_units(False, both_vert_loc)
         draft_both = self.draft_mongo.get_item(both_vert_loc)
         draft_both.display_name = 'Both vertical renamed'
-        self.draft_mongo.update_item(draft_both)
+        self.draft_mongo.update_item(draft_both, self.user_id)
         self.create_random_units(True, both_vert_loc)
         # vertical in draft only (x2)
         draft_vert_loc = self.old_course_key.make_usage_key('vertical', uuid.uuid4().hex)
@@ -85,7 +74,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
             live_vert_loc.category, live_vert_loc.name, {}, {'display_name': 'Live vertical end'}, 'chapter', chapter1_name,
             draft=False, split=False
         )
-        self.create_random_units(True, draft_vert_loc)
+        self.create_random_units(False, live_vert_loc)
 
         # now the other chapter w/ the conditional
         # create pointers to children (before the children exist)
@@ -154,38 +143,28 @@ class TestMigration(SplitWMongoCourseBoostrapper):
                 draft=draft, split=False
             )
 
-    def compare_courses(self, presplit, published):
+    def compare_courses(self, presplit, new_course_key, published):
         # descend via children to do comparison
         old_root = presplit.get_course(self.old_course_key)
-        new_root_locator = self.loc_mapper.translate_location_to_course_locator(
-            old_root.id, published
-        )
-        new_root = self.split_mongo.get_course(new_root_locator)
+        new_root = self.split_mongo.get_course(new_course_key)
         self.compare_dags(presplit, old_root, new_root, published)
 
         # grab the detached items to compare they should be in both published and draft
         for category in ['conditional', 'about', 'course_info', 'static_tab']:
             for conditional in presplit.get_items(self.old_course_key, category=category):
-                locator = self.loc_mapper.translate_location(
-                    conditional.location,
-                    published,
-                    add_entry_if_missing=False
-                )
+                locator = new_course_key.make_usage_key(category, conditional.location.block_id)
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
 
     def compare_dags(self, presplit, presplit_dag_root, split_dag_root, published):
-        # check that locations match
-        self.assertEqual(
-            presplit_dag_root.location,
-            self.loc_mapper.translate_locator_to_location(split_dag_root.location).replace(revision=None)
-        )
-        # compare all fields but children
+        if split_dag_root.category != 'course':
+            self.assertEqual(presplit_dag_root.location.block_id, split_dag_root.location.block_id)
+        # compare all fields but references
         for name, field in presplit_dag_root.fields.iteritems():
             if not isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
                 self.assertEqual(
                     getattr(presplit_dag_root, name),
                     getattr(split_dag_root, name),
-                    "{}/{}: {} != {}".format(
+                    u"{}/{}: {} != {}".format(
                         split_dag_root.location, name, getattr(presplit_dag_root, name), getattr(split_dag_root, name)
                     )
                 )
@@ -195,7 +174,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
             self.assertEqual(
                 # need get_children to filter out drafts
                 len(presplit_dag_root.get_children()), len(split_dag_root.children),
-                "{0.category} '{0.display_name}': children  {1} != {2}".format(
+                u"{0.category} '{0.display_name}': children  {1} != {2}".format(
                     presplit_dag_root, presplit_dag_root.children, split_dag_root.children
                 )
             )
@@ -204,7 +183,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
 
     def test_migrator(self):
         user = mock.Mock(id=1)
-        self.migrator.migrate_mongo_course(self.old_course_key, user)
+        new_course_key = self.migrator.migrate_mongo_course(self.old_course_key, user.id, new_run='new_run')
         # now compare the migrated to the original course
-        self.compare_courses(self.old_mongo, True)
-        self.compare_courses(self.draft_mongo, False)
+        self.compare_courses(self.draft_mongo, new_course_key, True)  # published
+        self.compare_courses(self.draft_mongo, new_course_key, False)  # draft

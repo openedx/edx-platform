@@ -19,14 +19,14 @@ from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
+from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
-from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
@@ -67,6 +67,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
+        self.modulestore = xmlstore
 
         def process_xml(xml):
             """Takes an xml string, and returns a XBlock created from
@@ -127,9 +128,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # put it in the error tracker--content folks need to see it.
 
                     if tag in need_uniq_names:
-                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      "state will not be properly tracked for this module.  Problem xml:"
-                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker(u"PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      u"state will not be properly tracked for this module.  Problem xml:"
+                                      u" '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -142,8 +143,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
-                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
-                               "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        msg = (u"Non-unique url_name in xml.  This may break state tracking for content."
+                               u"  url_name={0}.  Content={1}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
@@ -332,7 +333,7 @@ class ParentTracker(object):
         """
         Init
         """
-        # location -> set(parents).  Not using defaultdict because we care about the empty case.
+        # location -> parent.  Not using defaultdict because we care about the empty case.
         self._parents = dict()
 
     def add_parent(self, child, parent):
@@ -341,8 +342,7 @@ class ParentTracker(object):
 
         child and parent must be :class:`.Location` instances.
         """
-        setp = self._parents.setdefault(child, set())
-        setp.add(parent)
+        self._parents[child] = parent
 
     def is_known(self, child):
         """
@@ -353,13 +353,13 @@ class ParentTracker(object):
     def make_known(self, location):
         """Tell the parent tracker about an object, without registering any
         parents for it.  Used for the top level course descriptor locations."""
-        self._parents.setdefault(location, set())
+        self._parents.setdefault(location, None)
 
-    def parents(self, child):
+    def parent(self, child):
         """
-        Return a list of the parents of this child.  If not is_known(child), will throw a KeyError
+        Return the parent of this child.  If not is_known(child), will throw a KeyError
         """
-        return list(self._parents[child])
+        return self._parents[child]
 
 
 class XMLModuleStore(ModuleStoreReadBase):
@@ -408,6 +408,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
+
+        # The XML Module Store is a read-only store and only handles published content
+        self.branch_setting_func = lambda: ModuleStoreEnum.RevisionOption.published_only
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -716,7 +719,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
-    def get_items(self, course_id, settings=None, content=None, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, revision=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -741,6 +744,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                 you can search dates by providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
+        if revision == ModuleStoreEnum.RevisionOption.draft_only:
+            return []
+
         items = []
 
         category = kwargs.pop('category', None)
@@ -785,27 +791,22 @@ class XMLModuleStore(ModuleStoreReadBase):
         # here just to quell the abstractmethod. someone could write the impl if needed
         raise NotImplementedError
 
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location in this
+    def get_parent_location(self, location, **kwargs):
+        '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
-
-        returns an iterable of things that can be passed to Location.  This may
-        be empty if there are no parents.
         '''
         if not self.parent_trackers[location.course_key].is_known(location):
             raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
 
-        return self.parent_trackers[location.course_key].parents(location)
+        return self.parent_trackers[location.course_key].parent(location)
 
-    def get_modulestore_type(self, course_id):
+    def get_modulestore_type(self, course_key=None):
         """
-        Returns an enumeration-like type reflecting the type of this modulestore
-        The return can be one of:
-        "xml" (for XML based courses),
-        "mongo" for old-style MongoDB backed courses,
-        "split" for new-style split MongoDB backed courses.
+        Returns an enumeration-like type reflecting the type of this modulestore, per ModuleStoreEnum.Type
+        Args:
+            course_key: just for signature compatibility
         """
-        return XML_MODULESTORE_TYPE
+        return ModuleStoreEnum.Type.xml
 
     def get_courses_for_wiki(self, wiki_slug):
         """
@@ -815,3 +816,13 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         courses = self.get_courses()
         return [course.location for course in courses if (course.wiki_slug == wiki_slug)]
+
+    def heartbeat(self):
+        """
+        Ensure that every known course is loaded and ready to go. Really, just return b/c
+        if this gets called the __init__ finished which means the courses are loaded.
+
+        Returns the course count
+        """
+        return {ModuleStoreEnum.Type.xml: True}
+

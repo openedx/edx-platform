@@ -125,11 +125,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         ]
     }
 
-    # Capa modules have some additional metadata:
-    # TODO (vshnayder): do problems have any other metadata?  Do they
-    # actually use type and points?
-    metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-
     # The capa format specifies that what we call max_attempts in the code
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)

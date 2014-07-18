@@ -13,7 +13,8 @@ from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
@@ -105,7 +106,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
 
     def initialize_course(self):
         """Create a course in the store, with a chapter and section."""
-        self.module_store = editable_modulestore()
+        self.module_store = modulestore()
 
         # Create the course
         self.course = CourseFactory.create(org=TEST_COURSE_ORG,
@@ -207,8 +208,10 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         problem_xml = factory.build_xml(**factory_args)
         location = InstructorTaskTestCase.problem_location(problem_url_name)
         item = self.module_store.get_item(location)
-        item.data = problem_xml
-        self.module_store.update_item(item, '**replace_user**')
+        with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, location.course_key):
+            item.data = problem_xml
+            self.module_store.update_item(item, self.user.id)
+            self.module_store.publish(location, self.user.id)
 
     def get_student_module(self, username, descriptor):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""

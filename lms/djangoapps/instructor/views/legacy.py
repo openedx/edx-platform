@@ -28,7 +28,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xblock
 import xmodule.graders as xmgraders
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -152,7 +152,7 @@ def instructor_dashboard(request, course_id):
         """Outputs a CSV file from the contents of a datatable."""
         if file_pointer is None:
             response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(func)
+            response['Content-Disposition'] = (u'attachment; filename={0}'.format(func)).encode('utf-8')
         else:
             response = file_pointer
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
@@ -968,7 +968,7 @@ def instructor_dashboard(request, course_id):
         instructor_tasks = None
 
     # determine if this is a studio-backed course so we can provide a link to edit this course in studio
-    is_studio_course = modulestore().get_modulestore_type(course_key) != XML_MODULESTORE_TYPE
+    is_studio_course = modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
@@ -1033,7 +1033,7 @@ def instructor_dashboard(request, course_id):
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key': course_key.to_deprecated_string()}),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
 
         'analytics_results': analytics_results,
         'disable_buttons': disable_buttons,

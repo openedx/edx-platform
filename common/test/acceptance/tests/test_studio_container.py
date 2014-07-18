@@ -8,9 +8,10 @@ from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
+from ..pages.studio.utils import add_discussion
 
 from unittest import skip
-
+from bok_choy.promise import Promise
 
 class ContainerBase(UniqueCourseTest):
     """
@@ -32,6 +33,111 @@ class ContainerBase(UniqueCourseTest):
             self.course_info['run']
         )
 
+        self.setup_fixtures()
+
+        self.auth_page = AutoAuthPage(
+            self.browser,
+            staff=False,
+            username=self.user.get('username'),
+            email=self.user.get('email'),
+            password=self.user.get('password')
+        )
+
+        self.auth_page.visit()
+
+    def setup_fixtures(self):
+        pass
+
+    def go_to_container_page(self, make_draft=False):
+        """
+        Go to the test container page.
+
+        If make_draft is true, the unit page (accessed on way to container page) will be put into draft mode.
+        """
+        unit = self.go_to_unit_page(make_draft)
+        container = unit.components[0].go_to_container()
+        return container
+
+    def go_to_unit_page(self, make_draft=False):
+        """
+        Go to the test unit page.
+
+        If make_draft is true, the unit page will be put into draft mode.
+        """
+        self.outline.visit()
+        subsection = self.outline.section('Test Section').subsection('Test Subsection')
+        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        if make_draft:
+            unit.edit_draft()
+        return unit
+
+    def verify_ordering(self, container, expected_orderings):
+        """
+        Verifies the expected ordering of xblocks on the page.
+        """
+        xblocks = container.xblocks
+        blocks_checked = set()
+        for expected_ordering in expected_orderings:
+            for xblock in xblocks:
+                parent = expected_ordering.keys()[0]
+                if xblock.name == parent:
+                    blocks_checked.add(parent)
+                    children = xblock.children
+                    expected_length = len(expected_ordering.get(parent))
+                    self.assertEqual(
+                        expected_length, len(children),
+                        "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
+                    for idx, expected in enumerate(expected_ordering.get(parent)):
+                        self.assertEqual(expected, children[idx].name)
+                        blocks_checked.add(expected)
+                    break
+        self.assertEqual(len(blocks_checked), len(xblocks))
+
+    def verify_groups(self, container, active_groups, inactive_groups):
+        """
+        Check that the groups appear and are correctly categorized as to active and inactive.
+
+        Also checks that the "add missing groups" button/link is not present unless a value of False is passed
+        for verify_missing_groups_not_present.
+        """
+        def wait_for_xblocks_to_render():
+            # First xblock is the container for the page, subtract 1.
+            return (len(active_groups) + len(inactive_groups) == len(container.xblocks) - 1, len(active_groups))
+
+        Promise(wait_for_xblocks_to_render, "Number of xblocks on the page are incorrect").fulfill()
+
+        def check_xblock_names(expected_groups, actual_blocks):
+            self.assertEqual(len(expected_groups), len(actual_blocks))
+            for idx, expected in enumerate(expected_groups):
+                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
+
+        check_xblock_names(active_groups, container.active_xblocks)
+        check_xblock_names(inactive_groups, container.inactive_xblocks)
+
+        # Verify inactive xblocks appear after active xblocks
+        check_xblock_names(active_groups + inactive_groups, container.xblocks[1:])
+
+    def do_action_and_verify(self, action, expected_ordering):
+        """
+        Perform the supplied action and then verify the resulting ordering.
+        """
+        container = self.go_to_container_page(make_draft=True)
+        action(container)
+
+        self.verify_ordering(container, expected_ordering)
+
+        # Reload the page to see that the change was persisted.
+        container = self.go_to_container_page()
+        self.verify_ordering(container, expected_ordering)
+
+
+class NestedVerticalTest(ContainerBase):
+    __test__ = False
+
+    """
+    Sets up a course structure with nested verticals.
+    """
+    def setup_fixtures(self):
         self.container_title = ""
         self.group_a = "Expand or Collapse\nGroup A"
         self.group_b = "Expand or Collapse\nGroup B"
@@ -55,18 +161,6 @@ class ContainerBase(UniqueCourseTest):
         self.duplicate_label = "Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
-        self.setup_fixtures()
-
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=self.user.get('username'),
-            email=self.user.get('email'),
-            password=self.user.get('password')
-        )
-        self.auth_page.visit()
-
-    def setup_fixtures(self):
         course_fix = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],
@@ -96,46 +190,8 @@ class ContainerBase(UniqueCourseTest):
 
         self.user = course_fix.user
 
-    def go_to_container_page(self, make_draft=False):
-        unit = self.go_to_unit_page(make_draft)
-        container = unit.components[0].go_to_container()
-        return container
 
-    def go_to_unit_page(self, make_draft=False):
-        self.outline.visit()
-        subsection = self.outline.section('Test Section').subsection('Test Subsection')
-        unit = subsection.toggle_expand().unit('Test Unit').go_to()
-        if make_draft:
-            unit.edit_draft()
-        return unit
-
-    def verify_ordering(self, container, expected_orderings):
-        xblocks = container.xblocks
-        for expected_ordering in expected_orderings:
-            for xblock in xblocks:
-                parent = expected_ordering.keys()[0]
-                if xblock.name == parent:
-                    children = xblock.children
-                    expected_length = len(expected_ordering.get(parent))
-                    self.assertEqual(
-                        expected_length, len(children),
-                        "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
-                    for idx, expected in enumerate(expected_ordering.get(parent)):
-                        self.assertEqual(expected, children[idx].name)
-                    break
-
-    def do_action_and_verify(self, action, expected_ordering):
-        container = self.go_to_container_page(make_draft=True)
-        action(container)
-
-        self.verify_ordering(container, expected_ordering)
-
-        # Reload the page to see that the change was persisted.
-        container = self.go_to_container_page()
-        self.verify_ordering(container, expected_ordering)
-
-
-class DragAndDropTest(ContainerBase):
+class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
     """
@@ -196,7 +252,7 @@ class DragAndDropTest(ContainerBase):
 
         def add_new_components_and_rearrange(container):
             # Add a video component to Group 1
-            container.add_discussion(group_a_menu)
+            add_discussion(container, group_a_menu)
             # Duplicate the first item in Group A
             container.duplicate(self.group_a_item_1_action_index)
 
@@ -216,7 +272,7 @@ class DragAndDropTest(ContainerBase):
         self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
-class AddComponentTest(ContainerBase):
+class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
     """
@@ -224,7 +280,7 @@ class AddComponentTest(ContainerBase):
 
     def add_and_verify(self, menu_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.add_discussion(menu_index),
+            lambda (container): add_discussion(container, menu_index),
             expected_ordering
         )
 
@@ -256,7 +312,7 @@ class AddComponentTest(ContainerBase):
         self.add_and_verify(container_menu, expected_ordering)
 
 
-class DuplicateComponentTest(ContainerBase):
+class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
     """
@@ -302,7 +358,7 @@ class DuplicateComponentTest(ContainerBase):
         self.do_action_and_verify(duplicate_twice, expected_ordering)
 
 
-class DeleteComponentTest(ContainerBase):
+class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
     """
@@ -319,10 +375,13 @@ class DeleteComponentTest(ContainerBase):
                              {self.group_a: [self.group_a_item_2]},
                              {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
                              {self.group_empty: []}]
-        self.delete_and_verify(self.group_a_item_1_action_index, expected_ordering)
+
+        # Group A itself has a delete icon now, so item_1 is index 1 instead of 0.
+        group_a_item_1_delete_index = 1
+        self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
-class EditContainerTest(ContainerBase):
+class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
     """

@@ -1,8 +1,11 @@
+"""Provides factories for Split."""
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.course_module import CourseDescriptor
 from xmodule.x_module import XModuleDescriptor
 import factory
 from factory.helpers import lazy_attribute
-
+# Factories don't have __init__ methods, and are self documenting
+# pylint: disable=W0232, C0111
 
 class SplitFactory(factory.Factory):
     """
@@ -14,7 +17,7 @@ class SplitFactory(factory.Factory):
         # Delayed import so that we only depend on django if the caller
         # hasn't provided their own modulestore
         from xmodule.modulestore.django import modulestore
-        return modulestore('split')
+        return modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.split)
 
 
 class PersistentCourseFactory(SplitFactory):
@@ -24,7 +27,7 @@ class PersistentCourseFactory(SplitFactory):
     keywords: any xblock field plus (note, the below are filtered out; so, if they
     become legitimate xblock fields, they won't be settable via this factory)
     * org: defaults to textX
-    * master_branch: (optional) defaults to 'draft'
+    * master_branch: (optional) defaults to ModuleStoreEnum.BranchName.draft
     * user_id: (optional) defaults to 'test_user'
     * display_name (xblock field): will default to 'Robot Super Course' unless provided
     """
@@ -32,14 +35,14 @@ class PersistentCourseFactory(SplitFactory):
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, offering='999', org='testX', user_id='test_user',
-                master_branch='draft', **kwargs):
+    def _create(cls, target_class, course='999', run='run', org='testX', user_id=ModuleStoreEnum.UserID.test,
+                master_branch=ModuleStoreEnum.BranchName.draft, **kwargs):
 
         modulestore = kwargs.pop('modulestore')
         root_block_id = kwargs.pop('root_block_id', 'course')
         # Write the data to the mongo datastore
         new_course = modulestore.create_course(
-            org, offering, user_id, fields=kwargs,
+            org, course, run, user_id, fields=kwargs,
             master_branch=master_branch, root_block_id=root_block_id
         )
 
@@ -58,7 +61,7 @@ class ItemFactory(SplitFactory):
     # pylint: disable=W0613
     @classmethod
     def _create(cls, target_class, parent_location, category='chapter',
-                user_id='test_user', block_id=None, definition_locator=None, force=False,
+                user_id=ModuleStoreEnum.UserID.test, block_id=None, definition_locator=None, force=False,
                 continue_version=False, **kwargs):
         """
         passes *kwargs* as the new item's field values:

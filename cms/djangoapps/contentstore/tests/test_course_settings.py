@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
-from contentstore.utils import get_modulestore, EXTRA_TAB_PANELS, reverse_course_url, reverse_usage_url
+from contentstore.utils import EXTRA_TAB_PANELS, reverse_course_url, reverse_usage_url
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
@@ -335,7 +335,7 @@ class CourseGradingTest(CourseTestCase):
 
     def test_update_section_grader_type(self):
         # Get the descriptor and the section_grader_type and assert they are the default values
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
@@ -344,7 +344,7 @@ class CourseGradingTest(CourseTestCase):
 
         # Change the default grader type to Homework, which should also mark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'Homework', self.user)
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('Homework', section_grader_type['graderType'])
@@ -353,7 +353,7 @@ class CourseGradingTest(CourseTestCase):
 
         # Change the grader type back to notgraded, which should also unmark the section as graded
         CourseGradingModel.update_section_grader_type(self.course, 'notgraded', self.user)
-        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
+        descriptor = modulestore().get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course.location)
 
         self.assertEqual('notgraded', section_grader_type['graderType'])
@@ -413,8 +413,7 @@ class CourseGradingTest(CourseTestCase):
         Populate the course, grab a section, get the url for the assignment type access
         """
         self.populate_course()
-        sequential_usage_key = self.course.id.make_usage_key("sequential", None)
-        sections = get_modulestore(self.course.id).get_items(sequential_usage_key)
+        sections = modulestore().get_items(self.course.id, category="sequential")
         # see if test makes sense
         self.assertGreater(len(sections), 0, "No sections found")
         section = sections[0]  # just take the first one
@@ -449,12 +448,12 @@ class CourseMetadataEditingTest(CourseTestCase):
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
 
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
@@ -463,93 +462,74 @@ class CourseMetadataEditingTest(CourseTestCase):
         test_model = CourseMetadata.update_from_json(
             self.course,
             {
-                "advertised_start": "start A",
-                "days_early_for_beta": 2,
+                "advertised_start": {"value": "start A"},
+                "days_early_for_beta": {"value": 2},
             },
             user=self.user
          )
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
-        fresh = modulestore('direct').get_course(self.course.id)
+        fresh = modulestore().get_course(self.course.id)
         test_model = CourseMetadata.fetch(fresh)
         self.update_check(test_model)
         # now change some of the existing metadata
         test_model = CourseMetadata.update_from_json(
             fresh,
             {
-                "advertised_start": "start B",
-                "display_name": "jolly roger",
+                "advertised_start": {"value": "start B"},
+                "display_name": {"value": "jolly roger"},
             },
             user=self.user
         )
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start'], 'start B', "advertised_start not expected value")
+        self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     def update_check(self, test_model):
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start'], 'start A', "advertised_start not expected value")
+        self.assertEqual(test_model['advertised_start']['value'], 'start A', "advertised_start not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
-        self.assertEqual(test_model['days_early_for_beta'], 2, "days_early_for_beta not expected value")
-
-    def test_delete_key(self):
-        test_model = CourseMetadata.update_from_json(
-            self.fullcourse,
-            {"unsetKeys": ['showanswer', 'xqa_key']},
-            user=self.user
-        )
-        # ensure no harm
-        self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
-        self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
-        self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
-        # check for deletion effectiveness
-        self.assertEqual('finished', test_model['showanswer'], 'showanswer field still in')
-        self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
+        self.assertEqual(test_model['days_early_for_beta']['value'], 2, "days_early_for_beta not expected value")
 
     def test_http_fetch_initial_fields(self):
         response = self.client.get_json(self.course_setting_url)
         test_model = json.loads(response.content)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
 
         response = self.client.get_json(self.fullcourse_setting_url)
         test_model = json.loads(response.content)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
 
     def test_http_update_from_json(self):
         response = self.client.ajax_post(self.course_setting_url, {
-            "advertised_start": "start A",
-            "testcenter_info": {"c": "test"},
-            "days_early_for_beta": 2,
-            "unsetKeys": ['showanswer', 'xqa_key'],
+            "advertised_start": {"value": "start A"},
+            "days_early_for_beta": {"value": 2},
         })
         test_model = json.loads(response.content)
         self.update_check(test_model)
-        self.assertEqual('finished', test_model['showanswer'], 'showanswer field still in')
-        self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
 
         response = self.client.get_json(self.course_setting_url)
         test_model = json.loads(response.content)
         self.update_check(test_model)
         # now change some of the existing metadata
         response = self.client.ajax_post(self.course_setting_url, {
-            "advertised_start": "start B",
-            "display_name": "jolly roger"
+            "advertised_start": {"value": "start B"},
+            "display_name": {"value": "jolly roger"}
         })
         test_model = json.loads(response.content)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name'], 'jolly roger', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], 'jolly roger', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing revised advertised_start metadata field')
-        self.assertEqual(test_model['advertised_start'], 'start B', "advertised_start not expected value")
+        self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     def test_advanced_components_munge_tabs(self):
         """
@@ -558,13 +538,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), self.course.tabs)
         self.assertNotIn(EXTRA_TAB_PANELS.get("notes"), self.course.tabs)
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: ["combinedopenended"]
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": ["combinedopenended"]}
         })
         course = modulestore().get_course(self.course.id)
         self.assertIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
         self.assertNotIn(EXTRA_TAB_PANELS.get("notes"), course.tabs)
         self.client.ajax_post(self.course_setting_url, {
-            ADVANCED_COMPONENT_POLICY_KEY: []
+            ADVANCED_COMPONENT_POLICY_KEY: {"value": []}
         })
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)

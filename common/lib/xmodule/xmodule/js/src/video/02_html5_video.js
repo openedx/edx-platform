@@ -164,7 +164,7 @@ function () {
                 this.el = $('#' + el);
 
                 if (this.el.length === 0) {
-                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector does not found.');
+                    errorMessage = gettext('VideoPlayer: Element corresponding to the given selector was not found.');
                     if (window.console && console.log) {
                         console.log(errorMessage);
                     } else {

@@ -10,8 +10,11 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.x_module import STUDENT_VIEW
 
 from courseware.tests import BaseTestXmodule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -108,7 +111,7 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        generated_content = self.item_descriptor.render('student_view').content
+        generated_content = self.item_descriptor.render(STUDENT_VIEW).content
         expected_content = self.runtime.render_template('lti.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
 
@@ -158,7 +161,8 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             parent_location=self.section2.location,
             display_name="lti draft",
             category="lti",
-            location=self.course.id.make_usage_key('lti', 'lti_published').replace(revision='draft'),
+            location=self.course.id.make_usage_key('lti', 'lti_published'),
+            publish_item=False,
         )
 
     def expected_handler_url(self, handler):
@@ -182,7 +186,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             self.assertEqual(404, response.status_code)
 
     def test_lti_rest_listing(self):
-        """tests that the draft lti module is not a part of the endpoint response, but the published one is"""
+        """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
         response = get_course_lti_endpoints(request, self.course.id.to_deprecated_string())
@@ -194,7 +198,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             "lti_1_1_result_service_xml_endpoint": self.expected_handler_url('grade_handler'),
             "lti_2_0_result_service_json_endpoint":
             self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
-            "display_name": self.lti_published.display_name
+            "display_name": self.lti_draft.display_name
         }
         self.assertEqual([expected], json.loads(response.content))
 

@@ -187,6 +187,10 @@ native Coffeescript features that break the extraction from the .js files:
     # Translators: this won't get to the translators!
     message = gettext("Welcome, #{student_name}!")  # This won't work!
     
+    # YES like this:
+    `// Translators: this will get to the translators.`
+    message = gettext("This works")
+
     ###
     Translators: This will work, but takes three lines :(
     ###
@@ -217,18 +221,17 @@ the strings, or checking the translations into Github, see use cases).
    take a minute or two to complete::
 
     $ cd edx-platform
-    $ rake assets
-    $ rake i18n:extract
+    $ paver i18n_extract
 
 2. Generate dummy strings:  See coverage testing (below) for more details. This
    will create an "Esperanto" translation that is actually over-accented
    English.  Use this to create fake translations::
 
-    $ rake i18n:dummy
+    $ paver i18n_dummy
     
-3. Run the rake i18n:generate command to create machine-readable .mo files::
+3. Run the paver i18n_generate command to create machine-readable .mo files::
  
-    $ rake i18n:generate
+    $ paver i18n_generate
 
 4. Django should be ready to go. The next time you run Studio or LMS, append
    ``?preview-lang=eo`` to the URL to turn on Esperanto as a dark language. The
@@ -259,7 +262,7 @@ and correct specific gaps in compliance.
 
 Use the coverage tool to generate dummy files::
 
-    $ rake i18n:dummy
+    $ paver i18n_dummy
     
 This will create new dummy translations in the Esperanto directory
 (edx-platform/conf/local/eo/LC_MESSAGES).
@@ -426,6 +429,11 @@ which is now invalid Javascript.  This can be avoided by using double-quotes
 for the Javascript string.  The better solution is to use a filtering function
 that properly escapes the string for Javascript use::
 
+    <%!
+        from django.utils.translation import ugettext as _
+        from django.utils.html import escapejs
+    %>
+    ...
     <script>
     var feeling = '${escapejs(_("I love you."))}';
     </script>

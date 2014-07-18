@@ -167,6 +167,39 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         ).fulfill()
 
 
+class DiscussionSortPreferencePage(CoursePage):
+    """
+    Page that contain the discussion board with sorting options
+    """
+    def __init__(self, browser, course_id):
+        super(DiscussionSortPreferencePage, self).__init__(browser, course_id)
+        self.url_path = "discussion/forum"
+
+    def is_browser_on_page(self):
+        """
+        Return true if the browser is on the right page else false.
+        """
+        return self.q(css="body.discussion .forum-nav-sort-control").present
+
+    def get_selected_sort_preference(self):
+        """
+        Return the text of option that is selected for sorting.
+        """
+        options = self.q(css="body.discussion .forum-nav-sort-control option")
+        return options.filter(lambda el: el.is_selected())[0].get_attribute("value")
+
+    def change_sort_preference(self, sort_by):
+        """
+        Change the option of sorting by clicking on new option.
+        """
+        self.q(css="body.discussion .forum-nav-sort-control option[value='{0}']".format(sort_by)).click()
+
+    def refresh_page(self):
+        """
+        Reload the page.
+        """
+        self.browser.refresh()
+
 class DiscussionTabSingleThreadPage(CoursePage):
     def __init__(self, browser, course_id, thread_id):
         super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
@@ -233,6 +266,9 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
             lambda: bool(self.get_response_total_text()),
             "Thread expanded"
         ).fulfill()
+
+    def is_thread_anonymous(self):
+        return not self.q(css=".posted-details > .username").present
 
 
 class DiscussionUserProfilePage(CoursePage):
@@ -310,7 +346,7 @@ class DiscussionUserProfilePage(CoursePage):
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
 
-    ALERT_SELECTOR = ".discussion-body .sidebar .search-alert"
+    ALERT_SELECTOR = ".discussion-body .forum-nav .search-alert"
 
     def __init__(self, browser, course_id):
         super(DiscussionTabHomePage, self).__init__(browser, course_id)
@@ -319,13 +355,8 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
     def is_browser_on_page(self):
         return self.q(css=".discussion-body section.home-header").present
 
-    def perform_search(self):
-        self.q(css=".discussion-body .sidebar .search").first.click()
-        EmptyPromise(
-            lambda: self.q(css=".discussion-body .sidebar .search.is-open").present,
-            "waiting for search input to be available"
-        ).fulfill()
-        self.q(css="#search-discussions").fill("dummy" + chr(10))
+    def perform_search(self, text="dummy"):
+        self.q(css=".forum-nav-search-input").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"
@@ -333,6 +364,9 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
 
     def get_search_alert_messages(self):
         return self.q(css=self.ALERT_SELECTOR + " .message").text
+
+    def get_search_alert_links(self):
+        return self.q(css=self.ALERT_SELECTOR + " .link-jump")
 
     def dismiss_alert_message(self, text):
         """

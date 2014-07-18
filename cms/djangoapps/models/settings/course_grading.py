@@ -21,7 +21,7 @@ class CourseGradingModel(object):
         """
         Fetch the course grading policy for the given course from persistence and return a CourseGradingModel.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
         model = cls(descriptor)
         return model
 
@@ -31,7 +31,7 @@ class CourseGradingModel(object):
         Fetch the course's nth grader
         Returns an empty dict if there's no such grader.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
         index = int(index)
         if len(descriptor.raw_grader) > index:
             return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
@@ -52,14 +52,14 @@ class CourseGradingModel(object):
         Decode the json into CourseGradingModel and save any changes. Returns the modified model.
         Probably not the usual path for updates as it's too coarse grained.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
 
         descriptor.raw_grader = graders_parsed
         descriptor.grade_cutoffs = jsondict['grade_cutoffs']
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
 
         CourseGradingModel.update_grace_period_from_json(course_key, jsondict['grace_period'], user)
 
@@ -71,7 +71,7 @@ class CourseGradingModel(object):
         Create or update the grader of the given type (string key) for the given course. Returns the modified
         grader which is a full model on the client but not on the server (just a dict)
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
 
         # parse removes the id; so, grab it before parse
         index = int(grader.get('id', len(descriptor.raw_grader)))
@@ -82,7 +82,7 @@ class CourseGradingModel(object):
         else:
             descriptor.raw_grader.append(grader)
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
@@ -92,10 +92,10 @@ class CourseGradingModel(object):
         Create or update the grade cutoffs for the given course. Returns sent in cutoffs (ie., no extra
         db fetch).
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
         descriptor.grade_cutoffs = cutoffs
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
 
         return cutoffs
 
@@ -106,7 +106,7 @@ class CourseGradingModel(object):
         grace_period entry in an enclosing dict. It is also safe to call this method with a value of
         None for graceperiodjson.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
 
         # Before a graceperiod has ever been created, it will be None (once it has been
         # created, it cannot be set back to None).
@@ -117,14 +117,14 @@ class CourseGradingModel(object):
             grace_timedelta = timedelta(**graceperiodjson)
             descriptor.graceperiod = grace_timedelta
 
-            modulestore('direct').update_item(descriptor, user.id)
+            modulestore().update_item(descriptor, user.id)
 
     @staticmethod
     def delete_grader(course_key, index, user):
         """
         Delete the grader of the given type from the given course.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
 
         index = int(index)
         if index < len(descriptor.raw_grader):
@@ -132,22 +132,22 @@ class CourseGradingModel(object):
             # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
 
     @staticmethod
     def delete_grace_period(course_key, user):
         """
         Delete the course's grace period.
         """
-        descriptor = modulestore('direct').get_course(course_key)
+        descriptor = modulestore().get_course(course_key)
 
         del descriptor.graceperiod
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
 
     @staticmethod
     def get_section_grader_type(location):
-        descriptor = modulestore('direct').get_item(location)
+        descriptor = modulestore().get_item(location)
         return {
             "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
             "location": unicode(location),
@@ -162,7 +162,7 @@ class CourseGradingModel(object):
             del descriptor.format
             del descriptor.graded
 
-        modulestore('direct').update_item(descriptor, user.id)
+        modulestore().update_item(descriptor, user.id)
         return {'graderType': grader_type}
 
     @staticmethod

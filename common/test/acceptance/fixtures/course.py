@@ -2,6 +2,7 @@
 Fixture to create a course and course components (XBlocks).
 """
 
+import mimetypes
 import json
 import re
 import datetime
@@ -200,6 +201,7 @@ class CourseFixture(StudioApiFixture):
         self._handouts = []
         self._children = []
         self._assets = []
+        self._advanced_settings = {}
 
     def __str__(self):
         """
@@ -236,6 +238,12 @@ class CourseFixture(StudioApiFixture):
         """
         self._assets.extend(asset_name)
 
+    def add_advanced_settings(self, settings):
+        """
+        Adds advanced settings to be set on the course when the install method is called.
+        """
+        self._advanced_settings.update(settings)
+
     def install(self):
         """
         Create the course and XBlocks within the course.
@@ -248,6 +256,7 @@ class CourseFixture(StudioApiFixture):
         self._install_course_handouts()
         self._configure_course()
         self._upload_assets()
+        self._add_advanced_settings()
         self._create_xblock_children(self._course_location, self._children)
 
         return self
@@ -257,14 +266,14 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course.
         """
-        return "slashes:{org}+{number}+{run}".format(**self._course_dict)
+        return "{org}/{number}/{run}".format(**self._course_dict)
 
     @property
     def _course_location(self):
         """
         Return the locator string for the course.
         """
-        return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
+        return "i4x://{org}/{number}/course/{run}".format(**self._course_dict)
 
     @property
     def _assets_url(self):
@@ -278,7 +287,7 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course handouts
         """
-        return "location:{org}+{number}+{run}+course_info+handouts".format(**self._course_dict)
+        return "i4x://{org}/{number}/course_info/handouts".format(**self._course_dict)
 
     def _create_course(self):
         """
@@ -399,10 +408,10 @@ class CourseFixture(StudioApiFixture):
         test_dir = path(__file__).abspath().dirname().dirname().dirname()
 
         for asset_name in self._assets:
-            srt_path = test_dir + '/data/uploads/' + asset_name
+            asset_file_path = test_dir + '/data/uploads/' + asset_name
 
-            asset_file = open(srt_path)
-            files = {'file': (asset_name, asset_file)}
+            asset_file = open(asset_file_path)
+            files = {'file': (asset_name, asset_file, mimetypes.guess_type(asset_file_path)[0])}
 
             headers = {
                 'Accept': 'application/json',
@@ -414,6 +423,23 @@ class CourseFixture(StudioApiFixture):
             if not upload_response.ok:
                 raise CourseFixtureError('Could not upload {asset_name} with {url}. Status code: {code}'.format(
                     asset_name=asset_name, url=url, code=upload_response.status_code))
+
+    def _add_advanced_settings(self):
+        """
+        Add advanced settings.
+        """
+        url = STUDIO_BASE_URL + "/settings/advanced/" + self._course_key
+
+        # POST advanced settings to Studio
+        response = self.session.post(
+            url, data=self._encode_post_dict(self._advanced_settings),
+            headers=self.headers,
+        )
+
+        if not response.ok:
+            raise CourseFixtureError(
+                "Could not update advanced details to '{0}' with {1}: Status was {2}.".format(
+                    self._advanced_settings, url, response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """
@@ -489,6 +515,6 @@ class CourseFixture(StudioApiFixture):
         Encode `post_dict` (a dictionary) as UTF-8 encoded JSON.
         """
         return json.dumps({
-            k: v.encode('utf-8') if v is not None else v
+            k: v.encode('utf-8') if isinstance(v, basestring) else v
             for k, v in post_dict.items()
         })

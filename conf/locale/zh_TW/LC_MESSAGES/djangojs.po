@@ -11,6 +11,7 @@
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # bhsfmiao <mkr_mkr@163.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013
+# Sarina Canelake <sarina@edx.org>, 2014
 # hymnsf <singmoonson@gmail.com>, 2014
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2014
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
@@ -38,19 +39,21 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:23-0400\n"
-"PO-Revision-Date: 2014-06-11 15:18+0000\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2014-07-11 16:03-0400\n"
+"PO-Revision-Date: 2014-07-10 19:41+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -298,8 +301,8 @@ msgstr "最大"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
-"VideoPlayer: Element corresponding to the given selector does not found."
-msgstr ""
+"VideoPlayer: Element corresponding to the given selector was not found."
+msgstr "VideoPlayer：找不到給定的選擇器元素。"
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
@@ -373,6 +376,10 @@ msgstr "打開字幕"
 msgid "Turn off captions"
 msgstr "關閉字幕"
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr "建立消失的群組&hellip;"
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -418,7 +425,6 @@ msgid "We had some trouble processing your request. Please try again."
 msgstr "我們處理您的請求時遇到了一些麻煩，請再試一次。"
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -473,6 +479,10 @@ msgid_plural "%(unread_count)s new comments"
 msgstr[0] "%(unread_count)s 新的評論"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr "載入thread 列表"
 
@@ -480,7 +490,15 @@ msgstr "載入thread 列表"
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr "找不到 %(original_query)s 相關的結果，以下是 %(suggested_query)s 的結果。"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
 msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
+msgstr "呈現所有 %(username)s 的發表。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
 msgid "Click to remove report"
@@ -613,10 +631,12 @@ msgstr ""
 msgid "dropped on target"
 msgstr ""
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
 msgstr "%s 之前"
 
+#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
 msgstr "距今 %s "
@@ -676,7 +696,7 @@ msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation"
-msgstr ""
+msgstr "註解"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Start"
@@ -730,7 +750,7 @@ msgstr ""
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation Text"
-msgstr ""
+msgstr "註解文本"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
@@ -763,6 +783,7 @@ msgid "Reply"
 msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -933,6 +954,9 @@ msgstr "預覽"
 msgid "Post body"
 msgstr "Post body"
 
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 msgid "Error fetching distribution."
 msgstr ""
@@ -1000,7 +1024,8 @@ msgstr "請輸入使用者名稱或是電子郵件信箱"
 msgid "Please enter a username or email."
 msgstr "請輸入使用者名稱或是電子郵件信箱"
 
-#. Translators: A rolename appears this sentence.;
+#. Translators: A rolename appears this sentence. A rolename is something like
+#. "staff" or "beta tester".;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error fetching list for role"
 msgstr "抓取角色清單時發生錯誤"
@@ -1114,7 +1139,9 @@ msgstr ""
 msgid "The following users are no longer enrolled in the course:"
 msgstr ""
 
-#. Translators: A list of users appears after this sentence;
+#. Translators: A list of users appears after this sentence. This situation
+#. arises when a staff member tries to unenroll a user who is not currently
+#. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
@@ -1504,6 +1531,10 @@ msgstr "列表項"
 msgid "Heading"
 msgstr "標題"
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -1538,16 +1569,19 @@ msgid "Unable to retrieve data, please try again later."
 msgstr "無法檢索資料，請稍後再試"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "student(s) opened Subsection"
-msgstr ""
+msgid "%(num_students)s student opened Subsection"
+msgid_plural "%(num_students)s students opened Subsection"
+msgstr[0] "%(num_students)s 位學生開啟小節"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "students"
-msgstr ""
+msgid "%(num_students)s student"
+msgid_plural "%(num_students)s students"
+msgstr[0] "%(num_students)s 位學生"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
-msgid "questions"
-msgstr ""
+msgid "%(num_questions)s question"
+msgid_plural "%(num_questions)s questions"
+msgstr[0] "%(num_questions)s 個問題"
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -1605,6 +1639,10 @@ msgstr ""
 msgid "Yes, delete this component"
 msgstr ""
 
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr ""
+
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr "該連結將在一個強制回應視窗中開啓"
@@ -1650,6 +1688,22 @@ msgstr "尋求 Studio 的協助嗎？"
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr "您必須指定一個名稱"
+
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
+msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -1774,6 +1828,13 @@ msgstr ""
 msgid "Saving"
 msgstr "儲存中"
 
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] ""
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "上傳時發生錯誤"
@@ -1896,6 +1957,7 @@ msgid "Editor"
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr ""
 
@@ -1904,6 +1966,7 @@ msgid "Adding&hellip;"
 msgstr "新增&hellip;"
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -1915,6 +1978,10 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
+msgstr ""
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -1978,6 +2045,10 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2074,6 +2145,10 @@ msgid "total exercises that won't be graded"
 msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr ""
 
@@ -2138,11 +2213,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Chapter(s) information"
+msgid "Chapter information"
 msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
+msgstr ""
+
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
 msgstr ""
 
 #: cms/templates/js/metadata-dict-entry.underscore
@@ -2173,6 +2252,10 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr ""
+
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
 msgstr ""
@@ -2201,6 +2284,10 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

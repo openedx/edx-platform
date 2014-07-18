@@ -781,8 +781,12 @@ div.problem {
         text-align: right;
         font-size: 1em;
 
-        &.full-top{
+        &.full-top {
           @include position(absolute, 1px 0px auto 0px);
+        }
+
+        &.full-bottom {
+          @include position(absolute, auto 0px 1px 0px);
         }
       }
     }

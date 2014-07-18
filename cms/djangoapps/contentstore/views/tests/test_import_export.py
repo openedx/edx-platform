@@ -9,15 +9,12 @@ import shutil
 import tarfile
 import tempfile
 from path import path
-from pymongo import MongoClient
 from uuid import uuid4
 
 from django.test.utils import override_settings
 from django.conf import settings
 from contentstore.utils import reverse_course_url
 
-from xmodule.contentstore.django import _CONTENTSTORE
-from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import ItemFactory
 
 from contentstore.tests.utils import CourseTestCase
@@ -70,8 +67,6 @@ class ImportTestCase(CourseTestCase):
 
     def tearDown(self):
         shutil.rmtree(self.content_dir)
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
     def test_no_coursexml(self):
         """
@@ -294,8 +289,9 @@ class ExportTestCase(CourseTestCase):
         """
         Export failure.
         """
-        ItemFactory.create(parent_location=self.course.location, category='aawefawef')
-        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
+        fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
+        self.store.publish(fake_xblock.location, self.user.id)
+        self._verify_export_failure(u'/unit/i4x://MITx/999/course/Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):
         """
@@ -307,7 +303,7 @@ class ExportTestCase(CourseTestCase):
             category='aawefawef'
         )
 
-        self._verify_export_failure(u'/unit/location:MITx+999+Robot_Super_Course+vertical+foo')
+        self._verify_export_failure(u'/unit/i4x://MITx/999/vertical/foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """

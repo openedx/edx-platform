@@ -14,7 +14,7 @@ from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import UsageKey
 from instructor_task.models import InstructorTask, PROGRESS
 
 
@@ -262,7 +262,7 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
         student (User): the student affected
     """
 
-    assert isinstance(usage_key, Location)
+    assert isinstance(usage_key, UsageKey)
     if student is not None:
         task_input = {'problem_url': usage_key.to_deprecated_string(), 'student': student.username}
         task_key_stub = "{student}_{problem}".format(student=student.id, problem=usage_key.to_deprecated_string())

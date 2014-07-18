@@ -12,6 +12,7 @@
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# AzizAhmed <dr.zezo@gmail.com>, 2014
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
@@ -33,6 +34,7 @@
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # a.nassif <a.nassif@sit-mena.com>, 2013
+# AzizAhmed <dr.zezo@gmail.com>, 2014
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2014
@@ -49,6 +51,7 @@
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
 # Ahmad AbdArrahman <mygooglizer@gmail.com>, 2013-2014
 # ayshibly <ayshibly@gmail.com>, 2014
+# baraahadri <baraahadri@gmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # Hani <hani0a@hotmail.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
@@ -103,7 +106,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-12 12:24-0400\n"
+"POT-Creation-Date: 2014-07-11 16:04-0400\n"
 "PO-Revision-Date: 2014-05-12 17:39+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -145,7 +148,7 @@ msgstr "المتقدم"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
-msgstr "شهادة ميثاق شرف"
+msgstr "الشهادة الشرفية"
 
 #: common/djangoapps/course_modes/views.py common/djangoapps/student/views.py
 msgid "Enrollment is closed"
@@ -252,6 +255,10 @@ msgid "Course is full"
 msgstr "المساق ممتلئ بالكامل"
 
 #: common/djangoapps/student/views.py
+msgid "Student is already enrolled"
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
 msgstr "أنت غير مسجّل في هذا المساق "
 
@@ -302,13 +309,8 @@ msgid "Too many failed login attempts. Try again later."
 msgstr "محاولات تسجيل دخول غير ناجحة كثيرة. الرجاء إعادة المحاولة لاحقاً."
 
 #: common/djangoapps/student/views.py lms/templates/provider_login.html
-#, fuzzy
 msgid "Email or password is incorrect."
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"البريد الإلكتروني أو كلمة السر غير صحيحة\n"
-"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
-"البريد الإلكتروني أو كلمة المرور غير صحيحة"
+msgstr "البريد الإلكتروني أو كلمة المرور غير صحيحة"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -447,20 +449,61 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are re-using a password that you have used recently. You must have {0} "
-"distinct password(s) before reusing a previous password."
-msgstr ""
-"أنت تحاول إعادة استخدام كلمة سر كنت قد استعملتها مؤخّراً. يجب أن تستخدم {0} "
-"كلمة (كلمات) سر مميّزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"كلمة سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+msgstr[1] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"كلمة سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+msgstr[2] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+msgstr[3] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+msgstr[4] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"كلمات سر مميّزة {num} قبل إعادة استخدام واحدة مستخدمة مسبقاً."
+msgstr[5] ""
+"إنّك تقوم بإعادة استخدام كلمة سر كنت قد استخدمتها مؤخّراً. يجب أن تستخدم "
+"{num} كلمات سر متمايزة قبل إعادة استخدام واحدة مستخدمة مسبقاً."
 
 #: common/djangoapps/student/views.py
 msgid ""
-"You are resetting passwords too frequently. Due to security policies, {0} "
-"day(s) must elapse between password resets"
-msgstr ""
-"أنت تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. نظراً للسياسات "
-"الخاصة بأمن المعلومات، يتعيّن مرور  {0} يوم (أيام) بين كل عملية تغيير لكلمة "
-"سر والتي تليها."
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} يوم بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
+msgstr[1] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} يوم بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
+msgstr[2] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} أيام بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
+msgstr[3] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} أيام بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
+msgstr[4] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} أيام بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
+msgstr[5] ""
+"إنّك تقوم بإعادة ضبط كلمة السر بشكلٍ متكرّر أكثر من اللازم. ونظراً للسياسات "
+"الخاصة بأمن المعلومات، يتعيّن مرور {num} أيام بين كل عملية تغيير لكلمة سرّ "
+"والتي تليها."
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
@@ -493,6 +536,8 @@ msgstr "البريد الإلكتروني القديم مطابق للبريد �
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
 msgstr ""
+"ليس بالإمكان إرسال رابط تفعيل البريد الإلكتروني. الرجاء إعادة المحاولة "
+"لاحقاً."
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -938,11 +983,11 @@ msgstr "توقّع بطاقة تعريف <choice>؛ تمّ تلقي  {given_tag}
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
-"Your file(s) have been submitted. As soon as your submission is graded, this"
-" message will be replaced with the grader's feedback."
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
 msgstr ""
-"تم تقديم ملفك (ملفاتك). وحالما يتم تقييمه، سيتم استبدال هذه الرسالة بآراء "
-"وملاحظات الأستاذ المسؤول عن التقييم."
+"تم تقديم ملفاتك. وحالما يتم تقييم الأوراق المقدّمة، سيتمّ استبدال هذه "
+"الرسالة بآراء وملاحظات الأستاذ المسؤول عن التقييم."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -957,8 +1002,8 @@ msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
 msgstr ""
-"تم التقديم. وحالما يتم الحصول على استجابة بهذا الشأن، سيتم استبدال هذه "
-"الرسالة بتلك الآراء والملاحظات."
+"تم التقديم. وحالما يتم الحصول على رد بهذا الشأن، سيتم استبدال هذه الرسالة "
+"بتلك الآراء والملاحظات."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
@@ -966,13 +1011,35 @@ msgstr ""
 "لم يرد أي ردّ من  Xqueue في غضون {xqueue_timeout} ثواني. تمّ إيقاف العملية."
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "Cannot connect to the queue"
+msgstr "لا يمكن الاتصال بقائمة الانتظار"
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "No formula specified."
+msgstr "لم يتمّ تحديد أية صيغة."
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Couldn't parse formula: {error_msg}"
+msgstr "ليس بالإمكان تجزئة الصيغة: {error_msg}"
+
+#: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
+msgid "Error while rendering preview"
+msgstr "حدث خطأ ما أثناء الإعداد لعملية المعاينة"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Sorry, couldn't parse formula"
+msgstr "عذراً، ليس بالإمكان تجزئة الصيغة"
+
+#: common/lib/capa/capa/inputtypes.py
 msgid "{input_type}: unexpected tag {tag_name}"
-msgstr ""
+msgstr "{input_type}: بطاقة تعريف غير متوقّعة {tag_name}"
 
 #. Translators: a "tag" is an XML element, such as "<b>" in HTML
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
+"كان المتوقّع بطاقة تعريف {expected_tag}؛ تمّ الحصول على  {given_tag} بدلاً "
+"من ذلك"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -1143,7 +1210,7 @@ msgstr "حدث خطأ في التقييم {image_input_id}  (input={user_input})
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
 msgstr ""
-"حدث خطأ في توصيف المسألة! التحليل النصي غير ممكن للمستطيل في {sr_coords}"
+"حدث خطأ في توصيف المسألة! تجزئة النص غير ممكنة للمستطيل في {sr_coords}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer not provided for {input_type}"
@@ -1167,7 +1234,6 @@ msgstr "بيانات XML للحواشي"
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
-#: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/html_module.py
@@ -1210,6 +1276,7 @@ msgstr "عدد المحاولات التي قام بها الطالب على ه�
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Maximum Attempts"
 msgstr "الحد الأقصى للمحاولات"
 
@@ -1245,7 +1312,9 @@ msgstr ""
 "الفترة بعد مرور التاريخ المقرّر التي سيتمّ خلالها قبول ما يقوم الطلاب "
 "بتقديمه فيها"
 
-#: common/lib/xmodule/xmodule/capa_base.py lms/templates/problem.html
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/templates/problem.html
 #, fuzzy
 msgid "Show Answer"
 msgstr ""
@@ -1297,6 +1366,7 @@ msgid "Whether to force the save button to appear on the page"
 msgstr "اختيار فرض إظهار زرّ الحفظ على الصفحة "
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Randomization"
 msgstr "الترتيب العشوائي"
 
@@ -1513,7 +1583,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Open Response Assessment"
-msgstr "فتح تقييم الرد"
+msgstr "تقييم الردود المفتوحة"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Current task that the student is on."
@@ -1567,7 +1637,7 @@ msgstr "السماح بتحميل ملف"
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Whether or not the student can submit files as a response."
-msgstr "هل يستطيع الطالب أن يقوم بتقديم ملفات كإجابة أم لا."
+msgstr "هل يستطيع الطالب أن يقوم بتقديم ملفات كردٍّ أم لا."
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Disable Quality Filter"
@@ -1655,6 +1725,210 @@ msgstr ""
 "Graders per Response`"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "LTI Passports"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the passports for course LTI tools in the following format: "
+"\"id\":\"client_key:client_secret\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Advertised Start Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the date you want to advertise as the course start date, if this date "
+"is different from the set start date. To advertise the set start date, enter"
+" null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Calculator"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the calculator in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the name of the course as it should appear in the edX.org course list."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Course Editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Show Chat Widget"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. When true, students can see the chat widget in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Survey URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the URL for the end-of-course survey. If your course does not have a "
+"survey, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Blackout Dates"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as "
+"dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to"
+" include the \"T\" between the date and time)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Topic Mapping"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2014_T1\"}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Sorting Alphabetical"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Announcement Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the date to announce your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohort Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Cohorts are not currently supported by edX."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Is New"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, the course appears in the list of new courses "
+"on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Not Graded"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, the course will not be graded."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Disable Progress Graph"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter true or false. If true, students cannot view the progress graph."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "PDF Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "List of dictionaries containing pdf_textbook configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "HTML Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"For HTML textbooks that appear as separate tabs in the courseware, enter the"
+" name of the tab (usually the name of the book) as well as the URLs and "
+"titles of all the chapters in the book."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Remote Gradebook"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the remote gradebook mapping. Only use this setting when "
+"REMOTE_GRADEBOOK_URL has been specified."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Advanced Module List"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the names of the advanced components to use in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Getting Started With Studio"
 msgstr "البدء باستخدام استوديو edX"
 
@@ -1697,8 +1971,8 @@ msgid ""
 "Set up your assignment types and grading policy even if you haven't created "
 "all your assignments."
 msgstr ""
-"إعداد أنواع المهمّات وسياسة التقييم الخاصة بمساقك حتّى وإن كنت لم تقم بإنشاء"
-" كلّ المهمّات بعد."
+"إعداد أنواع الواجبات وسياسة التقييم الخاصة بمساقك حتّى وإن كنت لم تقم بإنشاء"
+" كلّ الواجبات بعد."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Edit Grading Settings"
@@ -1759,8 +2033,8 @@ msgid ""
 "Set a Subsection to be graded as a specific assignment type. Assignments "
 "within graded Subsections count toward a student's final grade."
 msgstr ""
-"تحديد قسم فرعي ليتمّ تقييمه بمثابة نوع مهمّة محدّد. تُحتسب المهمّات التي "
-"تندرج تحت الأقسام الفرعية التي تم تقييمها ضمن الدرجة النهائية للطالب."
+"تحديد قسم فرعي ليتمّ تقييمه بمثابة نوع واجب محدّد. تُحتسب الواجبات التابعة "
+"للأقسام الفرعية التي تم تقييمها ضمن الدرجة النهائية للطالب."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Reordering Course Content"
@@ -1909,6 +2183,146 @@ msgstr ""
 "في المساق."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Info Sidebar Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the heading that you want students to see above your course handouts "
+"on the Course Info page. Your course handouts appear in the right panel of "
+"the page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Due Date Display Format"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
+"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "External Login Domain"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enter the external login method students can use for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificates Downloadable Before End"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, students can download certificates before the "
+"course ends, if they've met certificate requirements."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course About Page Image"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Edit the name of the course image file. You must upload this file on the "
+"Files & Uploads page. You can also set the course image on the Settings & "
+"Details page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the short name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Short)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Between quotation marks, enter the long name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificate Name (Long)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "CSS Class for Course Reruns"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Discussion Forum External Link"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Hide Progress Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allows hiding of the progress tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Organization Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course organization that you want to appear in the courseware. "
+"This setting overrides the organization that you entered when you created "
+"the course. To use the organization that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Number Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the course number that you want to appear in the courseware. This "
+"setting overrides the course number that you entered when you created the "
+"course. To use the course number that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Course Maximum Student Enrollment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Public Wiki Access"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If true, edX users can view the course wiki even if "
+"they're not enrolled in the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "عام"
 
@@ -1996,7 +2410,7 @@ msgstr "إضافات توضيحية بشكل صورة"
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Tags for Assignments"
-msgstr "بطاقات التعريف الخاصة بالمهام"
+msgstr "بطاقات التعريف الخاصة بالواجبات"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -2030,6 +2444,7 @@ msgstr "الأحرف التسلسلية السرية لتخزين الحواشي
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Secret Token String for Annotation"
 msgstr "تسلسل الحروف الرمزي السري للحواشي"
 
@@ -2037,7 +2452,7 @@ msgstr "تسلسل الحروف الرمزي السري للحواشي"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Default Annotations Tab"
-msgstr ""
+msgstr "علامة تبويب الحواشي الأساسية"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -2046,12 +2461,14 @@ msgid ""
 "Select which tab will be the default in the annotations table: myNotes, "
 "Instructor, or Public."
 msgstr ""
+"اختيار علامة التبويب التي ستكون الأساسية في جدول الحواشي: myNotes، أو موجّه "
+"المساق، أو العامة."
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Email for 'Instructor' Annotations"
-msgstr ""
+msgstr "البريد الإلكتروني للحواشي الخاصّة بـ \"موجّه المساق\""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -2060,19 +2477,21 @@ msgid ""
 "Email of the user that will be attached to all annotations that will be "
 "found in 'Instructor' tab."
 msgstr ""
+"البريد الإلكتروني الخاص بالمستخدم الذي سيتمّ إرفاقه بكافة الحواشي الموجودة "
+"ضمن علامة التبويب الخاصة بـ \"موجّه المساق\"."
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Mode for Annotation Tool"
-msgstr ""
+msgstr "الوضع بالنسبة لأداة الحواشي"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid ""
 "Type in number corresponding to following modes:  'instructor' or 'everyone'"
-msgstr ""
+msgstr "كتابة الرقم المرتبط بالأوضاع التالية: \"موجّه المساق\" أو \"الجميع\""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -2194,7 +2613,7 @@ msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
 msgstr ""
-"لا يمكن تحليل المعطيات المعدّلة: {custom_parameter}. يجب أن يكون تسلسل النص "
+"لا يمكن تجزئة المعطيات المعدّلة: {custom_parameter}. يجب أن يكون تسلسل النص "
 "على شكل \"x=y\"."
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -2202,7 +2621,7 @@ msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
 "string."
 msgstr ""
-"لا يمكن تحليل جواز مرور LTI:  {lti_passport}. يجب أن يكون التسلسل النصي على "
+"لا يمكن تجزئة جواز مرور LTI:  {lti_passport}. يجب أن يكون التسلسل النصي على "
 "شكل \"id:key:secret\"."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
@@ -2255,13 +2674,27 @@ msgstr "بيانات الطالب لمسألة محدّدة تخضع لتقيي�
 msgid "Peer Grading Interface"
 msgstr "واجهة تقييم النظراء"
 
+#: common/lib/xmodule/xmodule/seq_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Due Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Enter the date by which problems are due."
+msgstr ""
+
 #. Translators: This message will be added to the front of messages of type
 #. warning,
 #. e.g. "Warning: this component has not been configured yet".
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Warning"
-msgstr ""
+msgstr "تحذير"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: common/lib/xmodule/xmodule/split_test_module.py
 #: lms/templates/name_changes.html lms/templates/name_changes.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Error"
@@ -2269,60 +2702,74 @@ msgstr "خطأ"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Not Selected"
-msgstr ""
+msgstr "لم يتمّ اختياره"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "This name is used for organizing your course content, but is not shown to "
 "students."
-msgstr ""
+msgstr "يستخدم هذا الإسم لتنظيم محتوى المساق الخاص بك، لكنّه لا يظهر للطلاب."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
-msgstr ""
+msgstr "اختبار المحتوى"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
 "The list of group configurations for partitioning students in content "
 "experiments."
-msgstr ""
+msgstr "قائمة إعدادات المجموعة لتقسيم الطلاب في اختبارات المحتوى."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"The configuration for how users are grouped for this content experiment. "
-"After you select the group configuration and save the content experiment, "
-"you cannot change this setting."
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
 msgstr ""
+"تحدّد الإعدادات كيفية تقسيم المستخدمين إلى مجموعات فيما يخص اختبار المحتوى "
+"هذا. تحذير: سيؤثّر تغيير إعدادات المجموعة الخاصّة باختبار مرئي للطالب على "
+"بيانات الاختبار."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group Configuration"
-msgstr ""
+msgstr "إعدادات المجموعة"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Which child module students in a particular group_id should see"
-msgstr ""
+msgstr "ما هي الوحدة الفرعية التي يجب أن يراها الطلاب في group_id محدّدة "
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/templates/split_test_studio_header.html
-msgid "You must select a group configuration for this content experiment."
-msgstr ""
+msgid "The experiment is not associated with a group configuration."
+msgstr "لم يتم ربط الاختبار بإعدادات المجموعة."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This content experiment will not be shown to students because it refers to a"
-" group configuration that has been deleted. You can delete this experiment "
-"or reinstate the group configuration to repair it."
-msgstr ""
+msgid "Select a Group Configuration"
+msgstr "اختيار أحد إعدادات المجموعة"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
-"This content experiment is in an invalid state and cannot be repaired. "
-"Please delete and recreate."
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
 msgstr ""
+"يستخدم الاختبار إعدادات لمجموعة محذوفة. الرجاء اختيار إعدادات مجموعة صحيحة "
+"أو حذف هذا الاختبار."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid "This content experiment uses group configuration '{experiment_name}'."
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
+msgstr "لا يتضمّن الاختبار كافة المجموعات الموجودة في الإعدادات."
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Add Missing Groups"
+msgstr "إضافة المجموعات الناقصة"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
 msgstr ""
+"يتضمن الاختبار مجموعة غير فعّالة. الرجاء نقل المحتوى إلى مجموعات فعّالة، ثمّ"
+" حذف المجموعة غير الفعّالة."
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Courseware' refers to the tab in the courseware that leads to
@@ -2474,6 +2921,126 @@ msgstr "كافة الكلمات المحتملة من جميع الطلاب."
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
 msgstr "أفضل num_top_words كلمات لسحابة الكلمات."
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "GIT URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the URL for the course data GIT repository."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "XQA Key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "This setting is not currently supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "URL for Annotation Storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", and \"never\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify how often variable values in a problem are randomized when a student"
+" loads the problem. Valid values are \"always\", \"onreset\", \"never\", and"
+" \"per_student\". This setting only applies to problems that have randomly "
+"generated numeric values."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Days Early for Beta Users"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Static Asset Path"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Text Customization"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter string customization substitutions for particular locations."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable LaTeX Compiler"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. This"
+" is a course-wide setting, but you can specify a different number when you "
+"create an individual problem. To allow unlimited attempts, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Matlab API key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Experiment Group Configurations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the configurations that govern how students are grouped for content "
+"experiments."
+msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -2638,7 +3205,7 @@ msgstr "حدث خطأ أثناء إجراء العملية المطلوبة. ا�
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
-msgstr "تم تقديم إجابتك. الرجاء التحقق لاحقاً من علامتك."
+msgstr "تم تقديم ردك. الرجاء التحقق لاحقاً من علامتك."
 
 #. Translators: "Not started" communicates to a student that their response
 #. has not yet been graded
@@ -2686,10 +3253,6 @@ msgid ""
 msgstr ""
 "لا يمكن تلقّي النصوص من موقع يوتيوب لمقطع الفيديو {youtube_id}. رمز الحالة: "
 "{status_code}."
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "Can't find any transcripts on the Youtube service."
-msgstr "لا يمكن إيجاد أية نصوص على خدمة يوتيوب."
 
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid "We support only SubRip (*.srt) transcripts format."
@@ -3153,20 +3716,72 @@ msgstr "الفرع الخارجي المحدّد غير موجود."
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr "لا يمكن التغيير إلى الفرع المحدّد. الرجاء التأكد من اسم الفرع."
 
-#: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}, error {1}\n"
+#: lms/djangoapps/dashboard/support.py cms/templates/login.html
+#: cms/templates/register.html
+msgid "Email Address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: lms/djangoapps/dashboard/support.py
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#, fuzzy
+msgid "Course ID"
 msgstr ""
-"فشلت عملية مصادقة {0}، خطأ {1}\n"
-"\n"
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"الرقم التعريفي للمساق \n"
+"#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
+"رقم تعريف المساق "
 
+#: lms/djangoapps/dashboard/support.py
+msgid "User not found"
+msgstr "المستخدم غير موجود"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Invalid course id"
+msgstr "رقم تعريف المساق غير صحيح"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Course {course_id} not past the refund window."
+msgstr "لم يتخطّى المساق {course_id} نافذة استرداد القيمة."
+
+#: lms/djangoapps/dashboard/support.py
+msgid "No order found for {user} in course {course_id}"
+msgstr "لا يوجد طلب خاص بالمستخدم {user} في المساق {course_id}"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Unenrolled {user} from {course_id}"
+msgstr " تمّ إلغاء تسجيل {user} من المساق {course_id}"
+
+#: lms/djangoapps/dashboard/support.py
+msgid "Refunded {cost} for order id {order_id}"
+msgstr "تمّ استرداد مبلغ  {cost} الخاص بالرقم المرجعي للطلب {order_id}"
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed in authenticating {0}\n"
-msgstr "فشلت عملية مصادقة {0}\n"
+msgid "Failed in authenticating {username}, error {error}\n"
+msgstr "فشلت عملية التحقق من هوية المستخدم  {username}، خطأ {error}\n"
 
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py
+msgid "Failed in authenticating {username}\n"
+msgstr "فشلت عملية التحقق من هوية المستخدم  {username}\n"
+
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
 msgstr "كلمة سر ثابتة"
 
+#. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
 msgstr "كل شئ على ما يرام!"
@@ -3179,13 +3794,15 @@ msgstr "يجب إدخال اسم المستخدم"
 msgid "Must provide full name"
 msgstr "يجب إدخال الاسم بالكامل"
 
+#. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "email must end in"
-msgstr "يجب أن ينتهي البريد الإلكتروني بـ"
+msgid "Email address must end in {domain}"
+msgstr "يجب أن ينتهي عنوان البريد الإلكتروني بـ {domain}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed - email {0} already exists as external_id"
-msgstr "فشلت العملية - البريد الإلكتروني {0} موجود سابقاً كمعرِّف خارجي"
+msgid "Failed - email {email_addr} already exists as {external_id}"
+msgstr ""
+"فشلت العملية - البريد الإلكتروني {email_addr} موجود سابقاً كـ {external_id} "
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -3196,24 +3813,25 @@ msgid "email address required (not username)"
 msgstr "البريد الإلكتروني مطلوب (وليس اسم المستخدم)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr "عفواً، فشلت عملية إنشاء المستخدم {0}، خطأ تكامل"
+msgid "Oops, failed to create user {user}, {error}"
+msgstr "عفواً، فشلت عملية إنشاء المستخدم {error} ،{user}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "User {0} created successfully!"
-msgstr "تم إنشاء المستخدم {0} بنجاح!"
+msgid "User {user} created successfully!"
+msgstr "تم إنشاء المستخدم {user} بنجاح!"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with email address {0}"
-msgstr "لا يوجد مستخدم بالبريد الالكتروني {0}"
+msgid "Cannot find user with email address {email_addr}"
+msgstr ""
+"لم يتمّ إيجاد المستخدم الذي يحمل عنوان البريد الإلكتروني {email_addr} "
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Cannot find user with username {0} - {1}"
-msgstr "لا يوجد مستخدم له اسم المستخدم {0} - {1}"
+msgid "Cannot find user with username {username} - {error}"
+msgstr "لم يتم إيجاد المستخدم الذي يحمل اسم المستخدم {error} - {username}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Deleted user {0}"
-msgstr "هذا المستخدم محذوف"
+msgid "Deleted user {username}"
+msgstr "هذا المستخدم {username} محذوف"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -3267,6 +3885,9 @@ msgstr ""
 msgid "Added Course"
 msgstr "مساق مضاف"
 
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
@@ -3298,19 +3919,19 @@ msgstr ""
 " الذي تلقّيناه كان: {0!r}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Failed to clone repository to {0}"
-msgstr "فشلت عملية استنساخ الحاضنة إلى {0}"
+msgid "Failed to clone repository to {directory_name}"
+msgstr "فشلت عملية استنساخ المستودع إلى {directory_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
 msgstr "تم التغيير بنجاح إلى الفرع: {branch_name}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr "المساق المحمل {0} {1}<br/>أخطاء:"
+msgid "Loaded course {course_name}<br/>Errors:"
+msgstr "المساق الذي تمّ تحميله  {course_name} <br/> الأخطاء:"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html cms/templates/settings.html
+#: cms/templates/index.html
 #, fuzzy
 msgid "Course Name"
 msgstr ""
@@ -3323,6 +3944,8 @@ msgstr ""
 msgid "Directory/ID"
 msgstr "الدليل/بطاقة التعريف"
 
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
 msgstr "إيداع Git"
@@ -3362,7 +3985,7 @@ msgstr "# موظفين"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "instructors"
-msgstr "المشرفون "
+msgstr "الموجّهون"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
@@ -3425,12 +4048,6 @@ msgstr "خطأ في تحميل الملف. الرجاء الاتصال بالم�
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
 msgstr "جيد"
-
-#: lms/djangoapps/django_comment_client/forum/views.py
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "All Groups"
-msgstr "كافة المجموعات "
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -3530,6 +4147,51 @@ msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 "تم بنجاح إعادة ضبط التاريخ المحدد إلى الوضع الأصلي للطالب {0} لـ {1} إلى {2}"
 
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id is None"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) is already inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) added successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id not found"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) already exists"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "E-Commerce"
+msgstr ""
+
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
 msgstr "العضوية"
@@ -3551,6 +4213,11 @@ msgstr "تنزيل البيانات"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Analytics"
 msgstr "التحليلات"
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/courseware/instructor_dashboard.html
+msgid "Metrics"
+msgstr "المقاييس"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -3667,15 +4334,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Assignment Name"
-msgstr "اسم المهمة المفروضة"
+msgstr "اسم الواجب المفروض"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Please enter an assignment name"
-msgstr "الرجاء إدخال اسم للمهمة المفروضة"
+msgstr "الرجاء إدخال اسم للواجب المفروض"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Invalid assignment name '{name}'"
-msgstr "اسم غير صحيح للمهمة المفروضة '{name}'"
+msgstr "اسم غير صحيح للواجب المفروض '{name}'"
 
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
@@ -3684,7 +4351,7 @@ msgstr "بريد إلكتروني خارجي"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
-msgstr "العلامات الخاصة بالمهمة المفروضة \"{name}\""
+msgstr "العلامات الخاصة بالواجب المفروض \"{name}\""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Staff"
@@ -3727,7 +4394,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Your email was successfully queued for sending."
-msgstr "تم بنجاح إدراج رسالتك ضمن صف الرسائل بانتظار إرسالها."
+msgstr "تم بنجاح إدراج رسالتك ضمن صف الرسائل التي تنتظر الإرسال."
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -4093,9 +4760,9 @@ msgid ""
 "answers to any open response assessment questions? If not, please do so and "
 "return to this page."
 msgstr ""
-"لا يمكن العثور على مشاكل إستجابة مفتوحة في هذه المساق. هل قمت بالإجابة على "
-"أي أسئلة تقييم إستجابة مفتوحة ؟ إن لم تقم بذلك ، الرجاء القيام بها الأن ثم "
-"عد إلى هذه الصفحة مرة أخرى . "
+"لا يمكن العثور على مشاكل ردود مفتوحة في هذه المساق. هل قمت بتقديم إجابات على"
+" أي أسئلة تقييم ردود مفتوحة ؟ إن لم تقم بذلك ، الرجاء القيام بها الأن ثم عد "
+"إلى هذه الصفحة مرة أخرى . "
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
@@ -4115,7 +4782,7 @@ msgstr "تفقّد آلي "
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Instructor Assessment"
-msgstr "تقييم الموجّه"
+msgstr "تقييم موجّه المساق"
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
@@ -4291,7 +4958,11 @@ msgstr "التكلفة الإجمالية"
 msgid "Currency"
 msgstr "العملة "
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -4410,25 +5081,46 @@ msgid "Course added to cart."
 msgstr "تم إضافة المساق لسلة التسوق."
 
 #: lms/djangoapps/shoppingcart/views.py
+msgid "Discount does not exist against coupon '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' already used."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is inactive."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
 msgstr "ليست لديك الصلاحيات اللازمة للاطلاع على مكونات هذه الصفحة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "لم يقم نظام معالجة الدفع بإرجاع المُدخل المطلوب: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "قام نظام معالجة الدفع بإرجاع قيمة مطبوعة بشكلٍ سيئ {0} للمُدخل المطلوب {1}. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
 msgstr "قام نظام معالجة الدفع بقبول طلب لا وجود لرقمه في نظامنا. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -4437,6 +5129,7 @@ msgstr ""
 "الطلب {2} {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -4459,6 +5152,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4480,6 +5174,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4522,6 +5217,7 @@ msgstr ""
 "</p>"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Successful transaction."
 msgstr "معاملة ناجحة."
 
@@ -4530,6 +5226,7 @@ msgid "The request is missing one or more required fields."
 msgstr "الطلب ينقصه واحد أو أكثر من الحقول المطلوبة."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "One or more fields in the request contains invalid data."
 msgstr "يحتوي واحد أو أكثر من الحقول في الطلب على بيانات غير صالحة."
 
@@ -4587,6 +5284,7 @@ msgstr ""
 "باستخدام شكلٍ آخر من أشكال الدفع "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Expired card. You might also receive this if the expiration date you\n"
@@ -4600,6 +5298,7 @@ msgstr ""
 "الإجراء التصحيحي الممكن: إعادة المحاولة باستخدام وسيلة أخرى للدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            General decline of the card. No other information provided by the issuing bank.\n"
@@ -4611,6 +5310,7 @@ msgstr ""
 "الإجراء التصحيحي الممكن: إعادة المحاولة باستخدام وسيلة أخرى للدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
@@ -4624,12 +5324,14 @@ msgid "Unknown reason"
 msgstr "سبب غير معروف."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
 "البنك المصدر غير موجود. حل محتمل: الرجاء إعادة المحاولة بعد دقائق قليلة "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Inactive card or card not authorized for card-not-present transactions.\n"
@@ -4641,6 +5343,7 @@ msgstr ""
 "الإجراء التصحيحي الممكن: إعادة المحاولة باستخدام وسيلة أخرى للدفع. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
@@ -4657,6 +5360,7 @@ msgstr ""
 "باستخدام وسيلة أخرى للدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
@@ -4664,6 +5368,7 @@ msgstr ""
 "أخرى للدفع."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type is not accepted by the payment processor.\n"
@@ -4675,6 +5380,7 @@ msgstr ""
 "الإجراء التصحيحي الممكن: إعادة المحاولة باستخدام وسيلة أخرى للدفع. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
@@ -4696,6 +5402,7 @@ msgid "The requested amount exceeds the originally authorized amount."
 msgstr "المبلغ المطلوب يتجاوز المبلغ الأصلي المسموح به.  "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr "خلل في معالج البيانات. حل محتمل: إعادة محاولة الدفع مرة أخرى "
 
@@ -4709,6 +5416,7 @@ msgid ""
 msgstr "يجب أن يتطابق مبلغ المعاملة المطلوب مع مبلغ المعاملة السابق. "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
@@ -4773,6 +5481,87 @@ msgstr ""
 "تمت الموافقة على طلب التفويض من قبل البنك المصدر لكنه رُفِض من CyberSource.\n"
 "الإجراء التصحيحي الممكن: إعادة المحاولة باستخدام وسيلة أخرى للدفع. "
 
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
+"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
+"            Possible fix: retry the payment after 15 minutes.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Only a partial amount was approved."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
+"            becouse it did not pass the Address Verification System (AVS).\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The issuing bank has questions about the request. You do not receive an\n"
+"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stolen or lost card"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid card verification number (CVN). Possible fix: retry with another "
+"form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The customer matched an entry on the processors negative file."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Account frozen. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by\n"
+"            CyberSource because it did not pass the CVN check.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            There is a problem with the information in your CyberSource account.  Please let us know at {0}\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The cardholder is enrolled for payer authentication"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Payer authentication could not be authenticated"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
+"            on your legacy Smart Authorization settings.\n"
+"            Possible fix: retry with a different form of payment.\n"
+"            "
+msgstr ""
+
 #: lms/djangoapps/shoppingcart/tests/test_views.py
 #: lms/templates/shoppingcart/download_report.html
 msgid "Download CSV Reports"
@@ -4823,10 +5612,96 @@ msgstr "لا يدعم هذا المساق الشهادات الموثّقة"
 msgid "No selected price or selected price is below minimum."
 msgstr "لم يتم اختيار سعر أو أن السعر الذي تم اختياره قليل جداً.  "
 
+#: lms/lib/xblock/mixin.py
+msgid "Courseware Chrome"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
+"\"chromeless\" -- to not use tabs or the accordion; \n"
+"\"tabs\" -- to use tabs only; \n"
+"\"accordion\" -- to use the accordion only; or \n"
+"\"tabs,accordion\" -- to use tabs and the accordion."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Default Tab"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
+" is selected."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "LaTeX Source File Name"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Enter the source file name for LaTeX."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid "Course Is Public"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py
+msgid ""
+"Enter true or false. If true, the course is open to the public. If false, "
+"the course is open only to admins."
+msgstr ""
+
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
 msgid "Skip to this view's content"
 msgstr "تخطى حتى تصل إلى المحتوى الخاص بالمعروض هنا"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+#: lms/templates/dashboard/support.html
+msgid "Manual Refund"
+msgstr "استرداد المبلغ يدوياً"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "About to refund this order:"
+msgstr "على وشك استرداد قيمة هذا الطلب:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Id:"
+msgstr "الرقم المرجعي للطلب:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Enrollment:"
+msgstr "التسجيل:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "enrolled"
+msgstr "مسجّل"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "unenrolled"
+msgstr "ألغي التسجيل"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Cost:"
+msgstr "التكلفة:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "CertificateItem Status:"
+msgstr "حالة CertificateItem:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Order Status:"
+msgstr "حالة الطلب:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Fulfilled Time:"
+msgstr "تمّ استيفاء الوقت:"
+
+#: lms/templates/dashboard/_dashboard_refund.html
+msgid "Refund Request Time:"
+msgstr "وقت طلب استرداد المبلغ:"
 
 #: lms/templates/registration/password_reset_complete.html
 #: lms/templates/registration/password_reset_complete.html
@@ -4916,6 +5791,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Required Information"
 msgstr "معلومات مطلوبة"
 
@@ -4971,10 +5848,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
+" user account at %(site_name)s."
 msgstr ""
-"وصلتك رسالة البريد الالكتروني هذه بناءً على طلبك تغيير كلمة السر لحسابك في "
-"edx.org"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -4993,8 +5868,8 @@ msgid "Thanks for using our site!"
 msgstr "شكراً لاستخدامك موقعنا!"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The edX Team"
-msgstr "فريق عمل edX"
+msgid "The %(platform_name)s Team"
+msgstr ""
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -5108,6 +5983,8 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
@@ -5550,7 +6427,6 @@ msgid "Video"
 msgstr "مقطع فيديو"
 
 #: cms/djangoapps/contentstore/views/component.py
-#: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "صفحة فارغة"
 
@@ -5684,6 +6560,10 @@ msgstr ""
 "ملاحظات اختيارية عن هذا المستخدم (مثلاً، لماذا تم رفض طلب الدخول لإنشاء "
 "مساق)"
 
+#: cms/djangoapps/models/settings/course_metadata.py
+msgid "Incorrect format for field '{name}'. {detailed_message}"
+msgstr ""
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -5698,7 +6578,7 @@ msgstr "هذه الصفحة غير موجودة"
 msgid "close"
 msgstr "إغلاق "
 
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -5712,6 +6592,13 @@ msgstr "جاري التحميل..."
 msgid "View"
 msgstr "عرض"
 
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "إعدادات"
+
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
 msgstr "خطأ:"
@@ -5723,13 +6610,11 @@ msgstr "رقم المساق "
 
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
+#: cms/templates/overview.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr "إلغاء"
@@ -5761,13 +6646,6 @@ msgstr "نسيت كلمة السر؟"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "كلمة السر"
-
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "إعدادات"
 
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5820,8 +6698,8 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "شروط الخدمة"
 
-#: cms/templates/widgets/footer.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "سياسة الخصوصية"
@@ -5871,8 +6749,8 @@ msgid "):"
 msgstr "): "
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I don't meet all the requirements?"
-msgstr "لماذا علي أن أدفع؟ ماذا إن لم تنطبق علي كافة المتطلبات؟ "
+msgid "Why do I have to pay? What if I want a free honor code certificate?"
+msgstr "لماذا ينبغي أن أدفع؟ ماذا لو أردت الحصول على شهادة شرفيّة مجانية؟"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -5910,33 +6788,24 @@ msgstr "ماذا إن كنت لا أستطيع تحمل تكاليفه أو أن
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost. If"
-" you would like to pursue the honor code certificate, please check the honor"
-" code certificate box, tell us why you can't pursue the verified certificate"
-" below, and then click the 'Select Certificate' button to complete your "
-"registration."
+"audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
 "إذا كنت لا تستطيع تحمل الحد الأدنى من الرسوم أو أنك لا تلبي متطلبات "
-"البرنامج، تستطيع حضور المساق كمستمع أو قد تختار تحصيل شهادة شرفية دون أية "
-"تكاليف. إذا أحببت أن تحصل على شهادة شرفية، الرجاء اختيار مربع الشهادة "
-"الشرفية في الطلب، وإعلامنا أدناه بأسباب عدم قدرتك على السعي للحصول على "
-"الشهادة الموثّقة، و من ثم إضغط زر \"اختيار الشهادة\" لإكمال عملية التسجيل. "
+"البرنامج، تستطيع حضور المساق كمستمع أو قد تختار الحصول على شهادة شرفية دون "
+"أية تكاليف."
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"If you would like to pursue the honor code certificate, please check the "
+"honor code certificate box and then click the 'Select Certificate' button to"
+" complete your registration."
+msgstr ""
+"إذا رغبت في الحصول على شهادة شرفية، الرجاء اختيار مربع الشهادة الشرفية في "
+"الطلب، و من ثمّ الضغط على زر \"اختيار الشهادة\" لإكمال عملية التسجيل."
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
 msgstr "اختر الشهادة الشرفية "
-
-#: common/templates/course_modes/choose.html
-msgid "Explain your situation: "
-msgstr "إشرح ظروفك: "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please write a few sentences about why you'd like to opt out of the paid "
-"verified certificate to pursue the honor code certificate:"
-msgstr ""
-"الرجاء كتابة بعض الجمل لتوضيح أسباب رغبتك الانسحاب من خيار الشهادة المدفوعة "
-"الموثّقة والسعي بدلاً من ذلك للحصول على شهادة شرفية: "
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
@@ -6030,12 +6899,13 @@ msgstr "الرؤية"
 msgid "Faq"
 msgstr "الأسئلة المتكررة"
 
-#: lms/templates/contact.html lms/templates/footer.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html
 msgid "Press"
 msgstr "الصحافة"
 
-#: lms/templates/contact.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "معلومات الاتصال"
@@ -6141,6 +7011,14 @@ msgstr "حدث خطأ. الرجاء إعادة المحاولة في وقتٍ ل
 #: lms/templates/dashboard.html
 msgid "Please verify your new email"
 msgstr "الرجاء تأكيد عنوان بريدك الإلكتروني الجديد"
+
+#: lms/templates/dashboard.html
+msgid ""
+"You'll receive a confirmation in your inbox. Please click the link in the "
+"email to confirm the email change."
+msgstr ""
+"ستصلك رسالة تأكيد على البريد الوارد الخاص بك. الرجاء الضغط على الرابط في "
+"الرسالة لتأكيد تغيير البريد الالكتروني."
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -6308,6 +7186,43 @@ msgstr "إلغاء التسجيل"
 msgid "View Unit in Studio"
 msgstr "عرض الوحدة في الاستديو"
 
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "About"
+msgstr "نبذة عن"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/jobs.html
+msgid "Jobs"
+msgstr "الوظائف"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "الأسئلة المتكررة "
+
+#: lms/templates/edx_footer.html
+msgid "edX Logo"
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr ""
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "شروط الخدمة وميثاق الشرف"
+
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
 msgstr "لم تتم عملية تغيير عنوان البريد الإلكتروني بنجاح"
@@ -6407,48 +7322,12 @@ msgid "User"
 msgstr "المستخدم"
 
 #: lms/templates/footer.html
-msgid "About"
-msgstr "نبذة عن"
-
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/jobs.html
-msgid "Jobs"
-msgstr "الوظائف"
-
-#: lms/templates/footer.html lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "الأسئلة المتكررة "
-
-#: lms/templates/footer.html
-msgid "{platform_name} Logo"
-msgstr "شعار {platform_name}"
-
-#: lms/templates/footer.html
-msgid ""
-"{platform_name} is a non-profit created by founding partners {Harvard} and "
-"{MIT} whose mission is to bring the best of higher education to students of "
-"all ages anywhere in the world, wherever there is Internet access. "
-"{platform_name}'s free online MOOCs are interactive and subjects include "
-"computer science, public health, and artificial intelligence."
+msgid "&copy; 2014 {platform_name}, some rights reserved"
 msgstr ""
-"{platform_name} هي منشأة غير ربحية تم تأسيسها من قبل الشركاء {Harvard} "
-"و{MIT}، الذين تتمثّل مهمتهم في تقديم أفضل مستويات الدراسات العليا وجعلها في "
-"متناول الطلاب من جميع الأعمار وفي أي مكان في العالم يتوفّر فيه الاتصال "
-"بالإنترنت. إن مساقات {platform_name} الضخمة المتاحة عبر الإنترنت والمقدّمة "
-"بشكلٍ مجاني هي مساقات تفاعلية، وتشمل عدة مواد من ضمنها علوم الحاسوب، الصحة "
-"العامة، و الذكاء الاصطناعي."
-
-#: lms/templates/footer.html
-msgid "&copy; 2014 {platform_name}, some rights reserved."
-msgstr "&copy; 2014 {platform_name}، بعض الحقوق محفوظة."
-
-#: lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "شروط الخدمة وميثاق الشرف"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Password Reset"
 msgstr "إعادة ضبط كلمة السر"
 
@@ -6496,9 +7375,9 @@ msgid ""
 "lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
-"لديك أسئلة عامة تتعلق بـ {platform_name}</strong>؟ بإمكانك أن تجد الكثير من "
-"المعلومات المفيدة في صفحة  {platform_name} {link_start}الأسئلة "
-"المتكررة{link_end}."
+"لديك أسئلة عامة<strong> تتعلق بـ {platform_name}</strong>؟ بإمكانك أن تجد "
+"الكثير من المعلومات المفيدة في صفحة  {platform_name} {link_start}الأسئلة "
+"المتكررة{link_end}. "
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -6646,7 +7525,7 @@ msgstr "الرجاء إعادة المحاولة لاحقاً."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
-msgstr ""
+msgstr "ملاحظة: يمكن فقط لموجّهي المساق إضافة الحواشي."
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -6755,7 +7634,7 @@ msgstr "حدثت الأخطاء التالية أثناء تسجيل دخولك:
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
-msgstr "عنوان بريدك الإلكتروني أو كلمة السر غير صحيحين"
+msgstr "عنوان بريدك الالكتروني أو كلمة السر غير صحيحين"
 
 #: lms/templates/login.html
 msgid ""
@@ -6968,12 +7847,8 @@ msgstr "تسجيل الدخول"
 #: lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link_start}Chrome{chrome_link_end} or "
-"{ff_link_start}Firefox{ff_link_end}."
+"recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"تحذير: المتصفح الذي تستخدمه غير مدعوم بشكل كامل، نوصي بشدة باستعمال "
-"{chrome_link_start}كروم{chrome_link_end} أو "
-"{ff_link_start}فايرفوكس{ff_link_end}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -7327,15 +8202,27 @@ msgstr "لديك حساب مسبقاً؟"
 msgid "Login."
 msgstr "تسجيل الدخول."
 
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment uses group configuration '{experiment_name}'."
+msgstr "يستخدم اختبار المحتوى هذا إعدادات المجموعة '{experiment_name}'."
+
+#: lms/templates/split_test_author_view.html
+msgid "This content experiment has issues that affect content visibility."
+msgstr "ثمّة مشاكل في اختبار المحتوى هذا تؤثّر على إمكانيّة رؤية المحتوى."
+
+#: lms/templates/split_test_author_view.html
+msgid "Active Groups"
+msgstr "المجموعات الفعّالة"
+
+#: lms/templates/split_test_author_view.html
+msgid "Inactive Groups"
+msgstr "المجموعات غير الفعّالة"
+
 #. Translators: The 'Group' here refers to the group of users that has been
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
 msgid "Group {group_id}"
 msgstr "المجموعة {group_id}"
-
-#: lms/templates/split_test_studio_header.html
-msgid "Select a Group Configuration"
-msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
@@ -7378,6 +8265,7 @@ msgid "Staff Debug"
 msgstr "تصحيح طاقم العمل"
 
 #: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr "الإجراءات"
 
@@ -7489,11 +8377,11 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr "إدارة الطاقم والأساتذة الخاصّين بالمساق"
+msgstr "إدارة الطاقم والموجّهين الخاصّين بالمساق"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
-msgstr "تنزيل قائمة الطاقم والأساتذة (ملف بصيغة csv)"
+msgstr "تنزيل قائمة الطاقم والموجّهين (ملف بصيغة csv)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -7531,27 +8419,20 @@ msgstr "إلغاء المساق من الموقع"
 msgid "Platform Version"
 msgstr "رقم الإصدار الخاص بالموقع"
 
+#. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Recent git load activity for {course_id}"
+msgstr ""
+
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
 msgstr "التاريخ "
 
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Course ID"
-msgstr "رقم تعريف المساق "
-
 #. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Action"
 msgstr "إجراء Action"
-
-#. Translators: Git is a version-control system; see http://git-scm.com/about
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Recent git load activity for"
-msgstr "نشاط تنزيل حديث لـ git  خاص بـ"
 
 #: lms/templates/textannotation.html
 msgid "Source:"
@@ -7703,7 +8584,7 @@ msgstr "تنزيل الفيديو "
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Download transcript"
-msgstr "تنزيل سجل الدرجات"
+msgstr "حمل نص الترجمة"
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -7719,7 +8600,7 @@ msgstr "إجمالي عدد الكلمات:"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
-msgstr "إجابات بنهايات مفتوحة "
+msgstr "ردود بنهايات مفتوحة "
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Assessments:"
@@ -7843,7 +8724,7 @@ msgstr "تقديم التغذية الراجعة"
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Response"
-msgstr "إجابة"
+msgstr "الرد"
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
@@ -7869,7 +8750,7 @@ msgstr "حدث خطأ في عملية التسليم الخاصة بك. الرج
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
-msgstr "معايير التقييم"
+msgstr "نموذج التقييم"
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid ""
@@ -8188,7 +9069,7 @@ msgstr "عرض التحديثات في الاستديو"
 msgid "Course Updates &amp; News"
 msgstr "تحديثات وأخبار المساق "
 
-#: lms/templates/courseware/info.html
+#: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Handout Navigation"
 msgstr "تصفح الورقة الموزّعة "
 
@@ -8207,32 +9088,33 @@ msgstr "عرض المساق في الاستوديو"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Back To Instructor Dashboard"
-msgstr "العودة إلى لوحة المعلومات للموجّه."
+msgstr "العودة إلى لوحة معلومات الموجّه."
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
-msgstr "لوحة المعلومات للموجّه"
+msgstr "لوحة المعلومات الخاصة بموجّه المساق"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "You are using the legacy instructor dashboard, which we will retire in the "
 "near future."
 msgstr ""
-"أنت تستخدم لوحة المعلومات الموروثة للموجّه، التي سنقوم بسحبها في المستقبل "
+"أنت تستخدم لوحة المعلومات الموروثة للموجّه، التي سنقوم بإيقافها في المستقبل "
 "القريب."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Return to the Instructor Dashboard"
-msgstr "العودة إلى لوحة المعلومات للموجّه"
+msgstr "العودة إلى لوحة معلومات الموجّه"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "If the Instructor Dashboard is missing functionality, please contact your PM"
 " to let us know."
 msgstr ""
-"إذا لم تكن لوحة المعلومات تعمل، الرجاء الاتصال بمدير المشروع لإعلامنا بذلك."
+"إذا لم تكن بعض وظائف لوحة المعلومات تعمل، الرجاء الاتصال بمدير المشروع "
+"لإعلامنا بذلك."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Psychometrics"
@@ -8253,10 +9135,6 @@ msgstr "تفريغ البيانات "
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Manage Groups"
 msgstr "إدارة المجموعات "
-
-#: lms/templates/courseware/instructor_dashboard.html
-msgid "Metrics"
-msgstr "المقاييس"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
@@ -8377,7 +9255,8 @@ msgstr "اختر مسألة وإجراء:"
 msgid ""
 "User requires forum administrator privileges to perform administration "
 "tasks.  See instructor."
-msgstr "يحتاج المستخدم صلاحيات مشرف منتدى لأداء مهام الإشراف. الرجوع للموجِه."
+msgstr ""
+"يحتاج المستخدم صلاحيات مشرف منتدى لأداء مهام الإشراف. الرجوع لموجّه المساق."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Explanation of Roles:"
@@ -8390,9 +9269,9 @@ msgid ""
 "the course is cohorted). Moderators' posts are marked as 'staff'."
 msgstr ""
 "مشرفو المنتدى: بإمكانهم تعديل أو حذف أية مادة منشورة، وإزالة إشارات إساءة "
-"الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد إجابات، ورؤية المواد المنشورة "
-"من قبل كافة الجماعات (إذا كان المساق مقسّم إلى جماعات). أما المواد المنشورة "
-"من قبل الوسطاء فيتم الإشارة عليها بأنها من قبل ’طاقم المساق‘."
+"الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد ردود، ورؤية المواد المنشورة من"
+" قبل كافة الجماعات (إذا كان المساق مقسّم إلى جماعات). أما المواد المنشورة من"
+" قبل الوسطاء فيتم الإشارة عليها بأنها من قبل ’طاقم المساق‘."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -8537,7 +9416,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "A queued email CANNOT be cancelled."
-msgstr "ولا يمكن إلغاء أي رسالة من صف الرسائل التي تنتظر الإرسال."
+msgstr "لا يمكن إلغاء أي رسالة من صف الرسائل التي تنتظر الإرسال."
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "No Analytics are available at this time."
@@ -8616,11 +9495,11 @@ msgstr "عدد الطلاب "
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
-"Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
+"Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
-" توزيع الطلاب في كل دولة، كافة المساقات، الفترة من 12-سبتمبر وحتى 17-أكتوبر،"
-" مخدّم واحد (يظهر هنا كمثال):  "
+" توزيع الطلاب في كل دولة، لكافة المساقات، للفترة 12 سبتمبر وحتّى 17 أكتوبر، "
+"مخدّم 1 (كما هو موضح هنا كمثال):"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -8628,7 +9507,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
-msgstr "مهام الموجِّه المعلقة "
+msgstr "المهمات قيد الانتظار لموجّه المساق "
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Type"
@@ -8857,13 +9736,13 @@ msgstr "تم التحقق"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as an honor code student"
-msgstr "تمّ تسجيلك بمثابة طالب في ميثاق الشرف."
+msgstr "تمّ تسجيلك كطالب لنيل الشهادة الشرفية."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/static_templates/honor.html
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
-msgstr "شهادة شرفيّة"
+msgstr "ميثاق الشرف"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're auditing this course"
@@ -8922,6 +9801,7 @@ msgid "View Archived Course"
 msgstr "مراجعة المساق المحفوظ في الأرشيف"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "استعراض المساق "
 
@@ -9069,8 +9949,8 @@ msgstr "إظهار النقاش"
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
 msgstr ""
-"لمشاهدة المناقشات المباشرة، الرجاء النقر على المعاينة المباشرة أو العرض "
-"المباشر في إعدادت الوحدة. "
+"لمشاهدة المناقشات المباشرة، الرجاء النقر على المعاينة أو العرض المباشر في "
+"إعدادات الوحدة. "
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
@@ -9081,94 +9961,20 @@ msgid "filter topics"
 msgstr "تصفية المواضيع"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_new_post.html
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show All Discussions"
-msgstr "أظهر جميع النقاشات"
+msgid "All Discussions"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
-msgid "Show Flagged Discussions"
-msgstr "أظهر النقاشات المعلَّمة "
+msgid "Flagged Discussions"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "المنشورات التي أقوم بمتابعتها "
 
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "follow this post"
-msgstr "تابع هذا المنشور "
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously"
-msgstr "انشر دون التعريف بالهوية  "
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "post anonymously to classmates"
-msgstr "انشر لزملاء الصف دون التعريف بالهوية "
-
-#. Translators: This labels the selector for which group of students can view
-#. a
-#. post
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Make visible to:"
-msgstr "اجعله مرئياً بالنسبة لـ: "
-
-#: lms/templates/discussion/_inline_new_post.html
-msgid "My Cohort"
-msgstr "جماعتي"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-msgid "new post title"
-msgstr "عنوان منشور جديد "
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-#: wiki/forms.py wiki/forms.py wiki/forms.py
-msgid "Title"
-msgstr "العنوان"
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Enter your question or comment…"
-msgstr "قم بإدخال سؤالك أو تعليقك..."
-
-#: lms/templates/discussion/_inline_new_post.html
-#: lms/templates/discussion/_new_post.html
-#: lms/templates/discussion/mustache/_inline_discussion.mustache
-#: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
-msgid "Add post"
-msgstr "أضف منشور "
-
-#: lms/templates/discussion/_new_post.html
-msgid "Create new post about:"
-msgstr "أنشئ منشوراً جديداً عن: "
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter List"
-msgstr "تصفية قائمة البحث "
-
-#: lms/templates/discussion/_new_post.html
-msgid "Filter discussion areas"
-msgstr "تصفية مجالات النقاش"
-
 #: lms/templates/discussion/_recent_active_posts.html
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Following"
 msgstr "يتابع "
 
@@ -9181,48 +9987,35 @@ msgid "Hide"
 msgstr "إخفاء"
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Home"
-msgstr "الصفحة الرئيسية للنقاش"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion Topics"
-msgstr "مواضيع النقاش"
-
-#: lms/templates/discussion/_thread_list_template.html
 msgid "Discussion topics; current selection is: "
 msgstr "مواضيع النقاش، الاختيار الحالي هو: "
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Search all discussions"
-msgstr "البحث في كافة النقاشات"
+msgid "Search all posts"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Sort by:"
-msgstr "الترتيب بحسب: "
+msgid "View all cohorts"
+msgstr ""
 
 #: lms/templates/discussion/_thread_list_template.html
-msgid "date"
-msgstr "التاريخ "
+msgid "View as {cohort_name}"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "votes"
-msgstr "الأصوات "
+msgid "by recent activity"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "comments"
-msgstr "التعليقات "
+msgid "by most activity"
+msgstr ""
 
+#. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
-msgid "Show:"
-msgstr "إظهار: "
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View All"
-msgstr "إظهار الكل "
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "View as {name}"
-msgstr "الاستعراض كـ  {name} "
+msgid "by most votes"
+msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread.mustache
@@ -9274,6 +10067,7 @@ msgid "Pin Thread"
 msgstr "ثبّت الموضوع "
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
 msgstr "مُثبَّت"
@@ -9289,6 +10083,12 @@ msgstr "تعديل منشور "
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Edit post title"
 msgstr "تعديل عنوان المنشور "
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html wiki/forms.py
+#: wiki/forms.py wiki/forms.py
+msgid "Title"
+msgstr "العنوان"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Update post"
@@ -9332,6 +10132,24 @@ msgid "Update comment"
 msgstr "تحديث التعليق"
 
 #: lms/templates/discussion/_underscore_templates.html
+msgid "By: Staff"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "By: Community TA"
+msgstr ""
+
+#. Translators: This is a label for a forum thread with a response that was
+#. endorsed by the course staff
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Endorsed response"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
+msgstr "%(votes_up_count)s%(span_sr_open)s  أصوات %(span_close)s"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
@@ -9342,10 +10160,6 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s %(span_sr_open)s  تعليق %(span_close)s"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "%(votes_up_count)s%(span_sr_open)s votes %(span_close)s"
-msgstr "%(votes_up_count)s%(span_sr_open)s  أصوات %(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "DISCUSSION HOME:"
@@ -9377,7 +10191,7 @@ msgstr "شارك في المواد المنشورة"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Upvote posts and good responses"
-msgstr "صوّت لرفع تقييم مواد منشورة وإجابات جيّدة"
+msgstr "صوّت لرفع تقييم مواد منشورة وردود جيّدة"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report Forum Misuse"
@@ -9402,6 +10216,57 @@ msgid ""
 msgstr ""
 "باختيار هذا المربّع ستتلقّى رسالة بريد إلكتروني واحدة يوميّاً تتضمن خلاصة عن"
 " الأنشطة الجديدة وغير المقروءة من المواد المنشورة التي تقوم بمتابعتها."
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Create new post about:"
+msgstr "أنشئ منشوراً جديداً عن: "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Show All Discussions"
+msgstr "أظهر جميع النقاشات"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter List"
+msgstr "تصفية قائمة البحث "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Filter discussion areas"
+msgstr "تصفية مجالات النقاش"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "follow this post"
+msgstr "تابع هذا المنشور "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously"
+msgstr "انشر دون التعريف بالهوية  "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "post anonymously to classmates"
+msgstr "انشر لزملاء الصف دون التعريف بالهوية "
+
+#. Translators: This labels the selector for which group of students can view
+#. a
+#. post
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Make visible to:"
+msgstr "اجعله مرئياً بالنسبة لـ: "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "All Groups"
+msgstr "كافة المجموعات "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "new post title"
+msgstr "عنوان منشور جديد "
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Enter your question or comment…"
+msgstr "قم بإدخال سؤالك أو تعليقك..."
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Add post"
+msgstr "أضف منشور "
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
@@ -9846,7 +10711,7 @@ msgstr "(إخفاء) "
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Student Response"
-msgstr "إجابة الطالب "
+msgstr "رد الطالب "
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -9864,6 +10729,38 @@ msgstr "إعطاء علامة تدل على محتوى غير مناسب لتت�
 #: lms/templates/instructor/staff_grading.html
 msgid "Skip"
 msgstr "تخطي "
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Please enter Coupon detail below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Percentage Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid "Active Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Score Distribution"
@@ -9899,7 +10796,7 @@ msgstr "معلومات الالتحاق"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr "إجمالي عدد الملتحقين (الأساتذة، أعضاء طاقم المساق، والطلاّب)"
+msgstr "إجمالي عدد الملتحقين (الموجّهون، أعضاء طاقم المساق، والطلاّب)"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -10072,6 +10969,65 @@ msgstr ""
 "الروابط أو إرسالها بالبريد الإلكتروني للدخول إليها بشكل مباشر، حيث تنتهي "
 "صلاحية نُسخ هذه الروابط في غضون 5 دقائق."
 
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons List"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Total Amount: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons Information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "+ Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Course_id"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Discount(%)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Count"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Discount Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Numeric value for Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Edit Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon Information"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
 msgstr "تمديدات المواعيد المقررة كلٌ على حدة"
@@ -10102,7 +11058,7 @@ msgid ""
 "{format_string})."
 msgstr ""
 "حدّد تاريخ وتوقيت التمديد (بحسب التوقيت العالمي؛ الرجاء استخدام الصيغة "
-"{شهر/يوم/سنة ساعة:دقيقة})."
+"{format_string})."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Change due date for student"
@@ -10170,10 +11126,6 @@ msgstr ""
 "لقد قمنا بتغيير شكل وأسلوب لوحة المعلومات. خلال فترة التحوّل هذه، يمكنك "
 "الدخول إلى لوحة المعلومات للموجّه القديمة من خلال الضغط على زرّ \"العودة إلى"
 " لوحة المعلومات الموروثة\" أعلاه."
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid "section_display_name"
-msgstr "الاسم_المعروض_للقسم "
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10371,8 +11323,8 @@ msgid ""
 "CAN add/delete other moderators and their posts are marked as 'staff'."
 msgstr ""
 "يمكن للمشرفين على النقاشات تعديل أو حذف أية مادة منشورة، وإزالة إشارات إساءة"
-" الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد إجابات، ورؤية المواد المنشورة"
-" من قبل كافة الجماعات. كما بإمكانهم إضافة وحذف وسطاء آخرين ويتم الإشارة على "
+" الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد ردود، ورؤية المواد المنشورة "
+"من قبل كافة الجماعات. كما بإمكانهم إضافة وحذف وسطاء آخرين ويتم الإشارة على "
 "المواد المنشورة من قبلهم بأنها من قبل ’طاقم المساق‘."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10391,8 +11343,8 @@ msgid ""
 "'staff'."
 msgstr ""
 "يمكنلوسطاء النقاشات تعديل أو حذف أية مادة منشورة، وإزالة إشارات إساءة "
-"الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد إجابات، ورؤية المواد المنشورة "
-"من قبل كافة الجماعات. لكن لا يمكنهم إضافة وحذف وسطاء آخرين ويتم الإشارة على "
+"الاستخدام، وإغلاق وإعادة فتح المواضيع، وتأييد ردود، ورؤية المواد المنشورة من"
+" قبل كافة الجماعات. لكن لا يمكنهم إضافة وحذف وسطاء آخرين ويتم الإشارة على "
 "المواد المنشورة من قبلهم بأنها من قبل ’طاقم المساق‘."
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10412,7 +11364,7 @@ msgid ""
 msgstr ""
 "مساعدو المشرف للمجموعة هم أعضاء مجتمع المنتدى الذين تعتقد بأنهم سيشكّلون "
 "عنصراً مساعداً للغاية على صفحات النقاشات. وهم مخولون بتعديل أو حذف أية مواد "
-"منشورة، وإزالة إشارات إساءة الاستخدام، وفتح وإغلاق المواضيع، وتأييد إجابات، "
+"منشورة، وإزالة إشارات إساءة الاستخدام، وفتح وإغلاق المواضيع، وتأييد ردود، "
 "ورؤية المواد المنشورة من كافة الجماعات. ويتم الإشارة إلى المواد التي يقومون "
 "بنشرها على أنها خاصة بـ’مساعد المشرف للمجموعة‘. "
 
@@ -10589,7 +11541,7 @@ msgid ""
 " for this problem and student, click on this button:"
 msgstr ""
 "تجري عمليات إعادة التقييم في الخلفية، بينما تظهر حالة أي مهمّات مفعّلة في "
-"جدول ’المهمّات قيد الانتظار لأستاذ المقرّر‘. لاستعراض الحالة الخاصة بكافة "
+"جدول ’المهمّات قيد الانتظار لموجّه المساق‘. لاستعراض الحالة الخاصة بكافة "
 "المهمّات التي تم إرسالها لهذه المسألة وهذا الطالب، اضغط هذا الزر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -10736,8 +11688,8 @@ msgstr ""
 "\n"
 "{p_tag}ليس لديك حالياً أية مهمّات تقييم نظراء تنتظرك. وحتى تصلك مهمّات تقييم نظراء:\n"
 "{ul_tag}\n"
-"{li_tag}يجب أن تكون قد قدّمت إجابةً على إحدى مسائل تقييم النظراء{end_li_tag}\n"
-"{li_tag}يتعيّن أن يقوم أستاذ المساق بتقييم المقالات المستخدمة بغرض مساعدتك على فهم معايير التقييم بشكلٍ أفضل.{end_li_tag}\n"
+"{li_tag}يجب أن تكون قد قدّمت رداً على إحدى مسائل تقييم النظراء{end_li_tag}\n"
+"{li_tag}يتعيّن أن يقوم موجّه المساق بتقييم المقالات المستخدمة بغرض مساعدتك على فهم معايير التقييم بشكلٍ أفضل.{end_li_tag}\n"
 "{li_tag}يتعيّن وجود تسليمات تنتظر التقييم.{end_li_tag}\n"
 "{end_ul_tag}\n"
 "{end_p_tag}\n"
@@ -10833,7 +11785,7 @@ msgid ""
 "You will now be shown a series of instructor-scored essays, and will be "
 "asked to score them yourself."
 msgstr ""
-"سيتم إطلاعك الآن على سلسلة من المقالات التي تم تقييمها من قبل الموجِّه، "
+"سيتم إطلاعك الآن على سلسلة من المقالات التي تم تقييمها من قبل موجّه المساق، "
 "وسيطلب منك تقييمهم بنفسك. "
 
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -10841,8 +11793,8 @@ msgid ""
 "Once you can score the essays similarly to an instructor, you will be ready "
 "to grade your peers."
 msgstr ""
-"لدى تمكنك من تقييم المقالات بطريقة مشابهة لما يقوم به الموجِه، ستكون جاهزاً "
-"عندها للقيام بالتقييم لنظرائك. "
+"لدى تمكنك من تقييم المقالات بطريقة مشابهة لما يقوم به موجّه المساق، ستكون "
+"جاهزاً عندها للقيام بالتقييم لنظرائك. "
 
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Start learning to grade"
@@ -11036,14 +11988,15 @@ msgid "Qty"
 msgstr "الكمية "
 
 #: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Note: items with strikethough like "
-msgstr "ملاحظة: العناصر المشطوبة مثل"
+msgid "URL"
+msgstr ""
 
+#. Translators: Please keep the "<del>" and "</del>" tags around your
+#. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid " have been refunded."
-msgstr "تم استرداد قيمتها. "
+msgid "Note: items with strikethough like <del>this</del> have been refunded."
+msgstr "ملاحظة: تمّ رد قيمة العناصر المشطوبة على النحو <del>هذا</del>."
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Billed To:"
@@ -11207,10 +12160,6 @@ msgstr "رقم الطلب "
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
 msgstr "المجموع "
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "this"
-msgstr "هذا "
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -12204,14 +13153,6 @@ msgstr "كاميرا ويب ومتصفح حديث "
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"{ff_a_start}Firefox{a_end}, {chrome_a_start}Chrome{a_end}, "
-"{safari_a_start}Safari{a_end}, {ie_a_start}IE9+{a_end}"
-msgstr ""
-"{ff_a_start}فايرفوكس{a_end}، {chrome_a_start}كروم{a_end}، "
-"{safari_a_start}سفاري{a_end}، {ie_a_start} IE9 فما فوق{a_end}"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
 "Please make sure your browser is updated to the most recent version possible"
 msgstr "الرجاء التأكد من أن المتصفح الخاص بك محدّث وفق آخر إصدار ممكن "
 
@@ -12999,6 +13940,45 @@ msgstr "المساق الخاص بك:"
 msgid "Course git url:"
 msgstr "الرابط الإلكتروني لنظام git الخاص بالمساق"
 
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Group Configurations"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "This module is disabled at the moment."
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "إعدادات أخرى للمساق"
+
+#: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "التفاصيل والجدول "
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Grading"
+msgstr "التقييم"
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr "فريق المقرّر"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr "إعدادات متقدمة"
+
 #: cms/templates/howitworks.html
 msgid "Welcome"
 msgstr "مرحباً"
@@ -13520,7 +14500,7 @@ msgstr ""
 "ملاحظة: هذا جزء من الرابط الإلكتروني الخاص بمساقك. لذلك، لا يسمح ترك فراغات "
 "أو استخدام أحرف خاصّة، ولا يمكن تغييره."
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/settings.html
 msgid "Course Run"
 msgstr "مجرى المساق"
 
@@ -13736,10 +14716,6 @@ msgstr "لا يوجد لديك حساب استوديو؟ قم بالتسجيل!"
 msgid "Required Information to Sign In to edX Studio"
 msgstr "المعلومات المطلوبة لتسجيل الدخول لاستوديو edX"
 
-#: cms/templates/login.html cms/templates/register.html
-msgid "Email Address"
-msgstr "عنوان البريد الإلكتروني"
-
 #: cms/templates/login.html
 msgid "Studio Support"
 msgstr "دعم الاستوديو"
@@ -13757,12 +14733,6 @@ msgstr ""
 #: cms/templates/manage_users.html
 msgid "Course Team Settings"
 msgstr "إعدادات فريق المساق"
-
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr "فريق المقرّر"
 
 #: cms/templates/manage_users.html
 msgid "New Team Member"
@@ -14334,21 +15304,13 @@ msgstr ""
 "ومتطلّبات الوقت التقريبية. ويستخدم الطلاب صفحات \"النبذة\" لاختيار المساقات "
 "الجديدة التي سيلتحقون بها."
 
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "إعدادات أخرى للمساق"
+#: cms/templates/settings_advanced.html
+msgid "Hide Deprecated Settings"
+msgstr ""
 
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr "التقييم"
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr "إعدادات متقدمة"
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+msgid "Show Deprecated Settings"
+msgstr ""
 
 #: cms/templates/settings_advanced.html
 msgid "Your policy changes have been saved."
@@ -14404,10 +15366,6 @@ msgstr ""
 "من استخدام علامات الاقتباس المزدوجة (\") حول الجملة. يرجى عدم استخدام علامات"
 " الاقتباس الفردية (')."
 
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "التفاصيل والجدول "
-
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
 msgstr "إعدادات التقييم"
@@ -14447,7 +15405,7 @@ msgstr "الفئات والعناوين لأي من التمارين القاب�
 
 #: cms/templates/settings_graders.html
 msgid "New Assignment Type"
-msgstr "نوع الواجب المطلوب الجديد"
+msgstr "النوع الجديد للواجبات المطلوبة"
 
 #: cms/templates/settings_graders.html
 msgid ""
@@ -14464,7 +15422,7 @@ msgid ""
 "You can specify whether your course offers students a grace period for late "
 "assignments."
 msgstr ""
-"يمكنك تحديد ما إذا كان المساق يقدّم للطلاب فترة سماح للمهمات المفروضة."
+"يمكنك تحديد ما إذا كان المساق يقدّم للطلاب فترة سماح للواجبات المتأخرة."
 
 #: cms/templates/settings_graders.html
 msgid ""
@@ -14472,9 +15430,9 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr ""
-"يمكنك أيضاً إنشاء أنواع المهمات، مثل الفروض، والواجبات، والمختبرات، "
-"والمسابقات، والامتحانات، وتحديد كم يستحقّ كلّ نوع من المهام من علامات "
-"الطالب."
+"يمكنك أيضاً إنشاء أنواع للواجبات، مثل الفروض المنزلية، والمختبرات، "
+"والاختبارات القصيرة، والامتحانات، وتحديد حصة كلّ نوع من أنواع الواجبات من "
+"إجمالي علامات الطالب."
 
 #: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_vertical_wrapper.html
@@ -14830,22 +15788,6 @@ msgstr "كيفية استعمال edX استوديو لإنشاء مساقك"
 #: cms/templates/widgets/sock.html
 msgid "Have problems, questions, or suggestions about edX Studio?"
 msgstr "هل لديك مشاكل، أسئلة، أو إقتراحات حول برنامج استوديو  edX ؟"
-
-#: cms/templates/widgets/split-edit.html
-msgid ""
-"This content experiment refers to a group configuration that has been "
-"deleted."
-msgstr ""
-
-#: cms/templates/widgets/split-edit.html
-msgid "This content experiment uses group configuration '{0}'."
-msgstr ""
-
-#: cms/templates/widgets/split-edit.html
-msgid ""
-"After you select the group configuration and save the content experiment, "
-"you cannot change this setting."
-msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"

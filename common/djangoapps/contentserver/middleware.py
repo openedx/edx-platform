@@ -50,10 +50,15 @@ class StaticContentServer(object):
             if getattr(content, "locked", False):
                 if not hasattr(request, "user") or not request.user.is_authenticated():
                     return HttpResponseForbidden('Unauthorized')
-                if not request.user.is_staff and not CourseEnrollment.is_enrolled_by_partial(
+                if not request.user.is_staff:
+                    if getattr(loc, 'deprecated', False) and not CourseEnrollment.is_enrolled_by_partial(
                         request.user, loc.course_key
-                ):
-                    return HttpResponseForbidden('Unauthorized')
+                    ):
+                        return HttpResponseForbidden('Unauthorized')
+                    if not getattr(loc, 'deprecated', False) and not CourseEnrollment.is_enrolled(
+                        request.user, loc.course_key
+                    ):
+                        return HttpResponseForbidden('Unauthorized')
 
             # convert over the DB persistent last modified timestamp to a HTTP compatible
             # timestamp, so we can simply compare the strings

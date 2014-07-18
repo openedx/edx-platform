@@ -1,4 +1,3 @@
-from itertools import repeat
 from .exceptions import (ItemNotFoundError, NoPathToItem)
 
 
@@ -53,21 +52,18 @@ def path_to_location(modulestore, usage_key):
         while len(queue) > 0:
             (next_usage, path) = queue.pop()  # Takes from the end
 
-            # get_parent_locations should raise ItemNotFoundError if location
-            # isn't found so we don't have to do it explicitly.  Call this
-            # first to make sure the location is there (even if it's a course, and
-            # we would otherwise immediately exit).
-            parents = modulestore.get_parent_locations(next_usage)
+            # get_parent_location raises ItemNotFoundError if location isn't found
+            parent = modulestore.get_parent_location(next_usage)
 
             # print 'Processing loc={0}, path={1}'.format(next_usage, path)
-            if next_usage.definition_key.block_type == "course":
+            if next_usage.block_type == "course":
                 # Found it!
                 path = (next_usage, path)
                 return flatten(path)
 
             # otherwise, add parent locations at the end
             newpath = (next_usage, path)
-            queue.extend(zip(parents, repeat(newpath)))
+            queue.append((parent, newpath))
 
         # If we're here, there is no path
         return None
@@ -96,7 +92,7 @@ def path_to_location(modulestore, usage_key):
     if n > 3:
         position_list = []
         for path_index in range(2, n - 1):
-            category = path[path_index].definition_key.block_type
+            category = path[path_index].block_type
             if category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_item(path[path_index])
                 child_locs = [c.location for c in section_desc.get_children()]

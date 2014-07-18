@@ -6,23 +6,28 @@ import ddt
 
 from mock import patch
 from pytz import UTC
+from unittest import skipUnless
 from webob import Response
 
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_usage_url
+from contentstore.utils import reverse_usage_url, reverse_course_url
 
-from contentstore.views.component import component_handler, get_component_templates
+from contentstore.views.component import (
+    component_handler, get_component_templates,
+    SPLIT_TEST_COMPONENT_TYPE
+)
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import compute_publish_state, PublishState
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore import PublishState
+from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
+from xblock.exceptions import NoSuchHandlerError
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -35,13 +40,14 @@ class ItemTest(CourseTestCase):
         self.course_key = self.course.id
         self.usage_key = self.course.location
 
-    @staticmethod
-    def get_item_from_modulestore(usage_key, draft=False):
+    def get_item_from_modulestore(self, usage_key, verify_is_draft=False):
         """
         Get the item referenced by the UsageKey from the modulestore
         """
-        store = modulestore('draft') if draft else modulestore('direct')
-        return store.get_item(usage_key)
+        item = self.store.get_item(usage_key)
+        if verify_is_draft:
+            self.assertTrue(getattr(item, 'is_draft', False))
+        return item
 
     def response_usage_key(self, response):
         """
@@ -50,7 +56,10 @@ class ItemTest(CourseTestCase):
         """
         parsed = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        return UsageKey.from_string(parsed['locator'])
+        key = UsageKey.from_string(parsed['locator'])
+        if key.course_key.run is None:
+            key = key.map_into_course(CourseKey.from_string(parsed['courseKey']))
+        return key
 
     def create_xblock(self, parent_usage_key=None, display_name=None, category=None, boilerplate=None):
         data = {
@@ -106,7 +115,7 @@ class GetItem(ItemTest):
         self.assertNotIn('wrapper-xblock', html)
 
         # Verify that the header and article tags are still added
-        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
         self.assertIn('<article class="xblock-render">', html)
 
     def test_get_container_fragment(self):
@@ -122,7 +131,7 @@ class GetItem(ItemTest):
 
         # Verify that the Studio nesting wrapper has been added
         self.assertIn('level-nesting', html)
-        self.assertIn('<header class="xblock-header">', html)
+        self.assertIn('<header class="xblock-header xblock-header-vertical">', html)
         self.assertIn('<article class="xblock-render">', html)
 
         # Verify that the Studio element wrapper has been added
@@ -149,7 +158,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/location:MITx\+999\+Robot_Super_Course\+wrapper\+\w+" class="action-button">\s*'
+            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -217,9 +226,7 @@ class TestCreateItem(ItemTest):
             boilerplate=template_id
         )
         prob_usage_key = self.response_usage_key(resp)
-        problem = self.get_item_from_modulestore(prob_usage_key, True)
-        # ensure it's draft
-        self.assertTrue(problem.is_draft)
+        problem = self.get_item_from_modulestore(prob_usage_key, verify_is_draft=True)
         # check against the template
         template = CapaDescriptor.get_template(template_id)
         self.assertEqual(problem.data, template['data'])
@@ -277,8 +284,8 @@ class TestDuplicateItem(ItemTest):
             self.assertTrue(check_equality(source_usage_key, usage_key), "Duplicated item differs from original")
 
         def check_equality(source_usage_key, duplicate_usage_key):
-            original_item = self.get_item_from_modulestore(source_usage_key, draft=True)
-            duplicated_item = self.get_item_from_modulestore(duplicate_usage_key, draft=True)
+            original_item = self.get_item_from_modulestore(source_usage_key)
+            duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
 
             self.assertNotEqual(
                 original_item.location,
@@ -353,7 +360,7 @@ class TestDuplicateItem(ItemTest):
         """
         def verify_name(source_usage_key, parent_usage_key, expected_name, display_name=None):
             usage_key = self._duplicate_item(parent_usage_key, source_usage_key, display_name)
-            duplicated_item = self.get_item_from_modulestore(usage_key, draft=True)
+            duplicated_item = self.get_item_from_modulestore(usage_key)
             self.assertEqual(duplicated_item.display_name, expected_name)
             return usage_key
 
@@ -406,6 +413,18 @@ class TestEditItem(ItemTest):
 
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
+    def verify_publish_state(self, usage_key, expected_publish_state):
+        """
+        Helper method that gets the item from the module store and verifies that the publish state is as expected.
+        Returns the item corresponding to the given usage_key.
+        """
+        item = self.get_item_from_modulestore(
+            usage_key,
+            (expected_publish_state == PublishState.private) or (expected_publish_state == PublishState.draft)
+        )
+        self.assertEqual(expected_publish_state, self.store.compute_publish_state(item))
+        return item
+
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
@@ -414,26 +433,26 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'metadata': {'rerandomize': 'onreset'}}
         )
-        problem = self.get_item_from_modulestore(self.problem_usage_key, True)
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertEqual(problem.rerandomize, 'onreset')
         self.client.ajax_post(
             self.problem_update_url,
             data={'metadata': {'rerandomize': None}}
         )
-        problem = self.get_item_from_modulestore(self.problem_usage_key, True)
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertEqual(problem.rerandomize, 'never')
 
     def test_null_field(self):
         """
         Sending null in for a field 'deletes' it
         """
-        problem = self.get_item_from_modulestore(self.problem_usage_key, True)
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertIsNotNone(problem.markdown)
         self.client.ajax_post(
             self.problem_update_url,
             data={'nullout': ['markdown']}
         )
-        problem = self.get_item_from_modulestore(self.problem_usage_key, True)
+        problem = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertIsNone(problem.markdown)
 
     def test_date_fields(self):
@@ -514,13 +533,12 @@ class TestEditItem(ItemTest):
     def test_make_public(self):
         """ Test making a private problem public (publishing it). """
         # When the problem is first created, it is only in draft (because of its category).
-        with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_usage_key, False)
+        self.verify_publish_state(self.problem_usage_key, PublishState.private)
         self.client.ajax_post(
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        self.verify_publish_state(self.problem_usage_key, PublishState.public)
 
     def test_make_private(self):
         """ Test making a public problem private (un-publishing it). """
@@ -529,14 +547,14 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+
         # Now make it private
         self.client.ajax_post(
             self.problem_update_url,
             data={'publish': 'make_private'}
         )
-        with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_usage_key, False)
+        self.verify_publish_state(self.problem_usage_key, PublishState.private)
 
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
@@ -545,21 +563,23 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+
         # Now make it draft, which means both versions will exist.
         self.client.ajax_post(
             self.problem_update_url,
             data={'publish': 'create_draft'}
         )
+        self.verify_publish_state(self.problem_usage_key, PublishState.draft)
+
         # Update the draft version and check that published is different.
         self.client.ajax_post(
             self.problem_update_url,
             data={'metadata': {'due': '2077-10-10T04:00Z'}}
         )
-        published = self.get_item_from_modulestore(self.problem_usage_key, False)
+        updated_draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
+        self.assertEqual(updated_draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
         self.assertIsNone(published.due)
-        draft = self.get_item_from_modulestore(self.problem_usage_key, True)
-        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_make_public_with_update(self):
         """ Update a problem and make it public at the same time. """
@@ -570,7 +590,7 @@ class TestEditItem(ItemTest):
                 'publish': 'make_public'
             }
         )
-        published = self.get_item_from_modulestore(self.problem_usage_key, False)
+        published = self.get_item_from_modulestore(self.problem_usage_key)
         self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_make_private_with_update(self):
@@ -580,6 +600,9 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
+        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+
+        # Make problem private and update.
         self.client.ajax_post(
             self.problem_update_url,
             data={
@@ -587,9 +610,7 @@ class TestEditItem(ItemTest):
                 'publish': 'make_private'
             }
         )
-        with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_usage_key, False)
-        draft = self.get_item_from_modulestore(self.problem_usage_key, True)
+        draft = self.verify_publish_state(self.problem_usage_key, PublishState.private)
         self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_create_draft_with_update(self):
@@ -599,7 +620,8 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+
         # Now make it draft, which means both versions will exist.
         self.client.ajax_post(
             self.problem_update_url,
@@ -608,10 +630,9 @@ class TestEditItem(ItemTest):
                 'publish': 'create_draft'
             }
         )
-        published = self.get_item_from_modulestore(self.problem_usage_key, False)
-        self.assertIsNone(published.due)
-        draft = self.get_item_from_modulestore(self.problem_usage_key, True)
+        draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertIsNone(published.due)
 
     def test_create_draft_with_multiple_requests(self):
         """
@@ -622,7 +643,8 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+
         # Now make it draft, which means both versions will exist.
         self.client.ajax_post(
             self.problem_update_url,
@@ -630,9 +652,7 @@ class TestEditItem(ItemTest):
                 'publish': 'create_draft'
             }
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
-        draft_1 = self.get_item_from_modulestore(self.problem_usage_key, True)
-        self.assertIsNotNone(draft_1)
+        draft_1 = self.verify_publish_state(self.problem_usage_key, PublishState.draft)
 
         # Now check that when a user sends request to create a draft when there is already a draft version then
         # user gets that already created draft instead of getting 'DuplicateItemError' exception.
@@ -642,7 +662,7 @@ class TestEditItem(ItemTest):
                 'publish': 'create_draft'
             }
         )
-        draft_2 = self.get_item_from_modulestore(self.problem_usage_key, True)
+        draft_2 = self.verify_publish_state(self.problem_usage_key, PublishState.draft)
         self.assertIsNotNone(draft_2)
         self.assertEqual(draft_1, draft_2)
 
@@ -655,9 +675,9 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key))
 
-        # Now make it private, and check that its published version not exists
+        # Now make it private, and check that its version is private
         resp = self.client.ajax_post(
             self.problem_update_url,
             data={
@@ -665,10 +685,7 @@ class TestEditItem(ItemTest):
             }
         )
         self.assertEqual(resp.status_code, 200)
-        with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_usage_key, False)
-        draft_1 = self.get_item_from_modulestore(self.problem_usage_key, True)
-        self.assertIsNotNone(draft_1)
+        draft_1 = self.verify_publish_state(self.problem_usage_key, PublishState.private)
 
         # Now check that when a user sends request to make it private when it already is private then
         # user gets that private version instead of getting 'ItemNotFoundError' exception.
@@ -679,24 +696,21 @@ class TestEditItem(ItemTest):
             }
         )
         self.assertEqual(resp.status_code, 200)
-        with self.assertRaises(ItemNotFoundError):
-            self.get_item_from_modulestore(self.problem_usage_key, False)
-        draft_2 = self.get_item_from_modulestore(self.problem_usage_key, True)
-        self.assertIsNotNone(draft_2)
+        draft_2 = self.verify_publish_state(self.problem_usage_key, PublishState.private)
         self.assertEqual(draft_1, draft_2)
 
     def test_published_and_draft_contents_with_update(self):
         """ Create a draft and publish it then modify the draft and check that published content is not modified """
 
         # Make problem public.
-        resp = self.client.ajax_post(
+        self.client.ajax_post(
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_usage_key, False))
+        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
 
         # Now make a draft
-        resp = self.client.ajax_post(
+        self.client.ajax_post(
             self.problem_update_url,
             data={
                 'id': unicode(self.problem_usage_key),
@@ -707,23 +721,21 @@ class TestEditItem(ItemTest):
         )
 
         # Both published and draft content should be different
-        published = self.get_item_from_modulestore(self.problem_usage_key, False)
-        draft = self.get_item_from_modulestore(self.problem_usage_key, True)
+        draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertNotEqual(draft.data, published.data)
 
         # Get problem by 'xblock_handler'
-        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": "student_view"})
+        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDENT_VIEW})
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Activate the editing view
-        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": "studio_view"})
+        view_url = reverse_usage_url("xblock_view_handler", self.problem_usage_key, {"view_name": STUDIO_VIEW})
         resp = self.client.get(view_url, HTTP_ACCEPT='application/json')
         self.assertEqual(resp.status_code, 200)
 
         # Both published and draft content should still be different
-        published = self.get_item_from_modulestore(self.problem_usage_key, False)
-        draft = self.get_item_from_modulestore(self.problem_usage_key, True)
+        draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertNotEqual(draft.data, published.data)
 
     def test_publish_states_of_nested_xblocks(self):
@@ -738,10 +750,8 @@ class TestEditItem(ItemTest):
 
         # The unit and its children should be private initially
         unit_update_url = reverse_usage_url('xblock_handler', unit_usage_key)
-        unit = self.get_item_from_modulestore(unit_usage_key, True)
-        html = self.get_item_from_modulestore(html_usage_key, True)
-        self.assertEqual(compute_publish_state(unit), PublishState.private)
-        self.assertEqual(compute_publish_state(html), PublishState.private)
+        self.verify_publish_state(unit_usage_key, PublishState.private)
+        self.verify_publish_state(html_usage_key, PublishState.private)
 
         # Make the unit public and verify that the problem is also made public
         resp = self.client.ajax_post(
@@ -749,10 +759,8 @@ class TestEditItem(ItemTest):
             data={'publish': 'make_public'}
         )
         self.assertEqual(resp.status_code, 200)
-        unit = self.get_item_from_modulestore(unit_usage_key, True)
-        html = self.get_item_from_modulestore(html_usage_key, True)
-        self.assertEqual(compute_publish_state(unit), PublishState.public)
-        self.assertEqual(compute_publish_state(html), PublishState.public)
+        self.verify_publish_state(unit_usage_key, PublishState.public)
+        self.verify_publish_state(html_usage_key, PublishState.public)
 
         # Make a draft for the unit and verify that the problem also has a draft
         resp = self.client.ajax_post(
@@ -764,12 +772,11 @@ class TestEditItem(ItemTest):
             }
         )
         self.assertEqual(resp.status_code, 200)
-        unit = self.get_item_from_modulestore(unit_usage_key, True)
-        html = self.get_item_from_modulestore(html_usage_key, True)
-        self.assertEqual(compute_publish_state(unit), PublishState.draft)
-        self.assertEqual(compute_publish_state(html), PublishState.draft)
+        self.verify_publish_state(unit_usage_key, PublishState.draft)
+        self.verify_publish_state(html_usage_key, PublishState.draft)
 
 
+@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
@@ -791,6 +798,9 @@ class TestEditSplitModule(ItemTest):
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
         self.split_test_usage_key = self.response_usage_key(resp)
         self.split_test_update_url = reverse_usage_url("xblock_handler", self.split_test_usage_key)
+        self.request_factory = RequestFactory()
+        self.request = self.request_factory.get('/dummy-url')
+        self.request.user = self.user
 
     def _update_partition_id(self, partition_id):
         """
@@ -807,16 +817,24 @@ class TestEditSplitModule(ItemTest):
         )
 
         # Verify the partition_id was saved.
-        split_test = self.get_item_from_modulestore(self.split_test_usage_key, True)
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
         self.assertEqual(partition_id, split_test.user_partition_id)
         return split_test
 
-    def test_split_create_groups(self):
+    def _assert_children(self, expected_number):
         """
-        Test that verticals are created for the experiment groups when
-        a spit test module is edited.
+        Verifies the number of children of the split_test instance.
         """
         split_test = self.get_item_from_modulestore(self.split_test_usage_key, True)
+        self.assertEqual(expected_number, len(split_test.children))
+        return split_test
+
+    def test_create_groups(self):
+        """
+        Test that verticals are created for the configuration groups when
+        a spit test module is edited.
+        """
+        split_test = self.get_item_from_modulestore(self.split_test_usage_key, verify_is_draft=True)
         # Initially, no user_partition_id is set, and the split_test has no children.
         self.assertEqual(-1, split_test.user_partition_id)
         self.assertEqual(0, len(split_test.children))
@@ -826,75 +844,178 @@ class TestEditSplitModule(ItemTest):
 
         # Verify that child verticals have been set to match the groups
         self.assertEqual(2, len(split_test.children))
-        vertical_0 = self.get_item_from_modulestore(split_test.children[0], True)
-        vertical_1 = self.get_item_from_modulestore(split_test.children[1], True)
+        vertical_0 = self.get_item_from_modulestore(split_test.children[0], verify_is_draft=True)
+        vertical_1 = self.get_item_from_modulestore(split_test.children[1], verify_is_draft=True)
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
         self.assertEqual("alpha", vertical_0.display_name)
         self.assertEqual("beta", vertical_1.display_name)
 
-        # Verify that the group_id_to child mapping is correct.
+        # Verify that the group_id_to_child mapping is correct.
         self.assertEqual(2, len(split_test.group_id_to_child))
-        split_test.group_id_to_child['0'] = vertical_0.location
-        split_test.group_id_to_child['1'] = vertical_1.location
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
 
-    def test_split_change_user_partition_id(self):
+    def test_change_user_partition_id(self):
         """
-        Test what happens when the user_partition_id is changed to a different experiment.
-
-        This is not currently supported by the Studio UI.
+        Test what happens when the user_partition_id is changed to a different groups
+        group configuration.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_vertical_0_location = split_test.children[0]
         initial_vertical_1_location = split_test.children[1]
 
-        # Set to second experiment
+        # Set to second group configuration
         split_test = self._update_partition_id(1)
-        # We don't currently remove existing children.
+        # We don't remove existing children.
         self.assertEqual(5, len(split_test.children))
-        vertical_0 = self.get_item_from_modulestore(split_test.children[2], True)
-        vertical_1 = self.get_item_from_modulestore(split_test.children[3], True)
-        vertical_2 = self.get_item_from_modulestore(split_test.children[4], True)
+        self.assertEqual(initial_vertical_0_location, split_test.children[0])
+        self.assertEqual(initial_vertical_1_location, split_test.children[1])
+        vertical_0 = self.get_item_from_modulestore(split_test.children[2], verify_is_draft=True)
+        vertical_1 = self.get_item_from_modulestore(split_test.children[3], verify_is_draft=True)
+        vertical_2 = self.get_item_from_modulestore(split_test.children[4], verify_is_draft=True)
 
         # Verify that the group_id_to child mapping is correct.
         self.assertEqual(3, len(split_test.group_id_to_child))
-        split_test.group_id_to_child['0'] = vertical_0.location
-        split_test.group_id_to_child['1'] = vertical_1.location
-        split_test.group_id_to_child['2'] = vertical_2.location
+        self.assertEqual(vertical_0.location, split_test.group_id_to_child['0'])
+        self.assertEqual(vertical_1.location, split_test.group_id_to_child['1'])
+        self.assertEqual(vertical_2.location, split_test.group_id_to_child['2'])
         self.assertNotEqual(initial_vertical_0_location, vertical_0.location)
         self.assertNotEqual(initial_vertical_1_location, vertical_1.location)
 
-    def test_split_same_user_partition_id(self):
+    def test_change_same_user_partition_id(self):
         """
         Test that nothing happens when the user_partition_id is set to the same value twice.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
-        # Set again to first experiment.
+        # Set again to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
 
-    def test_split_non_existent_user_partition_id(self):
+    def test_change_non_existent_user_partition_id(self):
         """
         Test that nothing happens when the user_partition_id is set to a value that doesn't exist.
 
         The user_partition_id will be updated, but children and group_id_to_child map will not change.
         """
-        # Set to first experiment.
+        # Set to first group configuration.
         split_test = self._update_partition_id(0)
         self.assertEqual(2, len(split_test.children))
         initial_group_id_to_child = split_test.group_id_to_child
 
-        # Set to an experiment that doesn't exist.
+        # Set to an group configuration that doesn't exist.
         split_test = self._update_partition_id(-50)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
+
+    def test_delete_children(self):
+        """
+        Test that deleting a child in the group_id_to_child map updates the map.
+
+        Also test that deleting a child not in the group_id_to_child_map behaves properly.
+        """
+        # Set to first group configuration.
+        self._update_partition_id(0)
+        split_test = self._assert_children(2)
+        vertical_1_usage_key = split_test.children[1]
+
+        # Add an extra child to the split_test
+        resp = self.create_xblock(category='html', parent_usage_key=self.split_test_usage_key)
+        extra_child_usage_key = self.response_usage_key(resp)
+        self._assert_children(3)
+
+        # Remove the first child (which is part of the group configuration).
+        resp = self.client.ajax_post(
+            self.split_test_update_url,
+            data={'children': [unicode(vertical_1_usage_key), unicode(extra_child_usage_key)]}
+        )
+        self.assertEqual(resp.status_code, 200)
+        split_test = self._assert_children(2)
+
+        # Check that group_id_to_child was updated appropriately
+        group_id_to_child = split_test.group_id_to_child
+        self.assertEqual(1, len(group_id_to_child))
+        self.assertEqual(vertical_1_usage_key, group_id_to_child['1'])
+
+        # Remove the "extra" child and make sure that group_id_to_child did not change.
+        resp = self.client.ajax_post(
+            self.split_test_update_url,
+            data={'children': [unicode(vertical_1_usage_key)]}
+        )
+        self.assertEqual(resp.status_code, 200)
+        split_test = self._assert_children(1)
+        self.assertEqual(group_id_to_child, split_test.group_id_to_child)
+
+    def test_add_groups(self):
+        """
+        Test the "fix up behavior" when groups are missing (after a group is added to a group configuration).
+
+        This test actually belongs over in common, but it relies on a mutable modulestore.
+        TODO: move tests that can go over to common after the mixed modulestore work is done.  # pylint: disable=fixme
+        """
+        # Set to first group configuration.
+        split_test = self._update_partition_id(0)
+
+        # Add a group to the first group configuration.
+        split_test.user_partitions = [
+            UserPartition(
+                0, 'first_partition', 'First Partition',
+                [Group("0", 'alpha'), Group("1", 'beta'), Group("2", 'pie')]
+            )
+        ]
+        self.store.update_item(split_test, self.user.id)
+
+        # group_id_to_child and children have not changed yet.
+        split_test = self._assert_children(2)
+        group_id_to_child = split_test.group_id_to_child
+        self.assertEqual(2, len(group_id_to_child))
+
+        # Call add_missing_groups method to add the missing group.
+        split_test.add_missing_groups(self.request)
+        split_test = self._assert_children(3)
+        self.assertNotEqual(group_id_to_child, split_test.group_id_to_child)
+        group_id_to_child = split_test.group_id_to_child
+        self.assertEqual(split_test.children[2], group_id_to_child["2"])
+
+        # Call add_missing_groups again -- it should be a no-op.
+        split_test.add_missing_groups(self.request)
+        split_test = self._assert_children(3)
+        self.assertEqual(group_id_to_child, split_test.group_id_to_child)
+
+    def test_view_index_ok(self):
+        """
+        Basic check that the groups configuration page responds correctly.
+        """
+        if SPLIT_TEST_COMPONENT_TYPE not in self.course.advanced_modules:
+            self.course.advanced_modules.append(SPLIT_TEST_COMPONENT_TYPE)
+            self.store.update_item(self.course, self.user.id)
+
+        url = reverse_course_url('group_configurations_list_handler', self.course.id)
+        resp = self.client.get(url)
+        self.assertContains(resp, self.course.display_name)
+        self.assertContains(resp, 'First Partition')
+        self.assertContains(resp, 'alpha')
+        self.assertContains(resp, 'Second Partition')
+        self.assertContains(resp, 'Group 1')
+
+    def test_view_index_disabled(self):
+        """
+        Check that group configuration page is not displayed when turned off.
+        """
+        if SPLIT_TEST_COMPONENT_TYPE in self.course.advanced_modules:
+            self.course.advanced_modules.remove(SPLIT_TEST_COMPONENT_TYPE)
+            self.store.update_item(self.course, self.user.id)
+
+        url = reverse_course_url('group_configurations_list_handler', self.course.id)
+        resp = self.client.get(url)
+        self.assertContains(resp, "module is disabled")
 
 
 @ddt.ddt
@@ -902,11 +1023,14 @@ class TestComponentHandler(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
 
-        patcher = patch('contentstore.views.component.get_modulestore')
-        self.get_modulestore = patcher.start()
+        patcher = patch('contentstore.views.component.modulestore')
+        self.modulestore = patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.descriptor = self.get_modulestore.return_value.get_item.return_value
+        # component_handler calls modulestore.get_item to get the descriptor of the requested xBlock.
+        # Here, we mock the return value of modulestore.get_item so it can be used to mock the handler
+        # of the xBlock descriptor.
+        self.descriptor = self.modulestore.return_value.get_item.return_value
 
         self.usage_key_string = unicode(
             Location('dummy_org', 'dummy_course', 'dummy_run', 'dummy_category', 'dummy_name')
@@ -918,7 +1042,7 @@ class TestComponentHandler(TestCase):
         self.request.user = self.user
 
     def test_invalid_handler(self):
-        self.descriptor.handle.side_effect = Http404
+        self.descriptor.handle.side_effect = NoSuchHandlerError
 
         with self.assertRaises(Http404):
             component_handler(self.request, self.usage_key_string, 'invalid_handler')

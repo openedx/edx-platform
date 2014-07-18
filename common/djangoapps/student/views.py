@@ -23,11 +23,15 @@ from django.db import IntegrityError, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
                          Http404)
 from django.shortcuts import redirect
+from django.utils.translation import ungettext
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from django.template.response import TemplateResponse
 
@@ -41,7 +45,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory
+    create_comments_service_user, PasswordHistory, UserSignupSource
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -52,7 +56,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
@@ -85,6 +89,7 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -461,7 +466,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -542,7 +547,7 @@ def dashboard(request):
 def try_change_enrollment(request):
     """
     This method calls change_enrollment if the necessary POST
-    parameters are present, but does not return anything. It
+    parameters are present, but does not return anything in most cases. It
     simply logs the result or exception. This is usually
     called after a registration or login, as secondary action.
     It should not interrupt a successful registration or login.
@@ -558,7 +563,10 @@ def try_change_enrollment(request):
                     enrollment_response.content
                 )
             )
-            if enrollment_response.content != '':
+            # Hack: since change_enrollment delivers its redirect_url in the content
+            # of its response, we check here that only the 200 codes with content
+            # will return redirect_urls.
+            if enrollment_response.status_code == 200 and enrollment_response.content != '':
                 return enrollment_response.content
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
@@ -612,6 +620,12 @@ def change_enrollment(request):
         if is_course_full:
             return HttpResponseBadRequest(_("Course is full"))
 
+        # check to see if user is currently enrolled in that course
+        if CourseEnrollment.is_enrolled(user, course_id):
+            return HttpResponseBadRequest(
+                _("Student is already enrolled")
+            )
+
         # If this course is available in multiple modes, redirect them to a page
         # where they can choose which mode they want.
         available_modes = CourseMode.modes_for_course(course_id)
@@ -647,13 +661,16 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
+# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
+# seems Probably Incorrect
 def _parse_course_id_from_string(input_str):
     """
     Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
         return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
@@ -691,7 +708,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
@@ -1006,6 +1023,21 @@ class AccountValidationError(Exception):
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
+
+
+@receiver(post_save, sender=User)
+def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+    """
+    handler that saves the user Signup Source
+    when the user is created
+    """
+    if 'created' in kwargs and kwargs['created']:
+        site = microsite.get_value('SITE_NAME')
+        if site:
+            user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
+            user_signup_source.save()
+            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+
 
 def _do_create_account(post_vars):
     """
@@ -1511,14 +1543,20 @@ def password_reset_confirm_wrapper(
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE']
             else:
                 num_distinct = settings.ADVANCED_SECURITY_CONFIG['MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE']
-            err_msg = _("You are re-using a password that you have used recently. You must "
-                        "have {0} distinct password(s) before reusing a previous password.").format(num_distinct)
+            err_msg = ungettext(
+                "You are re-using a password that you have used recently. You must have {num} distinct password before reusing a previous password.",
+                "You are re-using a password that you have used recently. You must have {num} distinct passwords before reusing a previous password.",
+                num_distinct
+            ).format(num=num_distinct)
 
         # also, check to see if passwords are getting reset too frequent
         if PasswordHistory.is_password_reset_too_soon(user):
             num_days = settings.ADVANCED_SECURITY_CONFIG['MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS']
-            err_msg = _("You are resetting passwords too frequently. Due to security policies, "
-                        "{0} day(s) must elapse between password resets").format(num_days)
+            err_msg = ungettext(
+                "You are resetting passwords too frequently. Due to security policies, {num} day must elapse between password resets.",
+                "You are resetting passwords too frequently. Due to security policies, {num} days must elapse between password resets.",
+                num_days
+            ).format(num=num_days)
 
     if err_msg:
         # We have an password reset attempt which violates some security policy, use the

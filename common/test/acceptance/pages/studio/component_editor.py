@@ -2,6 +2,7 @@ from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from utils import click_css
+from selenium.webdriver.support.ui import Select
 
 
 class ComponentEditorView(PageObject):
@@ -40,7 +41,7 @@ class ComponentEditorView(PageObject):
         """
         return None
 
-    def get_setting_entry_index(self, label):
+    def get_setting_element(self, label):
         """
         Returns the index of the setting entry with given label (display name) within the Settings modal.
         """
@@ -48,19 +49,27 @@ class ComponentEditorView(PageObject):
         setting_labels = self.q(css=self._bounded_selector('.metadata_edit .wrapper-comp-setting .setting-label'))
         for index, setting in enumerate(setting_labels):
             if setting.text == label:
-                return index
+                return self.q(css=self._bounded_selector('.metadata_edit div.wrapper-comp-setting .setting-input'))[index]
         return None
 
     def set_field_value_and_save(self, label, value):
         """
-        Set the field with given label (display name) to the specified value, and presses Save.
+        Sets the text field with given label (display name) to the specified value, and presses Save.
         """
-        index = self.get_setting_entry_index(label)
-        elem = self.q(css=self._bounded_selector('.metadata_edit div.wrapper-comp-setting input.setting-input'))[index]
+        elem = self.get_setting_element(label)
         # Click in the field, delete the value there.
         action = ActionChains(self.browser).click(elem)
         for _x in range(0, len(elem.get_attribute('value'))):
             action = action.send_keys(Keys.BACKSPACE)
         # Send the new text, then Tab to move to the next field (so change event is triggered).
         action.send_keys(value).send_keys(Keys.TAB).perform()
+        click_css(self, 'a.action-save')
+
+    def set_select_value_and_save(self, label, value):
+        """
+        Sets the select with given label (display name) to the specified value, and presses Save.
+        """
+        elem = self.get_setting_element(label)
+        select = Select(elem)
+        select.select_by_value(value)
         click_css(self, 'a.action-save')

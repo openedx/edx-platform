@@ -72,8 +72,12 @@ DEBUG_TOOLBAR_CONFIG = {
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 ###############################################################################
-# Lastly, see if the developer has any local overrides.
+# See if the developer has any local overrides.
 try:
     from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
+
+#####################################################################
+# Lastly, run any migrations, if needed.
+MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)

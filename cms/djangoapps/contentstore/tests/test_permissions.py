@@ -3,11 +3,9 @@ Test CRUD for authorization.
 """
 import copy
 
-from django.test.utils import override_settings
 from django.contrib.auth.models import User
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.tests.utils import AjaxEnabledTestClient
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_url, reverse_course_url
@@ -16,7 +14,6 @@ from contentstore.views.access import has_course_access
 from student import auth
 
 
-@override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestCourseAccess(ModuleStoreTestCase):
     """
     Course-based access (as opposed to access of a non-course xblock)
@@ -27,23 +24,10 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         Create a pool of users w/o granting them any permissions
         """
-        super(TestCourseAccess, self).setUp()
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the use so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
+        user_password = super(TestCourseAccess, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=uname, password=password)
+        self.client.login(username=self.user.username, password=user_password)
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_key = SlashSeparatedCourseKey('myu', 'mydept.mycourse', 'myrun')

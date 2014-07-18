@@ -9,7 +9,7 @@ from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreEnum
 
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
@@ -43,7 +43,7 @@ class TestXMLModuleStore(unittest.TestCase):
 
     def test_xml_modulestore_type(self):
         store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
-        self.assertEqual(store.get_modulestore_type('foo/bar/baz'), XML_MODULESTORE_TYPE)
+        self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
 
     def test_unicode_chars_in_xml_content(self):
         # edX/full/6.002_Spring_2012 has non-ASCII chars, and during

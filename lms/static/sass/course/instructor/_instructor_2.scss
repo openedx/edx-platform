@@ -597,7 +597,7 @@ section.instructor-dashboard-content-2 {
     float: left;
     clear: both;
     margin-top: 25px;
-  
+
     .metrics-left, .metrics-left-header {
       position: relative;
       width: 30%;
@@ -611,7 +611,7 @@ section.instructor-dashboard-content-2 {
     .metrics-section.metrics-left {
     	height: 640px;
     }
-    
+
     .metrics-right, .metrics-right-header {
       position: relative;
       width: 65%;
@@ -627,7 +627,7 @@ section.instructor-dashboard-content-2 {
     .metrics-section.metrics-right {
     	height: 295px;
     }
-          
+
     svg {
       .stacked-bar {
         cursor: pointer;
@@ -765,4 +765,277 @@ section.instructor-dashboard-content-2 {
 
 input[name="subject"] {
   width:600px;
+}
+
+.enrollment-wrapper {
+  margin-bottom: $baseline * 2;
+
+  .count {
+    color: green;
+    font-weight: bold;
+  }
+}
+
+.ecommerce-wrapper{
+  h2{
+    height: 26px;
+    line-height: 26px;
+    span{
+      float: right;
+      font-size: 16px;
+      font-weight: bold;
+      span{
+        background: #ddd;
+        padding: 2px 9px;
+        border-radius: 2px;
+        float: none;
+        font-weight: 400;
+      }
+    }
+  }
+  span.tip{
+    padding: 10px 15px;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background: #f8f4ec;
+    color: #3c3c3c;
+    line-height: 30px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+      float: right;
+    }
+  }
+
+}
+#e-commerce{
+  .coupon-errors {
+    background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+    border-bottom: 1px solid #B72667;
+    margin-bottom: 20px;
+    display: none;
+    }
+  .content{
+    padding: 0 !important;
+  }
+  .coupons-table {
+    width: 100%;
+    tr:nth-child(even){
+        background-color: #f8f8f8;
+        border-bottom: 1px solid #f3f3f3;
+      }
+    tr.always-gray{
+      background: #eee !important;
+      border-top: 2px solid #FFFFFF;
+    }
+    tr.always-white{
+      background: #fff !important;
+      td{
+        padding: 30px 0px 10px;
+      }
+    }
+    .coupons-headings {
+      height: 40px;
+      border-bottom: 1px solid #BEBEBE;
+
+      th:nth-child(5){
+        text-align: center;
+        width: 120px;
+      }
+      th:first-child{
+        padding-left: 20px;
+      }
+      th {
+        text-align: left;
+        border-bottom: 1px solid $border-color-1;
+
+        &.c_code {
+          width: 170px;
+        }
+        &.c_count {
+          width: 85px;
+        }
+        &.c_course_id {
+          width: 320px;
+          word-wrap: break-word;
+        }
+        &.c_discount {
+          width: 90px;
+        }
+        &.c_action {
+          width: 89px;
+        }
+        &.c_dsc{
+          width: 260px;
+          word-wrap: break-word;
+        }
+      }
+    }
+
+    // in_active coupon rows style
+    .inactive_coupon{
+      background:  #FFF0F0 !important;
+      text-decoration: line-through;
+      color: rgba(51,51,51,0.2);
+      border-bottom: 1px solid #fff;
+      td {
+        a {
+          color:  rgba(51,51,51,0.2);
+        }
+      }
+    }
+
+    // coupon items style
+    .coupons-items {
+      td {
+        padding: 10px 0px;
+        position: relative;
+        line-height: normal;
+        span.old-price{
+          left: -75px;
+          position: relative;
+          text-decoration: line-through;
+          color: red;
+          font-size: 12px;
+          top: -1px;
+        }
+      }
+      td:nth-child(5),td:first-child{
+        padding-left: 20px;
+      }
+      td:nth-child(2){
+         line-height: 22px;
+        padding-right: 0px;
+        word-wrap: break-word;
+      }
+      td:nth-child(5){
+        padding-left: 0;
+        text-align: center;
+      }
+      td{
+        a.edit-right{
+          margin-left: 15px;
+        }
+      }
+    }
+  }
+
+  // coupon edit and add modals 
+  #add-coupon-modal, #edit-coupon-modal{
+    .inner-wrapper {
+      background: #fff;
+    }
+    top:-95px !important;
+    width: 650px;
+    margin-left: -325px;
+    border-radius: 2px;
+    input[type="submit"]#update_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    input[type="submit"]#add_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    .modal-form-error {
+      box-shadow: inset 0 -1px 2px 0 #f3d9db;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 20px 0 10px 0 !important;
+      padding: 20px;
+      border: none;
+      border-bottom: 3px solid #a0050e;
+      background: #fbf2f3;
+    }
+    ol.list-input{
+      li{
+        width: 278px;
+        float: left;
+        label.required:after {
+          content: "*";
+          margin-left: 5px;
+        }
+      }
+      li:nth-child(even){
+        margin-left: 30px !important;
+      }
+      li:nth-child(3), li:nth-child(4){
+        margin-left: 0px !important;
+        width: 100%;
+      }
+      li:nth-child(3) {
+        margin-bottom: 0px !important;
+        textarea {
+          min-height: 100px;
+        }
+      }
+      li:last-child{
+        margin-bottom: 0px !important;
+      }
+
+    }
+    #coupon-content {
+      padding: 20px;
+      header {
+        margin: 0;
+        padding: 0;
+        h2 {
+          font-size: 24px;
+          font-weight: 100;
+          color: #1580b0;
+          text-align: left;
+        }
+      }
+      .instructions p {
+        margin-bottom: 5px;
+      }
+      form {
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+        border: none;
+        padding: 0;
+        .group-form {
+          margin: 0;
+          padding-top: 0;
+          padding-bottom: 20px;
+        }
+        .list-input {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+        .readonly {
+          background-color: #eee !important;
+          color: #aaa;
+        }
+        .field {
+          margin: 0 0 20px 0;
+        }
+        .field.required label {
+          font-weight: 600;
+        }
+        .field label {
+          -webkit-transition: color 0.15s ease-in-out 0s;
+          -moz-transition: color 0.15s ease-in-out 0s;
+          transition: color 0.15s ease-in-out 0s;
+          margin: 0 0 5px 0;
+          color: #333;
+        }
+        .field.text input {
+          background: #fff;
+          margin-bottom: 0;
+        }
+        .field input {
+          width: 100%;
+          margin: 0;
+          padding: 10px 15px;
+        }
+      }
+    }
+  }
 }

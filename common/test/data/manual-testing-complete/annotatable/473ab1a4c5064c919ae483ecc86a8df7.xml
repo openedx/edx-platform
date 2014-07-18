@@ -1,0 +1,5 @@
+<annotatable>
+  <p>This is an example annotation.</p>
+  <p>This page is required to post a comment <annotation title="My title" body="My comment" highlight="yellow" problem="0">These are one of the tags.</annotation> Thanks</p>
+  <p>Check this. <annotation body="Basic annotation example." problem="1">This is something else.</annotation> Specialized problems are advanced problems such as annotations, open response assessments, and word clouds. These problems are available through the Advanced component</p>
+</annotatable>

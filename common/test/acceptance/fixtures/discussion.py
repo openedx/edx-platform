@@ -30,6 +30,8 @@ class ContentFactory(factory.Factory):
 
 
 class Thread(ContentFactory):
+    anonymous = False
+    anonymous_to_peers = False
     comments_count = 0
     unread_comments_count = 0
     title = "dummy thread title"
@@ -125,4 +127,3 @@ class SearchResultFixture(DiscussionContentFixture):
 
     def get_config_data(self):
         return {"search_result": json.dumps(self.result)}
-

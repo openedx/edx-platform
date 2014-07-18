@@ -67,7 +67,7 @@ The following documentation is available:
   Updated `Working with Video Components`_ to reflect UI changes.
 
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
   
   Recent changes include:
 
@@ -79,7 +79,7 @@ The following documentation is available:
     formatting.
   
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
   Recent changes include: 
 

@@ -48,6 +48,8 @@ def test_system(options):
     if test_id:
         if not system:
             system = test_id.split('/')[0]
+        if system == 'common':
+            system = 'lms'
         opts['test_id'] = test_id
 
     if test_id or system:
@@ -127,19 +129,6 @@ def test_python(options):
 
 @task
 @needs(
-    'pavelib.prereqs.install_python_prereqs',
-    'pavelib.utils.test.utils.clean_reports_dir',
-)
-def test_i18n():
-    """
-    Run all i18n tests
-    """
-    i18n_suite = suites.I18nTestSuite('i18n')
-    i18n_suite.run()
-
-
-@task
-@needs(
     'pavelib.prereqs.install_prereqs',
     'pavelib.utils.test.utils.clean_reports_dir',
 )
@@ -157,11 +146,10 @@ def test(options):
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)
-    i18n_suite = suites.I18nTestSuite('i18n', **opts)
     js_suite = suites.JsTestSuite('JS Tests', mode='run', with_coverage=True)
 
     # Main suite to be run
-    all_unittests_suite = suites.TestSuite('All Tests', subsuites=[i18n_suite, js_suite, python_suite])
+    all_unittests_suite = suites.TestSuite('All Tests', subsuites=[js_suite, python_suite])
     all_unittests_suite.run()
 
 
@@ -207,23 +195,12 @@ def coverage(options):
         diff_html_path = os.path.join(Env.REPORT_DIR, 'diff_coverage_combined.html')
 
         # Generate the diff coverage reports (HTML and console)
-
-        sh("diff-cover {xml_report_str}".format(xml_report_str=xml_report_str))
-
         sh(
             "diff-cover {xml_report_str} --compare-branch={compare_branch} "
             "--html-report {diff_html_path}".format(
                 xml_report_str=xml_report_str,
                 compare_branch=compare_branch,
                 diff_html_path=diff_html_path,
-            )
-        )
-
-        sh(
-            "diff-cover {xml_report_str} --compare-branch="
-            "{compare_branch}".format(
-                xml_report_str=xml_report_str,
-                compare_branch=compare_branch,
             )
         )
 

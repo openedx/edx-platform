@@ -221,7 +221,7 @@ class InputTypeBase(object):
         self.status = state.get('status', 'unanswered')
 
         try:
-            # Pre-parse and propcess all the declared requirements.
+            # Pre-parse and process all the declared requirements.
             self.process_requirements()
 
             # Call subclass "constructor" -- means they don't have to worry about calling
@@ -230,8 +230,8 @@ class InputTypeBase(object):
             self.setup()
         except Exception as err:
             # Something went wrong: add xml to message, but keep the traceback
-            msg = "Error in xml '{x}': {err} ".format(
-                x=etree.tostring(xml), err=str(err))
+            msg = u"Error in xml '{x}': {err} ".format(
+                x=etree.tostring(xml), err=err.message)
             raise Exception, msg, sys.exc_info()[2]
 
     @classmethod
@@ -703,7 +703,7 @@ class FileSubmission(InputTypeBase):
         pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
         """
         _ = self.capa_system.i18n.ugettext
-        submitted_msg = _("Your file(s) have been submitted. As soon as your submission is"
+        submitted_msg = _("Your files have been submitted. As soon as your submission is"
                           " graded, this message will be replaced with the grader's feedback.")
         self.submitted_msg = submitted_msg
 
@@ -1746,7 +1746,7 @@ class ChoiceTextGroup(InputTypeBase):
 
         for choice in element:
             if choice.tag != 'choice':
-                msg = "[capa.inputtypes.extract_choices] {0}".format(
+                msg = u"[capa.inputtypes.extract_choices] {0}".format(
                     # Translators: a "tag" is an XML element, such as "<b>" in HTML
                     _("Expected a {expected_tag} tag; got {given_tag} instead").format(
                         expected_tag=u"<choice>",

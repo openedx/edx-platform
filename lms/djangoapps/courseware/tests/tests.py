@@ -18,7 +18,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_DIR, \
     TEST_DATA_MONGO_MODULESTORE, \
-    TEST_DATA_DRAFT_MONGO_MODULESTORE, \
     TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.field_data import LmsFieldData
 
@@ -134,9 +133,6 @@ class TestXmlCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.check_all_pages_load(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
 
-# Importing XML courses isn't possible with MixedModuleStore,
-# so we use a Mongo modulestore directly (as we would in Studio)
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
     """
     Check that all pages in test courses load properly from Mongo.
@@ -146,9 +142,8 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         super(TestMongoCoursesLoad, self).setUp()
         self.setup_user()
 
-        # Import the toy course into a Mongo-backed modulestore
-        self.store = modulestore()
-        import_from_xml(self.store, TEST_DATA_DIR, ['toy'])
+        # Import the toy course
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_toy_textbooks_loads(self, mock_get):
@@ -163,7 +158,6 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
 
-@override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
 class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()

@@ -106,7 +106,7 @@ class LTI20ModuleMixin(object):
         log.debug("[LTI] oauth_body_hash = {}".format(oauth_body_hash))
         client_key, client_secret = self.get_client_key_secret()
         client = Client(client_key, client_secret)
-        params = client.get_oauth_params()
+        params = client.get_oauth_params(None)
         params.append((u'oauth_body_hash', oauth_body_hash))
         mock_request = mock.Mock(
             uri=unicode(urllib.unquote(request.url)),

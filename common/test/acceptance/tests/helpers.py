@@ -1,9 +1,32 @@
 """
 Test helper functions and base classes.
 """
+import unittest
+import functools
 import requests
 from path import path
 from bok_choy.web_app_test import WebAppTest
+
+
+def skip_if_browser(browser):
+    """
+    Method decorator that skips a test if browser is `browser`
+
+    Args:
+        browser (str): name of internet browser
+
+    Returns:
+        Decorated function
+
+    """
+    def decorator(test_function):
+        @functools.wraps(test_function)
+        def wrapper(self, *args, **kwargs):
+            if self.browser.name == browser:
+                raise unittest.SkipTest('Skipping as this test will not work with {}'.format(browser))
+            test_function(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def is_youtube_available():

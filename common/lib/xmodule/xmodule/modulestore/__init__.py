@@ -5,9 +5,12 @@ that are stored in a database an accessible using their Location as an identifie
 
 import logging
 import re
+import json
+import datetime
 
 from collections import namedtuple, defaultdict
 import collections
+from contextlib import contextmanager
 
 from abc import ABCMeta, abstractmethod
 from xblock.plugin import default_select
@@ -20,13 +23,80 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
-import datetime
 
 log = logging.getLogger('edx.modulestore')
 
-SPLIT_MONGO_MODULESTORE_TYPE = 'split'
-MONGO_MODULESTORE_TYPE = 'mongo'
-XML_MODULESTORE_TYPE = 'xml'
+
+class ModuleStoreEnum(object):
+    """
+    A class to encapsulate common constants that are used with the various modulestores.
+    """
+
+    class Type(object):
+        """
+        The various types of modulestores provided
+        """
+        split = 'split'
+        mongo = 'mongo'
+        xml = 'xml'
+
+    class RevisionOption(object):
+        """
+        Revision constants to use for Module Store operations
+        Note: These values are passed into store APIs and only used at run time
+        """
+        # both DRAFT and PUBLISHED versions are queried, with preference to DRAFT versions
+        draft_preferred = 'rev-opt-draft-preferred'
+
+        # only DRAFT versions are queried and no PUBLISHED versions
+        draft_only = 'rev-opt-draft-only'
+
+        # # only PUBLISHED versions are queried and no DRAFT versions
+        published_only = 'rev-opt-published-only'
+
+        # all revisions are queried
+        all = 'rev-opt-all'
+
+    class Branch(object):
+        """
+        Branch constants to use for stores, such as Mongo, that have only 2 branches: DRAFT and PUBLISHED
+        Note: These values are taken from server configuration settings, so should not be changed without alerting DevOps
+        """
+        draft_preferred = 'draft-preferred'
+        published_only = 'published-only'
+
+    class BranchName(object):
+        """
+        Branch constants to use for stores, such as Split, that have named branches
+        """
+        draft = 'draft-branch'
+        published = 'published-branch'
+
+    class UserID(object):
+        """
+        Values for user ID defaults
+        """
+        # Note: we use negative values here to (try to) not collide
+        # with user identifiers provided by actual user services.
+
+        # user ID to use for all management commands
+        mgmt_command = -1
+
+        # user ID to use for primitive commands
+        primitive_command = -2
+
+        # user ID to use for tests that do not have a django user available
+        test = -3
+
+class PublishState(object):
+    """
+    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
+
+    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
+    """
+    draft = 'draft'
+    private = 'private'
+    public = 'public'
 
 
 class ModuleStoreRead(object):
@@ -184,11 +254,9 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_parent_locations(self, location):
-        '''Find all locations that are the parents of this location in this
+    def get_parent_location(self, location, **kwargs):
+        '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
-
-        returns an iterable of things that can be passed to Location.
         '''
         pass
 
@@ -217,6 +285,26 @@ class ModuleStoreRead(object):
         """
         pass
 
+    @abstractmethod
+    def compute_publish_state(self, xblock):
+        """
+        Returns whether this xblock is draft, public, or private.
+
+        Returns:
+            PublishState.draft - content is in the process of being edited, but still has a previous
+                version deployed to LMS
+            PublishState.public - content is locked and deployed to LMS
+            PublishState.private - content is editable and not deployed to LMS
+        """
+        pass
+
+    @abstractmethod
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        pass
+
 
 class ModuleStoreWrite(ModuleStoreRead):
     """
@@ -227,7 +315,7 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
@@ -237,35 +325,39 @@ class ModuleStoreWrite(ModuleStoreRead):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def delete_item(self, location, user_id=None, **kwargs):
+    def delete_item(self, location, user_id, **kwargs):
         """
-        Delete an item from persistence. Pass the user's unique id which the persistent store
+        Delete an item and its subtree from persistence. Remove the item from any parents (Note, does not
+        affect parents from other branches or logical branches; thus, in old mongo, deleting something
+        whose parent cannot be draft, deletes it from both but deleting a component under a draft vertical
+        only deletes it from the draft.
+
+        Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
 
-        :param delete_all_versions: removes both the draft and published version of this item from
-        the course if using draft and old mongo. Split may or may not implement this.
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def create_course(self, org, offering, user_id=None, fields=None, **kwargs):
+    def create_course(self, org, course, run, user_id, fields=None, **kwargs):
         """
         Creates and returns the course.
 
         Args:
             org (str): the organization that owns the course
-            offering (str): the name of the course offering
+            course (str): the name of the course
+            run (str): the name of the run
             user_id: id of the user creating the course
             fields (dict): Fields to set on the course at initialization
             kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
@@ -275,7 +367,24 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def delete_course(self, course_key, user_id=None):
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        Sets up source_course_id to point a course with the same content as the desct_course_id. This
+        operation may be cheap or expensive. It may have to copy all assets and all xblock content or
+        merely setup new pointers.
+
+        Backward compatibility: this method used to require in some modulestores that dest_course_id
+        pointed to an empty but already created course. Implementers should support this or should
+        enable creating the course from scratch.
+
+        Raises:
+            ItemNotFoundError: if the source course doesn't exist (or any of its xblocks aren't found)
+            DuplicateItemError: if the destination course already exists (with content in some cases)
+        """
+        pass
+
+    @abstractmethod
+    def delete_course(self, course_key, user_id):
         """
         Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
         depending on the persistence layer and how tightly bound the xblocks are to the course.
@@ -283,6 +392,14 @@ class ModuleStoreWrite(ModuleStoreRead):
         Args:
             course_key (CourseKey): which course to delete
             user_id: id of the user deleting the course
+        """
+        pass
+
+    @abstractmethod
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
         """
         pass
 
@@ -295,6 +412,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
 
     def __init__(
         self,
+        contentstore=None,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
         xblock_mixins=(), xblock_select=None,
@@ -311,6 +429,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
         self.xblock_select = xblock_select
+        self.contentstore = contentstore
 
     def get_course_errors(self, course_key):
         """
@@ -346,7 +465,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
 
     def has_course(self, course_id, ignore_case=False):
         """
-        Look for a specific course id.  Returns whether it exists.
+        Returns the course_id of the course if it was found, else None
         Args:
             course_id (CourseKey):
             ignore_case (boolean): some modulestores are case-insensitive. Use this flag
@@ -355,20 +474,71 @@ class ModuleStoreReadBase(ModuleStoreRead):
         # linear search through list
         assert(isinstance(course_id, CourseKey))
         if ignore_case:
-            return any(
-                (c.id.org.lower() == course_id.org.lower() and c.id.offering.lower() == course_id.offering.lower())
-                for c in self.get_courses()
+            return next(
+                (
+                    c.id for c in self.get_courses()
+                    if c.id.org.lower() == course_id.org.lower() and
+                    c.id.course.lower() == course_id.course.lower() and
+                    c.id.run.lower() == course_id.run.lower()
+                ),
+                None
             )
         else:
-            return any(c.id == course_id for c in self.get_courses())
+            return next(
+                (c.id for c in self.get_courses() if c.id == course_id),
+                None
+            )
+
+    def compute_publish_state(self, xblock):
+        """
+        Returns PublishState.public since this is a read-only store.
+        """
+        return PublishState.public
+
+    def heartbeat(self):
+        """
+        Is this modulestore ready?
+        """
+        # default is to say yes by not raising an exception
+        return {'default_impl': True}
+
+    def close_connections(self):
+        """
+        Closes any open connections to the underlying databases
+        """
+        if self.contentstore:
+            self.contentstore.close_connections()
+        super(ModuleStoreReadBase, self).close_connections()
+
+    @contextmanager
+    def default_store(self, store_type):
+        """
+        A context manager for temporarily changing the default store
+        """
+        if self.get_modulestore_type(None) != store_type:
+            raise ValueError(u"Cannot set default store to type {}".format(store_type))
+        yield
+
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):
+        """
+        A context manager for temporarily setting a store's branch value
+        """
+        previous_branch_setting_func = getattr(self, 'branch_setting_func', None)
+        try:
+            self.branch_setting_func = lambda: branch_setting
+            yield
+        finally:
+            self.branch_setting_func = previous_branch_setting_func
 
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(self, **kwargs):
-        super(ModuleStoreWriteBase, self).__init__(**kwargs)
+    def __init__(self, contentstore, **kwargs):
+        super(ModuleStoreWriteBase, self).__init__(contentstore=contentstore, **kwargs)
+
         # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
         # This is only used by partition_fields_by_scope, which is only needed because
         # the split mongo store is used for item creation as well as item persistence
@@ -390,7 +560,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
-    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
@@ -400,25 +570,92 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
 
-    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
+    def delete_item(self, location, user_id, force=False):
         """
         Delete an item from persistence. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
 
-        :param delete_all_versions: removes both the draft and published version of this item from
-        the course if using draft and old mongo. Split may or may not implement this.
+        :param user_id: ID of the user deleting the item
         :param force: fork the structure and don't update the course draftVersion if there's a version
         conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-        :raises VersionConflictError: if org, offering,  and version_guid given and the current
+        :raises VersionConflictError: if org, course, run, and version_guid given and the current
         version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         raise NotImplementedError
+
+    def create_and_save_xmodule(self, location, user_id, definition_data=None, metadata=None, runtime=None, fields={}):
+        """
+        Create the new xmodule and save it.
+
+        :param location: a Location--must have a category
+        :param user_id: ID of the user creating and saving the xmodule
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param runtime: if you already have an xblock from the course, the xblock.runtime value
+        :param fields: a dictionary of field names and values for the new xmodule
+        """
+        new_object = self.create_xmodule(location, definition_data, metadata, runtime, fields)
+        self.update_item(new_object, user_id, allow_not_found=True)
+        return new_object
+
+    def clone_course(self, source_course_id, dest_course_id, user_id):
+        """
+        This base method just copies the assets. The lower level impls must do the actual cloning of
+        content.
+        """
+        # copy the assets
+        if self.contentstore:
+            self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+            super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
+        return dest_course_id
+
+    def delete_course(self, course_key, user_id):
+        """
+        This base method just deletes the assets. The lower level impls must do the actual deleting of
+        content.
+        """
+        # delete the assets
+        if self.contentstore:
+            self.contentstore.delete_all_course_assets(course_key)
+        super(ModuleStoreWriteBase, self).delete_course(course_key, user_id)
+
+    def _drop_database(self):
+        """
+        A destructive operation to drop the underlying database and close all connections.
+        Intended to be used by test code for cleanup.
+        """
+        if self.contentstore:
+            self.contentstore._drop_database()  # pylint: disable=protected-access
+        super(ModuleStoreWriteBase, self)._drop_database()  # pylint: disable=protected-access
+
+    @contextmanager
+    def bulk_write_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk write events.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO
+        # Make this multi-process-safe if future operations need it.
+        # Right now, only Import Course, Clone Course, and Delete Course use this, so
+        # it's ok if the cached metadata in the memcache is invalid when another
+        # request comes in for the same course.
+        try:
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._begin_bulk_write_operation(course_id)
+            yield
+        finally:
+            # check for the begin method here,
+            # since it's an error if an end method is not defined when a begin method is
+            if hasattr(self, '_begin_bulk_write_operation'):
+                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):
@@ -435,3 +672,25 @@ def prefer_xmodules(identifier, entry_points):
         return default_select(identifier, from_xmodule)
     else:
         return default_select(identifier, entry_points)
+
+
+class EdxJSONEncoder(json.JSONEncoder):
+    """
+    Custom JSONEncoder that handles `Location` and `datetime.datetime` objects.
+
+    `Location`s are encoded as their url string form, and `datetime`s as
+    ISO date strings
+    """
+    def default(self, obj):
+        if isinstance(obj, Location):
+            return obj.to_deprecated_string()
+        elif isinstance(obj, datetime.datetime):
+            if obj.tzinfo is not None:
+                if obj.utcoffset() is None:
+                    return obj.isoformat() + 'Z'
+                else:
+                    return obj.isoformat()
+            else:
+                return obj.isoformat()
+        else:
+            return super(EdxJSONEncoder, self).default(obj)

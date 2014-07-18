@@ -19,6 +19,7 @@ video to your course has several steps.
 
 Also see:
 
+* :ref:`Video TOC`
 * :ref:`Additional Transcripts`
 * :ref:`Steps for sjson files`
 
@@ -283,6 +284,37 @@ The following options appear on the **Advanced** tab in the Video component.
     * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
       - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields. These settings are optional, for older browsers.
 
+
+.. _Video TOC:
+
+***************************
+Video Table of Contents
+***************************
+
+You can add a table of contents for your video by adding an .srt transcript file that contains clickable links to different parts of the video. When your students view the video, they can click the **CC** button at the bottom of the video player to switch between the main transcript for the video and the table of contents. 
+
+To add a table of contents, you'll work with a third-party service to create the .srt transcript file. Then, you'll use the **Transcript Languages** setting in the Video component to associate the .srt file with the video.
+
+.. image:: /Images/VideoTOC.png
+   :alt: Image of a video with a transcript that has links to different parts of the video
+   :width: 500
+
+#. After you've obtained the .srt transcript file that will function as the table of contents, open the Video component for the video.
+
+#. On the **Advanced** tab, scroll down to **Transcript Languages**, and then
+   click **Add**. 
+
+#. In the drop-down list that appears, select **Table of Contents**. 
+
+   An **Upload** button appears.
+
+#. Click **Upload**, browse to the .srt file for the transcript, and then click **Open**.
+
+#. In the **Upload translation** dialog box, click **Upload**.
+
+
+
+
 .. _Additional Transcripts:
 
 **********************
@@ -310,7 +342,6 @@ To add a downloadable transcript by using the **Upload Handout** field:
 #. In the dialog box, select the file on your computer, and then click **Open**.
 #. In the **Upload File** dialog box, click **Upload**.
 
-
 Before Studio added the **Upload Handout** feature, some courses posted transcript files on the **Files & Uploads** page or on the Internet, and then added a link to those files in the Video component. **We no longer recommend this method.**  When you use this method, the **Download Transcript** button appears, but only the transcript that you add is available for download. The .srt and .txt transcripts become unavailable. 
 
 .. image:: /Images/Video_DownTrans_other.png
@@ -331,7 +362,7 @@ each language, and then associate the .srt file with the video in Studio.
 
 #. After you've obtained the .srt files for additional languages, open the Video component for the video.
 
-#. On the **Advanced** tab, scroll down to **Transcript Translations**, and then
+#. On the **Advanced** tab, scroll down to **Transcript Languages**, and then
    click **Add**. 
 
 #. In the drop-down list that appears, select the language for the transcript that you want to add. 

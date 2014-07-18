@@ -3,8 +3,9 @@ Unit tests for the container page.
 """
 
 import re
-from contentstore.utils import compute_publish_state, PublishState
+from contentstore.utils import compute_publish_state
 from contentstore.views.tests.utils import StudioPageTestCase
+from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
 
@@ -19,16 +20,12 @@ class ContainerPageTestCase(StudioPageTestCase):
 
     def setUp(self):
         super(ContainerPageTestCase, self).setUp()
-        self.vertical = ItemFactory.create(parent_location=self.sequential.location,
-                                           category='vertical', display_name='Unit')
-        self.html = ItemFactory.create(parent_location=self.vertical.location,
-                                        category="html", display_name="HTML")
-        self.child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                  category='split_test', display_name='Split Test')
-        self.child_vertical = ItemFactory.create(parent_location=self.child_container.location,
-                                                 category='vertical', display_name='Child Vertical')
-        self.video = ItemFactory.create(parent_location=self.child_vertical.location,
-                                        category="video", display_name="My Video")
+        self.vertical = self._create_item(self.sequential.location, 'vertical', 'Unit')
+        self.html = self._create_item(self.vertical.location, "html", "HTML")
+        self.child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        self.child_vertical = self._create_item(self.child_container.location, 'vertical', 'Child Vertical')
+        self.video = self._create_item(self.child_vertical.location, "video", "My Video")
+        self.store = modulestore()
 
     def test_container_html(self):
         self._test_html_content(
@@ -49,21 +46,15 @@ class ContainerPageTestCase(StudioPageTestCase):
         Create the scenario of an xblock with children (non-vertical) on the container page.
         This should create a container page that is a child of another container page.
         """
-        published_container = ItemFactory.create(
-            parent_location=self.child_container.location,
-            category="wrapper", display_name="Wrapper"
-        )
-        ItemFactory.create(
-            parent_location=published_container.location,
-            category="html", display_name="Child HTML"
-        )
+        draft_container = self._create_item(self.child_container.location, "wrapper", "Wrapper")
+        self._create_item(draft_container.location, "html", "Child HTML")
 
         def test_container_html(xblock):
             self._test_html_content(
                 xblock,
                 expected_section_tag=(
                     '<section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" '
-                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(published_container.location)
+                    'data-locator="{0}" data-course-key="{0.course_key}">'.format(draft_container.location)
                 ),
                 expected_breadcrumbs=(
                     r'<a href="/unit/{unit}"\s*'
@@ -77,13 +68,12 @@ class ContainerPageTestCase(StudioPageTestCase):
                 )
             )
 
-        # Test the published version of the container
-        test_container_html(published_container)
+        # Test the draft version of the container
+        test_container_html(draft_container)
 
-        # Now make the unit and its children into a draft and validate the container again
-        modulestore('draft').convert_to_draft(self.vertical.location)
-        modulestore('draft').convert_to_draft(self.child_vertical.location)
-        draft_container = modulestore('draft').convert_to_draft(published_container.location)
+        # Now publish the unit and validate again
+        self.store.publish(self.vertical.location, self.user.id)
+        draft_container = self.store.get_item(draft_container.location)
         test_container_html(draft_container)
 
     def _test_html_content(self, xblock, expected_section_tag, expected_breadcrumbs):
@@ -98,7 +88,6 @@ class ContainerPageTestCase(StudioPageTestCase):
         self.assertRegexpMatches(html, expected_breadcrumbs)
 
         # Verify the link that allows users to change publish status.
-        expected_message = None
         if publish_state == PublishState.public:
             expected_message = 'you need to edit unit <a href="/unit/{}">Unit</a> as a draft.'
         else:
@@ -110,43 +99,52 @@ class ContainerPageTestCase(StudioPageTestCase):
         """
         Verify that a public xblock's container preview returns the expected HTML.
         """
-        self.validate_preview_html(self.vertical, self.container_view,
+        published_unit = self.store.publish(self.vertical.location, self.user.id)
+        published_child_container = self.store.get_item(self.child_container.location)
+        published_child_vertical = self.store.get_item(self.child_vertical.location)
+        self.validate_preview_html(published_unit, self.container_view,
                                    can_edit=False, can_reorder=False, can_add=False)
-        self.validate_preview_html(self.child_container, self.container_view,
+        self.validate_preview_html(published_child_container, self.container_view,
                                    can_edit=False, can_reorder=False, can_add=False)
-        self.validate_preview_html(self.child_vertical, self.reorderable_child_view,
+        self.validate_preview_html(published_child_vertical, self.reorderable_child_view,
                                    can_edit=False, can_reorder=False, can_add=False)
 
     def test_draft_container_preview_html(self):
         """
         Verify that a draft xblock's container preview returns the expected HTML.
         """
-        draft_unit = modulestore('draft').convert_to_draft(self.vertical.location)
-        draft_child_container = modulestore('draft').convert_to_draft(self.child_container.location)
-        draft_child_vertical = modulestore('draft').convert_to_draft(self.child_vertical.location)
-        self.validate_preview_html(draft_unit, self.container_view,
+        self.validate_preview_html(self.vertical, self.container_view,
                                    can_edit=True, can_reorder=True, can_add=True)
-        self.validate_preview_html(draft_child_container, self.container_view,
+        self.validate_preview_html(self.child_container, self.container_view,
                                    can_edit=True, can_reorder=True, can_add=True)
-        self.validate_preview_html(draft_child_vertical, self.reorderable_child_view,
+        self.validate_preview_html(self.child_vertical, self.reorderable_child_view,
                                    can_edit=True, can_reorder=True, can_add=True)
 
     def test_public_child_container_preview_html(self):
         """
         Verify that a public container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
-        self.validate_preview_html(empty_child_container, self.reorderable_child_view,
+        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        published_empty_child_container = self.store.publish(empty_child_container.location, self.user.id)
+        self.validate_preview_html(published_empty_child_container, self.reorderable_child_view,
                                    can_reorder=False, can_edit=False, can_add=False)
 
     def test_draft_child_container_preview_html(self):
         """
         Verify that a draft container rendered as a child of the container page returns the expected HTML.
         """
-        empty_child_container = ItemFactory.create(parent_location=self.vertical.location,
-                                                   category='split_test', display_name='Split Test')
-        modulestore('draft').convert_to_draft(self.vertical.location)
-        draft_empty_child_container = modulestore('draft').convert_to_draft(empty_child_container.location)
-        self.validate_preview_html(draft_empty_child_container, self.reorderable_child_view,
+        empty_child_container = self._create_item(self.vertical.location, 'split_test', 'Split Test')
+        self.validate_preview_html(empty_child_container, self.reorderable_child_view,
                                    can_reorder=True, can_edit=True, can_add=False)
+
+    def _create_item(self, parent_location, category, display_name, **kwargs):
+        """
+        creates an item in the module store, without publishing it.
+        """
+        return ItemFactory.create(
+            parent_location=parent_location,
+            category=category,
+            display_name=display_name,
+            publish_item=False,
+            **kwargs
+        )

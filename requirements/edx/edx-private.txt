@@ -7,5 +7,12 @@
 # Concept XBlock, in particular, is nowhere near finished and an early prototype. 
 
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
--e git+https://github.com/pmitros/DoneXBlock.git@604a79dc7ed3fc7894feb8884e168cd21266b594#egg=done-xblock
+-e git+https://github.com/pmitros/DoneXBlock.git@1ce0ac14d9f3df3083b951262ec82e84b58d16d1#egg=done-xblock
 -e git+https://github.com/pmitros/AudioXBlock.git@1fbf19cc21613aead62799469e1593adb037fdd9#egg=audio-xblock
+-e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
+
+# This XBlock shows a list of recommendations. 
+# It is an R&D prototype, intended for roll-out one location in one course. 
+# It should not be used without learning sciences support in the current state. 
+-e git+https://github.com/pmitros/RecommenderXBlock.git@fae9e5bc8a8297cb15001f0d674430e3d22ffa35#egg=recommender-xblock
+

@@ -34,9 +34,9 @@ The following documentation is available:
 
   * Expanded the `Grade and Answer Data <http://edx.readthedocs.org/projects/ca/en/latest/running_course/course_grades.html#grades>`_ section to include a topic on interpreting the Student Answer Distribution report.
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
-* `edX Platform Developer Documentation`_
+* `edX Developer's Guide`_
 
 
 *************

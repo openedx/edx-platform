@@ -11,7 +11,9 @@ from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.django import editable_modulestore
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.x_module import STUDENT_VIEW
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from cache_toolbox.core import del_cached_content
@@ -64,7 +66,7 @@ def _clear_assets(location):
 
     assets, __ = store.get_all_content_for_course(location.course_key)
     for asset in assets:
-        asset_location = AssetLocation._from_deprecated_son(asset["_id"], location.course_key.run)
+        asset_location = asset['asset_key']
         del_cached_content(asset_location)
         store.delete(asset_location)
 
@@ -175,7 +177,7 @@ class TestTranscriptAvailableTranslationsDispatch(TestVideo):
 
     def setUp(self):
         super(TestTranscriptAvailableTranslationsDispatch, self).setUp()
-        self.item_descriptor.render('student_view')
+        self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
         self.subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 
@@ -234,7 +236,7 @@ class TestTranscriptDownloadDispatch(TestVideo):
 
     def setUp(self):
         super(TestTranscriptDownloadDispatch, self).setUp()
-        self.item_descriptor.render('student_view')
+        self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
     def test_download_transcript_not_exist(self):
@@ -299,7 +301,7 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
 
     def setUp(self):
         super(TestTranscriptTranslationGetDispatch, self).setUp()
-        self.item_descriptor.render('student_view')
+        self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
     def test_translation_fails(self):
@@ -406,8 +408,9 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         """
         self.course.static_asset_path = 'dummy/static'
         self.course.save()
-        store = editable_modulestore()
-        store.update_item(self.course, 'OEoXaMPEzfM')
+        store = modulestore()
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            store.update_item(self.course, self.user.id)
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
@@ -609,7 +612,7 @@ class TestGetTranscript(TestVideo):
 
     def setUp(self):
         super(TestGetTranscript, self).setUp()
-        self.item_descriptor.render('student_view')
+        self.item_descriptor.render(STUDENT_VIEW)
         self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
     def test_good_transcript(self):

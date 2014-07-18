@@ -5,16 +5,18 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 """
 
 from __future__ import absolute_import
-from importlib import import_module
-import re
 
+from importlib import import_module
 from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError
 import django.utils
 
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
-from xmodule.util.django import get_current_request_hostname
+import re
+import threading
 
+from xmodule.util.django import get_current_request_hostname
+import xmodule.modulestore  # pylint: disable=unused-import
+from xmodule.contentstore.django import contentstore
 
 # We may not always have the request_cache module available
 try:
@@ -22,10 +24,6 @@ try:
     HAS_REQUEST_CACHE = True
 except ImportError:
     HAS_REQUEST_CACHE = False
-
-_MODULESTORES = {}
-
-FUNCTION_KEYS = ['render_template']
 
 
 def load_function(path):
@@ -39,7 +37,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, content_store, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -48,6 +46,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
     _options = {}
     _options.update(options)
 
+    FUNCTION_KEYS = ['render_template']
     for key in FUNCTION_KEYS:
         if key in _options and isinstance(_options[key], basestring):
             _options[key] = load_function(_options[key])
@@ -63,84 +62,37 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         metadata_inheritance_cache = get_cache('default')
 
     return class_(
+        contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
         xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
+        branch_setting_func=_get_modulestore_branch_setting,
+        create_modulestore_instance=create_modulestore_instance,
         **_options
     )
 
 
-def get_default_store_name_for_current_request():
+# A singleton instance of the Mixed Modulestore
+_MIXED_MODULESTORE = None
+
+
+def modulestore():
     """
-    This method will return the appropriate default store mapping for the current Django request,
-    else 'default' which is the system default
+    Returns the Mixed modulestore
     """
-    store_name = 'default'
-
-    # see what request we are currently processing - if any at all - and get hostname for the request
-    hostname = get_current_request_hostname()
-
-    # get mapping information which is defined in configurations
-    mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
-
-    # compare hostname against the regex expressions set of mappings
-    # which will tell us which store name to use
-    if hostname and mappings:
-        for key in mappings.keys():
-            if re.match(key, hostname):
-                store_name = mappings[key]
-                return store_name
-
-    return store_name
-
-
-def modulestore(name=None):
-    """
-    This returns an instance of a modulestore of given name. This will wither return an existing
-    modulestore or create a new one
-    """
-
-    if not name:
-        # If caller did not specify name then we should
-        # determine what should be the default
-        name = get_default_store_name_for_current_request()
-
-    if name not in _MODULESTORES:
-        _MODULESTORES[name] = create_modulestore_instance(
-            settings.MODULESTORE[name]['ENGINE'],
-            settings.MODULESTORE[name].get('DOC_STORE_CONFIG', {}),
-            settings.MODULESTORE[name].get('OPTIONS', {})
+    global _MIXED_MODULESTORE  # pylint: disable=global-statement
+    if _MIXED_MODULESTORE is None:
+        _MIXED_MODULESTORE = create_modulestore_instance(
+            settings.MODULESTORE['default']['ENGINE'],
+            contentstore(),
+            settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
+            settings.MODULESTORE['default'].get('OPTIONS', {})
         )
-        # inject loc_mapper into newly created modulestore if it needs it
-        if name == 'split' and _loc_singleton is not None:
-            _MODULESTORES['split'].loc_mapper = _loc_singleton
 
-    return _MODULESTORES[name]
-
-
-_loc_singleton = None
-def loc_mapper():
-    """
-    Get the loc mapper which bidirectionally maps Locations to Locators. Used like modulestore() as
-    a singleton accessor.
-    """
-    # pylint: disable=W0603
-    global _loc_singleton
-    # pylint: disable=W0212
-    if _loc_singleton is None:
-        try:
-            loc_cache = get_cache('loc_cache')
-        except InvalidCacheBackendError:
-            loc_cache = get_cache('default')
-        # instantiate
-        _loc_singleton = LocMapperStore(loc_cache, **settings.DOC_STORE_CONFIG)
-    # inject into split mongo modulestore
-    if 'split' in _MODULESTORES:
-        _MODULESTORES['split'].loc_mapper = _loc_singleton
-    return _loc_singleton
+    return _MIXED_MODULESTORE
 
 
 def clear_existing_modulestores():
@@ -150,43 +102,8 @@ def clear_existing_modulestores():
 
     This is useful for flushing state between unit tests.
     """
-    _MODULESTORES.clear()
-    # pylint: disable=W0603
-    global _loc_singleton
-    cache = getattr(_loc_singleton, "cache", None)
-    if cache:
-        cache.clear()
-    _loc_singleton = None
-
-
-def editable_modulestore(name='default'):
-    """
-    Retrieve a modulestore that we can modify.
-    This is useful for tests that need to insert test
-    data into the modulestore.
-
-    Currently, only Mongo-backed modulestores can be modified.
-    Returns `None` if no editable modulestore is available.
-    """
-
-    # Try to retrieve the ModuleStore
-    # Depending on the settings, this may or may not
-    # be editable.
-    store = modulestore(name)
-
-    # If this is a `MixedModuleStore`, then we will need
-    # to retrieve the actual Mongo instance.
-    # We assume that the default is Mongo.
-    if hasattr(store, 'modulestores'):
-        store = store.modulestores['default']
-
-    # At this point, we either have the ability to create
-    # items in the store, or we do not.
-    if hasattr(store, 'create_course'):
-        return store
-
-    else:
-        return None
+    global _MIXED_MODULESTORE  # pylint: disable=global-statement
+    _MIXED_MODULESTORE = None
 
 
 class ModuleI18nService(object):
@@ -217,3 +134,35 @@ class ModuleI18nService(object):
         # then Cale was a liar.
         from util.date_utils import strftime_localized
         return strftime_localized(*args, **kwargs)
+
+
+def _get_modulestore_branch_setting():
+    """
+    Returns the branch setting for the module store from the current Django request if configured,
+    else returns the branch value from the configuration settings if set,
+    else returns None
+
+    The value of the branch setting is cached in a thread-local variable so it is not repeatedly recomputed
+    """
+    def get_branch_setting():
+        """
+        Finds and returns the branch setting based on the Django request and the configuration settings
+        """
+        branch = None
+        hostname = get_current_request_hostname()
+        if hostname:
+            # get mapping information which is defined in configurations
+            mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
+
+            # compare hostname against the regex expressions set of mappings which will tell us which branch to use
+            if mappings:
+                for key in mappings.iterkeys():
+                    if re.match(key, hostname):
+                        return mappings[key]
+        if branch is None:
+            branch = getattr(settings, 'MODULESTORE_BRANCH', None)
+        return branch
+
+    # leaving this in code structured in closure-friendly format b/c we might eventually cache this (again)
+    # using request_cache
+    return get_branch_setting()

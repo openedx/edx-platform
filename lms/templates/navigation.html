@@ -71,7 +71,9 @@ site_status_msg = get_site_status_msg(course_id)
         <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+            % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+              <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+            % endif
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
         </ul>
@@ -129,8 +131,8 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<!--[if IE]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
+<!--[if lte IE 8]>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
 <![endif]-->
 % endif
 

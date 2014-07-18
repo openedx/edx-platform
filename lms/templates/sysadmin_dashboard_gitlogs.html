@@ -1,6 +1,11 @@
 <%inherit file="/main.html" />
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+    from django.core.urlresolvers import reverse
+    from django.utils.translation import ugettext as _
+    from django.utils.timezone import utc as UTC
+    from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
+    from django.conf import settings
+%>
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
@@ -46,87 +51,77 @@ textarea {
 </style>
 
 <section class="container">
-<div class="sysadmin-dashboard-wrapper">
+  <div class="sysadmin-dashboard-wrapper">
 
-  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
-    <h1>${_('Sysadmin Dashboard')}</h1>
-	<hr />
-    <h2 class="instructor-nav">
-	  <a href="${reverse('sysadmin')}">${_('Users')}</a>
-      <a href="${reverse('sysadmin_courses')}">${_('Courses')}</a>
-      <a href="${reverse('sysadmin_staffing')}">${_('Staffing and Enrollment')}</a> 
+    <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
+      <h1>${_('Sysadmin Dashboard')}</h1>
+      <hr />
+      <h2 class="instructor-nav">
+        <a href="${reverse('sysadmin')}">${_('Users')}</a>
+        <a href="${reverse('sysadmin_courses')}">${_('Courses')}</a>
+        <a href="${reverse('sysadmin_staffing')}">${_('Staffing and Enrollment')}</a>
+        ## Translators: refers to http://git-scm.com/docs/git-log
+        <a href="${reverse('gitlogs')}" class="active-section">${_('Git Logs')}</a>
+      </h2>
+      <hr />
+
+      <form name="dashform" method="POST" action="${reverse('sysadmin')}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        <input type="hidden" name="dash_mode" value="">
+      </form>
+
       ## Translators: refers to http://git-scm.com/docs/git-log
-      <a href="${reverse('gitlogs')}" class="active-section">${_('Git Logs')}</a>
-    </h2>
-	<hr />
+      <h3>${_('Git Logs')}</h3>
 
-    <form name="dashform" method="POST" action="${reverse('sysadmin')}">
-    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-    <input type="hidden" name="dash_mode" value="">
+      %if course_id is not None:
+          ## Translators: Git is a version-control system; see http://git-scm.com/about
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id)}</h2>
+          %if error_msg:
+              <h3>${_('Error')}:</h3>
+              <p>${error_msg}</p>
+          %endif
+      %endif
 
-      ## Translators: refers to http://git-scm.com/docs/git-log
-    <h3>${_('Git Logs')}</h3>
+      <table class="stat_table">
+        <thead>
+          <tr>
+            <th>${_('Date')}</th>
+            <th>${_('Course ID')}</th>
+            ## Translators: Git is a version-control system; see http://git-scm.com/about
+            <th>${_('Git Action')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%
+          if course_id == None:
+              logs = cilset[:10]
+          else:
+              logs = cilset[:2]
+          %>
+          % for cil in logs:
+              <%
+                  course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None
 
-%if course_id is None:
-    <table class="stat_table">
-	  <thead>
-		<tr>
-		  <th>${_('Date')}</th>
-		  <th>${_('Course ID')}</th>
-		  ## Translators: Git is a version-control system; see http://git-scm.com/about
-		  <th>${_('Git Action')}</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		%for cil in cilset[:10]:
-        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
-        <tr>
-	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
-	      <td>${cil.git_log}</td>
-		</tr>
-		%endfor
-	  </tbody>
-    </table>
-
-%else:
-
-    ## Translators: Git is a version-control system; see http://git-scm.com/about
-    <h2>${_('Recent git load activity for')} ${course_id}</h2>
-	%if error_msg:
-	<h3>${_('Error')}:</h3>
-	<p>${error_msg}</p>
-	%endif
-
-    <table class="stat_table">
-	  <thead>
-		<tr>
-		  <th>${_('Date')}</th>
-		  <th>${_('Course ID')}</th>
-		  ## Translators: Git is a version-control system; see http://git-scm.com/about
-		  <th>${_('Git Action')}</th>
-		</tr>
-	  </thead>
-	  <tbody>
-		% for cil in cilset[:2]:
-        <% course_id_string = cil.course_id.to_deprecated_string() if cil.course_id else None %>
-        <tr>
-	      <td>${cil.created}</td>
-	      <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
-	      <td>${cil.git_log}</td>
-		</tr>
-	
-		<tr>
-		  <td colspan="3">
-			<pre>${cil.import_log | h}</pre>
-		  </td>
-		</tr>
-		% endfor
-      </tbody>
-    </table>
-
-% endif
-
-  </section>
-</div>
+                  # Appropriate datetime string for current locale and timezone
+                  date = get_time_display(cil.created.replace(tzinfo=UTC),
+                                          DEFAULT_DATE_TIME_FORMAT, coerce_tz=settings.TIME_ZONE)
+              %>
+              <tr>
+                <td>${date}</td>
+                <td><a href="${reverse('gitlogs')}/${course_id_string}">${course_id_string}</a></td>
+                <td>${cil.git_log}</td>
+              </tr>
+          %endfor
+          ## Show the full log if viewing information about a specific course
+          %if course_id is not None:
+              <tr>
+                <td colspan="3">
+                  <pre>${cil.import_log | h}</pre>
+                </td>
+              </tr>
+          %endif
+        </tbody>
+      </table>
+    </section>
+  </div>
 </section>

@@ -1,7 +1,7 @@
 <header class="xblock-header">
     <div class="xblock-header-primary">
         <div class="header-details">
-            <span>Updated Test Container</span>
+            <span class="xblock-display-name">Updated Test Container</span>
         </div>
         <div class="header-actions">
             <ul class="actions-list">

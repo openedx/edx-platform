@@ -2,6 +2,7 @@
 
 locales:
     - en  # English - Source Language
+    - am  # Amharic
     - ar  # Arabic
     - az  # Azerbaijani
     - bg_BG  # Bulgarian (Bulgaria)
@@ -15,8 +16,10 @@ locales:
     - da  # Danish
     - de_DE  # German (Germany)
     - el  # Greek
-    - en@lolcat  # LOLCAT English
-    - en@pirate  # Pirate English
+    # Don't pull these until we figure out why pages randomly display in these locales,
+    # when the user's browser is in English and the user is not logged in.
+#    - en@lolcat  # LOLCAT English
+#    - en@pirate  # Pirate English
     - es_419  # Spanish (Latin America)
     - es_AR  # Spanish (Argentina)
     - es_EC  # Spanish (Ecuador)
@@ -28,6 +31,7 @@ locales:
     - fa  # Persian
     - fa_IR  # Persian (Iran)
     - fi_FI  # Finnish (Finland)
+    - fil  # Filipino
     - fr  # French
     - gl  # Galician
     - gu  # Gujarati
@@ -46,6 +50,7 @@ locales:
     - lt_LT  # Lithuanian (Lithuania)
     - ml  # Malayalam
     - mn  # Mongolian
+    - mr  # Marathi
     - ms  # Malay
     - nb  # Norwegian Bokmål
     - ne  # Nepali
@@ -59,10 +64,14 @@ locales:
     - si  # Sinhala
     - sk  # Slovak
     - sl  # Slovenian
+    - sr  # Serbian
+    - ta  # Tamil
+    - te  # Telugu
     - th  # Thai
     - tr_TR  # Turkish (Turkey)
     - uk  # Ukranian
     - ur  # Urdu
+    - uz  # Uzbek
     - vi  # Vietnamese
     - zh_CN  # Chinese (China)
     - zh_HK  # Chinese (Hong Kong)

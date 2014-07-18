@@ -3,17 +3,18 @@
 import copy
 import logging
 import re
+from datetime import datetime
+from pytz import UTC
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.store_utilities import delete_course
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -25,36 +26,25 @@ NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def delete_course_and_groups(course_id, commit=False):
+def delete_course_and_groups(course_id, user_id):
     """
     This deletes the courseware associated with a course_id as well as cleaning update_item
     the various user table stuff (groups, permissions, etc.)
     """
-    module_store = modulestore('direct')
-    content_store = contentstore()
+    module_store = modulestore()
 
-    module_store.ignore_write_events_on_courses.add(course_id)
-
-    if delete_course(module_store, content_store, course_id, commit):
+    with module_store.bulk_write_operations(course_id):
+        module_store.delete_course(course_id, user_id)
 
         print 'removing User permissions from course....'
         # in the django layer, we need to remove all the user permissions groups associated with this course
-        if commit:
-            try:
-                staff_role = CourseStaffRole(course_id)
-                staff_role.remove_users(*staff_role.users_with_role())
-                instructor_role = CourseInstructorRole(course_id)
-                instructor_role.remove_users(*instructor_role.users_with_role())
-            except Exception as err:
-                log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
-
-
-def get_modulestore(category_or_location):
-    """
-    This function no longer does anything more than just calling `modulestore()`. It used
-    to select 'direct' v 'draft' based on the category.
-    """
-    return modulestore()
+        try:
+            staff_role = CourseStaffRole(course_id)
+            staff_role.remove_users(*staff_role.users_with_role())
+            instructor_role = CourseInstructorRole(course_id)
+            instructor_role.remove_users(*instructor_role.users_with_role())
+        except Exception as err:
+            log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -64,7 +54,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, Location))
+    assert(isinstance(location, UsageKey))
 
     if settings.LMS_BASE is None:
         return None
@@ -86,7 +76,7 @@ def get_lms_link_for_about_page(course_id):
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(course_id, CourseKey))
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
@@ -124,35 +114,41 @@ def course_image_url(course):
     return path
 
 
-class PublishState(object):
-    """
-    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
-
-    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
-    """
-    draft = 'draft'
-    private = 'private'
-    public = 'public'
-
-
 def compute_publish_state(xblock):
     """
-    Returns whether this xblock is 'draft', 'public', or 'private'.
+    Returns whether this xblock is draft, public, or private.
 
-    'draft' content is in the process of being edited, but still has a previous
-        version visible in the LMS
-    'public' content is locked and visible in the LMS
-    'private' content is editable and not visible in the LMS
+    Returns:
+        PublishState.draft - content is in the process of being edited, but still has a previous
+            version deployed to LMS
+        PublishState.public - content is locked and deployed to LMS
+        PublishState.private - content is editable and not deployed to LMS
     """
 
-    if getattr(xblock, 'is_draft', False):
-        try:
-            modulestore('direct').get_item(xblock.location)
-            return PublishState.draft
-        except ItemNotFoundError:
-            return PublishState.private
-    else:
-        return PublishState.public
+    return modulestore().compute_publish_state(xblock)
+
+
+def is_xblock_visible_to_students(xblock):
+    """
+    Returns true if there is a published version of the xblock that has been released.
+    """
+
+    try:
+        published = modulestore().get_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+    # If there's no published version then the xblock is clearly not visible
+    except ItemNotFoundError:
+        return False
+
+    # If visible_to_staff_only is True, this xblock is not visible to students regardless of start date.
+    if published.visible_to_staff_only:
+        return False
+
+    # Check start date
+    if 'detached' not in published._class_tags and published.start is not None:
+        return datetime.now(UTC) > published.start
+
+    # No start date, so it's always visible
+    return True
 
 
 def add_extra_panel_tab(tab_type, course):

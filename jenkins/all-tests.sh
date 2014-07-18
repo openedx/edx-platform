@@ -1,1 +1,0 @@
-../scripts/all-tests.sh

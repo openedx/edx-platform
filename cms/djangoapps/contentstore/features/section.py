@@ -73,7 +73,7 @@ def i_click_on_section_name_in_modal(_step):
 
 @step('I see no form for editing section name in modal$')
 def edit_section_name_form_not_exist(_step):
-    assert not world.is_css_present('.modal-window .section-name input')
+    assert world.is_css_not_present('.modal-window .section-name input')
 
 
 @step('I see the complete section name with a quote in the editor$')

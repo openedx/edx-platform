@@ -6,13 +6,14 @@ import random
 import string  # pylint: disable=W0402
 
 from django.utils.translation import ugettext as _
+import django.utils
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
@@ -20,6 +21,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
+from xmodule.partitions.partitions import UserPartition, Group
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
@@ -30,7 +32,6 @@ from contentstore.utils import (
     get_lms_link_for_item,
     add_extra_panel_tab,
     remove_extra_panel_tab,
-    get_modulestore,
     reverse_course_url
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
@@ -44,7 +45,8 @@ from .access import has_course_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY
+    ADVANCED_COMPONENT_POLICY_KEY,
+    SPLIT_TEST_COMPONENT_TYPE,
 )
 
 from django_comment_common.models import assign_default_role
@@ -65,7 +67,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
-           'textbooks_list_handler', 'textbooks_detail_handler']
+           'textbooks_list_handler', 'textbooks_detail_handler',
+           'group_configurations_list_handler', 'group_configurations_detail_handler']
 
 
 class AccessListFallback(Exception):
@@ -107,7 +110,7 @@ def course_handler(request, course_key_string=None):
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        offering. Return same json as above.
+        course, run. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -164,7 +167,7 @@ def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
-    courses = modulestore('direct').get_courses()
+    courses = modulestore().get_courses()
 
     # filter out courses that we don't have access to
     def course_filter(course):
@@ -201,14 +204,15 @@ def _accessible_courses_list_from_groups(request):
         if course_key is None:
             # If the course_access does not have a course_id, it's an org-based role, so we fall back
             raise AccessListFallback
-        try:
-            course = modulestore('direct').get_course(course_key)
-        except ItemNotFoundError:
-            # If a user has access to a course that doesn't exist, don't do anything with that course
-            pass
-        if course is not None and not isinstance(course, ErrorDescriptor):
-            # ignore deleted or errored courses
-            courses_list[course_key] = course
+        if course_key not in courses_list:
+            try:
+                course = modulestore().get_course(course_key)
+            except ItemNotFoundError:
+                # If a user has access to a course that doesn't exist, don't do anything with that course
+                pass
+            if course is not None and not isinstance(course, ErrorDescriptor):
+                # ignore deleted or errored courses
+                courses_list[course_key] = course
 
     return courses_list.values()
 
@@ -265,7 +269,6 @@ def course_index(request, course_key):
     course_module = _get_course_module(course_key, request.user, depth=3)
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
-
 
     return render_to_response('overview.html', {
         'context_course': course_module,
@@ -332,9 +335,11 @@ def create_new_course(request):
         fields.update(metadata)
 
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-        new_course = modulestore('direct').create_course(
+        new_course = modulestore().create_course(
             course_key.org,
-            course_key.offering,
+            course_key.course,
+            course_key.run,
+            request.user.id,
             fields=fields,
         )
 
@@ -439,7 +444,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         raise PermissionDenied()
 
     if request.method == 'GET':
-        course_updates = get_course_updates(usage_key, provided_id)
+        course_updates = get_course_updates(usage_key, provided_id, request.user.id)
         if isinstance(course_updates, dict) and course_updates.get('error'):
             return JsonResponse(course_updates, course_updates.get('status', 400))
         else:
@@ -592,18 +597,18 @@ def _config_course_advanced_components(request, course_module):
             component_types = tab_component_map.get(tab_type)
             found_ac_type = False
             for ac_type in component_types:
-                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]:
+                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]["value"]:
                     # Add tab to the course if needed
                     changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
                     # If a tab has been added to the course, then send the
                     # metadata along to CourseMetadata.update_from_json
                     if changed:
                         course_module.tabs = new_tabs
-                        request.json.update({'tabs': new_tabs})
+                        request.json.update({'tabs': {'value': new_tabs}})
                         # Indicate that tabs should not be filtered out of
                         # the metadata
                         filter_tabs = False  # Set this flag to avoid the tab removal code below.
-                    found_ac_type = True  #break
+                    found_ac_type = True  # break
 
             # If we did not find a module type in the advanced settings,
             # we may need to remove the tab from the course.
@@ -611,7 +616,7 @@ def _config_course_advanced_components(request, course_module):
                 changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
                 if changed:
                     course_module.tabs = new_tabs
-                    request.json.update({'tabs':new_tabs})
+                    request.json.update({'tabs': {'value': new_tabs}})
                     # Indicate that tabs should *not* be filtered out of
                     # the metadata
                     filter_tabs = False
@@ -631,8 +636,7 @@ def advanced_settings_handler(request, course_key_string):
         json: get the model
     PUT, POST
         json: update the Course's settings. The payload is a json rep of the
-            metadata dicts. The dict can include a "unsetKeys" entry which is a list
-            of keys whose values to unset: i.e., revert to default
+            metadata dicts.
     """
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
@@ -647,9 +651,9 @@ def advanced_settings_handler(request, course_key_string):
         if request.method == 'GET':
             return JsonResponse(CourseMetadata.fetch(course_module))
         else:
-            # Whether or not to filter the tabs key out of the settings metadata
-            filter_tabs = _config_course_advanced_components(request, course_module)
             try:
+                # Whether or not to filter the tabs key out of the settings metadata
+                filter_tabs = _config_course_advanced_components(request, course_module)
                 return JsonResponse(CourseMetadata.update_from_json(
                     course_module,
                     request.json,
@@ -658,7 +662,7 @@ def advanced_settings_handler(request, course_key_string):
                 ))
             except (TypeError, ValueError) as err:
                 return HttpResponseBadRequest(
-                    "Incorrect setting format. {}".format(err),
+                    django.utils.html.escape(err.message),
                     content_type="text/plain"
                 )
 
@@ -739,7 +743,7 @@ def textbooks_list_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     course = _get_course_module(course_key, request.user)
-    store = get_modulestore(course.location)
+    store = modulestore()
 
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         # return HTML page
@@ -814,7 +818,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     """
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user)
-    store = get_modulestore(course_module.location)
+    store = modulestore()
     matching_id = [tb for tb in course_module.pdf_textbooks
                    if unicode(tb.get("id")) == unicode(textbook_id)]
     if matching_id:
@@ -852,6 +856,116 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
         course_module.pdf_textbooks = remaining_textbooks
         store.update_item(course_module, request.user.id)
         return JsonResponse()
+
+
+class GroupConfigurationsValidationError(Exception):
+    """
+    An error thrown when a group configurations input is invalid.
+    """
+    pass
+
+
+class GroupConfiguration(object):
+    """
+    Prepare Group Configuration for the course.
+    """
+    @staticmethod
+    def parse(configuration_json):
+        """
+        Parse given string that represents group configuration.
+        """
+        try:
+            group_configuration = json.loads(configuration_json)
+        except ValueError:
+            raise GroupConfigurationsValidationError(_("invalid JSON"))
+
+        if not group_configuration.get('version'):
+            group_configuration['version'] = UserPartition.VERSION
+
+        # this is temporary logic, we are going to build default groups on front-end
+        if not group_configuration.get('groups'):
+            group_configuration['groups'] = [
+                {'name': 'Group A'}, {'name': 'Group B'},
+            ]
+
+        for group in group_configuration['groups']:
+            group['version'] = Group.VERSION
+        return group_configuration
+
+    @staticmethod
+    def validate(group_configuration):
+        """
+        Validate group configuration representation.
+        """
+        if not group_configuration.get("name"):
+            raise GroupConfigurationsValidationError(_("must have name of the configuration"))
+        if not isinstance(group_configuration.get("description"), basestring):
+            raise GroupConfigurationsValidationError(_("must have description of the configuration"))
+        if len(group_configuration.get('groups')) < 2:
+            raise GroupConfigurationsValidationError(_("must have at least two groups"))
+        group_id = unicode(group_configuration.get("id", ""))
+        if group_id and not group_id.isdigit():
+            raise GroupConfigurationsValidationError(_("group configuration ID must be numeric"))
+
+@require_http_methods(("GET", "POST"))
+@login_required
+@ensure_csrf_cookie
+def group_configurations_list_handler(request, course_key_string):
+    """
+    A RESTful handler for Group Configurations
+
+    GET
+        html: return Group Configurations list page (Backbone application)
+    POST
+        json: create new group configuration
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
+    store = modulestore()
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+        return render_to_response('group_configurations.html', {
+            'context_course': course,
+            'group_configuration_url': group_configuration_url,
+            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
+        })
+    elif "application/json" in request.META.get('HTTP_ACCEPT') and request.method == 'POST':
+        # create a new group configuration for the course
+        try:
+            configuration = GroupConfiguration.parse(request.body)
+            GroupConfiguration.validate(configuration)
+        except GroupConfigurationsValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
+
+        if not configuration.get("id"):
+            configuration["id"] = random.randint(100, 10**12)
+
+        # Assign ids to every group in configuration.
+        for index, group in enumerate(configuration.get('groups', [])):
+            group["id"] = index
+
+        course.user_partitions.append(UserPartition.from_json(configuration))
+        store.update_item(course, request.user.id)
+        response = JsonResponse(configuration, status=201)
+
+        response["Location"] = reverse_course_url(
+            'group_configurations_detail_handler',
+            course.id,
+            kwargs={'group_configuration_id': configuration["id"]}
+        )
+        return response
+    else:
+        return HttpResponse(status=406)
+
+
+@require_http_methods(("GET", "POST"))
+@login_required
+@ensure_csrf_cookie
+def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
+    return JsonResponse(status=404)
 
 
 def _get_course_creator_status(user):

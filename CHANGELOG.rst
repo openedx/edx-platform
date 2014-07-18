@@ -5,7 +5,21 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: New advanced setting "invitation_only" for courses. This setting overrides the enrollment start/end dates
+  if set. LMS-2670
+
+LMS: Register button on About page was active even when greyed out. Now made inactive when appropriate and
+displays appropriate context sensitive message to student. LMS-2717
+
+Blades: Redirect Chinese students to a Chinese CDN for video. BLD-1052.
+
+Studio: Show display names and help text in Advanced Settings. Also hide deprecated settings
+by default.
+
 Studio: Move Peer Assessment into advanced problems menu.
+
+Studio: Support creation and editing of split_test instances (Content Experiments)
+entirely in Studio. STUD-1658.
 
 Blades: Add context-aware video index. BLD-933
 

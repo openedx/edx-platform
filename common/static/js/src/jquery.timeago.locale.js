@@ -1,5 +1,7 @@
 jQuery.timeago.settings.strings = {
+    // Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
     formatAgo: gettext("%s ago"),
+    // Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
     formatFromNow: gettext("%s from now"),
     seconds: gettext("less than a minute"),
     minute: gettext("about a minute"),
