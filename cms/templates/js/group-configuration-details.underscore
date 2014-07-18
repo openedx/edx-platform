@@ -37,4 +37,9 @@
           <% }) %>
         </ol>
     <% } %>
+    <ul class="actions group-configuration-actions">
+        <li class="action action-edit">
+            <button class="edit"><%= gettext("Edit") %></button>
+        </li>
+    </ul>
 </div>

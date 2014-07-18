@@ -6,6 +6,7 @@ function(BaseView, _, gettext) {
     var GroupConfigurationDetails = BaseView.extend({
         tagName: 'div',
         events: {
+            'click .edit': 'editConfiguration',
             'click .show-groups': 'showGroups',
             'click .hide-groups': 'hideGroups'
         },
@@ -34,6 +35,11 @@ function(BaseView, _, gettext) {
 
             this.$el.html(this.template(attrs));
             return this;
+        },
+
+        editConfiguration: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            this.model.set('editing', true);
         },
 
         showGroups: function(e) {

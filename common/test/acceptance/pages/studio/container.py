@@ -134,6 +134,12 @@ class ContainerPage(PageObject):
         """
         return self.q(css='.add-missing-groups-button').present
 
+    def get_xblock_information_message(self):
+        """
+        Returns an information message for the container page.
+        """
+        return self.q(css=".xblock-message.information").first.text[0]
+
 
 class XBlockWrapper(PageObject):
     """

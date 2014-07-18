@@ -273,7 +273,9 @@ define([
 
     describe('GroupConfigurationItem', function() {
         beforeEach(function() {
-            this.model = new GroupConfigurationModel({ });
+            view_helpers.installTemplate('group-configuration-edit', true);
+            view_helpers.installTemplate('group-configuration-details');
+            this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection([ this.model ]);
             this.view = new GroupConfigurationItem({
                 model: this.model
@@ -284,10 +286,10 @@ define([
         it('should render properly', function() {
             // Details view by default
             expect(this.view.$(SELECTORS.detailsView)).toExist();
-            this.model.set('editing', true);
+            this.view.$('.action-edit .edit').click();
             expect(this.view.$(SELECTORS.editView)).toExist();
             expect(this.view.$(SELECTORS.detailsView)).not.toExist();
-            this.model.set('editing', false);
+            this.view.$('.action-cancel').click();
             expect(this.view.$(SELECTORS.detailsView)).toExist();
             expect(this.view.$(SELECTORS.editView)).not.toExist();
         });

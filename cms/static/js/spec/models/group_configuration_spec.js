@@ -90,30 +90,36 @@ define([
 
             it('should match server model to client model', function() {
                 var serverModelSpec = {
-                      'id': 10,
-                      'name': 'My Group Configuration',
-                      'description': 'Some description',
-                      'groups': [
-                        {
-                          'name': 'Group 1'
-                        }, {
-                          'name': 'Group 2'
-                        }
-                      ]
+                        'id': 10,
+                        'name': 'My Group Configuration',
+                        'description': 'Some description',
+                        'version': 1,
+                        'groups': [
+                            {
+                                'version': 1,
+                                'name': 'Group 1'
+                            }, {
+                                'version': 1,
+                                'name': 'Group 2'
+                            }
+                        ]
                     },
                     clientModelSpec = {
-                      'id': 10,
-                      'name': 'My Group Configuration',
-                      'description': 'Some description',
-                      'showGroups': false,
-                      'editing': false,
-                      'groups': [
-                        {
-                          'name': 'Group 1'
-                        }, {
-                          'name': 'Group 2'
-                        }
-                      ]
+                        'id': 10,
+                        'name': 'My Group Configuration',
+                        'description': 'Some description',
+                        'showGroups': false,
+                        'editing': false,
+                        'version': 1,
+                        'groups': [
+                            {
+                                'version': 1,
+                                'name': 'Group 1'
+                            }, {
+                                'version': 1,
+                                'name': 'Group 2'
+                            }
+                        ]
                     },
                     model = new GroupConfigurationModel(serverModelSpec);
 
