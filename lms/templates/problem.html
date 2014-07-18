@@ -14,11 +14,7 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
 
-    <div hidden class="problem_hint">MARKER</div>  <!-- this pattern is expected by a 'replace' operation
-                                                        in file capa_base.py so it should not be changed here
-                                                        without making the appropriate adjustments in that file
-                                                    -->
-
+    <div hidden class="problem_hint">MARKER</div>
 
     % if check_button:
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
