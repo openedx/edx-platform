@@ -562,69 +562,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
 
-#    numericMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
-#
-#    if numericMatches                            # the xml has an opening and closing double bracket [[...]]
-#      reducedXmlString = xmlString.replace(numericMatches[0], '')
-#      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-#      returnXmlString +=  '    <optionresponse>\n'
-#      returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
-#
-#      optionsString = ''
-#      delimiter = ''
-#      for line in numericMatches[1].split('\n')    # split the string between [[..]] brackets into single lines
-#        line = line.trim()
-#        if line.length > 0
-#          hintText = ''
-#          correctnessText = ''
-#          itemText = ''
-#
-#          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-#          if hintMatches
-#            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-#            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
-#            hintText = @extractCustomLabel( hintText )
-#            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
-#
-#          correctChoiceMatch = line.match( /^\s*\(([^)]+)\)/ )  # try to match a parenthetical string: '(...)'
-#          if correctChoiceMatch                          # matched so this must be the correct answer
-#            correctnessText = 'True'
-#            itemText = correctChoiceMatch[1]
-#            returnXmlString = returnXmlString.replace('CORRECT_PLACEHOLDER', itemText)  # poke the correct value in
-#            optionsString += delimiter + '(' + itemText + ')'
-#          else
-#            correctnessText = 'False'
-#            itemText = line
-#            optionsString += delimiter + itemText.trim()
-#
-#          if itemText[itemText.length-1] == ','     # check for an end-of-line comma
-#            itemText = itemText.slice(0, itemText.length-1) # suppress it
-#          itemText = itemText.trim()
-#
-#          returnXmlString += '              <option  correct="' + correctnessText + '">'
-#          returnXmlString += '                  ' + itemText + '\n'
-#          if hintText
-#            returnXmlString += '                   <optionhint ' + @customLabel + '>' + hintText + '\n'
-#            returnXmlString += '                   </optionhint>\n'
-#          returnXmlString += '              </option>\n'
-#
-#          delimiter = ', '
-#      returnXmlString += '        </optioninput>\n'
-#
-#      returnXmlString = returnXmlString.replace('OPTIONS_PLACEHOLDER', optionsString)  # poke the options in
-#
-#      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-#      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
-#
-#      returnXmlString += '    </optionresponse>\n'
-#
-#    else
-#      returnXmlString = xmlString
-
-    return returnXmlString
-
-
-
 
 
 
@@ -651,60 +588,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       MarkdownEditingDescriptor.problemHintsBooleanExpressions = [];
       MarkdownEditingDescriptor.problemHintsBooleanStrings = [];
 
+debugger;
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
       xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
       xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
-debugger;
       xml = MarkdownEditingDescriptor.parseForNumeric(xml);         // examine the string for a numeric problem
 
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
 
-
-//      // group multiple choice answers
-//      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
-//      var choices = '';
-//      var shuffle = false;
-//      var options = match.split('\n');
-//      for(var i = 0; i < options.length; i++) {
-//          if(options[i].length > 0) {
-//
-//            options[i] = MarkdownEditingDescriptor.parseForQuestionHints(options[i]);
-//            hintString = String(MarkdownEditingDescriptor.questionHintStrings[i]);
-//            hintElement = '';
-//            if (hintString.length > 0) {
-//              hintElement = '\n            <choicehint> ' + hintString + ' </choicehint>\n';
-//            }
-//
-//            var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
-//            var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
-//            var correct = 'False';
-//            if(/x/i.test(inparens)) {
-//              correct = 'True';
-//            }
-//
-//            var fixed = '';
-//            if(/@/.test(inparens)) {
-//              fixed = ' fixed="true"';
-//            }
-//            if(/!/.test(inparens)) {
-//              shuffle = true;
-//            }
-//            choices += '        <choice correct="' + correct + '"' + fixed + '>' + value + hintElement + '        </choice>\n';
-//          }
-//        }
-//        var result = '    <multiplechoiceresponse>\n';
-//        if(shuffle) {
-//          result += '        <choicegroup type="MultipleChoice" shuffle="true">\n';
-//        } else {
-//          result += '        <choicegroup type="MultipleChoice">\n';
-//        }
-//        result += choices;
-//        result += '        </choicegroup>\n';
-//        result += '    </multiplechoiceresponse>\n\n';
-//
-//        return result;
-//      });
 
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
