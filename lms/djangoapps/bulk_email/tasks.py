@@ -459,6 +459,8 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             email = current_recipient['email']
             email_context['email'] = email
             email_context['name'] = current_recipient['profile__name']
+            email_context['user_id'] = current_recipient['pk']
+            email_context['course_id'] = course_email.course_id
 
             # Construct message content using templates and context:
             plaintext_msg = course_email_template.render_plaintext(course_email.text_message, email_context)
