@@ -1700,7 +1700,9 @@ class StringResponse(LoncapaResponse):
                 if self._check_hint_condition_match(primary_answer.get('answer'), student_answer, self.regexp):
                     hint_found = True
                     for primary_hint in self.original_xml.xpath('//stringresponse/correcthint'):
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">CORRECT: ' + primary_hint.text.strip() + '</div>'
+                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] \
+                                                   + '<div class="' + QUESTION_HINT_CORRECT_STYLE \
+                                                   + '">CORRECT: ' + primary_hint.text.strip() + '</div>'
 
             # check all additional answers
             if not hint_found:
@@ -1709,7 +1711,9 @@ class StringResponse(LoncapaResponse):
                     if self._check_hint_condition_match(additional_answer_text, student_answer, self.regexp):
                         hint_found = True
                         for additional_answer_hint in self.original_xml.xpath('//stringresponse/additional_answer'):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] \
+                                                       + '<div class="' + QUESTION_HINT_CORRECT_STYLE \
+                                                       + '">CORRECT: ' + additional_answer_hint.text.strip() + '</div>'
 
             # check all incorrect answers (regex not allowed)
             if not hint_found:
@@ -1718,7 +1722,9 @@ class StringResponse(LoncapaResponse):
                     if self._check_hint_condition_match(incorrect_answer_text, student_answer, False):
                         hint_found = True
                         for incorrect_answer_hint in self.original_xml.xpath('//stringequalhint'):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_INCORRECT_STYLE + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] \
+                                                       + '<div class="' + QUESTION_HINT_INCORRECT_STYLE \
+                                                       + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
             # check all incorrect answers (regex supplied)
             if not hint_found:
@@ -1728,7 +1734,9 @@ class StringResponse(LoncapaResponse):
                         hint_found = True
                         attribute_test = '[@answer="' + incorrect_answer_text + '"]'
                         for incorrect_answer_hint in self.original_xml.xpath('//regexphint' + attribute_test):
-                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_INCORRECT_STYLE + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
+                            new_cmap[problem]['msg'] = new_cmap[problem]['msg'] \
+                                                       + '<div class="' + QUESTION_HINT_INCORRECT_STYLE \
+                                                       + '>INCORRECT: ' + incorrect_answer_hint.text.strip() + '</div>'
 
         return hint_found
 
