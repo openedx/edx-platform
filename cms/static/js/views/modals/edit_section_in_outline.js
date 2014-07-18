@@ -57,6 +57,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 return this.template({
                     xblockInfo: this.xblockInfo,
                     getDateTime: this.getDateTime,
+                    graderTypes: this.graderTypes,
                     date: this.date,
                 });
             },
