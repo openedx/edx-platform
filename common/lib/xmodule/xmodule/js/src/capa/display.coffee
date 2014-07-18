@@ -703,10 +703,11 @@ class @Problem
 
   hint_button: =>
     Logger.log 'hint_button', 0
-    inputElement = document.getElementsByClassName("hint_button")[0]
+    inputElements = document.getElementsByClassName("hint_button")
+    inputElement = inputElements[1]
     for anAttribute in inputElement.attributes
       if inputElement.attributes[_i].name == "next_hint_index"
-        next_hint_index = inputElement.attributes[_i].nodeValue
+        next_hint_index = inputElement.attributes[_i].value
         break
 
     $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>

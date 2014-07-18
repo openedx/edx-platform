@@ -197,7 +197,7 @@ class CapaFields(object):
              "This key is granted for exclusive use by this course for the specified duration. "
              "Please do not share the API key with other courses and notify MathWorks immediately "
              "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report and issue, please contact moocsupport@mathworks.com",
+             "or to report an issue, please contact moocsupport@mathworks.com",
         scope=Scope.settings
     )
 
@@ -623,23 +623,16 @@ class CapaMixin(CapaFields):
             raise NotFoundError('Marker pattern not found')
         return html
 
-    def _insert_problem_hint(self, html):
-        '''
-        If the student has requested a program hint, find the next hint to display
-        for this problem and insert it into the html stream. This function is only
-        called when the student requests a hint so there is no need to verify conditions.
-        :param html:    The original html string (with the special string '> <' embedded therein)
-        :return:        The (potentially) modified html string
-        '''
-        hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
-        hint_text = hint_element.text.strip()
-        html = self._replace_div_text(hint_text, html)
-
-        self.next_hint_index += 1
-        if self.next_hint_index > self.problem_hints_count:     # if all hints have been shown
-            self.next_hint_index = 0                            # reset back to the first hint again
-
-        return html
+    # def _insert_problem_hint(self, html, show_problem_hint):
+    #     '''
+    #     If the student has requested a program hint, find the next hint to display
+    #     for this problem and insert it into the html stream. This function is only
+    #     called when the student requests a hint so there is no need to verify conditions.
+    #     :param html:    The original html string (with the special string '> <' embedded therein)
+    #     :return:        The hint text, or an empty string if no hint text
+    #     '''
+    #
+    #     return hint_text
 
     def get_problem_html(self, encapsulate=True, show_problem_hint=False):
         '''
@@ -677,6 +670,14 @@ class CapaMixin(CapaFields):
             'weight': self.weight,
         }
 
+        hint_text = ''
+        if show_problem_hint:                       # if the student has requested a problem hint
+            hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
+            hint_text = hint_element.text.strip()
+            self.next_hint_index += 1                               # increment the index
+            if self.next_hint_index == self.problem_hints_count:    # if all hints have been shown
+                self.next_hint_index = 0                            # reset back to the first hint again
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
@@ -693,6 +694,18 @@ class CapaMixin(CapaFields):
 
         html = self.runtime.render_template('problem.html', context)
 
+        if hint_text != '':
+            html = self._replace_div_text(hint_text, html)
+
+
+
+
+
+
+
+
+
+
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.runtime.ajax_url
@@ -706,9 +719,6 @@ class CapaMixin(CapaFields):
 
         if self.runtime.replace_jump_to_id_urls:
             html = self.runtime.replace_jump_to_id_urls(html)
-
-        if show_problem_hint:                       # if the student has requested a problem hint
-            html = self._insert_problem_hint(html)  # add the next sequential problem hint to the html
 
         html = self._strip_hints_from_xml(html)
 
@@ -757,7 +767,8 @@ class CapaMixin(CapaFields):
 
         return {
             'success': True,
-            'contents': html
+            'contents': html,
+            'next_hint_index': self.next_hint_index,
         }
 
     def is_past_due(self):
