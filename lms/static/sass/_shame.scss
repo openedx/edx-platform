@@ -62,13 +62,11 @@
   background: $action-primary-bg;
   color: $action-primary-fg;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $action-primary-focused-bg;
   }
   &:focus {
-    background: $action-primary-fg;
-    color: $action-primary-focused-bg;
-    outline: 2px solid $action-primary-focused-bg;
+    outline: 2px solid $black;
   }
 
   &.current, &.active {
@@ -97,6 +95,9 @@
 
   &:hover, &:active, &:focus {
     background: $action-secondary-focused-bg;
+  }
+  &:focus {
+    outline: 2px solid $black;
   }
 
   &.current, &.active {
