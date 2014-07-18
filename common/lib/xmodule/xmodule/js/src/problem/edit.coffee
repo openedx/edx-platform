@@ -389,6 +389,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         hintText = ''
         correctnessText = ''
         itemText = ''
+        line += ' '       # an extra space at the end of line works around what looks like a bug in the regex parser
         choiceMatches = @matchMultipleChoicePattern( line )
         if choiceMatches                          # this line includes '(...)' so it must be a multiple choice item
           isMultipleChoiceType = true
