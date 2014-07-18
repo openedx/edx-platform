@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 12:38-0400\n"
-"PO-Revision-Date: 2014-07-07 16:38:22.731143\n"
+"POT-Creation-Date: 2014-07-18 17:47+0000\n"
+"PO-Revision-Date: 2014-07-18 17:47:47.338644\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +76,27 @@ msgstr "Prößlém #"
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr "Àdvänçéd #"
+
+#: common/djangoapps/cities/models.py common/djangoapps/cities/models.py
+msgid "Code"
+msgstr "Çödé Ⱡ'σяєм#"
+
+#: common/djangoapps/cities/models.py
+msgid "State"
+msgstr "Stäté Ⱡ'σяєм ι#"
+
+#: common/djangoapps/cities/models.py
+msgid "States"
+msgstr "Stätés Ⱡ'σяєм ιρѕ#"
+
+#: common/djangoapps/cities/models.py cms/templates/register.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "City"
+msgstr "Çïtý Ⱡ'σяєм#"
+
+#: common/djangoapps/cities/models.py
+msgid "Cities"
+msgstr "Çïtïés Ⱡ'σяєм ιρѕ#"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -172,6 +193,11 @@ msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
 #: common/djangoapps/student/models.py
 msgid "None"
 msgstr "Nöné Ⱡ'σяєм#"
+
+#: common/djangoapps/student/validators.py common/djangoapps/student/views.py
+#: common/djangoapps/student/views.py
+msgid "Invalid ID"
+msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -453,10 +479,6 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "Name required"
 msgstr "Nämé réqüïréd Ⱡ'#"
-
-#: common/djangoapps/student/views.py common/djangoapps/student/views.py
-msgid "Invalid ID"
-msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -6599,7 +6621,7 @@ msgstr "Pägé nöt föünd Ⱡ'#"
 msgid "close"
 msgstr "çlösé Ⱡ'σяєм ι#"
 
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -6612,6 +6634,13 @@ msgstr "Löädïng... Ⱡ#"
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr "Vïéw Ⱡ'σяєм#"
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "Séttïngs #"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -6661,13 +6690,6 @@ msgstr "Förgöt pässwörd? Ⱡ'σ#"
 msgid "Password"
 msgstr "Pässwörd #"
 
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "Séttïngs #"
-
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Admin"
@@ -6692,6 +6714,14 @@ msgstr "Sïgn Ûp #"
 #: lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'#"
+
+#: cms/templates/register.html lms/templates/register.html
+msgid "TYPE ID"
+msgstr "TÝPÉ ÌD #"
+
+#: cms/templates/register.html lms/templates/register.html
+msgid "example: Quito, Pichincha, Ecuador"
+msgstr "éxämplé: Qüïtö, Pïçhïnçhä, Éçüädör Ⱡ'σяєм ιρ#"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -8170,10 +8200,6 @@ msgstr "Püßlïç Dïspläý Nämé Ⱡ'σя#"
 #: lms/templates/register.html lms/templates/register.html
 msgid "Extra Personal Information"
 msgstr "Éxträ Pérsönäl Ìnförmätïön Ⱡ'σяєм#"
-
-#: lms/templates/register.html
-msgid "City"
-msgstr "Çïtý Ⱡ'σяєм#"
 
 #: lms/templates/register.html
 msgid "example: New York"
@@ -14168,6 +14194,45 @@ msgstr "Ýöür çöürsé: Ⱡ#"
 msgid "Course git url:"
 msgstr "Çöürsé gït ürl: Ⱡ'#"
 
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Group Configurations"
+msgstr "Gröüp Çönfïgürätïöns Ⱡ'σя#"
+
+#: cms/templates/group_configurations.html
+msgid "This module is disabled at the moment."
+msgstr "Thïs mödülé ïs dïsäßléd ät thé mömént. Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "Öthér Çöürsé Séttïngs Ⱡ'σя#"
+
+#: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Détäïls &amp; Sçhédülé Ⱡ'σя#"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Grading"
+msgstr "Grädïng #"
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr "Çöürsé Téäm Ⱡ#"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr "Àdvänçéd Séttïngs Ⱡ'σ#"
+
 #: cms/templates/howitworks.html
 msgid "Welcome"
 msgstr "Wélçömé #"
@@ -14962,12 +15027,6 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr "Çöürsé Téäm Séttïngs Ⱡ'σя#"
 
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr "Çöürsé Téäm Ⱡ#"
-
 #: cms/templates/manage_users.html
 msgid "New Team Member"
 msgstr "Néw Téäm Mémßér Ⱡ'#"
@@ -15241,8 +15300,32 @@ msgstr ""
 "süppört förüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/register.html
-msgid "Your Location"
-msgstr "Ýöür Löçätïön Ⱡ'#"
+msgid "Cedula / Pasaporte"
+msgstr "Çédülä / Päsäpörté Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid "example: 0102030405"
+msgstr "éxämplé: 0102030405 Ⱡ'σя#"
+
+#: cms/templates/register.html
+msgid "Don't input special characters in your ID"
+msgstr "Dön't ïnpüt spéçïäl çhäräçtérs ïn ýöür ÌD Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/register.html
+msgid "Debe"
+msgstr "Déßé Ⱡ'σяєм#"
+
+#: cms/templates/register.html
+msgid "seleccionar"
+msgstr "séléççïönär Ⱡ#"
+
+#: cms/templates/register.html
+msgid "su ciudad de la lista que se desplega"
+msgstr "sü çïüdäd dé lä lïstä qüé sé désplégä Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/register.html
+msgid "cuando digite un texto."
+msgstr "çüändö dïgïté ün téxtö. Ⱡ'σяє#"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -15560,22 +15643,6 @@ msgstr ""
 "néw çöürsés tö täké. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
 "єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρ#"
 
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "Öthér Çöürsé Séttïngs Ⱡ'σя#"
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr "Grädïng #"
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr "Àdvänçéd Séttïngs Ⱡ'σ#"
-
 #: cms/templates/settings_advanced.html
 msgid "Hide Deprecated Settings"
 msgstr "Hïdé Dépréçätéd Séttïngs Ⱡ'σяє#"
@@ -15642,10 +15709,6 @@ msgstr ""
 " ýöü üsé döüßlé qüötätïön märks (&quot;) äröünd thé strïng. Dö nöt üsé "
 "sïnglé qüötätïön märks (&apos;). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιη#"
-
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Détäïls &amp; Sçhédülé Ⱡ'σя#"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"

@@ -56,6 +56,19 @@
               <span class="tip tip-input" id="cedula-tip">${_("Don't input special characters in your ID")}</span>
             </li>
 
+            <div class="field required select" id="type-id">
+              <label for="type_id">${_("TYPE ID")}</label>
+              <select id="type-id" name="type_id">
+                <option value="cedula">CEDULA</option>
+                <option value="pasaporte">PASAPORTE</option>
+              </select>
+            </div>
+            <li class="field required text" id="field-cedula">
+              <label for="name">${_('Cedula / Pasaporte')}</label>
+              <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>
+              <span class="tip tip-input" id="cedula-tip">${_("Don't input special characters in your ID")}</span>
+            </li>
+
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
               <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
@@ -146,6 +159,7 @@ require(["jquery", "jquery.cookie"], function($) {
   });
 });
   </script>
+
 <script type="text/javascript">
 require(["jquery","jquery.ui"], function($) {
   $("#city").autocomplete({

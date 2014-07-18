@@ -87,3 +87,9 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+
+PLATFORM_NAME = 'MOOC UPEx'
+SITE_NAME = 'upex.edu.ec'

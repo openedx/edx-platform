@@ -260,7 +260,7 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8001"
+SITE_NAME = "upex.edu.ec"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 
@@ -293,7 +293,7 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'es-419'
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True

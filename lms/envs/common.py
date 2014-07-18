@@ -548,7 +548,7 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "example.com"
+SITE_NAME = "upex.edu.ec"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
@@ -1295,7 +1295,9 @@ INSTALLED_APPS = (
 
     # Monitoring functionality
     'monitoring',
-    'cities',
+
+    #cities
+    'cities'
 )
 
 ######################### MARKETING SITE ###############################
@@ -1646,3 +1648,18 @@ THIRD_PARTY_AUTH = {}
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+
+#####################IAEN CONF##################################
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70
+
+########################## WS CONFIG ###########################
+
+WS_CONFIG = {
+    'ws_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'ws_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'method_permission': "validarPermisoPeticion",
+    'method_query_title': "consultaTitulo",
+    'identity': '0103893954'
+    }

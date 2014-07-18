@@ -513,3 +513,9 @@ urlpatterns += (
     url(r'404', handler404),
     url(r'500', handler500),
 )
+
+# Extra ajax calls
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler')
+)

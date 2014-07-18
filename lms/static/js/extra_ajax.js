@@ -9,11 +9,11 @@ $(function(){
                 },
                 success: function(data){
                     response( $.map(data, function(item){
-                        $("#city_id").val(item[0]); 
-                        return {
-                            label: item[1],
-                            value: item[1]
-                        }
+                      $("#city_id").val(item[0]); 
+                      return {
+                          label: item[1],
+                          value: item[1]
+                      }
                     }));
                 }
             });

@@ -64,6 +64,8 @@ from courseware.access import has_access
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
+from student.validators import validate_cedula
+from cities.models import City
 import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
@@ -1070,12 +1072,27 @@ def _do_create_account(post_vars):
     profile.level_of_education = post_vars.get('level_of_education')
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
-    profile.city = post_vars.get('city')
+#    profile.city = post_vars.get('city')
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
     profile.cedula = post_vars.get('cedula')
     profile.city = city
 
+    city = City.objects.get(id=post_vars['city_id'])
+    profile.city = city
+
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = "ID Incorrecto"
+            js['field'] = 'cedula'
+            js['sucess'] = False
+            return JsonResponse(js, status=400)
+
+    profile.cedula = post_vars['cedula']
+        
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
@@ -1894,7 +1911,6 @@ def change_email_settings(request):
 
     return JsonResponse({"success": True})
 
-
 @ensure_csrf_cookie
 def student_handler(request):
     """
@@ -1908,4 +1924,4 @@ def student_handler(request):
     result = utils.verify_academic_student(cedula)
     if result:
         data.update(result)
-    return HttpResponse(json.dumps(data))
+    return JsonResponse(data)

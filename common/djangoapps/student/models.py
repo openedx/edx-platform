@@ -31,6 +31,7 @@ from django.dispatch import receiver, Signal
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_noop
 from django_countries import CountryField
+from cities.models import City
 from track import contexts
 from eventtracking import tracker
 from importlib import import_module
@@ -206,7 +207,7 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range((this_year-settings.DELTA_YEAR), this_year - settings.MAX_YEAR_ALLOWED, -1)
+    VALID_YEARS = range(this_year-settings.DELTA_YEAR, this_year - settings.MAX_YEAR_ALLOWED, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (
         ('m', ugettext_noop('Male')),
@@ -240,13 +241,12 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
+#    city = models.TextField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
-    #EVEX fields
-    cedula = models.CharField(max_length=32, blank=True, null=True)
-    city = models.ForeignKey(City, default=None, blank=True, null=True)
+    cedula = models.CharField(max_length=132, blank=True, null=True)
+    city = models.ForeignKey('cities.City', default=None, blank=True, null=True)
 
     def get_meta(self):
         js_str = self.meta

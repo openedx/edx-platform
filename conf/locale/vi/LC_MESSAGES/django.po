@@ -12,6 +12,7 @@
 # Hoàng Văn Quân, 2014
 # Hoàng Văn Quân, 2014
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
+# minhtuev <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
@@ -52,6 +53,7 @@
 # Hoàng Văn Quân, 2014
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
 # Nguyen D. Man <mannd@live.com>, 2013
+# minhtuev <mvo@edx.org>, 2014
 # Ha Ngoc Chung <ngocchung75@gmail.com>, 2013
 # NGUYEN CONG NAM <congnam0409@gmail.com>, 2014
 # Nguyen D. Man <mannd@live.com>, 2013
@@ -61,6 +63,7 @@
 # Bùi Việt Thành <thanhbv@gmail.com>, 2014
 # Bùi Việt Thành <thanhbv@gmail.com>, 2014
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
+# gvikei <truckhuyen@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -95,6 +98,7 @@
 # 
 # Translators:
 # Đoàn Trần Hoàng <dthoang92@gmail.com>, 2014
+# minhtuev <mvo@edx.org>, 2014
 # NGUYEN HOANG AN <neyugn2909@gmail.com>, 2014
 # JosephTrong <phdtrong200748@gmail.com>, 2014
 # Tan Manh Nguyen <tan.mng90@gmail.com>, 2014
@@ -102,9 +106,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-07 10:29-0400\n"
-"PO-Revision-Date: 2014-05-29 03:21+0000\n"
-"Last-Translator: NGUYEN HOANG AN <neyugn2909@gmail.com>\n"
+"POT-Creation-Date: 2014-07-11 16:04-0400\n"
+"PO-Revision-Date: 2014-07-13 18:10+0000\n"
+"Last-Translator: minhtuev <mvo@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3399,6 +3403,8 @@ msgid "Email Address"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Course ID"
 msgstr "Mã Khóa Học"
 
@@ -3782,6 +3788,51 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id is None"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) is already inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) added successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon id not found"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) already exists"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "E-Commerce"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4471,7 +4522,11 @@ msgstr ""
 msgid "Currency"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -4583,19 +4638,39 @@ msgid "Course added to cart."
 msgstr "Khoá học được thêm vào giỏ hàng."
 
 #: lms/djangoapps/shoppingcart/views.py
+msgid "Discount does not exist against coupon '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' already used."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Coupon '{0}' is inactive."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "Bộ xử lý thanh toán không trả về một tham số yêu cầu: {0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr "Bộ xử lý thanh toán trả về một kiểu giá trị tồi {0} cho tham số {1}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
 msgstr ""
@@ -4603,6 +4678,7 @@ msgstr ""
 "thống của chúng tôi."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -4611,6 +4687,7 @@ msgstr ""
 " {3}."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -4624,6 +4701,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4636,6 +4714,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4660,6 +4739,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Successful transaction."
 msgstr "Giao dịch thành công."
 
@@ -4668,6 +4748,7 @@ msgid "The request is missing one or more required fields."
 msgstr "Yêu cầu thiếu một hoặc nhiều trường cần thiết."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "One or more fields in the request contains invalid data."
 msgstr "Một hoặc nhiều trường trong yêu cầu chứa thông tin sai."
 
@@ -4714,6 +4795,7 @@ msgstr ""
 "thức thanh toán khác"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Expired card. You might also receive this if the expiration date you\n"
@@ -4723,6 +4805,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            General decline of the card. No other information provided by the issuing bank.\n"
@@ -4731,6 +4814,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
@@ -4744,12 +4828,14 @@ msgid "Unknown reason"
 msgstr "Không rõ lý do"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
 "Ngân hàng phát hành không dùng được. Khắc phục: thử lại lần nữa sau vài phút"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            Inactive card or card not authorized for card-not-present transactions.\n"
@@ -4758,6 +4844,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
@@ -4774,6 +4861,7 @@ msgstr ""
 "toán khác"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
@@ -4781,6 +4869,7 @@ msgstr ""
 "khác"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type is not accepted by the payment processor.\n"
@@ -4789,6 +4878,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
@@ -4808,6 +4898,7 @@ msgid "The requested amount exceeds the originally authorized amount."
 msgstr "Số tiền yêu cầu vượt quá số tiền ban đầu được ủy quyền."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr "Xử lý thất bại. Cách khắc phục: thử lại việc thanh toán"
 
@@ -4821,6 +4912,7 @@ msgid ""
 msgstr "Số tiền giao dịch yêu cầu phải khớp với số tiền giao dịch trước đó."
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            The card type sent is invalid or does not correlate with the credit card number.\n"
@@ -4868,6 +4960,87 @@ msgstr ""
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource.'\n"
+"            Possible fix: retry with a different form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
+"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
+"            Possible fix: retry the payment after 15 minutes.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Only a partial amount was approved."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
+"            becouse it did not pass the Address Verification System (AVS).\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The issuing bank has questions about the request. You do not receive an\n"
+"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Stolen or lost card"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Invalid card verification number (CVN). Possible fix: retry with another "
+"form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The customer matched an entry on the processors negative file."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Account frozen. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by\n"
+"            CyberSource because it did not pass the CVN check.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            There is a problem with the information in your CyberSource account.  Please let us know at {0}\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The cardholder is enrolled for payer authentication"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "Payer authentication could not be authenticated"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
+"            on your legacy Smart Authorization settings.\n"
 "            Possible fix: retry with a different form of payment.\n"
 "            "
 msgstr ""
@@ -5148,10 +5321,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
+" user account at %(site_name)s."
 msgstr ""
-"Bạn nhận e-mail này vì bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của bạn"
-" trên trang edx.org."
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -5168,8 +5339,8 @@ msgid "Thanks for using our site!"
 msgstr "Cảm ơn bạn đã sử dụng trang web của chúng tôi!"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The edX Team"
-msgstr "Nhóm edX"
+msgid "The %(platform_name)s Team"
+msgstr ""
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -5278,6 +5449,8 @@ msgstr "Xem trước"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
@@ -5857,7 +6030,7 @@ msgstr "Không tìm thấy trang"
 msgid "close"
 msgstr ""
 
-#: cms/templates/container.html
+#: cms/templates/container.html cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -5870,6 +6043,13 @@ msgstr ""
 #: lms/templates/wiki/includes/article_menu.html
 msgid "View"
 msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "Settings"
+msgstr "Thiết lập"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -5918,13 +6098,6 @@ msgstr "Quên mật khẩu?"
 #: lms/templates/sysadmin_dashboard.html
 msgid "Password"
 msgstr "Mật khẩu"
-
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "Settings"
-msgstr "Thiết lập"
 
 #: cms/templates/manage_users.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5977,8 +6150,8 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "Điều khoản sử dụng dịch vụ"
 
-#: cms/templates/widgets/footer.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "Chính sách bảo mật"
@@ -6126,7 +6299,7 @@ msgstr ""
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
-msgstr ""
+msgstr "Tóm lược chung về-{platform_name}"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -6141,38 +6314,39 @@ msgstr "Hướng dẫn"
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
 msgid "Collapse Instructions"
-msgstr ""
+msgstr "Thu Gọn Hướng Dẫn"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr ""
+msgstr "Thảo Luận Theo Hướng Dẫn"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
-msgstr ""
+msgstr "Ẩn Chú thích"
 
 #: lms/templates/contact.html lms/templates/static_templates/about.html
 #: lms/templates/static_templates/about.html
 msgid "Vision"
-msgstr ""
+msgstr "Tầm nhìn"
 
 #: lms/templates/contact.html
 msgid "Faq"
 msgstr "Thắc mắc thường gặp"
 
-#: lms/templates/contact.html lms/templates/footer.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html
 msgid "Press"
 msgstr "Báo chí"
 
-#: lms/templates/contact.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
+#: lms/templates/contact.html lms/templates/edx_footer.html
+#: lms/templates/footer.html lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
 msgstr "Liên hệ"
 
 #: lms/templates/contact.html
 msgid "Class Feedback"
-msgstr ""
+msgstr "Phản Hồi về Lớp Học"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6181,10 +6355,14 @@ msgid ""
 " issues specific to a particular class, please post on the discussion forums"
 " of that&nbsp;class."
 msgstr ""
+"Chúng tôi luôn tìm kiếm thông tin phản hồi để cải thiện các khóa học của "
+"mình. Nếu bạn là một học sinh đã ghi danh và có thắc mắc, ý kiến ​​phản hồi,"
+" góp ý, hay bất kỳ vấn đề cụ thể nào liên quan đến một lớp học cụ thể, xin "
+"vui lòng đăng lên diễn đàn thảo luận của lớp đó."
 
 #: lms/templates/contact.html
 msgid "General Inquiries and Feedback"
-msgstr ""
+msgstr "Thắc Mắc Chung và Phản Hồi"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6197,7 +6375,7 @@ msgstr ""
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
-msgstr ""
+msgstr "Thắc Mắc Kỹ Thuật và Phản Hồi"
 
 #: lms/templates/contact.html
 msgid ""
@@ -6219,6 +6397,9 @@ msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
+"Vui lòng truy cập {link_start}trang truyền thông/báo chí{link_end} để biết "
+"thêm thông tin. Nếu có câu hỏi gì về truyền thông hay báo chí, xin vui lòng "
+"liên hệ qua email {email}."
 
 #: lms/templates/contact.html
 msgid "Universities"
@@ -6303,7 +6484,7 @@ msgstr "Đặt Lại Mật Khẩu"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
-msgstr ""
+msgstr "Những Khóa Học Đang Mở"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't registered for any courses yet."
@@ -6319,7 +6500,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Course-loading errors"
-msgstr ""
+msgstr "Lỗi khi tải khóa học"
 
 #: lms/templates/dashboard.html
 msgid "Email Settings for {course_number}"
@@ -6414,6 +6595,43 @@ msgstr "Hủy Đăng Ký"
 #: lms/templates/edit_unit_link.html
 msgid "View Unit in Studio"
 msgstr ""
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "About"
+msgstr "Về edX"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/jobs.html
+#: lms/templates/static_templates/jobs.html
+msgid "Jobs"
+msgstr "Việc làm"
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+#: lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "Hỏi Đáp"
+
+#: lms/templates/edx_footer.html
+msgid "edX Logo"
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
+
+#: lms/templates/edx_footer.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr ""
+
+#: lms/templates/edx_footer.html lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "Điều Khoản Sử Dụng Dịch Vụ và Cam Kết Danh Dự"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -6512,47 +6730,12 @@ msgid "User"
 msgstr "Người dùng"
 
 #: lms/templates/footer.html
-msgid "About"
-msgstr "Về edX"
-
-#: lms/templates/footer.html lms/templates/static_templates/jobs.html
-#: lms/templates/static_templates/jobs.html
-msgid "Jobs"
-msgstr "Việc làm"
-
-#: lms/templates/footer.html lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "Hỏi Đáp"
-
-#: lms/templates/footer.html
-msgid "{platform_name} Logo"
+msgid "&copy; 2014 {platform_name}, some rights reserved"
 msgstr ""
-
-#: lms/templates/footer.html
-msgid ""
-"{platform_name} is a non-profit created by founding partners {Harvard} and "
-"{MIT} whose mission is to bring the best of higher education to students of "
-"all ages anywhere in the world, wherever there is Internet access. "
-"{platform_name}'s free online MOOCs are interactive and subjects include "
-"computer science, public health, and artificial intelligence."
-msgstr ""
-"{platform_name} là một tổ chức phi lợi nhuận được thành lập bởi {Harvard} và"
-" {MIT} - Dự án có sứ mệnh mang nền giáo dục với chất lượng tốt nhất đến với "
-"mọi người không giới hạn tuổi tác ở khắp nơi trên thế giới. Hệ thống khóa "
-"học mở trực tuyến {platform_name} có khả năng tương tác cao, bao gồm rất "
-"nhiều các môn học như khoa học máy tính, y tế công cộng, trí tuệ nhân tạo..."
-
-#: lms/templates/footer.html
-msgid "&copy; 2014 {platform_name}, some rights reserved."
-msgstr ""
-
-#: lms/templates/footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "Điều Khoản Sử Dụng Dịch Vụ và Cam Kết Danh Dự"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Password Reset"
 msgstr "Đặt Lại Mật Khẩu"
 
@@ -7047,12 +7230,8 @@ msgstr "Đăng nhập"
 #: lms/templates/navigation.html
 msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
-"recommend using {chrome_link_start}Chrome{chrome_link_end} or "
-"{ff_link_start}Firefox{ff_link_end}."
+"recommend using {chrome_link} or {ff_link}."
 msgstr ""
-"<strong>Cảnh Báo:</strong>Trình duyệt của bạn không được hỗ trợ đầy đủ. "
-"Chúng tôi đề nghị sử dụng {chrome_link_start}Chrome{chrome_link_end} hoặc "
-"{ff_link_start}Firefox{ff_link_end}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -7445,6 +7624,7 @@ msgid "Staff Debug"
 msgstr ""
 
 #: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
 msgstr ""
 
@@ -8199,7 +8379,7 @@ msgstr ""
 msgid "Course Updates &amp; News"
 msgstr "Cập Nhật Khóa Học &amp; Tin Tức"
 
-#: lms/templates/courseware/info.html
+#: lms/templates/courseware/info.html lms/templates/courseware/info.html
 msgid "Handout Navigation"
 msgstr ""
 
@@ -8723,7 +8903,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
-msgstr ""
+msgstr "Điểm tổng kết của bạn:"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Grade required for a {cert_name_short}:"
@@ -8822,7 +9002,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr ""
+msgstr "Khóa Học Đã Kết Thúc - {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
@@ -8865,6 +9045,7 @@ msgid "View Archived Course"
 msgstr "Xem Lưu Trữ Khóa Học"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "Xem Khóa Học"
 
@@ -9691,6 +9872,26 @@ msgstr ""
 msgid "Skip"
 msgstr "Bỏ qua"
 
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Please enter Coupon detail below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Percentage Discount"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Active Students"
 msgstr ""
@@ -9874,6 +10075,65 @@ msgstr ""
 msgid ""
 "<b>Note</b>: To keep student data secure, you cannot save or email these "
 "links for direct access. Copies of links expire within 5 minutes."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons List"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Total Amount: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons Information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "+ Add Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Course_id"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Discount(%)"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Count"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Code"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Discount Value Greater than 0"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Numeric value for Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Edit Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Update Coupon Information"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -10609,10 +10869,13 @@ msgid ""
 "e-mail programs will sometimes split it into two lines. If you still have "
 "issues, e-mail us to let us know what happened at {email}."
 msgstr ""
+"Có lỗi. Hãy kiểm tra để chắc chắn địa chỉ URL bạn mở là chính xác -- các "
+"chương trình e-mail đôi khi tách địa chỉ thành hai dòng. Nếu bạn vẫn còn gặp"
+" vấn đề trên, hãy thông báo cho chúng tôi qua email {email}."
 
 #: lms/templates/registration/activation_invalid.html
 msgid "Or you can go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Hoặc bạn có thể quay lại {link_start}trang chủ{link_end}."
 
 #: lms/templates/registration/password_reset_done.html
 msgid "Password reset successful"
@@ -10724,6 +10987,10 @@ msgstr "Mặt hàng đặt mua:"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Qty"
+msgstr ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "URL"
 msgstr ""
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
@@ -11783,12 +12050,6 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"{ff_a_start}Firefox{a_end}, {chrome_a_start}Chrome{a_end}, "
-"{safari_a_start}Safari{a_end}, {ie_a_start}IE9+{a_end}"
-msgstr ""
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
 "Please make sure your browser is updated to the most recent version possible"
 msgstr ""
 
@@ -12509,6 +12770,45 @@ msgstr ""
 msgid "Course git url:"
 msgstr ""
 
+#: cms/templates/group_configurations.html
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Group Configurations"
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "This module is disabled at the moment."
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Other Course Settings"
+msgstr "Thiết Lập Khóa Học Khác"
+
+#: cms/templates/group_configurations.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+msgid "Details &amp; Schedule"
+msgstr "Chi Tiết &amp; Lịch Trình"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
+#: cms/templates/widgets/header.html
+msgid "Grading"
+msgstr "Đánh Giá"
+
+#: cms/templates/group_configurations.html cms/templates/manage_users.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Course Team"
+msgstr "Nhóm Điều Hành"
+
+#: cms/templates/group_configurations.html cms/templates/settings.html
+#: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Advanced Settings"
+msgstr "Thiết Lập Nâng Cao"
+
 #: cms/templates/howitworks.html
 msgid "Welcome"
 msgstr "Chào mừng"
@@ -13165,12 +13465,6 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr ""
 
-#: cms/templates/manage_users.html cms/templates/settings.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Course Team"
-msgstr "Nhóm Điều Hành"
-
 #: cms/templates/manage_users.html
 msgid "New Team Member"
 msgstr ""
@@ -13699,22 +13993,6 @@ msgstr ""
 " thiệu, và thời gian yêu cầu ước lượng để hoàn thành khóa học. Sinh viên sử "
 "dụng trang About để chọn khóa học mới để học."
 
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html
-msgid "Other Course Settings"
-msgstr "Thiết Lập Khóa Học Khác"
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Grading"
-msgstr "Đánh Giá"
-
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-#: cms/templates/widgets/header.html
-msgid "Advanced Settings"
-msgstr "Thiết Lập Nâng Cao"
-
 #: cms/templates/settings_advanced.html
 msgid "Hide Deprecated Settings"
 msgstr ""
@@ -13765,10 +14043,6 @@ msgid ""
 " you use double quotation marks (&quot;) around the string. Do not use "
 "single quotation marks (&apos;)."
 msgstr ""
-
-#: cms/templates/settings_advanced.html cms/templates/settings_graders.html
-msgid "Details &amp; Schedule"
-msgstr "Chi Tiết &amp; Lịch Trình"
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
