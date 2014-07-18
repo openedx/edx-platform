@@ -58,7 +58,6 @@
                   <option value="notgraded">Not Graded</option>
                   <% graderTypes.each(function(grader) { %>
                     <option value="<%= grader.get('type') %>"><%= grader.get('type') %></option>
-                    <br>
                   <% }); %>
               </select>
             </li>
