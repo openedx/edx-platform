@@ -125,11 +125,11 @@ def remove_item(request):
 
 
 @login_required
-def use_coupon(request):
+def use_code(request):
     """
     This method generate discount against valid coupon code and save its entry into coupon redemption table
     """
-    coupon_code = request.POST["coupon_code"]
+    coupon_code = request.POST["cart_code"]
     try:
         coupon = Coupon.objects.get(code=coupon_code)
     except Coupon.DoesNotExist:
