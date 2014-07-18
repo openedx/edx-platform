@@ -101,6 +101,9 @@ def xblock_handler(request, usage_key_string):
     """
     if usage_key_string:
         usage_key = UsageKey.from_string(usage_key_string)
+        # usage_key's course_key may have an empty run property
+        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+
         if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
 
@@ -135,13 +138,21 @@ def xblock_handler(request, usage_key_string):
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
             parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
+            # usage_key's course_key may have an empty run property
+            parent_usage_key = parent_usage_key.replace(
+                course_key=modulestore().fill_in_run(parent_usage_key.course_key)
+            )
             duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
+            # usage_key's course_key may have an empty run property
+            duplicate_source_usage_key = duplicate_source_usage_key.replace(
+                course_key=modulestore().fill_in_run(duplicate_source_usage_key.course_key)
+            )
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
                 duplicate_source_usage_key,
-                request.json.get('display_name'),
                 request.user,
+                request.json.get('display_name'),
             )
 
             return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
@@ -167,6 +178,8 @@ def xblock_view_handler(request, usage_key_string, view_name):
             the second is the resource description
     """
     usage_key = UsageKey.from_string(usage_key_string)
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -193,8 +206,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            # change not authored by requestor but by xblocks.
-            store.update_item(xblock, None)
+            store.update_item(xblock, request.user.id)
         elif view_name in (unit_views + container_views):
             is_container_view = (view_name in container_views)
 
@@ -293,7 +305,6 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
                 pass
         elif publish == 'create_draft':
             try:
-                # This recursively clones the item subtree and marks the copies as draft
                 store.convert_to_draft(existing_item.location, user.id)
             except DuplicateItemError:
                 pass
@@ -306,11 +317,11 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         data = old_content['data'] if 'data' in old_content else None
 
     if children is not None:
-        children_usage_keys = [
-            UsageKey.from_string(child)
-            for child
-            in children
-        ]
+        children_usage_keys = []
+        for child in children:
+            child_usage_key = UsageKey.from_string(child)
+            child_usage_key = child_usage_key.replace(course_key=modulestore().fill_in_run(child_usage_key.course_key))
+            children_usage_keys.append(child_usage_key)
         existing_item.children = children_usage_keys
 
     # also commit any metadata which might have been passed along
@@ -377,6 +388,8 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 def _create_item(request):
     """View for create items."""
     usage_key = UsageKey.from_string(request.json['parent_locator'])
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     category = request.json['category']
 
     display_name = request.json.get('display_name')
@@ -432,7 +445,7 @@ def _create_item(request):
     return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -454,6 +467,8 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
 
     dest_module = store.create_and_save_xmodule(
         dest_usage_key,
+
+
         user.id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
@@ -467,7 +482,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
         for child in source_item.children:
             dupe = _duplicate_item(dest_module.location, child, user=user)
             dest_module.children.append(dupe)
-        store.update_item(dest_module, user.id if user else None)
+        store.update_item(dest_module, user.id)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = store.get_item(parent_usage_key)
@@ -478,7 +493,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
             parent.children.insert(source_index + 1, dest_module.location)
         else:
             parent.children.append(dest_module.location)
-        store.update_item(parent, user.id if user else None)
+        store.update_item(parent, user.id)
 
     return dest_module.location
 

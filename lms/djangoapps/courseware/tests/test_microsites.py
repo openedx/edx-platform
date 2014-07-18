@@ -56,6 +56,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.activate_user(email)
 
 
+    @override_settings(SITE_NAME=MICROSITE_TEST_HOSTNAME)
     def test_microsite_anonymous_homepage_content(self):
         """
         Verify that the homepage, when accessed via a Microsite domain, returns

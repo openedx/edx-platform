@@ -310,6 +310,18 @@ class EnrollInCourseTest(TestCase):
         self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
         self.mock_tracker.reset_mock()
 
+    def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
+        """Ensures an enrollment mode change event was emitted"""
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.mode_changed',
+            {
+                'course_id': course_key.to_deprecated_string(),
+                'user_id': user.pk,
+                'mode': mode
+            }
+        )
+        self.mock_tracker.reset_mock()
+
     def assert_enrollment_event_was_emitted(self, user, course_key):
         """Ensures an enrollment event was emitted since the last event related assertion"""
         self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
@@ -446,6 +458,23 @@ class EnrollInCourseTest(TestCase):
         CourseEnrollment.enroll(user, course_id)
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_enrollment_event_was_emitted(user, course_id)
+
+    def test_change_enrollment_modes(self):
+        user = User.objects.create(username="justin", email="jh@fake.edx.org")
+        course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
+
+        CourseEnrollment.enroll(user, course_id)
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+        CourseEnrollment.enroll(user, course_id, "audit")
+        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "audit")
+
+        # same enrollment mode does not emit an event
+        CourseEnrollment.enroll(user, course_id, "audit")
+        self.assert_no_events_were_emitted()
+
+        CourseEnrollment.enroll(user, course_id, "honor")
+        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

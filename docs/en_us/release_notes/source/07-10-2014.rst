@@ -1,0 +1,92 @@
+###################################
+July 10, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of July
+10,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* In some situations, when you changed your browser's language to any language
+  other than English, Studio did not save changes to video URLs in the Video
+  component. This bug has been fixed.
+
+* Every setting on the **Advanced Settings** page now has a user-friendly name
+  and a description.
+
+***************************************
+edX Learning Management System
+***************************************
+   
+* In Internet Explorer, an "Only secure content is displayed" security warning
+  sometimes appeared in courseware. This bug has been fixed. (LMS-2892)
+
+* When you selected a topic for a new post in the discussion forum, topic names
+  in the discussion forum topic list sometimes appeared with unexpected
+  formatting. This bug has been fixed. (FOR-578)
+
+* The Discussions user interface is updated to include labels for pinned and
+  staff-initiated threads in the discussion list, as shown in the following
+  example:
+
+  .. image:: images/discussion_labels.png
+   :alt: Image of discussions with Pinned and By: Staff labels
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  * Updated `The Course End Date`_ to specify when students can earn and access
+    certificates.
+       
+* `edX Research Guide`_
+
+  Recent changes include: 
+
+  * In the `Tracking Logs`_ chapter, corrected an error in the description of
+    the ``edx.forum.search`` event, updated the ``seek_video`` event, and added
+    the ``stop_video`` event.
+
+  * Added the `Keys and Credentials for Data Transfers`_ chapter.
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

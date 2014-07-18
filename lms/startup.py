@@ -20,6 +20,8 @@ def run():
     """
     autostartup()
 
+    add_mimetypes()
+
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
 
@@ -28,6 +30,20 @@ def run():
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
+
+
+def add_mimetypes():
+    """
+    Add extra mimetypes. Used in xblock_resource.
+
+    If you add a mimetype here, be sure to also add it in cms/startup.py.
+    """
+    import mimetypes
+
+    mimetypes.add_type('application/vnd.ms-fontobject', '.eot')
+    mimetypes.add_type('application/x-font-opentype', '.otf')
+    mimetypes.add_type('application/x-font-ttf', '.ttf')
+    mimetypes.add_type('application/font-woff', '.woff')
 
 
 def enable_theme():

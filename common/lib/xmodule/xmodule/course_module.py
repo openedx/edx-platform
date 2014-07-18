@@ -9,6 +9,7 @@ import dateutil.parser
 from lazy import lazy
 
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import UsageKey
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -539,6 +540,11 @@ class CourseFields(object):
                                        default=False,
                                        scope=Scope.settings)
 
+    invitation_only = Boolean(display_name=_("Invitation Only"),
+                              help="Whether to restrict enrollment to invitation by the course staff.",
+                              default=False,
+                              scope=Scope.settings)
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 
@@ -550,7 +556,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, Location):
+            if isinstance(self.location, UsageKey):
                 self.wiki_slug = self.location.course
             elif isinstance(self.location, CourseLocator):
                 self.wiki_slug = self.id.offering or self.display_name

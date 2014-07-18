@@ -14,9 +14,9 @@ import django.utils
 import re
 import threading
 
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
+from xmodule.contentstore.django import contentstore
 
 # We may not always have the request_cache module available
 try:
@@ -37,7 +37,7 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, content_store, doc_store_config, options, i18n_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -62,6 +62,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         metadata_inheritance_cache = get_cache('default')
 
     return class_(
+        contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
         request_cache=request_cache,
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
@@ -69,6 +70,7 @@ def create_modulestore_instance(engine, doc_store_config, options, i18n_service=
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
         branch_setting_func=_get_modulestore_branch_setting,
+        create_modulestore_instance=create_modulestore_instance,
         **_options
     )
 
@@ -85,6 +87,7 @@ def modulestore():
     if _MIXED_MODULESTORE is None:
         _MIXED_MODULESTORE = create_modulestore_instance(
             settings.MODULESTORE['default']['ENGINE'],
+            contentstore(),
             settings.MODULESTORE['default'].get('DOC_STORE_CONFIG', {}),
             settings.MODULESTORE['default'].get('OPTIONS', {})
         )
@@ -99,36 +102,8 @@ def clear_existing_modulestores():
 
     This is useful for flushing state between unit tests.
     """
-    global _MIXED_MODULESTORE, _loc_singleton  # pylint: disable=global-statement
+    global _MIXED_MODULESTORE  # pylint: disable=global-statement
     _MIXED_MODULESTORE = None
-    # pylint: disable=W0603
-    cache = getattr(_loc_singleton, "cache", None)
-    if cache:
-        cache.clear()
-    _loc_singleton = None
-
-
-# singleton instance of the loc_mapper
-_loc_singleton = None
-
-
-def loc_mapper():
-    """
-    Get the loc mapper which bidirectionally maps Locations to Locators. Used like modulestore() as
-    a singleton accessor.
-    """
-    # pylint: disable=W0603
-    global _loc_singleton
-    # pylint: disable=W0212
-    if _loc_singleton is None:
-        try:
-            loc_cache = get_cache('loc_cache')
-        except InvalidCacheBackendError:
-            loc_cache = get_cache('default')
-        # instantiate
-        _loc_singleton = LocMapperStore(loc_cache, **settings.DOC_STORE_CONFIG)
-
-    return _loc_singleton
 
 
 class ModuleI18nService(object):
@@ -161,10 +136,6 @@ class ModuleI18nService(object):
         return strftime_localized(*args, **kwargs)
 
 
-# thread local cache
-_THREAD_CACHE = threading.local()
-
-
 def _get_modulestore_branch_setting():
     """
     Returns the branch setting for the module store from the current Django request if configured,
@@ -192,7 +163,6 @@ def _get_modulestore_branch_setting():
             branch = getattr(settings, 'MODULESTORE_BRANCH', None)
         return branch
 
-    # cache the branch setting for this thread so we don't have to recompute it each time
-    if not hasattr(_THREAD_CACHE, 'branch_setting'):
-        _THREAD_CACHE.branch_setting = get_branch_setting()
-    return _THREAD_CACHE.branch_setting
+    # leaving this in code structured in closure-friendly format b/c we might eventually cache this (again)
+    # using request_cache
+    return get_branch_setting()

@@ -4,11 +4,20 @@ define([
 function(BaseView, _, gettext) {
     'use strict';
     var GroupConfigurationDetails = BaseView.extend({
-        tagName: 'section',
-        className: 'group-configuration',
+        tagName: 'div',
         events: {
+            'click .edit': 'editConfiguration',
             'click .show-groups': 'showGroups',
             'click .hide-groups': 'hideGroups'
+        },
+
+        className: function () {
+            var index = this.model.collection.indexOf(this.model);
+
+            return [
+                'group-configuration-details',
+                'group-configuration-details-' + index
+            ].join(' ');
         },
 
         initialize: function() {
@@ -28,6 +37,11 @@ function(BaseView, _, gettext) {
             return this;
         },
 
+        editConfiguration: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            this.model.set('editing', true);
+        },
+
         showGroups: function(e) {
             if(e && e.preventDefault) { e.preventDefault(); }
             this.model.set('showGroups', true);
@@ -41,7 +55,10 @@ function(BaseView, _, gettext) {
         getGroupsCountTitle: function () {
             var count = this.model.get('groups').length,
                 message = ngettext(
-                    // Translators: 'count' is number of groups that the group configuration contains.
+                    /*
+                        Translators: 'count' is number of groups that the group
+                        configuration contains.
+                    */
                     'Contains %(count)s group', 'Contains %(count)s groups',
                     count
                 );

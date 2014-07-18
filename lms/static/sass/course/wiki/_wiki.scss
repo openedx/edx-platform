@@ -277,6 +277,7 @@ section.wiki {
         a {
           color: $link-color;
           font-weight: bold;
+          background-color: $gray-l4;
 
           .icon-view,
           .icon-home {
@@ -301,20 +302,17 @@ section.wiki {
             background-position: -25px -99px;
           }
 
-          &:hover, &:focus {
-            background: none;
-          }
         }
       }
     }
 
     a {
       display: block;
-      padding: 2px 4px;
+      padding: 2px 8px;
       border-radius: 3px;
       font-size: 0.9em;
       line-height: 25px;
-      color: #8f8f8f;
+      color: $link-color;
 
       .icon {
         float: left;

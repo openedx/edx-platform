@@ -19,6 +19,7 @@ from django.utils.translation import ugettext as _
 </%block>
 
 <%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <script type='text/javascript'>
 require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "js/collections/component_template",
     "xmodule", "jquery.ui", "coffee/src/main", "xblock/cms.runtime.v1"],

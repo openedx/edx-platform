@@ -31,14 +31,14 @@ files before making them available to a partner institution. As a result, when
 you receive a data package (or other files) from the edX Analytics team, you
 must decrypt the files that it contains before you use them.
 
-The cryptograhpic processes of encrypting and decrypting data files require that you create a pair of keys: the public key in the pair is used to encrypt data, and the corresponding private key is used to decrypt any files that have been encrypted with the public key. 
+The cryptographic processes of encrypting and decrypting data files require that you create a pair of keys: the public key in the pair is used to encrypt data, and the corresponding private key is used to decrypt any files that have been encrypted with the public key. 
 
 To create the keys needed for this encryption and decryption process, you use
 GNU Privacy Guard (GnuPG or GPG). Essentially, you install a cryptographic
 application on your local computer and supply your email address and a secret
 passphrase (a password). 
 
-.. note:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
+.. important:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
 
 The result is the public key that you send to edX to use in encrypting data
 files for your institution, and the private key which you keep secret and use
@@ -64,10 +64,10 @@ Create Keys: Windows
    a. When you are prompted to specify the type of key pair you want, click
       **Create personal OpenPGP key pair**.
 
-   b.  When you are prompted for your email address, be sure to enter your
-       official university or institution email address. EdX cannot use public
-       keys that are based on personal or other non-official email addresses to
-       encrypt data.
+   b.  When you are prompted for your email address, be sure to enter *your
+       official university or institution email address*. EdX cannot use
+       public keys that are based on personal or other non-official email
+       addresses to encrypt data.
 
    c. When you are prompted for a passphrase, enter a strong passphrase. Be
       sure to remember your passphrase: you will use it to decrypt your data
@@ -97,9 +97,9 @@ Create Keys: Macintosh
    When installation is complete, GPG Keychain Access opens a web page with
    `First Steps`_ and a dialog box.
 
-#. Enter your name and email address. Be sure to enter your official university
-   or institution email address. EdX cannot use public keys that are based on
-   personal or other non-official email addresses to encrypt data.
+#. Enter your name and email address. Be sure to enter *your official
+   university or institution email address*. EdX cannot use public keys that
+   are based on personal or other non-official email addresses to encrypt data.
 
 #. Click **Generate key**. A dialog box opens to prompt you for a passphrase.
 

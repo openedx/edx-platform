@@ -15,7 +15,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
-
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -27,13 +26,14 @@ def configure_screenshots_for_all_steps(_step, action):
     automatic saving of screenshots before and after each step in a
     scenario.
     """
-    action=action.strip()
+    action = action.strip()
     if action == 'enable':
         world.auto_capture_screenshots = True
     elif action == 'disable':
         world.auto_capture_screenshots = False
     else:
         raise ValueError('Parameter `action` should be one of "enable" or "disable".')
+
 
 @world.absorb
 def capture_screenshot_before_after(func):
@@ -43,12 +43,12 @@ def capture_screenshot_before_after(func):
     for each step in a scenario, but rather want to debug a single function.
     """
     def inner(*args, **kwargs):
-        prefix=round(time.time() * 1000)
+        prefix = round(time.time() * 1000)
 
         world.capture_screenshot("{}_{}_{}".format(
             prefix, func.func_name, 'before'
         ))
-        ret_val=func(*args, **kwargs)
+        ret_val = func(*args, **kwargs)
         world.capture_screenshot("{}_{}_{}".format(
             prefix, func.func_name, 'after'
         ))
@@ -94,11 +94,11 @@ def i_am_registered_for_the_course(step, course):
 
     # Create the user
     world.create_user('robot', 'test')
-    u = User.objects.get(username='robot')
+    user = User.objects.get(username='robot')
 
     # If the user is not already enrolled, enroll the user.
     # TODO: change to factory
-    CourseEnrollment.enroll(u, course_id(course))
+    CourseEnrollment.enroll(user, course_id(course))
 
     world.log_in(username='robot', password='test')
 
@@ -132,10 +132,6 @@ def course_location(course_num):
 
 def section_location(course_num):
     return world.scenario_dict['SECTION'].location.replace(course=course_num)
-
-
-def publish(location):
-    modulestore().publish(location, '**replace_user**')
 
 
 def visit_scenario_item(item_key):

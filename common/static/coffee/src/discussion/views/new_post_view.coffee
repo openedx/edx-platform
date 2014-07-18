@@ -7,6 +7,7 @@ if Backbone?
               throw new Error("invalid mode: " + @mode)
           @course_settings = options.course_settings
           @maxNameWidth = 100
+          @topicId = options.topicId
 
       render: () ->
           if @mode is "tab"

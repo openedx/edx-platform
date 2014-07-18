@@ -10,8 +10,8 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation, SlashSeparatedCourseKey
-from .django import contentstore
+from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
 
@@ -103,7 +103,7 @@ class StaticContent(object):
         if course_key is None:
             return None
 
-        assert(isinstance(course_key, SlashSeparatedCourseKey))
+        assert(isinstance(course_key, CourseKey))
         return course_key.make_asset_key('asset', '').to_deprecated_string()
 
     @staticmethod
@@ -111,6 +111,8 @@ class StaticContent(object):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
+        # TODO OpaqueKeys after opaque keys deprecation is working
+        # return AssetLocation.from_string(path)
         return AssetLocation.from_deprecated_string(path)
 
     @staticmethod
@@ -186,23 +188,13 @@ class ContentStore(object):
         Returns a list of static assets for a course, followed by the total number of assets.
         By default all assets are returned, but start and maxresults can be provided to limit the query.
 
-        The return format is a list of dictionary elements. Example:
-
-            [
-
-            {u'displayname': u'profile.jpg', u'chunkSize': 262144, u'length': 85374,
-            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 183000), u'contentType': u'image/jpeg',
-            u'_id': {u'category': u'asset', u'name': u'profile.jpg', u'course': u'6.002x', u'tag': u'c4x',
-            u'org': u'MITx', u'revision': None}, u'md5': u'36dc53519d4b735eb6beba51cd686a0e'},
-
-            {u'displayname': u'profile.thumbnail.jpg', u'chunkSize': 262144, u'length': 4073,
-            u'uploadDate': datetime.datetime(2012, 10, 3, 5, 41, 54, 196000), u'contentType': u'image/jpeg',
-            u'_id': {u'category': u'asset', u'name': u'profile.thumbnail.jpg', u'course': u'6.002x', u'tag': u'c4x',
-            u'org': u'MITx', u'revision': None}, u'md5': u'ff1532598830e3feac91c2449eaa60d6'},
-
-            ....
-
-            ]
+        The return format is a list of asset data dictionaries.
+        The asset data dictionaries have the following keys:
+            asset_key (:class:`opaque_keys.edx.AssetKey`): The key of the asset
+            displayname: The human-readable name of the asset
+            uploadDate (datetime.datetime): The date and time that the file was uploadDate
+            contentType: The mimetype string of the asset
+            md5: An md5 hash of the asset content
         '''
         raise NotImplementedError
 
@@ -210,6 +202,12 @@ class ContentStore(object):
         """
         Delete all of the assets which use this course_key as an identifier
         :param course_key:
+        """
+        raise NotImplementedError
+
+    def copy_all_course_assets(self, source_course_key, dest_course_key):
+        """
+        Copy all the course assets from source_course_key to dest_course_key
         """
         raise NotImplementedError
 
@@ -248,7 +246,7 @@ class ContentStore(object):
                 thumbnail_content = StaticContent(thumbnail_file_location, thumbnail_name,
                                                   'image/jpeg', thumbnail_file)
 
-                contentstore().save(thumbnail_content)
+                self.save(thumbnail_content)
 
             except Exception, e:
                 # log and continue as thumbnails are generally considered as optional

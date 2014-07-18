@@ -30,6 +30,9 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -42,7 +45,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory
+    create_comments_service_user, PasswordHistory, UserSignupSource
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -88,6 +91,7 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -659,13 +663,16 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
+# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
+# seems Probably Incorrect
 def _parse_course_id_from_string(input_str):
     """
     Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
         return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
@@ -703,7 +710,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
@@ -1018,6 +1025,21 @@ class AccountValidationError(Exception):
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
+
+
+@receiver(post_save, sender=User)
+def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+    """
+    handler that saves the user Signup Source
+    when the user is created
+    """
+    if 'created' in kwargs and kwargs['created']:
+        site = microsite.get_value('SITE_NAME')
+        if site:
+            user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
+            user_signup_source.save()
+            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+
 
 def _do_create_account(post_vars):
     """

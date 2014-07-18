@@ -63,7 +63,6 @@ XQUEUE_INTERFACE = XQueueInterface(
 # Some brave person should make the variable names consistently someday, but the code's
 # coupled enough that it's kind of tricky--you've been warned!
 
-
 class LmsModuleRenderError(Exception):
     """
     An exception class for exceptions thrown by module_render that don't fit well elsewhere
@@ -505,7 +504,15 @@ def get_module_system_for_user(user, field_data_cache,
     )
 
     # pass position specified in URL to module through ModuleSystem
+    if position is not None:
+        try:
+            position = int(position)
+        except (ValueError, TypeError):
+            log.exception('Non-integer %r passed as position.', position)
+            position = None
+
     system.set('position', position)
+
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData

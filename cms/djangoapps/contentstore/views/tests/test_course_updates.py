@@ -5,7 +5,8 @@ import json
 
 from contentstore.tests.test_course_settings import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
 
@@ -246,7 +247,7 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(payload['content'], content)
 
         updates_location = self.course.id.make_usage_key('course_info', 'updates')
-        self.assertTrue(isinstance(updates_location, Location))
+        self.assertTrue(isinstance(updates_location, UsageKey))
         self.assertEqual(updates_location.name, block)
 
         # check posting on handouts

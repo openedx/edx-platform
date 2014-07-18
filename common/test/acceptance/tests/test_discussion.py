@@ -297,7 +297,8 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        CoursewarePage(self.browser, self.course_id).visit()
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
 
     def setup_thread_page(self, thread_id):
@@ -312,6 +313,21 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def test_expand_discussion_empty(self):
         self.discussion_page.expand_discussion()
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
+
+    def check_anonymous_to_peers(self, is_staff):
+        thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))
+        self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
+
+    def test_anonymous_to_peers_threads_as_staff(self):
+        AutoAuthPage(self.browser, course_id=self.course_id, roles="Administrator").visit()
+        self.courseware_page.visit()
+        self.check_anonymous_to_peers(True)
+
+    def test_anonymous_to_peers_threads_as_peer(self):
+        self.check_anonymous_to_peers(False)
 
 
 class DiscussionUserProfileTest(UniqueCourseTest):

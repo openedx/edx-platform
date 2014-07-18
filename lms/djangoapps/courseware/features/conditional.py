@@ -4,7 +4,7 @@
 from lettuce import world, steps
 from nose.tools import assert_in, assert_true  # pylint: disable=no-name-in-module
 
-from common import i_am_registered_for_the_course, visit_scenario_item, publish
+from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import add_problem_to_course, answer_problem
 
 @steps
@@ -66,9 +66,6 @@ class ConditionalSteps(object):
             display_name='Conditional Contents',
             data='<html><div class="hidden-contents">Hidden Contents</p></html>'
         )
-
-        publish(world.scenario_dict['VERTICAL'].location)
-
 
     def setup_problem_attempts(self, step, not_attempted=None):
         r'that the conditioned problem has (?P<not_attempted>not )?been attempted$'

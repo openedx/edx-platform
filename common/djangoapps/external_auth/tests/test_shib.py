@@ -17,8 +17,8 @@ from django.utils.importlib import import_module
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from external_auth.models import ExternalAuthMap
@@ -80,7 +80,8 @@ class ShibSPTest(ModuleStoreTestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        self.store = modulestore()
+        super(ShibSPTest, self).setUp(create_user=False)
+        self.test_user_id = ModuleStoreEnum.UserID.test
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_exception_shib_login(self):
@@ -377,13 +378,21 @@ class ShibSPTest(ModuleStoreTestCase):
         """
         Tests that the correct course specific login and registration urls work for shib
         """
-        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(
+            org='MITx',
+            number='999',
+            display_name='Robot Super Course',
+            user_id=self.test_user_id,
+        )
 
         # Test for cases where course is found
         for domain in ["", "shib:https://idp.stanford.edu/"]:
             # set domains
-            course.enrollment_domain = domain
-            self.store.update_item(course, '**replace_user**')
+
+            # temporarily set the branch to draft-preferred so we can update the course
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course.id):
+                course.enrollment_domain = domain
+                self.store.update_item(course, self.test_user_id)
 
             # setting location to test that GET params get passed through
             login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
@@ -393,8 +402,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                     '?course_id=MITx/999/course/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course'))
-            reg_response = course_specific_register(login_request, SlashSeparatedCourseKey('MITx', '999', 'Robot_Super_Course'))
+            login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
+            reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
 
             if "shib" in domain:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
@@ -428,8 +437,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                                     '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, SlashSeparatedCourseKey('DNE', 'DNE', 'DNE'))
-            reg_response = course_specific_register(login_request, SlashSeparatedCourseKey('DNE', 'DNE', 'DNE'))
+            login_response = course_specific_login(login_request, 'DNE/DNE/DNE')
+            reg_response = course_specific_register(login_request, 'DNE/DNE/DNE')
 
             self.assertIsInstance(login_response, HttpResponseRedirect)
             self.assertEqual(login_response['Location'],
@@ -450,13 +459,21 @@ class ShibSPTest(ModuleStoreTestCase):
         """
 
         # create 2 course, one with limited enrollment one without
-        shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
-        shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(shib_course, '**replace_user**')
+        shib_course = CourseFactory.create(
+            org='Stanford',
+            number='123',
+            display_name='Shib Only',
+            enrollment_domain='shib:https://idp.stanford.edu/',
+            user_id=self.test_user_id,
+        )
 
-        open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        open_enroll_course.enrollment_domain = ''
-        self.store.update_item(open_enroll_course, '**replace_user**')
+        open_enroll_course = CourseFactory.create(
+            org='MITx',
+            number='999',
+            display_name='Robot Super Course',
+            enrollment_domain='',
+            user_id=self.test_user_id,
+        )
 
         # create 3 kinds of students, external_auth matching shib_course, external_auth not matching, no external auth
         shib_student = UserFactory.create()
@@ -520,9 +537,13 @@ class ShibSPTest(ModuleStoreTestCase):
         student.save()
         extauth.save()
 
-        course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
-        course.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        self.store.update_item(course, '**replace_user**')
+        course = CourseFactory.create(
+            org='Stanford',
+            number='123',
+            display_name='Shib Only',
+            enrollment_domain='shib:https://idp.stanford.edu/',
+            user_id=self.test_user_id,
+        )
 
         # use django test client for sessions and url processing
         # no enrollment before trying

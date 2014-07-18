@@ -1,17 +1,19 @@
 define([
-    'backbone', 'underscore', 'gettext', 'js/models/group',
+    'backbone', 'underscore', 'underscore.string', 'gettext', 'js/models/group',
     'js/collections/group', 'backbone.associations', 'coffee/src/main'
 ],
-function(Backbone, _, gettext, GroupModel, GroupCollection) {
+function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
     'use strict';
+    _.str = str;
     var GroupConfiguration = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {
-                id: null,
                 name: '',
                 description: '',
-                groups: new GroupCollection([{}, {}]),
-                showGroups: false
+                version: null,
+                groups: new GroupCollection([]),
+                showGroups: false,
+                editing: false
             };
         },
 
@@ -50,36 +52,17 @@ function(Backbone, _, gettext, GroupModel, GroupCollection) {
                 id: this.get('id'),
                 name: this.get('name'),
                 description: this.get('description'),
+                version: this.get('version'),
                 groups: this.get('groups').toJSON()
             };
         },
 
         validate: function(attrs) {
-            if (!attrs.name) {
+            if (!_.str.trim(attrs.name)) {
                 return {
                     message: gettext('Group Configuration name is required'),
                     attributes: {name: true}
                 };
-            }
-            if (attrs.groups.length === 0) {
-                return {
-                    message: gettext('Please add at least one group'),
-                    attributes: {groups: true}
-                };
-            } else {
-                // validate all groups
-                var invalidGroups = [];
-                attrs.groups.each(function(group) {
-                    if(!group.isValid()) {
-                        invalidGroups.push(group);
-                    }
-                });
-                if (!_.isEmpty(invalidGroups)) {
-                    return {
-                        message: gettext('All groups must have a name'),
-                        attributes: {groups: invalidGroups}
-                    };
-                }
             }
         }
     });

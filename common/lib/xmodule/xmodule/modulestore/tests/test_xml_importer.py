@@ -50,10 +50,8 @@ class ModuleStoreNoSettings(unittest.TestCase):
         """
         cleanup
         """
-        if modulestore:
-            connection = self.modulestore.database.connection
-            connection.drop_database(self.modulestore.database)
-            connection.close()
+        if self.modulestore:
+            self.modulestore._drop_database()  # pylint: disable=protected-access
 
     def setUp(self):
         """
@@ -85,6 +83,7 @@ def modulestore():
 
         # pylint: disable=W0142
         ModuleStoreNoSettings.modulestore = class_(
+            None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
             **options
         )

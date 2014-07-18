@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-from south.db import db
 from south.v2 import DataMigration
-from django.db import models
-from xmodule.modulestore.django import loc_mapper
 import re
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
@@ -10,6 +7,10 @@ import bson.son
 import logging
 from django.db.models.query_utils import Q
 from django.db.utils import IntegrityError
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.mixed import MixedModuleStore
+import itertools
 
 log = logging.getLogger(__name__)
 
@@ -25,8 +26,20 @@ class Migration(DataMigration):
         """
         Converts group table entries for write access and beta_test roles to course access roles table.
         """
+        store = modulestore()
+        if isinstance(store, MixedModuleStore):
+            self.mongostore = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+            self.xmlstore = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
+        elif store.get_modulestore_type() == ModuleStoreEnum.Type.mongo:
+            self.mongostore = store
+            self.xmlstore = None
+        elif store.get_modulestore_type() == ModuleStoreEnum.Type.xml:
+            self.mongostore = None
+            self.xmlstore = store
+        else:
+            return
+
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        loc_map_collection = loc_mapper().location_map
         # b/c the Groups table had several entries for each course, we need to ensure we process each unique
         # course only once. The below datastructures help ensure that.
         hold = {}  # key of course_id_strings with array of group objects. Should only be org scoped entries
@@ -64,21 +77,27 @@ class Migration(DataMigration):
                     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
                     # course_key is the downcased version, get the normal cased one. loc_mapper() has no
                     # methods taking downcased SSCK; so, need to do it manually here
-                    correct_course_key = self._map_downcased_ssck(course_key, loc_map_collection)
+                    correct_course_key = self._map_downcased_ssck(course_key)
                     if correct_course_key is not None:
                         _migrate_users(correct_course_key, role, course_key.org)
                 except InvalidKeyError:
-                    entry = loc_map_collection.find_one({
-                        'course_id': re.compile(r'^{}$'.format(course_id_string), re.IGNORECASE)
-                    })
-                    if entry is None:
+                    # old dotted format, try permutations
+                    parts = course_id_string.split('.')
+                    if len(parts) < 3:
                         hold.setdefault(course_id_string, []).append(group)
-                    else:
-                        correct_course_key = SlashSeparatedCourseKey(*entry['_id'].values())
-                        if 'lower_id' in entry:
-                            _migrate_users(correct_course_key, role, entry['lower_id']['org'])
+                    elif len(parts) == 3:
+                        course_key = SlashSeparatedCourseKey(*parts)
+                        correct_course_key = self._map_downcased_ssck(course_key)
+                        if correct_course_key is None:
+                            hold.setdefault(course_id_string, []).append(group)
                         else:
-                            _migrate_users(correct_course_key, role, entry['_id']['org'].lower())
+                            _migrate_users(correct_course_key, role, course_key.org)
+                    else:
+                        correct_course_key = self.divide_parts_find_key(parts)
+                        if correct_course_key is None:
+                            hold.setdefault(course_id_string, []).append(group)
+                        else:
+                            _migrate_users(correct_course_key, role, course_key.org)
 
         # see if any in hold were missed above
         for held_auth_scope, groups in hold.iteritems():
@@ -99,28 +118,50 @@ class Migration(DataMigration):
                 # don't silently skip unexpected roles
                 log.warn("Didn't convert roles %s", [group.name for group in groups])
 
+    def divide_parts_find_key(self, parts):
+        """
+        Look for all possible org/course/run patterns from a possibly dotted source
+        """
+        for org_stop, course_stop in itertools.combinations(range(1, len(parts)), 2):
+            org = '.'.join(parts[:org_stop])
+            course = '.'.join(parts[org_stop:course_stop])
+            run = '.'.join(parts[course_stop:])
+            course_key = SlashSeparatedCourseKey(org, course, run)
+            correct_course_key = self._map_downcased_ssck(course_key)
+            if correct_course_key is not None:
+                return correct_course_key
+        return None
+
     def backwards(self, orm):
-        "Write your backwards methods here."
+        "Removes the new table."
         # Since this migration is non-destructive (monotonically adds information), I'm not sure what
         # the semantic of backwards should be other than perhaps clearing the table.
         orm['student.courseaccessrole'].objects.all().delete()
 
-    def _map_downcased_ssck(self, downcased_ssck, loc_map_collection):
+    def _map_downcased_ssck(self, downcased_ssck):
         """
         Get the normal cased version of this downcased slash sep course key
         """
-        # given the regex, the son may be an overkill
-        course_son = bson.son.SON([
-            ('_id.org', re.compile(r'^{}$'.format(downcased_ssck.org), re.IGNORECASE)),
-            ('_id.course', re.compile(r'^{}$'.format(downcased_ssck.course), re.IGNORECASE)),
-            ('_id.name', re.compile(r'^{}$'.format(downcased_ssck.run), re.IGNORECASE)),
-        ])
-        entry = loc_map_collection.find_one(course_son)
-        if entry:
-            idpart = entry['_id']
-            return SlashSeparatedCourseKey(idpart['org'], idpart['course'], idpart['name'])
-        else:
-            return None
+        if self.mongostore is not None:
+            course_son = bson.son.SON([
+                ('_id.tag', 'i4x'),
+                ('_id.org', re.compile(r'^{}$'.format(downcased_ssck.org), re.IGNORECASE)),
+                ('_id.course', re.compile(r'^{}$'.format(downcased_ssck.course), re.IGNORECASE)),
+                ('_id.category', 'course'),
+                ('_id.name', re.compile(r'^{}$'.format(downcased_ssck.run), re.IGNORECASE)),
+            ])
+            entry = self.mongostore.collection.find_one(course_son)
+            if entry:
+                idpart = entry['_id']
+                return SlashSeparatedCourseKey(idpart['org'], idpart['course'], idpart['name'])
+        if self.xmlstore is not None:
+            for course in self.xmlstore.get_courses():
+                if (
+                    course.id.org.lower() == downcased_ssck.org and course.id.course.lower() == downcased_ssck.course
+                    and course.id.run.lower() == downcased_ssck.run
+                ):
+                    return course.id
+        return None
 
 
     models = {

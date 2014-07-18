@@ -28,6 +28,8 @@
 
 .. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
+.. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
+
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 
 .. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#view-your-live-course
@@ -174,6 +176,10 @@
 
 
 .. _Review Grades for Enrolled Students (Small Courses): http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#gradebook
+
+.. _Video Table of Contents: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#video-toc
+
+.. _Download or view student data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#view-and-download-student-data
 
 .. DATA DOCUMENTATION
 

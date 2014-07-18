@@ -559,7 +559,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                 changed = True
 
         if changed:
-            # request does not have a user attribute, so pass None for user.
+            # TODO user.id - to be fixed by Publishing team
             self.system.modulestore.update_item(self, None)
         return Response()
 

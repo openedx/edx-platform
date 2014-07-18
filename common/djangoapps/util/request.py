@@ -5,7 +5,8 @@ from django.conf import settings
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)')
+
+COURSE_REGEX = re.compile(r'^.*?/courses/{}'.format(settings.COURSE_ID_PATTERN))
 
 
 def safe_get_host(request):

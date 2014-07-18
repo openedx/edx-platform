@@ -121,8 +121,7 @@ def _assets_json(request, course_key):
 
     asset_json = []
     for asset in assets:
-        asset_id = asset['_id']
-        asset_location = StaticContent.compute_location(course_key, asset_id['name'])
+        asset_location = asset['asset_key']
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
