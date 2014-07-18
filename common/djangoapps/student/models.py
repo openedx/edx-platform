@@ -71,6 +71,17 @@ class AnonymousUserId(models.Model):
     unique_together = (user, course_id)
 
 
+def is_ascii_string(string):
+    """
+    checks if a given string is a ascii string or not.
+    """
+    try:
+        string.decode('ascii')
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return False
+
+    return True
+
 def anonymous_id_for_user(user, course_id, save=True):
     """
     Return a unique id for a (user, course) pair, suitable for inserting
@@ -94,7 +105,12 @@ def anonymous_id_for_user(user, course_id, save=True):
     hasher.update(settings.SECRET_KEY)
     hasher.update(unicode(user.id))
     if course_id:
-        hasher.update(course_id.to_deprecated_string())
+        # Adjust non-ascii course ids.
+        course_id_string = course_id.to_deprecated_string()
+        if not is_ascii_string(course_id_string):
+            course_id_string = course_id_string.encode('utf-8')
+        hasher.update(course_id_string)
+
     digest = hasher.hexdigest()
 
     if not hasattr(user, '_anonymous_id'):
