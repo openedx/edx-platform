@@ -1669,3 +1669,62 @@ class CoursesApiTests(TestCase):
         test_uri = '/api/courses/{}/workgroups/'.format(self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_course_users_count_by_city(self):
+        test_uri = '/api/users'
+
+        # create a 25 new users
+        for i in xrange(1, 26):
+            if i < 10:
+                city = 'San Francisco'
+            elif i < 15:
+                city = 'Denver'
+            elif i < 20:
+                city = 'Dallas'
+            else:
+                city = 'New York City'
+            data = {
+                'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
+                'password': 'test.me!',
+                'first_name': '{} {}'.format('John', i), 'last_name': '{} {}'.format('Doe', i), 'city': city,
+                'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', 'gender': 'male',
+                'title': 'Software Engineer', 'avatar_url': 'http://example.com/avatar.png'
+            }
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+            user_uri = response.data['uri']
+            # now enroll this user in the course
+            post_data = {'user_id': created_user_id}
+            courses_test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+            response = self.do_post(courses_test_uri, post_data)
+            self.assertEqual(response.status_code, 201)
+
+            response = self.do_get(user_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['city'], city)
+
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id, '/metrics/cities/'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
+        self.assertEqual(response.data['results'][0]['count'], 9)
+
+        # filter counts by city
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id,
+                                               '/metrics/cities/?city=new york city, San Francisco'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
+        self.assertEqual(response.data['results'][0]['count'], 9)
+        self.assertEqual(response.data['results'][1]['city'], 'New York City')
+        self.assertEqual(response.data['results'][1]['count'], 6)
+
+        # filter counts by city
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id,
+                                               '/metrics/cities/?city=Denver'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['city'], 'Denver')
+        self.assertEqual(response.data['results'][0]['count'], 5)

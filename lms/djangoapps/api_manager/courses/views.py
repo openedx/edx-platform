@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Sum, Count
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -25,7 +26,7 @@ from xmodule.modulestore.django import modulestore
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
-from api_manager.users.serializers import UserSerializer
+from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, get_course, get_course_child
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
@@ -1598,3 +1599,31 @@ class CoursesSocialMetrics(SecureListAPIView):
             http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
 
         return Response(data, http_status)
+
+
+class CoursesCitiesMetrics(SecureListAPIView):
+    """
+    ### The CoursesCitiesMetrics view allows clients to retrieve ordered list of user
+    count by city in a particular course
+    - URI: ```/api/courses/{course_id}/metrics/cities/```
+    - GET: Provides paginated list of user count by cities
+    list can be filtered by city
+    GET ```/api/courses/{course_id}/metrics/cities/?city={city1},{city2}```
+    """
+
+    serializer_class = UserCountByCitySerializer
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        city = self.request.QUERY_PARAMS.get('city', None)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        queryset = CourseEnrollment.users_enrolled_in(course_id)
+        if city:
+            city = city.split(',')[:upper_bound]
+            q_list = [Q(profile__city__iexact=item.strip()) for item in city]
+            q_list = reduce(lambda a, b: a | b, q_list)
+            queryset = queryset.filter(q_list)
+
+        queryset = queryset.values('profile__city').annotate(count=Count('profile__city'))\
+            .filter(count__gt=0).order_by('-count')
+        return queryset
