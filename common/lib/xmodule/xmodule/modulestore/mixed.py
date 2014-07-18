@@ -497,8 +497,8 @@ def store_bulk_write_operations_on_course(store, course_id):
     # request comes in for the same course.
 
     # if the caller passed in the mixed modulestore, get a direct pointer to the underlying store
-    if hasattr(store, '_get_modulestore_by_course_id'):
-        store = store._get_modulestore_by_course_id(course_id)
+    if hasattr(store, '_get_modulestore_for_courseid'):
+        store = store._get_modulestore_for_courseid(course_id)
 
     try:
         if hasattr(store, 'begin_bulk_write_operation_on_course'):
