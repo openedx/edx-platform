@@ -700,15 +700,21 @@ class @Problem
         @enableCheckButton true
     window.setTimeout(enableCheckButton, 750)
 
-
   hint_button: =>
     Logger.log 'hint_button', 0
-    inputElements = document.getElementsByClassName("hint_button")
-    inputElement = inputElements[1]
-    for anAttribute in inputElement.attributes
-      if inputElement.attributes[_i].name == "next_hint_index"
-        next_hint_index = inputElement.attributes[_i].value
-        break
+    next_hint_index = -1
+    problemId = this.element_id
+    for problemElement in document.getElementsByClassName('problems-wrapper')
+      for pAttribute in problemElement.attributes
+        if pAttribute.name == 'id'
+          if pAttribute.value == problemId
+            hintButtonElements = problemElement.getElementsByClassName("hint_button")
+            for hbAttribute in hintButtonElements[0].attributes
+              if hbAttribute.name == 'next_hint_index'
+                next_hint_index = hbAttribute.value
+                debugger
+                break
+            break
 
     $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>
         @render(response.contents)

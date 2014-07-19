@@ -768,7 +768,6 @@ class CapaMixin(CapaFields):
         return {
             'success': True,
             'contents': html,
-            'next_hint_index': self.next_hint_index,
         }
 
     def is_past_due(self):
