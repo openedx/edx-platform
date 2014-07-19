@@ -151,11 +151,11 @@ class CourseTestCase(ModuleStoreTestCase):
         self.assertEqual(self.store.compute_publish_state(draft_vertical), PublishState.draft)
 
         # create a Private (draft only) vertical
-        private_vertical = self.store.create_and_save_xmodule(course_id.make_usage_key('vertical', self.PRIVATE_VERTICAL), self.user.id)
+        private_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PRIVATE_VERTICAL)
         self.assertEqual(self.store.compute_publish_state(private_vertical), PublishState.private)
 
         # create a Published (no draft) vertical
-        public_vertical = self.store.create_and_save_xmodule(course_id.make_usage_key('vertical', self.PUBLISHED_VERTICAL), self.user.id)
+        public_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PUBLISHED_VERTICAL)
         public_vertical = self.store.publish(public_vertical.location, self.user.id)
         self.assertEqual(self.store.compute_publish_state(public_vertical), PublishState.public)
 

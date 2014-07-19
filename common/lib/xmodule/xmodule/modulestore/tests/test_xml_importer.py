@@ -7,6 +7,7 @@ from xblock.fields import String, Scope, ScopeIds
 from xblock.runtime import Runtime, KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleMixin
 from opaque_keys.edx.locations import Location
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.xml_importer import _import_module_and_update_references
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -39,7 +40,7 @@ class ModuleStoreNoSettings(unittest.TestCase):
         'collection': COLLECTION,
     }
     MODULESTORE = {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
         'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': modulestore_options
     }
@@ -85,6 +86,7 @@ def modulestore():
         ModuleStoreNoSettings.modulestore = class_(
             None,  # contentstore
             ModuleStoreNoSettings.MODULESTORE['DOC_STORE_CONFIG'],
+            branch_setting_func = lambda: ModuleStoreEnum.Branch.draft_preferred,
             **options
         )
 

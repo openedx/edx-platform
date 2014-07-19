@@ -287,7 +287,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            existing_item = store.create_and_save_xmodule(usage_key, user.id)
+            existing_item = store.create_item(user.id, usage_key.course_key, usage_key.block_type, usage_key.block_id)
         else:
             raise
     except InvalidLocationError:
@@ -416,9 +416,11 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    created_block = store.create_and_save_xmodule(
-        dest_usage_key,
+    created_block = store.create_child(
         request.user.id,
+        usage_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=data,
         metadata=metadata,
         runtime=parent.runtime,
@@ -436,11 +438,6 @@ def _create_item(request):
             )
         )
         store.update_item(course, request.user.id)
-
-    # TODO replace w/ nicer accessor
-    if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(created_block.location)
-        store.update_item(parent, request.user.id)
 
     return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
@@ -465,11 +462,11 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         else:
             duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
-    dest_module = store.create_and_save_xmodule(
-        dest_usage_key,
-
-
+    dest_module = store.create_item(
         user.id,
+        dest_usage_key.course_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
         runtime=source_item.runtime,
@@ -531,7 +528,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_course_access(request.user, course_usage_key):
-            return JsonResponse(modulestore().get_orphans(course_usage_key))
+            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -539,11 +536,9 @@ def orphan_handler(request, course_key_string):
             store = modulestore()
             items = store.get_orphans(course_usage_key)
             for itemloc in items:
-                # get_orphans returns the deprecated string format w/o revision
-                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
                 # need to delete all versions
-                store.delete_item(usage_key, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
-            return JsonResponse({'deleted': items})
+                store.delete_item(itemloc, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
+            return JsonResponse({'deleted': [unicode(item) for item in items]})
         else:
             raise PermissionDenied()
 
@@ -559,7 +554,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
-            module = store.create_and_save_xmodule(usage_key, user.id)
+            module = store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
         else:
             raise
 

@@ -54,7 +54,6 @@ class DraftModuleStore(MongoModuleStore):
                 This should be an attribute from ModuleStoreEnum.Branch
         """
         super(DraftModuleStore, self).__init__(*args, **kwargs)
-        self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
 
     def get_item(self, usage_key, depth=0, revision=None):
         """
@@ -287,7 +286,7 @@ class DraftModuleStore(MongoModuleStore):
                 else ModuleStoreEnum.RevisionOption.draft_preferred
         return super(DraftModuleStore, self).get_parent_location(location, revision, **kwargs)
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
+    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator if
         the category allows drafts. If the category does not allow drafts, just creates a published module.
@@ -483,6 +482,7 @@ class DraftModuleStore(MongoModuleStore):
                 ModuleStoreEnum.RevisionOption.published_only - removes only Published versions
                 ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
                     currently only provided by contentstore.views.item.orphan_handler
+                Otherwise, raises a ValueError.
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
@@ -527,8 +527,10 @@ class DraftModuleStore(MongoModuleStore):
             as_functions = [as_draft, as_published]
         elif revision == ModuleStoreEnum.RevisionOption.published_only:
             as_functions = [as_published]
-        else:
+        elif revision is None:
             as_functions = [as_draft]
+        else:
+            raise ValueError('revision not one of None, ModuleStoreEnum.RevisionOption.published_only, or ModuleStoreEnum.RevisionOption.all')
         self._delete_subtree(location, as_functions)
 
     def _delete_subtree(self, location, as_functions):

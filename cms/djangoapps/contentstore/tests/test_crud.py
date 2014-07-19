@@ -162,7 +162,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(self.split_store.get_course(id_locator), CourseDescriptor)
         # and by guid
         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
-        self.split_store.delete_course(id_locator, ModuleStoreEnum.UserID.test)
+        self.split_store.delete_course(id_locator, 'testbot')
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, self.split_store.get_course, id_locator)
         # but can by guid
@@ -187,16 +187,16 @@ class TemplateTests(unittest.TestCase):
         )
         first_problem.max_attempts = 3
         first_problem.save()  # decache the above into the kvs
-        updated_problem = self.split_store.update_item(first_problem, ModuleStoreEnum.UserID.test)
+        updated_problem = self.split_store.update_item(first_problem, 'testbot')
         self.assertIsNotNone(updated_problem.previous_version)
         self.assertEqual(updated_problem.previous_version, first_problem.update_version)
         self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
-        updated_loc = self.split_store.delete_item(updated_problem.location, ModuleStoreEnum.UserID.test, 'testbot')
+        self.split_store.delete_item(updated_problem.location, 'testbot')
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
             parent_location=BlockUsageLocator.make_relative(
-                updated_loc, block_type='problem', block_id=sub.location.block_id
+                test_course.location.version_agnostic(), block_type='problem', block_id=sub.location.block_id
             ),
             user_id='testbot', category='problem',
             data="<problem></problem>"
