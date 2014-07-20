@@ -701,7 +701,6 @@ class @Problem
     window.setTimeout(enableCheckButton, 750)
 
   hint_button: =>
-    Logger.log 'hint_button', 0
     next_hint_index = -1
     problemId = this.element_id
     for problemElement in document.getElementsByClassName('problems-wrapper')
@@ -712,7 +711,6 @@ class @Problem
             for hbAttribute in hintButtonElements[0].attributes
               if hbAttribute.name == 'next_hint_index'
                 next_hint_index = hbAttribute.value
-                debugger
                 break
             break
 
