@@ -697,15 +697,6 @@ class CapaMixin(CapaFields):
         if hint_text != '':
             html = self._replace_div_text(hint_text, html)
 
-
-
-
-
-
-
-
-
-
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.runtime.ajax_url
