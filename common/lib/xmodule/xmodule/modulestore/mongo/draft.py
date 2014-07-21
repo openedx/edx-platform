@@ -632,7 +632,12 @@ class DraftModuleStore(MongoModuleStore):
             """
             Depth first publishing from the given location
             """
-            item = self.get_item(item_location)
+            try:
+                # handle child does not exist w/o killing publish
+                item = self.get_item(item_location)
+            except ItemNotFoundError:
+                log.warning('Cannot find: %s', item_location)
+                return
 
             # publish the children first
             if item.has_children:
