@@ -9,14 +9,14 @@ from unittest import skip, skipUnless
 from xmodule.partitions.partitions import Group, UserPartition
 from bok_choy.promise import Promise
 
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.settings_advanced import AdvancedSettingsPage
-from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.studio.utils import add_advanced_component
-from ..pages.xblock.utils import wait_for_xblock_initialization
-from .helpers import UniqueCourseTest
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.studio.utils import add_advanced_component
+from ...pages.xblock.utils import wait_for_xblock_initialization
+from ..helpers import UniqueCourseTest
 
 from test_studio_container import ContainerBase
 
