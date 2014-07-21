@@ -1106,6 +1106,41 @@ def _do_create_account(post_vars):
     return (user, profile, registration)
 
 
+def make_registration_track_function(request, post_vars):
+    '''
+    Make a tracking function that logs registration events.
+    '''
+
+    import track
+
+    fields = post_vars.copy()
+    censored_fields = ['password']
+    unwanted_fields = ['csrfmiddlewaretoken']
+
+    for field in censored_fields:
+        if field in fields:
+            fields[field] = '********'
+
+    for field in unwanted_fields:
+        if field in fields:
+            del fields[field]
+
+    def function(success, js_data=None):
+        event_info = {'fields': fields}
+
+        if success:
+            event_type = 'edx.user.creation.succeeded'
+        else:
+            event_type = 'edx.user.creation.failed'
+            if js_data:
+                event_info['error_message'] = js_data['value']
+                if 'field' in js_data:
+                    event_info['error_field'] = js_data['field']
+
+        return track.views.server_track(request, event_type, event_info, page='register')
+
+    return function
+
 @ensure_csrf_cookie
 def create_account(request, post_override=None):  # pylint: disable-msg=too-many-statements
     """
@@ -1120,6 +1155,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
         post_vars = dict(post_vars.items())
         post_vars.update({'password': pipeline.make_random_password()})
+
+    track_registration = make_registration_track_function(request, post_vars)
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
@@ -1146,12 +1183,14 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         if a not in post_vars:
             js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
+            track_registration(False, js)
             return JsonResponse(js, status=400)
 
     if extra_fields.get('honor_code', 'required') == 'required' and \
             post_vars.get('honor_code', 'false') != u'true':
         js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
+        track_registration(False, js)
         return JsonResponse(js, status=400)
 
     # Can't have terms of service for certain SHIB users, like at Stanford
@@ -1168,6 +1207,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         if post_vars.get('terms_of_service', 'false') != u'true':
             js['value'] = _("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
+            track_registration(False, js)
             return JsonResponse(js, status=400)
 
     # Confirm appropriate fields are there.
@@ -1206,6 +1246,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             }
             js['value'] = error_str[field_name]
             js['field'] = field_name
+            track_registration(False, js)
             return JsonResponse(js, status=400)
 
         max_length = 75
@@ -1219,6 +1260,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             }
             js['value'] = error_str[field_name]
             js['field'] = field_name
+            track_registration(False, js)
             return JsonResponse(js, status=400)
 
     try:
@@ -1226,6 +1268,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     except ValidationError:
         js['value'] = _("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
+        track_registration(False, js)
         return JsonResponse(js, status=400)
 
     try:
@@ -1233,6 +1276,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     except ValidationError:
         js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
         js['field'] = 'username'
+        track_registration(False, js)
         return JsonResponse(js, status=400)
 
     # enforce password complexity as an optional feature
@@ -1246,14 +1290,18 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         except ValidationError, err:
             js['value'] = _('Password: ') + '; '.join(err.messages)
             js['field'] = 'password'
+            track_registration(False, js)
             return JsonResponse(js, status=400)
 
     # Ok, looks like everything is legit.  Create the account.
     try:
         with transaction.commit_on_success():
             ret = _do_create_account(post_vars)
+        track_registration(True)
     except AccountValidationError as e:
-        return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
+        js = {'success': False, 'value': e.message, 'field': e.field}
+        track_registration(False, js)
+        return JsonResponse(js, status=400)
 
     (user, profile, registration) = ret
 
