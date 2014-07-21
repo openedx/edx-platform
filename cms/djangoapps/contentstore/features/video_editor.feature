@@ -2,22 +2,6 @@
 Feature: CMS Video Component Editor
   As a course author, I want to be able to create video components
 
-  # 1
-  Scenario: User can view Video metadata
-    Given I have created a Video component
-    And I edit the component
-    Then I see the correct video settings and default values
-
-  # 2
-  # Safari has trouble saving values on Sauce
-  @skip_safari
-  Scenario: User can modify Video display name
-    Given I have created a Video component
-    And I edit the component
-    And I open tab "Advanced"
-    Then I can modify video display name
-    And my video display name change is persisted on save
-
   # 3
   # Sauce Labs cannot delete cookies
   @skip_sauce

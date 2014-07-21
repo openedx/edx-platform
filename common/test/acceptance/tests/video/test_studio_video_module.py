@@ -41,6 +41,8 @@ class CMSVideoBaseTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         )
 
+        self.assets = []
+
     def _install_course_fixture(self):
         """
         Prepare for tests by creating a course with a section, subsection, and unit.
@@ -49,6 +51,9 @@ class CMSVideoBaseTest(UniqueCourseTest):
             Create a user and make that user a course author
             Log the user into studio
         """
+
+        if self.assets:
+            self.course_fixture.add_asset(self.assets)
 
         # Create course with Video component
         self.course_fixture.add_children(
