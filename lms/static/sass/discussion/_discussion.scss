@@ -656,6 +656,10 @@ body.discussion {
       background: url(../images/endorse-icon.png) no-repeat;
     }
 
+    &.mark-answer .check-icon {
+      background: url(../images/answer-icon.png) no-repeat;
+    }
+
     &.is-endorsed {
       border: 1px solid #4697c1;
       @include linear-gradient(top, #6dccf1, #38a8e5);
@@ -663,6 +667,11 @@ body.discussion {
 
       .check-icon {
         background-position: 0 -12px;
+      }
+
+      &.mark-answer {
+        @include linear-gradient(top, tint(#1d9348, 60%), tint(#1d9348, 20%));
+        border: 1px solid #1d9348;
       }
     }
   }

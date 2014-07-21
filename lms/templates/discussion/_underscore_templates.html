@@ -153,7 +153,20 @@
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header>
         <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
-        <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <%
+            tooltip_expr = u"<%- thread.get('thread_type') == 'question' ? '{mark_answer}' : '{endorse}' %>".format(
+                endorse=_("endorse"),
+                mark_answer=_("mark as answer")
+            )
+        %>
+        <a
+            href="javascript:void(0)"
+            class="endorse-btn action-endorse ${"<%= thread.get('thread_type') == 'question' ? 'mark-answer' : '' %>"}"
+            style="cursor: default; display: none;"
+            data-tooltip="${tooltip_expr}"
+        >
+            <span class="check-icon" style="pointer-events: none; "></span>
+        </a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
         ${"<% } else { %>"}
