@@ -14,7 +14,7 @@
 <%def name="render_entry(entries, entry)">
     <li
         class="forum-nav-browse-menu-item"
-        data-discussion-id='${json.dumps(entries[entry])}'
+        data-discussion-id='${entries[entry]["id"]}'
         data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
     >
         <a href="#" class="forum-nav-browse-title">${entry}</a>
