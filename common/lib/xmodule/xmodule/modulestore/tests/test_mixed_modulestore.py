@@ -396,7 +396,7 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         item = self.store.create_item(
-            self.course_locations[self.MONGO_COURSEID], 'problem', self.user_id, block_id='orphan'
+            self.user_id, self.course_locations[self.MONGO_COURSEID].course_key, 'problem', block_id='orphan'
         )
         self.assertTrue(self.store.has_changes(item.location))
         self.store.publish(item.location, self.user_id)
