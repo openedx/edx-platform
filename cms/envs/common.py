@@ -645,3 +645,36 @@ ADVANCED_SECURITY_CONFIG = {}
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
+
+################ ADVANCED_COMPONENT_TYPES ###############
+
+ADVANCED_COMPONENT_TYPES = [
+    'annotatable',
+    'textannotation',  # module for annotating text (with annotation table)
+    'videoannotation',  # module for annotating video (with annotation table)
+    'imageannotation',  # module for annotating image (with annotation table)
+    'word_cloud',
+    'graphical_slider_tool',
+    'lti',
+    # XBlocks from pmitros repos are prototypes. They should not be used
+    # except for edX Learning Sciences experiments on edge.edx.org without
+    # further work to make them robust, maintainable, finalize data formats,
+    # etc.
+    'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
+    'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
+    'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
+    'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
+    'split_test',
+    'combinedopenended',
+    'peergrading',
+    'notes',
+]
+
+# Specify xblocks that should be treated as advanced problems. Each entry is a tuple
+# specifying the xblock name and an optional YAML template to be used.
+ADVANCED_PROBLEM_TYPES = [
+    {
+        'component': 'openassessment',
+        'boilerplate_name': None,
+    }
+]

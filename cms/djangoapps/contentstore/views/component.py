@@ -43,44 +43,22 @@ log = logging.getLogger(__name__)
 
 # NOTE: unit_handler assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
-SPLIT_TEST_COMPONENT_TYPE = 'split_test'
 
+# Constants for determining if these components should be enabled for this course
+SPLIT_TEST_COMPONENT_TYPE = 'split_test'
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
+
 if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
     ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 else:
-
-    ADVANCED_COMPONENT_TYPES = [
-        'annotatable',
-        'textannotation',  # module for annotating text (with annotation table)
-        'videoannotation',  # module for annotating video (with annotation table)
-        'imageannotation',  # module for annotating image (with annotation table)
-        'word_cloud',
-        'graphical_slider_tool',
-        'lti',
-        # XBlocks from pmitros repos are prototypes. They should not be used
-        # except for edX Learning Sciences experiments on edge.edx.org without
-        # further work to make them robust, maintainable, finalize data formats,
-        # etc.
-        'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
-        'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
-        'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-        SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
-        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
-    ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+    ADVANCED_COMPONENT_TYPES = settings.ADVANCED_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
-# Specify xblocks that should be treated as advanced problems. Each entry is a tuple
-# specifying the xblock name and an optional YAML template to be used.
-ADVANCED_PROBLEM_TYPES = [
-    {
-        'component': 'openassessment',
-        'boilerplate_name': None
-    }
-]
+ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
+
 
 @require_GET
 @login_required
@@ -358,7 +336,7 @@ def get_component_templates(course):
             "type": category,
             "templates": templates_for_category,
             "display_name": component_display_names[category]
-            })
+        })
 
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings

@@ -52,6 +52,7 @@ from .component import (
     NOTE_COMPONENT_TYPES,
     ADVANCED_COMPONENT_POLICY_KEY,
     SPLIT_TEST_COMPONENT_TYPE,
+    ADVANCED_COMPONENT_TYPES,
 )
 from .tasks import rerun_course
 
@@ -722,7 +723,7 @@ def _config_course_advanced_components(request, course_module):
             component_types = tab_component_map.get(tab_type)
             found_ac_type = False
             for ac_type in component_types:
-                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]["value"]:
+                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]["value"] and ac_type in ADVANCED_COMPONENT_TYPES:
                     # Add tab to the course if needed
                     changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
                     # If a tab has been added to the course, then send the
@@ -1150,7 +1151,7 @@ def group_configurations_list_handler(request, course_key_string):
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
         course_outline_url = reverse_course_url('course_handler', course_key)
-        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
 
         configurations = GroupConfiguration.add_usage_info(course, store)
 
