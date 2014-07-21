@@ -103,6 +103,14 @@ li[class*=forum-nav-thread-label-] {
   }
 }
 
+// --------------------------------
+// moderator action overrides
+// --------------------------------
+
+.moderator-actions {
+  padding-left: 0 !important;
+}
+
 // -------------
 // new post form
 // -------------
@@ -127,7 +135,7 @@ li[class*=forum-nav-thread-label-] {
     margin-bottom: 0;
   }
 
-  // Override global span rules 
+  // Override global span rules
   .post-topic-button .drop-arrow {
     line-height: 36px;
   }

@@ -1,0 +1,231 @@
+// discussion - elements - actions
+// ====================
+
+// vote and endorse buttons
+.container .discussion-body {
+
+  .discussion-post {
+    > header .vote-btn {
+      position: relative;
+      z-index: 100;
+      margin-top: ($baseline/4);
+      margin-left: ($baseline*2);
+    }
+  }
+
+  .vote-btn {
+    position: relative;
+    z-index: 100;
+    float: right;
+    display: block;
+    height: 27px;
+    padding: 0 8px;
+    border-radius: 5px;
+    border: 1px solid #b2b2b2;
+    @include linear-gradient(top, $white 35%, #ebebeb);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .15);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 25px;
+    color: #333;
+
+    .plus-icon {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 8px 6px 0 0;
+      background: url(../images/vote-plus-icon.png) no-repeat;
+      font-size: 18px;
+      text-indent: -9999px;
+      color: #17b429;
+      overflow: hidden;
+    }
+
+    &.is-cast {
+      border-color: #379a42;
+      @include linear-gradient(top, #50cc5e, #3db84b);
+      color: $white;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset, 0 1px 2px $shadow;
+
+      .plus-icon {
+        background-position: 0 -10px;
+        color: #336a39;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
+      }
+    }
+  }
+
+  .endorse-btn {
+    display: block;
+    float: right;
+    width: 27px;
+    height: 27px;
+    margin-right: ($baseline/2);
+    border-radius: 27px;
+    border: 1px solid #a0a0a0;
+    @include linear-gradient(top, $white 35%, $gray-l4);
+    box-shadow: 0 1px 1px $shadow-l1;
+
+    .check-icon {
+      display: block;
+      width: 13px;
+      height: 12px;
+      margin: 8px auto;
+      background: url(../images/endorse-icon.png) no-repeat;
+    }
+
+    &.is-endorsed {
+      border: 1px solid #4697c1;
+      @include linear-gradient(top, #6dccf1, #38a8e5);
+      box-shadow: 0 1px 1px $shadow-l1, 0 1px 0 rgba(255, 255, 255, .4) inset;
+
+      .check-icon {
+        background-position: 0 -12px;
+      }
+    }
+  }
+}
+
+// moderator actions
+.container .discussion-body {
+
+  .moderator-actions {
+    margin: 0;
+    padding: $baseline 0;
+    @include clearfix;
+
+    li {
+      float: left;
+      margin-right: ($baseline/2);
+      list-style: none;
+    }
+
+    a {
+      @include white-button;
+      height: 26px;
+      @include linear-gradient(top, $white 35%, #ebebeb);
+      font-size: 13px;
+      line-height: 24px;
+      color: #737373;
+      font-weight: normal;
+      box-shadow: 0 1px 1px $shadow-l1;
+
+      &:hover, &:focus {
+        @include linear-gradient(top, $white 35%, #ddd);
+      }
+
+      .delete-icon {
+        display: block;
+        float: left;
+        width: 10px;
+        height: 10px;
+        margin: 8px 4px 0 0;
+        background: url(../images/moderator-delete-icon.png) no-repeat;
+      }
+
+      .edit-icon {
+        display: block;
+        float: left;
+        width: 10px;
+        height: 10px;
+        margin: 7px 4px 0 0;
+        background: url(../images/moderator-edit-icon.png) no-repeat;
+      }
+    }
+  }
+}
+
+// ====================
+
+// post actions - pinning
+.discussion-pin {
+  font-size: 12px;
+  float: right;
+  padding-right: ($baseline/4);
+  font-style: italic;
+  margin-right: ($baseline/2);
+  opacity: 0.8;
+
+  &.admin-pin {
+    cursor: pointer;
+
+    &:hover, &:focus {
+      @include transition(opacity .2s linear 0s);
+      opacity: 1.0;
+    }
+  }
+}
+
+.discussion-pin-inline {
+  font-size: 12px;
+  float:right;
+  font-style: italic;
+  position: relative;
+  right:-20px;
+  top:-13px;
+  margin-right:35px;
+  margin-top:13px;
+  opacity: 1.0;
+}
+
+.notpinned .icon {
+  display: block;
+  float: left;
+  margin: 3px;
+  width: 10px;
+  height: 14px;
+  padding-right: 3px;
+  color: #333;
+}
+
+.pinned .icon {
+  display: block;
+  float: left;
+  margin: 3px;
+  width: 10px;
+  height: 14px;
+  padding-right: 3px;
+  color: $pink;
+}
+
+.pinned span {
+  color: $pink;
+  font-style: italic;
+}
+
+.notpinned span {
+  color: #333;
+  font-style: italic;
+}
+
+.pinned-false {
+  display:none;
+}
+
+// ====================
+
+// post actions - flagging
+.discussion-flag-abuse, .discussion-delete-comment, .discussion-edit-comment {
+  font-size: 12px;
+  float:right;
+  margin-left: ($baseline/2);
+  font-style: italic;
+  cursor:pointer;
+  color: $dark-gray;
+  opacity: 0.8;
+
+  &:hover, &:focus {
+    @include transition(opacity .2s linear 0s);
+    opacity: 1.0;
+  }
+
+  .flag-label {
+    font-style: italic;
+    margin-left: ($baseline/4);
+  }
+}
+
+.flagged * {
+  color: $pink;
+}

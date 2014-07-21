@@ -51,7 +51,10 @@
 @import "discussion/utilities/variables";
 @import "discussion/mixins";
 @import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import "discussion/views/home";
 @import "discussion/views/new-post";
+@import "discussion/views/profile";
+@import "discussion/elements/actions";
 @import "discussion/elements/editor";
 @import "discussion/elements/navigation";
 @import "discussion/views/thread";
