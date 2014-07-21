@@ -168,7 +168,7 @@ def import_from_xml(
             if target_course_id is not None:
                 dest_course_id = target_course_id
             else:
-                dest_course_id = course_key
+                dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
 
             # Creates a new course if it doesn't already exist
             if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
@@ -342,14 +342,16 @@ def _import_module_and_update_references(
         )
 
     # Move the module to a new course
-    new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
-    if new_usage_key.category == 'course':
-        new_usage_key = new_usage_key.replace(name=dest_course_id.run)
+    block_type = module.scope_ids.block_type
+    if block_type == 'course':
+        block_id = dest_course_id.run
+    else:
+        block_id = module.scope_ids.usage_id.block_id
     new_module = store.create_item(
         user_id,
         dest_course_id,
-        module.scope_ids.block_type,
-        module.scope_ids.usage_id.block_id,
+        block_type,
+        block_id,
         runtime=runtime
     )
 

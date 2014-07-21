@@ -378,6 +378,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 result.append(course_list[0])
         return result
 
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run)
+
     def get_course(self, course_id, depth=0):
         '''
         Gets the course descriptor for the course identified by the locator

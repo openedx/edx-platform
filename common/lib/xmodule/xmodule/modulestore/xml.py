@@ -24,6 +24,7 @@ from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.locator import CourseLocator
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
@@ -765,6 +766,15 @@ class XMLModuleStore(ModuleStoreReadBase):
                 items.append(module)
 
         return items
+
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run, deprecated=True)
 
     def get_courses(self, depth=0):
         """

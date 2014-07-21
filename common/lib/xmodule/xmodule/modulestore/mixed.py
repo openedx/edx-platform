@@ -105,6 +105,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                         return store
 
         # return the first store, as the default
+        return self.default_modulestore
+
+    @property
+    def default_modulestore(self):
+        """
+        Return the default modulestore
+        """
         return self.modulestores[0]
 
     def _get_modulestore_by_type(self, modulestore_type):
@@ -197,6 +204,22 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     courses[course_id] = course
 
         return courses.values()
+
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        # If there is a mapping that match this org/course/run, use that
+        for course_id, store in self.mappings.iteritems():
+            candidate_key = store.make_course_key(org, course, run)
+            if candidate_key == course_id:
+                return candidate_key
+
+        # Otherwise, return the key created by the default store
+        return self.default_modulestore.make_course_key(org, course, run)
 
     def get_course(self, course_key, depth=0):
         """

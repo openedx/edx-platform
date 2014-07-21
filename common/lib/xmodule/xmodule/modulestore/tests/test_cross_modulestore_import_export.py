@@ -236,7 +236,10 @@ MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
-COURSE_DATA_NAMES = ('toy', 'manual-testing-complete')
+COURSE_DATA_NAMES = (
+    'toy',
+    'manual-testing-complete',
+)
 
 
 @ddt.ddt
@@ -260,8 +263,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
     ))
     @ddt.unpack
     def test_round_trip(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
-        source_course_key = SlashSeparatedCourseKey('source', 'course', 'key')
-        dest_course_key = SlashSeparatedCourseKey('dest', 'course', 'key')
 
         # Construct the contentstore for storing the first import
         with source_content_builder.build() as source_content:
@@ -271,6 +272,9 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                 with dest_content_builder.build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with dest_builder.build(dest_content) as dest_store:
+                        source_course_key = source_store.make_course_key('source', 'course', 'key')
+                        dest_course_key = dest_store.make_course_key('dest', 'course', 'key')
+
                         import_from_xml(
                             source_store,
                             'test_user',
