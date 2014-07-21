@@ -98,7 +98,7 @@ describe "DiscussionThreadListView", ->
                                 <ul class="forum-nav-browse-submenu">
                                     <li
                                         class="forum-nav-browse-menu-item"
-                                        data-discussion-id='{"sort_key": null, "id": "child"}'
+                                        data-discussion-id="child"
                                         data-cohorted="false"
                                     >
                                         <a href="#" class="forum-nav-browse-title">Child</a>
@@ -106,7 +106,7 @@ describe "DiscussionThreadListView", ->
                                 </ul>
                             <li
                                 class="forum-nav-browse-menu-item"
-                                data-discussion-id='{"sort_key": null, "id": "sibling"}'
+                                data-discussion-id="sibling"
                                 data-cohorted="false"
                             >
                                 <a href="#" class="forum-nav-browse-title">Sibling</a>
@@ -115,7 +115,7 @@ describe "DiscussionThreadListView", ->
                     </li>
                     <li
                         class="forum-nav-browse-menu-item"
-                        data-discussion-id='{"sort_key": null, "id": "other"}'
+                        data-discussion-id="other"
                         data-cohorted="false"
                     >
                         <a href="#" class="forum-nav-browse-title">Other Category</a>
