@@ -6,18 +6,17 @@ displaying containers within units.
 from nose.plugins.attrib import attr
 
 from ..pages.studio.overview import CourseOutlinePage
-from ..fixtures.course import XBlockFixtureDesc
 
+from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.html_component_editor import HtmlComponentEditorView
 from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.staff_view import StaffPage
 
-from unittest import skip
-from acceptance.tests.base_studio_test import StudioCourseTest
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
+from acceptance.tests.base_studio_test import StudioCourseTest
 
 
 @attr('shard_1')
@@ -388,23 +387,17 @@ class UnitPublishingTest(ContainerBase):
     LAST_PUBLISHED = 'Last published'
     LAST_SAVED = 'Draft saved on'
 
-    def setup_fixtures(self):
+    def populate_course_fixture(self, course_fixture):
         """
         Sets up a course structure with a unit and a single HTML child.
         """
+
         self.html_content = '<p><strong>Body of HTML Unit.</strong></p>'
         self.courseware = CoursewarePage(self.browser, self.course_id)
-
-        course_fix = CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        )
         past_start_date = datetime.datetime(1974, 6, 22)
         self.past_start_date_text = "Jun 22, 1974 at 00:00 UTC"
 
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
@@ -426,9 +419,7 @@ class UnitPublishingTest(ContainerBase):
                     )
                 )
             )
-        ).install()
-
-        self.user = course_fix.user
+        )
 
     def test_publishing(self):
         """
@@ -495,7 +486,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the published content in LMS
         """
         unit = self.go_to_unit_page()
-        unit.view_published_version()
+        self._view_published_version(unit)
         self._verify_components_visible(['html'])
 
     def test_view_live_changes(self):
@@ -510,7 +501,7 @@ class UnitPublishingTest(ContainerBase):
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
-        unit.view_published_version()
+        self._view_published_version(unit)
         self._verify_components_visible(['html'])
         self.assertEqual(self.html_content, self.courseware.xblock_component_html_content(0))
 
@@ -527,7 +518,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page()
         add_discussion(unit)
         unit.publish_action.click()
-        unit.view_published_version()
+        self._view_published_version(unit)
         self._verify_components_visible(['html', 'discussion'])
 
     def test_initially_unlocked_visible_to_students(self):
@@ -547,7 +538,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + ' with Section "Unlocked Section"'
         )
-        unit.view_published_version()
+        self._view_published_version(unit)
         self._verify_student_view_visible(['problem'])
 
     def test_locked_visible_to_staff_only(self):
@@ -567,7 +558,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_publish_title(unit, self.LOCKED_STATUS)
-        unit.view_published_version()
+        self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
         self._verify_components_visible(['problem'])
         # Switch to student view and verify not visible
@@ -591,7 +582,7 @@ class UnitPublishingTest(ContainerBase):
             unit, self.RELEASE_TITLE_RELEASED,
             self.past_start_date_text + ' with Subsection "Subsection With Locked Unit"'
         )
-        unit.view_published_version()
+        self._view_published_version(unit)
         self._verify_student_view_locked()
 
     def test_unlocked_visible_to_all(self):
@@ -611,7 +602,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertFalse(checked)
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
-        unit.view_published_version()
+        self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
         self._verify_components_visible(['discussion'])
         # Switch to student view and verify visible.
@@ -641,7 +632,7 @@ class UnitPublishingTest(ContainerBase):
         unit.publish_action.click()
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
-        unit.view_published_version()
+        self._view_published_version(unit)
         self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
 
     def test_delete_child_in_published_unit(self):
@@ -662,8 +653,15 @@ class UnitPublishingTest(ContainerBase):
         unit.publish_action.click()
         unit.wait_for_ajax()
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
-        unit.view_published_version()
+        self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
+
+    def _view_published_version(self, unit):
+        """
+        Goes to the published version, then waits for the browser to load the page.
+        """
+        unit.view_published_version()
+        self.courseware.wait_for_page()
 
     def _verify_and_return_staff_page(self):
         """
