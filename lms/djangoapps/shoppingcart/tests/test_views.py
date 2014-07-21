@@ -1,6 +1,7 @@
 """
 Tests for Shopping Cart views
 """
+from django.http import HttpRequest
 from urlparse import urlparse
 
 from django.conf import settings
@@ -8,18 +9,21 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import Group
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import Group, User
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupon
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, AdminFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
+from shoppingcart.admin import SoftDeleteCouponAdmin
 from mock import patch, Mock
 from shoppingcart.views import initialize_report
 from decimal import Decimal
@@ -142,6 +146,39 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Coupon '{0}' already used.".format(self.coupon_code), resp.content)
+
+    def test_soft_delete_coupon(self):  # pylint: disable=E1101
+        self.add_coupon(self.course_key, True)
+        coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
+                        percentage_discount=12, created_by=self.user, is_active=True)
+        coupon.save()
+        self.assertEquals(coupon.__unicode__(), '[Coupon] code: TestCode course: MITx/999/Robot_Super_Course')
+        admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
+        admin.is_staff = True
+        get_coupon = Coupon.objects.get(id=1)
+        request = HttpRequest()
+        request.user = admin
+        setattr(request, 'session', 'session')  # pylint: disable=E1101
+        messages = FallbackStorage(request)  # pylint: disable=E1101
+        setattr(request, '_messages', messages)  # pylint: disable=E1101
+        coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
+        test_query_set = coupon_admin.queryset(request)
+        test_actions = coupon_admin.get_actions(request)
+        self.assertTrue('really_delete_selected' in test_actions['really_delete_selected'])
+        self.assertEqual(get_coupon.is_active, True)
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        for coupon in test_query_set:
+            self.assertEqual(coupon.is_active, False)
+        coupon_admin.delete_model(request, get_coupon)  # pylint: disable=E1101
+        self.assertEqual(get_coupon.is_active, False)
+
+        coupon = Coupon(code='TestCode123', description='testing123', course_id=self.course_key,
+                        percentage_discount=22, created_by=self.user, is_active=True)
+        coupon.save()
+        test_query_set = coupon_admin.queryset(request)
+        coupon_admin.really_delete_selected(request, test_query_set)  # pylint: disable=E1101
+        for coupon in test_query_set:
+            self.assertEqual(coupon.is_active, False)
 
     @patch('shoppingcart.views.log.debug')
     def test_non_existing_coupon_redemption_on_removing_item(self, debug_log):
