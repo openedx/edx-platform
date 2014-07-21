@@ -8,7 +8,7 @@ from . import BASE_URL
 
 from selenium.webdriver.common.action_chains import ActionChains
 
-from utils import click_css, wait_for_notification
+from utils import click_css, wait_for_notification, confirm_prompt
 
 
 class ContainerPage(PageObject):
@@ -16,6 +16,8 @@ class ContainerPage(PageObject):
     Container page in Studio
     """
     NAME_SELECTOR = '.page-header-title'
+    NAME_INPUT_SELECTOR = '.page-header .xblock-field-input'
+    NAME_FIELD_WRAPPER_SELECTOR = '.page-header .wrapper-xblock-field'
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -130,7 +132,7 @@ class ContainerPage(PageObject):
         Discards draft changes (which will then re-render the page).
         """
         click_css(self, 'a.action-discard', 0, require_notification=False)
-        self.q(css='a.button.action-primary').first.click()
+        confirm_prompt(self)
         self.wait_for_ajax()
 
     def toggle_staff_lock(self):
@@ -145,7 +147,7 @@ class ContainerPage(PageObject):
             self.q(css='a.action-staff-lock').first.click()
         else:
             click_css(self, 'a.action-staff-lock', 0, require_notification=False)
-            self.q(css='a.button.action-primary').first.click()
+            confirm_prompt(self)
         self.wait_for_ajax()
         return not was_locked_initially
 
@@ -212,7 +214,7 @@ class ContainerPage(PageObject):
         """
         click_css(self, 'a.delete-button', source_index, require_notification=False)
         # Click the confirmation dialog button
-        click_css(self, 'a.button.action-primary', 0)
+        confirm_prompt(self)
 
     def edit(self):
         """
@@ -237,6 +239,12 @@ class ContainerPage(PageObject):
         Returns an information message for the container page.
         """
         return self.q(css=".xblock-message.information").first.text[0]
+
+    def is_inline_editing_display_name(self):
+        """
+        Return whether this container's display name is in its editable form.
+        """
+        return "is-editing" in self.q(css=self.NAME_FIELD_WRAPPER_SELECTOR).first.attrs("class")[0]
 
 
 class XBlockWrapper(PageObject):
