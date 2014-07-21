@@ -17,7 +17,7 @@ if Backbone?
 
     initialize: ->
         super()
-        @model.on "change", @updateModelDetails
+        @listenTo(@model, "change", @render)
 
     renderTemplate: ->
         @template = _.template($("#thread-response-show-template").html())
@@ -60,8 +60,16 @@ if Backbone?
       $elem = $(event.target)
       url = @model.urlFor('endorse')
       endorsed = @model.get('endorsed')
-      data = { endorsed: not endorsed }
-      @model.set('endorsed', not endorsed)
+      new_endorsed = not endorsed
+      data = { endorsed: new_endorsed }
+      endorsement = {
+        "username": window.user.get("username"),
+        "time": new Date().toISOString()
+      }
+      @model.set(
+        "endorsed": new_endorsed
+        "endorsement": if new_endorsed then endorsement else null
+      )
       @trigger "comment:endorse", not endorsed
       DiscussionUtil.safeAjax
         $elem: $elem
@@ -86,7 +94,3 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
-        
-    updateModelDetails: =>
-      @renderVote()
-      @renderFlagged()
