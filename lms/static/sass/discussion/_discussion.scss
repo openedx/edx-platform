@@ -441,7 +441,8 @@ body.discussion {
         font-weight: 700;
       }
 
-      span {
+      .timeago, .top-post-status {
+        color: inherit;
         font-style: italic;
       }
     }
