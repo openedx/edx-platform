@@ -65,30 +65,22 @@ class SplitTestMixin(object):
 
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
-
 @attr('shard_1')
-class SplitTest(ContainerBase, SplitTestMixin):
+class SplitTest(ContainerBase):
     """
     Tests for creating and editing split test instances in Studio.
     """
     __test__ = True
 
-    def setUp(self):
-        super(SplitTest, self).setUp()
-        # This line should be called once courseFixture is installed
-        self.course_fixture._update_xblock(self.course_fixture._course_location, {
-            "metadata": {
-                u"user_partitions": [
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_advanced_settings(
+            {
+                u"advanced_modules": {"value": ["split_test"]},
+                u"user_partitions": {"value": [
                     UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
                     UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
-                ],
-            },
-        })
-
-    def populate_course_fixture(self, course_fixture):
-        """ Populates the course """
-        course_fixture.add_advanced_settings(
-            {u"advanced_modules": {"value": ["split_test"]}}
+                ]}
+            }
         )
 
         course_fixture.add_children(
@@ -98,6 +90,16 @@ class SplitTest(ContainerBase, SplitTestMixin):
                 )
             )
         )
+
+    def verify_add_missing_groups_button_not_present(self, container):
+        """
+        Checks that the "add missing groups" button/link is not present.
+        """
+        def missing_groups_button_not_present():
+            button_present = container.missing_groups_button_present()
+            return (not button_present, not button_present)
+
+        Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
     def create_poorly_configured_split_instance(self):
         """

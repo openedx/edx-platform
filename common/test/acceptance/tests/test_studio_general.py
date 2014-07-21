@@ -113,57 +113,6 @@ class CoursePagesTest(StudioCourseTest):
             page.visit()
 
 
-@attr('shard_1')
-class CourseSectionTest(StudioCourseTest):
-    """
-    Tests that verify the sections name editable only inside headers in Studio Course Outline that you can get to
-    when logged in and have a course.
-    """
-
-    COURSE_ID_SEPARATOR = "."
-
-    def setUp(self):
-        """
-        Install a course with no content using a fixture.
-        """
-        super(CourseSectionTest, self).setUp()
-        self.course_outline_page = CourseOutlinePage(
-            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
-        )
-        self.course_outline_page.visit()
-
-    def populate_course_fixture(self, course_fixture):
-        """ Populates the course fixture with a test section """
-        course_fixture.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section')
-        )
-
-    def test_section_name_editable_in_course_outline(self):
-        """
-        Check that section name is editable on course outline page.
-        """
-        new_name = u"Test Section New"
-        section = self.course_outline_page.section_at(0)
-        self.assertEqual(section.name, u"Test Section")
-        section.change_name(new_name)
-        self.browser.refresh()
-        self.assertEqual(section.name, new_name)
-
-    # TODO: re-enable when release date support is added back
-    # def test_section_name_not_editable_inside_modal(self):
-    #     """
-    #     Check that section name is not editable inside "Section Release Date" modal on course outline page.
-    #     """
-    #     parent_css='div.modal-window'
-    #     self.course_outline_page.click_release_date()
-    #     section_name = self.course_outline_page.get_section_name(parent_css)[0]
-    #     self.assertEqual(section_name, '"Test Section"')
-    #     self.course_outline_page.click_section_name(parent_css)
-    #     section_name_edit_form = self.course_outline_page.section_name_edit_form_present(parent_css)
-    #     self.assertFalse(section_name_edit_form)
-
-
-@attr('shard_1')
 class DiscussionPreviewTest(StudioCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio
