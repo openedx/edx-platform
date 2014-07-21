@@ -125,6 +125,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 // as it cannot visually effect the other sections.
                 if (childCategory === 'chapter' && children && children.length > 1) {
                     childView.$el.remove();
+                    children.splice(children.indexOf(childView.model), 1);
                 } else {
                     this.refresh();
                 }
