@@ -19,6 +19,18 @@ an email message when we have updated the edX Course Staff Release Notes.
 edX Studio
 ***************************************
 
+* In edX Studio, URL formats have changed. If you previously bookmarked a page
+  in Studio, that bookmark will no longer work. You must update the URL.
+
+  Following is a sample of this format change:
+
+  * Old URL: ``https://studio.edx.org/unit/location:MITx+7.00x+2013_SOND+vertical+Coming_Soon_Explore_a_Protein``
+
+  * New URL:
+    ``https://studio.edx.org/unit/i4x://MITx/7.00x/vertical/Coming_Soon_Explore_a_Protein``
+  
+  This change does not affect student-visible URLs.
+
 * In open response assessments, instructors can now create assignments that allow students to upload an image file as well as write a text response. For more information, see `Creating Peer Assessments`_.
 
 * In open response assessments, instructors can now create a criterion that includes a field for comments, but no options. For more information, see `Creating Peer Assessments`_.
