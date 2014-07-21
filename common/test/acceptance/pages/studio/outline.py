@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save
+from .utils import set_input_value_and_save, click_css
 
 
 class CourseOutlineItem(object):
@@ -50,6 +50,12 @@ class CourseOutlineItem(object):
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
         self.wait_for_ajax()
 
+    def in_editable_form(self):
+        """
+        Return whether this outline item's display name is in its editable form.
+        """
+        return "is-hidden" not in self.q(css=self._bounded_selector(self.NAME_INPUT_SELECTOR)).first.attrs("class")
+
 
 class CourseOutlineContainer(CourseOutlineItem):
     """
@@ -76,6 +82,18 @@ class CourseOutlineContainer(CourseOutlineItem):
             ).attrs('data-locator')[0]
         )
 
+    def children(self, child_class=None):
+        """
+        Returns all the children page objects of class child_class.
+        """
+        if not child_class:
+            child_class = self.CHILD_CLASS
+
+        children = []
+        for child_element in self.q(css=child_class.BODY_SELECTOR):
+            children.append(child_class(self.browser, child_element.get_attribute('data-locator')))
+        return children
+
     def child_at(self, index, child_class=None):
         """
         Returns the child at the specified index.
@@ -84,9 +102,16 @@ class CourseOutlineContainer(CourseOutlineItem):
         if not child_class:
             child_class = self.CHILD_CLASS
 
-        return child_class(
-            self.browser,
-            self.q(css=child_class.BODY_SELECTOR).attrs('data-locator')[index]
+        return self.children(child_class)[index]
+
+    def add_child(self, require_notification=True):
+        """
+        Adds a child to this xblock, waiting for notifications.
+        """
+        click_css(
+            self,
+            self._bounded_selector(".add-xblock-component a.add-button"),
+            require_notification=require_notification,
         )
 
 
@@ -104,7 +129,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
 
 class CourseOutlineUnit(CourseOutlineChild):
     """
-    PageObject that wraps a unit link on the Studio Course Overview page.
+    PageObject that wraps a unit link on the Studio Course Outline page.
     """
     url = None
     BODY_SELECTOR = '.outline-item-unit'
@@ -120,7 +145,7 @@ class CourseOutlineUnit(CourseOutlineChild):
 
 class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
-    :class`.PageObject` that wraps a subsection block on the Studio Course Overview page.
+    :class`.PageObject` that wraps a subsection block on the Studio Course Outline page.
     """
     url = None
 
@@ -154,10 +179,13 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
 
         return self
 
+    def add_unit(self):
+        self.add_child(require_notification=False)
+
 
 class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
     """
-    :class`.PageObject` that wraps a section block on the Studio Course Overview page.
+    :class`.PageObject` that wraps a section block on the Studio Course Outline page.
     """
     url = None
     BODY_SELECTOR = '.outline-item-section'
@@ -168,6 +196,18 @@ class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
         Return the :class:`.CourseOutlineSubsection` with the title `title`.
         """
         return self.child(title)
+
+    def subsections(self):
+        return self.children()
+
+    def subsection_at(self, index):
+        """
+        Returns the :class`.CourseOutlineSubsection` at the specified index.
+        """
+        return self.child_at(index)
+
+    def add_subsection(self):
+        self.add_child()
 
 
 class CourseOutlinePage(CoursePage, CourseOutlineContainer):
@@ -191,3 +231,21 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Returns the :class:`.CourseOutlineSection` at the specified index.
         """
         return self.child_at(index)
+
+    def sections(self):
+        """
+        Returns the sections of this course outline page.
+        """
+        return self.children()
+
+    def add_section_from_top_button(self):
+        """
+        Clicks the button for adding a section which resides at the top of the screen, waiting for notifications.
+        """
+        click_css(self, '.wrapper-mast nav.nav-actions .add-button')
+
+    def add_section_from_bottom_button(self):
+        """
+        Clicks the button for adding a section which resides at the bottom of the screen, waiting for notifications.
+        """
+        click_css(self, '.course-outline > .add-xblock-component .add-button')

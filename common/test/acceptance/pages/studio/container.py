@@ -16,6 +16,7 @@ class ContainerPage(PageObject):
     Container page in Studio
     """
     NAME_SELECTOR = '.page-header-title'
+    NAME_INPUT_SELECTOR = ".page-header .xblock-field-input"
 
     def __init__(self, browser, locator):
         super(ContainerPage, self).__init__(browser)
@@ -217,6 +218,12 @@ class ContainerPage(PageObject):
         Returns True if the "add missing groups" button is present.
         """
         return self.q(css='.add-missing-groups-button').present
+
+    def display_name_in_editable_form(self):
+        """
+        Return whether this container's display name is in its editable form.
+        """
+        return "is-hidden" not in self.q(css=self.NAME_INPUT_SELECTOR).first.attrs("class")
 
 
 class XBlockWrapper(PageObject):
