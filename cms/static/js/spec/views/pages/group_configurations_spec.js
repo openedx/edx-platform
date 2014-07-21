@@ -74,10 +74,8 @@ define([
 
             it('I do not see notification message if the model is not changed',
             function() {
-                var expectedMessage = [
-                        'You have unsaved changes. Do you really want to ',
-                        'leave this page?'
-                    ].join(''),
+                var expectedMessage = 
+    		        'You have unsaved changes. Do you really want to leave this page?',
                         view = renderPage(),
                         message;
 

@@ -335,7 +335,7 @@ REASONCODE_MAP.update(
         '200': dedent(_(
             """
             The authorization request was approved by the issuing bank but declined by CyberSource
-            becouse it did not pass the Address Verification System (AVS).
+            because it did not pass the Address Verification System (AVS).
             """)),
         '201': dedent(_(
             """
