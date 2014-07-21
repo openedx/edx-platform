@@ -424,7 +424,7 @@
 
     .title {
       margin: 0;
-      padding: ($baseline/2) $baseline;
+      padding: $baseline;
     }
 
 
@@ -447,6 +447,7 @@
       @include line-height(14);
       display: inline-block;
       color: $gray;
+      text-transform: none;
     }
 
     .wrapper-sts {
@@ -1407,9 +1408,25 @@
       width: flex-grid(12,12);
     }
 
+    .contribution-options {
+      width: flex-grid(8,12);
+      margin: 0;
+
+      &:after{
+        clear: none;
+        display: none;
+      }
+    }
+
     .register-choice-certificate .list-actions {
       border-top: none;
-      padding-top: none;
+      width: flex-grid(4,12);
+      float: right;
+      margin: ($baseline/4) 0;
+
+      .action-select {
+        width: initial;
+      }
     }
   }
 
