@@ -159,7 +159,28 @@
         ${"<% } else { %>"}
         <span class="anonymous"><em>${_('anonymous')}</em></span>
         ${"<% } %>"}
-        <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
+        <p class="posted-details">
+            <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
+            <%
+            js_block = u"""
+                interpolate(
+                    endorsement.username ? "{user_fmt_str}" : "{anon_fmt_str}",
+                    {{
+                        'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
+                        'user': endorsement.username
+                    }},
+                    true
+                )""".format(
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                )
+            %>
+            ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+        </p>
     </header>
     <div class="response-body">${"<%- body %>"}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">

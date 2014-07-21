@@ -29,7 +29,7 @@ if Backbone?
       @renderVote()
       @renderAttrs()
       @renderFlagged()
-      @$el.find(".posted-details").timeago()
+      @$el.find(".posted-details .timeago").timeago()
       @convertMath()
       @markAsStaff()
       @
