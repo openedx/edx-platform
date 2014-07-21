@@ -10,72 +10,50 @@ if Backbone?
           @topicId = options.topicId
 
       render: () ->
+          context = _.clone(@course_settings.attributes)
+          _.extend(context, {
+              cohort_options: @getCohortOptions(),
+              mode: @mode
+          })
+          context.topics_html = @renderCategoryMap(@course_settings.get("category_map")) if @mode is "tab"
+          @$el.html(_.template($("#new-post-template").html(), context))
+
           if @mode is "tab"
-              @$el.html(
-                  _.template(
-                      $("#new-post-tab-template").html(), {
-                          topic_dropdown_html: @getTopicDropdownHTML(),
-                          options_html: @getOptionsHTML(),
-                          editor_html: @getEditorHTML()
-                      }
-                  )
-              )
               # set up the topic dropdown in tab mode
-              @dropdownButton = @$(".topic_dropdown_button")
-              @topicMenu      = @$(".topic_menu_wrapper")
-              @menuOpen = @dropdownButton.hasClass('dropped')
-              @topicId    = @$(".topic").first().data("discussion_id")
-              @topicText  = @getFullTopicName(@$(".topic").first())
-              $('.choose-cohort').hide() unless @$(".topic_menu li a").first().is("[cohorted=true]")
-              @setSelectedTopic()
-          else # inline
-              @$el.html(
-                  _.template(
-                      $("#new-post-inline-template").html(), {
-                          options_html: @getOptionsHTML(),
-                          editor_html: @getEditorHTML()
-                      }
-                  )
-              )
-          DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
+              @dropdownButton = @$(".post-topic-button")
+              @topicMenu      = @$(".topic-menu-wrapper")
+              @hideTopicDropdown()
+              @setTopic(@$("a.topic-title").first())
 
-      getTopicDropdownHTML: () ->
-          # populate the category menu (topic dropdown)
-          _renderCategoryMap = (map) ->
-              category_template = _.template($("#new-post-menu-category-template").html())
-              entry_template = _.template($("#new-post-menu-entry-template").html())
-              html = ""
-              for name in map.children
-                  if name of map.entries
-                      entry = map.entries[name]
-                      html += entry_template({text: name, id: entry.id, is_cohorted: entry.is_cohorted})
-                  else # subcategory
-                      html += category_template({text: name, entries: _renderCategoryMap(map.subcategories[name])})
-              html
-          topics_html = _renderCategoryMap(@course_settings.get("category_map"))
-          _.template($("#new-post-topic-dropdown-template").html(), {topics_html: topics_html})
+          DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "js-post-body"
 
-      getEditorHTML: () ->
-          _.template($("#new-post-editor-template").html(), {})
+      renderCategoryMap: (map) ->
+          category_template = _.template($("#new-post-menu-category-template").html())
+          entry_template = _.template($("#new-post-menu-entry-template").html())
+          html = ""
+          for name in map.children
+              if name of map.entries
+                  entry = map.entries[name]
+                  html += entry_template({text: name, id: entry.id, is_cohorted: entry.is_cohorted})
+              else # subcategory
+                  html += category_template({text: name, entries: @renderCategoryMap(map.subcategories[name])})
+          html
 
-      getOptionsHTML: () ->
-          # cohort options?
+      getCohortOptions: () ->
           if @course_settings.get("is_cohorted") and DiscussionUtil.isStaff()
               user_cohort_id = $("#discussion-container").data("user-cohort-id")
-              cohort_options = _.map @course_settings.get("cohorts"), (cohort) ->
+              _.map @course_settings.get("cohorts"), (cohort) ->
                   {value: cohort.id, text: cohort.name, selected: cohort.id==user_cohort_id}
           else
-              cohort_options = null
-          context = _.clone(@course_settings.attributes)
-          context.cohort_options = cohort_options
-          _.template($("#new-post-options-template").html(), context)
+              null
 
       events:
-          "submit .new-post-form":            "createPost"
-          "click  .topic_dropdown_button":    "toggleTopicDropdown"
-          "click  .topic_menu_wrapper":       "setTopic"
-          "click  .topic_menu_search":        "ignoreClick"
-          "keyup .form-topic-drop-search-input": DiscussionFilter.filterDrop
+          "submit .forum-new-post-form": "createPost"
+          "click .post-topic-button": "toggleTopicDropdown"
+          "click .topic-menu-wrapper": "handleTopicEvent"
+          "click .topic-filter-label": "ignoreClick"
+          "keyup .topic-filter-input": DiscussionFilter.filterDrop
+          "change .post-option-input": "postOptionChange"
 
       # Because we want the behavior that when the body is clicked the menu is
       # closed, we need to ignore clicks in the search field and stop propagation.
@@ -83,15 +61,23 @@ if Backbone?
       ignoreClick: (event) ->
           event.stopPropagation()
 
+      postOptionChange: (event) ->
+          $target = $(event.target)
+          $optionElem = $target.closest(".post-option")
+          if $target.is(":checked")
+              $optionElem.addClass("is-enabled")
+          else
+              $optionElem.removeClass("is-enabled")
+
       createPost: (event) ->
           event.preventDefault()
-          title   = @$(".new-post-title").val()
-          body    = @$(".new-post-body").find(".wmd-input").val()
-          group = @$(".new-post-group option:selected").attr("value")
+          title   = @$(".js-post-title").val()
+          body    = @$(".js-post-body").find(".wmd-input").val()
+          group = @$(".js-group-select option:selected").attr("value")
 
-          anonymous          = false || @$("input.discussion-anonymous").is(":checked")
-          anonymous_to_peers = false || @$("input.discussion-anonymous-to-peers").is(":checked")
-          follow             = false || @$("input.discussion-follow").is(":checked")
+          anonymous          = false || @$(".js-anon").is(":checked")
+          anonymous_to_peers = false || @$(".js-anon-peers").is(":checked")
+          follow             = false || @$(".js-follow").is(":checked")
 
           url = DiscussionUtil.urlFor('create_thread', @topicId)
 
@@ -109,18 +95,20 @@ if Backbone?
                   anonymous_to_peers: anonymous_to_peers
                   auto_subscribe: follow
                   group_id: group
-              error: DiscussionUtil.formErrorHandler(@$(".new-post-form-errors"))
+              error: DiscussionUtil.formErrorHandler(@$(".post-errors"))
               success: (response, textStatus) =>
                   # TODO: Move this out of the callback, this makes it feel sluggish
                   thread = new Thread response['content']
-                  DiscussionUtil.clearFormErrors(@$(".new-post-form-errors"))
+                  DiscussionUtil.clearFormErrors(@$(".post-errors"))
                   @$el.hide()
-                  @$(".new-post-title").val("").attr("prev-text", "")
-                  @$(".new-post-body textarea").val("").attr("prev-text", "")
+                  @$(".js-post-title").val("").attr("prev-text", "")
+                  @$(".js-post-body textarea").val("").attr("prev-text", "")
                   @$(".wmd-preview p").html("") # only line not duplicated in new post inline view
                   @collection.add thread
 
+
       toggleTopicDropdown: (event) ->
+          event.preventDefault()
           event.stopPropagation()
           if @menuOpen
               @hideTopicDropdown()
@@ -133,7 +121,6 @@ if Backbone?
           @topicMenu.show()
           $(".form-topic-drop-search-input").focus()
 
-          $("body").bind "keydown", @setActiveItem
           $("body").bind "click", @hideTopicDropdown
 
           # Set here because 1) the window might get resized and things could
@@ -146,28 +133,33 @@ if Backbone?
           @dropdownButton.removeClass('dropped')
           @topicMenu.hide()
 
-          $("body").unbind "keydown", @setActiveItem
           $("body").unbind "click", @hideTopicDropdown
 
-      setTopic: (event) ->
-          $target = $(event.target)
-          if $target.data('discussion_id')
+      handleTopicEvent: (event) ->
+          event.preventDefault()
+          event.stopPropagation()
+          @setTopic($(event.target))
+
+      setTopic: ($target) ->
+          if $target.data('discussion-id')
               @topicText = $target.html()
               @topicText  = @getFullTopicName($target)
-              @topicId   = $target.data('discussion_id')
+              @topicId   = $target.data('discussion-id')
               @setSelectedTopic()
-              if $target.is('[cohorted=true]')
-                $('.choose-cohort').show();
+              if $target.data("cohorted")
+                $(".js-group-select").prop("disabled", false)
               else
-                $('.choose-cohort').hide();
+                $(".js-group-select").val("")
+                $(".js-group-select").prop("disabled", true)
+              @hideTopicDropdown()
 
       setSelectedTopic: ->
-          @dropdownButton.html(@fitName(@topicText) + ' <span class="drop-arrow">▾</span>')
+          @$(".js-selected-topic").html(@fitName(@topicText))
 
       getFullTopicName: (topicElement) ->
           name = topicElement.html()
-          topicElement.parents('ul').not('.topic_menu').each ->
-              name = $(this).siblings('a').text() + ' / ' + name
+          topicElement.parents('.topic-submenu').each ->
+              name = $(this).siblings('.topic-title').text() + ' / ' + name
           return name
 
       getNameWidth: (name) ->
@@ -204,29 +196,3 @@ if Backbone?
               name =  gettext("…") + " / " + rawName + " " + gettext("…")
 
           return name
-
-      setActiveItem: (event) ->
-          if event.which == 13
-            $(".topic_menu_wrapper .focused").click()
-            return
-          if event.which != 40 && event.which != 38
-            return
-          event.preventDefault()
-
-          items = $.makeArray($(".topic_menu_wrapper a").not(".hidden"))
-          index = items.indexOf($('.topic_menu_wrapper .focused')[0])
-
-          if event.which == 40
-              index = Math.min(index + 1, items.length - 1)
-          if event.which == 38
-              index = Math.max(index - 1, 0)
-
-          $(".topic_menu_wrapper .focused").removeClass("focused")
-          $(items[index]).addClass("focused")
-
-          itemTop = $(items[index]).parent().offset().top
-          scrollTop = $(".topic_menu").scrollTop()
-          itemFromTop = $(".topic_menu").offset().top - itemTop
-          scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
-          scrollTarget = Math.max(scrollTop - itemFromTop - $(".topic_menu").height() + $(items[index]).height() + 20, scrollTarget)
-          $(".topic_menu").scrollTop(scrollTarget)

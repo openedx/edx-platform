@@ -7,7 +7,7 @@ if Backbone?
       "click .new-post-btn": "toggleNewPost"
       "keydown .new-post-btn":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
-      "click .new-post-cancel": "hideNewPost"
+      "click .cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")

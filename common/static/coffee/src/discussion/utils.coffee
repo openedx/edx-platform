@@ -167,7 +167,7 @@ class @DiscussionUtil
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
       makeErrorElem = (message) ->
-        $("<li>").addClass("new-post-form-error").html(message)
+        $("<li>").addClass("post-error").html(message)
       errorsField.empty().show()
       if xhr.status == 400
         response = JSON.parse(xhr.responseText)
