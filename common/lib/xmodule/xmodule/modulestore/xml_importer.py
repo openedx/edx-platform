@@ -3,6 +3,7 @@ import os
 import mimetypes
 from path import path
 import json
+import re
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xblock.runtime import KvsFieldData, DictKeyValueStore
@@ -15,6 +16,7 @@ from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
+from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import InvalidLocationError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
@@ -49,7 +51,7 @@ def import_static_content(
 
             content_path = os.path.join(dirname, filename)
 
-            if filename.endswith('~'):
+            if re.match(ASSET_IGNORE_REGEX, filename):
                 if verbose:
                     log.debug('skipping static content %s...', content_path)
                 continue
