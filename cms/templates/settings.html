@@ -1,7 +1,8 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "schedule" %></%def>
 <%block name="title">${_("Schedule &amp; Details Settings")}</%block>
-<%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
+<%block name="bodyclass">is-signedin course schedule view-settings view-settings-details feature-upload</%block>
+<%block name='dataview'>view-settings-details</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -93,7 +94,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
+              <p><a class="link-courseURL" rel="external" data-rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
             </div>
 
             <ul class="list-actions">
@@ -216,7 +217,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
                   <%def name='overview_text()'><%
-                    a_link_start = '<a class="link-courseURL" rel="external" href="'
+                    a_link_start = '<a class="link-courseURL" rel="external" data-rel="external" href="'
                     a_link_end = '">' + _("your course summary page") + '</a>'
                     a_link = a_link_start + lms_link_for_about_page + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link

@@ -8,6 +8,7 @@
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
+<%block name='dataview'>view-outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -135,7 +136,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
             <a href="#" class="button new-button new-courseware-section-button"><i class="icon-plus"></i> ${_("New Section")}</a>
           </li>
           <li class="nav-item">
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+            <a href="${lms_link}" rel="external" data-rel="external" class="button view-button view-live-button">${_("View Live")}</a>
           </li>
         </ul>
       </nav>
@@ -306,7 +307,4 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       </form>
     </div>
   </div>
-
-
-
 </%block>
