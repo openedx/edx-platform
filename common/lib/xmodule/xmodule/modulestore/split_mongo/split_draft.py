@@ -3,11 +3,10 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
 from ..exceptions import ItemNotFoundError
-from split import SplitMongoModuleStore
+from split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.modulestore import ModuleStoreEnum, PublishState
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, UnsupportedRevisionError
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
@@ -46,15 +45,62 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Returns: a CourseDescriptor
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
-        return super(DraftVersioningModuleStore, self).create_course(
+        item = super(DraftVersioningModuleStore, self).create_course(
             org, course, run, user_id, master_branch=master_branch, **kwargs
         )
+        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        return item
 
     def get_courses(self):
         """
         Returns all the courses on the Draft branch (which is a superset of the courses on the Published branch).
         """
         return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+
+    def _auto_publish_no_children(self, location, category, user_id):
+        """
+        Publishes item if the category is DIRECT_ONLY. This assumes another method has checked that
+        location points to the head of the branch and ignores the version. If you call this in any
+        other context, you may blow away another user's changes.
+        NOTE: only publishes the item at location: no children get published.
+        """
+        if location.branch == ModuleStoreEnum.BranchName.draft and category in DIRECT_ONLY_CATEGORIES:
+            # version_agnostic b/c of above assumption in docstring
+            self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL)
+
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
+        item = super(DraftVersioningModuleStore, self).update_item(
+            descriptor,
+            user_id,
+            allow_not_found=allow_not_found,
+            force=force
+        )
+        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        return item
+
+    def create_item(
+        self, user_id, course_key, block_type, block_id=None,
+        definition_locator=None, fields=None,
+        force=False, continue_version=False, **kwargs
+    ):
+        item = super(DraftVersioningModuleStore, self).create_item(
+            user_id, course_key, block_type, block_id=block_id,
+            definition_locator=definition_locator, fields=fields,
+            force=force, continue_version=continue_version, **kwargs
+        )
+        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        return item
+
+    def create_child(
+            self, user_id, parent_usage_key, block_type, block_id=None,
+            fields=None, continue_version=False, **kwargs
+    ):
+        item = super(DraftVersioningModuleStore, self).create_child(
+            user_id, parent_usage_key, block_type, block_id=block_id,
+            fields=fields, continue_version=continue_version, **kwargs
+        )
+        self._auto_publish_no_children(parent_usage_key, item.location.category, user_id)
+        return item
 
     def delete_item(self, location, user_id, revision=None, **kwargs):
         """
@@ -86,7 +132,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             )
 
         for branch in branches_to_delete:
-            SplitMongoModuleStore.delete_item(self, location.for_branch(branch), user_id, **kwargs)
+            branched_location = location.for_branch(branch)
+            parent_loc = self.get_parent_location(branched_location)
+            SplitMongoModuleStore.delete_item(self, branched_location, user_id, **kwargs)
+            self._auto_publish_no_children(parent_loc, parent_loc.category, user_id)
 
     def _map_revision_to_branch(self, key, revision=None):
         """
@@ -158,20 +207,24 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         except ItemNotFoundError:
             return True
 
-        return draft.update_version != published.update_version
+        return draft.update_version != published.source_version
 
-    def publish(self, location, user_id, **kwargs):
+    def publish(self, location, user_id, blacklist=None, **kwargs):
         """
-        Save a current draft to the underlying modulestore.
+        Publishes the subtree under location from the draft branch to the published branch
         Returns the newly published item.
         """
         SplitMongoModuleStore.copy(
             self,
             user_id,
-            location.course_key.for_branch(ModuleStoreEnum.BranchName.draft),
+            # Directly using the replace function rather than the for_branch function
+            # because for_branch obliterates the version_guid and will lead to missed version conflicts.
+            location.course_key.replace(branch=ModuleStoreEnum.BranchName.draft),
             location.course_key.for_branch(ModuleStoreEnum.BranchName.published),
             [location],
+            blacklist=blacklist
         )
+        return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published))
 
     def unpublish(self, location, user_id):
         """
@@ -211,7 +264,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             Return the version of the given database representation of a block.
             """
             #TODO: make this method a more generic helper
-            return block['edit_info']['update_version']
+            return block['edit_info'].get('source_version', block['edit_info']['update_version'])
 
         draft_head = get_head(ModuleStoreEnum.BranchName.draft)
         published_head = get_head(ModuleStoreEnum.BranchName.published)
