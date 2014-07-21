@@ -275,7 +275,7 @@ def xblock_outline_handler(request, usage_key_string):
     This is used by the course outline in particular to construct the tree representation of
     a course.
     """
-    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key_with_run(usage_key_string)
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
