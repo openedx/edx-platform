@@ -150,7 +150,7 @@ def inline_discussion(request, course_id, discussion_id):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
     return utils.JsonResponse({
-        'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+        'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
@@ -173,7 +173,7 @@ def forum_form_discussion(request, course_id):
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
-        threads = [utils.safe_content(thread, is_staff) for thread in unsafethreads]
+        threads = [utils.safe_content(thread, course_id, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
@@ -253,7 +253,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        content = utils.safe_content(thread.to_dict(), is_staff)
+        content = utils.safe_content(thread.to_dict(), course_id, is_staff)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
@@ -276,7 +276,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             if not "pinned" in thread:
                 thread["pinned"] = False
 
-        threads = [utils.safe_content(thread, is_staff) for thread in threads]
+        threads = [utils.safe_content(thread, course_id, is_staff) for thread in threads]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
@@ -335,7 +335,7 @@ def user_profile(request, course_id, user_id):
         if request.is_ajax():
             is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
-                'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
@@ -386,7 +386,7 @@ def followed_threads(request, course_id, user_id):
             is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
-                'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
             })
