@@ -1275,6 +1275,14 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
                 extended_profile = {}
             extended_profile[field] = post_vars[field]
 
+    # Make sure that password and username fields do not match
+    username = post_vars['username']
+    password = post_vars['password']
+    if username == password:
+        js['value'] = _("Username and password fields cannot match")
+        js['field'] = 'username'
+        return JsonResponse(js, status=400)
+
     # Ok, looks like everything is legit.  Create the account.
     try:
         with transaction.commit_on_success():
