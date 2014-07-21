@@ -327,6 +327,22 @@ class RegistrationCodeRedemption(models.Model):
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
 
 
+class SoftDeleteCouponManager(models.Manager):
+    """ Use this manager to get objects that have a is_active=True """
+
+    def get_active_coupons_query_set(self):
+        """
+        filter the is_active = True Coupons only
+        """
+        return super(SoftDeleteCouponManager, self).get_query_set().filter(is_active=True)
+
+    def get_query_set(self):
+        """
+        get all the coupon objects
+        """
+        return super(SoftDeleteCouponManager, self).get_query_set()
+
+
 class Coupon(models.Model):
     """
     This table contains coupon codes
@@ -339,6 +355,11 @@ class Coupon(models.Model):
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
     is_active = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return "[Coupon] code: {} course: {}".format(self.code, self.course_id)
+
+    objects = SoftDeleteCouponManager()
 
 
 class CouponRedemption(models.Model):
