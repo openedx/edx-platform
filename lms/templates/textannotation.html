@@ -154,7 +154,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
         },
         optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
         optionsRS: {},
-        optionsOVA: {posBigNew:'none'},
+        optionsOVA: {posBigNew:'none', default_tab:"${default_tab}"},
         optionsRichText: {
             tinymce:{
                 selector: "li.annotator-item textarea",
@@ -176,6 +176,9 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     delete ova;
     //Load the plugin Video/Text Annotation
     var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
+
+    if (typeof Annotator.Plugin["Grouping"] === 'function') 
+        ova.annotator.addPlugin("Grouping");
 
     var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
             '${instructor_email}':
