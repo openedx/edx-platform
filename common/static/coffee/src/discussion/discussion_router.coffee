@@ -25,7 +25,7 @@ if Backbone?
         @newPostView.render()
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
-        $('.new-post-cancel').bind "click", @hideNewPost
+        @newPostView.$('.cancel').bind "click", @hideNewPost
 
     allThreads: ->
       @nav.updateSidebar()
@@ -45,8 +45,12 @@ if Backbone?
       if(@main)
         @main.cleanup()
         @main.undelegateEvents()
+      unless($(".forum-content").is(":visible"))
+        $(".forum-content").fadeIn()
+      if(@newPost.is(":visible"))
+        @newPost.fadeOut()
 
-      @main = new DiscussionThreadView(el: $(".discussion-column"), model: @thread)
+      @main = new DiscussionThreadView(el: $(".forum-content"), model: @thread)
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
@@ -59,8 +63,17 @@ if Backbone?
       @navigate("", trigger: true)
 
     showNewPost: (event) =>
-      @newPost.slideDown(300)
-      $('.new-post-title').focus()
+      $('.forum-content').fadeOut(
+        duration: 200
+        complete: =>
+          @newPost.fadeIn(200)
+          $('.new-post-title').focus()
+      )
 
     hideNewPost: (event) =>
-      @newPost.slideUp(300)
+      @newPost.fadeOut(
+        duration: 200
+        complete: =>
+          $('.forum-content').fadeIn(200)
+      )
+
