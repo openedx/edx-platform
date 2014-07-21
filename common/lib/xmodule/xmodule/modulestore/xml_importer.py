@@ -173,7 +173,8 @@ def import_from_xml(
             # Creates a new course if it doesn't already exist
             if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
                 try:
-                    store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+                    course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+                    dest_course_id = course.id
                 except InvalidLocationError:
                     # course w/ same org and course exists
                     log.debug(
@@ -215,6 +216,7 @@ def import_from_xml(
                             dest_course_id,
                             do_import_static=do_import_static
                         )
+                        dest_course_id = course.id
 
                         for entry in course.pdf_textbooks:
                             for chapter in entry.get('chapters', []):
