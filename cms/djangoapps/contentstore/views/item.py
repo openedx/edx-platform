@@ -62,6 +62,15 @@ def hash_resource(resource):
     return md5.hexdigest()
 
 
+def usage_key_with_run(usage_key_string):
+    """
+    Converts usage_key_string to a UsageKey, adding a course run if necessary
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    return usage_key
+
+
 # pylint: disable=unused-argument
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
@@ -100,9 +109,7 @@ def xblock_handler(request, usage_key_string):
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
-        usage_key = UsageKey.from_string(usage_key_string)
-        # usage_key's course_key may have an empty run property
-        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+        usage_key = usage_key_with_run(usage_key_string)
 
         if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
@@ -137,16 +144,8 @@ def xblock_handler(request, usage_key_string):
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
-            parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
-            # usage_key's course_key may have an empty run property
-            parent_usage_key = parent_usage_key.replace(
-                course_key=modulestore().fill_in_run(parent_usage_key.course_key)
-            )
-            duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
-            # usage_key's course_key may have an empty run property
-            duplicate_source_usage_key = duplicate_source_usage_key.replace(
-                course_key=modulestore().fill_in_run(duplicate_source_usage_key.course_key)
-            )
+            parent_usage_key = usage_key_with_run(request.json['parent_locator'])
+            duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
@@ -177,9 +176,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    usage_key = UsageKey.from_string(usage_key_string)
-    # usage_key's course_key may have an empty run property
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    usage_key = usage_key_with_run(usage_key_string)
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -319,8 +316,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     if children is not None:
         children_usage_keys = []
         for child in children:
-            child_usage_key = UsageKey.from_string(child)
-            child_usage_key = child_usage_key.replace(course_key=modulestore().fill_in_run(child_usage_key.course_key))
+            child_usage_key = usage_key_with_run(child)
             children_usage_keys.append(child_usage_key)
         existing_item.children = children_usage_keys
 
@@ -387,9 +383,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 @expect_json
 def _create_item(request):
     """View for create items."""
-    usage_key = UsageKey.from_string(request.json['parent_locator'])
-    # usage_key's course_key may have an empty run property
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    usage_key = usage_key_with_run(request.json['parent_locator'])
     category = request.json['category']
 
     display_name = request.json.get('display_name')
