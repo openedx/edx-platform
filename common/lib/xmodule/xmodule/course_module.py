@@ -556,10 +556,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, UsageKey):
-                self.wiki_slug = self.location.course
-            elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.id.offering or self.display_name
+            self.wiki_slug = self.location.course
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),
