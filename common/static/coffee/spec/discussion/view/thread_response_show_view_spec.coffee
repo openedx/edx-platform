@@ -97,3 +97,14 @@ describe "ThreadResponseShowView", ->
         @view.render()
         expect(@view.$(".posted-details").text()).toMatch("marked as answer less than a minute ago")
         expect(@view.$(".posted-details").text()).not.toMatch(" by ")
+
+    it "re-renders correctly when endorsement changes", ->
+        @thread.set("thread_type", "question")
+        @comment.updateInfo({"ability": {"can_endorse": true}})
+        expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
+        @view.$(".action-endorse").click()
+        expect(@view.$(".posted-details").text()).toMatch(
+          "marked as answer less than a minute ago by " + user.get("username")
+        )
+        @view.$(".action-endorse").click()
+        expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
