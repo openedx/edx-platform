@@ -214,7 +214,10 @@ def import_handler(request, course_key_string):
 
                     if dirpath != course_dir:
                         for fname in os.listdir(dirpath):
-                            shutil.move(dirpath / fname, course_dir)
+                            try:
+                                shutil.move(dirpath / fname, course_dir)
+                            except shutil.Error:  # directory already exists
+                                pass
 
                     _module_store, course_items = import_from_xml(
                         modulestore(),
