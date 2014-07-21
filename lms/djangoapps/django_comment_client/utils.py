@@ -365,7 +365,7 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content, is_staff=False):
+def safe_content(content, course_id, is_staff=False):
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
@@ -375,14 +375,40 @@ def safe_content(content, is_staff=False):
         'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
+        'endorsement',
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
         fields += ['username', 'user_id']
 
+    content = strip_none(extract(content, fields))
+
+    if content.get("endorsement"):
+        endorsement = content["endorsement"]
+        endorser = None
+        if endorsement["user_id"]:
+            try:
+                endorser = User.objects.get(pk=endorsement["user_id"])
+            except User.DoesNotExist:
+                log.error("User ID {0} in endorsement for comment {1} but not in our DB.".format(
+                    content.get('user_id'),
+                    content.get('id'))
+                )
+
+        # Only reveal endorser if requester can see author or if endorser is staff
+        if (
+            endorser and
+            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_id))
+        ):
+            endorsement["username"] = endorser.username
+        else:
+            del endorsement["user_id"]
+
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
-            safe_children = [safe_content(child) for child in content[child_content_key]]
+            safe_children = [
+                safe_content(child, course_id, is_staff) for child in content[child_content_key]
+            ]
             content[child_content_key] = safe_children
 
-    return strip_none(extract(content, fields))
+    return content
