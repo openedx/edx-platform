@@ -162,8 +162,8 @@ def import_from_xml(
     # method on XmlModuleStore.
     course_items = []
 
-    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-        for course_key in xml_module_store.modules.keys():
+    for course_key in xml_module_store.modules.keys():
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
 
             if target_course_id is not None:
                 dest_course_id = target_course_id

@@ -548,18 +548,6 @@ class ModuleStoreReadBase(ModuleStoreRead):
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
 
-    @contextmanager
-    def branch_setting(self, branch_setting, course_id=None):
-        """
-        A context manager for temporarily setting a store's branch value
-        """
-        previous_branch_setting_func = getattr(self, 'branch_setting_func', None)
-        try:
-            self.branch_setting_func = lambda: branch_setting
-            yield
-        finally:
-            self.branch_setting_func = previous_branch_setting_func
-
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''

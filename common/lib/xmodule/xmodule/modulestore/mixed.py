@@ -142,7 +142,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.get_item(usage_key, depth, **kwargs)
 
-    def get_items(self, course_key, settings=None, content=None, **kwargs):
+    def get_items(self, course_key, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -153,11 +153,12 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Args:
             course_key (CourseKey): the course identifier
-            settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
-            content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
-            kwargs (key=value): what to look for within the course.
+            kwargs:
+                settings (dict): fields to look for which have settings scope. Follows same syntax
+                    and rules as kwargs below
+                content (dict): fields to look for which have content scope. Follows same syntax and
+                    rules as kwargs below.
+            additional kwargs (key=value): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
@@ -170,7 +171,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_key)
-        return store.get_items(course_key, settings=settings, content=content, **kwargs)
+        return store.get_items(course_key, **kwargs)
 
     def get_courses(self):
         '''
@@ -519,7 +520,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         A context manager for temporarily setting the branch value for the given course' store
         to the given branch_setting.  If course_id is None, the default store is used.
         """
-        store = self._get_modulestore_for_courseid(course_id)
+        store = self._verify_modulestore_support(course_id, 'branch_setting')
         with store.branch_setting(branch_setting, course_id):
             yield
 

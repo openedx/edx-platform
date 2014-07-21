@@ -1,7 +1,6 @@
 import pymongo
 from uuid import uuid4
 import ddt
-from mock import patch
 from importlib import import_module
 from collections import namedtuple
 import unittest
@@ -172,7 +171,8 @@ class TestMixedModuleStore(unittest.TestCase):
         def create_sub_tree(parent, block_info):
             block = self.store.create_child(
                 self.user_id, parent.location.version_agnostic(),
-                block_info.category, block_id=block_info.display_name
+                block_info.category, block_id=block_info.display_name,
+                fields={'display_name': block_info.display_name},
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
@@ -801,6 +801,83 @@ class TestMixedModuleStore(unittest.TestCase):
             self.course_locations[self.XML_COURSEID2].course_key,
             wiki_courses
         )
+
+    @ddt.data('draft')
+    def test_branch_setting(self, default_ms):
+        """
+        Test the branch_setting context manager
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        problem_location = self.problem_x1a_1
+        problem_original_name = 'Problem_x1a_1'
+        problem_new_name = 'New Problem Name'
+        course_key = problem_location.course_key
+
+        def assertNumProblems(display_name, expected_number):
+            """
+            Asserts the number of problems with the given display name is the given expected number.
+            """
+            self.assertEquals(
+                len(self.store.get_items(course_key, settings={'display_name': display_name})),
+                expected_number
+            )
+
+        def assertProblemNameEquals(expected_display_name):
+            """
+            Asserts the display_name of the xblock at problem_location matches the given expected value.
+            """
+            # check the display_name of the problem
+            problem = self.store.get_item(problem_location)
+            self.assertEquals(problem.display_name, expected_display_name)
+
+            # there should be only 1 problem with the expected_display_name
+            assertNumProblems(expected_display_name, 1)
+
+        # verify Draft problem
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            assertProblemNameEquals(problem_original_name)
+
+        # verify Published problem doesn't exist
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            with self.assertRaises(ItemNotFoundError):
+                self.store.get_item(problem_location)
+
+        # PUBLISH the problem
+        self.store.publish(problem_location, self.user_id)
+
+        # verify Published problem
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            assertProblemNameEquals(problem_original_name)
+
+        # verify Draft-preferred
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            assertProblemNameEquals(problem_original_name)
+
+        # EDIT name
+        problem = self.store.get_item(problem_location)
+        problem.display_name = problem_new_name
+        self.store.update_item(problem, self.user_id)
+
+        # verify Draft problem has new name
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            assertProblemNameEquals(problem_new_name)
+
+        # verify Published problem still has old name
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            assertProblemNameEquals(problem_original_name)
+            # there should be no published problems with the new name
+            assertNumProblems(problem_new_name, 0)
+
+        # PUBLISH the problem
+        self.store.publish(problem_location, self.user_id)
+
+        # verify Published problem has new name
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            assertProblemNameEquals(problem_new_name)
+            # there should be no published problems with the old name
+            assertNumProblems(problem_original_name, 0)
 
 
 #=============================================================================================================
