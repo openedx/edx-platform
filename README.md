@@ -29,7 +29,7 @@ Documentation
 Documentation for developers, researchers, and course staff is located in the
 `docs` subdirectory. Documentation is built using
 [Sphinx](http://sphinx-doc.org/): you can [view the built documentation on
-ReadTheDocs](http://docs.edx.org/).
+ReadTheDocs](http://docs.edx.org/)..
 
 How to Contribute
 -----------------
