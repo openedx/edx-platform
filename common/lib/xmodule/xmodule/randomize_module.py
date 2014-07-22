@@ -48,7 +48,6 @@ class RandomizeModule(RandomizeFields, XModule):
         # NOTE: calling self.get_children() creates a circular reference --
         # it calls get_child_descriptors() internally, but that doesn't work
         # until we've picked a choice
-        # import pudb; pudb.set_trace()
         xml_attrs = self.descriptor.xml_attributes or []
         use_randrange = 'use_randrange' in xml_attrs
         # TODO: use this attr to toggle storing history and never showing the
@@ -140,16 +139,18 @@ class RandomizeModule(RandomizeFields, XModule):
         return child_html
 
     def handle_ajax(self, dispatch, data):
-        choices = self.get_choices().keys()
-        index = self.get_choice_index(choices=choices)
-        if dispatch == 'next':
-            self.choice = choices[index + 1]
-        elif dispatch == 'jump':
-            log.debug('jump, data=%s' % data)
-            self.choice = choices[int(data['choice'])]
-        #num_choices = len(choices)
-        #if self.choice >= num_choices:
-            #self.choice = 0
+        if self.runtime.user_is_staff:
+            choices = self.get_choices().keys()
+            index = self.get_choice_index(choices=choices)
+            try:
+                if dispatch == 'next':
+                    self.choice = choices[index + 1]
+                elif dispatch == 'jump':
+                    log.debug('jump, data=%s' % data)
+                    self.choice = choices[int(data['choice'])]
+            except (IndexError, ValueError):
+                # log the error in this case and return the current choice
+                log.exception("error in randomize next/jump (IGNORED):")
         result = {'ret': "choice=%s" % self.choice}
         return json.dumps(result)
 
