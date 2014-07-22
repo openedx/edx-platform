@@ -1024,7 +1024,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         xblock = self.create_xmodule(location, **kwargs)
         xblock = self.update_item(xblock, user_id, allow_not_found=True)
 
-        return xblock
+        # Retrieve the item from the store so that it has edit info attributes
+        return self.get_item(xblock.location)
 
     def create_child(self, user_id, parent_usage_key, block_type, block_id=None, **kwargs):
         """
