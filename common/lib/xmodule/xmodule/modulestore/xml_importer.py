@@ -183,6 +183,9 @@ def import_from_xml(
                     )
                     continue
 
+            # Once bulk_write_operations works in all modulestores, this can be removed.
+            dest_course_id = dest_course_id.version_agnostic()
+
             with store.bulk_write_operations(dest_course_id):
                 course_data_path = None
 
@@ -216,7 +219,6 @@ def import_from_xml(
                             dest_course_id,
                             do_import_static=do_import_static
                         )
-                        dest_course_id = course.id
 
                         for entry in course.pdf_textbooks:
                             for chapter in entry.get('chapters', []):
@@ -399,8 +401,7 @@ def _import_module_and_update_references(
                 setattr(new_module, field_name, value)
             else:
                 setattr(new_module, field_name, getattr(module, field_name))
-    store.update_item(new_module, user_id, allow_not_found=True)
-    return new_module
+    return store.update_item(new_module, user_id, allow_not_found=True)
 
 
 def _import_course_draft(
