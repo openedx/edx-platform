@@ -1,18 +1,16 @@
 import json
-import datetime
 import logging
+import datetime
 from collections import OrderedDict
 
 import pytz
+from django.contrib.auth.models import User
 
-from courseware.models import StudentModule
-from edxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
+from courseware.models import StudentModule
 from xmodule.modulestore.django import modulestore
 from instructor.offline_gradecalc import student_grades
 
-from django.http import HttpResponse
-from django.contrib.auth.models import User
 
 log = logging.getLogger("mitx.module_tree_reset")
 
@@ -341,105 +339,3 @@ class ProctorModuleInfo(object):
                     log.exception("Failed to do reset of %s for %s" %
                                   (f['assignment'], student))
         return failed
-
-
-def getip(request):
-    """
-    Extract IP address of requester from header, even if behind proxy
-    """
-    ip = request.META.get('HTTP_X_REAL_IP', '')  # nginx reverse proxy
-    if not ip:
-        ip = request.META.get('REMOTE_ADDR', 'None')
-    return ip
-
-
-ALLOWED_IPS = ['173.48.139.155', '10.152.159.162', '54.235.195.90']
-# ALLOWED_IPS = [  ]
-ALLOWED_STAFF = 'staff_MITx/3.091r-exam/2013_Fall_residential_exam'
-
-
-def index(request):
-    ip = getip(request)
-    if ip not in ALLOWED_IPS:
-        if request.user and request.user.is_staff and False:
-            log.debug('request allowed because user=%s is staff' %
-                      request.user)
-        elif request.user is not None and request.user:
-            groups = [g.name for g in request.user.groups.all()]
-
-            if ALLOWED_STAFF in groups:
-                log.debug('request allowed because user=%s is in group %s' %
-                          (request.user, ALLOWED_STAFF))
-            else:
-                log.debug('request denied, user=%s, groups %s' %
-                          (request.user, groups))
-                # return HttpResponse('permission denied', status=403)
-        else:
-            log.debug('request denied, user=%s, groups %s' %
-                      (request.user, groups))
-            # return HttpResponse('permission denied', status=403)
-    else:
-        log.debug('request allowed, in ALLOWED_IPS')
-
-    username = request.GET.get('username')
-
-    try:
-        student = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return HttpResponse(
-            json.dumps({'msg': 'User does not exist', 'error': True}))
-
-    cmd = request.GET.get('cmd')
-
-    if cmd == 'reset':
-        location = request.GET.get('location')  # e.g. proctor/Assessment_2
-        location = location.replace(' ', '_')
-
-        ms = modulestore()
-        pmod = ms.get_item('i4x://MITx/3.091r-exam/proctor/%s' % location)
-        tnset = TreeNodeSet(pmod, ms, student)
-
-        s = ''
-        for r in tnset.rset + tnset.pset:
-            s += str(r) + '\n'
-
-        # msg = tnset.reset_randomization()
-        tnset.reset_randomization()
-
-        # return render_to_response("module_tree_reset.html",
-        #                           {'status': s, 'msg': msg})
-        # cmd = 'grades'
-        cmd = 'status'
-
-    if cmd == 'status':
-        try:
-            pminfo = ProctorModuleInfo()
-            status = pminfo.get_student_status(student)
-        except Exception as err:
-            log.exception("Failed to get status for %s" % student)
-            return HttpResponse(json.dumps(
-                {'msg': 'Error getting grades for %s' % student,
-                 'error': True,
-                 'errstr': str(err)}))
-        return HttpResponse(json.dumps(status))
-
-    if cmd == 'grades':
-        # from instructor.offline_gradecalc import student_grades
-        ms = modulestore()
-        course = ms.get_item(
-            'i4x://MITx/3.091r-exam/course/2013_Fall_residential_exam')
-        try:
-            gradeset = student_grades(student, request, course,
-                                      keep_raw_scores=False, use_offline=False)
-        except Exception as err:
-            log.exception("Failed to get grades for %s" % student)
-            return HttpResponse(json.dumps(
-                {'msg': 'Error getting grades for %s' % student,
-                 'error': True}))
-
-        grades = gradeset['totaled_scores']
-        grades['student_id'] = student.id
-        return HttpResponse(json.dumps(grades))
-
-    return render_to_response("module_tree_reset.html",
-                              {'status': 'unknown command', 'msg': ''})
