@@ -2,8 +2,8 @@
  * This page is used to show the user an outline of the course.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
+        "js/views/course_outline", "js/utils/drag_and_drop"],
+    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ContentDragger) {
         var CourseOutlinePage = BasePage.extend({
             // takes XBlockInfo as a model
 
@@ -45,6 +45,29 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 this.outlineView.render();
                 this.outlineView.setViewState(this.initialState || {});
+
+                // Section
+                ContentDragger.makeDraggable(
+                    '.outline-section',
+                    '.section-drag-handle',
+                    'ol.list-sections',
+                    'article.outline'
+                );
+                // Subsection
+                ContentDragger.makeDraggable(
+                    '.outline-subsection',
+                    '.subsection-drag-handle',
+                    'ol.list-subsections',
+                    'li.outline-section'
+                );
+                // Unit
+                ContentDragger.makeDraggable(
+                    '.outline-unit',
+                    '.unit-drag-handle',
+                    'ol.list-units',
+                    'li.outline-subsection'
+                );
+
                 return $.Deferred().resolve().promise();
             },
 
