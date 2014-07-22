@@ -36,8 +36,7 @@ function ($, _, gettext, BaseView, GroupConfigurationsList) {
 
             if(dirty) {
                 return gettext(
-                    'You have unsaved changes. Do you really want to ' +
-                    'leave this page?'
+                    'You have unsaved changes. Do you really want to leave this page?'
                 );
             }
         }
