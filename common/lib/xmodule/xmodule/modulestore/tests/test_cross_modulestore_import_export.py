@@ -309,16 +309,20 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                         self.ignore_asset_key('content_son')
                         self.ignore_asset_key('thumbnail_location')
 
-                        self.assertCoursesEqual(
-                            source_store,
-                            source_course_key,
-                            dest_store,
-                            dest_course_key,
-                        )
+                        for setting in (ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only):
+                            print "Testing branch={!r}".format(setting)
+                            with source_store.branch_setting(setting):
+                                with dest_store.branch_setting(setting):
+                                    self.assertCoursesEqual(
+                                        source_store,
+                                        source_course_key,
+                                        dest_store,
+                                        dest_course_key,
+                                    )
 
-                        self.assertAssetsEqual(
-                            source_content,
-                            source_course_key,
-                            dest_content,
-                            dest_course_key,
-                        )
+                                    self.assertAssetsEqual(
+                                        source_content,
+                                        source_course_key,
+                                        dest_content,
+                                        dest_course_key,
+                                    )

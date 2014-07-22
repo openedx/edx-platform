@@ -193,10 +193,15 @@ class CourseComparisonTest(unittest.TestCase):
         Any field value mentioned in ``self.field_exclusions`` by the key (usage_id, field_name)
         will be ignored for the purpose of equality checking.
         """
+        self.maxDiff = None
+
         expected_items = expected_store.get_items(expected_course_key)
         actual_items = actual_store.get_items(actual_course_key)
         self.assertGreater(len(expected_items), 0)
-        self.assertEqual(len(expected_items), len(actual_items))
+        self.assertItemsEqual(
+            [item.location.map_into_course(actual_course_key) for item in expected_items],
+            [item.location for item in actual_items]
+        )
 
         actual_item_map = {item.location: item for item in actual_items}
 
