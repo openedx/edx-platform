@@ -81,3 +81,10 @@ except ImportError:
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
+
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+
+PLATFORM_NAME = 'MOOC UPEx'
+SITE_NAME = 'upex.edu.ec'
+

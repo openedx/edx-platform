@@ -10,7 +10,7 @@
   homepage_overlay_html = microsite.get_value('homepage_overlay_html')
 
   show_homepage_promo_video = microsite.get_value('show_homepage_promo_video', True)
-  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "XNaiOGxWeto")
+  homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "2m5zbShDcDA")
 
   show_partners = microsite.get_value('show_partners', True)
 
@@ -25,7 +25,7 @@
             ${homepage_overlay_html}
           % else:
             % if self.stanford_theme_enabled():
-              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Instituto de Altos Estudios Nacionales")}</h1>
             % else:
               <h1>${_("The Future of Online Education")}</h1>
             % endif
@@ -91,7 +91,7 @@
     <%
       youtube_video_id = homepage_promo_video_youtube_id
       if self.stanford_theme_enabled():
-        youtube_video_id = "2gmreZObCY4"
+        youtube_video_id = "2m5zbShDcDA"
     %>
     <iframe width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
