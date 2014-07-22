@@ -9,9 +9,12 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
+from student.tests.factories import CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -26,7 +29,7 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class OrganizationsApiTests(TestCase):
+class OrganizationsApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
@@ -46,6 +49,10 @@ class OrganizationsApiTests(TestCase):
         self.test_user = User.objects.create(
             email=self.test_user_email,
             username=self.test_user_username
+        )
+        self.course = CourseFactory.create()
+        self.second_course = CourseFactory.create(
+            number="899"
         )
 
         self.client = SecureClient()
@@ -252,3 +259,26 @@ class OrganizationsApiTests(TestCase):
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['username'], self.test_user.username)
         self.assertEqual(response.data[0]['email'], self.test_user.email)
+
+    def test_organizations_users_get_with_course_count(self):
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.test_user, course_id=self.second_course.id)
+
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.test_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get('{}{}'.format(users_uri, '?include_course_counts=True'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['id'], self.test_user.id)
+        self.assertEqual(response.data[0]['course_count'], 2)
