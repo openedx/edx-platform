@@ -20,6 +20,12 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                 reorderableContainer.sortable({
                     handle: '.drag-handle',
 
+                    start: function (event, ui) {
+                        // Necessary because of an open bug in JQuery sortable.
+                        // http://bugs.jqueryui.com/ticket/4990
+                        reorderableContainer.sortable('refreshPositions');
+                    },
+
                     stop: function (event, ui) {
                         var saving, hideSaving, removeFromParent;
 
