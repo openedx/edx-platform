@@ -1035,9 +1035,17 @@ Annotator.Plugin.HighlightTags = (function(_super) {
                     if(anns.tags[index].indexOf("flagged-") == -1){
                         if (typeof this.colors[anns.tags[index]] != "undefined") {
                             var finalcolor = this.colors[anns.tags[index]];
-                            $(annotations[annNum]).css("background","rgba("+finalcolor.red+","+finalcolor.green+","+finalcolor.blue+",0.3");
+                            $(annotations[annNum]).css(
+                                "background", 
+                                // last value, 0.3 is the standard highlight opacity for annotator
+                                "rgba(" + finalcolor.red + ", " + finalcolor.green + ", " + finalcolor.blue + ", 0.3)"
+                            );
                         }else{
-                            $(annotations[annNum]).css("background","");
+                            $(annotations[annNum]).css(
+                                "background", 
+                                // returns the value to the inherited value without the above
+                                ""
+                            );
                         }
                     }
                 }
