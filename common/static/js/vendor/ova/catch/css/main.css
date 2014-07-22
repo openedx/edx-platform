@@ -531,3 +531,8 @@
     text-decoration: underline;
     cursor: pointer;
 }
+
+#mainCatch div.annotations-loading-gif{
+  width:100%;
+  text-align:center;
+}
