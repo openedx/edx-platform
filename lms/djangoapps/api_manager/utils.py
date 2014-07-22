@@ -32,7 +32,10 @@ def str2bool(value):
     """
     convert string to bool
     """
-    return value.lower() in ("true",)
+    if value:
+        return value.lower() in ("true",)
+    else:
+        return False
 
 
 def generate_base_uri(request, strip_qs=False):
