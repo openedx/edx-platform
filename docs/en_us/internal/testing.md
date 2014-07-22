@@ -27,7 +27,7 @@ the unit under tests into smaller units, and then testing those individually.
 We use [voidspace mock](http://www.voidspace.org.uk/python/mock/).
 
 * We unit test Python code (using [unittest](http://docs.python.org/2/library/unittest.html)) and
-Javascript (using [Jasmine](http://pivotal.github.io/jasmine/))
+Javascript (using [Jasmine](http://jasmine.github.io/))
 
 ### Integration Tests
 * Test several units at the same time.
