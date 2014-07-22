@@ -122,4 +122,5 @@ class TestXMLModuleStore(unittest.TestCase):
         # XML store does NOT allow draft_preferred branch setting
         with self.assertRaises(ValueError):
             with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
-                pass
+                # verify that the above context manager raises a ValueError
+                pass  # pragma: no cover

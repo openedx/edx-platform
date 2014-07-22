@@ -12,8 +12,11 @@ import random
 from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import (ItemNotFoundError, VersionConflictError,
-            DuplicateItemError, DuplicateCourseError, InsufficientSpecificationError)
+from xmodule.modulestore.exceptions import (
+    ItemNotFoundError, VersionConflictError,
+    DuplicateItemError, DuplicateCourseError,
+    InsufficientSpecificationError
+)
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin

@@ -5,7 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum, PublishState
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, UnsupportedRevisionError
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
@@ -77,8 +77,12 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         elif revision is None:
             branches_to_delete = [ModuleStoreEnum.BranchName.draft]
         else:
-            raise self._unsupported_revision_error(
-                [None, ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.all]
+            raise UnsupportedRevisionError(
+                [
+                    None,
+                    ModuleStoreEnum.RevisionOption.published_only,
+                    ModuleStoreEnum.RevisionOption.all
+                ]
             )
 
         for branch in branches_to_delete:
@@ -95,7 +99,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         elif revision is None:
             return key
         else:
-            raise self._unsupported_revision_error()
+            raise UnsupportedRevisionError()
 
     def has_item(self, usage_key, revision=None):
         """
@@ -203,6 +207,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             return self._get_block_from_structure(course_structure, xblock.location.block_id)
 
         def get_version(block):
+            """
+            Return the version of the given database representation of a block.
+            """
+            #TODO: make this method a more generic helper
             return block['edit_info']['update_version']
 
         draft_head = get_head(ModuleStoreEnum.BranchName.draft)
