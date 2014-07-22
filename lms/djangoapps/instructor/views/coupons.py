@@ -61,7 +61,12 @@ def add_coupon(request, course_id):  # pylint: disable=W0613
 
     description = request.POST.get('description')
     course_id = request.POST.get('course_id')
-    discount = request.POST.get('discount')
+    try:
+        discount = int(request.POST.get('discount'))
+    except ValueError:
+        return HttpResponseNotFound(_("Please Enter the Integer Value for Coupon Discount"))
+    if discount > 100:
+        return HttpResponseNotFound(_("Please Enter the Coupon Discount Value Less than or Equal to 100"))
     coupon = Coupon(
         code=code, description=description, course_id=course_id,
         percentage_discount=discount, created_by_id=request.user.id
@@ -93,7 +98,12 @@ def update_coupon(request, course_id):  # pylint: disable=W0613
 
     description = request.POST.get('description')
     course_id = request.POST.get('course_id')
-    discount = request.POST.get('discount')
+    try:
+        discount = int(request.POST.get('discount'))
+    except ValueError:
+        return HttpResponseNotFound(_("Please Enter the Integer Value for Coupon Discount"))
+    if discount > 100:
+        return HttpResponseNotFound(_("Please Enter the Coupon Discount Value Less than or Equal to 100"))
     coupon.code = code
     coupon.description = description
     coupon.course_id = course_id

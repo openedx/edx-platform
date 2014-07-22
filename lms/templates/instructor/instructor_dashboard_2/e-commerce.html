@@ -142,6 +142,12 @@
         $("#update_coupon_button").removeAttr('disabled');
         return false;
       }
+      if (parseInt(coupon_discount) > 100) {
+        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+        $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
+        $("#update_coupon_button").removeAttr('disabled');
+        return false;
+      }
       if (!$.isNumeric(coupon_discount)) {
         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
@@ -168,6 +174,12 @@
       if (coupon_discount == '0') {
         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
+        $("#add_coupon_button").removeAttr('disabled');
+        return false;
+      }
+      if (parseInt(coupon_discount) > 100) {
+        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+        $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
         $("#add_coupon_button").removeAttr('disabled');
         return false;
       }
