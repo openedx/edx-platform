@@ -12,6 +12,18 @@ if Backbone?
         "keydown .discussion-flag-abuse":
           (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
+    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
+      endorsed: (endorsed) ->
+        if endorsed
+          @$(".action-endorse").show().addClass("is-endorsed")
+        else
+          if @model.get('ability')?.can_endorse
+            @$(".action-endorse").show()
+          else
+            @$(".action-endorse").hide()
+          @$(".action-endorse").removeClass("is-endorsed")
+    })
+
     $: (selector) ->
         @$el.find(selector)
 
