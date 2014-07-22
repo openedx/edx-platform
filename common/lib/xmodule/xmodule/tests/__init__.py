@@ -195,12 +195,27 @@ class CourseComparisonTest(unittest.TestCase):
         """
         self.maxDiff = None
 
+        expected_root = expected_store.get_course(expected_course_key)
+        actual_root = actual_store.get_course(actual_course_key)
+
         expected_items = expected_store.get_items(expected_course_key)
         actual_items = actual_store.get_items(actual_course_key)
         self.assertGreater(len(expected_items), 0)
+
+        # The usage_keys in the courses should match up, with the following exceptions/translations:
+        #    1) The course roots block_ids may be different
+        #    2) All other blocks should have matching block_type/block_id pairs
         self.assertItemsEqual(
-            [item.location.map_into_course(actual_course_key) for item in expected_items],
-            [item.location.map_into_course(actual_course_key) for item in actual_items]
+            [
+                (item.location.block_type, item.location.block_id)
+                for item in expected_items
+                if item.location != expected_root.location
+            ],
+            [
+                (item.location.block_type, item.location.block_id)
+                for item in actual_items
+                if item.location != actual_root.location
+            ]
         )
 
         actual_item_map = {item.location.map_into_course(actual_course_key): item for item in actual_items}
