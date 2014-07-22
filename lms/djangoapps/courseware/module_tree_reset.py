@@ -107,6 +107,11 @@ class ProctorModuleInfo(object):
         self.course = self.ms.get_course(course_id)
         self.get_released_proctor_modules()
 
+    def _get_student_obj(self, student):
+        if isinstance(student, basestring):
+            student = User.objects.get(username=student)
+        return student
+
     def get_released_proctor_modules(self):
         chapters = []
 
@@ -147,10 +152,8 @@ class ProctorModuleInfo(object):
         self.rpmods = rpmods
         return rpmods
 
-    def get_grades(self, student=None, request=None):
-        if student is None:
-            student = self.student
-
+    def get_grades(self, student, request=None):
+        student = self._get_student_obj(student)
         if request is None:
             request = DummyRequest()
             request.user = student
@@ -173,9 +176,7 @@ class ProctorModuleInfo(object):
         StudentModule state for each, and see which randomized problem was
         selected for a student (if any).
         """
-        if isinstance(student, basestring):
-            student = User.objects.get(username=student)
-        self.student = student
+        student = self._get_student_obj(student)
 
         smstates = OrderedDict()
 
@@ -241,7 +242,7 @@ class ProctorModuleInfo(object):
 
         # get grades, match gradeset assignments with StudentModule states, and
         # put grades there
-        self.get_grades()
+        self.get_grades(student)
         for score in self.gradeset['totaled_scores']['Assessment']:
             if score.section in smstates:
                 smstates[score.section].score = score
@@ -262,8 +263,8 @@ class ProctorModuleInfo(object):
             if not attempted and sm.score is not None and sm.score.earned:
                 attempted = True
 
-            earned=(sm.score.earned if sm.score is not None else None)
-            possible=(sm.score.possible if sm.score is not None else None)
+            earned = (sm.score.earned if sm.score is not None else None)
+            possible = (sm.score.possible if sm.score is not None else None)
             stat = dict(name=name, assignment=sm.rpmod.ra_ps.display_name,
                         pm_sm=sm.ps_sm.state, choice=sm.choice,
                         problem=sm.problem_name,
@@ -285,6 +286,7 @@ class ProctorModuleInfo(object):
         where grade1 = points earned on assignment LS1, or '' if not attempted
         and prob1 = problem which was assigned or '' if not attempted
         """
+        student = self._get_student_obj(student)
         status = self.get_student_status(student)
         ret = OrderedDict()
         ret['id'] = student.id
@@ -312,6 +314,7 @@ class ProctorModuleInfo(object):
                            possible=assignment['possible'])
 
     def get_assignments_attempted_and_failed(self, student, do_reset=False):
+        student = self._get_student_obj(student)
         status = self.get_student_status(student)
         failed = [self._get_od_for_assignment(student, a)
                   for a in status['assignments'] if a['attempted'] and
