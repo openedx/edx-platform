@@ -481,6 +481,10 @@ if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
         url(r'^debug/run_python', 'debug.views.run_python'),
     )
 
+urlpatterns += (
+    url(r'^debug/show_parameters', 'debug.views.show_parameters'),
+)
+
 # Crowdsourced hinting instructor manager.
 if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     urlpatterns += (

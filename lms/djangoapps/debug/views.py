@@ -10,6 +10,9 @@ from edxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec
 
+from util.json_request import JsonResponse
+
+
 @login_required
 @ensure_csrf_cookie
 def run_python(request):
@@ -29,3 +32,13 @@ def run_python(request):
         else:
             c['results'] = pprint.pformat(g)
     return render_to_response("debug/run_python_form.html", c)
+
+
+@login_required
+def show_parameters(request):
+    """A page that shows what GET parameters were on the URL."""
+    params = {
+        'get': dict(request.GET),
+        'post': dict(request.POST),
+    }
+    return JsonResponse(params)
