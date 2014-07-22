@@ -264,7 +264,30 @@
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
   <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
     <a href="#" class="forum-nav-thread-link">
-      <div class="forum-nav-thread-wrapper-1">
+      <div class="forum-nav-thread-wrapper-0">
+        ${u"""<%
+        var icon_class, sr_text;
+        if (thread_type == "discussion") {{
+            icon_class = "icon-comments";
+            sr_text = "{discussion}";
+        }} else if (endorsed) {{
+            icon_class = "icon-ok";
+            sr_text = "{answered_question}";
+        }} else {{
+            icon_class = "icon-question";
+            sr_text = "{unanswered_question}";
+        }}
+        %>""".format(
+            ## Translators: This is a label for a Discussion forum thread
+            discussion=escapejs(_("discussion")),
+            ## Translators: This is a label for a Question forum thread with a marked answer
+            answered_question=escapejs(_("answered question")),
+            ## Translators: This is a label for a Question forum thread without a marked answer
+            unanswered_question=escapejs(_("unanswered question"))
+        )}
+        <span class="sr">${"<%= sr_text %>"}</span>
+        <i class="icon ${"<%= icon_class %>"}"></i>
+      </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
         js_block = u"""
@@ -297,10 +320,6 @@
          %>
         ${"<%"}${js_block}${"%>"}
       </div><div class="forum-nav-thread-wrapper-2">
-        ${"<% if (endorsed) { %>"}
-          ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
-          <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">${_("Endorsed response")}</span></span>
-        ${"<% } %>"}
         <%
         js_block = u"""
             interpolate(

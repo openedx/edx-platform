@@ -3,6 +3,7 @@ class @DiscussionViewSpecHelper
         # Minimal set of properties necessary for rendering
         thread = {
           id: "dummy_id",
+          thread_type: "discussion",
           pinned: false,
           endorsed: false,
           votes: {up_count: '0'},
