@@ -60,6 +60,9 @@ def enable_theme():
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
 
+    # Include theme locale path for django translations lookup
+    settings.LOCALE_PATHS += (theme_root / 'conf/locale',)
+
 
 def enable_microsites():
     """
