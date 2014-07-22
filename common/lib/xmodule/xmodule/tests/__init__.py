@@ -200,10 +200,10 @@ class CourseComparisonTest(unittest.TestCase):
         self.assertGreater(len(expected_items), 0)
         self.assertItemsEqual(
             [item.location.map_into_course(actual_course_key) for item in expected_items],
-            [item.location for item in actual_items]
+            [item.location.map_into_course(actual_course_key) for item in actual_items]
         )
 
-        actual_item_map = {item.location: item for item in actual_items}
+        actual_item_map = {item.location.map_into_course(actual_course_key): item for item in actual_items}
 
         for expected_item in expected_items:
             actual_item_location = expected_item.location.map_into_course(actual_course_key)
