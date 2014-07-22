@@ -1017,6 +1017,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if block_id is None:
             block_id = uuid4().hex
 
+        if block_type == 'course':
+            block_id = course_key.run
+
         location = course_key.make_usage_key(block_type, block_id)
         xblock = self.create_xmodule(location, **kwargs)
         xblock = self.update_item(xblock, user_id, allow_not_found=True)

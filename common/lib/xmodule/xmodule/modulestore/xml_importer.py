@@ -347,10 +347,7 @@ def _import_module_and_update_references(
 
     # Move the module to a new course
     block_type = module.scope_ids.block_type
-    if block_type == 'course':
-        block_id = dest_course_id.run
-    else:
-        block_id = module.scope_ids.usage_id.block_id
+    block_id = module.scope_ids.usage_id.block_id
     new_module = store.create_item(
         user_id,
         dest_course_id,
