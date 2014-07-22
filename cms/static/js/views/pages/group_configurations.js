@@ -1,22 +1,22 @@
 define([
-    'jquery', 'underscore', 'gettext', 'js/views/baseview',
+    'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
     'js/views/group_configurations_list'
 ],
-function ($, _, gettext, BaseView, GroupConfigurationsList) {
+function ($, _, gettext, BasePage, GroupConfigurationsList) {
     'use strict';
-    var GroupConfigurationsPage = BaseView.extend({
+    var GroupConfigurationsPage = BasePage.extend({
         initialize: function() {
-            BaseView.prototype.initialize.call(this);
+            BasePage.prototype.initialize.call(this);
             this.listView = new GroupConfigurationsList({
                 collection: this.collection
             });
         },
 
-        render: function() {
-            this.hideLoadingIndicator();
-            this.$('.content-primary').append(this.listView.render().el);
+        renderPage: function() {
+            this.$el.append(this.listView.render().el);
             this.addButtonActions();
             this.addWindowActions();
+            return $.Deferred().resolve().promise();
         },
 
         addButtonActions: function () {
