@@ -173,7 +173,7 @@ class ProctorModuleInfo(object):
         StudentModule state for each, and see which randomized problem was
         selected for a student (if any).
         """
-        if isinstance(student, str):
+        if isinstance(student, basestring):
             student = User.objects.get(username=student)
         self.student = student
 
