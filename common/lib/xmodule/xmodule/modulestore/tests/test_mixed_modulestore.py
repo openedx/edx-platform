@@ -810,10 +810,22 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        problem_location = self.problem_x1a_1
-        problem_original_name = 'Problem_x1a_1'
-        problem_new_name = 'New Problem Name'
+        # TODO - Remove these lines once LMS-2869 is implemented
+        course_location = self.course_locations[self.MONGO_COURSEID]
+        self.store.publish(course_location, self.user_id)
+        problem_original_name = 'Problem_Original'
+        problem = self.store.create_child(
+            self.user_id, self.writable_chapter_location, 'problem', 'prob_block',
+            fields={'display_name': problem_original_name},
+        )
+        problem_location = problem.location.version_agnostic().for_branch(None)
+
+        # TODO - Uncomment out these lines once LMS-2869 is implemented
+        # problem_location = self.problem_x1a_1
+        # problem_original_name = 'Problem_x1a_1'
+
         course_key = problem_location.course_key
+        problem_new_name = 'New Problem Name'
 
         def assertNumProblems(display_name, expected_number):
             """
@@ -837,10 +849,12 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # verify Draft problem
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            self.assertTrue(self.store.has_item(problem_location))
             assertProblemNameEquals(problem_original_name)
 
         # verify Published problem doesn't exist
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self.assertFalse(self.store.has_item(problem_location))
             with self.assertRaises(ItemNotFoundError):
                 self.store.get_item(problem_location)
 
@@ -849,6 +863,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # verify Published problem
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self.assertTrue(self.store.has_item(problem_location))
             assertProblemNameEquals(problem_original_name)
 
         # verify Draft-preferred

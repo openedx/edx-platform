@@ -13,7 +13,7 @@ from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (ItemNotFoundError, VersionConflictError,
-            DuplicateItemError, DuplicateCourseError)
+            DuplicateItemError, DuplicateCourseError, InsufficientSpecificationError)
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTree, LocalId
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -667,7 +667,7 @@ class SplitModuleCourseTests(SplitModuleTest):
 
     def test_get_course_negative(self):
         # Now negative testing
-        with self.assertRaises(ItemNotFoundError):
+        with self.assertRaises(InsufficientSpecificationError):
             modulestore().get_course(CourseLocator(org='edu', course='meh', run='blah'))
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_course(CourseLocator(org='edu', course='nosuchthing', run="run", branch=BRANCH_NAME_DRAFT))

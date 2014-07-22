@@ -100,3 +100,11 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
     @abstractmethod
     def convert_to_draft(self, location, user_id):
         raise NotImplementedError
+
+    def _unsupported_revision_error(self, allowed_revisions=None):
+        if not allowed_revisions:
+            allowed_revisions = [
+                None, ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only
+            ]
+        return ValueError('revision not one of {}'.format(allowed_revisions))
+

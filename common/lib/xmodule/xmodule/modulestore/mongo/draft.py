@@ -519,7 +519,9 @@ class DraftModuleStore(MongoModuleStore):
         elif revision is None:
             as_functions = [as_draft]
         else:
-            raise ValueError('revision not one of None, ModuleStoreEnum.RevisionOption.published_only, or ModuleStoreEnum.RevisionOption.all')
+            raise self._unsupported_revision_error(
+                [None, ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.all]
+            )
         self._delete_subtree(location, as_functions)
 
     def _delete_subtree(self, location, as_functions):
