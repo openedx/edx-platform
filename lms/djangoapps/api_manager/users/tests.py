@@ -14,17 +14,16 @@ from mock import patch
 
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore import Location
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -39,12 +38,11 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
 @override_settings(API_PAGE_SIZE=10)
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
-class UsersApiTests(TestCase):
+class UsersApiTests(ModuleStoreTestCase):
 
     """ Test suite for Users API views """
 
