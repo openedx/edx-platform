@@ -179,14 +179,35 @@
   vertical-align: middle;
 }
 
+.forum-nav-thread-wrapper-0 {
+  @extend %forum-nav-thread-wrapper;
+  width: 7%;
+
+  .icon {
+    @include font-size(14);
+  }
+
+  .icon-comments {
+    color: $gray-l2;
+  }
+
+  .icon-ok {
+    color: $forum-color-marked-answer;
+  }
+
+  .icon-question {
+    color: $pink;
+  }
+}
+
 .forum-nav-thread-wrapper-1 {
   @extend %forum-nav-thread-wrapper;
-  width: 70%;
+  width: 80%;
 }
 
 .forum-nav-thread-wrapper-2 {
   @extend %forum-nav-thread-wrapper;
-  width: 30%;
+  width: 13%;
   text-align: right;
 }
 
@@ -250,11 +271,6 @@
   &:last-child {
     margin-right: 0;
   }
-}
-
-.forum-nav-thread-endorsed {
-  @extend %forum-nav-thread-wrapper-2-content;
-  color: $green-d1;
 }
 
 .forum-nav-thread-votes-count {

@@ -216,7 +216,7 @@ if Backbone?
       @model.comment()
 
     endorseThread: (endorsed) =>
-      is_endorsed = @$el.find(".is-endorsed").length
+      is_endorsed = @$el.find(".is-endorsed").length > 0
       @model.set 'endorsed', is_endorsed
 
     submitComment: (event) ->
