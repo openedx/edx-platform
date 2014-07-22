@@ -366,6 +366,14 @@ class TestMixedModuleStore(unittest.TestCase):
             self.user_id, private_vert.location, 'html', block_id='bug_leaf'
         )
 
+        # verify that an error is raised when the revision is not valid
+        with self.assertRaises(ValueError):
+            self.store.delete_item(
+                private_leaf.location,
+                self.user_id,
+                revision=ModuleStoreEnum.RevisionOption.draft_preferred
+            )
+
         self.store.publish(private_vert.location, self.user_id)
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
@@ -810,7 +818,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        # TODO - Remove these lines once LMS-2869 is implemented
+        # TODO - Remove these lines once LMS-11017 is implemented
         course_location = self.course_locations[self.MONGO_COURSEID]
         self.store.publish(course_location, self.user_id)
         problem_original_name = 'Problem_Original'
@@ -820,7 +828,7 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         problem_location = problem.location.version_agnostic().for_branch(None)
 
-        # TODO - Uncomment out these lines once LMS-2869 is implemented
+        # TODO - Uncomment out these lines once LMS-11017 is implemented
         # problem_location = self.problem_x1a_1
         # problem_original_name = 'Problem_x1a_1'
 
