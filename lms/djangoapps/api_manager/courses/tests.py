@@ -921,6 +921,55 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['enrollments']), 3)
 
+    def test_courses_users_list_get_filter_by_groups(self):
+        # create 2 groups
+        group_ids = []
+        for i in xrange(1, 3):
+            data = {'name': '{} {}'.format(self.test_group_name, i), 'type': 'test'}
+            response = self.do_post(self.base_groups_uri, data)
+            self.assertEqual(response.status_code, 201)
+            group_ids.append(response.data['id'])
+
+        # create 5 users
+        users = []
+        for i in xrange(0, 5):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post('/api/users', data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+            if i < 2:
+                data = {'user_id': response.data['id']}
+                response = self.do_post('{}{}/users'.format(self.base_groups_uri, group_ids[i]), data)
+                self.assertEqual(response.status_code, 201)
+
+        # enroll all users in course
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        for user in users:
+            data = {'user_id': user}
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # retrieve all users enrolled in the course and member of group 1
+        response = self.do_get('{}?groups={}'.format(test_uri, group_ids[0]))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 1)
+
+        # retrieve all users enrolled in the course and member of group 1 and group 2
+        response = self.do_get('{}?groups={},{}'.format(test_uri, group_ids[0], group_ids[1]))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 2)
+
+        # retrieve all users enrolled in the course and not member of group 1
+        response = self.do_get('{}?exclude_groups={}'.format(test_uri, group_ids[0]))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 4)
+
     def test_courses_users_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
         test_user_uri = '/api/users'

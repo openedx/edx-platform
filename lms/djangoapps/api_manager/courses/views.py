@@ -921,11 +921,17 @@ class CoursesUsersList(SecureAPIView):
 
           * username: The username of the user.
 
-        * GET supports filtering of user by organization(s) like this
+        * GET supports filtering of user by organization(s), groups
          * To get users enrolled in a course and are also member of organization
-         /api/courses/{course_id}/users?organizations={organization_id}
+         ```/api/courses/{course_id}/users?organizations={organization_id}```
          * organizations filter can be a single id or multiple ids separated by comma
-         /api/courses/{course_id}/users?organizations={organization_id1},{organization_id2}
+         ```/api/courses/{course_id}/users?organizations={organization_id1},{organization_id2}```
+         * To get users enrolled in a course and also member of specific groups
+         ```/api/courses/{course_id}/users?groups={group_id1},{group_id2}```
+        * GET supports exclude filtering of user by groups
+         * To get users enrolled in a course and also not member of specific groups
+         ```/api/courses/{course_id}/users?exclude_groups={group_id1},{group_id2}```
+
 
     **Post Values**
 
@@ -972,6 +978,8 @@ class CoursesUsersList(SecureAPIView):
         GET /api/courses/{course_id}
         """
         orgs = request.QUERY_PARAMS.get('organizations')
+        groups = request.QUERY_PARAMS.get('groups', None)
+        exclude_groups = request.QUERY_PARAMS.get('exclude_groups', None)
         response_data = OrderedDict()
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -980,11 +988,17 @@ class CoursesUsersList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         # Get a list of all enrolled students
         users = CourseEnrollment.users_enrolled_in(course_key)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
         if orgs:
-            if ',' in orgs:
-                upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
-                orgs = orgs.split(",")[:upper_bound]
+            orgs = orgs.split(",")[:upper_bound]
             users = users.filter(organizations__in=orgs)
+        if groups:
+            groups = groups.split(",")[:upper_bound]
+            users = users.filter(groups__in=groups)
+        if exclude_groups:
+            exclude_groups = exclude_groups.split(",")[:upper_bound]
+            users = users.exclude(groups__in=exclude_groups)
+
         response_data['enrollments'] = []
         for user in users:
             user_data = OrderedDict()
