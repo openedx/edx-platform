@@ -47,6 +47,7 @@ glob2==0.3
 gunicorn==0.17.4
 httpretty==0.8.3
 lazy==1.1
+longerusername==0.4
 lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1

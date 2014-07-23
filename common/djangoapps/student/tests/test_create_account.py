@@ -294,8 +294,8 @@ class TestCreateAccountValidation(TestCase):
             assert_username_error("Username must be minimum of two characters long")
 
         # Too long
-        params["username"] = "this_username_has_31_characters"
-        assert_username_error("Username cannot be more than 30 characters long")
+        params["username"] = 'a' * 256
+        assert_username_error("Username cannot be more than 255 characters long")
 
         # Invalid
         params["username"] = "invalid username"

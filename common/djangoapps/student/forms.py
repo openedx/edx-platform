@@ -105,7 +105,7 @@ class AccountCreationForm(forms.Form):
     # TODO: Resolve repetition
     username = forms.SlugField(
         min_length=2,
-        max_length=30,
+        max_length=255,
         error_messages={
             "required": _USERNAME_TOO_SHORT_MSG,
             "invalid": _("Username should only consist of A-Z and 0-9, with no spaces."),

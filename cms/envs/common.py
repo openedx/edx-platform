@@ -712,6 +712,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
+    # External auth
+    'longerusername',
+
     'embargo',
 
     # Monitoring signals
