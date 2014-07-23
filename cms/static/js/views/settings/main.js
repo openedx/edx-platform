@@ -1,5 +1,5 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
+    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date", "tinymce", "jquery.tinymce"],
     function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
@@ -37,6 +37,25 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
+        //tinymce
+        this.editor = new tinymce.Editor('course-overview', {
+            plugins: [
+                "link image",
+                "codemirror",
+                "table",
+                "paste textcolor"
+            ],
+            theme: "modern",
+            skin: 'studio-tmce4',
+            schema: "html5",
+            codemirror: {
+                path: "" + baseUrl + "/js/vendor"
+            },
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+            toolbar2: "print preview media | forecolor backcolor code",
+            image_advtab: true,
+        }, tinymce.EditorManager);
+
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
@@ -47,6 +66,16 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
+
+        // tinymce
+        var cachethis = this;
+        this.editor.on('change', function(e) {
+            var newVal = tinymce.activeEditor.getContent();
+            if (cachethis.model.get('overview') != newVal) {
+                cachethis.setAndValidate('overview', newVal);
+            }
+        });
+        this.editor.render();
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
@@ -206,8 +235,11 @@ var DetailsView = ValidatingView.extend({
         if (!this.codeMirrors[thisTarget.id]) {
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
+
+            this.editor.setContent(this.model.attributes.overview);
+
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text/html", lineNumbers: true, lineWrapping: true});
+                mode: "text/html", lineNumbers: true, lineWrapping: true, style: "display: none;"});
             this.codeMirrors[thisTarget.id].on('change', function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
