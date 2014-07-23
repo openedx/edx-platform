@@ -7,6 +7,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
+  @problemHintsStrings: []
 
   constructor: (element) ->
     @element = element
@@ -187,6 +188,41 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
+
+
+  #________________________________________________________________________________
+  @parseForProblemHints: (xmlString) ->
+    @problemHintsStrings = []
+    for line in xmlString.split('\n')
+      matches = line.match( /\|\|(.+)\|\|/ )      # string surrounded by ||...|| is a match group
+      if matches
+        problemHint = matches[1]
+        MarkdownEditingDescriptor.problemHintsStrings.push(problemHint)
+        xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
+    return xmlString
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # We may wish to add insertHeader. Here is Tom's code.
 # function makeHeader() {
 #  var selection = simpleEditor.getSelection();
@@ -201,29 +237,46 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     toXml = `function (markdown) {
       var xml = markdown,
           i, splits, scriptFlag;
+debugger;
+
+
+
+      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);
+
 
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
-      // group multiple choice answers
-      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
+
+
+
+
+
+
+      //_______________________________________________________________________
+      //
+      // multiple choice questions
+      //
+      xml = xml.replace(/(^\s*\(.{0,3}\)[^\n]+\n*)+/gm, function(match, p) {
         var choices = '';
         var shuffle = false;
         var options = match.split('\n');
         for(var i = 0; i < options.length; i++) {
           if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
-            var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
-            var correct = /x/i.test(inparens);
-            var fixed = '';
-            if(/@/.test(inparens)) {
-              fixed = ' fixed="true"';
+              var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
+              if(value) {
+              var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
+              var correct = /x/i.test(inparens);
+              var fixed = '';
+              if(/@/.test(inparens)) {
+                fixed = ' fixed="true"';
+              }
+              if(/!/.test(inparens)) {
+                shuffle = true;
+              }
+              choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
             }
-            if(/!/.test(inparens)) {
-              shuffle = true;
-            }
-            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
           }
         }
         var result = '<multiplechoiceresponse>\n';
@@ -237,6 +290,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         result += '</multiplechoiceresponse>\n\n';
         return result;
       });
+
+
+
+
+
+
+
 
       // group check answers
       xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
