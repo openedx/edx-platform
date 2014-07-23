@@ -198,24 +198,45 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             peergrading_module.link_to_location
         )
 
-    def test_rewrite_reference_value_dict(self):
+    def test_rewrite_reference_value_dict_published(self):
+        """
+        Test rewriting references in ReferenceValueDict, specifically with published content.
+        """
+        self._verify_split_test_import(
+            'split_test_copy',
+            'split_test_module',
+            'split1',
+            {"0": 'sample_0', "2": 'sample_2'},
+        )
+
+    def test_rewrite_reference_value_dict_draft(self):
+        """
+        Test rewriting references in ReferenceValueDict, specifically with draft content.
+        """
+        self._verify_split_test_import(
+            'split_test_copy_with_draft',
+            'split_test_module_draft',
+            'fb34c21fe64941999eaead421a8711b8',
+            {"0": '9f0941d021414798836ef140fb5f6841', "1": '0faf29473cf1497baa33fcc828b179cd'},
+        )
+
+    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):
         module_store = modulestore()
-        target_course_id = SlashSeparatedCourseKey('testX', 'split_test_copy', 'copy_run')
+        target_course_id = SlashSeparatedCourseKey('testX', target_course_name, 'copy_run')
         import_from_xml(
             module_store,
             self.user.id,
             'common/test/data/',
-            ['split_test_module'],
+            [source_course_name],
             target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            target_course_id.make_usage_key('split_test', 'split1')
+            target_course_id.make_usage_key('split_test', split_test_name)
         )
         self.assertIsNotNone(split_test_module)
-        self.assertEqual(
-            {
-                "0": target_course_id.make_usage_key('vertical', 'sample_0'),
-                "2": target_course_id.make_usage_key('vertical', 'sample_2'),
-            },
-            split_test_module.group_id_to_child,
-        )
+
+        remapped_verticals = {
+            key: target_course_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+        }
+
+        self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)
