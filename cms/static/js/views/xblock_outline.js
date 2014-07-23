@@ -22,7 +22,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             // takes XBlockInfo as a model
 
             options: {
-                collapsedClass: 'is-collapsed'
+                collapsedClass: 'is-collapsed is-expanded'
             },
 
             templateName: 'xblock-outline',
@@ -252,7 +252,20 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 XBlockViewUtils.addXBlock(target).done(function(locator) {
                     self.onChildAdded(locator, category, event);
                 });
-            }
+            },
+
+            /**
+             * Override the default implementation to use the new is-collapsed/is-expanded classes.
+             * @param event
+             */
+            toggleExpandCollapse: function(event) {
+                var target = $(event.target);
+                // Don't propagate the event as it is possible that two views will both contain
+                // this element, e.g. clicking on the element of a child view container in a parent.
+                event.stopPropagation();
+                event.preventDefault();
+                ViewUtils.toggleExpandCollapse(target, this.options.collapsedClass);
+            },
         });
 
         return XBlockOutlineView;

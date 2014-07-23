@@ -59,7 +59,7 @@ if (statusType === 'warning') {
 }
 %>
 <% if (parentInfo) { %>
-<li class="outline-item outline-<%= xblockType %> <%= publishClasses %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
+<li class="outline-item outline-<%= xblockType %> <%= publishClasses %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : 'is-expanded' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
 
     <div class="<%= xblockType %>-header">
