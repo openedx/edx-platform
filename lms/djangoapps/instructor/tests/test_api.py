@@ -1367,7 +1367,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         # using coupon code
-        resp = self.client.post(reverse('shoppingcart.views.use_coupon'), {'coupon_code': self.coupon_code})
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         response = self.client.get(url, {})
