@@ -106,7 +106,7 @@ class CapaFactoryWithDelay(object):
             descriptor,
             system,
             DictFieldData(field_data),
-            ScopeIds(None, None, location, location),
+            ScopeIds(None, 'problem', location, location),
         )
 
         if correct:

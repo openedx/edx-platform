@@ -36,7 +36,7 @@ def instantiate_descriptor(**field_data):
     usage_key = course_key.make_usage_key('video', 'SampleProblem')
     return system.construct_xblock_from_class(
         VideoDescriptor,
-        scope_ids=ScopeIds(None, None, usage_key, usage_key),
+        scope_ids=ScopeIds(None, 'video', usage_key, usage_key),
         field_data=DictFieldData(field_data),
     )
 

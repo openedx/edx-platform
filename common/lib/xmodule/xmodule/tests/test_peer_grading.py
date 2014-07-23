@@ -326,7 +326,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         """
         Return the proper scope ids for the peer grading module.
         """
-        return ScopeIds(None, None, self.problem_location, self.problem_location)
+        return ScopeIds(None, 'peergrading', self.problem_location, self.problem_location)
 
     def _create_peer_grading_descriptor_with_linked_problem(self):
         # Initialize the peer grading module.
