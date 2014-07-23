@@ -3,6 +3,8 @@
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
+from util.date_utils import get_time_display
+import datetime
 %>
 <%page args="course" />
 <article id="${course.id.to_deprecated_string()}" class="course">
@@ -27,7 +29,12 @@ from courseware.courses import course_image_url, get_course_about_section
         <div class="bottom">
           <span class="university">${get_course_about_section(course, 'university')}</span>
           % if not course.start_date_is_still_default:
-          <span class="start-date">${course.start_date_text}</span>
+          <%
+            start_date = course.raw_start_date
+            if isinstance(start_date, datetime.datetime):
+                start_date = get_time_display(start_date, format_string="SHORT_DATE", coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+          %>
+          <span class="start-date">${start_date}</span>
           % endif
         </div>
       </section>

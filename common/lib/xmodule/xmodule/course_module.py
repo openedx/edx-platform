@@ -222,8 +222,8 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."), 
-        default="Empty", 
+        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings
     )
@@ -941,6 +941,28 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def id(self):
         """Return the course_id for this course"""
         return self.location.course_key
+
+    @property
+    def raw_start_date(self):
+        """
+        Returns the raw course start datetime object, or the advertised start.
+        """
+        def try_parse_iso_8601(text):
+            try:
+                result = Date().from_json(text)
+                if result is None:
+                    result = text.title()
+            except ValueError:
+                result = text.title()
+
+            return result
+
+        if isinstance(self.advertised_start, basestring):
+            return try_parse_iso_8601(self.advertised_start)
+        elif self.start_date_is_still_default:
+            return _('TBD')
+        else:
+            return self.advertised_start or self.start
 
     @property
     def start_date_text(self):

@@ -4,6 +4,8 @@
   from courseware.courses import course_image_url, get_course_about_section
   from django.conf import settings
   from edxmako.shortcuts import marketing_link
+  from util.date_utils import get_time_display
+  import datetime
 
   if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
@@ -209,7 +211,7 @@
           <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
         </div>
       % endif
-      
+
       <nav>
         <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>
@@ -290,7 +292,12 @@
         <ol class="important-dates">
           <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-          <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
+          <%
+            start_date = course.raw_start_date
+            if isinstance(start_date, datetime.datetime):
+                start_date = get_time_display(start_date, format_string="SHORT_DATE", coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+          %>
+          <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${start_date}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
