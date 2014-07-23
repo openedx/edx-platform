@@ -1,0 +1,161 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+% if is_staff:
+<% override_label = "On" if staff_release else "Off" %>
+<div aria-hidden="true" class="wrap-instructor-info">
+    <a class="instructor-info-action" href="#proctor_admin_${element_id}" id="proctor_admin">${_("Proctor Student Admin")}</a>
+    <a class="instructor-info-action" href="#proctor_release_${element_id}" id="proctor_override">${_("Proctor Override")}: <b>${_(override_label)}</b></a>
+</div>
+<hr/>
+
+<section aria-hidden="true" class="modal history-modal" id="proctor_admin_${element_id}" style="width:80%; left:20%; height:80%; overflow:auto;" >
+  <div class="inner-wrapper" style="color:black">
+    <header>
+      <h2>${_("Proctor Student Admin")}</h2>
+    </header>
+    <form id="proctor_${element_id}_reset_form">
+      <label for="proctor_${element_id}_student_username">${_("User:")}</label>
+      <input name="username" id="proctor_${element_id}_student_username" type="text" placeholder=""/>
+      <input name="location" type="hidden" id="proctor_${element_id}_reset_location" value="${location}"/>
+      <div class="submit">
+          <button id="proctor_${element_id}_submit" name="submit" type="submit">${_("Reset Attempts")}</button>
+      </div>
+    </form>
+    <div id="proctor_${element_id}_text" class="staff_info" style="display:block">
+    </div>
+  </div>
+</section>
+
+<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
+<script type="text/javascript">
+<% override_cmd = "disable" if staff_release else "release" %>
+proctor_override = function(){
+    $.get( "${ajax_url}/${override_cmd}", function( data ) {
+        // $("#proctor_release").html( data );
+        // procrel.set_skiperr();
+        console.log("release successful");
+        location.reload();
+    });
+}
+$('#proctor_override').click(proctor_override);
+$('#proctor_admin').leanModal();
+
+$('#proctor_${element_id}_submit').click( function() {
+    $.ajax({
+        url: '${ajax_url}/reset',
+        type: 'POST',
+        dataType: 'json',
+        data: $('#proctor_${element_id}_reset_form').serialize(),
+        success: function(data) {
+            $('#proctor_${element_id}_text').append(JSON.stringify(data));
+        }
+    });
+});
+</script>
+
+% endif
+
+% if not is_released:
+
+<div>
+    <h2>Welcome: <b>${pp.user.profile.name or pp.user}</b></h2>
+
+    <p>${name} has not been released</p>
+
+    <div id="proctor_stat_${element_id}"></div>
+
+    <p><input id="proctor_${element_id}" type="button" value="Request Access"></p>
+
+</div>
+
+<script type="text/javascript">
+procrel = (function(){
+    var el = $('#proctor_${element_id}');
+
+    var skiperr = false;
+
+    var set_skiperr = function(){ skiperr = true; }
+
+    var mkurl = function(cmd) {
+        ps = encodeURIComponent("${pp.procset_name}");
+        return "${pp.proc_url}/cmd/" + cmd + "/${pp.user.id}/" + ps;
+    }
+
+    var statel = $('#proctor_stat_${element_id}');
+
+    var setstat = function(status){
+        statel.html('<font color="green">' + status + '</font>');
+    }
+
+    var do_pp_get = function(cmd, gfun){
+        $.ajax({ url: mkurl(cmd),
+                 type: 'GET',
+		 data: { "uname": "${pp.user.username}",
+		         "name": "${pp.user.profile.name}"
+		       },
+                 xhrFields: {
+                      withCredentials: true
+                 },
+                 username: "${pp.proc_user}",
+                 password: "${pp.proc_pass}",
+                 success: gfun,
+		 dataType: "json",
+                 error: function(xhr, status, error) {
+		     if (!skiperr){
+                         alert('Error: cannot connect to server ' + status + " error: " + error);
+		     }
+                 }
+               });
+    }
+
+    var check_access = function(){
+        do_pp_get('status', function(data){
+	    console.log(data);
+	    if (data.enabled) {
+                if (interval != null) {
+                    console.log("clearing interval for check_access");
+                    clearInterval(interval);
+                }
+	        console.log("Access Granted!");
+		location.reload();
+	    }
+	});
+    }
+
+    var check_count = 0;
+
+    var interval = null;
+
+    var periodic_check = function() {
+        if (interval == null) {
+            console.log("setting interval for check_access");
+            interval = setInterval(check_access, 2000);
+        } else {
+            console.log("interval already set for check_access");
+        }
+    }
+
+    var make_request = function(){
+        check_count = 0;
+	do_pp_get('request', function(result, status, xhr){
+		     setstat(result.status);
+		     periodic_check();
+                 });
+    }
+
+    el.click(make_request);
+
+    return { "check": check_access, "make": make_request,
+             "mkurl": mkurl, "do_pp_get": do_pp_get,
+	     "set_skiperr": set_skiperr
+	   };
+
+}() );
+</script>
+
+% elif child_html is not None:
+
+${child_html}
+
+% endif

@@ -11,6 +11,9 @@ from xmodule.seq_module import SequenceDescriptor
 from xblock.fields import Scope, String, Boolean
 from xblock.fragment import Fragment
 
+from courseware import module_tree_reset
+
+
 log = logging.getLogger('mitx.' + __name__)
 
 
@@ -135,58 +138,101 @@ class ProctorModule(ProctorFields, XModule):
         """
         return [self.child_descriptor]
 
-    def not_released_html(self):
-        return Fragment(self.runtime.render_template('proctor_release.html', {
-            'element_id': self.location.html_id(),
+    def _template_ctx(self):
+        ctx = {
             'id': self.id,
-            'name': self.display_name or self.procset_name,
             'pp': self.pp,
+            'name': self.display_name or self.procset_name,
+            'element_id': self.location.html_id(),
             'location': self.location,
             'ajax_url': self.runtime.ajax_url,
             'is_staff': self.runtime.user_is_staff,
-        }))
+            'staff_release': self.staff_release,
+            'is_released': self.is_released(),
+            'child_html': None,
+        }
+        return ctx
+
+    def not_released_html(self):
+        return Fragment(self.runtime.render_template('proctor.html',
+                                                     self._template_ctx()))
 
     def student_view(self, context):
-        if not self.is_released():  # check each time we do get_html()
-            return self.not_released_html()
+        proc_ctx = self._template_ctx()
         # for sequential module, just return HTML (no ajax container)
         categories = ['sequential', 'videosequence', 'problemset', 'randomize']
         if self.child.category in categories:
-            html = self.child.render('student_view', context)
-            if self.staff_release:
-                dishtml = self.runtime.render_template(
-                    'proctor_disable.html', {
-                        'element_id': self.location.html_id(),
-                        'is_staff': self.runtime.user_is_staff,
-                        'ajax_url': self.runtime.ajax_url,
-                    })
-                html.content = dishtml + html.content
-            return html
+            proc_ctx['child_html'] = self.child.render('student_view',
+                                                       context).content
+            return Fragment(self.runtime.render_template(
+                'proctor.html', proc_ctx))
         # return ajax container, so that we can dynamically check for
         # is_released changing
-        return Fragment(self.runtime.render_template('conditional_ajax.html', {
-            'element_id': self.location.html_id(),
-            'id': self.id,
-            'ajax_url': self.runtime.ajax_url,
-            'depends': '',
-        }))
+        proc_ctx['depends'] = ''
+        return Fragment(self.runtime.render_template('conditional_ajax.html',
+                                                     proc_ctx))
 
-    def handle_ajax(self, _dispatch, _data):
-        if self.runtime.user_is_staff and _dispatch == 'release':
-            self.staff_release = True
-            return json.dumps({'html': 'staff_release successful'})
-        if self.runtime.user_is_staff and _dispatch == 'disable':
-            self.staff_release = False
-            return json.dumps({'html': 'staff_disable successful'})
+    def handle_ajax(self, dispatch, data):
+        if self.runtime.user_is_staff:
+            if dispatch == 'release':
+                self.staff_release = True
+                return json.dumps({'html': 'staff_release successful'})
+            if dispatch == 'disable':
+                self.staff_release = False
+                return json.dumps({'html': 'staff_disable successful'})
+
+            # Proctor Student Admin URLs (STAFF ONLY)
+            if dispatch == 'reset':
+                username = data.get("username")
+                return self.reset(username)
+            if dispatch == 'status':
+                return self.status()
+            # if dispatch == 'grades':
+            #     return self.grades()
 
         if not self.is_released():  # check each time we do get_html()
             html = self.not_released_html()
-            return json.dumps({'html': [html], 'message': bool(True)})
+            return json.dumps({'html': [html], 'message': True})
         html = [child.get_html() for child in self.get_display_items()]
         return json.dumps({'html': html})
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
+
+    def reset(self, username):
+        pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
+        pminfo.get_assignments_attempted_and_failed(username, do_reset=True)
+        return self.status(username)
+
+    def status(self, username):
+        try:
+            student = self.pp.user
+            pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
+            status = pminfo.get_student_status(username)
+        except Exception as err:
+            log.exception("Failed to get status for %s" % student)
+            status = {'msg': 'Error getting grades for %s' % student,
+                      'error': True, 'errstr': str(err)}
+        return json.dumps(status)
+
+    # TODO: investigate whether this is needed or not
+    #
+    # def grades(self):
+    #     student = self.pp.user
+    #     ms = modulestore()
+    #     course = ms.get_item(
+    #         'i4x://MITx/3.091r-exam/course/2013_Fall_residential_exam')
+    #     try:
+    #         gradeset = student_grades(student, request, course,
+    #                                   keep_raw_scores=False, use_offline=False)
+    #     except Exception:
+    #         log.exception("Failed to get grades for %s" % student)
+    #         return json.dumps(
+    #             {'msg': 'Error getting grades for %s' % student,
+    #              'error': True})
+    #     grades = gradeset['totaled_scores']
+    #     grades['student_id'] = student.id
+    #     return json.dumps(grades)
 
 
 class ProctorDescriptor(ProctorFields, SequenceDescriptor):
