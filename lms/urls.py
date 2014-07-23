@@ -58,8 +58,6 @@ urlpatterns = ('',  # nopep8
     url(r'^password_reset_done/$', django.contrib.auth.views.password_reset_done,
         name='auth_password_reset_done'),
 
-    url(r'^heartbeat$', include('heartbeat.urls')),
-
     url(r'^user_api/', include('user_api.urls')),
 
     url(r'^lang_pref/', include('lang_pref.urls')),
@@ -73,6 +71,11 @@ urlpatterns = ('',  # nopep8
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
+
+if settings.FEATURES.get('ENABLE_HEARTBEAT'):
+    urlpatterns += (
+        url(r'^heartbeat$', include('heartbeat.urls')),
+    )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (

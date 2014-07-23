@@ -106,6 +106,9 @@ FEATURES = {
 
     # Toggles Group Configuration editing functionality
     'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
+
+    # Simple JSON service to verify that the app is up and running.
+    'ENABLE_HEARTBEAT': True,
 }
 ENABLE_JASMINE = False
 

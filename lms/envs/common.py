@@ -259,6 +259,9 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Simple JSON service to verify that the app is up and running.
+    'ENABLE_HEARTBEAT': True,
 }
 
 # Used for A/B testing
