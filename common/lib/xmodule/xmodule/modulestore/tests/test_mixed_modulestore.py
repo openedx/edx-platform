@@ -618,13 +618,10 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(parent, self.course_locations[self.XML_COURSEID1])
 
     def verify_get_parent_locations_results(self, expected_results):
-        def branch_agnostic(location):
-            return location if location is None else location.for_branch(None)
-
         for child_location, parent_location, revision in expected_results:
             self.assertEqual(
-                branch_agnostic(parent_location),
-                branch_agnostic(self.store.get_parent_location(child_location, revision=revision))
+                parent_location,
+                self.store.get_parent_location(child_location, revision=revision)
             )
 
     @ddt.data('draft', 'split')
@@ -904,7 +901,7 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         self.assertEqual(self.user_id, block.edited_by)
         self.assertGreater(datetime.datetime.now(UTC), block.edited_on)
-
+        
     @ddt.data('draft')
     def test_create_item_populates_subtree_edited_info(self, default_ms):
         self.initdb(default_ms)
