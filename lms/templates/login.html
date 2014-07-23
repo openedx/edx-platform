@@ -54,8 +54,8 @@
           var next = u.split("next=")[1];
           if (next != undefined) {
             // if next is undefined, decodeURI returns "undefined" causing a bad redirect.
-            next = decodeURI(next); 
-	  }		
+            next = decodeURIComponent(next);
+          }
           if (next && !isExternal(next)) {
             location.href=next;
           }  else if(json.redirect_url){
