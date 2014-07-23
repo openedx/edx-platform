@@ -50,7 +50,7 @@ class DuplicateItemError(Exception):
         """
         Print info about what's duplicated
         """
-        return '{0.store}[{0.collection}] already has {0.element_id}'.format(
+        return '{0.store}[{0.collection}] already has {0.element_id!r}'.format(
             self, Exception.__str__(self, *args, **kwargs)
         )
 
