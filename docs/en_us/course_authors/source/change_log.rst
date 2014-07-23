@@ -13,6 +13,9 @@ July, 2014
 
    * - Date
      - Change
+   * - 07/23/14
+     - Added the section :ref:`Grade Ranges and Certificates` to the
+       :ref:`Establish a Grading Policy` chapter.
    * - 07/22/14
      - Added :ref:`Example Messages to Students` to the :ref:`Launch` chapter.
    * - 07/15/14
