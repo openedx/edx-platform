@@ -671,6 +671,17 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 
     @ddt.data('draft', 'split')
+    def test_create_item_populates_edited_info(self, default_ms):
+        self.initdb(default_ms)
+        block = self.store.create_item(
+            self.user_id,
+            self.course.location.version_agnostic().course_key,
+            'problem'
+        )
+        self.assertEqual(self.user_id, block.edited_by)
+        self.assertIsNotNone(self.user_id, block.edited_on)
+
+    @ddt.data('draft', 'split')
     def test_get_courses_for_wiki(self, default_ms):
         """
         Test the get_courses_for_wiki method
