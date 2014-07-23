@@ -31,7 +31,9 @@ from xmodule_django.models import CourseKeyField
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException,
+                         CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException,
+                         RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
 
 from microsite_configuration import microsite
 
@@ -326,6 +328,25 @@ class CourseRegistrationCode(models.Model):
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
 
+    @classmethod
+    @transaction.commit_on_success
+    def free_user_enrollment(cls, cart):
+        """
+        Here we enroll the user free for all courses available in shopping cart
+        """
+        cart_items = cart.orderitem_set.all().select_subclasses()
+        if cart_items:
+            for item in cart_items:
+                CourseEnrollment.enroll(cart.user, item.course_id)
+                log.info("Enrolled '{0}' in free course '{1}'"
+                         .format(cart.user.email, item.course_id))  # pylint: disable=E1101
+                item.status = 'purchased'
+                item.save()
+
+            cart.status = 'purchased'
+            cart.purchase_time = datetime.now(pytz.utc)
+            cart.save()
+
 
 class RegistrationCodeRedemption(models.Model):
     """
@@ -335,6 +356,35 @@ class RegistrationCodeRedemption(models.Model):
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
+
+    @classmethod
+    def add_reg_code_redemption(cls, course_reg_code, order):
+        """
+        add course registration code info into RegistrationCodeRedemption model
+        """
+        cart_items = order.orderitem_set.all().select_subclasses()
+
+        for item in cart_items:
+            if getattr(item, 'course_id'):
+                if item.course_id == course_reg_code.course_id:
+                    # If another account tries to use a existing registration code before the student checks out, an
+                    # error message will appear.The reg code is un-reusable.
+                    code_redemption = cls.objects.filter(registration_code=course_reg_code)
+                    if code_redemption:
+                        log.exception("Registration code '{0}' already used".format(course_reg_code.code))
+                        raise RegCodeAlreadyExistException
+
+                    code_redemption = RegistrationCodeRedemption(registration_code=course_reg_code, order=order, redeemed_by=order.user)
+                    code_redemption.save()
+                    item.list_price = item.unit_cost
+                    item.unit_cost = 0
+                    item.save()
+                    log.info("Code '{0}' is used by user {1} against order id '{2}' "
+                             .format(course_reg_code.code, order.user.username, order.id))
+                    return course_reg_code
+
+        log.warning("Course item does not exist against registration code '{0}'".format(course_reg_code.code))
+        raise ItemDoesNotExistAgainstRegCodeException
 
 
 class SoftDeleteCouponManager(models.Manager):
