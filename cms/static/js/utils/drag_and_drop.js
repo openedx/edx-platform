@@ -7,6 +7,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
             collapsedClass: "is-collapsed",
+            expandedClass: "is-expanded",
 
             /*
              * Determine information about where to drop the currently dragged
@@ -159,7 +160,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The direction the drag is moving in (negative means up, positive down).
                     dragDirection: 0
                 };
-                if (!ele.hasClass(this.collapsedClass)) {
+                if (ele.hasClass(this.expandedClass)) {
+                    ele.removeClass(this.expandedClass);
                     ele.addClass(this.collapsedClass);
                     ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
@@ -257,6 +259,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
             expandElement: function (ele) {
                 ele.removeClass(this.collapsedClass);
+                ele.addClass(this.expandedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
 
