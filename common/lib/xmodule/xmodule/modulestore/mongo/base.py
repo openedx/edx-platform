@@ -1127,6 +1127,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 }
                 self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
 
+            # update the edit info of the instantiated xblock
+            xblock.edited_on = now
+            xblock.edited_by = user_id
+            xblock.subtree_edited_on = now
+            xblock.subtree_edited_by = user_id
+            if not hasattr(xblock, 'published_date'):
+                xblock.published_date = None
+            if not hasattr(xblock, 'published_by'):
+                xblock.published_by = None
+            if isPublish:
+                xblock.published_date = now
+                xblock.published_by = user_id
+
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
             # fire signal that we've written to DB
