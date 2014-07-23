@@ -8,6 +8,7 @@ import textwrap
 import json
 from datetime import timedelta
 from webob import Request
+from mock import MagicMock, Mock
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -23,7 +24,6 @@ from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
-from opaque_keys.edx.locations import AssetLocation
 
 SRT_content = textwrap.dedent("""
         0
@@ -401,16 +401,18 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation/uk')
         self.assertDictEqual(json.loads(response.body), subs)
 
-    def test_translation_static_transcript(self):
+    def test_translation_static_transcript_xml_with_data_dirc(self):
         """
-        Set course static_asset_path and ensure we get redirected to that path
-        if it isn't found in the contentstore
+        Test id data_dir is set in XML course.
+
+        Set course data_dir and ensure we get redirected to that path
+        if it isn't found in the contentstore.
         """
-        self.course.static_asset_path = 'dummy/static'
-        self.course.save()
-        store = modulestore()
-        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
-            store.update_item(self.course, self.user.id)
+        # Simulate data_dir set in course.
+        test_modulestore = MagicMock()
+        attrs = {'get_course.return_value': Mock(data_dir='dummy/static', static_asset_path='')}
+        test_modulestore.configure_mock(**attrs)
+        self.item_descriptor.runtime.modulestore = test_modulestore
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
@@ -437,16 +439,16 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation/uk')
         self.assertEqual(response.status, '404 Not Found')
 
-    def test_xml_transcript(self):
+    def test_translation_static_transcript(self):
         """
-        Set data_dir and remove runtime modulestore to simulate an XMLModuelStore course.
-        Then run the same tests as static_asset_path run.
+        Set course static_asset_path and ensure we get redirected to that path
+        if it isn't found in the contentstore
         """
-        # Simulate XMLModuleStore xmodule
-        self.item_descriptor.data_dir = 'dummy/static'
-        del self.item_descriptor.runtime.modulestore
-
-        self.assertFalse(self.course.static_asset_path)
+        self.course.static_asset_path = 'dummy/static'
+        self.course.save()
+        store = modulestore()
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.course.id):
+            store.update_item(self.course, self.user.id)
 
         # Test youtube style en
         request = Request.blank('/translation/en?videoId=12345')
