@@ -55,7 +55,7 @@ def passed(state):
 def update_stats(sm, stat, history=False):
     if sm.grade is None:
         return
-    state = json.loads(sm.state)
+    state = json.loads(sm.state or '{}')
     if 'attempts' not in state:
         return
     if not state.get('done', False):
@@ -95,7 +95,7 @@ def compute_stats(course_id):
             if ret in ['passed', 'attempted']:
                 continue
             smhset = StudentModuleHistory.objects.filter(student_module=sm)
-            states = [json.loads(smh.state) for smh in smhset]
+            states = [json.loads(smh.state or '{}') for smh in smhset]
             okset = [passed(x) for x in states]
             attempts = [x.get('attempts', 0) for x in states]
             stat.nattempts += max(attempts)
