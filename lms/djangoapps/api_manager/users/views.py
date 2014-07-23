@@ -1,6 +1,5 @@
 """ API implementation for user-oriented interactions. """
 
-import json
 import logging
 from requests.exceptions import ConnectionError
 
@@ -15,19 +14,23 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
 
+
+from api_manager.courseware_access import get_course, get_course_child, get_course_total_score
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.utils import generate_base_uri, get_course, get_course_child, get_course_total_score
+from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer
 
 from courseware import module_render
-from courseware.courses import get_course
 from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
+
+
+
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from user_api.models import UserPreference
@@ -638,7 +641,7 @@ class UsersCoursesList(SecureAPIView):
                     "id": unicode(course_key),
                     "uri": '{}/{}'.format(base_uri, unicode(course_key)),
                     "is_active": enrollment.is_active,
-                    "name": course_descriptor.display_name
+                    "name": course_descriptor.display_name,
                     "start": getattr(course_descriptor, 'start', None),
                     "end": getattr(course_descriptor, 'end', None)
                 }
@@ -701,6 +704,9 @@ class UsersCoursesDetail(SecureAPIView):
             if not content_position:
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             response_data['position'] = content_position
+
+
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, user_id, course_id):
@@ -711,11 +717,8 @@ class UsersCoursesDetail(SecureAPIView):
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
-            course_descriptor = get_course(course_id, depth=2)
+            course_descriptor, course_key, course_content = get_course(request, user, course_id, depth=2)
         except (ObjectDoesNotExist, ValueError):
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
-        if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not CourseEnrollment.is_enrolled(user, course_key):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
@@ -723,16 +726,16 @@ class UsersCoursesDetail(SecureAPIView):
         response_data['course_id'] = course_id
         response_data['uri'] = base_uri
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course_id,
+            course_key,
             user,
             course_descriptor,
-            depth=2)  # depth=2 should load submodules down to the 'vertical' tier
+            depth=2)
         course_module = module_render.get_module_for_descriptor(
             user,
             request,
             course_descriptor,
             field_data_cache,
-            course_id)
+            course_key)
         response_data['position'] = course_module.position
         response_data['position_tree'] = {}
         parent_module = course_module
@@ -740,13 +743,13 @@ class UsersCoursesDetail(SecureAPIView):
             current_child_descriptor = get_current_child(parent_module)
             if current_child_descriptor:
                 response_data['position_tree'][current_child_descriptor.category] = {}
-                response_data['position_tree'][current_child_descriptor.category]['id'] = current_child_descriptor.id
+                response_data['position_tree'][current_child_descriptor.category]['id'] = unicode(current_child_descriptor.scope_ids.usage_id)
                 parent_module = module_render.get_module(
                     user,
                     request,
-                    current_child_descriptor.id,
+                    current_child_descriptor.scope_ids.usage_id,
                     field_data_cache,
-                    course_id
+                    course_key
                 )
             else:
                 parent_module = None
@@ -803,7 +806,7 @@ class UsersCoursesGradesDetail(SecureAPIView):
         grading_policy = course_descriptor.grading_policy
 
         queryset = StudentModule.objects.filter(
-            course_id__exact=course_id,
+            course_id__exact=course_key,
             max_grade__isnull=False,
             max_grade__gt=0
         )

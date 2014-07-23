@@ -23,11 +23,12 @@ from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 
+from api_manager.courseware_access import get_course, get_course_child
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
-from api_manager.utils import generate_base_uri, get_course, get_course_child
+from api_manager.utils import generate_base_uri
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 
@@ -1326,7 +1327,7 @@ class CourseModuleCompletionList(SecureListAPIView):
 
         completion, created = CourseModuleCompletion.objects.get_or_create(user_id=user_id,
                                                                            course_id=course_key,
-                                                                           content_id=existing_content.location
+                                                                           content_id=existing_content.location,
                                                                            stage=stage)
         serializer = CourseModuleCompletionSerializer(completion)
         if created:
@@ -1570,9 +1571,8 @@ class CoursesWorkgroupsList(SecureListAPIView):
 
     def get_queryset(self):
         course_id = self.kwargs['course_id']
-        try:
-            get_course(course_id)
-        except ValueError:
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
             raise Http404
 
         queryset = Workgroup.objects.filter(project__course_id=course_id)
@@ -1617,7 +1617,10 @@ class CoursesCitiesMetrics(SecureListAPIView):
         course_id = self.kwargs['course_id']
         city = self.request.QUERY_PARAMS.get('city', None)
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
-        queryset = CourseEnrollment.users_enrolled_in(course_id)
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
+        queryset = CourseEnrollment.users_enrolled_in(course_key)
         if city:
             city = city.split(',')[:upper_bound]
             q_list = [Q(profile__city__iexact=item.strip()) for item in city]

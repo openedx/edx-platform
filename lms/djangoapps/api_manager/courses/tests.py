@@ -3,6 +3,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
+from datetime import datetime
 import json
 import uuid
 from random import randint
@@ -48,8 +49,8 @@ class CoursesApiTests(TestCase):
         self.attempts = 3
 
         self.course = CourseFactory.create(
-            start="2014-06-16T14:30:00Z",
-            end="2015-01-16T14:30:00Z"
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16)
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -57,7 +58,7 @@ class CoursesApiTests(TestCase):
             category="chapter",
             parent_location=self.course.location,
             data=self.test_data,
-            due="2014-05-16T14:30:00Z",
+            due=datetime(2014, 5, 16, 14, 30),
             display_name="Overview"
         )
 
@@ -254,8 +255,8 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['id'], self.test_course_id)
         self.assertEqual(response.data['name'], self.test_course_name)
-        self.assertEqual(response.data['start'], self.course.start)
-        self.assertEqual(response.data['end'], self.course.end)
+        self.assertEqual(datetime.strftime(response.data['start'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.start, '%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(datetime.strftime(response.data['end'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.end, '%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response.data['number'], self.test_course_number)
         self.assertEqual(response.data['org'], self.test_course_org)
         confirm_uri = self.test_server_prefix + test_uri
@@ -1359,10 +1360,10 @@ class CoursesApiTests(TestCase):
             )
             content_id = unicode(local_content.scope_ids.usage_id)
             if i < 25:
-                content_id = self.course_content.id + str(i)
+                content_id = unicode(self.course_content.scope_ids.usage_id) + str(i)
                 stage = None
             else:
-                content_id = self.course_content.id
+                content_id = unicode(self.course_content.scope_ids.usage_id)
                 stage = 'Last'
             completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': stage}
             response = self.do_post(completion_uri, completions_data)
