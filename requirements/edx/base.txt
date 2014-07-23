@@ -79,6 +79,9 @@ xmltodict==0.4.1
 django-ratelimit-backend==0.6
 unicodecsv==0.9.4
 
+# used for Paypal payments
+paypalrestsdk==1.2.1
+
 # Used for development operation
 watchdog==0.7.1
 
