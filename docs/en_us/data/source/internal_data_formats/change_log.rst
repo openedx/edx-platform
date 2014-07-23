@@ -11,6 +11,12 @@ Change Log
 
    * - Date
      - Change
+   * - 08/01/14
+     - Added the :ref:`Package` chapter with information to help data czars
+       locate and download data package files.
+   * - 07/10/14
+     - Added the :ref:`Getting_Credentials_Data_Czar` chapter with information
+       to help new data czars set up credentials for secure data transfers.
    * - 06/27/14
      - Made a correction to the ``edx.forum.searched`` event name in the
        :ref:`Tracking Logs` chapter.
