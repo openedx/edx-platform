@@ -1,3 +1,4 @@
+import sys
 import json
 import logging
 import requests
@@ -11,7 +12,13 @@ from xmodule.seq_module import SequenceDescriptor
 from xblock.fields import Scope, String, Boolean
 from xblock.fragment import Fragment
 
-from courseware import module_tree_reset
+try:
+    from courseware import module_tree_reset
+except ImportError:
+    # TODO: this is an ugly hack to get around courseware import error during
+    # static asset generation. fix this later some how
+    if 'xmodule_assets' not in ' '.join(sys.argv):
+        raise
 
 
 log = logging.getLogger('mitx.' + __name__)
