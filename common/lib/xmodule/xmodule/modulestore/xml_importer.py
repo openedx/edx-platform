@@ -192,72 +192,66 @@ def import_from_xml(
                 if verbose:
                     log.debug("Scanning {0} for course module...".format(course_key))
 
-                # Quick scan to get course module as we need some info from there.
+                # Import the course module first as we need some info from there.
                 # Also we need to make sure that the course module is committed
                 # first into the store
-                for module in xml_module_store.modules[course_key].itervalues():
-                    if module.scope_ids.block_type == 'course':
-                        course_data_path = path(data_dir) / module.data_dir
+                course_from_xml = xml_module_store.get_course(course_key)
 
-                        log.debug(u'======> IMPORTING course {course_key}'.format(
-                            course_key=course_key,
-                        ))
+                course_data_path = path(data_dir) / course_from_xml.data_dir
 
-                        if not do_import_static:
-                            # for old-style xblock where this was actually linked to kvs
-                            module.static_asset_path = module.data_dir
-                            module.save()
-                            log.debug('course static_asset_path={path}'.format(
-                                path=module.static_asset_path
-                            ))
+                log.debug(u'======> IMPORTING course {course_key}'.format(
+                    course_key=course_key,
+                ))
 
-                        log.debug('course data_dir={0}'.format(module.data_dir))
+                if not do_import_static:
+                    # for old-style xblock where this was actually linked to kvs
+                    course_from_xml.static_asset_path = course_from_xml.data_dir
+                    course_from_xml.save()
+                    log.debug('course static_asset_path={path}'.format(
+                        path=course_from_xml.static_asset_path
+                    ))
 
-                        course = _import_module_and_update_references(
-                            module, store, user_id,
-                            course_key,
-                            dest_course_id,
-                            revision=ModuleStoreEnum.RevisionOption.published_only,
-                            do_import_static=do_import_static
+                log.debug('course data_dir={0}'.format(course_from_xml.data_dir))
+
+                dest_course = store.get_course(dest_course_id)
+                _copy_fields(course_key, dest_course_id, course_from_xml, dest_course, do_import_static=do_import_static)
+
+                for entry in dest_course.pdf_textbooks:
+                    for chapter in entry.get('chapters', []):
+                        if StaticContent.is_c4x_path(chapter.get('url', '')):
+                            asset_key = StaticContent.get_location_from_path(chapter['url'])
+                            chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+
+                # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
+                # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
+                # values then remap it so that the wiki does not point to the old wiki.
+                if course_key != dest_course.id:
+                    original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
+                        course_key.org,
+                        course_key.course,
+                        course_key.run
+                    )
+                    if dest_course.wiki_slug == original_unique_wiki_slug or dest_course.wiki_slug == course_key.course:
+                        dest_course.wiki_slug = u'{0}.{1}.{2}'.format(
+                            dest_course.id.org,
+                            dest_course.id.course,
+                            dest_course.id.run,
                         )
 
-                        for entry in course.pdf_textbooks:
-                            for chapter in entry.get('chapters', []):
-                                if StaticContent.is_c4x_path(chapter.get('url', '')):
-                                    asset_key = StaticContent.get_location_from_path(chapter['url'])
-                                    chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+                # cdodge: more hacks (what else). Seems like we have a
+                # problem when importing a course (like 6.002) which
+                # does not have any tabs defined in the policy file.
+                # The import goes fine and then displays fine in LMS,
+                # but if someone tries to add a new tab in the CMS, then
+                # the LMS barfs because it expects that -- if there are
+                # *any* tabs -- then there at least needs to be
+                # some predefined ones
+                if dest_course.tabs is None or len(dest_course.tabs) == 0:
+                    CourseTabList.initialize_default(dest_course)
 
-                        # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
-                        # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
-                        # values then remap it so that the wiki does not point to the old wiki.
-                        if course_key != course.id:
-                            original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
-                                course_key.org,
-                                course_key.course,
-                                course_key.run
-                            )
-                            if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
-                                course.wiki_slug = u'{0}.{1}.{2}'.format(
-                                    course.id.org,
-                                    course.id.course,
-                                    course.id.run,
-                                )
+                store.update_item(dest_course, user_id)
 
-                        # cdodge: more hacks (what else). Seems like we have a
-                        # problem when importing a course (like 6.002) which
-                        # does not have any tabs defined in the policy file.
-                        # The import goes fine and then displays fine in LMS,
-                        # but if someone tries to add a new tab in the CMS, then
-                        # the LMS barfs because it expects that -- if there are
-                        # *any* tabs -- then there at least needs to be
-                        # some predefined ones
-                        if course.tabs is None or len(course.tabs) == 0:
-                            CourseTabList.initialize_default(course)
-
-                        store.update_item(course, user_id)
-
-                        course_items.append(course)
-                        break
+                course_items.append(dest_course)
 
                 # TODO: shouldn't this raise an exception if course wasn't found?
 
@@ -312,7 +306,7 @@ def import_from_xml(
                         dest_course_id,
                         revision=ModuleStoreEnum.RevisionOption.published_only,
                         do_import_static=do_import_static,
-                        runtime=course.runtime
+                        runtime=dest_course.runtime
                     )
 
                 # now import any DRAFT items
@@ -323,10 +317,67 @@ def import_from_xml(
                     course_data_path,
                     course_key,
                     dest_course_id,
-                    course.runtime
+                    dest_course.runtime
                 )
 
     return xml_module_store, course_items
+
+
+def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, do_import_static=True):
+    """
+    Copy fields from source_block to dest_block, mapping any ReferenceFields from
+    source_course_key to dest_course_key
+    """
+    def _convert_reference_fields_to_new_namespace(reference):
+        """
+        Convert a reference to the new namespace, but only
+        if the original namespace matched the original course.
+
+        Otherwise, returns the input value.
+        """
+        assert isinstance(reference, UsageKey)
+        if source_course_key == reference.course_key:
+            return reference.map_into_course(dest_course_key)
+        else:
+            return reference
+
+    for field_name, field in source_block.fields.iteritems():
+        if field.is_set_on(source_block):
+            if isinstance(field, Reference):
+                new_ref = _convert_reference_fields_to_new_namespace(field.read_from(source_block))
+                field.write_to(dest_block, new_ref)
+            elif isinstance(field, ReferenceList):
+                references = field.read_from(source_block)
+                new_references = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
+                field.write_to(dest_block, new_references)
+            elif isinstance(field, ReferenceValueDict):
+                reference_dict = field.read_from(source_block)
+                new_reference_dict = {
+                    key: _convert_reference_fields_to_new_namespace(reference)
+                    for key, reference
+                    in reference_dict.items()
+                }
+                field.write_to(dest_block, new_reference_dict)
+            elif field_name == 'xml_attributes':
+                value = field.read_from(source_block)
+                # remove any export/import only xml_attributes
+                # which are used to wire together draft imports
+                if 'parent_sequential_url' in value:
+                    del value['parent_sequential_url']
+
+                if 'index_in_children_list' in value:
+                    del value['index_in_children_list']
+                field.write_to(dest_block, value)
+            elif do_import_static and field_name == 'data' and isinstance(field, xblock.fields.String):
+                # we want to convert all 'non-portable' links in the module_data
+                # (if it is a string) to portable strings (e.g. /static/)
+                field.write_to(dest_block, rewrite_nonportable_content_links(
+                    source_course_key,
+                    dest_course_key,
+                    field.read_from(source_block)
+                ))
+            else:
+                field.write_to(dest_block, field.read_from(source_block))
 
 
 def _import_module_and_update_references(
@@ -336,15 +387,6 @@ def _import_module_and_update_references(
         do_import_static=True, runtime=None):
 
     logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
-
-    if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
-        # we want to convert all 'non-portable' links in the module_data
-        # (if it is a string) to portable strings (e.g. /static/)
-        module.data = rewrite_nonportable_content_links(
-            source_course_id,
-            dest_course_id,
-            module.data
-        )
 
     # Move the module to a new course
     block_type = module.scope_ids.block_type
@@ -356,50 +398,7 @@ def _import_module_and_update_references(
         block_id,
         runtime=runtime
     )
-
-    def _convert_reference_fields_to_new_namespace(reference):
-        """
-        Convert a reference to the new namespace, but only
-        if the original namespace matched the original course.
-
-        Otherwise, returns the input value.
-        """
-        assert isinstance(reference, UsageKey)
-        if source_course_id == reference.course_key:
-            return reference.map_into_course(dest_course_id)
-        else:
-            return reference
-
-    for field_name, field in module.fields.iteritems():
-        if field.is_set_on(module):
-            if isinstance(field, Reference):
-                new_ref = _convert_reference_fields_to_new_namespace(getattr(module, field_name))
-                setattr(new_module, field_name, new_ref)
-            elif isinstance(field, ReferenceList):
-                references = getattr(module, field_name)
-                new_references = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
-                setattr(new_module, field_name, new_references)
-            elif isinstance(field, ReferenceValueDict):
-                reference_dict = getattr(module, field_name)
-                new_reference_dict = {
-                    key: _convert_reference_fields_to_new_namespace(reference)
-                    for key, reference
-                    in reference_dict.items()
-                }
-                setattr(new_module, field_name, new_reference_dict)
-            elif field_name == 'xml_attributes':
-                value = getattr(module, field_name)
-                # remove any export/import only xml_attributes
-                # which are used to wire together draft imports
-                if 'parent_sequential_url' in value:
-                    del value['parent_sequential_url']
-
-                if 'index_in_children_list' in value:
-                    del value['index_in_children_list']
-                setattr(new_module, field_name, value)
-            else:
-                setattr(new_module, field_name, getattr(module, field_name))
-
+    _copy_fields(source_course_id, dest_course_id, module, new_module, do_import_static=do_import_static)
     return store.update_item(new_module, user_id, revision=revision, allow_not_found=True)
 
 
