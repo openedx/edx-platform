@@ -60,6 +60,12 @@ DEFAULT_CONFIGURATION = """
 
 
 class GraphicalSliderToolFields(object):
+    display_name = String(
+        display_name="Display Name",
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="Graphic slider tool",
+    )
     data = String(
         help="Html contents to display for this module",
         default='<render>{}</render><configuration>{}</configuration>'.format(
