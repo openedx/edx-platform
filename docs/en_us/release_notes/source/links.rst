@@ -117,6 +117,7 @@
 
 .. _Establishing a Grading Policy: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/establish_grading_policy.html
 
+.. _Grade Ranges and Certificates: http://edx-partner-course-staff.readthedocs.org/en/latest/building_course/establish_grading_policy.html#grade-ranges-and-certificates
 
 .. _Additional transcripts: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#additional-transcripts
 
