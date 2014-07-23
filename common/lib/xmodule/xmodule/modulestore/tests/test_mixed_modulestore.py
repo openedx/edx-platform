@@ -4,6 +4,8 @@ import ddt
 from importlib import import_module
 from collections import namedtuple
 import unittest
+import datetime
+from pytz import UTC
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
@@ -664,6 +666,28 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
+
+    @ddt.data('draft', 'split')
+    def test_create_item_populates_edited_info(self, default_ms):
+        self.initdb(default_ms)
+        block = self.store.create_item(
+            self.user_id,
+            self.course.location.version_agnostic().course_key,
+            'problem'
+        )
+        self.assertEqual(self.user_id, block.edited_by)
+        self.assertGreater(datetime.datetime.now(UTC), block.edited_on)
+
+    @ddt.data('draft')
+    def test_create_item_populates_subtree_edited_info(self, default_ms):
+        self.initdb(default_ms)
+        block = self.store.create_item(
+            self.user_id,
+            self.course.location.version_agnostic().course_key,
+            'problem'
+        )
+        self.assertEqual(self.user_id, block.subtree_edited_by)
+        self.assertGreater(datetime.datetime.now(UTC), block.subtree_edited_on)
 
     @ddt.data('draft', 'split')
     def test_get_courses_for_wiki(self, default_ms):
