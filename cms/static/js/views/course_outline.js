@@ -9,13 +9,19 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils",
-        "js/models/xblock_outline_info"],
-    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo) {
+        "js/models/xblock_outline_info", "js/utils/drag_and_drop" ],
+    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, ContentDragger) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
 
             templateName: 'course-outline',
+
+            render: function() {
+                var renderResult = XBlockOutlineView.prototype.render.call(this);
+                this.makeContentDraggable(this.$el);
+                return renderResult;
+            },
 
             shouldExpandChildren: function() {
                 // Expand the children if this xblock's locator is in the initially expanded state
@@ -75,6 +81,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 viewState = viewState || {};
                 viewState.expanded_locators = expandedLocators.concat(viewState.expanded_locators || []);
                 view.initialState = viewState;
+                this.makeContentDraggable(view.$el);
                 return view.model.fetch({});
             },
 
@@ -137,6 +144,36 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     expanded_locators: [ locator ],
                     scroll_offset: scrollOffset || 0
                 };
+            },
+
+            makeContentDraggable: function(el) {
+                if (el.hasClass("outline-section")) {
+                    ContentDragger.makeDraggable(
+                        '.outline-section',
+                        '.section-drag-handle',
+                        'ol.list-sections',
+                        'article.outline',
+                        el
+                    );
+                }
+                else if (el.hasClass("outline-subsection")) {
+                    ContentDragger.makeDraggable(
+                        '.outline-subsection',
+                        '.subsection-drag-handle',
+                        'ol.list-subsections',
+                        'li.outline-section',
+                        el
+                    );
+                }
+                else if (el.hasClass("outline-unit")) {
+                    ContentDragger.makeDraggable(
+                        '.outline-unit',
+                        '.unit-drag-handle',
+                        'ol.list-units',
+                        'li.outline-subsection',
+                        el
+                    );
+                }
             }
         });
 

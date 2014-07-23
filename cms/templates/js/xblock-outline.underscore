@@ -29,11 +29,6 @@
                             <span class="sr"><%= gettext('Delete') %></span>
                         </a>
                     </li>
-                    <li class="actions-item drag">
-                        <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle">
-                            <span class="sr"><%= gettext('Drag to reorder') %></span>
-                        </span>
-                    </li>
                 </ul>
             </div>
         </div>
