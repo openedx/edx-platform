@@ -254,7 +254,10 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             pointerInBounds: function (pointer, ele) {
-                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.width();
+//                console.log("pointer.clientX " + pointer.clientX);
+//                console.log("ele.offset().left " + ele.offset().left);
+//                console.log("ele.outerWidth() " + ele.outerWidth());
+                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.outerWidth();
             },
 
             expandElement: function (ele) {
