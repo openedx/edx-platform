@@ -40,6 +40,14 @@ class ItemDoesNotExistAgainstCouponException(InvalidCartItem):
     pass
 
 
+class RegCodeAlreadyExistException(InvalidCartItem):
+    pass
+
+
+class ItemDoesNotExistAgainstRegCodeException(InvalidCartItem):
+    pass
+
+
 class ReportException(Exception):
     pass
 
