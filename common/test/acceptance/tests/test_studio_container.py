@@ -340,9 +340,9 @@ class DeleteComponentTest(NestedVerticalTest):
     """
     __test__ = True
 
-    def delete_and_verify(self, source_index, expected_ordering):
+    def delete_and_verify(self, group_index, section_index, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.delete(source_index),
+            lambda (container): container.delete(group_index, section_index),
             expected_ordering
         )
 
@@ -352,9 +352,8 @@ class DeleteComponentTest(NestedVerticalTest):
                              {self.group_b: [self.group_b_item_1, self.group_b_item_2]},
                              {self.group_empty: []}]
 
-        # Group A itself has a delete icon now, so item_1 is index 1 instead of 0.
-        group_a_item_1_delete_index = 1
-        self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
+        # Delete the first item in the first visible group
+        self.delete_and_verify(0, 0, expected_ordering)
 
 
 class EditContainerTest(NestedVerticalTest):

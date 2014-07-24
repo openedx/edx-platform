@@ -37,15 +37,19 @@ class ContainerPage(PageObject):
     def is_browser_on_page(self):
 
         def _is_finished_loading():
-            # Wait until all components have been loaded
-            is_done = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results) == len(
-                self.q(css='{} .xblock'.format(XBlockWrapper.BODY_SELECTOR)).results)
+            # Wait until all components have been loaded.
+            # See common/static/coffee/src/xblock/core.coffee which adds the
+            # class "xblock-initialized" at the end of initializeBlock
+            num_wrappers = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results)
+            num_xblocks_init = len(self.q(css='{} .xblock.xblock-initialized'.format(XBlockWrapper.BODY_SELECTOR)).results)
+            is_done = num_wrappers == num_xblocks_init
             return (is_done, is_done)
 
         # First make sure that an element with the view-container class is present on the page,
-        # and then wait to make sure that the xblocks are all there.
+        # and then wait for the loading spinner to go away and all the xblocks to be initialized.
         return (
             self.q(css='body.view-container').present and
+            self.q(css='div.ui-loading.is-hidden').present and
             Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
@@ -100,14 +104,23 @@ class ContainerPage(PageObject):
         """
         click_css(self, 'a.duplicate-button', source_index)
 
-    def delete(self, source_index):
+    def delete(self, group_index=0, xblock_index=0):
         """
-        Delete the item with index source_index (based on vertical placement in page).
-        Only visible items are counted in the source_index.
-        The index of the first item is 0.
+        Delete the item with specified group and xblock indices (based on vertical placement in page).
+        Note:
+            Only visible items are counted.
+            The index of the first item is 0.
         """
+        # For the group index css, add 1 because nth-of-type is 1 based, and 1 more because
+        # there is a hidden div.wrapper-group, before Active Groups and Inactive Groups
+        # For the xblock index css, add 1 because nth-of-type is 1 based.
+        css = 'div.wrapper-groups:nth-of-type({}) section.wrapper-xblock:nth-of-type({}) a.delete-button'.format(
+            group_index + 2,
+            xblock_index + 1
+        )
+
         # Click the delete button
-        click_css(self, 'a.delete-button', source_index, require_notification=False)
+        click_css(self, css, 0, require_notification=False)
 
         # Wait for the warning prompt to appear
         self.wait_for_element_visibility('#prompt-warning', 'Deletion warning prompt is visible')

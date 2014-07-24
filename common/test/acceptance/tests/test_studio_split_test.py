@@ -170,9 +170,9 @@ class SplitTest(ContainerBase, SplitTestMixin):
         """
         container = self.create_poorly_configured_split_instance()
 
-        # The inactive group is the 2nd group, but it is the first one
-        # with a visible delete button, so use index 0
-        container.delete(0)
+        # The inactive group is the second (beta) group,
+        # the xblock is the first one in that group.
+        container.delete(group_index=1, xblock_index=0)
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
