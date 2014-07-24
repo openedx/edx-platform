@@ -25,15 +25,18 @@
 
 // ====================
 
-// needed to override ui-window styling for dragging state (outline selectors get too specific)
-.courseware-section.is-dragging {
-    box-shadow: 0 1px 2px 0 $shadow-d1 !important;
-    border: 1px solid $gray-d3 !important;
-}
+// overriding outline styling for general drag and drop cases
+.outline-section, .outline-subsection {
 
-.courseware-section.is-dragging.valid-drop {
-  border-color: $blue-s1 !important;
-  box-shadow: 0 1px 2px 0 $blue-t2 !important;
+  // STATE: is dragging
+  &.is-dragging {
+    border-color: $gray-d3;
+  }
+
+  // STATE: is dragging + valid drop
+  &.valid-drop {
+    border-color: $ui-action-primary-color-focus;
+  }
 }
 
 // ====================
