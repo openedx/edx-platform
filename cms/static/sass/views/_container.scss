@@ -99,16 +99,23 @@
     .bit-publishing {
       @extend %bar-module;
 
-      &.published,
-      &.is-published {
+      // CASE: content is ready to be made live
+      &.is-ready {
         @extend %bar-module-green;
       }
 
+      // CASE: content is live
+      &.is-live {
+        @extend %bar-module-blue;
+      }
+
+      // CASE: content is draft
       &.draft ,
       &.is-draft {
         @extend %bar-module-yellow;
       }
 
+      // CASE: content is staff only
       &.staff-only,
       &.is-staff-only {
         @extend %bar-module-black;
