@@ -36,7 +36,7 @@
                     <article class="outline" data-locator="mock-course" data-course-key="slashes:MockCourse">
                         <div class="no-content add-xblock-component">
                             <p>You haven't added any content to this course yet.
-                                <a href="#" class="add-button" data-category="chapter" data-parent="mock-course" data-default-name="Section">
+                                <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section">
                                     <i class="icon-plus"></i>Add Section
                                 </a>
                             </p>

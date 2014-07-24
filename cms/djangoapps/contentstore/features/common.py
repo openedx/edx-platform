@@ -203,7 +203,7 @@ def create_a_course():
 
 
 def add_section():
-    world.css_click('.course-outline .add-button')
+    world.css_click('.outline .button-new')
     assert_true(world.is_css_present('.outline-section .xblock-field-value'))
 
 
@@ -241,7 +241,7 @@ def create_unit_from_course_outline():
     The end result is the page where the user is editing the new unit.
     """
     css_selectors = [
-        '.outline-subsection .expand-collapse', '.outline-subsection .add-button'
+        '.outline-subsection .expand-collapse', '.outline-subsection .button-new'
     ]
     for selector in css_selectors:
         world.css_click(selector)
