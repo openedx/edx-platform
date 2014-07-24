@@ -1,6 +1,3 @@
-$ ->
-  new TooltipManager
-
 class @TooltipManager
   constructor: () ->
     @$body = $('body')
@@ -45,3 +42,8 @@ class @TooltipManager
   hideTooltip: (e) =>
     @$tooltip.hide().css('opacity', 0)
     clearTimeout(@tooltipTimer)
+
+# Move initialization at the bottom to make sure that TooltipManager is already
+# assigned to the Global object.
+$ ->
+  new TooltipManager

@@ -172,11 +172,21 @@
 
             .action {
               display: inline-block;
+              vertical-align: middle;
               margin-right: ($baseline/4);
 
               .edit {
                 @include blue-button;
                 @extend %t-action4;
+              }
+
+              .delete {
+                @extend %ui-btn-non;
+
+                &.is-disabled {
+                  background-color: $gray-l3;
+                  color: $gray-l6;
+                }
               }
             }
           }
@@ -199,255 +209,264 @@
         }
       }
 
-      &:hover .wrapper-group-configuration .actions {
-        opacity: 1.0;
-      }
-    }
+      .group-configuration-edit {
+        @include box-sizing(border-box);
+        border-radius: 2px;
+        width: 100%;
+        background: $white;
 
-    .group-configuration-edit {
-      @include box-sizing(border-box);
-      border-radius: 2px;
-      width: 100%;
-      background: $white;
+        .wrapper-form {
+          padding: $baseline ($baseline*1.5);
+        }
 
-      .wrapper-form {
-        padding: $baseline ($baseline*1.5);
-      }
+        .tip {
+          @extend %t-copy-sub2;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l3;
+        }
 
-      .tip {
-        @extend %t-copy-sub2;
-        @include transition(color, 0.15s, ease-in-out);
-        display: block;
-        margin-top: ($baseline/4);
-        color: $gray-l3;
-      }
+        .is-focused .tip{
+          color: $gray;
+        }
 
-      .is-focused .tip{
-        color: $gray;
-      }
+        .actions {
+          box-shadow: inset 0 1px 2px $shadow;
+          border-top: 1px solid $gray-l1;
+          padding: ($baseline*0.75) $baseline;
+          background: $gray-l6;
 
-      .actions {
-        box-shadow: inset 0 1px 2px $shadow;
-        border-top: 1px solid $gray-l1;
-        padding: ($baseline*0.75) $baseline;
-        background: $gray-l6;
+          .action {
+            margin-right: ($baseline/4);
 
-        .action {
-          margin-right: ($baseline/4);
+            &:last-child {
+              margin-right: 0;
+            }
+          }
 
-          &:last-child {
-            margin-right: 0;
+          // add a group is below with groups styling
+          .action-primary {
+            @include blue-button;
+            @extend %t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+          .action-secondary {
+            @include grey-button;
+            @extend %t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+          .wrapper-delete-button {
+            float: right;
+            padding: ($baseline/4) ($baseline/2);
+
+            .is-disabled {
+              color: $gray-l3;
+            }
           }
         }
 
-        // add a group is below with groups styling
-        .action-primary {
-          @include blue-button;
-          @extend %t-action2;
-          @include transition(all .15s);
-          display: inline-block;
-          padding: ($baseline/5) $baseline;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
+        .copy {
+          @extend %t-copy-sub2;
+          margin: ($baseline) 0 ($baseline/2) 0;
+          color: $gray;
 
-        .action-secondary {
-          @include grey-button;
-          @extend %t-action2;
-          @include transition(all .15s);
-          display: inline-block;
-          padding: ($baseline/5) $baseline;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-      }
-
-      .copy {
-        @extend %t-copy-sub2;
-        margin: ($baseline) 0 ($baseline/2) 0;
-        color: $gray;
-
-        strong {
-          font-weight: 600;
-        }
-      }
-
-      .groups-fields,
-      .group-configuration-fields {
-        @extend %cont-no-list;
-
-        .field {
-          margin: 0 0 ($baseline*0.75) 0;
-
-          &:last-child {
-            margin-bottom: 0;
+          strong {
+            font-weight: 600;
           }
+        }
 
-          &.required {
+        .groups-fields,
+        .group-configuration-fields {
+          @extend %cont-no-list;
 
-            label {
-              font-weight: 600;
+          .field {
+            margin: 0 0 ($baseline*0.75) 0;
+
+            &:last-child {
+              margin-bottom: 0;
             }
 
-            label:after {
+            &.required {
+
+              label {
+                font-weight: 600;
+              }
+
+              label:after {
+                margin-left: ($baseline/4);
+                content: "*";
+              }
+            }
+
+            label, input, textarea {
+              display: block;
+            }
+
+            textarea {
+              resize: vertical;
+            }
+
+            label {
+              @extend %t-copy-sub1;
+              @include transition(color, 0.15s, ease-in-out);
+              margin: 0 0 ($baseline/4) 0;
+
+              &.is-focused {
+                color: $blue;
+              }
+            }
+
+            //this section is borrowed from _account.scss - we should clean up and unify later
+            input, textarea {
+              @extend %t-copy-base;
+              height: 100%;
+              width: 100%;
+              padding: ($baseline/2);
+
+              &.long {
+                width: 100%;
+              }
+
+              &.short {
+                width: 25%;
+              }
+
+              ::-webkit-input-placeholder {
+                 color: $gray-l4;
+              }
+
+              :-moz-placeholder {
+                 color: $gray-l3;
+              }
+
+              ::-moz-placeholder {
+                 color: $gray-l3;
+              }
+
+              :-ms-input-placeholder {
+                 color: $gray-l3;
+              }
+
+              &:focus {
+                + .tip {
+                  color: $gray;
+                }
+              }
+            }
+
+            &.error {
+                label {
+                  color: $red;
+                }
+
+                input {
+                  border-color: $red;
+                }
+            }
+
+            &.add-group-configuration-name label {
+              @extend %t-title5;
+              display: inline-block;
+              width: 50%;
+              padding-right: 5%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              vertical-align: bottom;
+            }
+
+            .group-configuration-id {
+              display: inline-block;
+              width: 45%;
+              text-align: right;
+              vertical-align: top;
+              color: $gray-l1;
+
+              .group-configuration-value {
+                font-weight: 600;
+                white-space: nowrap;
+                margin-left: ($baseline*0.5);
+              }
+            }
+
+            &.group-allocation {
+              color: $gray-l1;
+            }
+          }
+
+          label.required {
+            font-weight: 600;
+
+            &:after {
               margin-left: ($baseline/4);
               content: "*";
             }
           }
 
-          label, input, textarea {
-            display: block;
-          }
+          .field-group {
+            @include clearfix();
+            margin: 0 0 ($baseline/2) 0;
+            padding: ($baseline/4) 0 0 0;
 
-          textarea {
-            resize: vertical;
-          }
-
-          label {
-            @extend %t-copy-sub1;
-            @include transition(color, 0.15s, ease-in-out);
-            margin: 0 0 ($baseline/4) 0;
-
-            &.is-focused {
-              color: $blue;
-            }
-          }
-
-          //this section is borrowed from _account.scss - we should clean up and unify later
-          input, textarea {
-            @extend %t-copy-base;
-            height: 100%;
-            width: 100%;
-            padding: ($baseline/2);
-
-            &.long {
-              width: 100%;
+            .group-allocation,
+            .field {
+              display: inline-block;
+              vertical-align: middle;
+              margin: 0 3% 0 0;
             }
 
-            &.short {
-              width: 25%;
+            .group-allocation {
+              max-width: 10%;
+              min-width: 5%;
+              color: $gray-l1;
             }
 
-            ::-webkit-input-placeholder {
-               color: $gray-l4;
-            }
+            .field {
+              position: relative;
 
-            :-moz-placeholder {
-               color: $gray-l3;
-            }
-
-            ::-moz-placeholder {
-               color: $gray-l3;
-            }
-
-            :-ms-input-placeholder {
-               color: $gray-l3;
-            }
-
-            &:focus {
-              + .tip {
-                color: $gray;
-              }
-            }
-          }
-
-          &.error {
-              label {
-                color: $red;
+              &.long {
+                width: 80%;
               }
 
-              input {
-                border-color: $red;
+              &.short {
+                width: 10%;
               }
-          }
-
-          &.add-group-configuration-name label {
-            @extend %t-title5;
-            display: inline-block;
-            width: 50%;
-            padding-right: 5%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            vertical-align: bottom;
-          }
-
-          .group-configuration-id {
-            display: inline-block;
-            width: 45%;
-            text-align: right;
-            vertical-align: top;
-            color: $gray-l1;
-
-            .group-configuration-value {
-              font-weight: 600;
-              white-space: nowrap;
-              margin-left: ($baseline*0.5);
             }
-          }
 
-          &.group-allocation {
-            color: $gray-l1;
+            .action-close {
+              @include transition(color 0.25s ease-in-out);
+              @include font-size(22);
+              display: inline-block;
+              border: 0;
+              padding: 0;
+              background: transparent;
+              color: $blue-l3;
+              vertical-align: middle;
+
+              &:hover {
+                color: $blue;
+              }
+            }
           }
         }
 
-        label.required {
-          font-weight: 600;
-
-          &:after {
-            margin-left: ($baseline/4);
-            content: "*";
-          }
-        }
-
-        .field-group {
-          @include clearfix();
-          margin: 0 0 ($baseline/2) 0;
-          padding: ($baseline/4) 0 0 0;
-
-          .group-allocation,
-          .field {
-            display: inline-block;
-            vertical-align: middle;
-            margin: 0 3% 0 0;
-          }
-
-          .group-allocation {
-            max-width: 10%;
-            min-width: 5%;
-            color: $gray-l1;
-          }
-
-          .field {
-            position: relative;
-
-            &.long {
-              width: 80%;
-            }
-
-            &.short {
-              width: 10%;
-            }
-          }
-
-          .action-close {
-            @include transition(color 0.25s ease-in-out);
-            @include font-size(22);
-            display: inline-block;
-            border: 0;
-            padding: 0;
-            background: transparent;
-            color: $blue-l3;
-            vertical-align: middle;
-
-            &:hover {
-              color: $blue;
-            }
-          }
+        .group-configuration-fields {
+          margin-bottom: $baseline;
         }
       }
 
-      .group-configuration-fields {
-        margin-bottom: $baseline;
+      &:hover .wrapper-group-configuration .actions {
+        opacity: 1.0;
       }
 
       .action-add-group {
