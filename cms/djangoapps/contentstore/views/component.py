@@ -17,7 +17,6 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
@@ -25,7 +24,6 @@ from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import create_xblock_info
 
-from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
 
 from .access import has_course_access
@@ -33,7 +31,6 @@ from django.utils.translation import ugettext as _
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
-           'subsection_handler',
            'container_handler',
            'component_handler'
            ]
