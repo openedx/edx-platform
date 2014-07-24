@@ -1,8 +1,6 @@
 // studio - elements - UI controls
 // ====================
 
-// ====================
-
 // general actions
 %action {
   @extend %ui-fake-link;
@@ -350,7 +348,7 @@
 
 // UI: elem is draggable
 .is-draggable {
-  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0);
+  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0, margin $tmg-f2 ease-in-out 0);
   position: relative;
 
   .draggable-drop-indicator {
@@ -390,20 +388,16 @@
 
   // UI: condition - valid drop
   &.valid-drop {
-    border-color: $blue-s1;
-    box-shadow: 0 1px 2px 0 $blue-t2;
+    border-color: $ui-action-primary-color-focus;
+    box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.50);
   }
-}
-
-// UI: drag state - was dragging
-.was-dragging {
-  @include transition(transform $tmg-f2 ease-in-out 0);
 }
 
 // UI: drag target
 .drop-target {
 
   &.drop-target-before {
+    margin-top: ($baseline*1.5);
 
     > .draggable-drop-indicator-before {
       opacity: 1.0;
@@ -411,9 +405,17 @@
   }
 
   &.drop-target-after {
+    margin-bottom: ($baseline*1.5);
 
     > .draggable-drop-indicator-after {
       opacity: 1.0;
     }
   }
+}
+
+// UI: drop state - was dropped
+.was-dropped {
+  @include animation(was-dropped $tmg-avg ease-in-out 1);
+  border-color: $ui-action-primary-color-focus;
+  box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.50);
 }

@@ -63,7 +63,7 @@ if (statusType === 'warning') {
                     </a>
                 </li>
                 <li class="action-item action-drag">
-                  <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle action">
+                    <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle action">
                         <span class="sr"><%= gettext('Drag to reorder') %></span>
                     </span>
                 </li>
