@@ -111,3 +111,14 @@ def get_codemirror_value(page, index=0, find_prefix="$"):
         return {find_prefix}('div.CodeMirror:eq({index})').get(0).CodeMirror.getValue();
         """.format(index=index, find_prefix=find_prefix)
     )
+
+
+def confirm_prompt(page, cancel=False):
+    """
+    Ensures that a modal prompt and confirmation button are visible, then clicks the button. The prompt is canceled iff
+    cancel is True.
+    """
+    page.wait_for_element_visibility('.prompt', 'Prompt is visible')
+    confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
+    page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
+    click_css(page, confirmation_button_css, require_notification=(not cancel))
