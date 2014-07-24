@@ -28,7 +28,6 @@ logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-
 def get_paypal_config():
     """
     This method will return any microsite specific paypal configuration,
@@ -45,8 +44,10 @@ def get_paypal_config():
 
     return config
 
+def get_purchase_endpoint():
+    return get_paypal_config().get('PURCHASE_ENDPOINT', '/shoppingcart/paypal/checkout')
 
-def create_payment():
+def create_payment(params):
     """
     Creates the paypal payment
     """
@@ -138,6 +139,11 @@ def process_postpay_callback(params):
     helpful-enough error message in error_html.
     """
     # TODO: Implement verification to confirm status of paypal purchase
+    success = execute_payment(payment, payer_id)
+    if success:
+        return {'success': True, 'order': order_id, 'error_html': ""}
+    else:
+        return {'success': False, 'order': order_id, 'error_html': ""}
     pass
 
 
@@ -146,14 +152,8 @@ def render_purchase_form_html(cart):
     Renders the HTML of the form used to initiate a Paypal purchase
     """
     return render_to_string('shoppingcart/paypal_form.html', {
-        'action': get_purchase_endpoint(),
-        'params': get_signed_purchase_params(cart),
+        'action': get_purchase_endpoint()
     })
-
-# don't think purchase endpoint is applicable to Paypal
-# def get_purchase_endpoint():
-#     return get_paypal_config().get('PURCHASE_ENDPOINT', '')
-
 
 def record_purchase(params, order):
     """
