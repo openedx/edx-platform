@@ -49,12 +49,12 @@ class RandomizeModule(RandomizeFields, XModule):
         # it calls get_child_descriptors() internally, but that doesn't work
         # until we've picked a choice
         xml_attrs = self.descriptor.xml_attributes or []
-        use_randrange = 'use_randrange' in xml_attrs
-        # TODO: use this attr to toggle storing history and never showing the
-        # same problem twice
-        # no_repeats = xml_attrs.has_key('no_repeats')
-        no_repeats = use_randrange
+        use_randrange = self._str_to_bool(xml_attrs.get('use_randrange', ''))
+        no_repeats = self._str_to_bool(xml_attrs.get('no_repeats', ''))
         self.pick_choice(use_randrange=use_randrange, no_repeats=no_repeats)
+
+    def _str_to_bool(self, v):
+        return v.lower() == 'true'
 
     def pick_choice(self, use_randrange=None, no_repeats=None):
         children = [c.location.url() for c in self.descriptor.get_children()]
