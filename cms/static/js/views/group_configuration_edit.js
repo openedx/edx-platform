@@ -42,6 +42,7 @@ function(BaseView, _, $, gettext, GroupEdit) {
                 uniqueId: _.uniqueId(),
                 name: this.model.escape('name'),
                 description: this.model.escape('description'),
+                usage: this.model.get('usage'),
                 isNew: this.model.isNew(),
                 error: this.model.validationError
             }));

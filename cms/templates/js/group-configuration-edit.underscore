@@ -36,5 +36,13 @@
     <div class="actions">
         <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
         <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+        <% deleteBtnClassName = _.isEmpty(usage) ? '' : 'is-disabled' %>
+        <% if (_.isEmpty(usage)) { %>
+            <span class="wrapper-delete-button">
+        <% } else { %>
+            <span class="wrapper-delete-button" title="<%= gettext('Cannot delete when used by experiment') %>">
+        <% } %>
+                <a class="button action-delete delete <%= deleteBtnClassName %>" href="#"><%= gettext("Delete") %></a>
+            </span>
     </div>
 </form>

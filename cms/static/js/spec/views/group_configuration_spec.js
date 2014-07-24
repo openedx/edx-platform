@@ -1,5 +1,5 @@
 define([
-    'js/models/course', 'js/models/group_configuration',
+    'underscore', 'js/models/course', 'js/models/group_configuration',
     'js/collections/group_configuration',
     'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
@@ -8,7 +8,7 @@ define([
     'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
     'js/spec_helpers/edit_helpers', 'jasmine-stealth'
 ], function(
-    Course, GroupConfigurationModel, GroupConfigurationCollection,
+    _, Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
     GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
     Notification, create_sinon, view_helpers
@@ -33,7 +33,8 @@ define([
         usageText: '.group-configuration-usage-text',
         usageTextAnchor: '.group-configuration-usage-text > a',
         usageUnit: '.group-configuration-usage-unit',
-        usageUnitAnchor: '.group-configuration-usage-unit > a'
+        usageUnitAnchor: '.group-configuration-usage-unit > a',
+        note: '.wrapper-delete-button'
     };
 
     beforeEach(function() {
@@ -105,6 +106,7 @@ define([
         it('should render properly', function() {
             expect(this.view.$el).toContainText('Configuration');
             expect(this.view.$el).toContainText('ID: 0');
+            expect(this.view.$('.delete')).toExist();
         });
 
         it('should show groups appropriately', function() {
@@ -171,6 +173,10 @@ define([
 
             usageUnitAnchors = this.view.$(SELECTORS.usageUnitAnchor);
 
+            expect(this.view.$(SELECTORS.note)).toHaveAttr(
+                'title', 'Cannot delete when used by experiment'
+            );
+            expect(this.view.$('.delete')).toHaveClass('is-disabled');
             expect(this.view.$(SELECTORS.usageCount)).not.toExist();
             expect(this.view.$(SELECTORS.usageText))
                 .toContainText('This Group Configuration is used in:');
@@ -192,6 +198,10 @@ define([
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
 
+            expect(this.view.$(SELECTORS.note)).toHaveAttr(
+                'title', 'Cannot delete when used by experiment'
+            );
+            expect(this.view.$('.delete')).toHaveClass('is-disabled');
             expect(this.view.$(SELECTORS.usageText)).not.toExist();
             expect(this.view.$(SELECTORS.usageUnit)).not.toExist();
             expect(this.view.$(SELECTORS.usageCount))
@@ -234,6 +244,7 @@ define([
                 name: 'Configuration',
                 description: 'Configuration Description'
             });
+            expect(this.view.$('.delete')).toExist();
         });
 
         it ('should allow you to create new groups', function() {
@@ -372,7 +383,7 @@ define([
             });
         });
 
-        it('groups have correct default names and placeholders', function () {
+        it('groups have correct default names', function () {
             var group1 = new GroupModel({ name: 'Group A' }),
                 group2 = new GroupModel({ name: 'Group B' }),
                 collection = this.model.get('groups');
@@ -400,12 +411,24 @@ define([
                 'Group A', 'Group C', 'Group D', 'Group E', 'Group F', 'Group G'
             ]);
         });
+
+        it('cannot be deleted if it is in use', function () {
+            this.model.set('usage', [ {'label': 'label1', 'url': 'url1'} ]);
+            this.view.render();
+            expect(this.view.$(SELECTORS.note)).toHaveAttr(
+                'title', 'Cannot delete when used by experiment'
+            );
+            expect(this.view.$('.delete')).toHaveClass('is-disabled');
+        });
     });
 
     describe('GroupConfigurationsList', function() {
+        var emptyMessage = 'You haven\'t created any group configurations yet.';
+
         beforeEach(function() {
             view_helpers.installTemplate('no-group-configurations', true);
 
+            this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection();
             this.view = new GroupConfigurationsList({
                 collection: this.collection
@@ -415,38 +438,51 @@ define([
 
         describe('empty template', function () {
             it('should be rendered if no group configurations', function() {
-                expect(this.view.$el).toContainText(
-                    'You haven\'t created any group configurations yet.'
-                );
+                expect(this.view.$el).toContainText(emptyMessage);
                 expect(this.view.$('.new-button')).toExist();
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
 
             it('should disappear if group configuration is added', function() {
-                var emptyMessage = 'You haven\'t created any group ' +
-                    'configurations yet.';
-
                 expect(this.view.$el).toContainText(emptyMessage);
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
-                this.collection.add([{}]);
+                this.collection.add(this.model);
                 expect(this.view.$el).not.toContainText(emptyMessage);
                 expect(this.view.$(SELECTORS.itemView)).toExist();
+            });
+
+            it('should appear if configurations were removed', function() {
+                this.collection.add(this.model);
+                expect(this.view.$(SELECTORS.itemView)).toExist();
+                this.collection.remove(this.model);
+                expect(this.view.$el).toContainText(emptyMessage);
+                expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
         });
     });
 
     describe('GroupConfigurationItem', function() {
+        var clickDeleteItem;
+
         beforeEach(function() {
             view_helpers.installTemplates([
                 'group-configuration-edit', 'group-configuration-details'
             ], true);
             this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection([ this.model ]);
+            this.collection.url = '/group_configurations';
             this.view = new GroupConfigurationItem({
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
         });
+
+        clickDeleteItem = function (view, promptSpy) {
+            view.$('.delete').click();
+            view_helpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
+            view_helpers.confirmPrompt(promptSpy);
+            view_helpers.verifyPromptHidden(promptSpy);
+        };
 
         it('should render properly', function() {
             // Details view by default
@@ -457,6 +493,40 @@ define([
             this.view.$('.action-cancel').click();
             expect(this.view.$(SELECTORS.detailsView)).toExist();
             expect(this.view.$(SELECTORS.editView)).not.toExist();
+        });
+
+        it('should destroy itself on confirmation of deleting', function () {
+            var requests = create_sinon.requests(this),
+                promptSpy = view_helpers.createPromptSpy(),
+                notificationSpy = view_helpers.createNotificationSpy();
+
+            clickDeleteItem(this.view, promptSpy);
+            // Backbone.emulateHTTP is enabled in our system, so setting this
+            // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
+            // setting the X-HTTP-Method-Override header with the true method.
+            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
+            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            create_sinon.respondToDelete(requests);
+            view_helpers.verifyNotificationHidden(notificationSpy);
+            expect($(SELECTORS.itemView)).not.toExist();
+        });
+
+        it('does not hide deleting message if failure', function() {
+            var requests = create_sinon.requests(this),
+                promptSpy = view_helpers.createPromptSpy(),
+                notificationSpy = view_helpers.createNotificationSpy();
+
+            clickDeleteItem(this.view, promptSpy);
+            // Backbone.emulateHTTP is enabled in our system, so setting this
+            // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
+            // setting the X-HTTP-Method-Override header with the true method.
+            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
+            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            create_sinon.respondWithError(requests);
+            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            expect($(SELECTORS.itemView)).toExist();
         });
     });
 
