@@ -1,31 +1,43 @@
 <%
-var publishClasses = "";
+var publishClass = '';
+if (publishState === 'staff_only') {
+    publishClass = 'is-staff-only';
+} else if (publishState === 'live') {
+    publishClass = 'is-live is-published is-released';
+} else if (publishState === 'ready') {
+    publishClass = 'is-ready is-published';
+} else if (publishState === 'has_unpublished_content') {
+    publishClass = 'has-warnings';
+}
+
 var title = gettext("Draft (Never published)");
-if (published) {
-    if (published && hasChanges) {
-        publishClasses = publishClasses + " is-draft";
-        title = gettext("Draft (Unpublished changes)");
-    } else {
-        publishClasses = publishClasses + " is-published";
-        title = gettext("Published");
-    }
-}
-if (releaseDate) {
-    publishClasses = publishClasses + " is-scheduled";
-}
-if (visibleToStaffOnly) {
-    publishClasses = publishClasses + " is-staff-only";
+if (publishState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
+} else if (publishState === 'live' || publishState === 'ready') {
+    title = gettext("Published");
+} else if (publishState === 'has_unpublished_content') {
+    title = gettext("Draft (Unpublished changes)");
 }
+
+var releaseLabel = gettext("Release:");
+if (publishState === 'live') {
+    releaseLabel = gettext("Released:");
+} else if (publishState === 'ready') {
+    releaseLabel = gettext("Scheduled:");
+}
+
+var canPublish = publishState !== 'ready' && publishState !== 'live';
+var canDiscardChanges = publishState === 'has_unpublished_content';
+var visibleToStaffOnly = publishState === 'staff_only';
 %>
-<div class="bit-publishing <%= publishClasses %>">
+<div class="bit-publishing <%= publishClass %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
         <%= title %>
     </h3>
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
-            <% if (hasChanges && editedOn && editedBy) {
+            <% if (publishState === 'has_unpublished_changes' && editedOn && editedBy) {
                 var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
                 <%= interpolate(message, {
                     last_saved_date: '<span class="date">' + editedOn + '</span>',
@@ -42,17 +54,7 @@ if (visibleToStaffOnly) {
     </div>
 
     <div class="wrapper-release bar-mod-content">
-        <h5 class="title">
-            <% if (published && releaseDate) {
-                if (releasedToStudents) { %>
-                    <%= gettext("Released:") %>
-                <% } else { %>
-                    <%= gettext("Scheduled:") %>
-                <% }
-            } else { %>
-                <%= gettext("Release:") %>
-            <% } %>
-        </h5>
+        <h5 class="title"><%= releaseLabel %></h5>
         <p class="copy">
             <% if (releaseDate) { %>
                 <% var message = gettext("%(release_date)s with %(section_or_subsection)s") %>
@@ -87,12 +89,12 @@ if (visibleToStaffOnly) {
     <div class="wrapper-pub-actions bar-mod-actions">
         <ul class="action-list">
             <li class="action-item">
-                <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
+                <a class="action-publish action-primary <% if (!canPublish) { %>is-disabled<% } %>"
                    href=""><%= gettext("Publish") %>
                 </a>
             </li>
             <li class="action-item">
-                <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
+                <a class="action-discard action-secondary <% if (!canDiscardChanges) { %>is-disabled<% } %>"
                    href=""><%= gettext("Discard Changes") %>
                 </a>
             </li>

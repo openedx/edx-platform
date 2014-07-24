@@ -25,20 +25,14 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "ancestor_info": null,
             /**
-             * True iff:
-             * 1) Edits have been made to the xblock and no published version exists.
-             * 2) Edits have been made to the xblock since the last published version.
+             * Represents the possible publish states for an xblock:
+             *   is_live - the block and all of its children are live to students (except for staff only items)
+             *   is_ready - the block and all of its children are ready to go live in the future
+             *   unscheduled - the block and all of its children are unscheduled
+             *   has_unpublished_content - the block or its children have unpublished content that is not staff only
+             *   is_staff_only - all of the block's content is to be shown to staff only
              */
-            "has_changes": null,
-            /**
-             * True iff a published version of the xblock exists.
-             */
-            "published": null,
-            /**
-             * If true, only course staff can see the xblock regardless of publish status or
-             * release date status.
-             */
-            "visible_to_staff_only": null,
+            "publish_state": null,
             /**
              * Date of the last edit to this xblock or any of its descendants.
              */

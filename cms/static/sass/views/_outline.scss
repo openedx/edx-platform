@@ -6,6 +6,37 @@
 %outline-item-header {
   @include clearfix();
   line-height: 0;
+
+  // CASE: is-editable
+  // TODO: abstract out
+  .is-editable {
+
+    .incontext-editor-open-action {
+      @include transition(opacity $tmg-f1 ease-in-out 0);
+      opacity: 0.0;
+    }
+
+    .incontext-editor-form {
+      width: 100%;
+    }
+
+    .incontext-editor-input {
+      @extend %t-title5;
+      @extend %t-strong;
+      width: 100%;
+      background: none repeat scroll 0 0 $white;
+      border: 0;
+      box-shadow: 0 0 2px 2px $shadow-l1 inset;
+    }
+
+    // STATE: hover/focus
+    &:hover, &:focus {
+
+      .incontext-editor-open-action {
+        opacity: 1.0;
+      }
+    }
+  }
 }
 
 %outline-item-content-hidden {
@@ -271,6 +302,36 @@
 
     // STATE: is-collapsed
     &.is-collapsed {
+
+      .section-content {
+        @extend %outline-item-content-hidden;
+      }
+    }
+
+    // content
+    .section-content {
+      @extend %outline-item-content-shown;
+    }
+
+    // CASE: is-collapsible
+    &.is-collapsible {
+      @extend %ui-expand-collapse;
+
+      .ui-toggle-expansion {
+        @extend %t-icon3;
+        color: $gray-l3;
+      }
+    }
+
+    // STATE: is-expanded
+    &.is-expanded.is-expanded {
+      border-left-width: 1px;
+      border-left-color: $color-draft;
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left-width: ($baseline/4);
 
       .section-content {
         @extend %outline-item-content-hidden;
