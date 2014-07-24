@@ -73,27 +73,30 @@ def create_payment(params):
                 "item_list": {
                     "items": [{
                         "name": "item",
-                        "sku": "item",
-                        "price": "1.00",
-                        "currency": "USD",
+                        "sku": str(params['orderNumber']),
+                        "price": str(params['amount']),
+                        "currency": str(params['currency']),
                         "quantity": 1
                     }]
                 },
                 "amount": {
-                    "total": "1.00",
-                    "currency": "USD"
+                    "total": str(params['amount']),
+                    "currency": str(params['currency'])
                 },
                 "description": "This is the payment transaction description."
             }]
     })
 
-    if payment.create():
+    result = payment.create()
+    if result:
         print("Payment[{}] created successfully".format(payment.id))
         # return successfully created payment
+        import pdb; pdb.set_trace()
         return payment
     else:
-        # TODO: handle errors
-        pass
+        errors = payment.errors or [""]
+        print "Couldn't create payment because of error(s): {}".format(','.join(errors))
+        return payment
 
 
 def execute_payment(payment):
@@ -146,8 +149,22 @@ def render_purchase_form_html(cart):
     Renders the HTML of the form used to initiate a Paypal purchase
     """
     return render_to_string('shoppingcart/paypal_form.html', {
-        'action': get_purchase_endpoint()
+        'action': get_purchase_endpoint(),
+        'params': get_purchase_params(cart),
     })
+
+def get_purchase_params(cart):
+    total_cost = cart.total_cost
+    amount = "{0:0.2f}".format(total_cost)
+    cart_items = cart.orderitem_set.all()
+    params = OrderedDict()
+    params['amount'] = amount
+    params['currency'] = cart.currency
+    params['orderPage_transactionType'] = 'sale'
+    params['orderNumber'] = "{0:d}".format(cart.id)
+
+    return params
+
 
 def record_purchase(params, order):
     """
