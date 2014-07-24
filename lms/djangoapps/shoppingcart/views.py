@@ -181,8 +181,12 @@ def paypal_checkout(request):
         order_num = request.REQUEST.get('orderNumber', 'N/A')
         # TODO: Generate error_html for paypal errors
         error_html = request.REQUEST.get('error_html', "<h3> Sorry, that's all we know.")
-        return render_to_response('shoppingcart/error.html', {'order': order_num,
-                                                              'error_html': error_html})
+        return render_to_response('shoppingcart/error.html',
+                                  {
+                                      'order': order_num,
+                                      'error_html': error_html
+                                  }
+        )
 
 
 @csrf_exempt
