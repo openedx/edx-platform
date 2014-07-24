@@ -96,6 +96,7 @@ def create_thread(request, course_id, commentable_id):
         commentable_id=commentable_id,
         course_id=course_key.to_deprecated_string(),
         user_id=request.user.id,
+        thread_type=post["thread_type"],
         body=post["body"],
         title=post["title"]
     )

@@ -102,7 +102,11 @@ li[class*=forum-nav-thread-label-] {
 
 .forum-new-post-form {
   // Override global label rules
-  .topic-filter-label {
+  .post-type {
+    text-shadow: none;
+  }
+
+  .post-type, .topic-filter-label {
     margin-bottom: 0;
   }
 
