@@ -269,12 +269,15 @@ $outline-indent-width: $baseline;
 
 // UI: section
 %outline-section {
-  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s);
+  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
   border-left: 1px solid $color-draft;
+  margin-bottom: $baseline;
+  padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline + 4);
 
   // STATE: is-collapsed
   &.is-collapsed {
     border-left-width: ($baseline/4);
+    padding-left: $baseline;
 
     // CASE: is ready to be live
     &.is-ready {
@@ -306,7 +309,12 @@ $outline-indent-width: $baseline;
 // UI: subsection
 %outline-subsection {
   @include transition(border-left-color $tmg-f2 linear 0s);
+  margin-bottom: ($baseline/2);
+  border: 1px solid $gray-l4;
   border-left: ($baseline/4) solid $color-draft;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: ($baseline*0.75);
 
   // CASE: is ready to be live
   &.is-ready {
@@ -405,8 +413,6 @@ $outline-indent-width: $baseline;
   @extend %ui-window;
   @extend %outline-item;
   @extend %outline-section;
-  margin-bottom: $baseline;
-  padding: ($baseline*0.75) $baseline;
 
   // header - title
   .section-title {
