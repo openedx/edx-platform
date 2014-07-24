@@ -57,10 +57,9 @@ class RandomizeModule(RandomizeFields, XModule):
         return v.lower() == 'true'
 
     def pick_choice(self, use_randrange=None, no_repeats=None):
-        children = [c.location.url() for c in self.descriptor.get_children()]
         choices = self.get_choices(no_repeats=no_repeats)
         num_choices = len(choices)
-        if self.choice is not None and self.choice not in children:
+        if self.choice is not None and self.choice not in choices:
             # Children changed. Reset.
             self.choice = None
 
