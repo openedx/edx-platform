@@ -172,7 +172,7 @@ def paypal_checkout(request):
         for link in payment.links:
             if link.method == "REDIRECT":
                 redirect_url = link.href
-                print("Redirect for approval: %s"%(redirect_url))
+                log.info("Redirect for approval: {}".format(redirect_url))
                 return HttpResponseRedirect(redirect_url)
     else:
         # we don't want to fail to generate the error page so if

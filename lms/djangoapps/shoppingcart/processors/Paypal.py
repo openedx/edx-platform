@@ -89,12 +89,12 @@ def create_payment(params):
 
     result = payment.create()
     if result:
-        print("Payment[{}] created successfully".format(payment.id))
+        logger.info("Payment[{}] created successfully".format(payment.id))
         # return successfully created payment
         return payment
     else:
         errors = payment.errors or [""]
-        print "Couldn't create payment because of error(s): {}".format(','.join(errors))
+        logger.warn("Couldn't create payment because of error(s): {}".format(','.join(errors)))
         return payment
 
 
