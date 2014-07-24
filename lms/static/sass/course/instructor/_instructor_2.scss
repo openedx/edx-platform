@@ -854,7 +854,7 @@ section.instructor-dashboard-content-2 {
   }
 
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal{
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal{
     .inner-wrapper {
       background: #fff;
     }
@@ -867,6 +867,10 @@ section.instructor-dashboard-content-2 {
       @extend .button-reset;
     }
     input[type="submit"]#add_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    input[type="submit"]#set_course_button{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -906,9 +910,21 @@ section.instructor-dashboard-content-2 {
       li:last-child{
         margin-bottom: 0px !important;
       }
-
     }
-    #coupon-content {
+    li#set-course-mode-modal-field-price{
+      width: 100%;
+      label.required:after {
+        content: "*";
+        margin-left: 5px;
+      }
+    }
+    li#set-course-mode-modal-field-currency{
+      margin-left: 0px !important;
+      select {
+        width: 100%;
+      }
+    }
+    #coupon-content, #course-content {
       padding: 20px;
       header {
         margin: 0;

@@ -11,10 +11,10 @@ class ECommerce
     # gather elements
     @$list_purchase_csv_btn = @$section.find("input[name='list-purchase-transaction-csv']'")
     @$transaction_group_name = @$section.find("input[name='transaction_group_name']'")
-    @$transaction_group_name = @$section.find("input[name='transaction_group_name']'")
-    @$download_transaction_group_name = @$section.find("input[name='transaction_group_name']'")
-    @$active_transaction_group_name = @$section.find("input[name='transaction_group_name']'")
-    @$spent_transaction_group_name = @$section.find('input[name="course_registration_code_number"]')
+    @$course_registration_number = @$section.find("input[name='course_registration_code_number']'")
+    @$download_transaction_group_name = @$section.find("input[name='download_transaction_group_name']'")
+    @$active_transaction_group_name = @$section.find("input[name='active_transaction_group_name']'")
+    @$spent_transaction_group_name = @$section.find('input[name="spent_transaction_group_name"]')
 
     @$generate_registration_code_form = @$section.find("form#course_codes_number")
     @$download_registration_codes_form = @$section.find("form#download_registration_codes")
