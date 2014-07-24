@@ -280,6 +280,8 @@ if settings.COURSEWARE_ENABLED:
         # For the instructor
         url(r'^courses/{}/instructor$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard"),
+        url(r'^courses/{}/set_course_mode_price$'.format(settings.COURSE_ID_PATTERN),
+            'instructor.views.instructor_dashboard.set_course_mode_price', name="set_course_mode_price"),
         url(r'^courses/{}/instructor/api/'.format(settings.COURSE_ID_PATTERN),
             include('instructor.views.api_urls')),
         url(r'^courses/{}/remove_coupon$'.format(settings.COURSE_ID_PATTERN),
