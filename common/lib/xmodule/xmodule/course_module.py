@@ -973,7 +973,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return _('TBD')
         else:
             when = self.advertised_start or self.start
-            return strftime(when, "SHORT_DATE", "US/Pacific")
+            return strftime(when, "SHORT_DATE", settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
 
     @property
     def start_date_is_still_default(self):
