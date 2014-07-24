@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
+# TODO: processors shouldn't be exposed here. Abstract flow to work with everything and interface with processors/__init__.py
+from shoppingcart.processors.Paypal import create_payment, execute_payment
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption
@@ -149,6 +151,28 @@ def use_coupon(request):
     else:
         return HttpResponseBadRequest(_("Coupon '{0}' is inactive.".format(coupon_code)))
 
+@csrf_exempt
+@require_POST
+def paypal_checkout(request):
+    """
+    A view for the paypal checkout form
+
+    TODO: Figure out how to abstract/move this into Paypal.py
+    Need to be able to handle this and other payment flows.
+
+    This exists to stay compatible with the current design/checkout
+    process in place. It is very likely that this function will become
+    deprecated.
+    """
+    # create payment and redirect user
+    redirect_url = None
+    payment = create_payment(request.REQUEST)
+    print payment.links
+    for link in payment.links:
+        if link.method == "REDIRECT":
+            redirect_url = link.href
+            print("Redirect for approval: %s"%(redirect_url))
+    return HttpResponseRedirect(redirect_url)
 
 @csrf_exempt
 @require_POST
