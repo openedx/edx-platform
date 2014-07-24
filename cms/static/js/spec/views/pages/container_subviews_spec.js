@@ -24,10 +24,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 display_name: 'Test Container',
                 category: 'vertical',
                 publish_state: 'unscheduled',
-                has_changes: false,
                 edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe",
                 published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako",
-                visible_to_staff_only: false,
                 currently_visible_to_students: false
             };
 
@@ -201,8 +199,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify updates displayed
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
-                    // Verify that the "published" value has been cleared out of the model.
-                    expect(containerPage.model.get("publish")).toBeNull();
+                    // Verify that the "publish_state" value has been updated
+                    expect(containerPage.model.get("publish_state")).toBe('ready');
                 });
 
                 it('can does not fetch if publish fails', function () {
@@ -220,7 +218,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Verify still in draft state.
                     expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
-                    // Verify that the "published" value has been cleared out of the model.
+                    // Verify that the "publish_state" value has been updated
                     expect(containerPage.model.get("publish_state")).toBe('unscheduled');
                 });
 
@@ -262,11 +260,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('does not discard changes on cancel', function () {
-                    renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": true, "has_changes": true});
+                    renderContainerPage(this, mockContainerXBlockHtml, { publish_state: 'has_unpublished_content' });
                     var numRequests = requests.length;
 
                     // Click discard changes
+                    expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                     containerPage.$(discardChangesButtonCss).click();
 
                     // Click cancel to confirmation.
@@ -279,7 +277,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('renders the last published date and user when there are no changes', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
+                    fetch({published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"});
                     expect(containerPage.$(lastDraftCss).text()).
                         toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
                 });
@@ -364,7 +362,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         });
                         create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         create_sinon.respondWithJson(requests, createXBlockInfo({
-                            publish_state: 'staff_only'
+                            publish_state: isStaffOnly ? 'staff_only' : 'unscheduled'
                         }));
                     };
 
@@ -394,27 +392,16 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it("can remove staff only setting", function() {
                         promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml);
-                        requestStaffOnly(true);
+                        renderContainerPage(this, mockContainerXBlockHtml, { publish_state: 'staff_only' });
                         requestStaffOnly(false);
                         verifyStaffOnly(false);
                         expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
                     });
 
-                    it("can remove staff only setting from published unit", function() {
-                        promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml, { published: true });
-                        requestStaffOnly(true);
-                        requestStaffOnly(false);
-                        verifyStaffOnly(false);
-                        expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
-                    });
-
                     it("does not refresh if removing staff only is canceled", function() {
                         var requestCount;
                         promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml);
-                        requestStaffOnly(true);
+                        renderContainerPage(this, mockContainerXBlockHtml, { publish_state: 'staff_only' });
                         requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();
                         edit_helpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
@@ -437,25 +424,26 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             describe("PublishHistory", function () {
                 var lastPublishCss = ".wrapper-last-publish";
 
+                it('renders never published when the block is unpublished', function () {
+                    renderContainerPage(this, mockContainerXBlockHtml, {
+                        published: false, published_on: null, published_by: null
+                    });
+                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
+                });
+
                 it('renders the last published date and user when the block is published', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
-                        "published": true, "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"
+                        published: true, published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"
                     });
                     expect(containerPage.$(lastPublishCss).text()).
                         toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
                 });
 
-                it('renders never published when the block is unpublished', function () {
-                    renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({ "published": false });
-                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
-                });
-
                 it('renders correctly when the block is published without publish info', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
-                        "published": true, "published_on": null, "published_by": null
+                        published: true, published_on: null, published_by: null
                     });
                     expect(containerPage.$(lastPublishCss).text()).toContain("Previously published");
                 });

@@ -109,6 +109,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     publishState: this.model.get('publish_state'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
+                    published: this.model.get('published'),
                     publishedOn: this.model.get('published_on'),
                     publishedBy: this.model.get('published_by'),
                     releasedToStudents: this.model.get('released_to_students'),
@@ -161,7 +162,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = !xblockInfo.get('visible_to_staff_only');
+                enableStaffLock = xblockInfo.get('publish_state') !== 'staff_only';
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);

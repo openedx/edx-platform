@@ -7,13 +7,15 @@ if (publishState === 'staff_only') {
 } else if (publishState === 'ready') {
     publishClass = 'is-ready is-published';
 } else if (publishState === 'has_unpublished_content') {
-    publishClass = 'has-warnings';
+    publishClass = 'has-warnings is-draft';
 }
 
 var title = gettext("Draft (Never published)");
 if (publishState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
-} else if (publishState === 'live' || publishState === 'ready') {
+} else if (publishState === 'live') {
+    title = gettext("Published and Live");
+} else if (publishState === 'ready') {
     title = gettext("Published");
 } else if (publishState === 'has_unpublished_content') {
     title = gettext("Draft (Unpublished changes)");
@@ -37,7 +39,7 @@ var visibleToStaffOnly = publishState === 'staff_only';
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
-            <% if (publishState === 'has_unpublished_changes' && editedOn && editedBy) {
+            <% if (publishState === 'has_unpublished_content' && editedOn && editedBy) {
                 var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
                 <%= interpolate(message, {
                     last_saved_date: '<span class="date">' + editedOn + '</span>',

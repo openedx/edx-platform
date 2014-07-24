@@ -601,8 +601,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     not a particular xblock should have its children included.
     """
 
-    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
-
     def safe_get_username(user_id):
         """
         Guard against bad user_ids, like the infamous "**replace_user**".
@@ -628,13 +626,16 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         child_info = None
 
+    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     currently_visible_to_students = is_currently_visible_to_students(xblock)
 
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
+        "published": published,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "edited_by": safe_get_username(xblock.subtree_edited_by),
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
