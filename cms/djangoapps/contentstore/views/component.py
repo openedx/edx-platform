@@ -17,7 +17,6 @@ from xmodule.modulestore.django import modulestore
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
-from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
@@ -25,7 +24,6 @@ from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import create_xblock_info
 
-from models.settings.course_grading import CourseGradingModel
 from opaque_keys.edx.keys import UsageKey
 
 from .access import has_course_access
@@ -33,7 +31,6 @@ from django.utils.translation import ugettext as _
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
-           'subsection_handler',
            'container_handler',
            'component_handler'
            ]
@@ -66,7 +63,7 @@ else:
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
-        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
+        'recommender'  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -80,71 +77,6 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None
     }
 ]
-
-@require_GET
-@login_required
-def subsection_handler(request, usage_key_string):
-    """
-    The restful handler for subsection-specific requests.
-
-    GET
-        html: return html page for editing a subsection
-        json: not currently supported
-    """
-    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        usage_key = UsageKey.from_string(usage_key_string)
-        try:
-            course, item, lms_link = _get_item_in_course(request, usage_key)
-        except ItemNotFoundError:
-            return HttpResponseBadRequest()
-
-        preview_link = get_lms_link_for_item(item.location, preview=True)
-
-        # make sure that location references a 'sequential', otherwise return
-        # BadRequest
-        if item.location.category != 'sequential':
-            return HttpResponseBadRequest()
-
-        parent = get_parent_xblock(item)
-
-        # remove all metadata from the generic dictionary that is presented in a
-        # more normalized UI. We only want to display the XBlocks fields, not
-        # the fields from any mixins that have been added
-        fields = getattr(item, 'unmixed_class', item.__class__).fields
-
-        policy_metadata = dict(
-            (field.name, field.read_from(item))
-            for field
-            in fields.values()
-            if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
-        )
-
-        can_view_live = False
-        subsection_units = item.get_children()
-        for unit in subsection_units:
-            has_published = modulestore().has_item(unit.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            if has_published:
-                can_view_live = True
-                break
-
-        return render_to_response(
-            'edit_subsection.html',
-            {
-                'subsection': item,
-                'context_course': course,
-                'new_unit_category': 'vertical',
-                'lms_link': lms_link,
-                'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(item.location.course_key).graders),
-                'parent_item': parent,
-                'locator': item.location,
-                'policy_metadata': policy_metadata,
-                'subsection_units': subsection_units,
-                'can_view_live': can_view_live
-            }
-        )
-    else:
-        return HttpResponseBadRequest("Only supports html requests")
 
 
 def _load_mixed_class(category):
