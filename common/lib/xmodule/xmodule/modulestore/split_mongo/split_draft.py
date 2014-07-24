@@ -5,8 +5,9 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum, PublishState
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, UnsupportedRevisionError
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
@@ -14,7 +15,36 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
+    def _lookup_course(self, course_locator):
+        """
+        overrides the implementation of _lookup_course in SplitMongoModuleStore in order to
+        use the configured branch_setting in the course_locator
+        """
+        if course_locator.org and course_locator.course and course_locator.run:
+            if course_locator.branch is None:
+                # default it based on branch_setting
+                branch_setting = self.get_branch_setting()
+                if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
+                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.draft)
+                elif branch_setting == ModuleStoreEnum.Branch.published_only:
+                    course_locator = course_locator.for_branch(ModuleStoreEnum.BranchName.published)
+                else:
+                    raise InsufficientSpecificationError(course_locator)
+        return super(DraftVersioningModuleStore, self)._lookup_course(course_locator)
+
     def create_course(self, org, course, run, user_id, **kwargs):
+        """
+        Creates and returns the course.
+
+        Args:
+            org (str): the organization that owns the course
+            course (str): the name of the course
+            run (str): the name of the run
+            user_id: id of the user creating the course
+            kwargs: Any optional arguments understood by a subset of modulestores to customize instantiation
+
+        Returns: a CourseDescriptor
+        """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
         return super(DraftVersioningModuleStore, self).create_course(
             org, course, run, user_id, master_branch=master_branch, **kwargs
@@ -47,7 +77,14 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         elif revision is None:
             branches_to_delete = [ModuleStoreEnum.BranchName.draft]
         else:
-            raise ValueError('revision not one of None, ModuleStoreEnum.RevisionOption.published_only, or ModuleStoreEnum.RevisionOption.all')
+            raise UnsupportedRevisionError(
+                [
+                    None,
+                    ModuleStoreEnum.RevisionOption.published_only,
+                    ModuleStoreEnum.RevisionOption.all
+                ]
+            )
+
         for branch in branches_to_delete:
             SplitMongoModuleStore.delete_item(self, location.for_branch(branch), user_id, **kwargs)
 
@@ -59,8 +96,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             return key.for_branch(ModuleStoreEnum.BranchName.published)
         elif revision == ModuleStoreEnum.RevisionOption.draft_only:
             return key.for_branch(ModuleStoreEnum.BranchName.draft)
-        else:
+        elif revision is None:
             return key
+        else:
+            raise UnsupportedRevisionError()
 
     def has_item(self, usage_key, revision=None):
         """
@@ -163,30 +202,29 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             PublishState.public - published exists and is the same as draft
             PublishState.private - no published version exists
         """
-        # TODO figure out what to say if xblock is not from the HEAD of its branch
         def get_head(branch):
             course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
             return self._get_block_from_structure(course_structure, xblock.location.block_id)
 
-        if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
-            try:
-                other = get_head(ModuleStoreEnum.BranchName.published)
-            except ItemNotFoundError:
-                return PublishState.private
-        elif xblock.location.branch == ModuleStoreEnum.BranchName.published:
-            other = get_head(ModuleStoreEnum.BranchName.draft)
-        else:
-            raise ValueError(u'{} is in a branch other than draft or published.'.format(xblock.location))
+        def get_version(block):
+            """
+            Return the version of the given database representation of a block.
+            """
+            #TODO: make this method a more generic helper
+            return block['edit_info']['update_version']
 
-        if not other:
-            if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
-                return PublishState.private
-            else:
-                return PublishState.public
-        elif xblock.update_version != other['edit_info']['update_version']:
-            return PublishState.draft
-        else:
+        draft_head = get_head(ModuleStoreEnum.BranchName.draft)
+        published_head = get_head(ModuleStoreEnum.BranchName.published)
+
+        if not published_head:
+            # published version does not exist
+            return PublishState.private
+        elif get_version(draft_head) == get_version(published_head):
+            # published and draft versions are equal
             return PublishState.public
+        else:
+            # published and draft versions differ
+            return PublishState.draft
 
     def convert_to_draft(self, location, user_id):
         """

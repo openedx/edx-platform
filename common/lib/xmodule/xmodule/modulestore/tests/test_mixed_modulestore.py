@@ -20,6 +20,7 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
 
 
 @ddt.ddt
@@ -255,6 +256,10 @@ class TestMixedModuleStore(unittest.TestCase):
         ))
         self.assertFalse(self.store.has_item(self.fake_location))
 
+        # verify that an error is raised when the revision is not valid
+        with self.assertRaises(UnsupportedRevisionError):
+            self.store.has_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+
     @ddt.data('draft', 'split')
     def test_get_item(self, default_ms):
         self.initdb(default_ms)
@@ -269,6 +274,10 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.fake_location)
 
+        # verify that an error is raised when the revision is not valid
+        with self.assertRaises(UnsupportedRevisionError):
+            self.store.get_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+
     @ddt.data('draft', 'split')
     def test_get_items(self, default_ms):
         self.initdb(default_ms)
@@ -278,6 +287,13 @@ class TestMixedModuleStore(unittest.TestCase):
             modules = self.store.get_items(locn, category='course')
             self.assertEqual(len(modules), 1)
             self.assertEqual(modules[0].location, course_locn)
+
+        # verify that an error is raised when the revision is not valid
+        with self.assertRaises(UnsupportedRevisionError):
+            self.store.get_items(
+                self.course_locations[self.MONGO_COURSEID].course_key,
+                revision=ModuleStoreEnum.RevisionOption.draft_preferred
+            )
 
     @ddt.data('draft', 'split')
     def test_update_item(self, default_ms):
@@ -365,6 +381,14 @@ class TestMixedModuleStore(unittest.TestCase):
         private_leaf = self.store.create_child(
             self.user_id, private_vert.location, 'html', block_id='bug_leaf'
         )
+
+        # verify that an error is raised when the revision is not valid
+        with self.assertRaises(UnsupportedRevisionError):
+            self.store.delete_item(
+                private_leaf.location,
+                self.user_id,
+                revision=ModuleStoreEnum.RevisionOption.draft_preferred
+            )
 
         self.store.publish(private_vert.location, self.user_id)
         private_leaf.display_name = 'change me'
@@ -802,7 +826,7 @@ class TestMixedModuleStore(unittest.TestCase):
             wiki_courses
         )
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_branch_setting(self, default_ms):
         """
         Test the branch_setting context manager
@@ -810,10 +834,22 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         self._create_block_hierarchy()
 
-        problem_location = self.problem_x1a_1
-        problem_original_name = 'Problem_x1a_1'
-        problem_new_name = 'New Problem Name'
+        # TODO - Remove these lines once LMS-11017 is implemented
+        course_location = self.course_locations[self.MONGO_COURSEID]
+        self.store.publish(course_location, self.user_id)
+        problem_original_name = 'Problem_Original'
+        problem = self.store.create_child(
+            self.user_id, self.writable_chapter_location, 'problem', 'prob_block',
+            fields={'display_name': problem_original_name},
+        )
+        problem_location = problem.location.version_agnostic().for_branch(None)
+
+        # TODO - Uncomment out these lines once LMS-11017 is implemented
+        # problem_location = self.problem_x1a_1
+        # problem_original_name = 'Problem_x1a_1'
+
         course_key = problem_location.course_key
+        problem_new_name = 'New Problem Name'
 
         def assertNumProblems(display_name, expected_number):
             """
@@ -837,10 +873,12 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # verify Draft problem
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            self.assertTrue(self.store.has_item(problem_location))
             assertProblemNameEquals(problem_original_name)
 
         # verify Published problem doesn't exist
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self.assertFalse(self.store.has_item(problem_location))
             with self.assertRaises(ItemNotFoundError):
                 self.store.get_item(problem_location)
 
@@ -849,6 +887,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # verify Published problem
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self.assertTrue(self.store.has_item(problem_location))
             assertProblemNameEquals(problem_original_name)
 
         # verify Draft-preferred

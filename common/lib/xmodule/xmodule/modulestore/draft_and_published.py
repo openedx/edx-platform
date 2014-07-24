@@ -100,3 +100,17 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
     @abstractmethod
     def convert_to_draft(self, location, user_id):
         raise NotImplementedError
+
+
+class   UnsupportedRevisionError(ValueError):
+    """
+    This error is raised if a method is called with an unsupported revision parameter.
+    """
+    def __init__(self, allowed_revisions=None):
+        if not allowed_revisions:
+            allowed_revisions = [
+                None,
+                ModuleStoreEnum.RevisionOption.published_only,
+                ModuleStoreEnum.RevisionOption.draft_only
+            ]
+        super(UnsupportedRevisionError, self).__init__('revision not one of {}'.format(allowed_revisions))
