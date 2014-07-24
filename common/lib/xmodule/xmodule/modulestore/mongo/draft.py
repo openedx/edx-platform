@@ -20,6 +20,7 @@ from xmodule.modulestore.mongo.base import (
     DIRECT_ONLY_CATEGORIES, SORT_REVISION_FAVOR_DRAFT
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
 
 log = logging.getLogger(__name__)
 
@@ -519,7 +520,13 @@ class DraftModuleStore(MongoModuleStore):
         elif revision is None:
             as_functions = [as_draft]
         else:
-            raise ValueError('revision not one of None, ModuleStoreEnum.RevisionOption.published_only, or ModuleStoreEnum.RevisionOption.all')
+            raise UnsupportedRevisionError(
+                [
+                    None,
+                    ModuleStoreEnum.RevisionOption.published_only,
+                    ModuleStoreEnum.RevisionOption.all
+                ]
+            )
         self._delete_subtree(location, as_functions)
 
     def _delete_subtree(self, location, as_functions):
