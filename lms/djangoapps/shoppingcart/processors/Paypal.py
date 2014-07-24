@@ -73,15 +73,15 @@ def create_payment(params):
                 "item_list": {
                     "items": [{
                         "name": "item",
-                        "sku": str(params['orderNumber']),
-                        "price": str(params['amount']),
-                        "currency": str(params['currency']),
+                        "sku": params['orderNumber'],
+                        "price": params['amount'],
+                        "currency": params['currency'].upper(),
                         "quantity": 1
                     }]
                 },
                 "amount": {
-                    "total": str(params['amount']),
-                    "currency": str(params['currency'])
+                    "total": params['amount'],
+                    "currency": params['currency'].upper()
                 },
                 "description": "This is the payment transaction description."
             }]
@@ -91,7 +91,6 @@ def create_payment(params):
     if result:
         print("Payment[{}] created successfully".format(payment.id))
         # return successfully created payment
-        import pdb; pdb.set_trace()
         return payment
     else:
         errors = payment.errors or [""]
