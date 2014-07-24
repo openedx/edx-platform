@@ -4,6 +4,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_group_views.py]
 """
+from datetime import datetime
 from random import randint
 import uuid
 import json
@@ -52,7 +53,7 @@ class GroupsApiTests(TestCase):
             category="videosequence",
             parent_location=self.course.location,
             data=self.test_course_data,
-            due="2016-05-16T14:30:00Z",
+            due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence"
         )
 

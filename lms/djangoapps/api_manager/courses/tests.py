@@ -3,6 +3,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
+from datetime import datetime
 import json
 import uuid
 from random import randint
@@ -48,8 +49,8 @@ class CoursesApiTests(TestCase):
         self.attempts = 3
 
         self.course = CourseFactory.create(
-            start="2014-06-16T14:30:00Z",
-            end="2015-01-16T14:30:00Z"
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16)
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -57,7 +58,7 @@ class CoursesApiTests(TestCase):
             category="chapter",
             parent_location=self.course.location,
             data=self.test_data,
-            due="2014-05-16T14:30:00Z",
+            due=datetime(2014, 5, 16, 14, 30),
             display_name="Overview"
         )
 
@@ -254,8 +255,8 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['id'], self.test_course_id)
         self.assertEqual(response.data['name'], self.test_course_name)
-        self.assertEqual(response.data['start'], self.course.start)
-        self.assertEqual(response.data['end'], self.course.end)
+        self.assertEqual(datetime.strftime(response.data['start'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.start, '%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(datetime.strftime(response.data['end'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.end, '%Y-%m-%d %H:%M:%S'))
         self.assertEqual(response.data['number'], self.test_course_number)
         self.assertEqual(response.data['org'], self.test_course_org)
         confirm_uri = self.test_server_prefix + test_uri
@@ -870,6 +871,56 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
+    def test_courses_users_list_get_filter_by_orgs(self):
+        # create 5 users
+        users = []
+        for i in xrange(1, 6):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post('/api/users', data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        # create 3 organizations each one having one user
+        org_ids = []
+        for i in xrange(1, 4):
+            data = {
+                'name': '{} {}'.format('Test Organization', i),
+                'display_name': '{} {}'.format('Test Org Display Name', i),
+                'users': [users[i]]
+            }
+            response = self.do_post('/api/organizations/', data)
+            self.assertEqual(response.status_code, 201)
+            self.assertGreater(response.data['id'], 0)
+            org_ids.append(response.data['id'])
+
+        # enroll all users in course
+        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        for user in users:
+            data = {'user_id': user}
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # retrieve all users enrolled in the course
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['enrollments']), 5)
+
+        # retrieve users by organization
+        response = self.do_get('{}?organizations={}'.format(test_uri, org_ids[0]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 1)
+
+        # retrieve all users enrolled in the course
+        response = self.do_get('{}?organizations={},{},{}'.format(test_uri, org_ids[0], org_ids[1], org_ids[2]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['enrollments']), 3)
+
     def test_courses_users_detail_get(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
         test_user_uri = '/api/users'
@@ -1241,7 +1292,8 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         created_user_id = response.data['id']
         completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
-        completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': created_user_id}
+        stage = 'First'
+        completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': created_user_id, 'stage': stage}
         response = self.do_post(completions_uri, completions_data)
         self.assertEqual(response.status_code, 201)
         coursemodulecomp_id = response.data['id']
@@ -1249,6 +1301,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['user_id'], created_user_id)
         self.assertEqual(response.data['course_id'], unicode(self.course.id))
         self.assertEqual(response.data['content_id'], unicode(self.course_content.scope_ids.usage_id))
+        self.assertEqual(response.data['stage'], stage)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -1306,7 +1359,13 @@ class CoursesApiTests(TestCase):
                 display_name=local_content_name
             )
             content_id = unicode(local_content.scope_ids.usage_id)
-            completions_data = {'content_id': content_id, 'user_id': created_user_id}
+            if i < 25:
+                content_id = unicode(self.course_content.scope_ids.usage_id) + str(i)
+                stage = None
+            else:
+                content_id = unicode(self.course_content.scope_ids.usage_id)
+                stage = 'Last'
+            completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': stage}
             response = self.do_post(completion_uri, completions_data)
             self.assertEqual(response.status_code, 201)
 
@@ -1353,6 +1412,13 @@ class CoursesApiTests(TestCase):
         response = self.do_get(content_filter_uri)
         self.assertEqual(response.status_code, 404)
 
+        #filter course module completion by stage
+        content_filter_uri = '{}?stage={}'.format(completion_uri, 'Last')
+        response = self.do_get(content_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(len(response.data['results']), 1)
+
     def test_coursemodulecompletions_get_invalid_course(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
         print completion_uri
@@ -1389,6 +1455,17 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['course_avg'], 3.4)
         self.assertEqual(response.data['position'], 2)
         self.assertEqual(response.data['points'], 4.5)
+
+        # Filter by user who has never accessed a course module
+        test_user = UserFactory.create(username="testusernocoursemod")
+        user_filter_uri = '{}/{}/metrics/proficiency/leaders/?user_id={}'\
+            .format(self.base_courses_uri, self.test_course_id, test_user.id)
+        response = self.do_get(user_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['leaders']), 3)
+        self.assertEqual(response.data['course_avg'], 3.4)
+        self.assertEqual(response.data['position'], 4)
+        self.assertEqual(response.data['points'], 0)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
@@ -1562,3 +1639,93 @@ class CoursesApiTests(TestCase):
         # test with bogus course
         response = self.do_get(course_metrics_uri.format(self.test_bogus_course_id))
         self.assertEqual(response.status_code, 404)
+
+    def test_course_workgroups_list(self):
+        projects_uri = '/api/projects/'
+        data = {
+            'course_id': self.test_course_id,
+            'content_id': 'self.test_course_content_id'
+        }
+        response = self.do_post(projects_uri, data)
+        self.assertEqual(response.status_code, 201)
+        project_id = response.data['id']
+
+        test_workgroups_uri = '/api/workgroups/'
+        for i in xrange(1, 12):
+            data = {
+                'name': '{} {}'.format('Workgroup', i),
+                'project': project_id
+            }
+            response = self.do_post(test_workgroups_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # get workgroups associated to course
+        test_uri = '/api/courses/{}/workgroups/?page_size=10'.format(self.test_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 11)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # test with bogus course
+        test_uri = '/api/courses/{}/workgroups/'.format(self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_course_users_count_by_city(self):
+        test_uri = '/api/users'
+
+        # create a 25 new users
+        for i in xrange(1, 26):
+            if i < 10:
+                city = 'San Francisco'
+            elif i < 15:
+                city = 'Denver'
+            elif i < 20:
+                city = 'Dallas'
+            else:
+                city = 'New York City'
+            data = {
+                'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
+                'password': 'test.me!',
+                'first_name': '{} {}'.format('John', i), 'last_name': '{} {}'.format('Doe', i), 'city': city,
+                'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', 'gender': 'male',
+                'title': 'Software Engineer', 'avatar_url': 'http://example.com/avatar.png'
+            }
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+            user_uri = response.data['uri']
+            # now enroll this user in the course
+            post_data = {'user_id': created_user_id}
+            courses_test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+            response = self.do_post(courses_test_uri, post_data)
+            self.assertEqual(response.status_code, 201)
+
+            response = self.do_get(user_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['city'], city)
+
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id, '/metrics/cities/'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
+        self.assertEqual(response.data['results'][0]['count'], 9)
+
+        # filter counts by city
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id,
+                                               '/metrics/cities/?city=new york city, San Francisco'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
+        self.assertEqual(response.data['results'][0]['count'], 9)
+        self.assertEqual(response.data['results'][1]['city'], 'New York City')
+        self.assertEqual(response.data['results'][1]['count'], 6)
+
+        # filter counts by city
+        response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id,
+                                               '/metrics/cities/?city=Denver'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['city'], 'Denver')
+        self.assertEqual(response.data['results'][0]['count'], 5)
