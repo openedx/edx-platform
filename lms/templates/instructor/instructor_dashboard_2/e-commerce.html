@@ -2,6 +2,7 @@
 <%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
+<%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
 
 <div class="ecommerce-wrapper">
   <h3 class="coupon-errors" id="code-error"></h3>
@@ -43,17 +44,23 @@
     </form>
   </p>
   <hr>
+  <h2>${_("Course Price")}</h2>
+    <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
+      %if section_data['access']['finance_admin'] is True:
+        <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ Set Price</a>
+      %endif
+    </span>
+  <hr>
   %if section_data['access']['finance_admin'] is True:
+    <h2>${_("Transactions")}</h2>
+    %if section_data['total_amount'] is not None:
+         <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+    %endif
 
-  <h2>${_("Transactions")}</h2>
-  %if section_data['total_amount'] is not None:
-       <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+    <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
+
+    <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
   %endif
-
-  <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
-
-  <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
-%endif
 
   <h2>${_("Coupons List")}</h2>
 
@@ -202,8 +209,37 @@
         return false;
       }
     });
+    $('#course_price_link').click(function () {
+      reset_input_fields();
+    });
     $('#add_coupon_link').click(function () {
       reset_input_fields();
+    });
+    $('#set_price_form').submit(function () {
+      $("#set_course_button").attr('disabled', true);
+      // Get the Code and Discount value and trim it
+      var course_price = $.trim($('#mode_price').val());
+      var currency = $.trim($('#course_mode_currency').val());
+
+      // Check if empty of not
+      if (course_price === '') {
+        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+        $('#set_price_form #course_form_error').text("${_('Please Enter the Course Price')}");
+        $("#set_course_button").removeAttr('disabled');
+        return false;
+      }
+      if (!$.isNumeric(course_price)) {
+        $("#set_course_button").removeAttr('disabled');
+        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+        $('#set_price_form #course_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+        return false;
+      }
+      if (currency == '') {
+        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+        $('#set_price_form #course_form_error').text("${_('Please Select the Currency')}");
+        $("#set_course_button").removeAttr('disabled');
+        return false;
+      }
     });
     $('#add_coupon_form').submit(function () {
       $("#add_coupon_button").attr('disabled', true);
@@ -238,6 +274,16 @@
       }
     });
 
+    $('#set_price_form').on('ajax:complete', function (event, xhr) {
+      if (xhr.status == 200) {
+        location.reload(true);
+      } else {
+        $("#set_course_button").removeAttr('disabled');
+        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+        $('#set_price_form #course_form_error').text(xhr.responseText);
+      }
+    });
+
     $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
       if (xhr.status == 200) {
         location.reload(true);
@@ -261,6 +307,7 @@
     $('.close-modal').click(function (e) {
       $("#update_coupon_button").removeAttr('disabled');
       $("#add_coupon_button").removeAttr('disabled');
+      $("#set_course_button").removeAttr('disabled');
       reset_input_fields();
       e.preventDefault();
     });
@@ -270,7 +317,9 @@
       $(".remove_coupon").focus();
       $("#edit-coupon-modal").attr("aria-hidden", "true");
       $(".edit-right").focus();
+      $("#set-course-mode-price-modal").attr("aria-hidden", "true");
       $("#add_coupon_button").removeAttr('disabled');
+      $("#set_course_button").removeAttr('disabled');
       $("#update_coupon_button").removeAttr('disabled');
       reset_input_fields();
     };
@@ -288,16 +337,17 @@
 
     $("#add-coupon-modal .close-modal").click(onModalClose);
     $("#edit-coupon-modal .close-modal").click(onModalClose);
-    $("#add-coupon-modal .close-modal").click(reset_input_fields);
+    $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
 
 
     // Hitting the ESC key will exit the modal
-    $("#add-coupon-modal, #edit-coupon-modal").on("keydown", function (e) {
+    $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
       var keyCode = e.keyCode || e.which;
       // 27 is the ESC key
       if (keyCode === 27) {
         e.preventDefault();
         $("#add-coupon-modal .close-modal").click();
+        $("#set-course-mode-price-modal .close-modal").click();
         $("#edit-coupon-modal .close-modal").click();
       }
     });
@@ -306,7 +356,9 @@
     $('#coupon-error').val('');
     $('#coupon-error').attr('style', 'display: none');
     $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
+    $('#set_price_form #course_form_error').attr('style', 'display: none');
     $('#add_coupon_form #coupon_form_error').text();
+    $('input#mode_price').val('');
     $('input#coupon_code').val('');
     $('input#coupon_discount').val('');
     $('textarea#coupon_description').val('');
