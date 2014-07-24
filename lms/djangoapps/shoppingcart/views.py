@@ -157,22 +157,33 @@ def paypal_checkout(request):
     """
     A view for the paypal checkout form
 
+    Takes one of two paths:
+
+    - Paypal -> postpay_callback
+    - Renders an error page
+
     TODO: Figure out how to abstract/move this into Paypal.py
     Need to be able to handle this and other payment flows.
-
-    This exists to stay compatible with the current design/checkout
-    process in place. It is very likely that this function will become
-    deprecated.
     """
     # create payment and redirect user
     redirect_url = None
     payment = create_payment(request.REQUEST)
-    print payment.links
-    for link in payment.links:
-        if link.method == "REDIRECT":
-            redirect_url = link.href
-            print("Redirect for approval: %s"%(redirect_url))
-    return HttpResponseRedirect(redirect_url)
+    if payment.success():
+        for link in payment.links:
+            if link.method == "REDIRECT":
+                redirect_url = link.href
+                print("Redirect for approval: %s"%(redirect_url))
+                return HttpResponseRedirect(redirect_url)
+    else:
+        # we don't want to fail to generate the error page so if
+        # things go terribly wrong the user will be redirected
+        # to an error page with N/A's
+        order_num = request.REQUEST.get('orderNumber', 'N/A')
+        # TODO: Generate error_html for paypal errors
+        error_html = request.REQUEST.get('error_html', "<h3> Sorry, that's all we know.")
+        return render_to_response('shoppingcart/error.html', {'order': order_num,
+                                                              'error_html': error_html})
+
 
 @csrf_exempt
 @require_POST
