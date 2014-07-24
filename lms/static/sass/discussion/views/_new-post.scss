@@ -24,6 +24,7 @@
       .field-input {
         display: inline-block;
         width: 100%;
+        vertical-align: top;
       }
 
       .field-label-text {
@@ -77,6 +78,39 @@
       float: right;
       color: #999;
     }
+  }
+
+  .post-type-input {
+    @extend %text-sr;
+  }
+
+  .post-type-label {
+    @extend %cont-truncated;
+    @include box-sizing(border-box);
+    @include white-button;
+    @include font-size(14);
+    display: inline-block;
+    padding: 0 ($baseline/2);
+    width: 48%;
+    height: 40px;
+    text-align: center;
+    color: $gray-d3;
+    font-weight: 600;
+    line-height: 36px;
+
+    .icon {
+      margin-right: 5px;
+    }
+  }
+
+  .post-type-input:checked + .post-type-label {
+    background-color: $forum-color-active-thread;
+    background-image: none;
+    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset;
+  }
+
+  .post-type-input:focus + .post-type-label {
+    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset, 0 0 2px 2px $blue;
   }
 
   input[type=text].field-input {

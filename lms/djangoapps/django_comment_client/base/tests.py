@@ -72,6 +72,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
     def test_create_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
+            "thread_type": "discussion",
             "title": "Hello",
             "body": "this is a post",
             "course_id": "MITx/999/Robot_Super_Course",
@@ -100,12 +101,14 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "read": False,
             "comments_count": 0,
         })
-        thread = {"body": ["this is a post"],
-                  "anonymous_to_peers": ["false"],
-                  "auto_subscribe": ["false"],
-                  "anonymous": ["false"],
-                  "title": ["Hello"]
-                  }
+        thread = {
+            "thread_type": "discussion",
+            "body": ["this is a post"],
+            "anonymous_to_peers": ["false"],
+            "auto_subscribe": ["false"],
+            "anonymous": ["false"],
+            "title": ["Hello"],
+        }
         url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
                                                'course_id': self.course_id.to_deprecated_string()})
         response = self.client.post(url, data=thread)
@@ -114,6 +117,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             'post',
             '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),
             data={
+                'thread_type': 'discussion',
                 'body': u'this is a post',
                 'anonymous_to_peers': False, 'user_id': 1,
                 'title': u'Hello',
@@ -628,7 +632,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
         self._set_mock_request_data(mock_request, {})
-        request = RequestFactory().post("dummy_url", {"body": text, "title": text})
+        request = RequestFactory().post("dummy_url", {"thread_type": "discussion", "body": text, "title": text})
         request.user = self.student
         request.view_name = "create_thread"
         response = views.create_thread(request, course_id=self.course.id.to_deprecated_string(), commentable_id="test_commentable")

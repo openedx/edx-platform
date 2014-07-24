@@ -30,7 +30,7 @@ class Thread(models.Model):
         'endorsed', 'read'
     ]
 
-    initializable_fields = updatable_fields
+    initializable_fields = updatable_fields + ['thread_type']
 
     base_url = "{prefix}/threads".format(prefix=settings.PREFIX)
     default_retrieve_params = {'recursive': False}
