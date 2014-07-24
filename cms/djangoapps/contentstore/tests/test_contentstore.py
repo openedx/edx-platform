@@ -1289,11 +1289,6 @@ class ContentStoreTest(ContentStoreTestCase):
         test_get_html('advanced_settings_handler')
         test_get_html('textbooks_list_handler')
 
-        # go look at a subsection page
-        subsection_key = course_key.make_usage_key('sequential', 'test_sequence')
-        resp = self.client.get_html(get_url('subsection_handler', subsection_key))
-        self.assertEqual(resp.status_code, 200)
-
         # go look at the Edit page
         unit_key = course_key.make_usage_key('vertical', 'test_vertical')
         resp = self.client.get_html(get_url('container_handler', unit_key))

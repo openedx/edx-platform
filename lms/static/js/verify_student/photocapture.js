@@ -258,11 +258,6 @@ function objectTagForFlashCamera(name) {
   }
 }
 
-function linkNewWindow(e) {
-        window.open($(e.target).attr('href'));
-            e.preventDefault();
-}
-
 function waitForFlashLoad(func, flash_object) {
     if(!flash_object.hasOwnProperty('percentLoaded') || flash_object.percentLoaded() < 100){
         setTimeout(function() {
@@ -334,6 +329,9 @@ $(document).ready(function() {
   analytics.pageview("Capture Face Photo");
   initSnapshotHandler(["photo_id", "face"], hasHtml5CameraSupport);
 
-  $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
+  $('a[rel="external"]').attr({
+    title: gettext('This link will open in a new browser window/tab'),
+    target: '_blank'
+  });
 
 });
