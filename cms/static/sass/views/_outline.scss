@@ -207,6 +207,16 @@
         }
       }
     }
+
+    // STATE: drag and drop
+    .drop-target-prepend .draggable-drop-indicator-initial {
+      opacity: 1.0;
+    }
+
+    // STATE: was dropped
+    &.was-dropped {
+      border-color: $blue;
+    }
   }
 
   // outline: sections
@@ -407,40 +417,17 @@
       bottom: -13px;
       left: 0;
     }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-      background-color: $ui-update-color;
-    }
   }
 
   // UI: drag and drop: subsection
   .outline-subsection {
 
     .draggable-drop-indicator-before {
-      top: 0;
+      top: -6px;
     }
 
     .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
-      }
+      bottom: -7px;
     }
   }
 
@@ -448,19 +435,11 @@
   .outline-unit {
 
     .draggable-drop-indicator-before {
-      top: 0;
+      top: -7px;
     }
 
     .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
-      }
+      bottom: -6px;
     }
   }
 

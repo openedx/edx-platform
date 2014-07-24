@@ -62,6 +62,8 @@ if (statusType === 'warning') {
 <li class="outline-item outline-<%= xblockType %> <%= publishClasses %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : 'is-expanded' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
 
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon-caret-right"></i></span>
+
     <div class="<%= xblockType %>-header">
         <% if (includesChildren) { %>
             <h3 class="<%= xblockType %>-header-details expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion" title="<%= gettext('Collapse/Expand this Checklist') %>">
@@ -89,8 +91,8 @@ if (statusType === 'warning') {
                         <span class="sr"><%= gettext('Delete') %></span>
                     </a>
                 </li>
-                <li class="actions-item drag">
-                    <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle">
+                <li class="action-item action-drag">
+                  <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle action">
                         <span class="sr"><%= gettext('Drag to reorder') %></span>
                     </span>
                 </li>
@@ -154,5 +156,10 @@ if (statusType === 'warning') {
     <% } %>
 
 <% if (parentInfo) { %>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon-caret-right"></i></span>
+
+    <div class="ui-splint ui-splint-indicator">
+        <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+    </div>
 </li>
 <% } %>

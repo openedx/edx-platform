@@ -1,8 +1,6 @@
 // studio - elements - UI controls
 // ====================
 
-// ====================
-
 // general actions
 %action {
   @extend %ui-fake-link;
@@ -390,8 +388,8 @@
 
   // UI: condition - valid drop
   &.valid-drop {
-    border-color: $blue-s1;
-    box-shadow: 0 1px 2px 0 $blue-t2;
+    border-color: $ui-action-primary-color-focus;
+    box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.50);
   }
 }
 
@@ -416,4 +414,11 @@
       opacity: 1.0;
     }
   }
+}
+
+// UI: drop state - was dropped
+.was-dropped {
+  @include animation(pulse $tmg-avg ease-in-out 1);
+  border-color: $ui-action-primary-color-focus;
+  box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.50);
 }
