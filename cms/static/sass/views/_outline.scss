@@ -246,6 +246,16 @@
         }
       }
     }
+
+    // STATE: drag and drop
+    .drop-target-prepend .draggable-drop-indicator-initial {
+      opacity: 1.0;
+    }
+
+    // STATE: was dropped
+    &.was-dropped {
+      border-color: $blue;
+    }
   }
 
   // outline: sections
@@ -319,6 +329,11 @@
       .section-content {
         @extend %outline-item-content-hidden;
       }
+    }
+
+    // STATE: drag and drop - was dropped
+    &.was-dropped {
+      border-left-color: $ui-action-primary-color-focus;
     }
   }
 
@@ -439,49 +454,36 @@
   // --------------------
   .outline-section {
 
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline/4);
+    }
+
     .draggable-drop-indicator-before {
-      top: -($baseline/2);
+      top: -($baseline*0.75);
       left: 0;
     }
 
     .draggable-drop-indicator-after {
-      bottom: -13px;
+      bottom: -($baseline*0.75);
       left: 0;
-    }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-      background-color: $ui-update-color;
     }
   }
 
   // UI: drag and drop: subsection
   .outline-subsection {
 
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline*1.25);
+    }
+
     .draggable-drop-indicator-before {
-      top: 0;
+      top: -($baseline*0.75);
     }
 
     .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // CASE: DnD - empty subsection with unit dropping
-    .drop-target-prepend .draggable-drop-indicator-initial {
-      opacity: 1.0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
-      }
+      bottom: -($baseline*0.75);
     }
   }
 
@@ -489,24 +491,41 @@
   .outline-unit {
 
     .draggable-drop-indicator-before {
-      top: 0;
+      top: -($baseline*0.75);
     }
 
     .draggable-drop-indicator-after {
-      bottom: 0;
-    }
-
-    // STATE: was dropped
-    &.was-dropped {
-
-      > .section-item {
-        background-color: $ui-update-color !important; // nasty, but needed for specificity
-      }
+      bottom: -($baseline*0.75);
     }
   }
 
   // UI: drag and drop: splints
   .ui-splint-indicator {
     position: relative;
+
+    .draggable-drop-indicator {
+      @extend %ui-depth3;
+      @include transition(opacity $tmg-f2 linear 0s);
+      @include size(100%, auto);
+      position: absolute;
+      border-top: 1px solid $blue-l1;
+      opacity: 0.0;
+
+      *[class^="icon-caret"] {
+        @extend %t-icon5;
+        position: absolute;
+        top: -12px;
+        left: -($baseline/4);
+        color: $blue-s1;
+      }
+    }
+
+    .draggable-drop-indicator-before {
+      top: -($baseline/2);
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -($baseline/2);
+    }
   }
 }
