@@ -58,6 +58,8 @@ def create_payment(params):
         "client_secret": "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
     })
 
+    order_number = params['orderNumber']
+
     # TODO: find/make payment cancel page
     payment = paypalrestsdk.Payment({
         "intent": "sale",
@@ -65,7 +67,7 @@ def create_payment(params):
             "payment_method": "paypal",
         },
         "redirect_urls": {
-            "return_url": "http://localhost:8000/shoppingcart/postpay_callback",
+            "return_url": "http://localhost:8000/shoppingcart/postpay_callback?orderNumber={}".format(order_number),
             "cancel_url": "http://localhost:8000/payment/cancel"
         },
         "transactions": [
@@ -144,10 +146,9 @@ def process_postpay_callback(params):
     token = params.get('token')
     payer_id = params.get('PayerID')
 
-
     if payer_id and token:
         # TODO: See if there is a way to verify token and payer_id match
-        order_number = params['order_number']
+        order_number = params['orderNumber']
         order = Order.objects.get(pk=order_number)
         # actually purchase the order since we've verfied a transaction took place
         order.purchase()

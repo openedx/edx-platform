@@ -48,7 +48,7 @@ def add_course_to_cart(request, course_id):
     Adds course specified by course_id to the cart.  The model function add_to_order does all the
     heavy lifting (logging, error checking, etc)
     """
-
+    
     assert isinstance(course_id, basestring)
     if not request.user.is_authenticated():
         log.info("Anon user trying to add course {} to cart".format(course_id))
@@ -168,12 +168,6 @@ def paypal_checkout(request):
     # create payment and redirect user
     redirect_url = None
     payment = create_payment(request.REQUEST)
-
-    # putting order number into session so process_postpay_callback can see it.
-    # this is necessary because we need the order num to redirect user to receipt
-    # TODO: figure out how to get paypal to send back order number, etc.
-    order_num = request.REQUEST['orderNumber']
-    request.REQUEST["order_num"] = order_num
 
     if payment.success():
         for link in payment.links:
