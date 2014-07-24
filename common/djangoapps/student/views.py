@@ -483,6 +483,8 @@ def dashboard(request):
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
 
+    enrolled_courses_either_paid = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                             if _enrollment.is_paid_course())
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -535,6 +537,7 @@ def dashboard(request):
         'duplicate_provider': None,
         'logout_url': reverse(logout_user),
         'platform_name': settings.PLATFORM_NAME,
+        'enrolled_courses_either_paid': enrolled_courses_either_paid,
         'provider_states': [],
     }
 
