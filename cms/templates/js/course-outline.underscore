@@ -33,6 +33,8 @@ if (statusType === 'warning') {
 <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
 
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon-caret-right"></i></span>
+
     <div class="<%= xblockType %>-header">
         <% if (includesChildren) { %>
             <h3 class="<%= xblockType %>-header-details expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion" title="<%= gettext('Collapse/Expand this Checklist') %>">
@@ -60,8 +62,8 @@ if (statusType === 'warning') {
                         <span class="sr action-button-text"><%= gettext('Delete') %></span>
                     </a>
                 </li>
-                <li class="actions-item drag">
-                    <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle">
+                <li class="action-item action-drag">
+                  <span data-tooltip="<%= gettext('Drag to reorder') %>" class="drag-handle <%= xblockType %>-drag-handle action">
                         <span class="sr"><%= gettext('Drag to reorder') %></span>
                     </span>
                 </li>
@@ -114,6 +116,10 @@ if (statusType === 'warning') {
         <div class="outline-content <%= xblockType %>-content">
             <ol class="<%= typeListClass %> is-sortable">
             </ol>
+            <div class="ui-splint ui-splint-indicator">
+                <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+            </div>
+
             <% if (childType) { %>
                 <div class="add-<%= childType %> add-item">
                     <a href="#" class="button button-new" data-category="<%= childCategory %>"
@@ -126,5 +132,6 @@ if (statusType === 'warning') {
     <% } %>
 
 <% if (parentInfo) { %>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon-caret-right"></i></span>
 </li>
 <% } %>
