@@ -82,36 +82,37 @@ if (statusType === 'warning') {
             </ul>
         </div>
     </div>
-    <% if (statusMessage) { %>
-        <div class="<%= xblockType %>-status">
-            <% if (category !== 'vertical') { %>
-                <div class="status-release">
-                    <p>
-                        <span class="sr status-release-label">Release Status:</span>
-                        <span class="status-release-value">
-                            <% if (xblockInfo.get('released_to_students')) { %>
-                                <i class="icon icon-check-sign"></i>
-                                <%= gettext('Released:') %>
-                            <% } else if (xblockInfo.get('release_date')) { %>
-                                <i class="icon icon-time"></i>
-                                <%= gettext('Scheduled:') %>
-                            <% } else { %>
-                                <i class="icon icon-file-alt"></i>
-                                <%= gettext('Unscheduled') %>
-                            <% } %>
-                            <% if (xblockInfo.get('release_date')) { %>
-                                <%= xblockInfo.get('release_date') %>
-                            <% } %>
-                        </span>
-                    </p>
-                </div>
-            <% } %>
-            <div class="status-message">
-                <i class="icon <%= statusIconClass %>"></i>
-                <p class="status-message-copy"><%- statusMessage %></p>
+    <div class="<%= xblockType %>-status">
+        <% if (category !== 'vertical') { %>
+            <div class="status-release">
+                <p>
+                    <span class="sr status-release-label">Release Status:</span>
+                    <span class="status-release-value">
+                        <% if (xblockInfo.get('released_to_students')) { %>
+                            <i class="icon icon-check-sign"></i>
+                            <%= gettext('Released:') %>
+                        <% } else if (xblockInfo.get('release_date')) { %>
+                            <i class="icon icon-time"></i>
+                            <%= gettext('Scheduled:') %>
+                        <% } else { %>
+                            <i class="icon icon-file-alt"></i>
+                            <%= gettext('Unscheduled') %>
+                        <% } %>
+                        <% if (xblockInfo.get('release_date')) { %>
+                            <%= xblockInfo.get('release_date') %>
+                        <% } %>
+                    </span>
+                </p>
             </div>
+        <% } %>
+
+        <% if (statusMessage) { %>
+        <div class="status-message">
+            <i class="icon <%= statusIconClass %>"></i>
+            <p class="status-message-copy"><%- statusMessage %></p>
         </div>
-    <% } %>
+        <% } %>
+    </div>
 <% } %>
 
     <% if (!parentInfo && xblockInfo.get('child_info') && xblockInfo.get('child_info').children.length === 0) { %>
