@@ -3,6 +3,23 @@
 
 // Scale - (6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72)
 
+// weights
+%t-ultrastrong {
+ font-weight: 800;
+}
+%t-strong {
+ font-weight: 600;
+}
+%t-regular {
+ font-weight: 400;
+}
+%t-light {
+ font-weight: 300;
+}
+%t-ultralight {
+ font-weight: 200;
+}
+
 // headings/titles
 %t-title {
   font-family: $f-sans-serif;
