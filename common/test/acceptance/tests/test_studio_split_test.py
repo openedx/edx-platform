@@ -10,14 +10,15 @@ from unittest import skip, skipUnless
 from xmodule.partitions.partitions import Group, UserPartition
 from bok_choy.promise import Promise
 
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.utils import add_advanced_component
 from ..pages.xblock.utils import wait_for_xblock_initialization
-from .helpers import UniqueCourseTest
+
+from acceptance.tests.base_studio_test import StudioCourseTest
+
 from test_studio_container import ContainerBase
 
 
@@ -68,15 +69,9 @@ class SplitTest(ContainerBase, SplitTestMixin):
     """
     __test__ = True
 
-    def setup_fixtures(self):
-        course_fix = CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        )
-
-        course_fix.add_advanced_settings(
+    def populate_course_fixture(self, course_fixture):
+        """ Populates the course """
+        course_fixture.add_advanced_settings(
             {
                 u"advanced_modules": {"value": ["split_test"]},
                 u"user_partitions": {"value": [
@@ -86,17 +81,13 @@ class SplitTest(ContainerBase, SplitTestMixin):
             }
         )
 
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit')
                 )
             )
-        ).install()
-
-        self.course_fix = course_fix
-
-        self.user = course_fix.user
+        )
 
     def create_poorly_configured_split_instance(self):
         """
@@ -110,7 +101,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
-        self.course_fix.add_advanced_settings(
+        self.course_fixture.add_advanced_settings(
             {
                 u"user_partitions": {"value": [
                     UserPartition(0, 'Configuration alpha,beta', 'first',
@@ -118,7 +109,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
                 ]}
             }
         )
-        self.course_fix._add_advanced_settings()
+        self.course_fixture._add_advanced_settings()
         return self.go_to_container_page()
 
     def test_create_and_select_group_configuration(self):
@@ -177,26 +168,13 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class SettingsMenuTest(UniqueCourseTest):
+class SettingsMenuTest(StudioCourseTest):
     """
     Tests that Setting menu is rendered correctly in Studio
     """
 
     def setUp(self):
         super(SettingsMenuTest, self).setUp()
-
-        course_fix = CourseFixture(**self.course_info)
-        course_fix.install()
-
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=course_fix.user.get('username'),
-            email=course_fix.user.get('email'),
-            password=course_fix.user.get('password')
-        )
-        self.auth_page.visit()
-
         self.advanced_settings = AdvancedSettingsPage(
             self.browser,
             self.course_info['org'],
@@ -245,24 +223,6 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     __test__ = True
 
-    def setup_fixtures(self):
-        course_fix = CourseFixture(**self.course_info)
-        course_fix.add_advanced_settings({
-            u"advanced_modules": {"value": ["split_test"]},
-        })
-        course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('vertical', 'Test Unit')
-                )
-            )
-        ).install()
-
-        self.course_fix = course_fix
-
-        self.course_fix = course_fix
-        self.user = course_fix.user
-
     def setUp(self):
         super(GroupConfigurationsTest, self).setUp()
         self.page = GroupConfigurationsPage(
@@ -301,6 +261,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Collapse the configuration
         config.toggle()
 
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_advanced_settings({
+            u"advanced_modules": {"value": ["split_test"]},
+        })
+        course_fixture.add_children(
+            XBlockFixtureDesc('chpater', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        )
+
     def test_no_group_configurations_added(self):
         """
         Scenario: Ensure that message telling me to create a new group configuration is
@@ -329,7 +301,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see `description` and `groups` appear and also have correct values
         And I do the same checks for the second group configuration
         """
-        self.course_fix.add_advanced_settings({
+        self.course_fixture.add_advanced_settings({
             u"user_partitions": {
                 "value": [
                     UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
@@ -337,7 +309,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
                 ],
             },
         })
-        self.course_fix._add_advanced_settings()
+        self.course_fixture._add_advanced_settings()
 
         self.page.visit()
 
@@ -523,7 +495,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And I click button 'Cancel'
         Then I see that new changes were discarded
         """
-        self.course_fix.add_advanced_settings({
+        self.course_fixture.add_advanced_settings({
             u"user_partitions": {
                 "value": [
                     UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
@@ -531,7 +503,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
                 ],
             },
         })
-        self.course_fix._add_advanced_settings()
+        self.course_fixture._add_advanced_settings()
         self.page.visit()
 
         config = self.page.group_configurations()[0]

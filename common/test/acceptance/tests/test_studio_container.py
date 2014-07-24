@@ -2,18 +2,18 @@
 Acceptance tests for Studio related to the container page.
 """
 
-from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..fixtures.course import XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.utils import add_discussion
 
 from unittest import skip
 
+from acceptance.tests.base_studio_test import StudioCourseTest
 
-class ContainerBase(UniqueCourseTest):
+
+class ContainerBase(StudioCourseTest):
     """
     Base class for tests that do operations on the container page.
     """
@@ -32,21 +32,6 @@ class ContainerBase(UniqueCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
-
-        self.setup_fixtures()
-
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=self.user.get('username'),
-            email=self.user.get('email'),
-            password=self.user.get('password')
-        )
-
-        self.auth_page.visit()
-
-    def setup_fixtures(self):
-        pass
 
     def go_to_container_page(self, make_draft=False):
         """
@@ -110,10 +95,10 @@ class ContainerBase(UniqueCourseTest):
 class NestedVerticalTest(ContainerBase):
     __test__ = False
 
-    """
-    Sets up a course structure with nested verticals.
-    """
-    def setup_fixtures(self):
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with nested verticals.
+        """
         self.container_title = ""
         self.group_a = "Expand or Collapse\nGroup A"
         self.group_b = "Expand or Collapse\nGroup B"
@@ -137,14 +122,7 @@ class NestedVerticalTest(ContainerBase):
         self.duplicate_label = "Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
-        course_fix = CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        )
-
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
@@ -162,9 +140,7 @@ class NestedVerticalTest(ContainerBase):
                     )
                 )
             )
-        ).install()
-
-        self.user = course_fix.user
+        )
 
 
 class DragAndDropTest(NestedVerticalTest):
