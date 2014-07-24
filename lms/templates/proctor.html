@@ -27,7 +27,9 @@
   </div>
 </section>
 
-<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>
+<!--We should be using this but currently it's broken-->
+<!--<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>-->
+<script type="text/javascript" src="/static/js/vendor/jquery.leanModal.min.js"></script>
 <script type="text/javascript">
 <% override_cmd = "disable" if staff_release else "release" %>
 proctor_override = function(){
