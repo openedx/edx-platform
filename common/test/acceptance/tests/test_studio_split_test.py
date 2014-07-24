@@ -164,6 +164,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container = self.go_to_container_page()
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
+    @skip("Disabling as this fails intermittently. STUD-2003")
     def test_delete_inactive_group(self):
         """
         Test deleting an inactive group.
