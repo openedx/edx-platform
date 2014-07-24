@@ -135,13 +135,27 @@ def process_postpay_callback(params):
     side effects but should try to figure out why and return a
     helpful-enough error message in error_html.
     """
-    # TODO: Implement verification to confirm status of paypal purchase
-    if success:
-        return {'success': True, 'order': order_id, 'error_html': ""}
-    else:
-        return {'success': False, 'order': order_id, 'error_html': ""}
-    pass
+    paypalrestsdk.configure({
+        "mode": "sandbox",  # sandbox or live
+        "client_id": "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM",
+        "client_secret": "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
+    })
 
+    token = params.get('token')
+    payer_id = params.get('PayerID')
+
+
+    if payer_id and token:
+        # TODO: See if there is a way to verify token and payer_id match
+        order_number = params['order_number']
+        order = Order.objects.get(pk=order_number)
+        return {'success': True,
+                'order': order,  # due to exception we may not have the order
+                'error_html': ""}
+    else:
+        return {'success': True,
+                'order': None,  # due to exception we may not have the order
+                'error_html': ""}
 
 def render_purchase_form_html(cart):
     """
