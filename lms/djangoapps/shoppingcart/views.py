@@ -168,6 +168,13 @@ def paypal_checkout(request):
     # create payment and redirect user
     redirect_url = None
     payment = create_payment(request.REQUEST)
+
+    # putting order number into session so process_postpay_callback can see it.
+    # this is necessary because we need the order num to redirect user to receipt
+    # TODO: figure out how to get paypal to send back order number, etc.
+    order_num = request.REQUEST['orderNumber']
+    request.REQUEST["order_num"] = order_num
+
     if payment.success():
         for link in payment.links:
             if link.method == "REDIRECT":
@@ -190,7 +197,7 @@ def paypal_checkout(request):
 
 
 @csrf_exempt
-@require_POST
+# @require_POST
 def postpay_callback(request):
     """
     Receives the POST-back from processor.
@@ -201,7 +208,7 @@ def postpay_callback(request):
     If unsuccessful the order will be left untouched and HTML messages giving more detailed error info will be
     returned.
     """
-    params = request.POST.dict()
+    params = request.REQUEST
     result = process_postpay_callback(params)
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
