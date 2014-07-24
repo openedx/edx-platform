@@ -67,21 +67,11 @@
         % if course.has_ended():
         ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
         % elif course.has_started():
-        <%
-          start = course.raw_start_date
-          if isinstance(start, datetime.datetime):
-             start = get_time_display(start, format_string="SHORT_DATE", coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
-        %>
-        ${_("Course Started - {start_date}").format(start_date=start)}
+        ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
         % elif course.start_date_is_still_default: # Course start date TBD
         ${_("Course has not yet started")}
         % else:   # hasn't started yet
-        <%
-          start = course.raw_start_date
-          if isinstance(start, datetime.datetime):
-             start = get_time_display(start, format_string="SHORT_DATE", coerce_tz='US/Pacific')
-        %>
-        ${_("Course Starts - {start_date}").format(start_date=start)}
+        ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
         % endif
         </p>
         <h2 class="university">${get_course_about_section(course, 'university')}</h2>

@@ -19,6 +19,7 @@ from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -943,28 +944,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return self.location.course_key
 
     @property
-    def raw_start_date(self):
-        """
-        Returns the raw course start datetime object, or the advertised start.
-        """
-        def try_parse_iso_8601(text):
-            try:
-                result = Date().from_json(text)
-                if result is None:
-                    result = text.title()
-            except ValueError:
-                result = text.title()
-
-            return result
-
-        if isinstance(self.advertised_start, basestring):
-            return try_parse_iso_8601(self.advertised_start)
-        elif self.start_date_is_still_default:
-            return _('TBD')
-        else:
-            return self.advertised_start or self.start
-
-    @property
     def start_date_text(self):
         """
         Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
@@ -980,7 +959,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = strftime(result, "SHORT_DATE")
+                    result = strftime(result, "SHORT_DATE", settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
             except ValueError:
                 result = text.title()
 
@@ -994,7 +973,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return _('TBD')
         else:
             when = self.advertised_start or self.start
-            return strftime(when, "SHORT_DATE")
+            return strftime(when, "SHORT_DATE", "US/Pacific")
 
     @property
     def start_date_is_still_default(self):
