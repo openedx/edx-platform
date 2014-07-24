@@ -169,6 +169,9 @@ class SplitTest(ContainerBase, SplitTestMixin):
         Test deleting an inactive group.
         """
         container = self.create_poorly_configured_split_instance()
+
+        # The inactive group is the 2nd group, but it is the first one
+        # with a visible delete button, so use index 0
         container.delete(0)
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
