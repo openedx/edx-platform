@@ -13,7 +13,8 @@ if Backbone?
           context = _.clone(@course_settings.attributes)
           _.extend(context, {
               cohort_options: @getCohortOptions(),
-              mode: @mode
+              mode: @mode,
+              form_id: @mode + (if @topicId then "-" + @topicId else "")
           })
           context.topics_html = @renderCategoryMap(@course_settings.get("category_map")) if @mode is "tab"
           @$el.html(_.template($("#new-post-template").html(), context))
@@ -71,6 +72,7 @@ if Backbone?
 
       createPost: (event) ->
           event.preventDefault()
+          thread_type = @$(".post-type-input:checked").val()
           title   = @$(".js-post-title").val()
           body    = @$(".js-post-body").find(".wmd-input").val()
           group = @$(".js-group-select option:selected").attr("value")
@@ -89,6 +91,7 @@ if Backbone?
               dataType: 'json'
               async: false # TODO when the rest of the stuff below is made to work properly..
               data:
+                  thread_type: thread_type
                   title: title
                   body: body
                   anonymous: anonymous
