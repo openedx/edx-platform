@@ -107,3 +107,19 @@ class TestXMLModuleStore(unittest.TestCase):
             SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
             locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
         )
+
+    def test_branch_setting(self):
+        """
+        Test the branch setting context manager
+        """
+        store = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+        course_key = store.get_courses()[0]
+
+        # XML store allows published_only branch setting
+        with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            store.get_item(course_key.location)
+
+        # XML store does NOT allow draft_preferred branch setting
+        with self.assertRaises(ValueError):
+            with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+                pass
