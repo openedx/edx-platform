@@ -148,11 +148,6 @@ class DashboardTest(TestCase):
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.assertIsNotNone(self.course)
         self.user = UserFactory.create(username="jack", email="jack@fake.edx.org", password='test')
-        CourseModeFactory.create(
-            course_id=self.course.id,
-            mode_slug='honor',
-            mode_display_name='Honor Code',
-        )
         self.client = Client()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -229,6 +224,26 @@ class DashboardTest(TestCase):
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         verified_mode.save()
         self.assertFalse(enrollment.refundable())
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_refundable_of_purchased_course(self):
+
+        self.client.login(username="jack", password="test")
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            min_price=10,
+            currency='usd',
+            mode_display_name='honor',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+
+        # TODO: Until we can allow course administrators to define a refund period for paid for courses show_refund_option should be False. # pylint: disable=W0511
+        self.assertFalse(enrollment.refundable())
+
+        resp = self.client.post(reverse('student.views.dashboard', args=[]))
+        self.assertIn('You will not be refunded the amount you paid.', resp.content)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_refundable_when_certificate_exists(self):
