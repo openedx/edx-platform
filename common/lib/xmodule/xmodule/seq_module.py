@@ -58,7 +58,9 @@ class SequenceModule(SequenceFields, XModule):
             try:
                 self.position = int(self.system.position)
             except TypeError:
-                self.position = 1
+                if not self.position:
+                    self.position = 1
+
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.

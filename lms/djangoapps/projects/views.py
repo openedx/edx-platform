@@ -124,8 +124,8 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         if response.status_code == status.HTTP_201_CREATED:
             # create the workgroup cohort
             workgroup = self.object
-
-            add_cohort(workgroup.project.course_id, workgroup.cohort_name, CourseUserGroup.WORKGROUP)
+            course_descriptor, course_key, course_content = _get_course(self.request, self.request.user, workgroup.project.course_id)  # pylint: disable=W0612
+            add_cohort(course_key, workgroup.cohort_name, CourseUserGroup.WORKGROUP)
 
         return response
 
@@ -178,21 +178,23 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             workgroup = self.get_object()
             workgroup.users.add(user)
             # add user to the workgroup cohort
-            cohort = get_cohort_by_name(workgroup.project.course_id,
+            course_descriptor, course_key, course_content = _get_course(self.request, user, workgroup.project.course_id)  # pylint: disable=W0612
+            cohort = get_cohort_by_name(course_key,
                                         workgroup.cohort_name, CourseUserGroup.WORKGROUP)
             add_user_to_cohort(cohort, user.username)
             workgroup.save()
             return Response({}, status=status.HTTP_201_CREATED)
         else:
             user_id = request.DATA.get('id')
-            workgroup = self.get_object()
-            cohort = get_cohort_by_name(workgroup.project.course_id,
-                                        workgroup.cohort_name, CourseUserGroup.WORKGROUP)
             try:
                 user = User.objects.get(id=user_id)
             except ObjectDoesNotExist:
                 message = 'User {} does not exist'.format(user_id)
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+            workgroup = self.get_object()
+            course_descriptor, course_key, course_content = _get_course(self.request, user, workgroup.project.course_id)  # pylint: disable=W0612
+            cohort = get_cohort_by_name(course_key,
+                                        workgroup.cohort_name, CourseUserGroup.WORKGROUP)
             workgroup.users.remove(user)
             remove_user_from_cohort(cohort, user.username, CourseUserGroup.WORKGROUP)
             return Response({}, status=status.HTTP_204_NO_CONTENT)

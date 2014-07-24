@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.http import Http404
@@ -14,15 +14,23 @@ from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.response import Response
 
+
+from api_manager.courseware_access import get_course, get_course_child, get_course_total_score
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.utils import generate_base_uri, get_course, get_course_child
+from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer
 
-from courseware.views import save_child_position, get_current_child
+from courseware import module_render
+from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
+from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
+
+
+
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from user_api.models import UserPreference
@@ -633,7 +641,9 @@ class UsersCoursesList(SecureAPIView):
                     "id": unicode(course_key),
                     "uri": '{}/{}'.format(base_uri, unicode(course_key)),
                     "is_active": enrollment.is_active,
-                    "name": course_descriptor.display_name
+                    "name": course_descriptor.display_name,
+                    "start": getattr(course_descriptor, 'start', None),
+                    "end": getattr(course_descriptor, 'end', None)
                 }
                 response_data.append(course_data)
             else:
@@ -694,6 +704,9 @@ class UsersCoursesDetail(SecureAPIView):
             if not content_position:
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
             response_data['position'] = content_position
+
+
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, user_id, course_id):
@@ -704,17 +717,42 @@ class UsersCoursesDetail(SecureAPIView):
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
-        except ObjectDoesNotExist:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
-        if not course_descriptor:
+            course_descriptor, course_key, course_content = get_course(request, user, course_id, depth=2)
+        except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not CourseEnrollment.is_enrolled(user, course_key):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
         response_data['uri'] = base_uri
-        response_data['position'] = course_descriptor.position
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_key,
+            user,
+            course_descriptor,
+            depth=2)
+        course_module = module_render.get_module_for_descriptor(
+            user,
+            request,
+            course_descriptor,
+            field_data_cache,
+            course_key)
+        response_data['position'] = course_module.position
+        response_data['position_tree'] = {}
+        parent_module = course_module
+        while parent_module is not None:
+            current_child_descriptor = get_current_child(parent_module)
+            if current_child_descriptor:
+                response_data['position_tree'][current_child_descriptor.category] = {}
+                response_data['position_tree'][current_child_descriptor.category]['id'] = unicode(current_child_descriptor.scope_ids.usage_id)
+                parent_module = module_render.get_module(
+                    user,
+                    request,
+                    current_child_descriptor.scope_ids.usage_id,
+                    field_data_cache,
+                    course_key
+                )
+            else:
+                parent_module = None
         return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, course_id):
@@ -767,10 +805,30 @@ class UsersCoursesGradesDetail(SecureAPIView):
         grade_summary = grades.grade(student, request, course_descriptor)
         grading_policy = course_descriptor.grading_policy
 
+        queryset = StudentModule.objects.filter(
+            course_id__exact=course_key,
+            max_grade__isnull=False,
+            max_grade__gt=0
+        )
+
+        total_score = get_course_total_score(courseware_summary)
+        user_queryset = queryset.filter(grade__isnull=False, student=student)
+        comp_modules = user_queryset.aggregate(Sum('grade'))
+        score_of_comp_module = comp_modules['grade__sum'] or 0
+        max_possible_score = user_queryset.aggregate(Sum('max_grade'))
+        current_grade = 0
+        pro_forma_grade = 0
+        if total_score:
+            current_grade = score_of_comp_module / float(total_score) * 100
+
+        if max_possible_score['max_grade__sum']:
+            pro_forma_grade = score_of_comp_module / float(max_possible_score['max_grade__sum']) * 100
         response_data = {
             'courseware_summary': courseware_summary,
             'grade_summary': grade_summary,
-            'grading_policy': grading_policy
+            'grading_policy': grading_policy,
+            'current_grade': current_grade,
+            'pro_forma_grade': pro_forma_grade
         }
 
         return Response(response_data)
@@ -818,16 +876,16 @@ class UsersPreferences(SecureAPIView):
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
-            return Response({}, status.HTTP_404_NOT_FOUND)
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         if not len(request.DATA):
-            return Response({}, status.HTTP_400_BAD_REQUEST)
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         # do a quick inspection to make sure we're only getting strings as values
         for key in request.DATA.keys():
             value = request.DATA[key]
             if not isinstance(value, basestring):
-                return Response({}, status.HTTP_400_BAD_REQUEST)
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         status_code = status.HTTP_200_OK
         for key in request.DATA.keys():
@@ -849,6 +907,44 @@ class UsersPreferences(SecureAPIView):
                 status_code = status.HTTP_201_CREATED
 
         return Response({}, status_code)
+
+class UsersPreferencesDetail(SecureAPIView):
+    """
+    ### The UsersPreferencesDetail view allows clients to interact with the User's preferences
+    - URI: ```/api/users/{user_id}/preferences/{preference_id}```
+    - DELETE: Removes the specified preference from the user's record
+    ### Use Cases/Notes:
+    * Use DELETE to remove the last-visited course for a user (for example)
+    """
+
+    def get(self, request, user_id, preference_id):  # pylint: disable=W0613
+        """
+        GET returns the specified preference for the specified user
+        """
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        response_data = {}
+        try:
+            response_data[preference_id] = user.preferences.get(key=preference_id).value
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        return Response(response_data)
+
+    def delete(self, request, user_id, preference_id):  # pylint: disable=W0613
+        """
+        DELETE /api/users/{user_id}/preferences/{preference_id}
+        """
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+        for preference in user.preferences.all():
+            if preference.key == preference_id:
+                UserPreference.objects.get(user_id=user_id, key=preference.key).delete()
+                break
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 class UsersOrganizationsList(SecureListAPIView):
@@ -947,7 +1043,7 @@ class UsersSocialMetrics(SecureListAPIView):
         comment_user.course_id = course_id
 
         try:
-            data = comment_user.social_stats()
+            data = (comment_user.social_stats())[user_id]
             http_status = status.HTTP_200_OK
         except (CommentClientRequestError, ConnectionError), error:
             data = {

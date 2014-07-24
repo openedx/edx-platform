@@ -158,6 +158,7 @@ class CourseModuleCompletion(TimeStampedModel):
     user = models.ForeignKey(User, db_index=True, related_name="course_completions")
     course_id = models.CharField(max_length=255, db_index=True)
     content_id = models.CharField(max_length=255, db_index=True)
+    stage = models.CharField(max_length=255, null=True, blank=True)
 
 
 class APIUserQuerySet(models.query.QuerySet):  # pylint: disable=R0924

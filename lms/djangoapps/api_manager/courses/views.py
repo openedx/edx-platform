@@ -12,6 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Sum, Count
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -19,19 +20,23 @@ from rest_framework.response import Response
 from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
-from projects.models import Project
-from projects.serializers import ProjectSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 
+from api_manager.courseware_access import get_course, get_course_child
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
-from api_manager.users.serializers import UserSerializer
-from api_manager.utils import generate_base_uri, get_course, get_course_child
+from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
+from api_manager.utils import generate_base_uri
+from projects.models import Project, Workgroup
+from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 
 from .serializers import CourseModuleCompletionSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
+
+from lms.lib.comment_client.user import get_course_social_stats
+from lms.lib.comment_client.utils import CommentClientRequestError
 
 log = logging.getLogger(__name__)
 
@@ -916,6 +921,12 @@ class CoursesUsersList(SecureAPIView):
 
           * username: The username of the user.
 
+        * GET supports filtering of user by organization(s) like this
+         * To get users enrolled in a course and are also member of organization
+         /api/courses/{course_id}/users?organizations={organization_id}
+         * organizations filter can be a single id or multiple ids separated by comma
+         /api/courses/{course_id}/users?organizations={organization_id1},{organization_id2}
+
     **Post Values**
 
         To create a new user through POST /api/courses/{course_id}/users, you
@@ -960,6 +971,7 @@ class CoursesUsersList(SecureAPIView):
         """
         GET /api/courses/{course_id}
         """
+        orgs = request.QUERY_PARAMS.get('organizations')
         response_data = OrderedDict()
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -968,6 +980,11 @@ class CoursesUsersList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         # Get a list of all enrolled students
         users = CourseEnrollment.users_enrolled_in(course_key)
+        if orgs:
+            if ',' in orgs:
+                upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+                orgs = orgs.split(",")[:upper_bound]
+            users = users.filter(organizations__in=orgs)
         response_data['enrollments'] = []
         for user in users:
             user_data = OrderedDict()
@@ -1237,6 +1254,7 @@ class CourseModuleCompletionList(SecureListAPIView):
                     "user_id": "3",
                     "course_id": "32fgdf",
                     "content_id": "324dfgd",
+                    "stage": "First",
                     "created": "2014-06-10T13:14:49.878Z",
                     "modified": "2014-06-10T13:14:49.914Z"
                 }
@@ -1245,13 +1263,14 @@ class CourseModuleCompletionList(SecureListAPIView):
 
     Filters can also be applied
     ```/api/courses/{course_id}/completions/?user_id={user_id}```
-    ```/api/courses/{course_id}/completions/?content_id={content_id}```
+    ```/api/courses/{course_id}/completions/?content_id={content_id}&stage={stage}```
     ```/api/courses/{course_id}/completions/?user_id={user_id}&content_id={content_id}```
     - POST: Creates a Course-Module completion entity
     - POST Example:
         {
             "content_id":"i4x://the/content/location",
-            "user_id":4
+            "user_id":4,
+            "stage": "First"
         }
     ### Use Cases/Notes:
     * Use GET operation to retrieve list of course completions by user
@@ -1265,6 +1284,7 @@ class CourseModuleCompletionList(SecureListAPIView):
         """
         user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        stage = self.request.QUERY_PARAMS.get('stage', None)
         course_id = self.kwargs['course_id']
         course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
         print course_descriptor
@@ -1282,6 +1302,9 @@ class CourseModuleCompletionList(SecureListAPIView):
                 raise Http404
             queryset = queryset.filter(content_id=existing_content.location)
 
+        if stage:
+            queryset = queryset.filter(stage=stage)
+
         return queryset
 
     def post(self, request, course_id):
@@ -1290,6 +1313,7 @@ class CourseModuleCompletionList(SecureListAPIView):
         """
         content_id = request.DATA.get('content_id', None)
         user_id = request.DATA.get('user_id', None)
+        stage = request.DATA.get('stage', None)
         if not content_id:
             return Response({'message': _('content_id is missing')}, status.HTTP_400_BAD_REQUEST)
         if not user_id:
@@ -1303,7 +1327,8 @@ class CourseModuleCompletionList(SecureListAPIView):
 
         completion, created = CourseModuleCompletion.objects.get_or_create(user_id=user_id,
                                                                            course_id=course_key,
-                                                                           content_id=existing_content.location)
+                                                                           content_id=existing_content.location,
+                                                                           stage=stage)
         serializer = CourseModuleCompletionSerializer(completion)
         if created:
             return Response(serializer.data, status=status.HTTP_201_CREATED)  # pylint: disable=E1101
@@ -1461,10 +1486,11 @@ class CoursesLeadersList(SecureListAPIView):
         if user_id:
             user_points = StudentModule.objects.filter(course_id__exact=course_key,
                                                        student__id=user_id).aggregate(points=Sum('grade'))
+            user_points = user_points['points'] or 0
             users_above = queryset.values('student__id').annotate(points=Sum('grade')).\
-                filter(points__gt=user_points['points']).count()
+                filter(points__gt=user_points).count()
             data['position'] = users_above + 1
-            data['points'] = user_points['points']
+            data['points'] = user_points
 
         points = queryset.aggregate(total=Sum('grade'))
         users = queryset.filter(student__is_active=True).aggregate(total=Count('student__id', distinct=True))
@@ -1531,3 +1557,76 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         serializer = CourseCompletionsLeadersSerializer(queryset, many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursesWorkgroupsList(SecureListAPIView):
+    """
+    ### The CoursesWorkgroupsList view allows clients to retrieve a list of workgroups
+    associated to a course
+    - URI: ```/api/courses/{course_id}/workgroups/```
+    - GET: Provides paginated list of workgroups associated to a course
+    """
+
+    serializer_class = BasicWorkgroupSerializer
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
+
+        queryset = Workgroup.objects.filter(project__course_id=course_id)
+        return queryset
+
+
+class CoursesSocialMetrics(SecureListAPIView):
+    """
+    ### The CoursesSocialMetrics view allows clients to query about the activity of all users in the
+    forums
+    - URI: ```/api/users/{course_id}/metrics/social/```
+    - GET: Returns a list of social metrics for users in the specified course
+    """
+
+    def get(self, request, course_id): # pylint: disable=W0613
+
+        try:
+            data = get_course_social_stats(course_id)
+            http_status = status.HTTP_200_OK
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, http_status)
+
+
+class CoursesCitiesMetrics(SecureListAPIView):
+    """
+    ### The CoursesCitiesMetrics view allows clients to retrieve ordered list of user
+    count by city in a particular course
+    - URI: ```/api/courses/{course_id}/metrics/cities/```
+    - GET: Provides paginated list of user count by cities
+    list can be filtered by city
+    GET ```/api/courses/{course_id}/metrics/cities/?city={city1},{city2}```
+    """
+
+    serializer_class = UserCountByCitySerializer
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        city = self.request.QUERY_PARAMS.get('city', None)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
+        queryset = CourseEnrollment.users_enrolled_in(course_key)
+        if city:
+            city = city.split(',')[:upper_bound]
+            q_list = [Q(profile__city__iexact=item.strip()) for item in city]
+            q_list = reduce(lambda a, b: a | b, q_list)
+            queryset = queryset.filter(q_list)
+
+        queryset = queryset.values('profile__city').annotate(count=Count('profile__city'))\
+            .filter(count__gt=0).order_by('-count')
+        return queryset

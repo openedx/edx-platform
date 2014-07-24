@@ -30,6 +30,9 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/metrics/*$', courses_views.CourseMetrics.as_view(), name='course-metrics'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/metrics/proficiency/leaders/*$', courses_views.CoursesLeadersList.as_view(), name='course-metrics-proficiency-leaders'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/metrics/completions/leaders/*$', courses_views.CoursesCompletionsLeadersList.as_view(), name='course-metrics-completions-leaders'),
+    url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/workgroups/*$', courses_views.CoursesWorkgroupsList.as_view()),
+    url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/metrics/social/$', courses_views.CoursesSocialMetrics.as_view(), name='courses-social-metrics'),
+    url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)/metrics/cities/$', courses_views.CoursesCitiesMetrics.as_view(), name='courses-cities-metrics'),
     url(r'^(?P<course_id>[a-zA-Z0-9_+\/:]+)$', courses_views.CoursesDetail.as_view()),
     url(r'/*$^', courses_views.CoursesList.as_view()),
 )

@@ -4,6 +4,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/projects/tests/test_workgroups.py]
 """
+from datetime import datetime
 import json
 import uuid
 
@@ -51,8 +52,8 @@ class WorkgroupsApiTests(TestCase):
         self.test_workgroup_name = str(uuid.uuid4())
 
         self.test_course = CourseFactory.create(
-            start="2014-06-16T14:30:00Z",
-            end="2015-01-16T14:30:00Z"
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30)
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -60,7 +61,7 @@ class WorkgroupsApiTests(TestCase):
             category="group_project",
             parent_location=self.test_course.location,
             data=self.test_data,
-            due="2014-05-16T14:30:00Z",
+            due=datetime(2014, 5, 16, 14, 30),
             display_name="Group Project"
         )
 
