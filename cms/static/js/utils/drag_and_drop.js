@@ -15,7 +15,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
              */
             findDestination: function (ele, yChange) {
                 var eleY = ele.offset().top;
-                var eleYEnd = eleY + ele.height();
+                var eleYEnd = eleY + ele.outerHeight();
                 var containers = $(ele.data('droppable-class'));
 
                 for (var i = 0; i < containers.length; i++) {
@@ -37,7 +37,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                         var collapseFudge = 10;
                         if (Math.abs(eleY - parentListTop) < collapseFudge ||
                             (eleY > parentListTop &&
-                             eleYEnd - collapseFudge <= parentListTop + parentList.height())
+                             eleYEnd - collapseFudge <= parentListTop + parentList.outerHeight())
                             ) {
                             return {
                                 ele: container,
@@ -66,7 +66,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                             for (var j = 0; j < siblings.length; j++) {
                                 var $sibling = $(siblings[j]);
                                 var siblingY = $sibling.offset().top;
-                                var siblingHeight = $sibling.height();
+                                var siblingHeight = $sibling.outerHeight();
                                 var siblingYEnd = siblingY + siblingHeight;
 
                                 // Facilitate dropping into the beginning or end of a list
