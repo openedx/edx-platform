@@ -22,7 +22,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
                 this.nameEditor.render();
                 if (this.options.action === 'new') {
-                    this.nameEditor.$('.xblock-field-value').click();
+                    this.nameEditor.$('.xblock-field-value-edit').click();
                 }
                 this.xblockView = new ContainerView({
                     el: this.$('.wrapper-xblock'),
