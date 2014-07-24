@@ -61,7 +61,7 @@ def enable_theme():
     )
 
     # Include theme locale path for django translations lookup
-    settings.LOCALE_PATHS += (theme_root / 'conf/locale',)
+    settings.LOCALE_PATHS = (theme_root / 'conf/locale',) + settings.LOCALE_PATHS
 
 
 def enable_microsites():
