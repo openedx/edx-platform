@@ -47,14 +47,14 @@ from contentstore.utils import reverse_usage_url
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
-                        <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
-                        <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="Section">
+                        <i class="icon-plus"></i>${_('New Section')}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="Section">
-                        <i class="icon-plus"></i>${_('New Section')}
+                    <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
+                        <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
+                        <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
                     </a>
                 </li>
                 <li class="nav-item">
