@@ -58,21 +58,15 @@ def create_payment(params):
         "client_secret": "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
     })
 
+    # TODO: find/make payment cancel page
     payment = paypalrestsdk.Payment({
         "intent": "sale",
         "payer": {
-            "payment_method": "credit_card",
-            "funding_instruments": [{
-                "credit_card": {
-                    "type": "visa",
-                    "number": "4417119669820331",
-                    "expire_month": "11",
-                    "expire_year": "2018",
-                    "cvv2": "874",
-                    "first_name": "Joe",
-                    "last_name": "Shopper"
-                }
-            }]
+            "payment_method": "paypal",
+        },
+        "redirect_urls": {
+            "return_url": "http://localhost:8000/shoppingcart/postpay_callback",
+            "cancel_url": "http://localhost:8000/payment/cancel"
         },
         "transactions": [
             {
@@ -93,23 +87,21 @@ def create_payment(params):
             }]
     })
 
-    if payment is True:
-        # payment was created
+    if payment.create():
+        print("Payment[{}] created successfully".format(payment.id))
+        # return successfully created payment
         return payment
-    elif payment is False:
-        if payment.error:
-            # Todo: figure out what type this (and other) exception should be
-            raise Exception("Error creating payment; {}".format(payment.error))
-        else:
-            raise Exception("Error creating payment but paypal returned no error!")
+    else:
+        # TODO: handle errors
+        pass
 
 
-def execute_payment(payment_id, payer_id):
+def execute_payment(payment):
     """
     Executes payment after user vists paypal approve link
     """
     # ID of the payment. This ID is provided when creating payment.
-    payment = Payment.find(payment_id)
+    payment = Payment.find(payment.id)
 
     # PayerID is required to approve the payment.
     if payment.execute({"payer_id": payer_id}):  # return True or False
@@ -128,6 +120,9 @@ def process_postpay_callback(params):
 
     Verify the callback and determine if the payment was successful
 
+    Paypal is redirected directly back to here right now. May need to make
+    a view that redirects here after munging data to proper format
+
     The top level call to this module, basically
 
     It returns {'success':bool, 'order':Order, 'error_html':str}
@@ -139,7 +134,6 @@ def process_postpay_callback(params):
     helpful-enough error message in error_html.
     """
     # TODO: Implement verification to confirm status of paypal purchase
-    success = execute_payment(payment, payer_id)
     if success:
         return {'success': True, 'order': order_id, 'error_html': ""}
     else:
