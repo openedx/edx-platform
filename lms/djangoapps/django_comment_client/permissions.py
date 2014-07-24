@@ -37,16 +37,16 @@ def has_permission(user, permission, course_id=None):
 CONDITIONS = ['is_open', 'is_author']
 
 
-def _check_condition(user, condition, course_id, data):
-    def check_open(user, condition, course_id, data):
+def _check_condition(user, condition, content):
+    def check_open(user, content):
         try:
-            return data and not data['content']['closed']
+            return content and not content['closed']
         except KeyError:
             return False
 
-    def check_author(user, condition, course_id, data):
+    def check_author(user, content):
         try:
-            return data and data['content']['user_id'] == str(user.id)
+            return content and content['user_id'] == str(user.id)
         except KeyError:
             return False
 
@@ -55,10 +55,10 @@ def _check_condition(user, condition, course_id, data):
         'is_author': check_author,
     }
 
-    return handlers[condition](user, condition, course_id, data)
+    return handlers[condition](user, content)
 
 
-def _check_conditions_permissions(user, permissions, course_id, **kwargs):
+def _check_conditions_permissions(user, permissions, course_id, content):
     """
     Accepts a list of permissions and proceed if any of the permission is valid.
     Note that ["can_view", "can_edit"] will proceed if the user has either
@@ -69,7 +69,7 @@ def _check_conditions_permissions(user, permissions, course_id, **kwargs):
     def test(user, per, operator="or"):
         if isinstance(per, basestring):
             if per in CONDITIONS:
-                return _check_condition(user, per, course_id, kwargs)
+                return _check_condition(user, per, content)
             return cached_has_permission(user, per, course_id=course_id)
         elif isinstance(per, list) and operator in ["and", "or"]:
             results = [test(user, x, operator="and") for x in per]
@@ -115,4 +115,4 @@ def check_permissions_by_view(user, course_id, content, name):
         p = VIEW_PERMISSIONS[name]
     except KeyError:
         logging.warning("Permission for view named %s does not exist in permissions.py" % name)
-    return _check_conditions_permissions(user, p, course_id, content=content)
+    return _check_conditions_permissions(user, p, course_id, content)
