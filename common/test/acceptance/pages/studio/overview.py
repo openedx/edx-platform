@@ -171,8 +171,8 @@ class CourseOutlineUnit(CourseOutlineChild):
     PageObject that wraps a unit link on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-unit'
-    NAME_SELECTOR = '.xblock-title a'
+    BODY_SELECTOR = '.outline-unit'
+    NAME_SELECTOR = '.unit-title a'
 
     def go_to(self):
         """
@@ -188,7 +188,7 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
     url = None
 
-    BODY_SELECTOR = '.outline-item-subsection'
+    BODY_SELECTOR = '.outline-subsection'
     CHILD_CLASS = CourseOutlineUnit
 
     def unit(self, title):
@@ -221,7 +221,7 @@ class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
     :class`.PageObject` that wraps a section block on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-section'
+    BODY_SELECTOR = '.outline-section'
     CHILD_CLASS = CourseOutlineSubsection
 
     def subsection(self, title):

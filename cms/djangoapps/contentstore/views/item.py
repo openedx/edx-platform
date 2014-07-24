@@ -716,43 +716,6 @@ def _compute_publish_state(xblock, child_info):
         return PublishState.ready
 
 
-def _is_visible_to_staff_only(xblock, child_info):
-    """
-    Returns true if the specified xblock and all of its children are shown to staff only.
-    """
-    if xblock.visible_to_staff_only:
-        return True
-    elif child_info and len(child_info['children']) > 0:
-        return all(info['publish_state'] == PublishState.staff_only for info in child_info['children'])
-    return False
-
-
-def _is_unscheduled(xblock, child_info):
-    """
-    Returns true if the specified xblock and all of its children are unscheduled.
-    """
-    if xblock.start != DEFAULT_START_DATE:
-        return False
-    elif child_info:
-        return all(
-            info['publish_state'] in [PublishState.unscheduled, PublishState.staff_only]
-            for info in child_info['children']
-        )
-    return True
-
-
-def _has_unpublished_content(xblock, child_info):
-    """
-    Returns true if the xblock or its children have unpublished content (that is not staff only)
-    """
-    if is_unit(xblock):
-        return modulestore().has_changes(xblock.location)
-    elif child_info:
-        return any(info['publish_state'] == PublishState.has_unpublished_content for info in child_info['children'])
-    else:
-        return False
-
-
 def _create_xblock_ancestor_info(xblock):
     """
     Returns information about the ancestors of an xblock. Note that the direct parent will also return
