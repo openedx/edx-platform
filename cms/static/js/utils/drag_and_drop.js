@@ -7,7 +7,6 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
             collapsedClass: "is-collapsed",
-            expandedClass: "is-expanded",
 
             /*
              * Determine information about where to drop the currently dragged
@@ -160,8 +159,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The direction the drag is moving in (negative means up, positive down).
                     dragDirection: 0
                 };
-                if (ele.hasClass(this.expandedClass)) {
-                    ele.removeClass(this.expandedClass);
+                if (!ele.hasClass(this.collapsedClass)) {
                     ele.addClass(this.collapsedClass);
                     ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
@@ -262,7 +260,6 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
             expandElement: function (ele) {
                 ele.removeClass(this.collapsedClass);
-                ele.addClass(this.expandedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
 
@@ -330,13 +327,13 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
              * `parentLocationSelector`.
              */
             makeDraggable: function (type, handleClass, droppableClass, parentLocationSelector, el) {
-                console.log("makeDraggable on " + type);
+//                console.log("makeDraggable on " + type);
                 _.each(
                     el ? el : $(type),
                     function (ele) {
                         // Remember data necessary to reconstruct the parent-child relationships
                         if ($(ele).data('droppable-class') !== droppableClass) {
-                            console.log('populating dragable info for type ' + type);
+//                            console.log('populating dragable info for type ' + type);
                             $(ele).data('droppable-class', droppableClass);
                             $(ele).data('parent-location-selector', parentLocationSelector);
                             $(ele).data('child-selector', type);
