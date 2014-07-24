@@ -149,6 +149,8 @@ def process_postpay_callback(params):
         # TODO: See if there is a way to verify token and payer_id match
         order_number = params['order_number']
         order = Order.objects.get(pk=order_number)
+        # actually purchase the order since we've verfied a transaction took place
+        order.purchase()
         return {'success': True,
                 'order': order,  # due to exception we may not have the order
                 'error_html': ""}
