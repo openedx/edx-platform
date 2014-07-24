@@ -55,6 +55,13 @@ class GroupConfiguration(object):
         css = 'a.group-toggle'
         self.find_css(css).first.click()
 
+    def add_group(self):
+        """
+        Add new group.
+        """
+        css = 'button.action-add-group'
+        self.find_css(css).first.click()
+
     def get_text(self, css):
         """
         Return text for the defined by css locator.
@@ -144,10 +151,10 @@ class GroupConfiguration(object):
         """
         css = '.group'
 
-        def group_selector(config_index, group_index):
-            return self.get_selector('.groups-{} .group-{} '.format(config_index, group_index))
+        def group_selector(group_index):
+            return self.get_selector('.group-{} '.format(group_index))
 
-        return [Group(self.page, group_selector(self.index, index)) for index, element in enumerate(self.find_css(css))]
+        return [Group(self.page, group_selector(index)) for index, element in enumerate(self.find_css(css))]
 
     def __repr__(self):
         return "<{}:{}>".format(self.__class__.__name__, self.name)
@@ -170,10 +177,18 @@ class Group(object):
     @property
     def name(self):
         """
-        Return group name.
+        Return the name of the group .
         """
         css = '.group-name'
         return self.find_css(css).first.text[0]
+
+    @name.setter
+    def name(self, value):
+        """
+        Set the name for the group.
+        """
+        css = '.group-name'
+        self.find_css(css).first.fill(value)
 
     @property
     def allocation(self):
@@ -182,6 +197,13 @@ class Group(object):
         """
         css = '.group-allocation'
         return self.find_css(css).first.text[0]
+
+    def remove(self):
+        """
+        Remove the group.
+        """
+        css = '.action-close'
+        return self.find_css(css).first.click()
 
     def __repr__(self):
         return "<{}:{}>".format(self.__class__.__name__, self.name)

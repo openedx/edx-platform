@@ -11,7 +11,7 @@
 <%block name="bodyclass">is-signedin course view-group-configurations</%block>
 
 <%block name="header_extras">
-% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "basic-modal", "modal-button"]:
+% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "group-edit", "basic-modal", "modal-button"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -23,7 +23,7 @@
 require(["domReady!", "js/collections/group_configuration", "js/views/pages/group_configurations"],
 function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
   % if configurations is not None:
-    var collection = new GroupConfigurationCollection(${json.dumps(configurations)});
+    var collection = new GroupConfigurationCollection(${json.dumps(configurations)}, { parse: true });
 
     collection.url = "${group_configuration_url}";
     new GroupConfigurationsPage({

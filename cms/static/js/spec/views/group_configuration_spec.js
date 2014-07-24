@@ -3,13 +3,15 @@ define([
     'js/collections/group_configuration',
     'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
-    'js/views/group_configuration_item', 'js/views/feedback_notification',
-    'js/spec_helpers/create_sinon', 'js/spec_helpers/edit_helpers',
-    'jasmine-stealth'
+    'js/views/group_configuration_item', 'js/models/group',
+    'js/collections/group', 'js/views/group_edit',
+    'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
+    'js/spec_helpers/edit_helpers', 'jasmine-stealth'
 ], function(
     Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
-    GroupConfigurationItem, Notification, create_sinon, view_helpers
+    GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
+    Notification, create_sinon, view_helpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -17,13 +19,15 @@ define([
         editView: '.group-configuration-edit',
         itemView: '.group-configurations-list-item',
         group: '.group',
+        groupFields: '.groups-fields',
         name: '.group-configuration-name',
         description: '.group-configuration-description',
         groupsCount: '.group-configuration-groups-count',
         groupsAllocation: '.group-allocation',
         errorMessage: '.group-configuration-edit-error',
+        inputGroupName: '.group-name',
         inputName: '.group-configuration-name-input',
-        inputDescription: '.group-configuration-description-input'
+        inputDescription: '.group-configuration-description-input',
     };
 
     beforeEach(function() {
@@ -59,6 +63,13 @@ define([
                 return _.every(values, function (value, key) {
                     return this.actual.get(key) === value;
                 }.bind(this));
+            },
+            toHaveDefaultNames: function (values) {
+                var actualValues = $.map(this.actual, function (item) {
+                    return $(item).val();
+                });
+
+                return _.isEqual(actualValues, values);
             }
         });
     });
@@ -90,7 +101,7 @@ define([
         });
 
         it('should show groups appropriately', function() {
-            this.model.get('groups').add([{}, {}, {}]);
+            this.model.get('groups').add([{}]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
 
@@ -104,7 +115,7 @@ define([
         });
 
         it('should hide groups appropriately', function() {
-            this.model.get('groups').add([{}, {}, {}]);
+            this.model.get('groups').add([{}]);
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
 
@@ -129,7 +140,9 @@ define([
 
         beforeEach(function() {
             view_helpers.installViewTemplates();
-            view_helpers.installTemplate('group-configuration-edit');
+            view_helpers.installTemplates([
+                'group-configuration-edit', 'group-edit'
+            ]);
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -152,10 +165,18 @@ define([
             });
         });
 
+        it ('should allow you to create new groups', function() {
+            var numGroups = this.model.get('groups').length;
+            this.view.$('.action-add-group').click();
+            expect(this.model.get('groups').length).toEqual(numGroups + 1);
+        });
+
         it('should save properly', function() {
             var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy();
+                notificationSpy = view_helpers.createNotificationSpy(),
+                groups;
 
+            this.view.$('.action-add-group').click();
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'
@@ -170,6 +191,10 @@ define([
                 name: 'New Configuration',
                 description: 'New Description'
             });
+
+            groups = this.model.get('groups');
+            expect(groups.length).toBe(3);
+            expect(groups.at(2).get('name')).toBe('Group C');
             expect(this.view.$el).not.toExist();
         });
 
@@ -185,10 +210,14 @@ define([
         });
 
         it('does not save on cancel', function() {
+            this.view.$('.action-add-group').click();
             setValuesToInputs(this.view, {
                 inputName: 'New Configuration',
                 inputDescription: 'New Description'
             });
+
+            expect(this.model.get('groups').length).toBe(3);
+
             this.view.$('.action-cancel').click();
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'Configuration',
@@ -197,6 +226,7 @@ define([
             // Model is still exist in the collection
             expect(this.collection.indexOf(this.model)).toBeGreaterThan(-1);
             expect(this.collection.length).toBe(1);
+            expect(this.model.get('groups').length).toBe(2);
         });
 
         it('should be removed on cancel if it is a new item', function() {
@@ -236,6 +266,69 @@ define([
             expect(this.view.$(SELECTORS.errorMessage)).not.toExist();
             expect(requests.length).toBe(1);
         });
+
+        it('should have appropriate class names on focus/blur', function () {
+            var groupInput = this.view.$(SELECTORS.inputGroupName).first(),
+                groupFields = this.view.$(SELECTORS.groupFields);
+
+            groupInput.focus();
+            expect(groupFields).toHaveClass('is-focused');
+            groupInput.blur();
+            expect(groupFields).not.toHaveClass('is-focused');
+        });
+
+        describe('removes all newly created groups on cancel', function () {
+            it('if the model has a non-empty groups', function() {
+                var groups = this.model.get('groups');
+
+                this.view.render();
+                groups.add([{ name: 'non-empty' }]);
+                expect(groups.length).toEqual(3);
+                this.view.$('.action-cancel').click();
+                // Restore to default state (2 groups by default).
+                expect(groups.length).toEqual(2);
+            });
+
+            it('if the model has no non-empty groups', function() {
+                var groups = this.model.get('groups');
+
+                this.view.render();
+                groups.add([{}, {}, {}]);
+                expect(groups.length).toEqual(5);
+                this.view.$('.action-cancel').click();
+                // Restore to default state (2 groups by default).
+                expect(groups.length).toEqual(2);
+            });
+        });
+
+        it('groups have correct default names and placeholders', function () {
+            var group1 = new GroupModel({ name: 'Group A' }),
+                group2 = new GroupModel({ name: 'Group B' }),
+                collection = this.model.get('groups');
+
+            collection.reset([group1, group2]); // Group A, Group B
+            this.view.$('.action-add-group').click(); // Add Group C
+            this.view.$('.action-add-group').click(); // Add Group D
+            this.view.$('.action-add-group').click(); // Add Group E
+
+            expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
+                'Group A', 'Group B', 'Group C', 'Group D', 'Group E'
+            ]);
+
+            // Remove Group B
+            this.view.$('.group-1 .action-close').click();
+
+            expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
+                'Group A', 'Group C', 'Group D', 'Group E'
+            ]);
+
+            this.view.$('.action-add-group').click(); // Add Group F
+            this.view.$('.action-add-group').click(); // Add Group G
+
+            expect(this.view.$(SELECTORS.inputGroupName)).toHaveDefaultNames([
+                'Group A', 'Group C', 'Group D', 'Group E', 'Group F', 'Group G'
+            ]);
+        });
     });
 
     describe('GroupConfigurationsList', function() {
@@ -254,7 +347,7 @@ define([
                 expect(this.view.$el).toContainText(
                     'You haven\'t created any group configurations yet.'
                 );
-                expect(this.view.$el).toContain('.new-button');
+                expect(this.view.$('.new-button')).toExist();
                 expect(this.view.$(SELECTORS.itemView)).not.toExist();
             });
 
@@ -273,8 +366,9 @@ define([
 
     describe('GroupConfigurationItem', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-configuration-edit', true);
-            view_helpers.installTemplate('group-configuration-details');
+            view_helpers.installTemplates([
+                'group-configuration-edit', 'group-configuration-details'
+            ], true);
             this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection([ this.model ]);
             this.view = new GroupConfigurationItem({
@@ -292,6 +386,35 @@ define([
             this.view.$('.action-cancel').click();
             expect(this.view.$(SELECTORS.detailsView)).toExist();
             expect(this.view.$(SELECTORS.editView)).not.toExist();
+        });
+    });
+
+    describe('GroupEdit', function() {
+        beforeEach(function() {
+            view_helpers.installTemplate('group-edit', true);
+
+            this.model = new GroupModel({
+                name: 'Group A'
+            });
+
+            this.collection = new GroupCollection([this.model]);
+
+            this.view = new GroupEdit({
+                model: this.model
+            });
+        });
+
+        describe('Basic', function () {
+            it('can render properly', function() {
+                this.view.render();
+                expect(this.view.$('.group-name').val()).toBe('Group A');
+                expect(this.view.$('.group-allocation')).toContainText('100%');
+            });
+
+            it ('can delete itself', function() {
+                this.view.render().$('.action-close').click();
+                expect(this.collection.length).toEqual(0);
+            });
         });
     });
 });

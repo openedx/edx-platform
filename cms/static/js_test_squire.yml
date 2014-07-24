@@ -50,6 +50,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/domReady.js
     - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js

@@ -3,17 +3,31 @@
  */
 define(["jquery", "js/views/feedback_notification", "js/spec_helpers/create_sinon"],
     function($, NotificationView, create_sinon) {
-        var installTemplate, installViewTemplates, createNotificationSpy, verifyNotificationShowing,
-            verifyNotificationHidden;
+        var installTemplate, installTemplates, installViewTemplates, createNotificationSpy,
+            verifyNotificationShowing, verifyNotificationHidden;
 
         installTemplate = function(templateName, isFirst) {
             var template = readFixtures(templateName + '.underscore'),
                 templateId = templateName + '-tpl';
+
             if (isFirst) {
                 setFixtures($("<script>", { id: templateId, type: "text/template" }).text(template));
             } else {
                 appendSetFixtures($("<script>", { id: templateId, type: "text/template" }).text(template));
             }
+        };
+
+        installTemplates = function(templateNames, isFirst) {
+            if (!$.isArray(templateNames)) {
+                templateNames = [templateNames];
+            }
+
+            $.each(templateNames, function(index, templateName) {
+                installTemplate(templateName, isFirst);
+                if (isFirst) {
+                    isFirst = false;
+                }
+            });
         };
 
         installViewTemplates = function(append) {
@@ -41,6 +55,7 @@ define(["jquery", "js/views/feedback_notification", "js/spec_helpers/create_sino
 
         return {
             'installTemplate': installTemplate,
+            'installTemplates': installTemplates,
             'installViewTemplates': installViewTemplates,
             'createNotificationSpy': createNotificationSpy,
             'verifyNotificationShowing': verifyNotificationShowing,
