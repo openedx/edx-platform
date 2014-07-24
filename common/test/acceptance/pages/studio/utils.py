@@ -14,9 +14,7 @@ def click_css(page, css, source_index=0, require_notification=True):
     If require_notification is False (default value is True), the method will return immediately.
     Otherwise, it will wait for the "mini-notification" to appear and disappear.
     """
-    buttons = page.q(css=css).filter(lambda el: el.size['width'] > 0)
-    target = buttons[source_index]
-    ActionChains(page.browser).click(target).release().perform()
+    page.q(css=css).filter(lambda el: el.size['width'] > 0).nth(source_index).click()
     if require_notification:
         wait_for_notification(page)
 
