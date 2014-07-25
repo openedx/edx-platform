@@ -511,7 +511,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // insert any extracted problem hints
 
-      // surround w/ problem tag
+      // make all elements descendants of a single problem element
       xml = '<problem schema="edXML/1.0">\n' + xml + '\n</problem>';
 
       return xml;
