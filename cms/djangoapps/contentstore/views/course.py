@@ -4,11 +4,11 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
-
 from django.utils.translation import ugettext as _
 import django.utils
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
+from django.core.context_processors import csrf
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
@@ -58,8 +58,11 @@ from student.roles import CourseRole, UserBasedRole
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
+from dark_lang.models import DarkLangConfig
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 
 from microsite_configuration import microsite
 
@@ -249,12 +252,35 @@ def course_listing(request):
             course.location.name
         )
 
+    language_options = DarkLangConfig.current().released_languages_list
+
+    # add in the default language if it's not in the list of released languages
+    if settings.LANGUAGE_CODE not in language_options:
+        language_options.append(settings.LANGUAGE_CODE)
+        # Re-alphabetize language options
+        language_options.sort()
+
+    # try to get the prefered language for the user
+    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    if cur_lang_code:
+        # if the user has a preference, get the name from the code
+        current_language = settings.LANGUAGE_DICT[cur_lang_code]
+    else:
+        # if the user doesn't have a preference, use the site language
+        current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
+
+    csrf_token = csrf(request)['csrf_token']
+
     return render_to_response('index.html', {
         'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'language_options': language_options,
+        'current_language': current_language,
+        'current_language_code': cur_lang_code,
+        'csrf_token': csrf_token,
     })
 
 

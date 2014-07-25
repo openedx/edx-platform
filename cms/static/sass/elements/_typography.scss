@@ -3,6 +3,27 @@
 
 // Scale - (6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72)
 
+// weight
+%t-weight0 {
+  font-weight: 300;
+}
+
+%t-weight1 {
+  font-weight: 400;
+}
+
+%t-weight2 {
+  font-weight: 500;
+}
+
+%t-weight3 {
+  font-weight: 600;
+}
+
+%t-weight4 {
+  font-weight: 700;
+}
+
 // headings/titles
 %t-title {
   font-family: $f-sans-serif;
@@ -175,4 +196,82 @@
 %t-icon9 {
   @include font-size(10);
   @include line-height(10);
+}
+
+// ====================
+
+// canned typography - headers
+%hd-alpha {
+
+}
+
+%hd-bravo {
+
+}
+
+%hd-charlie {
+
+}
+
+%hd-delta {
+  @extend %t-weight3;
+  @extend %t-title7;
+  margin: 0 0 ($baseline/2) 0;
+  border-bottom: 1px solid $gray-l4;
+  padding: 0 0 ($baseline/4) 0;
+  color: $gray-l3;
+}
+
+%hd-epsilon {
+  @extend %t-weight3;
+  @extend %t-title7;
+  margin: 0 0 ($baseline/4) 0;
+  color: $gray-d2;
+}
+
+%hd-foxtrot {
+
+}
+
+%hd-golf {
+
+}
+
+// ====================
+
+// canned typography - copy
+%copy-alpha {
+
+}
+
+%copy-bravo {
+
+}
+
+%copy-charlie {
+
+}
+
+%copy-delta {
+
+}
+
+// ====================
+
+// canned typography - actions
+%action-alpha {
+
+}
+
+%action-bravo {
+  @extend %t-action2;
+}
+
+%action-charlie {
+  @extend %t-weight3;
+  @extend %t-action3;
+}
+
+%action-delta {
+
 }

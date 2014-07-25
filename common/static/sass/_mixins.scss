@@ -97,6 +97,24 @@
   background: $white;
 }
 
+
+// ====================
+
+// utility hide/show classes
+%ui-shown {
+  visibility: visible;
+  opacity: 1.0;
+  height: auto;
+  overflow: visible;
+}
+
+%ui-hidden {
+  visibility: hidden;
+  opacity: 0.0;
+  height: 0;
+  overflow: hidden;
+}
+
 // extends - UI - visual link
 %ui-fake-link {
   cursor: pointer;
@@ -215,14 +233,14 @@
 }
 
 %ui-btn-flat-outline {
-  @extend %t-action4;
+  @extend %t-action4; // needs to be abstracted out (BT)
   @include transition(all .15s);
   font-weight: 600;
   text-align: center;
   border-radius: ($baseline/4);
   border: 1px solid $blue-l2;
   padding: 1px ($baseline/2) 2px ($baseline/2);
-  background-color: $white;
+  background-color: transparent;
   color: $blue-l2;
 
   &:hover, &:focus {
@@ -259,6 +277,21 @@
     @extend %cont-text-sr;
   }
 }
+
+// button made to look like a link - very very sneaky
+%ui-btn-fakelink {
+  @include transition(color $tmg-f2 ease-in-out 0s);
+  border: none;
+  background: none;
+  text-decoration: none;
+  color: $blue;
+
+  &:hover {
+    color: $orange-d1;
+  }
+}
+
+// ====================
 
 // extends - UI archetypes - well
 %ui-well {

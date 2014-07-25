@@ -28,6 +28,28 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
     $('#request-coursecreator-submit').click(function(e){
       $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
     });
+
+    $(".account-settings-language .action-edit").click(function(event, xhr) {
+        event.preventDefault();
+        $(".account-settings-language").toggleClass("is-editing");
+    });
+
+    $(".account-settings-language .action-cancel").click(function(event, xhr) {
+        event.preventDefault();
+        $(".account-settings-language").toggleClass("is-editing");
+    });
+
+    $(".account-settings-language .action-submit").click(function(event, xhr) {
+        event.preventDefault();
+        $.post('/lang_pref/setlang/',
+            {"language": $('.settings-language-value').val()})
+        .done(
+            function(data){
+                // submit form as normal
+                $('.settings-language-form').submit();
+            }
+        );
+    });
 });
 </script>
 </%block>
@@ -276,6 +298,58 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
     </article>
     <aside class="content-supplementary" role="complimentary">
+      %if len(language_options) > 1:
+      <div class="bit bit-account-settings">
+        <h2 class="title-super">Your Account</h2>
+
+        <div class="account-settings-language ui-toggle-edit">
+          <h3 class="title">${_('Preferred Language:')}</h3>
+
+          <div class="status ui-toggle-edit-display">
+            <span class="sr">${_("Your current language preference is set to:")}</span>
+            <span class="value">${current_language}</span>
+
+            <ul class="list-actions ui-toggle-edit-control">
+              <li class="action-item">
+                <a class="action action-edit" href="" role="button">${_("Edit")}</a>
+              </li>
+            </ul>
+          </div>
+
+	  <form action="/i18n/setlang/" method="post" class="settings-language-form ui-toggle-edit-form">
+	  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+            <ol class="list-input">
+              <li class="field text settings-language-select">
+                <label class="label sr" for="settings-language-value">${_("Please choose your preferred language")}</label>
+                <select class="input select settings-language-value" name="language">
+		  % for abbrv in language_options:
+		    % for language in settings.LANGUAGES:
+                      % if abbrv == language[0]:
+                        % if abbrv == current_language_code:
+                          <option value="${language[0]}" selected="selected">${language[1]}</option>
+			% else:
+                          <option value="${language[0]}">${language[1]}</option>
+			% endif
+		      % endif
+		    % endfor
+		  % endfor
+                </select>
+              </li>
+            </ol>
+
+            <ul class="list-actions">
+              <li class="action-item">
+                <button type="submit" class="action action-submit">${_("Save Language Settings")}</button>
+              </li>
+              <li class="action-item">
+                <button type="reset" class="action action-cancel">${_("Cancel")}</button>
+              </li>
+            </ul>
+          </form>
+        </div>
+      </div>
+      %endif
+
       <div class="bit">
         <h3 class="title title-3">${_('New to edX Studio?')}</h3>
         <p>${_('Click Help in the upper-right corner to get more information about the Studio page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other Studio resources.')}</p>
