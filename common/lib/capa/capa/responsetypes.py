@@ -958,7 +958,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         self.correct_choices = [
             contextualize_text(choice.get('name'), self.context)
             for choice in cxml
-            if contextualize_text(choice.get('correct'), self.context) == "True"
+            if contextualize_text(choice.get('correct'), self.context).upper() == "TRUE"
         ]
 
     def get_single_choice_hints(self, new_cmap, student_answers):
@@ -1229,7 +1229,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         incorrect_choices = []
 
         for choice in choices:
-            if choice.get('correct') == 'True':
+            if choice.get('correct').upper() == 'TRUE':
                 correct_choices.append(choice)
             else:
                 incorrect_choices.append(choice)
