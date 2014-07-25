@@ -19,7 +19,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # There are 12 created items and 7 parent updates
         # create course: finds: 1 to verify uniqueness, 1 to find parents
         # sends: 1 to create course, 1 to create overview
-        with check_mongo_calls(self.draft_mongo, 7, 2):
+        with check_mongo_calls(self.draft_mongo, 6, 2):
             super(TestPublish, self)._create_course(split=False)  # 2 inserts (course and overview)
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
@@ -62,7 +62,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                     'vertical', 'Vert2',
                     split=False
                 )
-            with check_mongo_calls(self.draft_mongo, 4, 2):
+            with check_mongo_calls(self.draft_mongo, 2, 2):
                 # 2 finds b/c looking for non-existent parents
                 self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, split=False)
                 self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, split=False)
