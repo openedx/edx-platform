@@ -41,6 +41,9 @@ class @DiscussionUtil
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
 
+  @isPrivilegedUser: (user_id) ->
+    @isStaff(user_id) || @isTA(user_id)
+
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
       Content.getContent(id).updateInfo(info)

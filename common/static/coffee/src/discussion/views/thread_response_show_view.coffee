@@ -14,14 +14,10 @@ if Backbone?
 
     attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
       endorsed: (endorsed) ->
-        if endorsed
-          @$(".action-endorse").show().addClass("is-endorsed")
-        else
-          if @model.get('ability')?.can_endorse
-            @$(".action-endorse").show()
-          else
-            @$(".action-endorse").hide()
-          @$(".action-endorse").removeClass("is-endorsed")
+        $endorseButton = @$(".action-endorse")
+        $endorseButton.toggleClass("is-clickable", @model.canBeEndorsed())
+        $endorseButton.toggleClass("is-endorsed", endorsed)
+        $endorseButton.toggle(endorsed || @model.canBeEndorsed())
     })
 
     $: (selector) ->
@@ -67,7 +63,7 @@ if Backbone?
 
     toggleEndorse: (event) ->
       event.preventDefault()
-      if not @model.can('can_endorse')
+      if not @model.canBeEndorsed()
         return
       $elem = $(event.target)
       url = @model.urlFor('endorse')

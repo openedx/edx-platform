@@ -41,6 +41,7 @@ describe "ThreadResponseShowView", ->
             course_id: "TestOrg/TestCourse/TestRun",
             body: "this is a comment",
             created_at: "2013-04-03T20:08:39Z",
+            endorsed: false,
             abuse_flaggers: [],
             votes: {up_count: "42"}
         }
@@ -99,8 +100,8 @@ describe "ThreadResponseShowView", ->
         expect(@view.$(".posted-details").text()).not.toMatch(" by ")
 
     it "re-renders correctly when endorsement changes", ->
+        DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set("thread_type", "question")
-        @comment.updateInfo({"ability": {"can_endorse": true}})
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
         @view.$(".action-endorse").click()
         expect(@view.$(".posted-details").text()).toMatch(
@@ -108,3 +109,56 @@ describe "ThreadResponseShowView", ->
         )
         @view.$(".action-endorse").click()
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
+
+    it "allows a moderator to mark an answer in a question thread", ->
+        DiscussionUtil.loadRoles({"Moderator": parseInt(window.user.id)})
+        @thread.set({
+            "thread_type": "question",
+            "user_id": (parseInt(window.user.id) + 1).toString()
+        })
+        @view.render()
+        endorseButton = @view.$(".action-endorse")
+        expect(endorseButton.length).toEqual(1)
+        expect(endorseButton).not.toHaveCss({"display": "none"})
+        expect(endorseButton).toHaveClass("is-clickable")
+        endorseButton.click()
+        expect(endorseButton).toHaveClass("is-endorsed")
+
+    it "allows the author of a question thread to mark an answer", ->
+        @thread.set({
+            "thread_type": "question",
+            "user_id": window.user.id
+        })
+        @view.render()
+        endorseButton = @view.$(".action-endorse")
+        expect(endorseButton.length).toEqual(1)
+        expect(endorseButton).not.toHaveCss({"display": "none"})
+        expect(endorseButton).toHaveClass("is-clickable")
+        endorseButton.click()
+        expect(endorseButton).toHaveClass("is-endorsed")
+
+    it "does not allow the author of a discussion thread to endorse", ->
+        @thread.set({
+            "thread_type": "discussion",
+            "user_id": window.user.id
+        })
+        @view.render()
+        endorseButton = @view.$(".action-endorse")
+        expect(endorseButton.length).toEqual(1)
+        expect(endorseButton).toHaveCss({"display": "none"})
+        expect(endorseButton).not.toHaveClass("is-clickable")
+        endorseButton.click()
+        expect(endorseButton).not.toHaveClass("is-endorsed")
+
+    it "does not allow a student who is not the author of a question thread to mark an answer", ->
+        @thread.set({
+            "thread_type": "question",
+            "user_id": (parseInt(window.user.id) + 1).toString()
+        })
+        @view.render()
+        endorseButton = @view.$(".action-endorse")
+        expect(endorseButton.length).toEqual(1)
+        expect(endorseButton).toHaveCss({"display": "none"})
+        expect(endorseButton).not.toHaveClass("is-clickable")
+        endorseButton.click()
+        expect(endorseButton).not.toHaveClass("is-endorsed")
