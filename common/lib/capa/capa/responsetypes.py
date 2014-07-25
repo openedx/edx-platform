@@ -988,14 +988,14 @@ class MultipleChoiceResponse(LoncapaResponse):
                         choice_hint_label = choice_hint.get('label')
 
                         message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
-                        if choice.get('correct') == 'True':
+                        if choice.get('correct').upper() == 'TRUE':
                             message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
 
                         if choice_hint_label:
                             correctness_string = choice_hint_label + ': '
                         else:
                             correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-                            if choice.get('correct') == 'True':
+                            if choice.get('correct').upper() == 'TRUE':
                                 correctness_string = 'CORRECT: '
 
                         new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
