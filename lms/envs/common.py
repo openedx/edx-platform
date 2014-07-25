@@ -740,6 +740,7 @@ EMBARGO_SITE_REDIRECT_URL = None
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 ##### Using paypal by default #####
+# TODO: Add link to paypal.rst docs in repo
 CC_PROCESSOR = {
     'Paypal': {
         'mode': '',  # sandbox or live

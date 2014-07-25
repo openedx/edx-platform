@@ -47,16 +47,26 @@ def get_paypal_config():
 def get_purchase_endpoint():
     return get_paypal_config().get('PURCHASE_ENDPOINT', '/shoppingcart/paypal/checkout')
 
+def configure_paypal_rest_sdk():
+    """
+    Mutates/sets auth details in state of paypalrestsdk module
+    """
+    config = get_paypal_config()
+    api_mode = config['mode']
+    client_id = config['client_id']
+    client_secret = config['client_secret']
+    paypalrestsdk.configure({
+        "mode": api_mode,  # sandbox or live
+        "client_id": client_id,
+        "client_secret": client_secret,
+    })
+
 def create_payment(params):
     """
     Creates the paypal payment
     """
-    # TODO: Take these out and get settings using get_paypal_config
-    paypalrestsdk.configure({
-        "mode": "sandbox",  # sandbox or live
-        "client_id": "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM",
-        "client_secret": "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
-    })
+    # sets mode, client_id, and client_secret internally for paypal_rest_sdk
+    configure_paypal_rest_sdk()
 
     order_number = params['orderNumber']
 
@@ -137,11 +147,8 @@ def process_postpay_callback(params):
     side effects but should try to figure out why and return a
     helpful-enough error message in error_html.
     """
-    paypalrestsdk.configure({
-        "mode": "sandbox",  # sandbox or live
-        "client_id": "EBWKjlELKMYqRNQ6sYvFo64FtaRLRR5BdHEESmha49TM",
-        "client_secret": "EO422dn3gQLgDbuwqTjzrFgFtaRLRR5BdHEESmha49TM"
-    })
+    # sets mode, client_id, and client_secret internally for paypal_rest_sdk
+    configure_paypal_rest_sdk()
 
     token = params.get('token')
     payer_id = params.get('PayerID')
