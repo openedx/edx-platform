@@ -12,7 +12,7 @@ Feature: CMS.Help
         Given I have opened a new course in Studio
 
         And I click the course link in My Courses
-        Then I should see online help for "organizing_course"
+        Then I should see online help for "outline"
 
         And I go to the course updates page
         Then I should see online help for "updates"
