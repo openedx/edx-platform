@@ -1,10 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace name='static' file='/static_content.html'/>
+<%namespace name='static' file='static_content.html'/>
 
 % if is_staff:
 <% override_label = "On" if staff_release else "Off" %>
 <div aria-hidden="true" class="wrap-instructor-info">
-    <a class="instructor-info-action" href="#proctor_admin_${element_id}" id="proctor_admin">${_("Proctor Student Admin")}</a>
+    <a class="instructor-info-action" href="#proctor_admin_${element_id}" id="proctor_admin" rel="leanModal">${_("Proctor Student Admin")}</a>
     <a class="instructor-info-action" href="#proctor_release_${element_id}" id="proctor_override">${_("Proctor Override")}: <b>${_(override_label)}</b></a>
 </div>
 <hr/>
@@ -27,9 +27,6 @@
   </div>
 </section>
 
-<!--We should be using this but it's currently broken-->
-<!--<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>-->
-<script type="text/javascript" src="/static/js/vendor/jquery.leanModal.min.js"></script>
 <script type="text/javascript">
 proctor_override = function(){
     var data = {enabled: "${not staff_release}"};
@@ -38,7 +35,6 @@ proctor_override = function(){
     });
 }
 $('#proctor_override').click(proctor_override);
-$('#proctor_admin').leanModal();
 
 $('#proctor_${element_id}_submit').click( function() {
     $.ajax({
