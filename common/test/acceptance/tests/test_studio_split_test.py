@@ -20,7 +20,7 @@ from ..pages.studio.utils import add_advanced_component
 from ..pages.studio.unit import UnitPage
 from ..pages.xblock.utils import wait_for_xblock_initialization
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 from test_studio_container import ContainerBase
 

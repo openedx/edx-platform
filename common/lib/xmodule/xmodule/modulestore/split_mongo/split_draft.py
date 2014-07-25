@@ -4,7 +4,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 
 from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore, EXCLUDE_ALL
-from xmodule.modulestore import ModuleStoreEnum, LegacyPublishState
+from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 
@@ -251,9 +251,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Returns whether this xblock is draft, public, or private.
 
         Returns:
-            LegacyPublishState.draft - published exists and is different from draft
-            LegacyPublishState.public - published exists and is the same as draft
-            LegacyPublishState.private - no published version exists
+            PublishState.draft - published exists and is different from draft
+            PublishState.public - published exists and is the same as draft
+            PublishState.private - no published version exists
         """
         # TODO figure out what to say if xblock is not from the HEAD of its branch
         def get_head(branch):
@@ -272,13 +272,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
         if not published_head:
             # published version does not exist
-            return LegacyPublishState.private
+            return PublishState.private
         elif get_version(draft_head) == get_version(published_head):
             # published and draft versions are equal
-            return LegacyPublishState.public
+            return PublishState.public
         else:
             # published and draft versions differ
-            return LegacyPublishState.draft
+            return PublishState.draft
 
     def convert_to_draft(self, location, user_id):
         """
