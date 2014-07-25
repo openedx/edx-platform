@@ -645,7 +645,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "release_date": release_date,
         "release_date_from": _get_release_date_from(xblock) if release_date else None,
         "currently_visible_to_students": currently_visible_to_students,
-        "publish_state": _compute_publish_state(xblock, child_info) if not xblock.category == 'course' else None
+        "visibility_state": _compute_visibility_state(xblock, child_info) if not xblock.category == 'course' else None
     }
     if data is not None:
         xblock_info["data"] = data
@@ -684,7 +684,7 @@ class VisibilityState(object):
     staff_only = 'staff_only'
 
 
-def _compute_publish_state(xblock, child_info):
+def _compute_visibility_state(xblock, child_info):
     """
     Returns the current publish state for the specified xblock and its children
     """
@@ -693,13 +693,14 @@ def _compute_publish_state(xblock, child_info):
     elif is_unit(xblock) and modulestore().has_changes(xblock.location):
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
+    is_live = datetime.now(UTC) > xblock.start
     children = child_info and child_info['children']
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True
         all_live = True
         for child in child_info['children']:
-            child_state = child['publish_state']
+            child_state = child['visibility_state']
             if child_state == VisibilityState.needs_attention:
                 return child_state
             elif not child_state == VisibilityState.staff_only:
@@ -711,17 +712,14 @@ def _compute_publish_state(xblock, child_info):
         if all_staff_only:
             return VisibilityState.staff_only
         elif all_unscheduled:
-            if not is_unscheduled:
-                return VisibilityState.needs_attention
-            else:
-                return VisibilityState.unscheduled
+            return VisibilityState.unscheduled if is_unscheduled else VisibilityState.needs_attention
         elif all_live:
-            return VisibilityState.live
+            return VisibilityState.live if is_live else VisibilityState.needs_attention
         else:
-            return VisibilityState.ready
+            return VisibilityState.ready if not is_unscheduled else VisibilityState.needs_attention
     if is_unscheduled:
         return VisibilityState.unscheduled
-    elif datetime.now(UTC) > xblock.start:
+    elif is_live:
         return VisibilityState.live
     else:
         return VisibilityState.ready

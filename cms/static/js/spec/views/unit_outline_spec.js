@@ -25,14 +25,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     category: 'vertical',
                     display_name: displayName,
                     studio_url: '/container/mock-unit',
-                    publish_state: 'unscheduled',
+                    visibility_state: 'unscheduled',
                     ancestor_info: {
                         ancestors: [{
                             id: 'mock-subsection',
                             category: 'sequential',
                             display_name: 'Mock Subsection',
                             studio_url: '/course/mock-course?show=mock-subsection',
-                            publish_state: 'unscheduled',
+                            visibility_state: 'unscheduled',
                             child_info: {
                                 category: 'vertical',
                                 display_name: 'Unit',
@@ -41,13 +41,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                                     category: 'vertical',
                                     display_name: displayName,
                                     studio_url: '/container/mock-unit',
-                                    publish_state: 'unscheduled'
+                                    visibility_state: 'unscheduled'
                                 }, {
                                     id: 'mock-unit-2',
                                     category: 'vertical',
                                     display_name: 'Mock Unit 2',
                                     studio_url: '/container/mock-unit-2',
-                                    publish_state: 'unscheduled'
+                                    visibility_state: 'unscheduled'
                                 }]
                             }
                         }, {
@@ -55,13 +55,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             category: 'chapter',
                             display_name: 'Section',
                             studio_url: '/course/slashes:mock-course?show=mock-section',
-                            publish_state: 'unscheduled'
+                            visibility_state: 'unscheduled'
                         }, {
                             id: 'mock-course',
                             category: 'course',
                             display_name: 'Mock Course',
                             studio_url: '/course/mock-course',
-                            publish_state: 'unscheduled'
+                            visibility_state: 'unscheduled'
                         }]
                     },
                     metadata: {

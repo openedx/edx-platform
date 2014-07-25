@@ -122,7 +122,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(json_response['category'], 'course')
         self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
-        self.assertIsNone(json_response['publish_state'])
+        self.assertIsNone(json_response['visibility_state'])
 
         # Now verify the first child
         children = json_response['child_info']['children']
@@ -131,7 +131,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
-        self.assertEqual(first_child_response['publish_state'], VisibilityState.unscheduled)
+        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
         self.assertTrue(len(first_child_response['child_info']['children']) > 0)
 
         # Finally, validate the entire response for consistency

@@ -1,7 +1,7 @@
 <%
 var category = xblockInfo.get('category');
 var releasedToStudents = xblockInfo.get('released_to_students');
-var publishState = xblockInfo.get('publish_state');
+var visibilityState = xblockInfo.get('visibility_state');
 
 var listType = 'list-unknown';
 if (xblockType === 'course') {
@@ -14,10 +14,10 @@ if (xblockType === 'course') {
 
 var statusMessage = null;
 var statusType = null;
-if (publishState === 'staff_only') {
+if (visibilityState === 'staff_only') {
     statusType = 'staff-only';
     statusMessage = 'Contains staff only content';
-} else if (publishState === 'needs_attention') {
+} else if (visibilityState === 'needs_attention') {
     if (category === 'vertical') {
         statusType = 'warning';
         if (releasedToStudents) {

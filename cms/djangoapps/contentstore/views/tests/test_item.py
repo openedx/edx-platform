@@ -1245,11 +1245,12 @@ class TestXBlockPublishingInfo(ItemTest):
     """
     FIRST_SUBSECTION_PATH = [0]
     FIRST_UNIT_PATH = [0, 0]
+    SECOND_UNIT_PATH = [0, 1]
 
-    def _create_child(self, parent, category, display_name, publish_item=False):
+    def _create_child(self, parent, category, display_name, publish_item=False, staff_only=False):
         return ItemFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
-            user_id=self.user.id, publish_item=publish_item
+            user_id=self.user.id, publish_item=publish_item, visible_to_staff_only=staff_only
         )
 
     def _get_child(self, xblock_info, index):
@@ -1294,7 +1295,7 @@ class TestXBlockPublishingInfo(ItemTest):
         xblock.display_name = display_name
         self.store.update_item(xblock, self.user.id)
 
-    def _verify_publish_state(self, xblock_info, expected_state, path=None):
+    def _verify_visibility_state(self, xblock_info, expected_state, path=None):
         """
         Verify the publish state of an item in the xblock_info. If no path is provided
         then the root item is verified.
@@ -1302,82 +1303,82 @@ class TestXBlockPublishingInfo(ItemTest):
         if path:
             direct_child = self._get_child(xblock_info, path[0])
             remaining_path = path[1:] if len(path) > 1 else None
-            self._verify_publish_state(direct_child, expected_state, remaining_path)
+            self._verify_visibility_state(direct_child, expected_state, remaining_path)
         else:
-            self.assertEqual(xblock_info['publish_state'], expected_state)
+            self.assertEqual(xblock_info['visibility_state'], expected_state)
 
     def test_empty_chapter(self):
         empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
         xblock_info = self._get_xblock_info(empty_chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.unscheduled)
+        self.assertEqual(xblock_info['visibility_state'], VisibilityState.unscheduled)
 
-    def test_empty_section(self):
+    def test_empty_sequential(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         self._create_child(chapter, 'sequential', "Empty Sequential")
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.unscheduled)
-        self.assertEqual(self._get_child(xblock_info, 0)['publish_state'], VisibilityState.unscheduled)
+        self.assertEqual(xblock_info['visibility_state'], VisibilityState.unscheduled)
+        self.assertEqual(self._get_child(xblock_info, 0)['visibility_state'], VisibilityState.unscheduled)
 
     def test_published_unit(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
         self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.ready)
-        sequential_child_info = self._get_child(xblock_info, 0)
-        self.assertEqual(sequential_child_info['publish_state'], VisibilityState.ready)
-        unit_child_info = self._get_child(sequential_child_info, 0)
-        self.assertEqual(unit_child_info['publish_state'], VisibilityState.ready)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
     def test_released_unit(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
         self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.live)
-        sequential_child_info = self._get_child(xblock_info, 0)
-        self.assertEqual(sequential_child_info['publish_state'], VisibilityState.live)
-        unit_child_info = self._get_child(sequential_child_info, 0)
-        self.assertEqual(unit_child_info['publish_state'], VisibilityState.live)
-
-    def test_partially_released_section(self):
-        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
-        released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
-        self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
-        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
-        published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
-        self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
-        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1))
-        xblock_info = self._get_xblock_info(chapter.location)
-
-        # Verify the state of the released sequential
-        released_sequential_child_info = self._get_child(xblock_info, 0)
-        released_unit_child_info = self._get_child(released_sequential_child_info, 0)
-        self.assertEqual(released_unit_child_info['publish_state'], VisibilityState.live)
-        self.assertEqual(released_sequential_child_info['publish_state'], VisibilityState.live)
-
-        # Verify the state of the published sequential
-        public_sequential_child_info = self._get_child(xblock_info, 1)
-        public_unit_child_info = self._get_child(public_sequential_child_info, 0)
-        self.assertEqual(public_sequential_child_info['publish_state'], VisibilityState.ready)
-        self.assertEqual(public_unit_child_info['publish_state'], VisibilityState.ready)
-
-        # Finally verify the state of the chapter
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.ready)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
     def test_unpublished_changes(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         unit = self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
         self._set_display_name(unit.location, 'Updated Unit')
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.needs_attention)
-        sequential_child_info = self._get_child(xblock_info, 0)
-        self.assertEqual(sequential_child_info['publish_state'], VisibilityState.needs_attention)
-        unit_child_info = self._get_child(sequential_child_info, 0)
-        self.assertEqual(unit_child_info['publish_state'], VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_partially_released_section(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
+        self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
+        self._create_child(released_sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
+        published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
+        self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(published_sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+
+        # Verify the state of the released sequential
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=[0])
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=[0, 0])
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=[0, 1])
+
+        # Verify the state of the published sequential
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=[1])
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=[1, 0])
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=[1, 1])
+
+        # Finally verify the state of the chapter
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
 
     def test_staff_only(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
@@ -1385,18 +1386,31 @@ class TestXBlockPublishingInfo(ItemTest):
         unit = self._create_child(sequential, 'vertical', "Published Unit")
         self._set_staff_only(unit.location, True)
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['publish_state'], VisibilityState.staff_only)
-        sequential_child_info = self._get_child(xblock_info, 0)
-        self.assertEqual(sequential_child_info['publish_state'], VisibilityState.staff_only)
-        unit_child_info = self._get_child(sequential_child_info, 0)
-        self.assertEqual(unit_child_info['publish_state'], VisibilityState.staff_only)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_UNIT_PATH)
 
     def test_unscheduled_section_with_live_subsection(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
         self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
-        self._verify_publish_state(xblock_info, VisibilityState.needs_attention)
-        self._verify_publish_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
-        self._verify_publish_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_unreleased_section_with_live_subsection(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)

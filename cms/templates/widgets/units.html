@@ -17,7 +17,7 @@ This def will enumerate through a passed in subsection and list all of the units
     <%include file="_ui-dnd-indicator-before.html" />
 
     <%
-      unit_state = 'draft' // Note: this is a hack since this HTML file is being removed in bulk-publishing
+      unit_state = 'draft'   # Note: this is a hack since this HTML file is being removed in bulk-publishing
       if unit.location == selected:
         selected_class = 'editing'
       else:

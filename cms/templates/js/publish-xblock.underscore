@@ -1,23 +1,23 @@
 <%
 var title = gettext("Draft (Never published)");
-if (publishState === 'staff_only') {
+if (visibilityState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
-} else if (publishState === 'live') {
+} else if (visibilityState === 'live') {
     title = gettext("Published and Live");
-} else if (publishState === 'ready') {
+} else if (visibilityState === 'ready') {
     title = gettext("Published");
-} else if (publishState === 'needs_attention') {
+} else if (visibilityState === 'needs_attention') {
     title = gettext("Draft (Unpublished changes)");
 }
 
 var releaseLabel = gettext("Release:");
-if (publishState === 'live') {
+if (visibilityState === 'live') {
     releaseLabel = gettext("Released:");
-} else if (publishState === 'ready') {
+} else if (visibilityState === 'ready') {
     releaseLabel = gettext("Scheduled:");
 }
 
-var visibleToStaffOnly = publishState === 'staff_only';
+var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
 <div class="bit-publishing <%= visibilityClass %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>

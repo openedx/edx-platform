@@ -100,7 +100,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
-                    'has_changes', 'published', 'edited_on', 'edited_by', 'publish_state'
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state'
                 ])) {
                    this.render();
                 }
@@ -108,8 +108,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             render: function () {
                 this.$el.html(this.template({
-                    publishState: this.model.get('publish_state'),
-                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('publish_state')),
+                    visibilityState: this.model.get('visibility_state'),
+                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('visibility_state')),
                     hasChanges: this.model.get('has_changes'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
@@ -166,7 +166,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = xblockInfo.get('publish_state') !== VisibilityState.staffOnly;
+                enableStaffLock = xblockInfo.get('visibility_state') !== VisibilityState.staffOnly;
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);

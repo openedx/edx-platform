@@ -53,7 +53,7 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              * Represents the possible publish states for an xblock. See the documentation
              * for XBlockVisibility to see a comprehensive enumeration of the states.
              */
-            "publish_state": null,
+            "visibility_state": null,
             /**
              * True iff the release date of the xblock is in the past.
              */
