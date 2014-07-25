@@ -27,7 +27,7 @@
   </div>
 </section>
 
-<!--We should be using this but currently it's broken-->
+<!--We should be using this but it's currently broken-->
 <!--<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>-->
 <script type="text/javascript" src="/static/js/vendor/jquery.leanModal.min.js"></script>
 <script type="text/javascript">
@@ -81,7 +81,7 @@ procrel = (function(){
 
     var mkurl = function(cmd) {
         ps = encodeURIComponent("${pp.procset_name}");
-        return "${pp.proc_url}/cmd/" + cmd + "/${pp.user.id}/" + ps;
+        return "${ajax_url}/cmd/" + cmd + "/${pp.user.id}/" + ps;
     }
 
     var statel = $('#proctor_stat_${element_id}');
@@ -96,11 +96,6 @@ procrel = (function(){
 		 data: { "uname": "${pp.user.username}",
 		         "name": "${pp.user.profile.name}"
 		       },
-                 xhrFields: {
-                      withCredentials: true
-                 },
-                 username: "${pp.proc_user}",
-                 password: "${pp.proc_pass}",
                  success: gfun,
 		 dataType: "json",
                  error: function(xhr, status, error) {

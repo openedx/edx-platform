@@ -1,6 +1,7 @@
 import sys
 import json
 import logging
+import urlparse
 import requests
 
 from lxml import etree
@@ -43,21 +44,29 @@ class ProctorPanel(object):
         self.proc_user = proc_user
         self.proc_pass = proc_pass
         self.procset_name = procset_name
-        self.ses = requests.session()
         self.user = user
+        self.ses = requests.session()
 
-    def is_released(self):
-        url = '{1}/cmd/status/{0}'.format(self.user.id, self.proc_url)
-        log.info('ProctorPanel url={0}'.format(url))
-        ret = self.ses.get(url, verify=False,
+    def request(self, url, data=None, json=True):
+        ret = self.ses.get(urlparse.urljoin(self.proc_url, url),
+                           verify=False, data=data,
                            auth=(self.proc_user, self.proc_pass),
                            params={'problem': self.procset_name})
-        try:
-            retdat = ret.json()
-        except Exception:
-            log.error('bad return from proctor panel: '
-                      'ret.content={0}'.format(ret.content))
-            retdat = {}
+        if json:
+            try:
+                data = ret.json()
+            except Exception:
+                log.error('bad return from proctor panel: '
+                          'ret.content={0}'.format(ret.content))
+                data = {}
+        else:
+            data = ret.content
+        return data
+
+    def is_released(self):
+        url = 'cmd/status/{0}'.format(self.user.id)
+        log.info('ProctorPanel url={0}'.format(url))
+        retdat = self.request(url)
         log.info('ProctorPanel retdat={0}'.format(retdat))
         enabled = retdat.get('enabled', False)
         return enabled
@@ -196,6 +205,10 @@ class ProctorModule(ProctorFields, XModule):
                 return self.status()
             # if dispatch == 'grades':
             #     return self.grades()
+
+        # Proctor Panel requests (ALL USERS)
+        if dispatch.startswith('cmd/'):
+            return self.pp.request(dispatch, data, json=False)
 
         if not self.is_released():  # check each time we do get_html()
             html = self.not_released_html()
