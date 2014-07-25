@@ -31,12 +31,9 @@
 <!--<script type="text/javascript" src="${static.url('js/vendor/jquery.leanModal.min.js')}"></script>-->
 <script type="text/javascript" src="/static/js/vendor/jquery.leanModal.min.js"></script>
 <script type="text/javascript">
-<% override_cmd = "disable" if staff_release else "release" %>
 proctor_override = function(){
-    $.get( "${ajax_url}/${override_cmd}", function( data ) {
-        // $("#proctor_release").html( data );
-        // procrel.set_skiperr();
-        console.log("release successful");
+    var data = {enabled: "${not staff_release}"};
+    $.post( "${ajax_url}/override", data, function( data ) {
         location.reload();
     });
 }
@@ -79,11 +76,6 @@ procrel = (function(){
 
     var set_skiperr = function(){ skiperr = true; }
 
-    var mkurl = function(cmd) {
-        ps = encodeURIComponent("${pp.procset_name}");
-        return "${ajax_url}/cmd/" + cmd + "/${pp.user.id}/" + ps;
-    }
-
     var statel = $('#proctor_stat_${element_id}');
 
     var setstat = function(status){
@@ -91,7 +83,7 @@ procrel = (function(){
     }
 
     var do_pp_get = function(cmd, gfun){
-        $.ajax({ url: mkurl(cmd),
+        $.ajax({ url: "${ajax_url}/" + cmd,
                  type: 'GET',
 		 data: { "uname": "${pp.user.username}",
 		         "name": "${pp.user.profile.name}"
@@ -103,7 +95,7 @@ procrel = (function(){
                          alert('Error: cannot connect to server ' + status + " error: " + error);
 		     }
                  }
-               });
+        });
     }
 
     var check_access = function(){
@@ -143,12 +135,14 @@ procrel = (function(){
 
     el.click(make_request);
 
-    return { "check": check_access, "make": make_request,
-             "mkurl": mkurl, "do_pp_get": do_pp_get,
-	     "set_skiperr": set_skiperr
-	   };
+    return {
+            "check": check_access,
+            "make": make_request,
+            "do_pp_get": do_pp_get,
+            "set_skiperr": set_skiperr
+    };
 
-}() );
+}());
 </script>
 
 % elif child_html is not None:

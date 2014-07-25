@@ -188,14 +188,15 @@ class ProctorModule(ProctorFields, XModule):
         return Fragment(self.runtime.render_template('conditional_ajax.html',
                                                      proc_ctx))
 
+    def _str_to_bool(self, v):
+        return v.lower() == 'true'
+
     def handle_ajax(self, dispatch, data):
         if self.runtime.user_is_staff:
-            if dispatch == 'release':
-                self.staff_release = True
-                return json.dumps({'html': 'staff_release successful'})
-            if dispatch == 'disable':
-                self.staff_release = False
-                return json.dumps({'html': 'staff_disable successful'})
+            if dispatch == 'override':
+                enabled = self._str_to_bool(data.get('enabled', 'false'))
+                self.staff_release = enabled
+                return json.dumps({'enabled': enabled})
 
             # Proctor Student Admin URLs (STAFF ONLY)
             if dispatch == 'reset':
