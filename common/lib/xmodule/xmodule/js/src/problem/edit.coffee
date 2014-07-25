@@ -7,8 +7,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
-  @customLabel: ""
-
 
   constructor: (element) ->
     @element = element
@@ -189,389 +187,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-#  #________________________________________________________________________________
-#  @parseForQuestionHints: (answerString) ->
-#    # parse a single answer string for any hint text associated with this single answer item
-#    feedbackString = ''
-#    matchString = ''
-#    matches = answerString.match( /{{(.+)}}/ )       # string surrounded by {{...}} is a match group
-#    if matches
-#        matchString = matches[0]        # group 0 holds the entire matching string (includes delimiters)
-#        feedbackString = matches[1]     # group 1 holds the matching characters (our string)
-#        tokens = feedbackString.split('::')
-#        if tokens.length > 1            # check for a custom label to precede the feedback string
-#          @customLabel = tokens[0]
-#          feedbackString = tokens[1]
+# We may wish to add insertHeader. Here is Tom's code.
+# function makeHeader() {
+#  var selection = simpleEditor.getSelection();
+#  var revisedSelection = selection + '\n';
+#  for(var i = 0; i < selection.length; i++) {
+#revisedSelection += '=';
+#  }
+#  simpleEditor.replaceSelection(revisedSelection);
+#}
 #
-#    MarkdownEditingDescriptor.questionHintStrings.push(feedbackString)  # add a feedback string entry (possibly null)
-#    MarkdownEditingDescriptor.questionHintMatches.push(matchString)     # add a match string entry (possibly null)
-#    answerString = answerString.replace(matchString, '')
-#    return answerString
-
-  #________________________________________________________________________________
-  @extractCustomLabel: (feedbackString) ->
-    returnString = feedbackString                     # assume we will find no custom label
-    tokens = feedbackString.split('::')
-    if tokens.length > 1                              # check for a custom label to precede the feedback string
-      @customLabel = ' label="' + tokens[0] + '"'    # save the custom label for insertion into the XML
-      returnString = tokens[1]
-    else
-      @customLabel = ' '
-    return returnString                               # return the feedback string but without the custom label, if any
-
-
-  #________________________________________________________________________________
-  @parseForProblemHints: (xmlString) ->
-    for line in xmlString.split('\n')
-      matches = line.match( /\|\|(.+)\|\|/ )      # string surrounded by ||...|| is a match group
-      if matches
-        problemHint = matches[1]
-        MarkdownEditingDescriptor.problemHintsStrings.push(problemHint)
-        xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
-    return xmlString
-
-  #________________________________________________________________________________
-  @insertProblemHints: (xmlStringUnderConstruction) ->
-    if MarkdownEditingDescriptor.problemHintsStrings.length > 0
-      ondemandElement =  '    <demandhint>\n'
-      for problemHint in MarkdownEditingDescriptor.problemHintsStrings
-        ondemandElement += '        <hint> ' +  problemHint + '\n'
-        ondemandElement += '        </hint>\n'
-      ondemandElement +=  '    </demandhint>\n'
-      xmlStringUnderConstruction += ondemandElement
-    return xmlStringUnderConstruction
-
-  #________________________________________________________________________________
-  @parseForCompoundConditionHints: (xmlString) ->
-    for line in xmlString.split('\n')
-      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
-      if matches
-        questionHintString = matches[1]
-        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
-        if splitMatches
-          booleanExpression = splitMatches[1]
-          hintText = splitMatches[2]
-          MarkdownEditingDescriptor.problemHintsBooleanStrings.push(hintText)
-          MarkdownEditingDescriptor.problemHintsBooleanExpressions.push(booleanExpression)
-    return xmlString
-
-  #________________________________________________________________________________
-  @insertBooleanHints: (xmlStringUnderConstruction) ->
-    index = 0
-    for booleanExpression in MarkdownEditingDescriptor.problemHintsBooleanExpressions
-      hintText = MarkdownEditingDescriptor.problemHintsBooleanStrings[index]
-      booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
-      booleanHintElement += '        </booleanhint>\n'
-      xmlStringUnderConstruction += booleanHintElement
-      index = index + 1
-    return xmlStringUnderConstruction
-
-  #________________________________________________________________________________
-  @insertParagraphText: (xmlString, reducedXmlString) ->
-      returnXmlString = ''
-      for line in reducedXmlString.split('\n')
-        trimmedLine = line.trim()
-        if trimmedLine.length > 0
-          compoundConditionMatches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
-          if compoundConditionMatches == null
-            returnXmlString += '<p>\n'
-            returnXmlString += trimmedLine
-            returnXmlString += '</p>\n'
-      return returnXmlString
-
-  #________________________________________________________________________________
-  @matchCompoundConditionPattern: (testString) ->
-    return testString.match( /\{\{(.+)\}\}/ )
-
-  #________________________________________________________________________________
-  @matchBooleanConditionPattern: (testString) ->
-    return testString.match( /\(\((.+)\)\)(.+)/ )
-
-  #________________________________________________________________________________
-  @matchMultipleChoicePattern: (testString) ->
-    return testString.match( /\s+\(\s*x?\s*\)[^\n]+/ )
-
-  #________________________________________________________________________________
-  @matchCheckboxMarkerPattern: (testString) ->
-    return testString.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
-
-  #________________________________________________________________________________
-  @parseForCheckbox: (xmlString) ->
-    # try to parse the supplied string to find a checkbox problem
-    # return the string unmodified if this is not a checkbox problem
-    isCheckboxType = false
-    returnXmlString = ''
-    reducedXmlString = ''
-
-    for line in xmlString.split('\n')
-      choiceMatches = @matchCheckboxMarkerPattern( line )
-
-      if choiceMatches              # this line includes '(...)' so it must be a checkbox item
-        isCheckboxType = true
-      else
-        reducedXmlString += line + '\n'    # this line is not an item line, add it to reduced lines string
-
-    if isCheckboxType
-      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-
-      returnXmlString +=  '    <choiceresponse>\n'
-      returnXmlString += '        <checkboxgroup direction="vertical">\n'
-
-      for line in xmlString.split('\n')
-        hintTextSelected = ''
-        hintTextUnselected = ''
-        correctnessText = ''
-        itemText = ''
-        choiceMatches = @matchCheckboxMarkerPattern( line )
-        if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
-          line = line.replace(choiceMatches[1], '')  # remove the [..] phrase, else it will be displayed to student
-          isCheckboxType = true
-          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-          if hintMatches
-            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
-
-            combinedHintText = hintMatches[0].trim()
-            combinedHintText = combinedHintText.replace( /(selected:|s:)/i, "S:")
-            combinedHintText = combinedHintText.replace( /(unselected:|u:)/i, "U:")
-            selectedMatches = combinedHintText.match(/\s*\{\s*S:\s*([^}]+)/)
-            unselectedMatches = combinedHintText.match(/\s*\{\s*U:\s*([^}]+)/)
-            if selectedMatches and unselectedMatches
-              hintTextSelected = selectedMatches[1]
-              hintTextUnselected = unselectedMatches[1]
-
-          correctnessText = 'False'
-          if choiceMatches[1].match(/X/i)
-            correctnessText = 'True'
-
-          returnXmlString += '          <choice  correct="' + correctnessText + '">'
-          returnXmlString += '              ' + line + '\n'
-          if hintTextSelected.length > 0 and hintTextUnselected.length > 0
-            returnXmlString += '               <choicehint selected="True">' + hintTextSelected + '\n'
-            returnXmlString += '               </choicehint>\n'
-            returnXmlString += '               <choicehint selected="False">' + hintTextUnselected + '\n'
-            returnXmlString += '               </choicehint>\n'
-          returnXmlString += '          </choice>\n'
-
-      returnXmlString += '        </checkboxgroup>\n'
-
-      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
-
-      returnXmlString += '    </choiceresponse>\n'
-    else
-      returnXmlString = xmlString
-
-    return returnXmlString
-
-  #________________________________________________________________________________
-  @parseForMultipleChoice: (xmlString) ->
-    # try to parse the supplied string to find a multiple choice problem
-    # return the string unmodified if this is not a multiple choice problem
-    isMultipleChoiceType = false
-    returnXmlString = ''
-    reducedXmlString = ''
-
-    for line in xmlString.split('\n')
-      choiceMatches = @matchMultipleChoicePattern( line )
-      if choiceMatches              # this line includes '(...)' so it must be a multiple choice item
-        isMultipleChoiceType = true
-      else
-        reducedXmlString += line    # this line is not a choice item line, add it to reduced lines string
-
-    if isMultipleChoiceType
-      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-
-      returnXmlString +=  '    <multiplechoiceresponse>\n'
-      returnXmlString += '        <choicegroup>\n'
-
-      for line in xmlString.split('\n')
-        hintText = ''
-        correctnessText = ''
-        itemText = ''
-        line += ' '       # an extra space at the end of line works around what looks like a bug in the regex parser
-        choiceMatches = @matchMultipleChoicePattern( line )
-        if choiceMatches                          # this line includes '(...)' so it must be a multiple choice item
-          isMultipleChoiceType = true
-          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-          if hintMatches
-            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
-            hintText = @extractCustomLabel( hintText )
-            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
-
-          itemMatches = line.match( /(\s+\(\s*x?\s*\))(.+)[^\n]+/ )
-          if itemMatches
-            correctnessText = 'False'
-            if itemMatches[1].match(/X/i)
-              correctnessText = 'True'
-            itemText = itemMatches[2].trim()
-
-          returnXmlString += '          <choice  correct="' + correctnessText + '">'
-          returnXmlString += '              ' + itemText + '\n'
-          if hintText
-            returnXmlString += '               <choicehint ' + @customLabel + '>' + hintText + '\n'
-            returnXmlString += '               </choicehint>\n'
-          returnXmlString += '          </choice>\n'
-
-      returnXmlString += '        </choicegroup>\n'
-
-      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
-      returnXmlString += '    </multiplechoiceresponse>\n'
-    else
-      returnXmlString = xmlString
-
-    return returnXmlString
-
-  #________________________________________________________________________________
-  @parseForDropdown: (xmlString) ->
-    # try to parse the supplied string to find a drop down problem
-    # return the string unmodified if this is not a drop down problem
-    dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
-
-    if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
-      reducedXmlString = xmlString.replace(dropdownMatches[0], '')
-      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-      returnXmlString +=  '    <optionresponse>\n'
-      returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
-
-      optionsString = ''
-      delimiter = ''
-      for line in dropdownMatches[1].split('\n')    # split the string between [[..]] brackets into single lines
-        line = line.trim()
-        if line.length > 0
-          hintText = ''
-          correctnessText = ''
-          itemText = ''
-
-          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-          if hintMatches
-            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
-            hintText = @extractCustomLabel( hintText )
-            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
-
-          correctChoiceMatch = line.match( /^\s*\(([^)]+)\)/ )  # try to match a parenthetical string: '(...)'
-          if correctChoiceMatch                          # matched so this must be the correct answer
-            correctnessText = 'True'
-            itemText = correctChoiceMatch[1]
-            returnXmlString = returnXmlString.replace('CORRECT_PLACEHOLDER', itemText)  # poke the correct value in
-            optionsString += delimiter + '(' + itemText + ')'
-          else
-            correctnessText = 'False'
-            itemText = line
-            optionsString += delimiter + itemText.trim()
-
-          if itemText[itemText.length-1] == ','     # check for an end-of-line comma
-            itemText = itemText.slice(0, itemText.length-1) # suppress it
-          itemText = itemText.trim()
-
-          returnXmlString += '              <option  correct="' + correctnessText + '">'
-          returnXmlString += '                  ' + itemText + '\n'
-          if hintText
-            returnXmlString += '                   <optionhint ' + @customLabel + '>' + hintText + '\n'
-            returnXmlString += '                   </optionhint>\n'
-          returnXmlString += '              </option>\n'
-
-          delimiter = ', '
-      returnXmlString += '        </optioninput>\n'
-
-      returnXmlString = returnXmlString.replace('OPTIONS_PLACEHOLDER', optionsString)  # poke the options in
-
-      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
-
-      returnXmlString += '    </optionresponse>\n'
-
-    else
-      returnXmlString = xmlString
-
-    return returnXmlString
-
-  #________________________________________________________________________________
-  @parseForNumeric: (xmlString) ->
-    # try to parse the supplied string to find a numeric problem
-    # return the string unmodified if this is not a drop down problem
-    returnXmlString = ''
-    reducedXmlString = ''
-    answerLines = []
-    operator = ''
-    answerExpression = ''
-    answerString = ''
-    plusMinus = ''
-    tolerance = ''
-    isNumeric = false
-    responseParameterElementString = ''
-    correctHintElementString = ''
-    numericHintElementString = ''
-
-    for line in xmlString.split('\n')
-      numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
-      if numericMatch
-        isNumeric = true
-        answerLines.push(line)
-      else
-        reducedXmlString += line + '\n'
-
-    if isNumeric                    # if this is a numeric problem
-      for line in answerLines
-        numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
-        if numericMatch
-          if numericMatch[1]
-            operator = numericMatch[1]
-          if numericMatch[2]
-            answerExpression = numericMatch[2]
-          if numericMatch[3]
-            plusMinus = numericMatch[3]
-          if numericMatch[4]
-            tolerance = numericMatch[4]
-
-          if operator == '='
-            if answerExpression
-              if answerString == ''           # if this is the *first* answer supplied
-                answerString = answerExpression
-                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
-                  responseParameterElementString = '<responseparam type="tolerance" default="' + tolerance + '"/>\n'
-                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-                  if hintMatches
-                    hintText = hintMatches[1].trim()
-                    correctHintElementString = "<correcthint>\n" + hintText + "\n</correcthint>\n"
-                else
-                  responseParameterElementString = '<responseparam type="equal"/>\n'
-              else                            # else this is not the first answer
-                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
-                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-                  if hintMatches
-                    hintText = hintMatches[1].trim()
-                    numericHintElementString += '<numerichint answer="' + answerExpression + '" tolerance="' + tolerance + '">' + hintText + '\n</numerichint>\n'
-                else
-                  responseParameterElementString = '<responseparam type="equal"/>\n'
-
-      returnXmlString += MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-      returnXmlString +=  '    <numericalresponse answer="' + answerString  + '">\n'
-      returnXmlString += '        ' + responseParameterElementString
-      returnXmlString += '        <formulaequationinput/>\n'
-      returnXmlString += '        ' + correctHintElementString
-      returnXmlString += '        ' + numericHintElementString
-      returnXmlString +=  '    </numericalresponse>\n'
-    else                        # else this is not a numeric problem
-      returnXmlString = xmlString
-    return returnXmlString
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
       var xml = markdown,
@@ -581,22 +206,59 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
-      // initialize the targeted feedback working arrays
-      MarkdownEditingDescriptor.questionHintStrings = [];
-      MarkdownEditingDescriptor.questionHintMatches = [];
-      MarkdownEditingDescriptor.problemHintsStrings = [];
-      MarkdownEditingDescriptor.problemHintsBooleanExpressions = [];
-      MarkdownEditingDescriptor.problemHintsBooleanStrings = [];
+      // group multiple choice answers
+      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
+        var choices = '';
+        var shuffle = false;
+        var options = match.split('\n');
+        for(var i = 0; i < options.length; i++) {
+          if(options[i].length > 0) {
+            var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
+            var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
+            var correct = /x/i.test(inparens);
+            var fixed = '';
+            if(/@/.test(inparens)) {
+              fixed = ' fixed="true"';
+            }
+            if(/!/.test(inparens)) {
+              shuffle = true;
+            }
+            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
+          }
+        }
+        var result = '<multiplechoiceresponse>\n';
+        if(shuffle) {
+          result += '  <choicegroup type="MultipleChoice" shuffle="true">\n';
+        } else {
+          result += '  <choicegroup type="MultipleChoice">\n';
+        }
+        result += choices;
+        result += '  </choicegroup>\n';
+        result += '</multiplechoiceresponse>\n\n';
+        return result;
+      });
 
-debugger;
-      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
-      xml = MarkdownEditingDescriptor.parseForCheckbox(xml);        // examine the string for a checkbox problem
-      xml = MarkdownEditingDescriptor.parseForMultipleChoice(xml);  // examine the string for a multple choice problem
-      xml = MarkdownEditingDescriptor.parseForDropdown(xml);        // examine the string for a dropdown problem
-      xml = MarkdownEditingDescriptor.parseForNumeric(xml);         // examine the string for a numeric problem
+      // group check answers
+      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
+          var groupString = '<choiceresponse>\n',
+              options, value, correct;
 
-      xml = MarkdownEditingDescriptor.insertProblemHints(xml);      // add any problem hints
+          groupString += '  <checkboxgroup direction="vertical">\n';
+          options = match.split('\n');
 
+          for (i = 0; i < options.length; i += 1) {
+              if(options[i].length > 0) {
+                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
+                  correct = /^\s*\[x\]/i.test(options[i]);
+                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+              }
+          }
+
+          groupString += '  </checkboxgroup>\n';
+          groupString += '</choiceresponse>\n\n';
+
+          return groupString;
+      });
 
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
@@ -749,9 +411,9 @@ debugger;
       xml = xml.replace(/\n\n\n/g, '\n');
 
       // surround w/ problem tag
-      xml = '<problem schema="edXML/1.0">\n' + xml + '\n</problem>';
+      xml = '<problem>\n' + xml + '\n</problem>';
 
-       return xml;
+      return xml;
     }`
     return toXml markdown
 
