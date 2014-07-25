@@ -327,8 +327,9 @@ form[class^="create-"] {
 }
 
 
-// form - inline xblock name edit on unit, container, outline?
+// form - inline xblock name edit on unit, container, outline
 
+// TOOD: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
 
   .incontext-editor-value,
