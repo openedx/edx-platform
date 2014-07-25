@@ -81,7 +81,27 @@ FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
-#####################################################################
+############################## Course static files #############################
+if os.path.isdir(DATA_DIR):
+    # Add the full course repo if there is no static directory
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir)
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir) and
+            not os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+    # Otherwise, add only the static directory from the course dir
+    STATICFILES_DIRS += [
+        # TODO (cpennington): When courses are stored in a database, this
+        # should no longer be added to STATICFILES
+        (course_dir, DATA_DIR / course_dir / 'static')
+        for course_dir in os.listdir(DATA_DIR)
+        if (os.path.isdir(DATA_DIR / course_dir / 'static'))
+    ]
+
+################################################################################
 # See if the developer has any local overrides.
 try:
     from .private import *      # pylint: disable=F0401
