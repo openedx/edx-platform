@@ -10,7 +10,6 @@ define(['js/views/xblock_outline'],
             // takes XBlockInfo as a model
 
             templateName: 'unit-outline',
-            className: 'group-configurations-list',
 
             render: function() {
                 XBlockOutlineView.prototype.render.call(this);

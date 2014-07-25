@@ -9,7 +9,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import LegacyPublishState, ModuleStoreEnum, mongo
+from xmodule.modulestore import PublishState, ModuleStoreEnum, mongo
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -151,16 +151,16 @@ class CourseTestCase(ModuleStoreTestCase):
         # create a Draft vertical
         vertical = self.store.get_item(course_id.make_usage_key('vertical', self.TEST_VERTICAL), depth=1)
         draft_vertical = self.store.convert_to_draft(vertical.location, self.user.id)
-        self.assertEqual(self.store.compute_publish_state(draft_vertical), LegacyPublishState.draft)
+        self.assertEqual(self.store.compute_publish_state(draft_vertical), PublishState.draft)
 
         # create a Private (draft only) vertical
         private_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PRIVATE_VERTICAL)
-        self.assertEqual(self.store.compute_publish_state(private_vertical), LegacyPublishState.private)
+        self.assertEqual(self.store.compute_publish_state(private_vertical), PublishState.private)
 
         # create a Published (no draft) vertical
         public_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PUBLISHED_VERTICAL)
         public_vertical = self.store.publish(public_vertical.location, self.user.id)
-        self.assertEqual(self.store.compute_publish_state(public_vertical), LegacyPublishState.public)
+        self.assertEqual(self.store.compute_publish_state(public_vertical), PublishState.public)
 
         # add the new private and new public as children of the sequential
         sequential = self.store.get_item(course_id.make_usage_key('sequential', self.SEQUENTIAL))
@@ -197,7 +197,7 @@ class CourseTestCase(ModuleStoreTestCase):
 
         def verify_item_publish_state(item, publish_state):
             """Verifies the publish state of the item is as expected."""
-            if publish_state in (LegacyPublishState.private, LegacyPublishState.draft):
+            if publish_state in (PublishState.private, PublishState.draft):
                 self.assertTrue(getattr(item, 'is_draft', False))
             else:
                 self.assertFalse(getattr(item, 'is_draft', False))
@@ -210,18 +210,18 @@ class CourseTestCase(ModuleStoreTestCase):
             return item
 
         # verify that the draft vertical is draft
-        vertical = get_and_verify_publish_state('vertical', self.TEST_VERTICAL, LegacyPublishState.draft)
+        vertical = get_and_verify_publish_state('vertical', self.TEST_VERTICAL, PublishState.draft)
         for child in vertical.get_children():
-            verify_item_publish_state(child, LegacyPublishState.draft)
+            verify_item_publish_state(child, PublishState.draft)
 
         # make sure that we don't have a sequential that is not in draft mode
-        sequential = get_and_verify_publish_state('sequential', self.SEQUENTIAL, LegacyPublishState.public)
+        sequential = get_and_verify_publish_state('sequential', self.SEQUENTIAL, PublishState.public)
 
         # verify that we have the private vertical
-        private_vertical = get_and_verify_publish_state('vertical', self.PRIVATE_VERTICAL, LegacyPublishState.private)
+        private_vertical = get_and_verify_publish_state('vertical', self.PRIVATE_VERTICAL, PublishState.private)
 
         # verify that we have the public vertical
-        public_vertical = get_and_verify_publish_state('vertical', self.PUBLISHED_VERTICAL, LegacyPublishState.public)
+        public_vertical = get_and_verify_publish_state('vertical', self.PUBLISHED_VERTICAL, PublishState.public)
 
         # verify verticals are children of sequential
         for vert in [vertical, private_vertical, public_vertical]:
@@ -332,7 +332,7 @@ class CourseTestCase(ModuleStoreTestCase):
         it'll return public in that case
         """
         supposed_state = self.store.compute_publish_state(item)
-        if supposed_state == LegacyPublishState.draft and isinstance(item.runtime.modulestore, DraftModuleStore):
+        if supposed_state == PublishState.draft and isinstance(item.runtime.modulestore, DraftModuleStore):
             # see if the draft differs from the published
             published = self.store.get_item(item.location, revision=ModuleStoreEnum.RevisionOption.published_only)
             if item.get_explicitly_set_fields_by_scope() != published.get_explicitly_set_fields_by_scope():
@@ -345,13 +345,13 @@ class CourseTestCase(ModuleStoreTestCase):
                 # checking children: if published differs from item, return draft
                 return supposed_state
             # published == item in all respects, so return public
-            return LegacyPublishState.public
-        elif supposed_state == LegacyPublishState.public and item.location.category in DIRECT_ONLY_CATEGORIES:
+            return PublishState.public
+        elif supposed_state == PublishState.public and item.location.category in DIRECT_ONLY_CATEGORIES:
             if not all([
                 self.store.has_item(child_loc, revision=ModuleStoreEnum.RevisionOption.draft_only)
                 for child_loc in item.children
             ]):
-                return LegacyPublishState.draft
+                return PublishState.draft
             else:
                 return supposed_state
         else:
