@@ -20,7 +20,6 @@ from .fields import Date
 from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
 from django.conf import settings
-from xmodule.modulestore.django import ModuleI18nService
 
 log = logging.getLogger(__name__)
 
@@ -950,8 +949,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
         then falls back to .start
         """
-        #i18n = self.runtime.service(self, "i18n")
-        i18n = ModuleI18nService()
+        i18n = self.runtime.service(self, "i18n")
         _ = i18n.ugettext
         strftime = i18n.strftime
 

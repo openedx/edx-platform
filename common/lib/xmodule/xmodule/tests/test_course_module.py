@@ -13,7 +13,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.conf import settings
-from xmodule.modulestore.django import ModuleI18nService
 
 
 ORG = 'test_org'
@@ -32,10 +31,10 @@ class CourseFieldsTestCase(unittest.TestCase):
 
 class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules, i18n_service):
+    def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[],
-                                  load_error_modules=load_error_modules, i18n_service=i18n_service)
+                                  load_error_modules=load_error_modules)
         course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
@@ -55,7 +54,7 @@ class DummySystem(ImportSystem):
 def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None, certs=False):
     """Get a dummy course"""
 
-    system = DummySystem(load_error_modules=True, i18n_service=ModuleI18nService())
+    system = DummySystem(load_error_modules=True)
 
     def to_attrb(n, v):
         return '' if v is None else '{0}="{1}"'.format(n, v).lower()
@@ -89,7 +88,7 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
     def setUp(self):
-        system = DummySystem(load_error_modules=True, i18n_service=ModuleI18nService())
+        system = DummySystem(load_error_modules=True)
         #sample_xml = """
         # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
         #        graceperiod="1 day" url_name="test"
@@ -214,9 +213,9 @@ class IsNewCourseTestCase(unittest.TestCase):
 
     @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="US/Pacific")
     def test_start_date_text_correct_timezone(self):
+        import pdb; pdb.set_trace()
         for s in self.pacific_timezone_start_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
-            print "UTC: %s Pacific: %s" % (s[0], s[2])
             self.assertEqual(d.start_date_text, s[2])
 
     def test_display_organization(self):

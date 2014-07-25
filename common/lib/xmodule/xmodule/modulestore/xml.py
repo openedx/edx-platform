@@ -389,8 +389,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
-        if i18n_service is not None:
-            self.i18n_service = i18n_service
 
         if course_ids is not None:
             course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
