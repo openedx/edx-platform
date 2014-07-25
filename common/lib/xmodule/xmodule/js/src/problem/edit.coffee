@@ -190,7 +190,60 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
 
+  #________________________________________________________________________________
+  @insertBooleanHints: (xmlStringUnderConstruction) ->
+    if MarkdownEditingDescriptor.problemHintsBooleanExpressions
+      index = 0
+      for booleanExpression in MarkdownEditingDescriptor.problemHintsBooleanExpressions
+        hintText = MarkdownEditingDescriptor.problemHintsBooleanStrings[index]
+        booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
+        booleanHintElement += '        </booleanhint>\n'
+        xmlStringUnderConstruction += booleanHintElement
+        index = index + 1
+    return xmlStringUnderConstruction
 
+  #________________________________________________________________________________
+  @parseForCompoundConditionHints: (xmlString) ->
+    for line in xmlString.split('\n')
+      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
+      if matches
+        questionHintString = matches[1]
+        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
+        if splitMatches
+          booleanExpression = splitMatches[1]
+          hintText = splitMatches[2]
+          MarkdownEditingDescriptor.problemHintsBooleanStrings.push(hintText)
+          MarkdownEditingDescriptor.problemHintsBooleanExpressions.push(booleanExpression)
+    return xmlString
+
+#________________________________________________________________________________
+  @matchCompoundConditionPattern: (testString) ->
+    return testString.match( /\{\{(.+)\}\}/ )
+
+  #________________________________________________________________________________
+  @matchBooleanConditionPattern: (testString) ->
+    return testString.match( /\(\((.+)\)\)(.+)/ )
+
+  #________________________________________________________________________________
+  @matchMultipleChoicePattern: (testString) ->
+    return testString.match( /\s+\(\s*x?\s*\)[^\n]+/ )
+
+  #________________________________________________________________________________
+  @matchCheckboxMarkerPattern: (testString) ->
+    return testString.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+
+  #________________________________________________________________________________
+  @insertParagraphText: (xmlString, reducedXmlString) ->
+      returnXmlString = ''
+      for line in reducedXmlString.split('\n')
+        trimmedLine = line.trim()
+        if trimmedLine.length > 0
+          compoundConditionMatches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
+          if compoundConditionMatches == null
+            returnXmlString += '<p>\n'
+            returnXmlString += trimmedLine
+            returnXmlString += '</p>\n'
+      return returnXmlString
 
   #________________________________________________________________________________
   # check a hint string for a custom label (e.g., 'NOPE::you got this answer wrong')
@@ -227,15 +280,80 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   # element to the xml with a 'hint' element for each item
   #
   @insertProblemHints: (xmlStringUnderConstruction) ->
-    if MarkdownEditingDescriptor.problemHintsStrings.length > 0
-      ondemandElement =  '    <demandhint>\n'
-      for problemHint in MarkdownEditingDescriptor.problemHintsStrings
-        ondemandElement += '        <hint> ' +  problemHint + '\n'
-        ondemandElement += '        </hint>\n'
-      ondemandElement +=  '    </demandhint>\n'
-      xmlStringUnderConstruction += ondemandElement
+    if MarkdownEditingDescriptor.problemHintsStrings
+      if MarkdownEditingDescriptor.problemHintsStrings.length > 0
+        ondemandElement =  '    <demandhint>\n'
+        for problemHint in MarkdownEditingDescriptor.problemHintsStrings
+          ondemandElement += '        <hint> ' +  problemHint + '\n'
+          ondemandElement += '        </hint>\n'
+        ondemandElement +=  '    </demandhint>\n'
+        xmlStringUnderConstruction += ondemandElement
     return xmlStringUnderConstruction
 
+  #________________________________________________________________________________
+  @parseForDropdown: (xmlString) ->
+    # try to parse the supplied string to find a drop down problem
+    # return the string unmodified if this is not a drop down problem
+    dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
+
+    if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
+      reducedXmlString = xmlString.replace(dropdownMatches[0], '')
+      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
+      returnXmlString +=  '    <optionresponse>\n'
+      returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
+
+      optionsString = ''
+      delimiter = ''
+      for line in dropdownMatches[1].split('\n')    # split the string between [[..]] brackets into single lines
+        line = line.trim()
+        if line.length > 0
+          hintText = ''
+          correctnessText = ''
+          itemText = ''
+
+          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+          if hintMatches
+            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
+            hintText = hintMatches[1].trim()      # group 1 holds the matching characters (our string)
+            hintText = @extractCustomLabel( hintText )
+            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+
+          correctChoiceMatch = line.match( /^\s*\(([^)]+)\)/ )  # try to match a parenthetical string: '(...)'
+          if correctChoiceMatch                          # matched so this must be the correct answer
+            correctnessText = 'True'
+            itemText = correctChoiceMatch[1]
+            returnXmlString = returnXmlString.replace('CORRECT_PLACEHOLDER', itemText)  # poke the correct value in
+            optionsString += delimiter + '(' + itemText + ')'
+          else
+            correctnessText = 'False'
+            itemText = line
+            optionsString += delimiter + itemText.trim()
+
+          if itemText[itemText.length-1] == ','     # check for an end-of-line comma
+            itemText = itemText.slice(0, itemText.length-1) # suppress it
+          itemText = itemText.trim()
+
+          returnXmlString += '              <option  correct="' + correctnessText + '">'
+          returnXmlString += '                  ' + itemText + '\n'
+          if hintText
+            returnXmlString += '                   <optionhint ' + @customLabel + '>' + hintText + '\n'
+            returnXmlString += '                   </optionhint>\n'
+          returnXmlString += '              </option>\n'
+
+          delimiter = ', '
+      returnXmlString += '        </optioninput>\n'
+
+      returnXmlString = returnXmlString.replace('OPTIONS_PLACEHOLDER', optionsString)  # poke the options in
+
+      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
+      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
+
+      returnXmlString += '    </optionresponse>\n'
+
+    else
+      returnXmlString = xmlString
+
+    return returnXmlString
 
 
 
@@ -281,25 +399,26 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       //---------------------------------------------------------------------------
       // multiple choice questions
+      //
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
         var choices = '';
         var shuffle = false;
         var options = match.split('\n');
 
         for(var i = 0; i < options.length; i++) {
-          options[i] = options[i].trim();               // trim off leading/trailing whitespace
-          if(options[i].length > 0) {
+          line = options[i].trim();               // trim off leading/trailing whitespace
+          if(line.length > 0) {
             hintText = '';
-            hintMatches = options[i].match( /{{(.+)}}/ );  // extract the {{...}} phrase, if any
+            hintMatches = line.match( /{{(.+)}}/ );  // extract the {{...}} phrase, if any
             if(hintMatches) {
               matchString = hintMatches[0];          // group 0 holds the entire matching string (includes delimiters)
               hintText = hintMatches[1].trim();      // group 1 holds the matching characters (our hint string)
               hintText = MarkdownEditingDescriptor.extractCustomLabel( hintText );
-              options[i] = options[i].replace(matchString, '');  // remove the {{...}} phrase, else it will be displayed
+              line = line.replace(matchString, '');  // remove the {{...}} phrase, else it will be displayed
             }
 
-            var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
-            var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
+            var value = line.split(/^\s*\(.{0,3}\)\s*/)[1];
+            var inparens = /^\s*\((.{0,3})\)\s*/.exec(line)[1];
             var correct = /x/i.test(inparens);
             var fixed = '';
             if(/@/.test(inparens)) {
@@ -346,9 +465,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           options = match.split('\n');
 
           for (i = 0; i < options.length; i += 1) {
-              if(options[i].length > 0) {
-                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
-                  correct = /^\s*\[x\]/i.test(options[i]);
+              if(line.length > 0) {
+                  value = line.split(/^\s*\[.?\]\s*/)[1];
+                  correct = /^\s*\[x\]/i.test(line);
                   groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
               }
           }
@@ -420,30 +539,29 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
       });
 
-      // replace selects
-      xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
-          var selectString = '\n<optionresponse>\n',
-              correct, options;
 
-          selectString += '  <optioninput options="(';
-          options = p.split(/\,\s*/g);
 
-          for (i = 0; i < options.length; i += 1) {
-              selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
-          }
 
-          selectString += ')" correct="';
-          correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
 
-          if (correct) {
-              selectString += correct[1];
-          }
-
-          selectString += '"></optioninput>\n';
-          selectString += '</optionresponse>\n\n';
-
-          return selectString;
+      //---------------------------------------------------------------------------
+      // dropdown questions
+      //
+      xml = xml.replace(/\[\[([^\]]+)\]\]/gm, function(match, p) {
+        return MarkdownEditingDescriptor.parseForDropdown(match);
       });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
