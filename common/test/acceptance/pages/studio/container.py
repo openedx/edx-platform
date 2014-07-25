@@ -86,16 +86,12 @@ class ContainerPage(PageObject):
         This should drag the element with the source_index drag handle BEFORE the
         one with the target_index drag handle.
         """
-        draggables = self.q(css='.drag-handle')
+        draggables = self.q(css='.drag-handle').results
         source = draggables[source_index]
         target = draggables[target_index]
+
         action = ActionChains(self.browser)
-        # When dragging before the target element, must take into account that the placeholder
-        # will appear in the place where the target used to be.
-        placeholder_height = 40
-        action.click_and_hold(source).move_to_element_with_offset(
-            target, 0, placeholder_height
-        ).release().perform()
+        action.drag_and_drop(source, target).perform()
         wait_for_notification(self)
 
     def duplicate(self, source_index):

@@ -155,7 +155,6 @@ class DragAndDropTest(NestedVerticalTest):
             expected_ordering
         )
 
-    @skip("Sporadically drags outside of the Group.")
     def test_reorder_in_group(self):
         """
         Drag Group A Item 2 before Group A Item 1.
