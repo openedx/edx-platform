@@ -1,6 +1,6 @@
 describe "DiscussionContentView", ->
     beforeEach ->
-
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures(
             """
             <div class="discussion-post">
@@ -36,7 +36,6 @@ describe "DiscussionContentView", ->
         @thread = new Thread(@threadData)
         @view = new DiscussionContentView({ model: @thread })
         @view.setElement($('.discussion-post'))
-        window.user = new DiscussionUser({id: '567', upvoted_ids: []})
 
     it 'defines the tag', ->
         expect($('#jasmine-fixtures')).toExist

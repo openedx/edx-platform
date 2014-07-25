@@ -15,11 +15,14 @@ version 1.1.1 specifications.
 
 You can use an LTI component in several ways.
 
-- You can add external LTI content that is displayed only, such as
-   textbook content that doesn’t require a student response.
-- You can add external LTI content that requires a student response. An
-   external provider will grade student responses.
-- You can use the component as a placeholder for syncing with an external grading system. 
+* You can add external LTI content that is displayed only, such as textbook
+  content that doesn’t require a student response.
+
+* You can add external LTI content that requires a student response. An external
+  provider will grade student responses.
+
+* You can use the component as a placeholder for syncing with an external
+  grading system.
 
 For example, the following LTI component incorporates a Cerego tool that students interact with. 
 
@@ -40,7 +43,8 @@ unit, you need the following information.
    provider. The launch URL is the URL that Studio sends to the external
    LTI provider so that the provider can send back students’ grades.
 
-- The **lti_passports** policy key. This policy key has three parts: an LTI ID, a client key, and a client secret.
+- The **LTI Passports** policy key. This policy key has three parts: an LTI ID,
+  a client key, and a client secret.
 
   -  The **LTI ID**. This is a value that you create to refer to the external LTI
      provider. You should create an LTI ID that you can remember easily.
@@ -61,11 +65,11 @@ unit, you need the following information.
      may be a string of numbers and letters such as **23746387264** or
      **yt4984yr8**.
 
-  To create the **lti_passports** policy key, combine the LTI ID, client key, and client secret in the following format (make sure to include the colons):
+  To create the **LTI Passports** policy key, combine the LTI ID, client key, and client secret in the following format (make sure to include the colons):
 
   ``lti_id:client_key:client_secret``
 
-  For example, an **lti_passports** policy key may resemble any of the following:
+  For example, an **LTI Passports** policy key may resemble any of the following:
 
   ``test_lti_id:b289378-f88d-2929-ctools.school.edu:secret``
   
@@ -79,32 +83,31 @@ Create an LTI Component
 
 Creating an LTI component in your course has three steps.
 
-#. Add LTI to the **advanced_modules** policy key.
+#. Add LTI to the **Advanced Module List**  policy key.
 #. Register the LTI provider.
 #. Create the LTI component in an individual unit.
 
 ======================================================
-Step 1. Add LTI to the Advanced Modules Policy Key
+Step 1. Add LTI to the Advanced Module List Policy Key
 ======================================================
 
 #. On the **Settings** menu, click **Advanced Settings**.
 
-#. On the **Advanced Settings** page, locate the **advanced_modules** policy key (this key is at the top of the list).
+#. In the field for the **Advanced Module List** policy key, place your cursor
+   between the brackets.
 
-#. Under **Policy Value**, place your cursor between the brackets, and
-   then enter ``“lti”``. Make sure to include the quotation marks, but
-   not the period.
+#. Enter ``“lti”``. Make sure to include the quotation marks, but not the
+   period.
 
    .. image:: /Images/LTIPolicyKey.png
      :width: 500
      :alt: Image of the advanced_modules key in the Advanced Settings page, with the LTI value added
 
-   **Note** If the **Policy Value** field already contains text, place your
-   cursor directly after the closing quotation mark for the final item, and
-   then enter a comma followed by ``“lti”`` (make sure that you include the
-   quotation marks).
+.. note:: If the **Advanced Module List** field already contains text, place your cursor directly
+   after the closing quotation mark for the final item, and then enter a comma
+   followed by ``“lti”`` (make sure that you include the quotation marks).
 
-#. At the bottom of the page, click **Save Changes**.
+4. At the bottom of the page, click **Save Changes**.
 
 The page refreshes automatically. At the top of the page,
 you see a notification that your changes have been saved.
@@ -113,18 +116,23 @@ you see a notification that your changes have been saved.
 Step 2. Register the External LTI Provider
 ==========================================
 
-To register the external LTI provider, you’ll add the **lti_passports** policy key to the course's advanced settings.
+To register the external LTI provider, you’ll add the **LTI Passports** policy
+key to the course's advanced settings.
 
-#. On the **Advanced Settings** page, locate the **lti_passports**
+#. On the **Advanced Settings** page, locate the **LTI Passports**
    policy key.
 
-#. In the **Policy Value** field for the **lti_passports** policy key, place your cursor between the brackets, and then enter the **lti_passports** policy key surrounded by quotation marks.
+#. Place your cursor between the brackets.
 
-   For example, the text in the **Policy Value** field may resemble the following.
+#. Enter the **LTI Passports** policy key surrounded by quotation marks.
+
+   For example, the text in the **LTI Passports** field may resemble the following.
 
    ``"test_lti_id:b289378-f88d-2929-ctools.umich.edu:secret"``
 
-   If you have multiple LTI providers, separate the values for each **lti_passports** policy key with a comma. Make sure to surround each entry with quotation marks.
+   If you have multiple LTI providers, separate the values for each **LTI
+   Passports** policy key with a comma. Make sure to surround each entry with
+   quotation marks.
 
    .. code-block:: xml
 
@@ -132,12 +140,11 @@ To register the external LTI provider, you’ll add the **lti_passports** policy
       "id_21441:b289378-f88d-2929-ctools.school.edu:23746387264",
       "book_lti_provider_from_new_york:b289378-f88d-2929-ctools.company.com:yt4984yr8"
 
+4. At the bottom of the page, click **Save Changes**.
 
-#. At the bottom of the page, click **Save Changes**.
-
-The page refreshes automatically. At the top of the page,
-you see a notification that your changes have been saved, and you can
-see your entries for the **lti_passports** policy key.
+The page refreshes automatically. At the top of the page, you see a
+notification that your changes have been saved, and you can see your entries
+for the **LTI Passports** policy key.
 
 ==========================================
 Step 3. Add the LTI Component to a Unit

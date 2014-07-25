@@ -1,0 +1,11 @@
+<problem display_name="Checkboxes" markdown="A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.&#10;&gt;&gt;Select the answer that matches&lt;&lt;&#10;&#10;[x] correct&#10;[ ] incorrect&#10;[x] correct&#10;">
+  <p>A checkboxes problem presents checkbox buttons for student input. Students can select more than one option presented.</p>
+  <p>Select the answer that matches</p>
+  <choiceresponse>
+    <checkboxgroup direction="vertical" label="Select the answer that matches">
+      <choice correct="true">correct</choice>
+      <choice correct="false">incorrect</choice>
+      <choice correct="true">correct</choice>
+    </checkboxgroup>
+  </choiceresponse>
+</problem>

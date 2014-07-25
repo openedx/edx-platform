@@ -1,9 +1,22 @@
 describe 'All Content', ->
     beforeEach ->
-        # TODO: figure out a better way of handling this
-        # It is set up in main.coffee DiscussionApp.start
-        window.$$course_id = 'edX/999/test'
-        window.user = new DiscussionUser {id: '567'}
+        DiscussionSpecHelper.setUpGlobals()
+
+    describe 'Staff and TA Content', ->
+        beforeEach ->
+            DiscussionUtil.loadRoles({"Moderator": [567], "Administrator": [567], "Community TA": [567]})
+
+        it 'anonymous thread should not include login role label', ->
+            anon_content = new Content
+            anon_content.initialize
+            expect(anon_content.get 'staff_authored').toBe false
+            expect(anon_content.get 'community_ta_authored').toBe false
+
+        it 'general thread should include login role label', ->
+            anon_content = new Content { user_id: '567' }
+            anon_content.initialize
+            expect(anon_content.get 'staff_authored').toBe true
+            expect(anon_content.get 'community_ta_authored').toBe true
 
     describe 'Content', ->
         beforeEach ->

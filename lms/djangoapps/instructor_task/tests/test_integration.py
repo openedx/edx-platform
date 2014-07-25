@@ -17,6 +17,7 @@ from django.core.urlresolvers import reverse
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
 from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore import ModuleStoreEnum
 
 from courseware.model_data import StudentModule
 
@@ -104,6 +105,9 @@ class TestRescoringTask(TestIntegrationTask):
         self.create_student('u3')
         self.create_student('u4')
         self.logout()
+
+        # set up test user for performing test operations
+        self.setup_user()
 
     def render_problem(self, username, problem_url_name):
         """
@@ -294,7 +298,9 @@ class TestRescoringTask(TestIntegrationTask):
                 InstructorTaskModuleTestCase.problem_location(problem_url_name)
             )
             descriptor.data = problem_xml
-            self.module_store.update_item(descriptor, '**replace_user**')
+            with self.module_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, descriptor.location.course_key):
+                self.module_store.update_item(descriptor, self.user.id)
+                self.module_store.publish(descriptor.location, self.user.id)
         else:
             # Use "per-student" rerandomization so that check-problem can be called more than once.
             # Using "always" means we cannot check a problem twice, but we want to call once to get the

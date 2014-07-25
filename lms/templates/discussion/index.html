@@ -23,11 +23,21 @@
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<%include file="_new_post.html" />
+<article class="new-post-article"></article>
 
-<section class="discussion container" id="discussion-container" data-roles="${roles}" data-course-id="${course_id}" data-user-info="${user_info}" data-threads="${threads}" data-thread-pages="${thread_pages}" data-content-info="${annotated_content_info}" data-sort-preference="${sort_preference}" data-flag-moderator="${flag_moderator}">
+<section class="discussion container" id="discussion-container"
+         data-roles="${roles}"
+         data-course-id="${course_id}"
+         data-user-info="${user_info}"
+         data-threads="${threads}"
+         data-thread-pages="${thread_pages}"
+         data-content-info="${annotated_content_info}"
+         data-sort-preference="${sort_preference}"
+         data-flag-moderator="${flag_moderator}"
+         data-user-cohort-id="${user_cohort}"
+         data-course-settings="${course_settings}">
     <div class="discussion-body">
-        <div class="sidebar"></div>
+        <div class="forum-nav"></div>
         <div class="discussion-column">
         </div>
     </div>

@@ -29,19 +29,19 @@ To create a word cloud tool:
 
     #. On the **Settings** menu, click **Advanced Settings**.
 
-    #. On the **Advanced Settings** page, locate the **Manual Policy Definition** section, and then locate the **advanced_modules** policy key (this key is at the top of the list).
+    #. In the field for the **Advanced Module List** policy key, place your
+       cursor between the brackets.
 
-    #. Under **Policy Value**, place your cursor between the brackets, and
-       then enter the following. Make sure to include the quotation marks.
+    #. Enter the following value. Make sure to include the quotation marks.
 
        ``"word_cloud"``
 
-    #. At the bottom of the page, click **Save Changes**.
+    4. At the bottom of the page, click **Save Changes**.
 
        The page refreshes automatically. At the top of the page, you see a
        notification that your changes have been saved.
 
-    #. Return to the unit where you want to add the specialized problem. The
+    5. Return to the unit where you want to add the specialized problem. The
        list of possible components now contains an Advanced component.
 
 #. In the unit where you want to create the problem, click **Advanced**

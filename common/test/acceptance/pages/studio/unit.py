@@ -62,6 +62,30 @@ class UnitPage(PageObject):
             'Wait for draft mode to be activated'
         ).fulfill()
 
+    def set_unit_visibility(self, visibility):
+        """
+        Set unit visibility state
+
+        Arguments:
+            visibility (str): private or public
+
+        """
+        self.q(css='select[name="visibility-select"] option[value="{}"]'.format(visibility)).first.click()
+        self.wait_for_ajax()
+
+        selector = '.edit-button'
+        if visibility == 'private':
+            check_func = lambda: self.q(css=selector).visible
+        elif visibility == 'public':
+            check_func = lambda: not self.q(css=selector).visible
+
+        EmptyPromise(check_func, 'Unit Visibility is {}'.format(visibility)).fulfill()
+
+
+COMPONENT_BUTTONS = {
+    'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
+    'save_settings': '.action-save',
+}
 
 class Component(PageObject):
     """
@@ -125,3 +149,26 @@ class Component(PageObject):
         an initialized :class:`.ContainerPage` for that xblock.
         """
         return ContainerPage(self.browser, self.locator).visit()
+
+    def _click_button(self, button_name):
+        """
+        Click on a button as specified by `button_name`
+
+        Arguments:
+            button_name (str): button name
+
+        """
+        self.q(css=COMPONENT_BUTTONS[button_name]).first.click()
+        self.wait_for_ajax()
+
+    def open_advanced_tab(self):
+        """
+        Click on Advanced Tab.
+        """
+        self._click_button('advanced_tab')
+
+    def save_settings(self):
+        """
+        Click on settings Save button.
+        """
+        self._click_button('save_settings')

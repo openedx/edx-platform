@@ -68,7 +68,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_get_module(self):
         self.assertEqual(
             None,
-            render.get_module('dummyuser', None, 'invalid location', None, None)
+            render.get_module('dummyuser', None, 'invalid location', None)
         )
 
     def test_module_render_with_jump_to_id(self):
@@ -90,7 +90,6 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             mock_request,
             self.course_key.make_usage_key('html', 'toyjumpto'),
             field_data_cache,
-            self.course_key
         )
 
         # get the rendered HTML output which should have the rewritten link
@@ -208,6 +207,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
+        self.assertEquals('Unauthenticated', response.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -461,7 +461,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             wrap_xmodule_display=True,
         )
         result_fragment = module.render(STUDENT_VIEW)
@@ -474,7 +473,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             wrap_xmodule_display=False,
         )
         result_fragment = module.render(STUDENT_VIEW)
@@ -487,7 +485,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
 
@@ -505,7 +502,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
 
@@ -528,7 +524,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
             static_asset_path="toy_course_dir",
         )
         result_fragment = module.render(STUDENT_VIEW)
@@ -555,7 +550,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
 
@@ -593,7 +587,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
             self.request,
             location,
             field_data_cache,
-            course_id,
         )
 
     def setup_mongo_course(self, course_edit_method='Studio'):
@@ -740,7 +733,6 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('Staff Debug', result_fragment.content)
@@ -751,7 +743,6 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertIn('Staff Debug', result_fragment.content)
@@ -763,7 +754,6 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
             self.request,
             self.location,
             self.field_data_cache,
-            self.course.id,
         )
         result_fragment = module.render(STUDENT_VIEW)
         self.assertNotIn('histrogram', result_fragment.content)
@@ -787,7 +777,6 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 self.request,
                 html_descriptor.location,
                 field_data_cache,
-                self.course.id,
             )
             module.render(STUDENT_VIEW)
             self.assertFalse(mock_grade_histogram.called)
@@ -810,7 +799,6 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
                 self.request,
                 self.location,
                 self.field_data_cache,
-                self.course.id,
             )
             module.render(STUDENT_VIEW)
             self.assertTrue(mock_grade_histogram.called)
@@ -976,7 +964,6 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             mock_request,
             self.problem.location,
             field_data_cache,
-            self.course.id
         )._xmodule
 
     def set_module_grade_using_publish(self, grade_dict):
@@ -1025,7 +1012,7 @@ class TestRebindModule(TestSubmittingProblems):
             mock_request,
             self.lti.location,
             field_data_cache,
-            self.course.id)._xmodule
+        )._xmodule
 
     def test_rebind_noauth_module_to_user_not_anonymous(self):
         """

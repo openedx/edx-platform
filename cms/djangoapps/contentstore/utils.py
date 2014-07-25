@@ -11,13 +11,10 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.store_utilities import delete_course
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -29,27 +26,25 @@ NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def delete_course_and_groups(course_id, commit=False):
+def delete_course_and_groups(course_id, user_id):
     """
     This deletes the courseware associated with a course_id as well as cleaning update_item
     the various user table stuff (groups, permissions, etc.)
     """
     module_store = modulestore()
-    content_store = contentstore()
 
-    with store_bulk_write_operations_on_course(module_store, course_id):
-        if delete_course(module_store, content_store, course_id, commit):
+    with module_store.bulk_write_operations(course_id):
+        module_store.delete_course(course_id, user_id)
 
-            print 'removing User permissions from course....'
-            # in the django layer, we need to remove all the user permissions groups associated with this course
-            if commit:
-                try:
-                    staff_role = CourseStaffRole(course_id)
-                    staff_role.remove_users(*staff_role.users_with_role())
-                    instructor_role = CourseInstructorRole(course_id)
-                    instructor_role.remove_users(*instructor_role.users_with_role())
-                except Exception as err:
-                    log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
+        print 'removing User permissions from course....'
+        # in the django layer, we need to remove all the user permissions groups associated with this course
+        try:
+            staff_role = CourseStaffRole(course_id)
+            staff_role.remove_users(*staff_role.users_with_role())
+            instructor_role = CourseInstructorRole(course_id)
+            instructor_role.remove_users(*instructor_role.users_with_role())
+        except Exception as err:
+            log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -59,7 +54,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, Location))
+    assert(isinstance(location, UsageKey))
 
     if settings.LMS_BASE is None:
         return None
@@ -81,7 +76,7 @@ def get_lms_link_for_about_page(course_id):
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(course_id, CourseKey))
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
@@ -142,6 +137,10 @@ def is_xblock_visible_to_students(xblock):
         published = modulestore().get_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     # If there's no published version then the xblock is clearly not visible
     except ItemNotFoundError:
+        return False
+
+    # If visible_to_staff_only is True, this xblock is not visible to students regardless of start date.
+    if published.visible_to_staff_only:
         return False
 
     # Check start date

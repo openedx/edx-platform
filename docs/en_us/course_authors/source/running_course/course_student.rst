@@ -7,13 +7,15 @@ Student Data
 You can access data about the students who are enrolled in your course at any
 time after you create the course.
 
-For information about the data you can access, see the following topics:
+For information about student data, see the following topics:
 
 * :ref:`PII`
 
 * :ref:`Access_student_data`
 
 * :ref:`Access_anonymized`
+  
+* :ref:`Track Student Activity`
 
 You can also view charts of certain student demographics for graded problems.
 See :ref:`Grades`.
@@ -21,7 +23,7 @@ See :ref:`Grades`.
 .. _PII:
 
 ***************************************************************
-Guidance for working with personal information
+Guidance for Working with Personal Information
 ***************************************************************
 
 The information that edX collects from site registrants includes personal
@@ -38,7 +40,7 @@ distribution or misuse of this information.
 .. _Access_student_data:
 
 ****************************
-Access student data
+Access Student Data
 ****************************
 
 You can download data about the students who are currently enrolled in your
@@ -47,7 +49,7 @@ course in a CSV (comma-separated values) file. For courses that have fewer than
 Instructor Dashboard.
 
 ======================
-Student-reported data
+Student-Reported Data
 ======================
 
 When students register with edX, they select a public username and supply
@@ -85,7 +87,7 @@ time.
 .. _View and download student data:
 
 ==========================================
-Download or view student data
+Download or View Student Data
 ==========================================
 
 You can download student data to learn about population demographics at a
@@ -124,7 +126,7 @@ To download or view student data:
 .. note:: The columns for language and location are included in this report for backward compatibility only. This data is no longer collected during student registration.
 
 ==========================================
-View demographic distributions
+View Demographic Distributions
 ==========================================
 
 You can view a course-wide summary of certain demographic distributions for
@@ -161,7 +163,7 @@ To display demographic data for your students:
 .. _Access_anonymized:
 
 ********************************
-Access anonymized student IDs
+Access Anonymized Student IDs
 ********************************
 
 Some of the tools that are available for use with the edX platform, including
@@ -187,5 +189,22 @@ To research and deanonymize student data, you can use this file together with
 the enrolled_profile.csv file of student data or the
 {course_id}_grade_report_{date}.csv file of grades.
 
+.. _Track Student Activity:
 
+******************************
+Track Student Activity
+******************************
+
+To monitor student activity during your course, you can review the number of
+students who, each week, interacted with your course. To be considered active,
+students must visit pages, play videos, add to discussions, submit answers to
+problems, or complete other course activities. The active student count is
+updated weekly.
+
+To display the number of active students:
+
+#. View the live version of your course.
+
+#. Click **Instructor**, then click **Analytics**. The count of active students
+   appears at the top of the page.
 

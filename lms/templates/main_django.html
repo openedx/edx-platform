@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
-  <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
+ <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
 
   {% compressed_css 'style-vendor' %}
   {% compressed_css 'style-app' %}
@@ -23,6 +23,7 @@
   {% endif %}
   {% render_block "css" %}
 
+  {% microsite_css_overrides_file %}
 
   <!--[if lt IE 9]>
   <script src="{% static 'js/html5shiv.js' %}"></script>
@@ -44,12 +45,17 @@
     {% block bodyextra %}{% endblock %}
   </div>
 
+<<<<<<< HEAD
   {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-footer.html" %}
   {% else %}
     {% include "footer.html" %}
   {% endif %}
     
+=======
+  {% include "edx_footer.html" %}
+
+>>>>>>> upstream/rc/2014-07-23
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
 

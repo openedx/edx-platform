@@ -1,9 +1,24 @@
 """Tests for the lms module itself."""
 
+import mimetypes
+
 from django.test import TestCase
 
 from edxmako import add_lookup, LOOKUP
 from lms import startup
+
+
+class LmsModuleTests(TestCase):
+    """
+    Tests for lms module itself.
+    """
+
+    def test_new_mimetypes(self):
+        extensions = ['eot', 'otf', 'ttf', 'woff']
+        for extension in extensions:
+            mimetype, _ = mimetypes.guess_type('test.' + extension)
+            self.assertIsNotNone(mimetype)
+
 
 class TemplateLookupTests(TestCase):
     """

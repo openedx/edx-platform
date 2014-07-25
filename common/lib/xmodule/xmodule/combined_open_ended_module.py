@@ -497,8 +497,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
-    metadata_attributes = RawDescriptor.metadata_attributes
-
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
     js_module_name = "OpenEndedMarkdownEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}

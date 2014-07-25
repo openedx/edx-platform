@@ -51,12 +51,14 @@ from mako.exceptions import TopLevelLookupException
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from instructor.enrollment import uses_shib
 
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
 CONTENT_DEPTH = 2
+
 
 def user_groups(user):
     """
@@ -647,6 +649,7 @@ def course_about(request, course_id):
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
 
+<<<<<<< HEAD
     # only allow course sneak peek if
     # 1) within enrollment period
     # 2) course specifies it's okay
@@ -659,6 +662,22 @@ def course_about(request, course_id):
     is_course_full = CourseEnrollment.is_course_full(course)
 
     context = {
+=======
+    # Used to provide context to message to student if enrollment not allowed
+    can_enroll = has_access(request.user, 'enroll', course)
+    invitation_only = course.invitation_only
+    is_course_full = CourseEnrollment.is_course_full(course)
+
+    # Register button should be disabled if one of the following is true:
+    # - Student is already registered for course
+    # - Course is already full
+    # - Student cannot enroll in course
+    active_reg_button = not(registered or is_course_full or not can_enroll)
+
+    is_shib_course = uses_shib(course)
+
+    return render_to_response('courseware/course_about.html', {
+>>>>>>> upstream/rc/2014-07-23
         'course': course,
         'regularly_registered': regularly_registered,
         'sneakpeek_allowed': sneakpeek_allowed,
@@ -669,10 +688,19 @@ def course_about(request, course_id):
         'in_cart': in_cart,
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,
+<<<<<<< HEAD
         'is_course_full': is_course_full
     }
 
     return render_to_response('courseware/course_about.html', context)
+=======
+        'is_course_full': is_course_full,
+        'can_enroll': can_enroll,
+        'invitation_only': invitation_only,
+        'active_reg_button': active_reg_button,
+        'is_shib_course': is_shib_course,
+    })
+>>>>>>> upstream/rc/2014-07-23
 
 
 @ensure_csrf_cookie
@@ -887,7 +915,7 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, course.id, static_asset_path=course.static_asset_path
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path
     )
 
     logging.debug('course_module = {0}'.format(tab_module))
@@ -899,7 +927,7 @@ def get_static_tab_contents(request, course, tab):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course={course}, tab={tab_url}".format(course=course,tab_url=tab['url_slug'])
+                u"Error rendering course={course}, tab={tab_url}".format(course=course, tab_url=tab['url_slug'])
             )
 
     return html

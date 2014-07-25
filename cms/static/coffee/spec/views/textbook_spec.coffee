@@ -308,7 +308,9 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 #            expect(typeof ctorOptions.onSuccess).toBe('function')
 #            expect(uploadSpies.show).toHaveBeenCalled()
 
-        it "saves content when opening upload dialog", ->
+        # Disabling because this test does not close the modal dialog. This can cause
+        # tests that run after it to fail (see STUD-1963).
+        xit "saves content when opening upload dialog", ->
             @view.render()
             @view.$("input.chapter-name").val("rainbows")
             @view.$("input.chapter-asset-path").val("unicorns")

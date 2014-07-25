@@ -33,11 +33,13 @@ For asynchronous conversation, we have several mailing lists on Google Groups:
 * `openedx-translation`_: everything related to *translating* Open edX into
   other languages. This includes volunteer translators, our internationalization
   infrastructure, issues related to Transifex, and so on.
+* `openedx-analytics`_: everything related to *analytics* in Open edX.
 * `edx-code`_: everything related to the *code* in Open edX. This includes
   feature requests, idea proposals, refactorings, and so on.
 
 .. _openedx-ops: https://groups.google.com/forum/#!forum/openedx-ops
 .. _openedx-translation: https://groups.google.com/forum/#!forum/openedx-translation
+.. _openedx-analytics: https://groups.google.com/forum/#!forum/openedx-analytics
 .. _edx-code: https://groups.google.com/forum/#!forum/edx-code
 
 Step 1: Sign a Contribution Agreement

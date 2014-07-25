@@ -297,7 +297,8 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        CoursewarePage(self.browser, self.course_id).visit()
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
 
     def setup_thread_page(self, thread_id):
@@ -312,6 +313,21 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def test_expand_discussion_empty(self):
         self.discussion_page.expand_discussion()
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
+
+    def check_anonymous_to_peers(self, is_staff):
+        thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))
+        self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
+
+    def test_anonymous_to_peers_threads_as_staff(self):
+        AutoAuthPage(self.browser, course_id=self.course_id, roles="Administrator").visit()
+        self.courseware_page.visit()
+        self.check_anonymous_to_peers(True)
+
+    def test_anonymous_to_peers_threads_as_peer(self):
+        self.check_anonymous_to_peers(False)
 
 
 class DiscussionUserProfileTest(UniqueCourseTest):
@@ -509,7 +525,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         """
         Test to check the default sorting preference of user. (Default = date )
         """
-        selected_sort = self.sort_page.get_selected_sort_preference_text()
+        selected_sort = self.sort_page.get_selected_sort_preference()
         self.assertEqual(selected_sort, "date")
 
     def test_change_sort_preference(self):
@@ -520,7 +536,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         for sort_type in ["votes", "comments", "date"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
-            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
 
     def test_last_preference_saved(self):
@@ -531,8 +547,8 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         for sort_type in ["votes", "comments", "date"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
-            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
             self.sort_page.refresh_page()
-            selected_sort = self.sort_page.get_selected_sort_preference_text()
+            selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
