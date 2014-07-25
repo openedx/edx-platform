@@ -50,8 +50,22 @@ define(
         var getStatus = function (url, timeout, stage) {
             var currentStage = stage || 0;
             if (CourseImport.stopGetStatus) { return ;}
-            updateStage(currentStage);
-            if (currentStage == 3 ) { return ;}
+
+            if (currentStage === 4) {
+                // Succeeded
+                CourseImport.displayFinishedImport();
+                $('.view-import .choose-file-button').html(gettext("Choose new file")).show();
+            } else if (currentStage < 0) {
+                // Failed
+                var errMsg = gettext("Error importing course");
+                var failedStage = Math.abs(currentStage);
+                CourseImport.stageError(failedStage, errMsg);
+                $('.view-import .choose-file-button').html(gettext("Choose new file")).show();
+            } else {
+                // In progress
+                updateStage(currentStage);
+            }
+
             var time = timeout || 1000;
             $.getJSON(url,
                 function (data) {
@@ -109,17 +123,57 @@ define(
             },
 
             /**
+             * Make Import feedback status list visible.
+             */
+            displayFeedbackList: function (){
+                this.stopGetStatus = false;
+                $('div.wrapper-status').removeClass('is-hidden');
+                $('.status-info').show();
+            },
+
+            /**
+             * Start upload feedback. Makes status list visible and starts
+             * showing upload progress.
+             */
+            startUploadFeedback: function (){
+                this.displayFeedbackList();
+                updateStage(0);
+            },
+
+            /**
+             * Show last import status from server and start sending requests to the server for status updates.
+             */
+            getAndStartUploadFeedback: function (url, fileName){
+                var self = this;
+                $.getJSON(url,
+                    function (data) {
+                        if (data.ImportStatus != 0) {
+                            $('.file-name').html(fileName);
+                            $('.file-name-block').show();
+                            self.displayFeedbackList();
+                            if (data.ImportStatus === 4){
+                                self.displayFinishedImport();
+                            } else {
+                                $('.view-import .choose-file-button').hide();
+                                var time = 1000;
+                                setTimeout(function () {
+                                    getStatus(url, time, data.ImportStatus);
+                                }, time);
+                            }
+                        }
+                    }
+                );
+            },
+
+            /**
              * Entry point for server feedback. Makes status list visible and starts
              * sending requests to the server for status updates.
              * @param {string} url The url to send Ajax GET requests for updates.
              */
             startServerFeedback: function (url){
                 this.stopGetStatus = false;
-                $('div.wrapper-status').removeClass('is-hidden');
-                $('.status-info').show();
-                getStatus(url, 500, 0);
+                getStatus(url, 1000, 0);
             },
-
 
             /**
              * Give error message at the list element that corresponds to the stage
@@ -128,6 +182,7 @@ define(
              * @param {string} msg Error message to display.
              */
             stageError: function (stageNo, msg) {
+                this.stopGetStatus = true;
                 var all = $('ol.status-progress').children();
                 // Make all stages up to, and including, the error stage 'complete'.
                 var prevList = all.slice(0, stageNo + 1);
@@ -140,8 +195,10 @@ define(
                 });
                 var message = msg || gettext("There was an error with the upload");
                 var elem = $('ol.status-progress').children().eq(stageNo);
-                elem.removeClass('is-started').addClass('has-error');
-                elem.find('p.copy').hide().after("<p class='copy error'>" + message + "</p>");
+                if (!elem.hasClass('has-error')) {
+                    elem.removeClass('is-started').addClass('has-error');
+                    elem.find('p.copy').hide().after("<p class='copy error'>" + message + "</p>");
+                }
             }
 
         };
