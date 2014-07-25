@@ -14,9 +14,9 @@ class CourseOutlineItem(object):
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
     BODY_SELECTOR = None
-    EDIT_BUTTON_SELECTOR = '.xblock-title .xblock-field-value-edit'
+    EDIT_BUTTON_SELECTOR = '.xblock-field-value-edit'
     NAME_SELECTOR = '.xblock-title .xblock-field-value'
-    NAME_INPUT_SELECTOR = '.xblock-title .xblock-field-input'
+    NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
 
     def __repr__(self):
@@ -268,7 +268,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     """
     url_path = "course"
     CHILD_CLASS = CourseOutlineSection
-    EXPAND_COLLAPSE_CSS = '.toggle-button-expand-collapse'
+    EXPAND_COLLAPSE_CSS = '.button-toggle-expand-collapse'
     BOTTOM_ADD_SECTION_BUTTON = '.outline > .add-section .button-new'
 
     def is_browser_on_page(self):
@@ -329,7 +329,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Returns true if a message informing the user that the course has no content is visible
         """
-        return self.q(css='.course-outline .no-content').is_present()
+        return self.q(css='.outline .no-content').is_present()
 
     @property
     def expand_collapse_link_state(self):
