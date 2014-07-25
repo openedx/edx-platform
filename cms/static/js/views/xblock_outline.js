@@ -202,7 +202,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     }
                     ViewUtils.setScrollOffset(locatorElement, scrollOffset);
                     if (editDisplayName) {
-                        locatorElement.find('> .wrapper-xblock-header .xblock-field-value-edit').click();
+                        locatorElement.find('> div[class$="header"] .xblock-field-value-edit').click();
                     }
                 }
                 this.initialState = null;
