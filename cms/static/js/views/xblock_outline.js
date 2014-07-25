@@ -68,6 +68,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 }
                 html = this.template({
                     xblockInfo: xblockInfo,
+                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
                     parentInfo: this.parentInfo,
                     xblockType: xblockType,
                     parentType: parentType,
@@ -200,7 +201,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     } else {
                         locatorElement = this.$('.outline-item[data-locator="' + locatorToShow + '"]');
                     }
-                    ViewUtils.setScrollOffset(locatorElement, scrollOffset);
+                    if (locatorElement.length > 0) {
+                        ViewUtils.setScrollOffset(locatorElement, scrollOffset);
+                    } else {
+                        console.error("Failed to show item with locator " + locatorToShow + "");
+                    }
                     if (editDisplayName) {
                         locatorElement.find('> div[class$="header"] .xblock-field-value-edit').click();
                     }

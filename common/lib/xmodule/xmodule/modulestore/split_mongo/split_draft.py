@@ -4,7 +4,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 
 from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
-from xmodule.modulestore import ModuleStoreEnum, LegacyPublishState
+from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 
 
@@ -158,9 +158,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Returns whether this xblock is draft, public, or private.
 
         Returns:
-            LegacyPublishState.draft - published exists and is different from draft
-            LegacyPublishState.public - published exists and is the same as draft
-            LegacyPublishState.private - no published version exists
+            PublishState.draft - published exists and is different from draft
+            PublishState.public - published exists and is the same as draft
+            PublishState.private - no published version exists
         """
         # TODO figure out what to say if xblock is not from the HEAD of its branch
         def get_head(branch):
@@ -171,7 +171,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             try:
                 other = get_head(ModuleStoreEnum.BranchName.published)
             except ItemNotFoundError:
-                return LegacyPublishState.private
+                return PublishState.private
         elif xblock.location.branch == ModuleStoreEnum.BranchName.published:
             other = get_head(ModuleStoreEnum.BranchName.draft)
         else:
@@ -179,13 +179,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
         if not other:
             if xblock.location.branch == ModuleStoreEnum.BranchName.draft:
-                return LegacyPublishState.private
+                return PublishState.private
             else:
-                return LegacyPublishState.public
+                return PublishState.public
         elif xblock.update_version != other['edit_info']['update_version']:
-            return LegacyPublishState.draft
+            return PublishState.draft
         else:
-            return LegacyPublishState.public
+            return PublishState.public
 
     def convert_to_draft(self, location, user_id):
         """

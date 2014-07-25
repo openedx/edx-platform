@@ -11,7 +11,7 @@ import logging
 
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import LegacyPublishState, ModuleStoreEnum
+from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, InvalidBranchSetting, DuplicateCourseError
 )
@@ -601,7 +601,7 @@ class DraftModuleStore(MongoModuleStore):
             return False
 
         # don't check children if this block has changes (is not public)
-        if self.compute_publish_state(item) != LegacyPublishState.public:
+        if self.compute_publish_state(item) != PublishState.public:
             return True
         # if this block doesn't have changes, then check its children
         elif item.has_children:
@@ -780,10 +780,10 @@ class DraftModuleStore(MongoModuleStore):
         Returns whether this xblock is draft, public, or private.
 
         Returns:
-            LegacyPublishState.draft - content is in the process of being edited, but still has a previous
+            PublishState.draft - content is in the process of being edited, but still has a previous
                 version deployed to LMS
-            LegacyPublishState.public - content is locked and deployed to LMS
-            LegacyPublishState.private - content is editable and not deployed to LMS
+            PublishState.public - content is locked and deployed to LMS
+            PublishState.private - content is editable and not deployed to LMS
         """
         if getattr(xblock, 'is_draft', False):
             published_xblock_location = as_published(xblock.location)
@@ -791,11 +791,11 @@ class DraftModuleStore(MongoModuleStore):
                 {'_id': published_xblock_location.to_deprecated_son()}
             )
             if published_item is None:
-                return LegacyPublishState.private
+                return PublishState.private
             else:
-                return LegacyPublishState.draft
+                return PublishState.draft
         else:
-            return LegacyPublishState.public
+            return PublishState.public
 
     def _verify_branch_setting(self, expected_branch_setting):
         """

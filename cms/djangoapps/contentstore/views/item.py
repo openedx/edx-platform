@@ -635,9 +635,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
-        "published": published,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "edited_by": safe_get_username(xblock.subtree_edited_by),
+        "published": published,
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
         "published_by": safe_get_username(xblock.published_by),
         'studio_url': xblock_studio_url(xblock),
@@ -645,7 +645,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "release_date": release_date,
         "release_date_from": _get_release_date_from(xblock) if release_date else None,
         "currently_visible_to_students": currently_visible_to_students,
-        "publish_state": _compute_publish_state(xblock, child_info) if not xblock.category == 'course' else None
+        "visibility_state": _compute_visibility_state(xblock, child_info) if not xblock.category == 'course' else None
     }
     if data is not None:
         xblock_info["data"] = data
@@ -658,63 +658,71 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     return xblock_info
 
 
-class PublishState(object):
+class VisibilityState(object):
     """
-    Represents the possible publish states for an xblock:
-      live - the block and all of its children are live to students (except for staff only items)
-      ready - the block and all of its children are ready to go live in the future
-      unscheduled - the block and all of its children are unscheduled
-      has_unpublished_content - the block or its children have unpublished content that is not staff only
+    Represents the possible visibility states for an xblock:
+
+      live - the block and all of its descendants are live to students (excluding staff only items)
+        Note: Live means both published and released.
+
+      ready - the block is ready to go live and all of its descendants are live or ready (excluding staff only items)
+        Note: content is ready when it is published and scheduled with a release date in the future.
+
+      unscheduled - the block and all of its descendants have no release date (excluding staff only items)
+        Note: it is valid for items to be published with no release date in which case they are still unscheduled.
+
+      needs_attention - the block or its descendants are not fully live, ready or unscheduled (excluding staff only items)
+        For example: one subsection has draft content, or there's both unreleased and released content in one section.
+
       staff_only - all of the block's content is to be shown to staff only
+        Note: staff only items do not affect their parent's state.
     """
     live = 'live'
     ready = 'ready'
-    unscheduled = 'unscheduled'
-    has_unpublished_content = 'has_unpublished_content'
+    unscheduled = 'unscheduled'  # unscheduled
+    needs_attention = 'needs_attention'
     staff_only = 'staff_only'
 
 
-def _compute_publish_state(xblock, child_info):
+def _compute_visibility_state(xblock, child_info):
     """
     Returns the current publish state for the specified xblock and its children
     """
     if xblock.visible_to_staff_only:
-        return PublishState.staff_only
+        return VisibilityState.staff_only
     elif is_unit(xblock) and modulestore().has_changes(xblock.location):
-        return PublishState.has_unpublished_content
+        return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
+    is_live = datetime.now(UTC) > xblock.start
     children = child_info and child_info['children']
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True
         all_live = True
         for child in child_info['children']:
-            child_state = child['publish_state']
-            if child_state == PublishState.has_unpublished_content:
+            child_state = child['visibility_state']
+            if child_state == VisibilityState.needs_attention:
                 return child_state
-            elif not child_state == PublishState.staff_only:
+            elif not child_state == VisibilityState.staff_only:
                 all_staff_only = False
-                if not child_state == PublishState.unscheduled:
+                if not child_state == VisibilityState.unscheduled:
                     all_unscheduled = False
-                    if not child_state == PublishState.live:
+                    if not child_state == VisibilityState.live:
                         all_live = False
         if all_staff_only:
-            return PublishState.staff_only
+            return VisibilityState.staff_only
         elif all_unscheduled:
-            if not is_unscheduled:
-                return PublishState.has_unpublished_content
-            else:
-                return PublishState.unscheduled
+            return VisibilityState.unscheduled if is_unscheduled else VisibilityState.needs_attention
         elif all_live:
-            return PublishState.live
+            return VisibilityState.live if is_live else VisibilityState.needs_attention
         else:
-            return PublishState.ready
+            return VisibilityState.ready if not is_unscheduled else VisibilityState.needs_attention
     if is_unscheduled:
-        return PublishState.unscheduled
-    elif datetime.now(UTC) > xblock.start:
-        return PublishState.live
+        return VisibilityState.unscheduled
+    elif is_live:
+        return VisibilityState.live
     else:
-        return PublishState.ready
+        return VisibilityState.ready
 
 
 def _create_xblock_ancestor_info(xblock):

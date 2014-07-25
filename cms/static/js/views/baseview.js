@@ -17,6 +17,9 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
             },
 
             options: {
+                // UX is moving towards using 'is-collapsed' in preference over 'collapsed',
+                // but use the old scheme as the default so that existing code doesn't need
+                // to be rewritten.
                 collapsedClass: 'collapsed'
             },
 

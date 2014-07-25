@@ -1,45 +1,32 @@
 <%
-var publishClass = '';
-if (publishState === 'staff_only') {
-    publishClass = 'is-staff-only';
-} else if (publishState === 'live') {
-    publishClass = 'is-live';
-} else if (publishState === 'ready') {
-    publishClass = 'is-ready';
-} else if (publishState === 'has_unpublished_content') {
-    publishClass = 'has-warnings is-draft';
-}
-
 var title = gettext("Draft (Never published)");
-if (publishState === 'staff_only') {
+if (visibilityState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
-} else if (publishState === 'live') {
+} else if (visibilityState === 'live') {
     title = gettext("Published and Live");
-} else if (publishState === 'ready') {
+} else if (visibilityState === 'ready') {
     title = gettext("Published");
-} else if (publishState === 'has_unpublished_content') {
+} else if (visibilityState === 'needs_attention') {
     title = gettext("Draft (Unpublished changes)");
 }
 
 var releaseLabel = gettext("Release:");
-if (publishState === 'live') {
+if (visibilityState === 'live') {
     releaseLabel = gettext("Released:");
-} else if (publishState === 'ready') {
+} else if (visibilityState === 'ready') {
     releaseLabel = gettext("Scheduled:");
 }
 
-var canPublish = publishState !== 'ready' && publishState !== 'live';
-var canDiscardChanges = publishState === 'has_unpublished_content';
-var visibleToStaffOnly = publishState === 'staff_only';
+var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
-<div class="bit-publishing <%= publishClass %>">
+<div class="bit-publishing <%= visibilityClass %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
         <%= title %>
     </h3>
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
-            <% if (publishState === 'has_unpublished_content' && editedOn && editedBy) {
+            <% if (hasChanges && editedOn && editedBy) {
                 var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
                 <%= interpolate(message, {
                     last_saved_date: '<span class="date">' + editedOn + '</span>',
@@ -91,12 +78,12 @@ var visibleToStaffOnly = publishState === 'staff_only';
     <div class="wrapper-pub-actions bar-mod-actions">
         <ul class="action-list">
             <li class="action-item">
-                <a class="action-publish action-primary <% if (!canPublish) { %>is-disabled<% } %>"
+                <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
                    href=""><%= gettext("Publish") %>
                 </a>
             </li>
             <li class="action-item">
-                <a class="action-discard action-secondary <% if (!canDiscardChanges) { %>is-disabled<% } %>"
+                <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
                    href=""><%= gettext("Discard Changes") %>
                 </a>
             </li>
