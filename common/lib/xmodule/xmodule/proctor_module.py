@@ -208,7 +208,7 @@ class ProctorModule(ProctorFields, XModule):
 
         # Proctor Panel requests (ALL USERS)
         if dispatch.startswith('cmd/'):
-            return self.pp.request(dispatch, data, json=False)
+            return self.pp.request(dispatch, dict(data.items()), json=False)
 
         if not self.is_released():  # check each time we do get_html()
             html = self.not_released_html()
