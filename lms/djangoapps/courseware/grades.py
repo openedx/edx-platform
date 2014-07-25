@@ -472,8 +472,9 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
             return (None, None)
 
     # Now we re-weight the problem, if specified
-    weight = float(problem_descriptor.weight)
+    weight = problem_descriptor.weight
     if weight is not None:
+        weight = float(weight)
         if total == 0:
             log.exception("Cannot reweight a problem with zero total points. Problem: " + str(student_module))
             return (correct, total)
