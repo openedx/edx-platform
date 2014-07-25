@@ -285,10 +285,11 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         var choices = '';
         var shuffle = false;
         var options = match.split('\n');
+
         for(var i = 0; i < options.length; i++) {
           options[i] = options[i].trim();               // trim off leading/trailing whitespace
           if(options[i].length > 0) {
-
+            hintText = '';
             hintMatches = options[i].match( /{{(.+)}}/ );  // extract the {{...}} phrase, if any
             if(hintMatches) {
               matchString = hintMatches[0];          // group 0 holds the entire matching string (includes delimiters)
