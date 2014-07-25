@@ -998,7 +998,6 @@ class MultipleChoiceResponse(LoncapaResponse):
                             if choice.get('correct') == 'True':
                                 correctness_string = 'CORRECT: '
 
-                        print('>>            : ' + message_style_class + '        choice.get("correct"): ' + choice.get('correct'))
                         new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
                             '<div class="' + message_style_class + '">' \
                             + correctness_string + choice_hint_text + '</div>'
