@@ -314,11 +314,17 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             print "Testing branch={!r}".format(setting)
                             with source_store.branch_setting(setting):
                                 with dest_store.branch_setting(setting):
+                                    source_store_type = source_store.get_modulestore_type(source_course_key)
+                                    dest_store_type = dest_store.get_modulestore_type(dest_course_key)
+
                                     self.assertCoursesEqual(
                                         source_store,
                                         source_course_key,
                                         dest_store,
                                         dest_course_key,
+                                        # Only assert that the published state is consistent when importing between
+                                        # stores of the same type.
+                                        assert_published_state=source_store_type == dest_store_type,
                                     )
 
                                     self.assertAssetsEqual(

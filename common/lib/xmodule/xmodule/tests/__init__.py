@@ -184,7 +184,7 @@ class CourseComparisonTest(unittest.TestCase):
         """
         self.ignored_asset_keys.add(key_name)
 
-    def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
+    def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key, assert_published_state=True):
         """
         Assert that the courses identified by ``expected_course_key`` in ``expected_store`` and
         ``actual_course_key`` in ``actual_store`` are identical (ignore differences related
@@ -226,19 +226,20 @@ class CourseComparisonTest(unittest.TestCase):
                 actual_item_location = actual_item_location.replace(name=actual_item_location.run)
             actual_item = actual_item_map.get(actual_item_location)
 
-            # compare published state
-            exp_pub_state = expected_store.compute_publish_state(expected_item)
-            act_pub_state = actual_store.compute_publish_state(actual_item)
-            self.assertEqual(
-                exp_pub_state,
-                act_pub_state,
-                'Published states for usages {} and {} differ: {!r} != {!r}'.format(
-                    expected_item.location,
-                    actual_item.location,
+            if assert_published_state:
+                # compare published state
+                exp_pub_state = expected_store.compute_publish_state(expected_item)
+                act_pub_state = actual_store.compute_publish_state(actual_item)
+                self.assertEqual(
                     exp_pub_state,
-                    act_pub_state
+                    act_pub_state,
+                    'Published states for usages {} and {} differ: {!r} != {!r}'.format(
+                        expected_item.location,
+                        actual_item.location,
+                        exp_pub_state,
+                        act_pub_state
+                    )
                 )
-            )
 
             # compare fields
             self.assertEqual(expected_item.fields, actual_item.fields)
