@@ -90,10 +90,10 @@ class ModuleStoreEnum(object):
         test = -3
 
 
-class LegacyPublishState(object):
+class PublishState(object):
     """
     The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
-    are no longer used in Studio directly, but are still referenced in a few places.
+    are no longer used in Studio, but they are still referenced in a few places in LMS.
     """
     draft = 'draft'
     private = 'private'
@@ -301,10 +301,10 @@ class ModuleStoreRead(object):
         Returns whether this xblock is draft, public, or private.
 
         Returns:
-            LegacyPublishState.draft - content is in the process of being edited, but still has a previous
+            PublishState.draft - content is in the process of being edited, but still has a previous
                 version deployed to LMS
-            LegacyPublishState.public - content is locked and deployed to LMS
-            LegacyPublishState.private - content is editable and not deployed to LMS
+            PublishState.public - content is locked and deployed to LMS
+            PublishState.private - content is editable and not deployed to LMS
         """
         pass
 
@@ -522,7 +522,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         Returns PublishState.public since this is a read-only store.
         """
-        return LegacyPublishState.public
+        return PublishState.public
 
     def heartbeat(self):
         """

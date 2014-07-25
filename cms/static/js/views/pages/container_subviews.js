@@ -1,10 +1,11 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils"],
-    function ($, _, gettext, BaseView, ViewUtils) {
-
-        var disabledCss = "is-disabled";
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+    "js/views/utils/xblock_utils"],
+    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+        var VisibilityState = XBlockViewUtils.VisibilityState,
+            disabledCss = "is-disabled";
 
         /**
          * A view that refreshes the view when certain values in the XBlockInfo have changed
@@ -53,20 +54,19 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
          */
         var PreviewActionController = ContainerStateListenerView.extend({
             shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['edited_on', 'published_on', 'publish_state']);
+                return ViewUtils.hasChangedAttributes(model, ['has_changes', 'published']);
             },
 
             render: function() {
                 var previewAction = this.$el.find('.button-preview'),
-                    viewLiveAction = this.$el.find('.button-view'),
-                    publishState = this.model.get('publish_state');
-                if (publishState !== 'unscheduled') {
+                    viewLiveAction = this.$el.find('.button-view');
+                if (this.model.get('published')) {
                     viewLiveAction.removeClass(disabledCss);
                 }
                 else {
                     viewLiveAction.addClass(disabledCss);
                 }
-                if (publishState !== 'live' && publishState !== 'ready') {
+                if (this.model.get('has_changes') || !this.model.get('published')) {
                     previewAction.removeClass(disabledCss);
                 }
                 else {
@@ -99,7 +99,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, [ 'edited_on', 'published_on', 'publish_state' ])) {
+                if (ViewUtils.hasChangedAttributes(model, [
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'publish_state'
+                ])) {
                    this.render();
                 }
             },
@@ -107,6 +109,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             render: function () {
                 this.$el.html(this.template({
                     publishState: this.model.get('publish_state'),
+                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('publish_state')),
+                    hasChanges: this.model.get('has_changes'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
                     published: this.model.get('published'),
@@ -162,7 +166,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = xblockInfo.get('publish_state') !== 'staff_only';
+                enableStaffLock = xblockInfo.get('publish_state') !== VisibilityState.staffOnly;
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);
@@ -221,7 +225,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             onSync: function(model) {
-                if (ViewUtils.hasChangedAttributes(model, ['published_on'])) {
+                if (ViewUtils.hasChangedAttributes(model, ['published', 'published_on', 'published_by'])) {
                    this.render();
                 }
             },

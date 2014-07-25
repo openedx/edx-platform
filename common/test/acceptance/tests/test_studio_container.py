@@ -4,12 +4,10 @@ The container page is used both for display units, and for
 displaying containers within units.
 """
 
-from unittest import skip
 from bok_choy.promise import Promise, EmptyPromise
 import datetime
 
 from ..fixtures.course import XBlockFixtureDesc
-from ..pages.lms.courseware import CoursewarePage
 from ..pages.studio.overview import CourseOutlinePage
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.html_component_editor import HtmlComponentEditorView
@@ -17,7 +15,7 @@ from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.staff_view import StaffPage
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 class ContainerBase(StudioCourseTest):

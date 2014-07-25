@@ -3,17 +3,6 @@ var category = xblockInfo.get('category');
 var releasedToStudents = xblockInfo.get('released_to_students');
 var publishState = xblockInfo.get('publish_state');
 
-var publishClass = '';
-if (publishState === 'staff_only') {
-    publishClass = 'is-staff-only';
-} else if (publishState === 'live') {
-    publishClass = 'is-live';
-} else if (publishState === 'ready') {
-    publishClass = 'is-ready';
-} else if (publishState === 'has_unpublished_content') {
-    publishClass = 'has-warnings';
-}
-
 var listType = 'list-unknown';
 if (xblockType === 'course') {
     listType = 'list-sections';
@@ -28,7 +17,7 @@ var statusType = null;
 if (publishState === 'staff_only') {
     statusType = 'staff-only';
     statusMessage = 'Contains staff only content';
-} else if (publishState === 'has_unpublished_content') {
+} else if (publishState === 'needs_attention') {
     if (category === 'vertical') {
         statusType = 'warning';
         if (releasedToStudents) {
@@ -49,7 +38,7 @@ if (statusType === 'warning') {
 }
 %>
 <% if (parentInfo) { %>
-<li class="outline-item outline-<%= xblockType %> <%= publishClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
+<li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
     data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
 
     <div class="<%= xblockType %>-header">

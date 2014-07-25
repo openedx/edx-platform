@@ -1,6 +1,7 @@
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..fixtures.course import CourseFixture
-from acceptance.tests.helpers import UniqueCourseTest
+from .helpers import UniqueCourseTest
+
 
 class StudioCourseTest(UniqueCourseTest):
     """

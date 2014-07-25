@@ -45,12 +45,13 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "published_by": null,
             /**
-             * Represents the possible publish states for an xblock:
-             *   is_live - the block and all of its children are live to students (except for staff only items)
-             *   is_ready - the block and all of its children are ready to go live in the future
-             *   unscheduled - the block and all of its children are unscheduled
-             *   has_unpublished_content - the block or its children have unpublished content that is not staff only
-             *   is_staff_only - all of the block's content is to be shown to staff only
+             * True if the xblock has changes.
+             * Note: this is not always provided as a performance optimization.
+             */
+            "has_changes": null,
+            /**
+             * Represents the possible publish states for an xblock. See the documentation
+             * for XBlockVisibility to see a comprehensive enumeration of the states.
              */
             "publish_state": null,
             /**
