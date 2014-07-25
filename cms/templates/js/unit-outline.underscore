@@ -1,16 +1,4 @@
 <%
-var publishState = xblockInfo.get('publish_state');
-var publishClass = '';
-if (publishState === 'staff_only') {
-    publishClass = 'is-staff-only';
-} else if (publishState === 'live') {
-    publishClass = 'is-live';
-} else if (publishState === 'ready') {
-    publishClass = 'is-ready';
-} else if (publishState === 'has_unpublished_content') {
-    publishClass = 'has_warnings';
-}
-
 var listType = 'list-for-' + xblockType;
 if (xblockType === 'course') {
     listType = 'list-sections';
@@ -21,7 +9,7 @@ if (xblockType === 'course') {
 }
 %>
 <% if (parentInfo) { %>
-    <li class="outline-item outline-<%= xblockType %> <%= publishClass %>"
+    <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %>"
         data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
         <div class="<%= xblockType %>-header">
             <h3 class="<%= xblockType %>-header-details">

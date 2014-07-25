@@ -8,7 +8,7 @@ from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandColl
 from ..pages.lms.courseware import CoursewarePage
 from ..fixtures.course import XBlockFixtureDesc
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 class CourseOutlineTest(StudioCourseTest):

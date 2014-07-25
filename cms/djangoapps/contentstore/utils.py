@@ -150,20 +150,6 @@ def course_image_url(course):
     return path
 
 
-def compute_publish_state(xblock):
-    """
-    Returns whether this xblock is draft, public, or private.
-
-    Returns:
-        LegacyPublishState.draft - content is in the process of being edited, but still has a previous
-            version deployed to LMS
-        LegacyPublishState.public - content is locked and deployed to LMS
-        LegacyPublishState.private - content is editable and not deployed to LMS
-    """
-
-    return modulestore().compute_publish_state(xblock)
-
-
 def is_currently_visible_to_students(xblock):
     """
     Returns true if there is a published version of the xblock that is currently visible to students.
