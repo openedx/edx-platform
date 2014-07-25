@@ -387,14 +387,10 @@
   </section>
 </section>
 
-<<<<<<< HEAD
-%if not regularly_registered:
-=======
 ## Need to put this hidden form on the page so that the registration button works.
 ## Since it's no harm to display a hidden form, we display it with the most permissive conditional
 ## which is when the student is not registered.
 %if active_reg_button or is_shib_course:
->>>>>>> upstream/rc/2014-07-23
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">

@@ -66,13 +66,9 @@ else:
         'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-<<<<<<< HEAD
-        'split_test',
-        'edx_sga'
-=======
+        'edx_sga', # that weird grading xblock thing - remove this next merge
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
         'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
->>>>>>> upstream/rc/2014-07-23
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'

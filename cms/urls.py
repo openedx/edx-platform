@@ -72,29 +72,9 @@ urlpatterns += patterns(
         r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'course_info_update_handler'
     ),
-<<<<<<< HEAD
-    url(r'^course/(?P<course_key_string>[^/]+)?$', 'course_handler', name='course_handler'),
-    url(r'^subsection/(?P<usage_key_string>[^/]+)$', 'subsection_handler'),
-    url(r'^unit/(?P<usage_key_string>[^/]+)$', 'unit_handler'),
-    url(r'^container/(?P<usage_key_string>[^/]+)$', 'container_handler'),
-    url(r'^checklists/(?P<course_key_string>[^/]+)/(?P<checklist_index>\d+)?$', 'checklists_handler'),
-    url(r'^orphan/(?P<course_key_string>[^/]+)$', 'orphan_handler'),
-    url(r'^assets/(?P<course_key_string>[^/]+)/(?P<asset_key_string>.+)?$', 'assets_handler'),
-    url(r'^import/(?P<course_key_string>[^/]+)$', 'import_handler'),
-    url(r'^import_status/(?P<course_key_string>[^/]+)/(?P<filename>.+)$', 'import_status_handler'),
-    url(r'^export/(?P<course_key_string>[^/]+)$', 'export_handler'),
-    url(r'^xblock/(?P<usage_key_string>[^/]+)/(?P<view_name>[^/]+)$', 'xblock_view_handler'),
-    url(r'^xblock/(?P<usage_key_string>[^/]+)?$', 'xblock_handler'),
-    url(r'^tabs/(?P<course_key_string>[^/]+)$', 'tabs_handler'),
-    url(r'^settings/details/(?P<course_key_string>[^/]+)$', 'settings_handler'),
-    url(r'^settings/grading/(?P<course_key_string>[^/]+)(/)?(?P<grader_index>\d+)?$', 'grading_handler'),
-    url(r'^settings/advanced/(?P<course_key_string>[^/]+)$', 'advanced_settings_handler'),
-    url(r'^textbooks/(?P<course_key_string>[^/]+)$', 'textbooks_list_handler'),
-    url(r'^textbooks/(?P<course_key_string>[^/]+)/(?P<textbook_id>\d[^/]*)$', 'textbooks_detail_handler'),
     url(r'^utilities/(?P<course_key_string>[^/]+)$', 'utility_handler'),
     url(r'^utility/captions/(?P<course_key_string>[^/]+)$', 'utility_captions_handler'),
     url(r'^utility/bulksettings/(?P<course_key_string>[^/]+)$', 'utility_bulksettings_handler'),
-=======
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^subsection/{}$'.format(settings.USAGE_KEY_PATTERN), 'subsection_handler'),
     url(r'^unit/{}$'.format(settings.USAGE_KEY_PATTERN), 'unit_handler'),
@@ -113,7 +93,6 @@ urlpatterns += patterns(
     url(r'^settings/advanced/{}$'.format(settings.COURSE_KEY_PATTERN), 'advanced_settings_handler'),
     url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_list_handler'),
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
->>>>>>> upstream/rc/2014-07-23
 )
 
 if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'):

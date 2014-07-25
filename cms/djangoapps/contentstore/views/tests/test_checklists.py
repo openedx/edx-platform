@@ -136,15 +136,9 @@ class ChecklistTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(checklist, index), stored)
 
-<<<<<<< HEAD
-        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/slashes:mitX+333+Checklists_Course/')
-        test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/slashes:mitX+333+Checklists_Course')
-        test_expansion(self.course.checklists[2], 0, 'http://www.youtube.com', 'http://www.youtube.com')
-=======
         test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/mitX/333/Checklists_Course/')
         test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/mitX/333/Checklists_Course')
-        test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
->>>>>>> upstream/rc/2014-07-23
+        test_expansion(self.course.checklists[2], 0, 'http://www.youtube.com', 'http://www.youtube.com')
 
 
 def get_first_item(checklist):

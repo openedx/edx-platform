@@ -170,16 +170,14 @@ def _has_access_course_desc(user, action, course):
         else:
             reg_method_ok = True  # if not using this access check, it's always OK.
 
-<<<<<<< HEAD
         if reg_method_ok and within_enrollment_period():
             # in enrollment period, so any user is allowed to enroll.
             debug("Allow: in enrollment period")
             return True
-=======
+
         now = datetime.now(UTC())
         start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
         end = course.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
->>>>>>> upstream/rc/2014-07-23
 
         # if user is in CourseEnrollmentAllowed with right course key then can also enroll
         # (note that course.id actually points to a CourseKey)
@@ -315,11 +313,8 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-<<<<<<< HEAD
-=======
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
->>>>>>> upstream/rc/2014-07-23
 
         # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):

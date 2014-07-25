@@ -45,17 +45,12 @@
     {% block bodyextra %}{% endblock %}
   </div>
 
-<<<<<<< HEAD
   {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-footer.html" %}
   {% else %}
     {% include "footer.html" %}
   {% endif %}
     
-=======
-  {% include "edx_footer.html" %}
-
->>>>>>> upstream/rc/2014-07-23
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
 
