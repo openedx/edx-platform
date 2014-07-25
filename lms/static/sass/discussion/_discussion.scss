@@ -647,6 +647,11 @@ body.discussion {
     border: 1px solid #a0a0a0;
     @include linear-gradient(top, $white 35%, $gray-l4);
     box-shadow: 0 1px 1px $shadow-l1;
+    cursor: default;
+
+    &.is-clickable {
+      cursor: auto;
+    }
 
     .check-icon {
       display: block;
@@ -654,6 +659,7 @@ body.discussion {
       height: 12px;
       margin: 8px auto;
       background: url(../images/endorse-icon.png) no-repeat;
+      pointer-events: none;
     }
 
     &.mark-answer .check-icon {
