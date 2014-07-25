@@ -971,37 +971,32 @@ class MultipleChoiceResponse(LoncapaResponse):
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
         '''
-        for problem in student_answers:
-            student_answer_list = student_answers[problem]
-            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-                student_answer_list = [student_answer_list]     # cast it as a true list
+        for student_answer in student_answers:
+            if unicode(self.answer_id) == student_answer:
+                choicegroup_test = '[@id="' + student_answer + '"]'
+                choice_test = '[@name="' + student_answers[student_answer] + '"]'
+                choice = self.xml.xpath('//choicegroup' + choicegroup_test + '/choice' + choice_test)[0]
+                choice_hint = self.xml.xpath('//choicegroup' + choicegroup_test + '/choice' + choice_test + '/choicehint')[0]
 
-            for student_answer in student_answer_list:
-                attribute_test = '[@name="' + student_answer + '"]'
-                choice = self.xml.xpath('//choice' + attribute_test)[0]
-                choice_correctness = choice.get("correct")
+                choice_hint_text = choice_hint.text.strip()
+                if len(choice_hint_text) > 0:
+                    choice_hint_label = choice_hint.get('label')
 
-                choicehint_list = self.xml.xpath('//choice' + attribute_test + '/choicehint')
-                for choice_hint in choicehint_list:
-                    choice_hint_text = choice_hint.text.strip()
-                    if len(choice_hint_text) > 0:
-                        choice_hint_label = choice_hint.get('label')
+                    message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                    if choice.get('correct').upper() == 'TRUE':
+                        message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
 
-                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                    if choice_hint_label:
+                        correctness_string = choice_hint_label + ': '
+                    else:
+                        correctness_string = 'INCORRECT: '  # assume the answer is incorrect
                         if choice.get('correct').upper() == 'TRUE':
-                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
+                            correctness_string = 'CORRECT: '
 
-                        if choice_hint_label:
-                            correctness_string = choice_hint_label + ': '
-                        else:
-                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-                            if choice.get('correct').upper() == 'TRUE':
-                                correctness_string = 'CORRECT: '
-
-                        new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + \
-                            '<div class="' + message_style_class + '">' \
-                            + correctness_string + choice_hint_text + '</div>'
-
+                    new_cmap[self.answer_id]['msg'] = new_cmap[self.answer_id]['msg'] + \
+                        '<div class="' + message_style_class + '">' \
+                        + correctness_string + choice_hint_text + '</div>'
+                break
 
     def mc_setup_response(self):
         """
