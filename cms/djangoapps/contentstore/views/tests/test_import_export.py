@@ -93,7 +93,7 @@ class ImportTestCase(CourseTestCase):
             )
         )
 
-        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], 2)
+        self.assertEquals(json.loads(resp_status.content)["ImportStatus"], -2)
 
     def test_with_coursexml(self):
         """

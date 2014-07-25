@@ -63,6 +63,9 @@
 
               <div class="status-detail">
                 <h3 class="title">${_("Uploading")}</h3>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
                 <p class="copy">${_("Transferring your file to our servers")}</p>
               </div>
             </li>
@@ -147,7 +150,7 @@
 <%block name="jsextra">
 <script>
 require(
-        ["js/views/import", "jquery", "gettext", "jquery.fileupload"],
+        ["js/views/import", "jquery", "gettext", "jquery.fileupload", "jquery.cookie"],
         function(CourseImport, $, gettext) {
 
 var file;
@@ -170,6 +173,12 @@ var defaults = [
     "${_("There was an error while importing the new course to our database.")}\n"
 ];
 
+// Display the status of last file upload on page load
+var lastfileupload = $.cookie('lastfileupload');
+if (lastfileupload){
+    CourseImport.getAndStartUploadFeedback(feedbackUrl.replace('fillerName', lastfileupload), lastfileupload);
+}
+
 $('#fileupload').fileupload({
 
     dataType: 'json',
@@ -185,20 +194,22 @@ $('#fileupload').fileupload({
         file = data.files[0];
         if (file.name.match(/tar\.gz$/)) {
             submitBtn.click(function(e){
+                $.cookie('lastfileupload', file.name);
                 e.preventDefault();
                 submitBtn.hide();
+                CourseImport.startUploadFeedback();
                 data.submit().complete(function(result, textStatus, xhr) {
-                    CourseImport.stopGetStatus = true;
                     window.onbeforeunload = null;
                     if (xhr.status != 200) {
-                        if (!result.responseText) {
-                            alert(gettext("Your browser has timed out, but the server is still processing your import. Please wait 5 minutes and verify that the new content has appeared."));
+                        try{
+                            var serverMsg = $.parseJSON(result.responseText);
+                        } catch (e) {
                             return;
                         }
                         var serverMsg = $.parseJSON(result.responseText);
                         var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg.ErrMsg : "" ;
                         if (serverMsg.hasOwnProperty("Stage")) {
-                            var stage = serverMsg.Stage;
+                            var stage = Math.abs(serverMsg.Stage);
                             CourseImport.stageError(stage, defaults[stage] + errMsg);
                         }
                         else {
@@ -207,6 +218,7 @@ $('#fileupload').fileupload({
                         chooseBtn.html("${_("Choose new file")}").show();
                         bar.hide();
                     }
+                    CourseImport.stopGetStatus = true;
                     chooseBtn.html("${_("Choose new file")}").show();
                     bar.hide();
                 });
@@ -230,11 +242,15 @@ $('#fileupload').fileupload({
         }
         if (percentInt >= doneAt) {
             bar.hide();
-            CourseImport.startServerFeedback(feedbackUrl.replace("fillerName", file.name));
+            // Start feedback with delay so that current stage of import properly updates in session
+            setTimeout(
+                function() { CourseImport.startServerFeedback(feedbackUrl.replace('fillerName', file.name)) },
+                3000
+            );
         } else {
             bar.show();
             fill.width(percentVal);
-            percent.html(percentVal);
+            fill.html(percentVal);
         }
     },
     done: function(e, data){
