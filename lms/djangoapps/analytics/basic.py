@@ -10,7 +10,7 @@ import xmodule.graders as xmgraders
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
-                    'level_of_education', 'mailing_address', 'goals')
+                    'level_of_education', 'mailing_address', 'goals', 'meta')
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 
 
