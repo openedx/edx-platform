@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=E1101
+# pylint: disable=protected-access
 """
 Tests for import_from_xml using the mongo modulestore.
 """
@@ -10,8 +11,10 @@ from django.conf import settings
 import copy
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.exceptions import NotFoundError
@@ -148,6 +151,21 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         _module_store, _content_store, course = self.load_test_import_course()
         print "course tabs = {0}".format(course.tabs)
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
+
+    def test_import_performance_mongo(self):
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+
+        # we try to refresh the inheritance tree for each update_item in the import
+        with check_exact_number_of_calls(store, store.refresh_cached_metadata_inheritance_tree, 46):
+
+            # the post-publish step loads each item in the subtree, which calls _get_cached_metadata_inheritance_tree
+            with check_exact_number_of_calls(store, store._get_cached_metadata_inheritance_tree, 22):
+
+                # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
+                # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
+                #       Locally, without memcache, the number of calls is actually 2 (once more during the publish step)
+                with check_number_of_calls(store, store._compute_metadata_inheritance_tree, 2):
+                    self.load_test_import_course()
 
     def test_rewrite_reference_list(self):
         module_store = modulestore()

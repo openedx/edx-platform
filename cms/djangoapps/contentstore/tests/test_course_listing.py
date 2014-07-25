@@ -200,10 +200,10 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Now count the db queries
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        with check_mongo_calls(store.collection, USER_COURSES_COUNT):
+        with check_mongo_calls(store, USER_COURSES_COUNT):
             courses_list = _accessible_courses_list_from_groups(self.request)
 
-        with check_mongo_calls(store.collection, 1):
+        with check_mongo_calls(store, 1):
             courses_list = _accessible_courses_list(self.request)
 
     def test_get_course_list_with_same_course_id(self):
