@@ -1,4 +1,4 @@
-﻿## -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
@@ -39,12 +39,6 @@
 
     <script type="text/javascript">
     window.baseUrl = "${settings.STATIC_URL}";
-    // Internet Explorer does not have built-in property 'window.location.origin',
-    // we need to create one here as some vendor code such as TinyMCE uses this.
-    if (!window.location.origin) {
-        window.location.origin = window.location.protocol + "//" + window.location.hostname
-                               + (window.location.port ? ':' + window.location.port : '');
-    }
     var require = {
         baseUrl: baseUrl,
         waitSeconds: 60,
@@ -86,6 +80,7 @@
             "accessibility": "js/src/accessibility_tools",
             "draggabilly": "js/vendor/draggabilly.pkgd",
             "URI": "js/vendor/URI.min",
+            "ieshim": "js/src/ie_shim",
 
             // externally hosted files
             "tender": [
@@ -239,7 +234,7 @@
         deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }

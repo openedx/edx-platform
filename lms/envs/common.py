@@ -1010,6 +1010,7 @@ PIPELINE_JS = {
             'js/query-params.js',
             'js/src/utility.js',
             'js/src/accessibility_tools.js',
+            'js/src/ie_shim.js',
         ],
         'output_filename': 'js/lms-application.js',
 
