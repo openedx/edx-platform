@@ -1,0 +1,10 @@
+
+        <form action="${action}" method="post">
+% if params:
+            % for pk, pv in params.iteritems():
+                <input type="hidden" name="${pk}" value="${pv}" />
+            % endfor
+% endif
+
+                <input type="submit" value="Check Out" />
+        </form> 

@@ -13,6 +13,8 @@ from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
+# TODO: processors shouldn't be exposed here. Abstract flow to work with everything and interface with processors/__init__.py
+from shoppingcart.processors.Paypal import create_payment, execute_payment
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption
@@ -46,7 +48,7 @@ def add_course_to_cart(request, course_id):
     Adds course specified by course_id to the cart.  The model function add_to_order does all the
     heavy lifting (logging, error checking, etc)
     """
-
+    
     assert isinstance(course_id, basestring)
     if not request.user.is_authenticated():
         log.info("Anon user trying to add course {} to cart".format(course_id))
@@ -149,9 +151,47 @@ def use_coupon(request):
     else:
         return HttpResponseBadRequest(_("Coupon '{0}' is inactive.".format(coupon_code)))
 
-
 @csrf_exempt
 @require_POST
+def paypal_checkout(request):
+    """
+    A view for the paypal checkout form
+
+    Takes one of two paths:
+
+    - Paypal -> postpay_callback
+    - Renders an error page
+
+    TODO: Figure out how to abstract/move this into Paypal.py
+    Need to be able to handle this and other payment flows.
+    """
+    # create payment and redirect user
+    redirect_url = None
+    payment = create_payment(request.REQUEST)
+
+    if payment.success():
+        for link in payment.links:
+            if link.method == "REDIRECT":
+                redirect_url = link.href
+                log.info("Redirect for approval: {}".format(redirect_url))
+                return HttpResponseRedirect(redirect_url)
+    else:
+        # we don't want to fail to generate the error page so if
+        # things go terribly wrong the user will be redirected
+        # to an error page with N/A's
+        order_num = request.REQUEST.get('orderNumber', 'N/A')
+        # TODO: Generate error_html for paypal errors
+        error_html = request.REQUEST.get('error_html', "<h3> Sorry, that's all we know.")
+        return render_to_response('shoppingcart/error.html',
+                                  {
+                                      'order': order_num,
+                                      'error_html': error_html
+                                  }
+        )
+
+
+@csrf_exempt
+# @require_POST
 def postpay_callback(request):
     """
     Receives the POST-back from processor.
@@ -162,7 +202,7 @@ def postpay_callback(request):
     If unsuccessful the order will be left untouched and HTML messages giving more detailed error info will be
     returned.
     """
-    params = request.POST.dict()
+    params = request.REQUEST
     result = process_postpay_callback(params)
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
