@@ -25,7 +25,7 @@ from ..pages.studio.signup import SignupPage
 from ..pages.studio.textbooks import TextbooksPage
 from ..fixtures.course import XBlockFixtureDesc
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 @attr('shard_1')

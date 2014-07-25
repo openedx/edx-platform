@@ -3,7 +3,36 @@
  */
 define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/utils/module"],
     function($, _, gettext, ViewUtils, ModuleUtils) {
-        var addXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField;
+        var addXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
+            getXBlockVisibilityClass;
+
+        /**
+         * Represents the possible visibility states for an xblock:
+         *
+         *   live - the block and all of its descendants are live to students (excluding staff only)
+         *     Note: Live means both published and released.
+         *
+         *   ready - the block is ready to go live and all of its descendants are live or ready (excluding staff only)
+         *     Note: content is ready when it is published and scheduled with a release date in the future.
+         *
+         *   unscheduled - the block and all of its descendants have no release date (excluding staff only)
+         *     Note: it is valid for items to be published with no release date in which case they are unscheduled.
+         *
+         *   needsAttention - the block or its descendants need attention
+         *     i.e. there is some content that is not fully live, ready, unscheduled or staff only.
+         *     For example: one subsection has draft content, or there's both unreleased and released content
+         *     in one section.
+         *
+         *   staffOnly - all of the block's content is to be shown to staff only
+         *     Note: staff only items do not affect their parent's state.
+         */
+        VisibilityState = {
+            live: 'live',
+            ready: 'ready',
+            unscheduled: 'unscheduled',
+            needsAttention: 'needs_attention',
+            staffOnly: 'staff_only'
+        };
 
         /**
          * Adds an xblock based upon the data attributes of the specified add button. A promise
@@ -83,9 +112,30 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
                 });
         };
 
+        /**
+         * Returns the CSS class to represent the specified xblock visibility state.
+         */
+        getXBlockVisibilityClass = function(visibilityState) {
+            if (visibilityState === VisibilityState.staffOnly) {
+                return 'is-staff-only';
+            }
+            if (visibilityState === VisibilityState.live) {
+                return 'is-live';
+            }
+            if (visibilityState === VisibilityState.ready) {
+                return 'is-ready';
+            }
+            if (visibilityState === VisibilityState.needsAttention) {
+                return 'has-warnings';
+            }
+            return '';
+        };
+
         return {
+            'VisibilityState': VisibilityState,
             'addXBlock': addXBlock,
             'deleteXBlock': deleteXBlock,
-            'updateXBlockField': updateXBlockField
+            'updateXBlockField': updateXBlockField,
+            'getXBlockVisibilityClass': getXBlockVisibilityClass
         };
     });

@@ -118,7 +118,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             category: 'vertical',
                             studio_url: '/container/mock-unit',
                             is_container: true,
-                            publish_state: 'unscheduled',
+                            visibility_state: 'unscheduled',
                             edited_on: 'Jul 02, 2014 at 20:56 UTC',
                             edited_by: 'MockUser'
                         }])
@@ -431,10 +431,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     unitAnchor = getItemsOfType('unit').find('.unit-title a');
                     expect(unitAnchor.attr('href')).toBe('/container/mock-unit');
                 });
-            });
-
-            describe("Publishing State", function() {
-                // TODO: implement this!!!!
             });
         });
     });
