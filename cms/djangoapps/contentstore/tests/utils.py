@@ -129,14 +129,6 @@ class CourseTestCase(ModuleStoreTestCase):
     SEQUENTIAL = 'vertical_sequential'
     LOCKED_ASSET_KEY = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
 
-    def verify_publish_state(self, location, expectedPublishState):
-        """
-
-        :param location:
-        :param expectedPublishState:
-        :return:
-        """
-
     def import_and_populate_course(self):
         """
         Imports the test toy course and populates it with additional test data

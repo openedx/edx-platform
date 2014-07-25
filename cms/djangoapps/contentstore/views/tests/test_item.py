@@ -1243,14 +1243,14 @@ class TestXBlockPublishingInfo(ItemTest):
     """
     Unit tests for XBlock's outline handling.
     """
-    def _create_child(self, parent, category, display_name, publish_item=False, children=None):
-        child = ItemFactory.create(
+    FIRST_SUBSECTION_PATH = [0]
+    FIRST_UNIT_PATH = [0, 0]
+
+    def _create_child(self, parent, category, display_name, publish_item=False):
+        return ItemFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
             user_id=self.user.id, publish_item=publish_item
         )
-        if children:
-            self._populate_children(child, children)
-        return child
 
     def _get_child(self, xblock_info, index):
         """
@@ -1391,12 +1391,12 @@ class TestXBlockPublishingInfo(ItemTest):
         unit_child_info = self._get_child(sequential_child_info, 0)
         self.assertEqual(unit_child_info['publish_state'], VisibilityState.staff_only)
 
-    def unscheduled_section_with_live_subsection(self):
+    def test_unscheduled_section_with_live_subsection(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
-        self._create_child(sequential, 'vertical', "Published Unit")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
         xblock_info = self._get_xblock_info(chapter.location)
-        self.verify_publish_state(xblock_info, VisibilityState.needs_attention)
-        self.verify_publish_state(xblock_info, VisibilityState.live, path=[0])
-        self.verify_publish_state(xblock_info, VisibilityState.live, path=[0, 0])
+        self._verify_publish_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_publish_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_publish_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
