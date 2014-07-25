@@ -83,12 +83,6 @@
             @extend %btn-primary-green;
             @extend %sizing;
           }
-
-          // CASE: toggle button
-          &.button-toggle {
-            @extend %btn-secondary-gray;
-            @extend %sizing;
-          }
         }
       }
     }
