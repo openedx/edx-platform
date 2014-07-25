@@ -17,7 +17,7 @@ from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.modulestore.exceptions import InvalidLocationError
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
 
@@ -391,13 +391,16 @@ def _import_module_and_update_references(
     # Move the module to a new course
     block_type = module.scope_ids.block_type
     block_id = module.scope_ids.usage_id.block_id
-    new_module = store.create_item(
-        user_id,
-        dest_course_id,
-        block_type,
-        block_id,
-        runtime=runtime
-    )
+    try:
+        new_module = store.get_item(dest_course_id.make_usage_key(block_type, block_id))
+    except ItemNotFoundError:
+        new_module = store.create_item(
+            user_id,
+            dest_course_id,
+            block_type,
+            block_id,
+            runtime=runtime
+        )
     _copy_fields(source_course_id, dest_course_id, module, new_module, do_import_static=do_import_static)
     return store.update_item(new_module, user_id, revision=revision, allow_not_found=True)
 
