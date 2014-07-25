@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from mock import patch, ANY
+from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -26,9 +26,11 @@ CS_PREFIX = "http://localhost:4567/api/v1"
 
 
 class MockRequestSetupMixin(object):
+    def _create_repsonse_mock(self, data):
+        return Mock(text=json.dumps(data), json=Mock(return_value=data))\
+
     def _set_mock_request_data(self, mock_request, data):
-        mock_request.return_value.text = json.dumps(data)
-        mock_request.return_value.json.return_value = data
+        mock_request.return_value = self._create_repsonse_mock(data)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -617,6 +619,53 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.client.login(username=self.moderator.username, password=self.password)
         response = self.client.post(
             reverse("un_pin_thread", kwargs={"course_id": self.course.id.to_deprecated_string(), "thread_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def _set_mock_request_thread_and_comment(self, mock_request, thread_data, comment_data):
+        def handle_request(*args, **kwargs):
+            url = args[1]
+            if "/threads/" in url:
+                return self._create_repsonse_mock(thread_data)
+            elif "/comments/" in url:
+                return self._create_repsonse_mock(comment_data)
+            else:
+                raise ArgumentError("Bad url to mock request")
+        mock_request.side_effect = handle_request
+
+    def test_endorse_response_as_staff(self, mock_request):
+        self._set_mock_request_thread_and_comment(
+            mock_request,
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "comment", "thread_id": "dummy"}
+        )
+        self.client.login(username=self.moderator.username, password=self.password)
+        response = self.client.post(
+            reverse("endorse_comment", kwargs={"course_id": self.course.id.to_deprecated_string(), "comment_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_endorse_response_as_student(self, mock_request):
+        self._set_mock_request_thread_and_comment(
+            mock_request,
+            {"type": "thread", "thread_type": "question", "user_id": str(self.moderator.id)},
+            {"type": "comment", "thread_id": "dummy"}
+        )
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("endorse_comment", kwargs={"course_id": self.course.id.to_deprecated_string(), "comment_id": "dummy"})
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_endorse_response_as_student_question_author(self, mock_request):
+        self._set_mock_request_thread_and_comment(
+            mock_request,
+            {"type": "thread", "thread_type": "question", "user_id": str(self.student.id)},
+            {"type": "comment", "thread_id": "dummy"}
+        )
+        self.client.login(username=self.student.username, password=self.password)
+        response = self.client.post(
+            reverse("endorse_comment", kwargs={"course_id": self.course.id.to_deprecated_string(), "comment_id": "dummy"})
         )
         self.assertEqual(response.status_code, 200)
 
