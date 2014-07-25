@@ -5,6 +5,7 @@ Module for checking permissions with the comment_client backend
 import logging
 from types import NoneType
 from django.core import cache
+from lms.lib.comment_client import Thread
 from opaque_keys.edx.keys import CourseKey
 
 CACHE = cache.get_cache('default')
@@ -34,7 +35,7 @@ def has_permission(user, permission, course_id=None):
     return False
 
 
-CONDITIONS = ['is_open', 'is_author']
+CONDITIONS = ['is_open', 'is_author', 'is_question_author']
 
 
 def _check_condition(user, condition, content):
@@ -50,9 +51,22 @@ def _check_condition(user, condition, content):
         except KeyError:
             return False
 
+    def check_question_author(user, content):
+        if not content:
+            return False
+        try:
+            if content["type"] == "thread":
+                return content["thread_type"] == "question" and content["user_id"] == str(user.id)
+            else:
+                # N.B. This will trigger a comments service query
+                return check_question_author(user, Thread(id=content["thread_id"]).to_dict())
+        except KeyError:
+            return False
+
     handlers = {
         'is_open': check_open,
         'is_author': check_author,
+        'is_question_author': check_question_author,
     }
 
     return handlers[condition](user, content)
@@ -85,7 +99,7 @@ VIEW_PERMISSIONS = {
     'create_comment': [["create_comment", "is_open"]],
     'delete_thread': ['delete_thread', ['update_thread', 'is_author']],
     'update_comment': ['edit_content', ['update_comment', 'is_open', 'is_author']],
-    'endorse_comment': ['endorse_comment'],
+    'endorse_comment': ['endorse_comment', 'is_question_author'],
     'openclose_thread': ['openclose_thread'],
     'create_sub_comment': [['create_sub_comment', 'is_open']],
     'delete_comment': ['delete_comment', ['update_comment', 'is_open', 'is_author']],

@@ -41,11 +41,11 @@ describe 'All Content', ->
 
         it 'can update info', ->
             @content.updateInfo {
-                                ability: 'can_endorse',
+                                ability: {'can_edit': true},
                                 voted: true,
                                 subscribed: true
                                 }
-            expect(@content.get 'ability').toEqual 'can_endorse'
+            expect(@content.get 'ability').toEqual {'can_edit': true}
             expect(@content.get 'voted').toEqual true
             expect(@content.get 'subscribed').toEqual true
 
