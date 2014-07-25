@@ -78,20 +78,25 @@ procrel = (function(){
         statel.html('<font color="green">' + status + '</font>');
     }
 
-    var do_pp_get = function(cmd, gfun){
+    var _do_pp = function(cmd, type, gfun){
         $.ajax({ url: "${ajax_url}/" + cmd,
-                 type: 'GET',
-		 data: { "uname": "${pp.user.username}",
-		         "name": "${pp.user.profile.name}"
-		       },
+                 type: type,
                  success: gfun,
 		 dataType: "json",
                  error: function(xhr, status, error) {
 		     if (!skiperr){
-                         alert('Error: cannot connect to server ' + status + " error: " + error);
+                         console.log('Error: cannot connect to server ' + status + " error: " + error);
 		     }
                  }
         });
+    }
+
+    var do_pp_get = function(cmd, gfun){
+        return _do_pp(cmd, 'GET', gfun);
+    }
+
+    var do_pp_post = function(cmd, gfun){
+        return _do_pp(cmd, 'POST', gfun);
     }
 
     var check_access = function(){
@@ -123,10 +128,10 @@ procrel = (function(){
 
     var make_request = function(){
         check_count = 0;
-	do_pp_get('request', function(result, status, xhr){
-		     setstat(result.status);
-		     periodic_check();
-                 });
+	do_pp_post('request', function(result, status, xhr){
+            setstat(result.status);
+            periodic_check();
+        });
     }
 
     el.click(make_request);
@@ -135,6 +140,7 @@ procrel = (function(){
             "check": check_access,
             "make": make_request,
             "do_pp_get": do_pp_get,
+            "do_pp_post": do_pp_post,
             "set_skiperr": set_skiperr
     };
 

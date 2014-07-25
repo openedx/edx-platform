@@ -1,6 +1,7 @@
 import sys
 import json
 import logging
+import urllib2
 import urlparse
 import requests
 
@@ -47,7 +48,7 @@ class ProctorPanel(object):
         self.user = user
         self.ses = requests.session()
 
-    def request(self, url, data=None, json=True):
+    def _make_request(self, url, data=None, json=True):
         ret = self.ses.get(urlparse.urljoin(self.proc_url, url),
                            verify=False, data=data,
                            auth=(self.proc_user, self.proc_pass),
@@ -63,10 +64,21 @@ class ProctorPanel(object):
             data = ret.content
         return data
 
+    def request(self, json=True):
+        url = 'cmd/request/{0}/{1}'.format(self.user.id,
+                                           urllib2.quote(self.procset_name))
+        data = dict(uname=self.user.username, name=self.user.profile.name)
+        return self._make_request(url, data=data, json=json)
+
+    def status(self, json=True):
+        url = 'cmd/status/{0}/{1}'.format(self.user.id,
+                                           urllib2.quote(self.procset_name))
+        return self._make_request(url, json=json)
+
     def is_released(self):
         url = 'cmd/status/{0}'.format(self.user.id)
         log.info('ProctorPanel url={0}'.format(url))
-        retdat = self.request(url)
+        retdat = self._make_request(url)
         log.info('ProctorPanel retdat={0}'.format(retdat))
         enabled = retdat.get('enabled', False)
         return enabled
@@ -202,14 +214,16 @@ class ProctorModule(ProctorFields, XModule):
             if dispatch == 'reset':
                 username = data.get("username")
                 return self.reset(username)
-            if dispatch == 'status':
-                return self.status()
+            #if dispatch == 'status':
+                #return self.status()
             # if dispatch == 'grades':
             #     return self.grades()
 
         # Proctor Panel requests (ALL USERS)
-        if dispatch.startswith('cmd/'):
-            return self.pp.request(dispatch, dict(data.items()), json=False)
+        if dispatch == 'request':
+            return self.pp.request(json=False)
+        if dispatch == 'status':
+            return self.pp.status(json=False)
 
         if not self.is_released():  # check each time we do get_html()
             html = self.not_released_html()
