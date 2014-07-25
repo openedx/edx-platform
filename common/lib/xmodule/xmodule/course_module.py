@@ -20,6 +20,7 @@ from .fields import Date
 from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
 from django.conf import settings
+from xmodule.modulestore.django import ModuleI18nService
 
 log = logging.getLogger(__name__)
 
@@ -949,7 +950,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
         then falls back to .start
         """
-        i18n = self.runtime.service(self, "i18n")
+        #i18n = self.runtime.service(self, "i18n")
+        i18n = ModuleI18nService()
         _ = i18n.ugettext
         strftime = i18n.strftime
 
@@ -959,7 +961,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 if result is None:
                     result = text.title()
                 else:
-                    result = strftime(result, "SHORT_DATE", settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                    result = strftime(result, "SHORT_DATE")
             except ValueError:
                 result = text.title()
 
@@ -973,7 +975,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             return _('TBD')
         else:
             when = self.advertised_start or self.start
-            return strftime(when, "SHORT_DATE", settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+            return strftime(when, "SHORT_DATE")
 
     @property
     def start_date_is_still_default(self):

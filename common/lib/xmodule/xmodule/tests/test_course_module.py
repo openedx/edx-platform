@@ -11,6 +11,9 @@ import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.utils.timezone import UTC
+from django.test.utils import override_settings
+from django.conf import settings
+from xmodule.modulestore.django import ModuleI18nService
 
 
 ORG = 'test_org'
@@ -29,10 +32,10 @@ class CourseFieldsTestCase(unittest.TestCase):
 
 class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
-    def __init__(self, load_error_modules):
+    def __init__(self, load_error_modules, i18n_service):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[],
-                                  load_error_modules=load_error_modules)
+                                  load_error_modules=load_error_modules, i18n_service=i18n_service)
         course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"
         error_tracker = Mock()
@@ -52,7 +55,7 @@ class DummySystem(ImportSystem):
 def get_dummy_course(start, announcement=None, is_new=None, advertised_start=None, end=None, certs=False):
     """Get a dummy course"""
 
-    system = DummySystem(load_error_modules=True)
+    system = DummySystem(load_error_modules=True, i18n_service=ModuleI18nService())
 
     def to_attrb(n, v):
         return '' if v is None else '{0}="{1}"'.format(n, v).lower()
@@ -86,7 +89,7 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
     def setUp(self):
-        system = DummySystem(load_error_modules=True)
+        system = DummySystem(load_error_modules=True, i18n_service=ModuleI18nService())
         #sample_xml = """
         # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
         #        graceperiod="1 day" url_name="test"
@@ -188,6 +191,8 @@ class IsNewCourseTestCase(unittest.TestCase):
         (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False),
     ]
 
+
+
     @patch('xmodule.course_module.datetime.now')
     def test_start_date_text(self, gmtime_mock):
         gmtime_mock.return_value = NOW
@@ -200,6 +205,19 @@ class IsNewCourseTestCase(unittest.TestCase):
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_is_still_default, s[3])
+
+    pacific_timezone_start_settings = [
+        # Start time in UTC, advertised in UTC, result in US/Pacific, is_still_default
+        ('2014-07-10T12:00', None, 'Jul 10, 2014', False),
+        ('2014-07-11T04:30', None, 'Jul 10, 2014', False),
+    ]
+
+    @override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="US/Pacific")
+    def test_start_date_text_correct_timezone(self):
+        for s in self.pacific_timezone_start_settings:
+            d = get_dummy_course(start=s[0], advertised_start=s[1])
+            print "UTC: %s Pacific: %s" % (s[0], s[2])
+            self.assertEqual(d.start_date_text, s[2])
 
     def test_display_organization(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)

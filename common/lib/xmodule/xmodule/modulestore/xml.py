@@ -389,6 +389,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.courses = {}  # course_dir -> XBlock for the course
         self.errored_courses = {}  # course_dir -> errorlog, for dirs that failed to load
 
+        if i18n_service is not None:
+            self.i18n_service = i18n_service
+
         if course_ids is not None:
             course_ids = [SlashSeparatedCourseKey.from_deprecated_string(course_id) for course_id in course_ids]
 
@@ -407,7 +410,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
-        self.i18n_service = i18n_service
+
 
         # The XML Module Store is a read-only store and only handles published content
         self.branch_setting_func = lambda: ModuleStoreEnum.RevisionOption.published_only
@@ -825,4 +828,3 @@ class XMLModuleStore(ModuleStoreReadBase):
         Returns the course count
         """
         return {ModuleStoreEnum.Type.xml: True}
-
