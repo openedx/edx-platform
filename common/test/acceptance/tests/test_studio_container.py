@@ -380,9 +380,11 @@ class UnitPublishingTest(ContainerBase):
     __test__ = True
 
     PUBLISHED_STATUS = "Publishing Status\nPublished"
+    PUBLISHED_LIVE_STATUS ="Publishing Status\nPublished and Live"
     DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
     LOCKED_STATUS = "Publishing Status\nUnpublished (Staff only)"
     RELEASE_TITLE_RELEASED = "RELEASED:"
+    RELEASE_TITLE_RELEASE = "RELEASE:"
 
     LAST_PUBLISHED = 'Last published'
     LAST_SAVED = 'Draft saved on'
@@ -426,7 +428,7 @@ class UnitPublishingTest(ContainerBase):
         Scenario: The publish title changes based on whether or not draft content exists
             Given I have a published unit with no unpublished changes
             When I go to the unit page in Studio
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published and Live"
             And the Publish button is disabled
             And the last published text contains "Last published"
             And the last saved text contains "Last published"
@@ -435,12 +437,12 @@ class UnitPublishingTest(ContainerBase):
             And the last saved text contains "Draft saved on"
             And the Publish button is enabled
             And when I click the Publish button
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published and Live"
             And the last published text contains "Last published"
             And the last saved text contains "Last published"
         """
         unit = self.go_to_unit_page()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC with Section "Test Section"'
@@ -455,7 +457,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_SAVED)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
 
     def test_discard_changes(self):
@@ -468,13 +470,13 @@ class UnitPublishingTest(ContainerBase):
             Then the title in the Publish information box is "Draft (Unpublished changes)"
             And the Discard Changes button is enabled
             And when I click the Discard Changes button
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published and Live"
         """
         unit = self.go_to_unit_page()
         add_discussion(unit)
         self._verify_publish_title(unit, self.DRAFT_STATUS)
         unit.discard_changes()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
 
     def test_view_live_no_changes(self):
         """
@@ -533,7 +535,7 @@ class UnitPublishingTest(ContainerBase):
             Then I see the content in the unit
         """
         unit = self.go_to_unit_page("Unlocked Section", "Unlocked Subsection", "Unlocked Unit")
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + ' with Section "Unlocked Section"'
@@ -570,7 +572,7 @@ class UnitPublishingTest(ContainerBase):
             Given I have a published locked unit with release date in the past
             When I go to the unit page in Studio
             Then the unit does not have a warning that it is visible to students
-            And it is marked as "RELEASED" with release date in the past visible
+            And it is marked as "RELEASE" with release date in the past visible
             And when I click on the View Live Button
             And when I view the course as a student
             Then I do not see any content in the unit
@@ -579,7 +581,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.LOCKED_STATUS)
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
-            unit, self.RELEASE_TITLE_RELEASED,
+            unit, self.RELEASE_TITLE_RELEASE,
             self.past_start_date_text + ' with Subsection "Subsection With Locked Unit"'
         )
         self._view_published_version(unit)
@@ -600,7 +602,7 @@ class UnitPublishingTest(ContainerBase):
         unit = self.go_to_unit_page("Section With Locked Unit", "Subsection With Locked Unit", "Locked Unit")
         checked = unit.toggle_staff_lock()
         self.assertFalse(checked)
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._view_published_version(unit)
         # Will initially be in staff view, components always visible.
@@ -617,7 +619,7 @@ class UnitPublishingTest(ContainerBase):
             Then the content changes
             And the title in the Publish information box is "Draft (Unpublished changes)"
             And when I click the Publish button
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published and Live"
             And when I click the View Live button
             Then I see the changed content in LMS
         """
@@ -631,7 +633,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertTrue(modified_content in self.courseware.xblock_component_html_content(0))
 
@@ -643,7 +645,7 @@ class UnitPublishingTest(ContainerBase):
             And delete the only component
             Then the title in the Publish information box is "Draft (Unpublished changes)"
             And when I click the Publish button
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published and Live"
             And when I click the View Live button
             Then I see an empty unit in LMS
         """
@@ -652,7 +654,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.DRAFT_STATUS)
         unit.publish_action.click()
         unit.wait_for_ajax()
-        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
 
