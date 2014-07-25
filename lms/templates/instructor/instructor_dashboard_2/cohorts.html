@@ -1,0 +1,54 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+## TODO jeez this is ugly as sin and the workflow makes no sense
+## TODO styles should be specified in CSS, not in a weird combo of here + js
+## TODO you shouldn't have to click the "Show Cohorts" button on entering this page;
+## it should be 'clicked' for you (or the page should just render the info without
+## needing the click). I'm not good enough at JS to know the best way here.
+
+## Developer: Use the cohorts.js in lms/static/coffee/src/instructor_dashboard/
+<div class="cohort-manager" data-ajax_url="${ section_data['cohorts_ajax_url'] }">
+  <h2>${_("Manage Cohort Groups")}</h2>
+
+  <div class="controls" style="padding-top:15px">
+    <input type="button" name="show-cohorts" class="button show-cohorts" value="${_("Show Cohorts")}" data-endpoint="#">
+  </div>
+
+  <div class="cohort-errors">
+  </div>
+
+  <div class="cohort-summary" style="display:none">
+    <h3>${_("All Cohorts")}</h3>
+    <ul class="cohorts">
+    </ul>
+
+    <p>
+      <input type="text" name="cohort-name" class="cohort-name" placeholder="${_('Cohort Name')}"/>
+
+      <input type="button" name="add-cohort" class="button add-cohort" value="${_("Add New Cohort")}" data-endpoint="#">
+    </p>
+
+  </div>
+
+  <div class="cohort-detail" style="display:none">
+    <h2 class="cohort-header"></h2>
+    <p>
+      <table class="cohort-users"></table>
+      <span class="cohort-page-num"></span>
+    </p>
+
+    <p>
+      <label for="cohort-users-area">
+	## This text is identical to others used on the instructor dashboard, so be careful in changing.
+	${_("Enter email addresses and/or usernames separated by new lines or commas.")}
+      </label>
+      <textarea rows="6" cols="50" class="cohort-users-area" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+    </p>
+    <div>
+      <input type="button" name="add-cohort-members" class="button add-cohort-members" value="${_("Add Cohort Members")}" data-endpoint="#">
+    </div>
+
+    <p><ul class="cohort-op-results"></ul></p>
+
+  </div>
+</div>

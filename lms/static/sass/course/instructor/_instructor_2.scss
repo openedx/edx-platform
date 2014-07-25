@@ -589,6 +589,50 @@ section.instructor-dashboard-content-2 {
 }
 
 
+.instructor-dashboard-wrapper-2 section.idash-section#cohorts {
+  .cohort-manager {
+    .cohort-errors {
+        margin: 0;
+    	padding-bottom: ($baseline);
+	color: $error-red;
+    }
+  }
+
+  .cohort-detail {
+    textarea {
+      margin-top: 0.2em;
+      height: auto;
+      width: 90%;
+    }
+
+    input {
+      margin-right: 5px;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    th {
+      padding: 5px;
+    }
+
+    .remove {
+      color: $lighter-base-font-color;
+      cursor: pointer;
+
+      &:hover, &:focus {
+        color: $alert-color;
+      }
+    }
+
+    .cohort-page-num {
+      position: absolute;
+      right: 15px;
+    }
+  }
+}
+
 .instructor-dashboard-wrapper-2 section.idash-section#metrics {
 
   .metrics-container, .metrics-header-container {

@@ -71,11 +71,14 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_key, access),
     ]
 
-    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    # check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
     course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
     course_mode_has_price = False
     if course_honor_mode and course_honor_mode.min_price > 0:
         course_mode_has_price = True
+
+    if course.is_cohorted:
+        sections.append(_section_cohorts(course_key, access))
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
@@ -126,6 +129,17 @@ section_key will be used as a css attribute, javascript tie-in, and template imp
 section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
+
+def _section_cohorts(course_key, access):
+    """ Provide data for the cohorts feature on instructor dashboard section """
+    section_data = {
+        'section_key': 'cohorts',
+        'section_display_name': _('Cohorts'),
+        'access': access,
+        'course_id': course_key,
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
+    }
+    return section_data
 
 def _section_e_commerce(course_key, access):
     """ Provide data for the corresponding dashboard section """

@@ -8,6 +8,7 @@ import json
 import logging
 import re
 
+from student.models import UserProfile
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
@@ -129,7 +130,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
 
     user_info = [{'username': u.username,
                   'email': u.email,
-                  'name': '{0} {1}'.format(u.first_name, u.last_name)}
+                  'name': UserProfile.objects.get(user=u).name}
                  for u in users]
 
     return json_http_response({'success': True,
@@ -237,6 +238,6 @@ def debug_cohort_mgmt(request, course_key_string):
 
     context = {'cohorts_ajax_url': reverse(
         'cohorts',
-        kwargs={'course_key': course_key.to_deprecated_string()}
+        kwargs={'course_key_string': course_key.to_deprecated_string()}
     )}
     return render_to_response('/course_groups/debug.html', context)
