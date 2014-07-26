@@ -116,7 +116,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     published: this.model.get('published'),
                     publishedOn: this.model.get('published_on'),
                     publishedBy: this.model.get('published_by'),
-                    releasedToStudents: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
                     releaseDateFrom: this.model.get('release_date_from')
                 }));

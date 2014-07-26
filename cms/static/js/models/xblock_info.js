@@ -46,7 +46,8 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
             "published_by": null,
             /**
              * True if the xblock has changes.
-             * Note: this is not always provided as a performance optimization.
+             * Note: this is not always provided as a performance optimization. It is only provided for
+             * verticals functioning as units.
              */
             "has_changes": null,
             /**

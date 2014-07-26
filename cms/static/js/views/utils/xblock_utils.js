@@ -4,7 +4,7 @@
 define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/utils/module"],
     function($, _, gettext, ViewUtils, ModuleUtils) {
         var addXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
-            getXBlockVisibilityClass;
+            getXBlockVisibilityClass, getXBlockListTypeClass;
 
         /**
          * Represents the possible visibility states for an xblock:
@@ -131,11 +131,24 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             return '';
         };
 
+        getXBlockListTypeClass = function (xblockType) {
+            var listType = 'list-unknown';
+            if (xblockType === 'course') {
+                listType = 'list-sections';
+            } else if (xblockType === 'section') {
+                listType = 'list-subsections';
+            } else if (xblockType === 'subsection') {
+                listType = 'list-units';
+            }
+            return listType;
+        };
+
         return {
             'VisibilityState': VisibilityState,
             'addXBlock': addXBlock,
             'deleteXBlock': deleteXBlock,
             'updateXBlockField': updateXBlockField,
-            'getXBlockVisibilityClass': getXBlockVisibilityClass
+            'getXBlockVisibilityClass': getXBlockVisibilityClass,
+            'getXBlockListTypeClass': getXBlockListTypeClass
         };
     });

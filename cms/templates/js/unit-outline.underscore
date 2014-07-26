@@ -1,13 +1,3 @@
-<%
-var listType = 'list-for-' + xblockType;
-if (xblockType === 'course') {
-    listType = 'list-sections';
-} else if (xblockType === 'section') {
-    listType = 'list-subsections';
-} else if (xblockType === 'subsection') {
-    listType = 'list-units';
-}
-%>
 <% if (parentInfo) { %>
     <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %>"
         data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
@@ -21,7 +11,7 @@ if (xblockType === 'course') {
 <% } %>
 
         <div class="<%= xblockType %>-content outline-content">
-            <ol class="<%= listType %>">
+            <ol class="<%= typeListClass %>">
             </ol>
             <% if (childType) { %>
                 <div class="add-<%= childType %> add-item">

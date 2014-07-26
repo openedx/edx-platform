@@ -2,28 +2,20 @@
 var category = xblockInfo.get('category');
 var releasedToStudents = xblockInfo.get('released_to_students');
 var visibilityState = xblockInfo.get('visibility_state');
-
-var listType = 'list-unknown';
-if (xblockType === 'course') {
-    listType = 'list-sections';
-} else if (xblockType === 'section') {
-    listType = 'list-subsections';
-} else if (xblockType === 'subsection') {
-    listType = 'list-units';
-}
+var published = xblockInfo.get('published');
 
 var statusMessage = null;
 var statusType = null;
 if (visibilityState === 'staff_only') {
     statusType = 'staff-only';
-    statusMessage = 'Contains staff only content';
+    statusMessage = gettext('Contains staff only content');
 } else if (visibilityState === 'needs_attention') {
     if (category === 'vertical') {
         statusType = 'warning';
-        if (releasedToStudents) {
-            statusMessage = 'Unpublished changes to live content';
+        if (published && releasedToStudents) {
+            statusMessage = gettext('Unpublished changes to live content');
         } else {
-            statusMessage = 'Unpublished units will not be released';
+            statusMessage = gettext('Unpublished units will not be released');
         }
     }
 }
@@ -75,7 +67,7 @@ if (statusType === 'warning') {
         <% if (category !== 'vertical') { %>
             <div class="status-release">
                 <p>
-                    <span class="sr status-release-label">Release Status:</span>
+                    <span class="sr status-release-label"><%= gettext('Release Status:') %></span>
                     <span class="status-release-value">
                         <% if (xblockInfo.get('released_to_students')) { %>
                             <i class="icon icon-check-sign"></i>
@@ -115,7 +107,7 @@ if (statusType === 'warning') {
         </div>
     <% } else { %>
         <div class="outline-content <%= xblockType %>-content">
-            <ol class="<%= listType %> is-sortable">
+            <ol class="<%= typeListClass %> is-sortable">
             </ol>
             <% if (childType) { %>
                 <div class="add-<%= childType %> add-item">
