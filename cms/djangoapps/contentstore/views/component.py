@@ -178,10 +178,6 @@ def container_handler(request, usage_key_string):
         # about the block's ancestors and siblings for use by the Unit Outline.
         xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
-        # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
-        if is_unit_page:
-            xblock_info['has_changes'] = modulestore().has_changes(xblock.location)
-
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
         # need to figure out where this item is in the list of children as the
