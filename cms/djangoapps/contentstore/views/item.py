@@ -631,6 +631,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     currently_visible_to_students = is_currently_visible_to_students(xblock)
 
+    is_xblock_unit = is_unit(xblock)
+    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
+
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -645,7 +648,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "release_date": release_date,
         "release_date_from": _get_release_date_from(xblock) if release_date else None,
         "currently_visible_to_students": currently_visible_to_students,
-        "visibility_state": _compute_visibility_state(xblock, child_info) if not xblock.category == 'course' else None
+        "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     }
     if data is not None:
         xblock_info["data"] = data
@@ -655,6 +658,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if child_info:
         xblock_info['child_info'] = child_info
+    # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
+    # We don't add it in general because it is an expensive operation.
+    if is_xblock_unit:
+        xblock_info['has_changes'] = is_unit_with_changes
+
     return xblock_info
 
 
@@ -684,13 +692,13 @@ class VisibilityState(object):
     staff_only = 'staff_only'
 
 
-def _compute_visibility_state(xblock, child_info):
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
     """
     Returns the current publish state for the specified xblock and its children
     """
     if xblock.visible_to_staff_only:
         return VisibilityState.staff_only
-    elif is_unit(xblock) and modulestore().has_changes(xblock.location):
+    elif is_unit_with_changes:
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
