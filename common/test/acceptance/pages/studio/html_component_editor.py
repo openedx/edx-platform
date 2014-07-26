@@ -18,4 +18,3 @@ class HtmlComponentEditorView(ComponentEditorView):
         ActionChains(self.browser).click(editor).\
             send_keys([Keys.CONTROL, 'a']).key_up(Keys.CONTROL).send_keys(content).perform()
         click_css(self, 'a.action-save')
-
