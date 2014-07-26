@@ -4,9 +4,9 @@ if (visibilityState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
 } else if (visibilityState === 'live') {
     title = gettext("Published and Live");
-} else if (visibilityState === 'ready') {
+} else if (published && !hasChanges) {
     title = gettext("Published");
-} else if (visibilityState === 'needs_attention') {
+} else if (published && hasChanges) {
     title = gettext("Draft (Unpublished changes)");
 }
 
@@ -19,7 +19,7 @@ if (visibilityState === 'live') {
 
 var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
-<div class="bit-publishing <%= visibilityClass %>">
+<div class="bit-publishing <%= visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
         <%= title %>
     </h3>

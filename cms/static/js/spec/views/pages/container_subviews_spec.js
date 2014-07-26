@@ -27,7 +27,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 category: 'vertical',
                 published: false,
                 has_changes: false,
-                visibility_state: 'unscheduled',
+                visibility_state: VisibilityState.unscheduled,
                 edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe",
                 published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako",
                 currently_visible_to_students: false
@@ -116,13 +116,15 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     liveClass = "is-live",
                     readyClass = "is-ready",
                     staffOnlyClass = "is-staff-only",
+                    scheduledClass = "is-scheduled",
+                    unscheduledClass = "",
                     hasWarningsClass = 'has-warnings',
                     publishButtonCss = ".action-publish",
                     discardChangesButtonCss = ".action-discard",
                     lastDraftCss = ".wrapper-last-draft",
                     releaseDateTitleCss = ".wrapper-release .title",
                     releaseDateContentCss = ".wrapper-release .copy",
-                    promptSpies, sendDiscardChangesToServer;
+                    promptSpies, sendDiscardChangesToServer, verifyPublishingBitUnscheduled;
 
                 sendDiscardChangesToServer = function() {
                     // Helper function to do the discard operation, up until the server response.
@@ -143,45 +145,75 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     );
                 };
 
+                verifyPublishingBitUnscheduled = function() {
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(liveClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(scheduledClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(unscheduledClass);
+                };
+
                 beforeEach(function() {
                     promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
                     promptSpies.show.andReturn(this.promptSpies);
                 });
 
-                it('renders correctly with unscheduled content', function () {
+                it('renders correctly with private content', function () {
                     var verifyPrivateState = function() {
                         expect(containerPage.$(headerCss).text()).toContain('Draft (Never published)');
                         expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
                         expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
                         expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(scheduledClass);
+                        expect(containerPage.$(bitPublishingCss)).toHaveClass(hasWarningsClass);
                     };
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({published: false, has_changes: false});
+                    fetch({published: false, has_changes: false, visibility_state: VisibilityState.needsAttention});
                     verifyPrivateState();
 
-                    fetch({published: false, has_changes: true});
+                    fetch({published: false, has_changes: true, visibility_state: VisibilityState.needsAttention});
                     verifyPrivateState();
                 });
 
                 it('renders correctly with published content', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.ready});
+                    fetch({
+                        published: true, has_changes: false, visibility_state: VisibilityState.ready,
+                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                    });
                     expect(containerPage.$(headerCss).text()).toContain('Published');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
-                    fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
+                    fetch({
+                        published: true, has_changes: true, visibility_state: VisibilityState.needsAttention,
+                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                    });
                     expect(containerPage.$(headerCss).text()).toContain('Draft (Unpublished changes)');
                     expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass(disabledCss);
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(hasWarningsClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
-                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.live});
+                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.live,
+                        release_date: "Jul 02, 1990 at 14:20 UTC"
+                    });
                     expect(containerPage.$(headerCss).text()).toContain('Published and Live');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(liveClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
+
+                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
+                        release_date: null
+                    });
+                    expect(containerPage.$(headerCss).text()).toContain('Published');
+                    expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
+                    expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
+                    verifyPublishingBitUnscheduled();
                 });
 
                 it('can publish private content', function () {
@@ -217,7 +249,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('does not refresh if publish fails', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                    verifyPublishingBitUnscheduled();
 
                     // Click publish
                     containerPage.$(publishButtonCss).click();
@@ -228,8 +260,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     expect(requests.length).toEqual(numRequests);
 
-                    // Verify still in draft state.
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                    // Verify still in draft (unscheduled) state.
+                    verifyPublishingBitUnscheduled();
                     // Verify that the "published" value has been cleared out of the model.
                     expect(containerPage.model.get("publish")).toBeNull();
                 });
@@ -273,7 +305,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('does not discard changes on cancel', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({published: true, has_changes: true});
+                    fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
                     var numRequests = requests.length;
 
                     // Click discard changes
@@ -373,7 +405,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         create_sinon.respondWithJson(requests, createXBlockInfo({
                             published: containerPage.model.get('published'),
-                            visibility_state: isStaffOnly ? VisibilityState.staffOnly : VisibilityState.live
+                            visibility_state: isStaffOnly ? VisibilityState.staffOnly : VisibilityState.live,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
                         }));
                     };
 
@@ -382,6 +415,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check');
                             expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff Only');
                             expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
+                            expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
                         } else {
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check-empty');
                             expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff and Students');
@@ -403,18 +437,19 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     it("can remove staff only setting", function() {
                         promptSpy = edit_helpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
-                            visibility_state: VisibilityState.staffOnly
+                            visibility_state: VisibilityState.staffOnly,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
                         });
                         requestStaffOnly(false);
                         verifyStaffOnly(false);
-                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
                     });
 
                     it("does not refresh if removing staff only is canceled", function() {
                         var requestCount;
                         promptSpy = edit_helpers.createPromptSpy();
                         renderContainerPage(this, mockContainerXBlockHtml, {
-                            visibility_state: VisibilityState.staffOnly
+                            visibility_state: VisibilityState.staffOnly,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
                         });
                         requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();

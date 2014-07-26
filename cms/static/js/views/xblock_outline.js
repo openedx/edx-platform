@@ -69,6 +69,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 html = this.template({
                     xblockInfo: xblockInfo,
                     visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
+                    typeListClass: XBlockViewUtils.getXBlockListTypeClass(xblockType),
                     parentInfo: this.parentInfo,
                     xblockType: xblockType,
                     parentType: parentType,
