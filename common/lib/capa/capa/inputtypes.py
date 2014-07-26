@@ -404,6 +404,7 @@ class OptionInput(InputTypeBase):
                         option_input_element.attrib.update({'options':options_string})
                         option_input_element.attrib.update({'correct':correct_option})
 
+
     def __init__(self, system, xml, state):
         super(OptionInput, self).__init__(system, xml, state)
         self._option_elements_to_attribute_string()          # if the problem follows the latest schema...
