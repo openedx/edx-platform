@@ -711,8 +711,8 @@ class TestEditItem(ItemTest):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(self._is_location_published(unit_usage_key))
         self.assertTrue(self._is_location_published(html_usage_key))
-        self.assertTrue(modulestore().get_item(unit_usage_key).has_changes())
-        self.assertTrue(modulestore().get_item(html_usage_key).has_changes())
+        self.assertTrue(modulestore().has_changes(unit_usage_key))
+        self.assertTrue(modulestore().has_changes(html_usage_key))
 
 
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
