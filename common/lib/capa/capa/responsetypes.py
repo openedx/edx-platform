@@ -1336,7 +1336,7 @@ class OptionResponse(LoncapaResponse):
         :return:                nothing
         """
         for student_answer in student_answers:
-            if unicode(self.answer_id) == student_answer:
+            if unicode(self.answer_ids[0]) == student_answer:
                 optiongroup_test = '[@id="' + student_answer + '"]'
                 option_test = '[@name="' + student_answers[student_answer] + '"]'
                 option = self.xml.xpath('//optioninput' + optiongroup_test + '/option' + option_test)[0]
