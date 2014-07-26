@@ -1333,37 +1333,65 @@ class OptionResponse(LoncapaResponse):
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
         """
-        choice_name = 'option'
-        if not hasattr(self, 'hint_tag'):
-            raise Exception("Class '" + str(self.__class__) + "' has no 'hint_tag' attribute")
+        for student_answer in student_answers:
+            if unicode(self.answer_id) == student_answer:
+                optiongroup_test = '[@id="' + student_answer + '"]'
+                option_test = '[@name="' + student_answers[student_answer] + '"]'
+                option = self.xml.xpath('//optioninput' + optiongroup_test + '/option' + option_test)[0]
+                option_hints = self.xml.xpath('//optioninput' + optiongroup_test + '/option' + option_test + '/optionhint')
+                if option_hints:
+                    option_hint = option_hints[0]
+                    option_hint_text = option_hint.text.strip()
+                    if len(option_hint_text) > 0:
+                        option_hint_label = option_hint.get('label')
 
-        for problem in student_answers:
-            student_answer_list = student_answers[problem]
-            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-                student_answer_list = [student_answer_list]     # cast it as a true list
+                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                        if option.get('correct').upper() == 'TRUE':
+                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
 
-            for student_answer in student_answer_list:
-                for choice_hint_element in self.xml.xpath('//' + self.hint_tag):
-                    choice_element = choice_hint_element.getparent()
-                    clean_choice_string = choice_element.text.strip()
-                    if student_answer == clean_choice_string:   # if we have found the student's choice
-                        choice_hint_text = choice_hint_element.text.strip()
-                        if len(choice_hint_text) > 0:
-                            if choice_element.get('correct') == 'True':
-                                correctness_style = QUESTION_HINT_CORRECT_STYLE
-                            else:
-                                correctness_style = QUESTION_HINT_INCORRECT_STYLE
+                        if option_hint_label:
+                            correctness_string = option_hint_label + ': '
+                        else:
+                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+                            if option.get('correct').upper() == 'TRUE':
+                                correctness_string = 'CORRECT: '
 
-                            choice_hint_label = choice_hint_element.get('label')
-                            if choice_hint_label:
-                                correctness_string = choice_hint_label + ': '
-                            else:
-                                correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-                                if choice_element.get('correct') == 'True':
-                                    correctness_string = 'CORRECT: '
+                        new_cmap[self.answer_id]['msg'] = new_cmap[self.answer_id]['msg'] + \
+                            '<div class="' + message_style_class + '">' \
+                            + correctness_string + option_hint_text + '</div>'
+                break
 
-                            new_cmap[problem]['msg'] = '<div class="' + correctness_style + '">' \
-                                + correctness_string + choice_hint_text.strip() + '</div>'
+        # choice_name = 'option'
+        # if not hasattr(self, 'hint_tag'):
+        #     raise Exception("Class '" + str(self.__class__) + "' has no 'hint_tag' attribute")
+        #
+        # for problem in student_answers:
+        #     student_answer_list = student_answers[problem]
+        #     if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
+        #         student_answer_list = [student_answer_list]     # cast it as a true list
+        #
+        #     for student_answer in student_answer_list:
+        #         for choice_hint_element in self.xml.xpath('//' + self.hint_tag):
+        #             choice_element = choice_hint_element.getparent()
+        #             clean_choice_string = choice_element.text.strip()
+        #             if student_answer == clean_choice_string:   # if we have found the student's choice
+        #                 choice_hint_text = choice_hint_element.text.strip()
+        #                 if len(choice_hint_text) > 0:
+        #                     if choice_element.get('correct') == 'True':
+        #                         correctness_style = QUESTION_HINT_CORRECT_STYLE
+        #                     else:
+        #                         correctness_style = QUESTION_HINT_INCORRECT_STYLE
+        #
+        #                     choice_hint_label = choice_hint_element.get('label')
+        #                     if choice_hint_label:
+        #                         correctness_string = choice_hint_label + ': '
+        #                     else:
+        #                         correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+        #                         if choice_element.get('correct') == 'True':
+        #                             correctness_string = 'CORRECT: '
+        #
+        #                     new_cmap[problem]['msg'] = '<div class="' + correctness_style + '">' \
+        #                         + correctness_string + choice_hint_text.strip() + '</div>'
 
 
 
