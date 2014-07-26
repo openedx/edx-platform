@@ -390,7 +390,7 @@ class OptionInput(InputTypeBase):
                     options_string = "("
                     correct_option = ''
                     delimiter = ''
-                    for option_element in self.xml.xpath('//option'):
+                    for option_element in self.xml.xpath('//optioninput [@id="' + self.input_id + '"]/option'):
                         option_name = option_element.text.strip()
                         options_string += delimiter + "'" + option_name + "'"
                         delimiter = ','
@@ -398,9 +398,11 @@ class OptionInput(InputTypeBase):
                             correct_option = option_name
 
                     options_string += ')'
-                    option_input_element = self.xml.xpath('//optioninput')[0]
-                    option_input_element.attrib.update({'options':options_string})
-                    option_input_element.attrib.update({'correct':correct_option})
+                    option_input_elements = self.xml.xpath('//optioninput [@id="' + self.input_id + '"]')
+                    if option_input_elements:
+                        option_input_element = option_input_elements[0]
+                        option_input_element.attrib.update({'options':options_string})
+                        option_input_element.attrib.update({'correct':correct_option})
 
     def __init__(self, system, xml, state):
         super(OptionInput, self).__init__(system, xml, state)

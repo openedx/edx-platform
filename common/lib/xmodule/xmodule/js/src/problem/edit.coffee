@@ -300,11 +300,11 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       reducedXmlString = xmlString.replace(dropdownMatches[0], '')
       returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
       returnXmlString +=  '    <optionresponse>\n'
-      returnXmlString += '        <optioninput options="[OPTIONS_PLACEHOLDER]" correct="CORRECT_PLACEHOLDER">\n'
+      returnXmlString += '        <optioninput options="OPTIONS_PLACEHOLDER" correct="CORRECT_PLACEHOLDER">\n'
 
       optionsString = ''
       delimiter = ''
-      for line in dropdownMatches[1].split('\n')    # split the string between [[..]] brackets into single lines
+      for line in dropdownMatches[1].split( /[,\n]/)    # split the string between [[..]] brackets into single lines
         line = line.trim()
         if line.length > 0
           hintText = ''
