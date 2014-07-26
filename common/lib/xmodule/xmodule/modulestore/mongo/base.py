@@ -1013,7 +1013,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         location = course_key.make_usage_key(block_type, block_id)
         xblock = self.create_xmodule(location, **kwargs)
-        self.update_item(xblock, user_id, allow_not_found=True)
+        xblock = self.update_item(xblock, user_id, allow_not_found=True)
 
         return xblock
 
@@ -1126,6 +1126,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     'edit_info.subtree_edited_by': user_id
                 }
                 self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
+
+            # update the edit info of the instantiated xblock
+            xblock.edited_on = now
+            xblock.edited_by = user_id
+            xblock.subtree_edited_on = now
+            xblock.subtree_edited_by = user_id
+            if not hasattr(xblock, 'published_date'):
+                xblock.published_date = None
+            if not hasattr(xblock, 'published_by'):
+                xblock.published_by = None
+            if isPublish:
+                xblock.published_date = now
+                xblock.published_by = user_id
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
