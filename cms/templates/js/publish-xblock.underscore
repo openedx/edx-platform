@@ -4,9 +4,9 @@ if (visibilityState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
 } else if (visibilityState === 'live') {
     title = gettext("Published and Live");
-} else if (visibilityState === 'ready') {
+} else if (published && !hasChanges) {
     title = gettext("Published");
-} else if (visibilityState === 'needs_attention') {
+} else {
     title = gettext("Draft (Unpublished changes)");
 }
 
