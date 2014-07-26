@@ -447,7 +447,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               line = line.replace(matchString, '');  // remove the {{...}} phrase, else it will be displayed
             }
 
-            var value = line.split(/^\s*\(.{0,3}\)\s*/)[1];
+            var value = line.split(/^\s*\(.{0,3}\)\s*/)[1].trim();
             var inparens = /^\s*\((.{0,3})\)\s*/.exec(line)[1];
             var correct = /x/i.test(inparens);
             var fixed = '';

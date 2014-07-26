@@ -1335,32 +1335,31 @@ class OptionResponse(LoncapaResponse):
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
         """
-        for student_answer in student_answers:
-            if unicode(self.answer_ids[0]) == student_answer:
-                optiongroup_test = '[@id="' + student_answer + '"]'
-                option_test = '[@name="' + student_answers[student_answer] + '"]'
-                option = self.xml.xpath('//optioninput' + optiongroup_test + '/option' + option_test)[0]
-                option_hints = self.xml.xpath('//optioninput' + optiongroup_test + '/option' + option_test + '/optionhint')
-                if option_hints:
-                    option_hint = option_hints[0]
-                    option_hint_text = option_hint.text.strip()
-                    if len(option_hint_text) > 0:
-                        option_hint_label = option_hint.get('label')
+        for student_answer_id in student_answers:
+            if unicode(self.answer_ids[0]) == student_answer_id:
+                optiongroup_test = '[@id="' + student_answer_id + '"]'
+                for option in self.xml.xpath('//optioninput' + optiongroup_test + '/option'):
+                    if unicode(option.text.strip()) == student_answers[student_answer_id]:
+                        for option_hint in option.iter('optionhint'):
 
-                        message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
-                        if option.get('correct').upper() == 'TRUE':
-                            message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
+                            option_hint_text = option_hint.text.strip()
+                            if len(option_hint_text) > 0:
+                                option_hint_label = option_hint.get('label')
 
-                        if option_hint_label:
-                            correctness_string = option_hint_label + ': '
-                        else:
-                            correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-                            if option.get('correct').upper() == 'TRUE':
-                                correctness_string = 'CORRECT: '
+                                message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+                                if option.get('correct').upper() == 'TRUE':
+                                    message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
 
-                        new_cmap[self.answer_id]['msg'] = new_cmap[self.answer_id]['msg'] + \
-                            '<div class="' + message_style_class + '">' \
-                            + correctness_string + option_hint_text + '</div>'
+                                if option_hint_label:
+                                    correctness_string = option_hint_label + ': '
+                                else:
+                                    correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+                                    if option.get('correct').upper() == 'TRUE':
+                                        correctness_string = 'CORRECT: '
+
+                                new_cmap[student_answer_id]['msg'] = new_cmap[student_answer_id]['msg'] + \
+                                    '<div class="' + message_style_class + '">' \
+                                    + correctness_string + option_hint_text + '</div>'
                 break
 
 
