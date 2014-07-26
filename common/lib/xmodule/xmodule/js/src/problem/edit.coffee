@@ -291,6 +291,32 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     return xmlStringUnderConstruction
 
   #________________________________________________________________________________
+  # search for any commas found *within* a hint string (i.e., enclosed by the
+  # {{...}} braces). if any are found, replace them by a very unique string (';;;')
+  # so the parser won't get confused when a split on commas is performed. if
+  # no such commas are found, try to replace the very unique string *back* to
+  # a comma.
+  #
+  # the strategy here is to encapsulate this subsitution operation here in a
+  # single bi-directional function to make it easier to understand what's
+  # going on.
+  #
+  @substituteCommasInHints: (optionString) ->
+    originalLength = optionString.length                                # save the starting length of the string
+
+    newLength = 0
+    while newLength != optionString.length                              # continue replacements until none are left
+      newLength = optionString.length
+      optionString = optionString.replace( /({{[^,]*),([^}]*}})/gm, '$1;;;$2')
+
+
+
+
+    if optionString.length == originalLength                            # if we found no commas to replace
+      optionString = optionString.replace( /;;;/gm, ',' )   # try the reverse replacment
+    return optionString
+
+  #________________________________________________________________________________
   @parseForDropdown: (xmlString) ->
     # try to parse the supplied string to find a drop down problem
     # return the string unmodified if this is not a drop down problem
@@ -304,8 +330,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       optionsString = ''
       delimiter = ''
-      for line in dropdownMatches[1].split( /[,\n]/)    # split the string between [[..]] brackets into single lines
+      debugger
+
+      dropdownMatch = dropdownMatches[1]              # the match string is the entire set of drop down options
+      dropdownMatch = @substituteCommasInHints(dropdownMatch)   # hide any in-hint commas
+
+      for line in dropdownMatch.split( /[,\n]/)  # split the string between [[..]] brackets into single lines
         line = line.trim()
+        line = @substituteCommasInHints(line)         # unhide any in-hint commas
+
         if line.length > 0
           hintText = ''
           correctnessText = ''
