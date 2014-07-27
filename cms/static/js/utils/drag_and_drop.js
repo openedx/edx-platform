@@ -319,29 +319,22 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             /*
-             * Make `type` draggable using `handleClass`, able to be dropped
-             * into `droppableClass`, and with parent type
-             * `parentLocationSelector`.
+             * Make DOM element with class `type` draggable using `handleClass`, able to be dropped
+             * into `droppableClass`, and with parent type `parentLocationSelector`.
              */
-            makeDraggable: function (type, handleClass, droppableClass, parentLocationSelector, el) {
-                _.each(
-                    el ? el : $(type),
-                    function (ele) {
-                        // Remember data necessary to reconstruct the parent-child relationships
-                        if ($(ele).data('droppable-class') !== droppableClass) {
-                            $(ele).data('droppable-class', droppableClass);
-                            $(ele).data('parent-location-selector', parentLocationSelector);
-                            $(ele).data('child-selector', type);
-                            var draggable = new Draggabilly(ele, {
-                                handle: handleClass,
-                                containment: '.wrapper-dnd'
-                            });
-                            draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
-                            draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
-                            draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
-                        }
-                    }
-                );
+            makeDraggable: function (element, type, handleClass, droppableClass, parentLocationSelector) {
+                if ($(element).data('droppable-class') !== droppableClass) {
+                    $(element).data('droppable-class', droppableClass);
+                    $(element).data('parent-location-selector', parentLocationSelector);
+                    $(element).data('child-selector', type);
+                    var draggable = new Draggabilly(element, {
+                        handle: handleClass,
+                        containment: '.wrapper-dnd'
+                    });
+                    draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
+                    draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
+                    draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
+                }
             }
         };
 

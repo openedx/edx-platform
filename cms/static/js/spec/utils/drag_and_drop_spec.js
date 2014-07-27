@@ -1,10 +1,32 @@
-define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery"],
-    function (ContentDragger, Notification, create_sinon, $) {
+define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery", "underscore"],
+    function (ContentDragger, Notification, create_sinon, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {
                 setFixtures(readFixtures('mock/mock-outline.underscore'));
-                ContentDragger.makeDraggable('.unit', '.unit-drag-handle', 'ol.sortable-unit-list', 'li.courseware-subsection, article.subsection-body');
-                ContentDragger.makeDraggable('.courseware-subsection', '.subsection-drag-handle', '.sortable-subsection-list', 'section');
+                _.each(
+                    $('.unit'),
+                    function (element) {
+                       ContentDragger.makeDraggable(
+                           element,
+                           '.unit',
+                           '.unit-drag-handle',
+                           'ol.sortable-unit-list',
+                           'li.courseware-subsection'
+                       );
+                    }
+                );
+                _.each(
+                    $('.courseware-subsection'),
+                    function (element) {
+                       ContentDragger.makeDraggable(
+                           element,
+                           '.courseware-subsection',
+                           '.subsection-drag-handle',
+                           '.sortable-subsection-list',
+                           'section'
+                       );
+                    }
+                );
             });
 
             describe("findDestination", function () {
