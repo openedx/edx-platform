@@ -155,7 +155,7 @@ class DraftModuleStore(MongoModuleStore):
         course_query = self._course_key_to_son(course_key)
         self.collection.remove(course_query, multi=True)
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         Only called if cloning within this store or if env doesn't set up mixed.
         * copy the courseware
@@ -177,13 +177,20 @@ class DraftModuleStore(MongoModuleStore):
             )
 
         # clone the assets
-        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
         # get the whole old course
         new_course = self.get_course(dest_course_id)
         if new_course is None:
             # create_course creates the about overview
-            new_course = self.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+            new_course = self.create_course(
+                dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
+            )
+        else:
+            # update fields on existing course
+            for key, value in fields.iteritems():
+                setattr(new_course, key, value)
+            self.update_item(new_course, user_id)
 
         # Get all modules under this namespace which is (tag, org, course) tuple
         modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)

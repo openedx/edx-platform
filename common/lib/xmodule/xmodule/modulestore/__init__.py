@@ -396,7 +396,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         Sets up source_course_id to point a course with the same content as the desct_course_id. This
         operation may be cheap or expensive. It may have to copy all assets and all xblock content or
@@ -577,7 +577,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         This base method just copies the assets. The lower level impls must do the actual cloning of
         content.
@@ -585,7 +585,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # copy the assets
         if self.contentstore:
             self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
-            super(ModuleStoreWriteBase, self).clone_course(source_course_id, dest_course_id, user_id)
         return dest_course_id
 
     def delete_course(self, course_key, user_id):

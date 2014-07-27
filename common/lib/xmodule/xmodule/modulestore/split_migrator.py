@@ -25,7 +25,7 @@ class SplitMigrator(object):
         self.split_modulestore = split_modulestore
         self.source_modulestore = source_modulestore
 
-    def migrate_mongo_course(self, source_course_key, user_id, new_org=None, new_course=None, new_run=None):
+    def migrate_mongo_course(self, source_course_key, user_id, new_org=None, new_course=None, new_run=None, fields=None):
         """
         Create a new course in split_mongo representing the published and draft versions of the course from the
         original mongo store. And return the new CourseLocator
@@ -51,10 +51,14 @@ class SplitMigrator(object):
             new_course = source_course_key.course
         if new_run is None:
             new_run = source_course_key.run
+
         new_course_key = CourseLocator(new_org, new_course, new_run, branch=ModuleStoreEnum.BranchName.published)
+        new_fields = self._get_json_fields_translate_references(original_course, new_course_key, None)
+        if fields:
+            new_fields.update(fields)
         new_course = self.split_modulestore.create_course(
             new_org, new_course, new_run, user_id,
-            fields=self._get_json_fields_translate_references(original_course, new_course_key, None),
+            fields=new_fields,
             master_branch=ModuleStoreEnum.BranchName.published,
         )
 

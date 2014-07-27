@@ -288,7 +288,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(None, 'create_course')
         return store.create_course(org, course, run, user_id, **kwargs)
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         See the superclass for the general documentation.
 
@@ -303,16 +303,16 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # to have only course re-runs go to split. This code, however, uses the config'd priority
         dest_modulestore = self._get_modulestore_for_courseid(dest_course_id)
         if source_modulestore == dest_modulestore:
-            return source_modulestore.clone_course(source_course_id, dest_course_id, user_id)
+            return source_modulestore.clone_course(source_course_id, dest_course_id, user_id, fields)
 
         # ensure super's only called once. The delegation above probably calls it; so, don't move
         # the invocation above the delegation call
-        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
             split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
             split_migrator.migrate_mongo_course(
-                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run
+                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run, fields
             )
 
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):

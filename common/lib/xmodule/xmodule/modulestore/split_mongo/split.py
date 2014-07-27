@@ -938,17 +938,17 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # don't need to update the index b/c create_item did it for this version
         return xblock
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         See :meth: `.ModuleStoreWrite.clone_course` for documentation.
 
         In split, other than copying the assets, this is cheap as it merely creates a new version of the
         existing course.
         """
-        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
         source_index = self.get_course_index_info(source_course_id)
         return self.create_course(
-            dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=None,  # override start_date?
+            dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields,
             versions_dict=source_index['versions'], search_targets=source_index['search_targets']
         )
 
