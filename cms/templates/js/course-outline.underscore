@@ -115,10 +115,10 @@ if (statusType === 'warning') {
     <% } else { %>
         <div class="outline-content <%= xblockType %>-content">
             <ol class="<%= typeListClass %> is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+                </li>
             </ol>
-            <div class="ui-splint ui-splint-indicator">
-                <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
-            </div>
 
             <% if (childType) { %>
                 <div class="add-<%= childType %> add-item">
