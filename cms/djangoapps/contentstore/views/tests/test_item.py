@@ -522,7 +522,24 @@ class TestEditItem(ItemTest):
         self.assertEqual(unit2_usage_key, children[1])
 
     def _is_location_published(self, location):
+        """
+        Returns whether or not the item with given location has a published version.
+        """
         return modulestore().has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only)
+
+    def _verify_published_with_no_draft(self, location):
+        """
+        Verifies the item with given location has a published version and no draft (unpublished changes).
+        """
+        self.assertTrue(self._is_location_published(location))
+        self.assertFalse(modulestore().has_changes(location))
+
+    def _verify_published_with_draft(self, location):
+        """
+        Verifies the item with given location has a published version and also a draft version (unpublished changes).
+        """
+        self.assertTrue(self._is_location_published(location))
+        self.assertTrue(modulestore().has_changes(location))
 
     def test_make_public(self):
         """ Test making a private problem public (publishing it). """
@@ -532,7 +549,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertTrue(self._is_location_published(self.problem_usage_key))
+        self._verify_published_with_no_draft(self.problem_usage_key)
 
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
@@ -545,7 +562,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'discard_changes'}
         )
-        self.assertTrue(self._is_location_published(self.problem_usage_key))
+        self._verify_published_with_no_draft(self.problem_usage_key)
         published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertIsNone(published.due)
 
@@ -591,7 +608,7 @@ class TestEditItem(ItemTest):
                 }
             }
         )
-        self.assertTrue(self._is_location_published(self.problem_usage_key))
+        self._verify_published_with_no_draft(self.problem_usage_key)
         published = modulestore().get_item(
             self.problem_usage_key,
             revision=ModuleStoreEnum.RevisionOption.published_only
@@ -607,7 +624,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertTrue(self._is_location_published(self.problem_usage_key))
+        self._verify_published_with_no_draft(self.problem_usage_key)
         published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
 
         # Update the draft version and check that published is different.
@@ -642,7 +659,7 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.assertTrue(self._is_location_published(self.problem_usage_key))
+        self._verify_published_with_no_draft(self.problem_usage_key)
         published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
 
         # Now make a draft
@@ -697,8 +714,8 @@ class TestEditItem(ItemTest):
             data={'publish': 'make_public'}
         )
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(self._is_location_published(unit_usage_key))
-        self.assertTrue(self._is_location_published(html_usage_key))
+        self._verify_published_with_no_draft(unit_usage_key)
+        self._verify_published_with_no_draft(html_usage_key)
 
         # Make a draft for the unit and verify that the problem also has a draft
         resp = self.client.ajax_post(
@@ -709,10 +726,8 @@ class TestEditItem(ItemTest):
             }
         )
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue(self._is_location_published(unit_usage_key))
-        self.assertTrue(self._is_location_published(html_usage_key))
-        self.assertTrue(modulestore().has_changes(unit_usage_key))
-        self.assertTrue(modulestore().has_changes(html_usage_key))
+        self._verify_published_with_draft(unit_usage_key)
+        self._verify_published_with_draft(html_usage_key)
 
 
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
@@ -1148,6 +1163,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['category'], 'course')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/course/Robot_Super_Course')
         self.assertEqual(xblock_info['display_name'], 'Robot Super Course')
+        self.assertTrue(xblock_info['published'])
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1159,6 +1175,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['category'], 'chapter')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(xblock_info['display_name'], 'Week 1')
+        self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
@@ -1171,6 +1188,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['category'], 'sequential')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
+        self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
@@ -1183,6 +1201,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['category'], 'vertical')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/vertical/Unit_1')
         self.assertEqual(xblock_info['display_name'], 'Unit 1')
+        self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Validate that the correct ancestor info has been included
@@ -1204,6 +1223,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['category'], 'video')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
         self.assertEqual(xblock_info['display_name'], 'My Video')
+        self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
@@ -1216,6 +1236,7 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNotNone(xblock_info['display_name'])
         self.assertIsNotNone(xblock_info['id'])
         self.assertIsNotNone(xblock_info['category'])
+        self.assertTrue(xblock_info['published'])
         self.assertEqual(xblock_info['edited_by'], 'testuser')
         if has_ancestor_info:
             self.assertIsNotNone(xblock_info.get('ancestor_info', None))
@@ -1253,9 +1274,9 @@ class TestXBlockPublishingInfo(ItemTest):
             user_id=self.user.id, publish_item=publish_item, visible_to_staff_only=staff_only
         )
 
-    def _get_child(self, xblock_info, index):
+    def _get_child_xblock_info(self, xblock_info, index):
         """
-        Returns the child at the specified index.
+        Returns the child xblock info at the specified index.
         """
         children = xblock_info['child_info']['children']
         self.assertTrue(len(children) > index)
@@ -1298,12 +1319,12 @@ class TestXBlockPublishingInfo(ItemTest):
     def _verify_visibility_state(self, xblock_info, expected_state, path=None):
         """
         Verify the publish state of an item in the xblock_info. If no path is provided
-        then the root item is verified.
+        then the root item will be verified.
         """
         if path:
-            direct_child = self._get_child(xblock_info, path[0])
+            direct_child_xblock_info = self._get_child_xblock_info(xblock_info, path[0])
             remaining_path = path[1:] if len(path) > 1 else None
-            self._verify_visibility_state(direct_child, expected_state, remaining_path)
+            self._verify_visibility_state(direct_child_xblock_info, expected_state, remaining_path)
         else:
             self.assertEqual(xblock_info['visibility_state'], expected_state)
 
@@ -1316,10 +1337,13 @@ class TestXBlockPublishingInfo(ItemTest):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         self._create_child(chapter, 'sequential', "Empty Sequential")
         xblock_info = self._get_xblock_info(chapter.location)
-        self.assertEqual(xblock_info['visibility_state'], VisibilityState.unscheduled)
-        self.assertEqual(self._get_child(xblock_info, 0)['visibility_state'], VisibilityState.unscheduled)
+        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
+        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled, path=self.FIRST_SUBSECTION_PATH)
 
     def test_published_unit(self):
+        """
+        Tests the visibility state of a published unit with release date in the future.
+        """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
@@ -1332,6 +1356,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
     def test_released_unit(self):
+        """
+        Tests the visibility state of a published unit with release date in the past.
+        """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
@@ -1344,10 +1371,14 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
 
     def test_unpublished_changes(self):
+        """
+        Tests the visibility state of a published unit with draft (unpublished) changes.
+        """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
         unit = self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
         self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        # Setting the display name creates a draft version of unit.
         self._set_display_name(unit.location, 'Updated Unit')
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
