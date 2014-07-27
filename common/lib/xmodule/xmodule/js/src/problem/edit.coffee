@@ -206,7 +206,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   #________________________________________________________________________________
   @parseForCompoundConditionHints: (xmlString) ->
-    debugger
     for line in xmlString.split('\n')
       matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
       if matches
@@ -330,7 +329,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       optionsString = ''
       delimiter = ''
-      debugger
 
       dropdownMatch = dropdownMatches[1]              # the match string is the entire set of drop down options
       dropdownMatch = @substituteCommasInHints(dropdownMatch)   # hide any in-hint commas
@@ -393,7 +391,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     returnXmlString = ''
     reducedXmlString = ''
 
-    debugger
     for line in xmlString.split('\n')
       choiceMatches = @matchCheckboxMarkerPattern( line )
 
@@ -408,6 +405,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       returnXmlString +=  '    <choiceresponse>\n'
       returnXmlString += '        <checkboxgroup direction="vertical">\n'
 
+      debugger
       for line in xmlString.split('\n')
         hintTextSelected = ''
         hintTextUnselected = ''
@@ -417,7 +415,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
           line = choiceMatches[2]  # remove the [..] phrase, else it will be displayed to student
           isCheckboxType = true
-          hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+          hintMatches = line.match(/{{.+/)        # extract the {{...}} phrase, if any
           if hintMatches
             matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
             line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
@@ -456,20 +454,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     return returnXmlString
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # We may wish to add insertHeader. Here is Tom's code.
 # function makeHeader() {
 #  var selection = simpleEditor.getSelection();
@@ -491,7 +475,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
 
-
       //---------------------------------------------------------------------------
       // checkbox questions
       //
@@ -500,10 +483,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // questions--until an unambiguous syntax is devised
       //
       xml = MarkdownEditingDescriptor.parseForCheckbox(xml)
-
-
-
-
 
       //---------------------------------------------------------------------------
       // multiple choice questions
@@ -625,10 +604,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
       });
 
-
-
-
-
       //---------------------------------------------------------------------------
       // dropdown questions
       //
@@ -636,20 +611,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return MarkdownEditingDescriptor.parseForDropdown(match);
       });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-      // replace explanations
+      //---------------------------------------------------------------------------
+      // explanation blocks
+      //
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
 
@@ -718,8 +682,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // make all elements descendants of a single problem element
       xml = '<problem schema="edXML/1.0">\n' + xml + '\n</problem>';
-
-      confirm(xml);
 
       return xml;
     }`
