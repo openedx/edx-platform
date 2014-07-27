@@ -252,9 +252,6 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             pointerInBounds: function (pointer, ele) {
-//                console.log("pointer.clientX " + pointer.clientX);
-//                console.log("ele.offset().left " + ele.offset().left);
-//                console.log("ele.outerWidth() " + ele.outerWidth());
                 return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.outerWidth();
             },
 
@@ -327,13 +324,11 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
              * `parentLocationSelector`.
              */
             makeDraggable: function (type, handleClass, droppableClass, parentLocationSelector, el) {
-//                console.log("makeDraggable on " + type);
                 _.each(
                     el ? el : $(type),
                     function (ele) {
                         // Remember data necessary to reconstruct the parent-child relationships
                         if ($(ele).data('droppable-class') !== droppableClass) {
-//                            console.log('populating dragable info for type ' + type);
                             $(ele).data('droppable-class', droppableClass);
                             $(ele).data('parent-location-selector', parentLocationSelector);
                             $(ele).data('child-selector', type);

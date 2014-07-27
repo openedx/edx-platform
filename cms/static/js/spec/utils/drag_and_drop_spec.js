@@ -115,7 +115,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 });
                 it("can drag into a collapsed list", function () {
                     var $ele, destination;
-                    $('#subsection-2').addClass('collapsed');
+                    $('#subsection-2').addClass('is-collapsed');
                     $ele = $('#unit-2');
                     $ele.offset({
                         top: $('#subsection-2').offset().top + 3,
@@ -142,11 +142,11 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     });
                 });
                 it("collapses expanded elements", function () {
-                    expect($('#subsection-1')).not.toHaveClass('collapsed');
+                    expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                     ContentDragger.onDragStart({
                         element: $('#subsection-1')
                     }, null, null);
-                    expect($('#subsection-1')).toHaveClass('collapsed');
+                    expect($('#subsection-1')).toHaveClass('is-collapsed');
                     expect($('#subsection-1')).toHaveClass('expand-on-drop');
                 });
             });
@@ -246,16 +246,16 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     expect(['0px', 'auto']).toContain($('#unit-1').css('left'));
                 });
                 it("expands an element if it was collapsed on drag start", function () {
-                    $('#subsection-1').addClass('collapsed');
+                    $('#subsection-1').addClass('is-collapsed');
                     $('#subsection-1').addClass('expand-on-drop');
                     ContentDragger.onDragEnd({
                         element: $('#subsection-1')
                     }, null, null);
-                    expect($('#subsection-1')).not.toHaveClass('collapsed');
+                    expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                     expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
                 });
                 it("expands a collapsed element when something is dropped in it", function () {
-                    $('#subsection-2').addClass('collapsed');
+                    $('#subsection-2').addClass('is-collapsed');
                     ContentDragger.dragState.dropDestination = $('#list-2');
                     ContentDragger.dragState.attachMethod = "prepend";
                     ContentDragger.dragState.parentList = $('#subsection-2');
@@ -264,7 +264,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, null, {
                         clientX: $('#unit-1').offset().left
                     });
-                    expect($('#subsection-2')).not.toHaveClass('collapsed');
+                    expect($('#subsection-2')).not.toHaveClass('is-collapsed');
                 });
             });
             describe("AJAX", function () {
