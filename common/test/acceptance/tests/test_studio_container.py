@@ -397,7 +397,7 @@ class UnitPublishingTest(ContainerBase):
     __test__ = True
 
     PUBLISHED_STATUS = "Publishing Status\nPublished"
-    PUBLISHED_LIVE_STATUS ="Publishing Status\nPublished and Live"
+    PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
     DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
     LOCKED_STATUS = "Publishing Status\nUnpublished (Staff only)"
     RELEASE_TITLE_RELEASED = "RELEASED:"
