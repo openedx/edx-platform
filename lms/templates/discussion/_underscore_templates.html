@@ -133,6 +133,10 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
+    <a href="#" class="action-show-comments">
+        ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(_("Show Comments (%(num_comments)s)"))}
+        <i class="icon icon-caret-down"></i>
+    </a>
     <ol class="comments">
         <li class="new-comment">
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):

@@ -1,8 +1,10 @@
 describe 'ThreadResponseView', ->
     beforeEach ->
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures """
             <script id="thread-response-template" type="text/template">
-                <div/>
+                <a href="#" class="action-show-comments">Show comments</a>
+                <ol class="comments"></ol>
             </script>
             <div id="thread-response-fixture"/>
         """
@@ -14,6 +16,33 @@ describe 'ThreadResponseView', ->
         spyOn(ResponseCommentView.prototype, "render")
 
     describe 'renderComments', ->
+        it 'hides "show comments" link if collapseComments is not set', ->
+            @view.render()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
+        it 'hides "show comments" link if collapseComments is set but response has no comments', ->
+            @response = new Comment { children: [] }
+            @view = new ThreadResponseView({
+                model: @response, el: $("#thread-response-fixture"),
+                collapseComments: true
+            })
+            @view.render()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
+        it 'hides comments if collapseComments is set and shows them when "show comments" link is clicked', ->
+            @view = new ThreadResponseView({
+                model: @response, el: $("#thread-response-fixture"),
+                collapseComments: true
+            })
+            @view.render()
+            expect(@view.$(".comments")).not.toBeVisible()
+            expect(@view.$(".action-show-comments")).toBeVisible()
+            @view.$(".action-show-comments").click()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
         it 'populates commentViews and binds events', ->
             # Ensure that edit view is set to test invocation of cancelEdit
             @view.createEditView()
