@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = APIUser
-        fields = ("id", "email", "username", "first_name", "last_name", "created", "organizations")
+        fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active", "organizations")
         read_only_fields = ("id", "email", "username")
 
 
