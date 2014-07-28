@@ -53,9 +53,14 @@ See :ref:`Create a Course Using Rerun` and :ref:`Update the New Course`.
 Use Re-Run to Create a Course
 ********************************************
 
-To re-run a course, you must have permission to create courses in Studio. You
-must also be a member of the course staff for the course that you want to re-
-run.
+Before you re-run a course, verify that:
+
+* You have permission to create courses in Studio.
+
+* You are a member of the course staff for the course that you want to re-
+  run.
+
+* The original course was created in Studio, not in XML.
 
 To re-run a course:
 
