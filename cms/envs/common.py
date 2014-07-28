@@ -552,7 +552,10 @@ INSTALLED_APPS = (
     'monitoring',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
+
+    # Additional problem types
+    'edx_jsme',    # Molecular Structure
 )
 
 
