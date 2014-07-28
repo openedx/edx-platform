@@ -36,16 +36,37 @@ proctor_override = function(){
 }
 $('#proctor_override').click(proctor_override);
 
-$('#proctor_${element_id}_submit').click( function() {
+$('#proctor_${element_id}_reset_form').submit(function(e) {
+    e.preventDefault();
+    $('#proctor_${element_id}_submit').attr("disabled", true);
+    $('#proctor_${element_id}_submit').html('${_("Processing, please wait...")}');
     $.ajax({
         url: '${ajax_url}/reset',
         type: 'POST',
         dataType: 'json',
         data: $('#proctor_${element_id}_reset_form').serialize(),
         success: function(data) {
-            $('#proctor_${element_id}_text').append(JSON.stringify(data));
-        }
+            var msg = '';
+            if ('error' in data) {
+                msg = "ERROR: " + data['error'];
+            } else {
+                var uname = $('#proctor_${element_id}_student_username').val();
+                msg = "Successfully reset attempts for user: " + uname;
+            }
+            $('#proctor_${element_id}_text').html(msg);
+        },
+        error: function(xhr, stat, error){
+            console.debug(xhr);
+            console.debug(stat);
+            console.debug(error);
+            $('#proctor_${element_id}_text').html('FATAL: ' + error);
+         },
+        complete: function(){
+            $('#proctor_${element_id}_submit').removeAttr("disabled");
+            $('#proctor_${element_id}_submit').html('${_("Reset Attempts")}');
+        },
     });
+    return false;
 });
 </script>
 

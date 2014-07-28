@@ -235,9 +235,12 @@ class ProctorModule(ProctorFields, XModule):
         return self.child.get_icon_class() if self.child else 'other'
 
     def reset(self, username):
-        pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
-        pminfo.get_assignments_attempted_and_failed(username, do_reset=True)
-        return self.status(username)
+        try:
+            pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
+            pminfo.get_assignments_attempted_and_failed(username, do_reset=True)
+            return self.status(username)
+        except Exception as exc:
+            return json.dumps({"error": str(exc)})
 
     def status(self, username):
         try:
