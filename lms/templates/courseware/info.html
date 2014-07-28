@@ -55,7 +55,7 @@ $(document).ready(function(){
         % endif
       % endif
 
-      <h1>${_("Course Updates &amp; News") | n}</h1>
+      <h1>${_("Course Updates & News")}</h1>
       ${get_course_info_section(request, course, 'updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
@@ -64,7 +64,7 @@ $(document).ready(function(){
     </section>
     % else:
     <section class="updates">
-      <h1>${_("Course Updates &amp; News") | n}</h1>
+      <h1>${_("Course Updates & News")}</h1>
       ${get_course_info_section(request, course, 'guest_updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">

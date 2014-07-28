@@ -66,7 +66,7 @@ from courseware.courses import course_image_url, get_course_about_section
       % if not reg_code_already_redeemed:
         %if redemption_success:
           <% course_url = reverse('info', args=[course.id.to_deprecated_string()]) %>
-          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course &nbsp; &nbsp; &#x25b8;")}</a>
+          <a href="${course_url}" class="link-button course-link-bg-color">${_(u"View Course ▸")}</a>
         %elif not registered_for_course:
           <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">

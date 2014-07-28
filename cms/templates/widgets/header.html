@@ -56,7 +56,7 @@
                     <a href="${tabs_url}">${_("Pages")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-uploads">
-                    <a href="${assets_url}">${_("Files &amp; Uploads") | n}</a>
+                    <a href="${assets_url}">${_("Files & Uploads")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
@@ -73,7 +73,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
-                    <a href="${settings_url}">${_("Schedule &amp; Details") | n}</a>
+                    <a href="${settings_url}">${_("Schedule & Details")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
                     <a href="${grading_url}">${_("Grading")}</a>
@@ -126,7 +126,7 @@
     <div class="wrapper wrapper-r">
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        <h2 class="sr">${_("Help &amp; Account Navigation") | n}</h2>
+        <h2 class="sr">${_("Help & Account Navigation")}</h2>
         <ol>
           <li class="nav-item nav-account-help">
             <h3 class="title"><span class="label"><a href="${get_online_help_info(online_help_token)['doc_url']}" title="${_("Contextual Online Help")}" target="${_("_blank")}">${_("Help")}</a></span></h3>
