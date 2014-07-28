@@ -415,6 +415,7 @@ class UnitPublishingTest(ContainerBase):
         self.courseware = CoursewarePage(self.browser, self.course_id)
         past_start_date = datetime.datetime(1974, 6, 22)
         self.past_start_date_text = "Jun 22, 1974 at 00:00 UTC"
+        future_start_date = datetime.datetime(2100, 9, 13)
 
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
@@ -436,6 +437,12 @@ class UnitPublishingTest(ContainerBase):
                     XBlockFixtureDesc('vertical', 'Locked Unit', metadata={'visible_to_staff_only': True}).add_children(
                         XBlockFixtureDesc('discussion', '', data=self.html_content)
                     )
+                )
+            ),
+            XBlockFixtureDesc('chapter', 'Unreleased Section',
+                              metadata={ 'start': future_start_date.isoformat() }).add_children(
+                XBlockFixtureDesc('sequential', 'Unreleased Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Unreleased Unit')
                 )
             )
         )
@@ -674,6 +681,25 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self._view_published_version(unit)
         self.assertEqual(0, self.courseware.num_xblock_components)
+
+    def test_published_not_live(self):
+        """
+        Scenario: The publish title displays correctly for units that are not live
+            Given I have a published unit with no unpublished changes that releases in the future
+            When I go to the unit page in Studio
+            Then the title in the Publish information box is "Published"
+            And when I add a component to the unit
+            Then the title in the Publish information box is "Draft (Unpublished changes)"
+            And when I click the Publish button
+            Then the title in the Publish information box is "Published"
+        """
+        unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
+        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
+        add_discussion(unit)
+        self._verify_publish_title(unit, self.DRAFT_STATUS)
+        unit.publish_action.click()
+        unit.wait_for_ajax()
+        self._verify_publish_title(unit, self.PUBLISHED_STATUS)
 
     def _view_published_version(self, unit):
         """

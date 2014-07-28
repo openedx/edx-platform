@@ -98,9 +98,9 @@ def get_codemirror_value(page, index=0, find_prefix="$"):
     )
 
 
-def set_input_value_and_save(page, css, value):
+def set_input_value(page, css, value):
     """
-    Sets the text field with given label (display name) to the specified value, and presses Save.
+    Sets the text field with the given label (display name) to the specified value.
     """
     input_element = page.q(css=css).results[0]
     # Click in the input to give it the focus
@@ -108,8 +108,16 @@ def set_input_value_and_save(page, css, value):
     # Delete all of the characters that are currently there
     for _x in range(0, len(input_element.get_attribute('value'))):
         action = action.send_keys(Keys.BACKSPACE)
-    # Send the new text, then hit the enter key so that the change event is triggered).
-    action.send_keys(value).send_keys(Keys.ENTER).perform()
+    # Send the new text, then return the input_element
+    action.send_keys(value).perform()
+
+
+def set_input_value_and_save(page, css, value):
+    """
+    Sets the text field with given label (display name) to the specified value, and presses Save.
+    """
+    set_input_value(page, css, value)
+    ActionChains(page.browser).send_keys(Keys.ENTER).perform()
 
 
 def confirm_prompt(page, cancel=False):

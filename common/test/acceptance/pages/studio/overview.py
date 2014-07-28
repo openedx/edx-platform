@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, click_css, confirm_prompt
+from .utils import set_input_value_and_save, click_css, confirm_prompt, set_input_value
 
 
 class CourseOutlineItem(object):
@@ -46,11 +46,23 @@ class CourseOutlineItem(object):
         else:
             return None
 
+    def edit_name(self):
+        """
+        Puts the item's name into editable form.
+        """
+        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
+
+    def enter_name(self, new_name):
+        """
+        Enters new_name as the item's display name.
+        """
+        set_input_value(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
+
     def change_name(self, new_name):
         """
         Changes the container's name.
         """
-        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
+        self.edit_name()
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
         self.wait_for_ajax()
 
@@ -130,7 +142,7 @@ class CourseOutlineContainer(CourseOutlineItem):
 
         currently_expanded = subsection_expanded()
 
-        self.q(css=self._bounded_selector('.ui-toggle-expansion')).first.click()
+        self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
@@ -144,7 +156,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Return whether this outline item is currently collapsed.
         """
-        return "collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]
+        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
