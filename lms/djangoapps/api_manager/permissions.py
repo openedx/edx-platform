@@ -7,6 +7,8 @@ from api_manager.utils import get_client_ip_address, address_exists_in_network
 from rest_framework import permissions, generics, filters, pagination, serializers
 from rest_framework.views import APIView
 
+from api_manager.utils import str2bool
+from api_manager.models import APIUser as User
 
 log = logging.getLogger(__name__)
 
@@ -95,6 +97,24 @@ class IdsInFilterBackend(filters.BaseFilterBackend):
                 ids = ids.split(",")[:upper_bound]
             return queryset.filter(id__in=ids)
         return queryset
+
+
+class HasOrgsFilterBackend(filters.BaseFilterBackend):
+    """
+        This backend support filtering users with and organization association or not
+    """
+    def filter_queryset(self, request, queryset, view):
+        """
+        Parse querystring base on has_organizations query param
+        """
+        has_orgs = request.QUERY_PARAMS.get('has_organizations', None)
+        if has_orgs:
+            if str2bool(has_orgs):
+                queryset = queryset.filter(organizations__id__gt=0)
+            else:
+                queryset = queryset.exclude(id__in=User.objects.filter(organizations__id__gt=0).
+                                            values_list('id', flat=True))
+        return queryset.distinct()
 
 
 class CustomPaginationSerializer(pagination.PaginationSerializer):
