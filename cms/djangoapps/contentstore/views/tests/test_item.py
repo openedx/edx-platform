@@ -1142,6 +1142,7 @@ class TestXBlockInfo(ItemTest):
         xblock_info = create_xblock_info(
             vertical,
             include_child_info=True,
+            include_edited_by=True,
             include_children_predicate=ALWAYS,
             include_ancestor_info=True
         )
@@ -1176,7 +1177,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1189,7 +1189,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1214,7 +1213,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(ancestors[2], has_child_info=False)
 
         # Finally, validate the entire response for consistency
-        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True)
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True, has_edited_by=True)
 
     def validate_component_xblock_info(self, xblock_info):
         """
@@ -1224,12 +1223,11 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info)
 
-    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False):
+    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False, has_edited_by=False):
         """
         Validate that the xblock info is internally consistent.
         """
@@ -1237,7 +1235,6 @@ class TestXBlockInfo(ItemTest):
         self.assertIsNotNone(xblock_info['id'])
         self.assertIsNotNone(xblock_info['category'])
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
         if has_ancestor_info:
             self.assertIsNotNone(xblock_info.get('ancestor_info', None))
             ancestors = xblock_info['ancestor_info']['ancestors']
@@ -1258,6 +1255,10 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
+        if has_edited_by:
+            self.assertEqual(xblock_info['edited_by'], 'testuser')
+        else:
+            self.assertIsNone(xblock_info.get('edited_by', None))
 
 
 class TestXBlockPublishingInfo(ItemTest):
