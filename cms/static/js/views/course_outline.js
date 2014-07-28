@@ -46,7 +46,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 var expandedLocators = [];
                 this.$('.outline-item.is-collapsible').each(function(index, rawElement) {
                     var element = $(rawElement);
-                    if (!element.hasClass('collapsed')) {
+                    if (!element.hasClass('is-collapsed')) {
                         expandedLocators.push(element.data('locator'));
                     }
                 });
