@@ -67,7 +67,7 @@ pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
 requests-oauthlib==0.4.1
-scipy==0.11.0
+scipy==0.12.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==11.12
