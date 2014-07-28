@@ -139,14 +139,3 @@ def set_input_value_and_save(page, css, value):
         action = action.send_keys(Keys.BACKSPACE)
     # Send the new text, then hit the enter key so that the change event is triggered).
     action.send_keys(value).send_keys(Keys.ENTER).perform()
-
-
-def confirm_prompt(page, cancel=False):
-    """
-    Ensures that a modal prompt and confirmation button are visible, then clicks the button. The prompt is canceled iff
-    cancel is True.
-    """
-    page.wait_for_element_visibility('.prompt', 'Prompt is visible')
-    confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
-    page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
-    click_css(page, confirmation_button_css, require_notification=(not cancel))

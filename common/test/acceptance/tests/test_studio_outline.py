@@ -131,6 +131,25 @@ class EditNamesTest(CourseOutlineTest):
             'Test Subsection'
         )
 
+    def test_editing_names_does_not_expand_collapse(self):
+        """
+        Scenario: A section stays in the same expand/collapse state while its name is edited
+            Given that I have created a section
+            And the section is expanded
+            When I click on the name of the section
+            Then the section is expanded
+            And given that I have entered a new name
+            Then the section is expanded
+        """
+        self.course_outline_page.visit()
+        self.assertFalse(self.course_outline_page.section_at(0).in_editable_form())
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).edit_name()
+        self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).enter_name('Changed')
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+
 
 class CreateSectionsTest(CourseOutlineTest):
     """
@@ -468,6 +487,22 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.course_outline_page.section_at(0).delete()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
+
+    def test_old_subsection_stays_collapsed_after_creation(self):
+        """
+        Scenario: Collapsed subsection stays collapsed after creating a new subsection
+            Given I have a course with one section and subsection
+            And I navigate to the course outline page
+            Then the subsection is collapsed
+            And when I create a new subsection
+            Then the first subsection is collapsed
+            And the second subsection is expanded
+        """
+        self.course_outline_page.visit()
+        self.assertTrue(self.course_outline_page.section_at(0).subsection_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).add_subsection()
+        self.assertTrue(self.course_outline_page.section_at(0).subsection_at(0).is_collapsed)
+        self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
 class ExpandCollapseEmptyTest(CourseOutlineTest):
