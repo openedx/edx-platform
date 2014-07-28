@@ -56,15 +56,15 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default}</a>
                     % else:
-                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default}</span>
                     % endif
                 % endfor
             </small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default | h}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default}</span></h1>
             </div>
         </div>
 
@@ -101,7 +101,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
 
             <article class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator | h}" data-course-key="${xblock_locator.course_key | h}">
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
                     <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
@@ -133,7 +133,7 @@ templates = ["basic-modal", "modal-button", "edit-xblock-modal",
                         <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
-                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name | h}</span>
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
                             </p>
                         </div>

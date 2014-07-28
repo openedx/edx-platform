@@ -59,12 +59,12 @@
     <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
-      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>" | n}" placeholder="${_('Title') | h}">
+      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>" | n}" placeholder="${_('Title')}">
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>" | n}</div>
     </div>
-    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
+    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
 </script>
 
@@ -81,7 +81,7 @@
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
                 <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>' | n}"
-                data-placeholder="${_('Add a comment...') | h}"></div>
+                data-placeholder="${_('Add a comment...')}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
@@ -154,7 +154,7 @@
     <div class="form-row">
       <div class="edit-post-body" name="body" data-id="${'<%- id %>' | n}">${"<%- body %>" | n}</div>
     </div>
-    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response") | h}">
+    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -200,7 +200,7 @@
     <div class="form-row">
       <div class="edit-comment-body" name="body" data-id="${'<%- id %>' | n}">${"<%- body %>" | n}</div>
     </div>
-    <input type="submit" id="edit-comment-submit" class="post-update" value="${_("Update comment") | h}">
+    <input type="submit" id="edit-comment-submit" class="post-update" value="${_("Update comment")}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>

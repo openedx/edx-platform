@@ -14,7 +14,7 @@
     <div class="block block-comment">${comment}</div>
 
     <div class="block">${comment_prompt}</div>
-    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value|h}</textarea>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value}</textarea>
 
     <div class="block">${tag_prompt}</div>
     <ul class="tags">
@@ -44,12 +44,12 @@
     % if debug:
     <div class="debug-value">
         Rendered with value:<br/>
-        <pre>${value|h}</pre>
+        <pre>${value}</pre>
         Current input value:<br/>
-        <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
+        <input type="text" class="value" name="input_${id}" id="input_${id}" value="${value}" />
     </div>
     % else:
-        <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
+        <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value}" />
     % endif
 
     <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"><span class="sr">${status.display_name}</span></span>

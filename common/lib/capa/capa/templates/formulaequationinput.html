@@ -2,7 +2,7 @@
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
   <div class="${status.classname}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
-        data-input-id="${id}" value="${value|h}"
+        data-input-id="${id}" value="${value}"
         aria-label="${label}"
         % if size:
         size="${size}"
@@ -16,7 +16,7 @@
          >
           <span class="sr equation">
               %if value:
-              ${value|h}
+              ${value}
               % else:
               ${label}
               %endif

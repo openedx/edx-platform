@@ -33,9 +33,9 @@ messages = json.dumps(xblock.validate().to_json())
 
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
+    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
+    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
     <section class="wrapper-xblock ${section_class} ${collapsible_class}">
@@ -50,7 +50,7 @@ messages = json.dumps(xblock.validate().to_json())
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
             % endif
-            <span class="xblock-display-name">${label | h}</span>
+            <span class="xblock-display-name">${label}</span>
         </div>
         <div class="header-actions">
             <ul class="actions-list">

@@ -434,7 +434,7 @@
                   <li class="wizard-step step-proceed">
                     <form id="pay_form" method="post" action="${purchase_endpoint}">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                      <input type="hidden" name="course_id" value="${course_id | h}" />
+                      <input type="hidden" name="course_id" value="${course_id}" />
                       <input class="action-primary disabled" type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
                     </form>
                   </li>

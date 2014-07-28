@@ -72,7 +72,7 @@
                 %>
 
                 % if isinstance(tab, StaticTab):
-                    <li class="component ${css_class}" data-locator="${tab.locator | h}" data-tab-id="${tab.tab_id | h}"></li>
+                    <li class="component ${css_class}" data-locator="${tab.locator}" data-tab-id="${tab.tab_id}"></li>
 
                 % else:
                     <li class="course-nav-item ${css_class}" data-tab-id="${tab.tab_id}">

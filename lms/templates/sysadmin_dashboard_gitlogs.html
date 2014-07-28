@@ -75,7 +75,7 @@ textarea {
 
       %if course_id is not None:
           ## Translators: Git is a version-control system; see http://git-scm.com/about
-          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id) | h}</h2>
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id)}</h2>
           %if error_msg:
               <h3>${_('Error')}:</h3>
               <p>${error_msg}</p>
@@ -108,7 +108,7 @@ textarea {
               %>
               <tr>
                 <td>${date}</td>
-                <td><a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">${cil.course_id | h}</a></td>
+                <td><a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">${cil.course_id}</a></td>
                 <td>${cil.git_log}</td>
               </tr>
           %endfor
@@ -118,7 +118,7 @@ textarea {
                 <td colspan="3">
                   <pre>
                     %if cil is not None:
-                        ${cil.import_log | h}
+                        ${cil.import_log}
                     %else:
                         ## Translators: git is a version-control system; see http://git-scm.com/about
                         ${_('No git import logs have been recorded for this course.')}

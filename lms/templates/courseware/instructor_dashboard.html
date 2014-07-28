@@ -791,17 +791,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${datatable['title'] | h}</h2>
+      <h2>${datatable['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in datatable['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in datatable['data']:
           <tr>
           %for value in row:
-            <td>${value | h}</td>
+            <td>${value}</td>
           %endfor
           </tr>
         %endfor
@@ -854,17 +854,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${course_stats['title'] | h}</h2>
+      <h2>${course_stats['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in course_stats['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in course_stats['data']:
           <tr>
             %for value in row:
-              <td>${value | h}</td>
+              <td>${value}</td>
             %endfor
           </tr>
         %endfor
@@ -908,9 +908,9 @@ function goto( mode)
     %else:
       <ul>
         % for (summary, err) in course_errors:
-        <li>${summary | h}
+        <li>${summary}
         % if err:
-          <ul><li><pre>${err | h}</pre></li></ul>
+          <ul><li><pre>${err}</pre></li></ul>
         % else:
           <p>&nbsp;</p>
         % endif

@@ -18,7 +18,7 @@ from courseware.courses import course_image_url, get_course_about_section
     <section>
       <div class="course-image">
         <img style="width: 100%; height: auto;" src="${course_image_url(course)}"
-             alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image"/>
+             alt="${course.display_number_with_default} ${get_course_about_section(course, 'title')} Cover Image"/>
       </div>
       <div class="enrollment-details">
         <div class="sub-title">${_("Confirm your enrollment for:")}

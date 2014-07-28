@@ -119,7 +119,7 @@
             %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
             <!-- STATE: re-run is processing -->
             %if course_info['is_in_progress']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -161,7 +161,7 @@
 
             <!-- STATE: re-run has error -->
             %if course_info['is_failed']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -212,7 +212,7 @@
       <div class="courses">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item" data-course-key="${course_info['course_key'] | h}">
+          <li class="course-item" data-course-key="${course_info['course_key']}">
             <a class="course-link" href="${course_info['url']}">
               <h3 class="course-title">${course_info['display_name']}</h3>
 
