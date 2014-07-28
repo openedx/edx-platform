@@ -286,6 +286,7 @@ def xblock_outline_handler(request, usage_key_string):
         return JsonResponse(create_xblock_info(
             root_xblock,
             include_child_info=True,
+            course_outline=True,
             include_children_predicate=lambda xblock: not xblock.category == 'vertical'
         ))
     else:
@@ -587,16 +588,18 @@ def _get_module_info(xblock, rewrite_static_links=True):
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       include_edited_by=False, include_published_by=False, include_children_predicate=NEVER):
+                       course_outline=False, include_children_predicate=NEVER):
     """
     Creates the information needed for client-side XBlockInfo.
 
     If data or metadata are not specified, their information will not be added
     (regardless of whether or not the xblock actually has data or metadata).
 
-    There are two optional boolean parameters:
+    There are three optional boolean parameters:
       include_ancestor_info - if true, ancestor info is added to the response
       include_child_info - if true, direct child info is included in the response
+      course_outline - if true, the xblock is being rendered on behalf of the course outline.
+        There are certain expensive computations that do not need to be included in this case.
 
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
@@ -622,7 +625,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Compute the child info first so it can be included in aggregate information for the parent
     if include_child_info and xblock.has_children:
         child_info = _create_xblock_child_info(
-            xblock, include_children_predicate=include_children_predicate
+            xblock,
+            course_outline,
+            include_children_predicate=include_children_predicate
         )
     else:
         child_info = None
@@ -630,7 +635,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-    currently_visible_to_students = is_currently_visible_to_students(xblock)
 
     is_xblock_unit = is_unit(xblock)
     is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
@@ -645,8 +649,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'studio_url': xblock_studio_url(xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
-        "release_date_from": _get_release_date_from(xblock) if release_date else None,
-        "currently_visible_to_students": currently_visible_to_students,
         "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     }
     if data is not None:
@@ -654,19 +656,19 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     if metadata is not None:
         xblock_info["metadata"] = metadata
     if include_ancestor_info:
-        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
+        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline)
     if child_info:
         xblock_info['child_info'] = child_info
-    # Currently, 'edited_by' and 'published_by' are only used by the container page.  Only compute them when asked to do
-    # so, since safe_get_username() is expensive.
-    if include_edited_by:
-        xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
-    if include_published_by:
-        xblock_info['published_by'] = safe_get_username(xblock.published_by)
-    # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
-    # We don't add it in general because it is an expensive operation.
-    if is_xblock_unit:
+    # Currently, 'edited_by', 'published_by', and 'release_date_from', and 'has_changes' are only used by the
+    # container page when rendering a unit. Since they are expensive to compute, only include them for units
+    # that are not being rendered on the course outline.
+    if is_xblock_unit and not course_outline:
+        xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
+        xblock_info["published_by"] = safe_get_username(xblock.published_by)
+        xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
         xblock_info['has_changes'] = is_unit_with_changes
+        if release_date:
+            xblock_info["release_date_from"] = _get_release_date_from(xblock)
 
     return xblock_info
 
@@ -740,7 +742,7 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         return VisibilityState.ready
 
 
-def _create_xblock_ancestor_info(xblock):
+def _create_xblock_ancestor_info(xblock, course_outline):
     """
     Returns information about the ancestors of an xblock. Note that the direct parent will also return
     information about all of its children.
@@ -756,6 +758,7 @@ def _create_xblock_ancestor_info(xblock):
             ancestors.append(create_xblock_info(
                 ancestor,
                 include_child_info=include_child_info,
+                course_outline=course_outline,
                 include_children_predicate=direct_children_only
             ))
             collect_ancestor_info(get_parent_xblock(ancestor))
@@ -765,7 +768,7 @@ def _create_xblock_ancestor_info(xblock):
     }
 
 
-def _create_xblock_child_info(xblock, include_children_predicate=NEVER):
+def _create_xblock_child_info(xblock, course_outline, include_children_predicate=NEVER):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -780,7 +783,8 @@ def _create_xblock_child_info(xblock, include_children_predicate=NEVER):
     if xblock.has_children and include_children_predicate(xblock):
         child_info['children'] = [
             create_xblock_info(
-                child, include_child_info=True, include_children_predicate=include_children_predicate
+                child, include_child_info=True, course_outline=course_outline,
+                include_children_predicate=include_children_predicate
             ) for child in xblock.get_children()
         ]
     return child_info
