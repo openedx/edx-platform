@@ -11,6 +11,16 @@
   // TODO: abstract out
   .is-editable {
 
+    .incontext-editor-value, .incontext-editor-action-wrapper {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .incontext-editor-value {
+      max-width: 80%;
+      margin-right: ($baseline/10);
+    }
+
     .incontext-editor-open-action {
       @include transition(opacity $tmg-f1 ease-in-out 0);
       opacity: 0.0;
