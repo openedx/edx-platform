@@ -12,11 +12,12 @@ from django.conf import settings
 from django.http import Http404
 from django.utils.translation import get_language, ugettext_lazy as _
 from rest_framework import status
+from rest_framework import filters
 from rest_framework.response import Response
 
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_total_score
-from api_manager.permissions import SecureAPIView, SecureListAPIView
+from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
@@ -102,7 +103,7 @@ class UsersList(SecureListAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
-    - GET: Provides paginated list of users, it supports email, username and id filters
+    - GET: Provides paginated list of users, it supports email, username, has_organizations and id filters
         Possible use cases
         GET /api/users?ids=23
         GET /api/users?ids=11,12,13&page=2
@@ -110,6 +111,10 @@ class UsersList(SecureListAPIView):
         GET /api/users?username={john}
             * email: string, filters user set by email address
             * username: string, filters user set by username
+        GET /api/users?has_organizations={true}
+            * has_organizations: boolean, filters user set with organization association
+        GET /api/users?has_organizations={false}
+            * has_organizations: boolean, filters user set with no organization association
 
         Example JSON output {'count': '25', 'next': 'https://testserver/api/users?page=2', num_pages='3',
         'previous': None, 'results':[]}
@@ -155,6 +160,7 @@ class UsersList(SecureListAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend, HasOrgsFilterBackend)
     filter_fields = ('email', 'username', )
 
     def get(self, request, *args, **kwargs):
@@ -164,7 +170,8 @@ class UsersList(SecureListAPIView):
         email = request.QUERY_PARAMS.get('email', None)
         username = request.QUERY_PARAMS.get('username', None)
         ids = request.QUERY_PARAMS.get('ids', None)
-        if email or username or ids:
+        has_orgs = request.QUERY_PARAMS.get('has_organizations', None)
+        if email or username or ids or has_orgs:
             return self.list(request, *args, **kwargs)
         else:
             return Response({'message': _('Unfiltered request is not allowed.')}, status=status.HTTP_400_BAD_REQUEST)

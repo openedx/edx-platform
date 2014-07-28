@@ -197,6 +197,44 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 0)
 
+    def test_user_list_get_with_org_filter(self):
+        test_uri = '/api/users'
+        users = []
+        # create a 7 new users
+        for i in xrange(1, 8):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        # create organizations and add users to them
+        total_orgs = 4
+        for i in xrange(1, total_orgs):
+            data = {
+                'name': '{} {}'.format('Org', i),
+                'display_name': '{} {}'.format('Org display name', i),
+                'users': users[:i]
+            }
+            response = self.do_post(self.org_base_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # fetch users without any organization association
+        response = self.do_get('{}?has_organizations=true'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)
+        self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+        response = self.do_get('{}?has_organizations=false'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(response.data['results']), 4)
+
     def test_user_list_post(self):
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
