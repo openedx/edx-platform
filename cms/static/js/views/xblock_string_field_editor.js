@@ -81,7 +81,7 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 event.preventDefault();
                 event.stopPropagation();
                 this.$el.addClass('is-editing');
-                input.focus();
+                input.focus().select();
             },
 
             hideInput: function() {
