@@ -127,6 +127,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# dcschwester <244876839@qq.com>, 2014
 # AdiaCheng <75707teen@gmail.com>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 肖寒 <bookman@vip.163.com>, 2013
@@ -184,8 +185,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-11 16:04-0400\n"
-"PO-Revision-Date: 2014-05-23 12:14+0000\n"
+"POT-Creation-Date: 2014-07-28 10:03-0400\n"
+"PO-Revision-Date: 2014-07-22 14:02+0000\n"
 "Last-Translator: wuqiong <wuqiong417@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -485,6 +486,10 @@ msgid "A country is required"
 msgstr "国家是必填项"
 
 #: common/djangoapps/student/views.py
+msgid "You are missing one or more required fields"
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Username cannot be more than {0} characters long"
 msgstr "用户名不能超过{0}字符长度"
 
@@ -503,6 +508,10 @@ msgstr "用户名只能包含英文字母A-Z大小写和阿拉伯数字0-9，不
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "密码: "
+
+#: common/djangoapps/student/views.py
+msgid "Username and password fields cannot match"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
@@ -1338,6 +1347,10 @@ msgid "Finished"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct or Past Due"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
 msgstr ""
 
@@ -1557,10 +1570,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
-"A list of lists of state dictionaries for student states that are saved.This"
-" field is only populated if the instructor changes tasks afterthe module is "
-"created and students have attempted it (for example changes a self assessed "
-"problem to self and peer assessed."
+"A list of lists of state dictionaries for student states that are saved. "
+"This field is only populated if the instructor changes tasks after the "
+"module is created and students have attempted it (for example, if a self "
+"assessed problem is changed to self and peer assessed)."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -2240,6 +2253,10 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Invitation Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "一般"
 
@@ -2776,6 +2793,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/lib/xblock/mixin.py
+msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3918,6 +3940,18 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "Please Enter the Integer Value for Coupon Discount"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -5160,7 +5194,7 @@ msgstr ""
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource\n"
-"            becouse it did not pass the Address Verification System (AVS).\n"
+"            because it did not pass the Address Verification System (AVS).\n"
 "            "
 msgstr ""
 
@@ -5504,7 +5538,7 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at %(site_name)s."
+" user account at edx.org."
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -5522,7 +5556,7 @@ msgid "Thanks for using our site!"
 msgstr "谢谢您访问我们的网站！"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The %(platform_name)s Team"
+msgid "The edX Team"
 msgstr ""
 
 #: lms/templates/wiki/article.html
@@ -6080,6 +6114,18 @@ msgstr ""
 "\n"
 "{err}"
 
+#: cms/djangoapps/contentstore/views/course.py
+msgid "invalid JSON"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "must have name of the configuration"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "must have at least two groups"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "课程成功被导出到Git源"
@@ -6095,6 +6141,10 @@ msgstr "文件上传失败，请重试。"
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
 msgstr "在包中未找到course.xml文件。"
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "Empty"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
@@ -7330,8 +7380,8 @@ msgid "Confirm"
 msgstr "确认"
 
 #: lms/templates/name_changes.html
-msgid "[Reject]"
-msgstr "[拒绝]"
+msgid "Reject"
+msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Global Navigation"
@@ -7583,10 +7633,6 @@ msgstr "完成您的账户注册开始学习"
 msgid "Please complete the following fields to register for an account. "
 msgstr "请将以下字段补充完整以完成账户注册。"
 
-#: lms/templates/register.html lms/templates/register.html
-msgid "cannot be changed later"
-msgstr "以后不能更改"
-
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
 msgstr "例：Jane Doe"
@@ -7594,6 +7640,10 @@ msgstr "例：Jane Doe"
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr "用于你将来获得的各种证书"
+
+#: lms/templates/register.html lms/templates/register.html
+msgid "cannot be changed later"
+msgstr "以后不能更改"
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
@@ -8302,10 +8352,6 @@ msgstr ""
 "当前登录用户的账号没有参加此课程的权限，建议您{start_logout_tag}登出{end_tag}后尝试重新注册，请访问{start_help_tag}帮助页面{end_tag}查找解决方法。"
 
 #: lms/templates/courseware/course_about.html
-msgid "About {course.display_number_with_default}"
-msgstr "关于{course.display_number_with_default}"
-
-#: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
 msgstr "您已注册了此课程"
 
@@ -8322,6 +8368,14 @@ msgid ""
 "Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
 msgstr ""
 "添加 {course.display_number_with_default} 到购物车 ({currency_symbol}{cost})"
+
+#: lms/templates/courseware/course_about.html
+msgid "Enrollment in this course is by invitation only"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Enrollment is Closed"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -8491,8 +8545,8 @@ msgid "speed of light"
 msgstr "光速"
 
 #: lms/templates/courseware/courseware.html
-msgid "freezing point of water in degrees Kelvin"
-msgstr "绝对温度下水的冰点"
+msgid "Typical room temperature: 298.15 (Kelvin), same as 25C/77F"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "fundamental charge"
@@ -12429,8 +12483,9 @@ msgstr "内容"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course_info.html cms/templates/edit-tabs.html
-#: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/overview.html cms/templates/textbooks.html
+#: cms/templates/group_configurations.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/overview.html
+#: cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr "页面操作"
 
@@ -12472,7 +12527,8 @@ msgid ""
 msgstr "你可以通过设定外部URL的值来引用你课程外的文件或者图像。请不要将外部URL值作为课程内部链接值直接使用。"
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/overview.html cms/templates/settings_graders.html
+#: cms/templates/group_configurations.html cms/templates/overview.html
+#: cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr "我在这个页面能做什么？"
 
@@ -12981,7 +13037,33 @@ msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/group_configurations.html
+msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "You can create and edit group configurations."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"A group configuration defines how many groups of students are in an "
+"experiment. When you create a content experiment, you select the group "
+"configuration to use."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Click {em_start}New Group Configuration{em_end} to add a new configuration. "
+"To edit an existing configuration, hover over its box and click "
+"{em_start}Edit{em_end}."
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/textbooks.html
+msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -13428,8 +13510,10 @@ msgid "e.g. Introduction to Computer Science"
 msgstr "例如，计算机科学导论"
 
 #: cms/templates/index.html
-msgid "The public display name for your course."
-msgstr "您的课程的公开显示名称"
+msgid ""
+"The public display name for your course. This cannot be changed, but you can"
+" set a different display name in Advanced Settings later."
+msgstr ""
 
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
@@ -14345,10 +14429,6 @@ msgid ""
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
 msgstr "如果您的教材没有独立的章节，您可以上传整个文本作为一个章节，并在章节名称字段中输入您所选择的名称。"
-
-#: cms/templates/textbooks.html
-msgid "Learn More"
-msgstr ""
 
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
