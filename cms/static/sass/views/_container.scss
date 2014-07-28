@@ -117,10 +117,14 @@
         @extend %bar-module-blue;
       }
 
-      // CASE: content is draft
-      &.draft ,
-      &.is-draft {
+      // CASE: content has warnings
+      &.has-warnings {
         @extend %bar-module-yellow;
+      }
+
+      // CASE: content has erors
+      &.has-errors {
+        @extend %bar-module-red;
       }
 
       // CASE: content is staff only
@@ -217,6 +221,7 @@
     // location widget
     .unit-location {
       @extend %bar-module;
+      border-top: none;
 
       .wrapper-unit-id {
 
