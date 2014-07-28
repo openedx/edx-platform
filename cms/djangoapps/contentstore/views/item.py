@@ -656,6 +656,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if child_info:
         xblock_info['child_info'] = child_info
+    # Currently, 'edited_by' and 'published_by' are only used by the container page.  Only compute them when asked to do
+    # so, since safe_get_username() is expensive.
     if include_edited_by:
         xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
     if include_published_by:
