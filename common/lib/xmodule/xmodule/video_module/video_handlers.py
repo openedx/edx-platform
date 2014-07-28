@@ -11,7 +11,6 @@ from webob import Response
 
 from xblock.core import XBlock
 
-from xmodule.modulestore.django import modulestore
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
