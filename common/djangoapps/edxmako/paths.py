@@ -47,7 +47,7 @@ def add_lookup(namespace, directory, package=None, prepend=False):
             module_directory=settings.MAKO_MODULE_DIR,
             output_encoding='utf-8',
             input_encoding='utf-8',
-            default_filters=['decode.utf8'],
+            default_filters=['decode.utf8', 'h'],
             encoding_errors='replace',
         )
     if package:
