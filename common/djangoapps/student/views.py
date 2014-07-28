@@ -1383,7 +1383,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         return JsonResponse(js, status=400)
 
     # enforce password complexity as an optional feature
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+    # but not if we're doing ext auth b/c those pws never get used and are auto-generated so might not pass validation
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False) and not DoExternalAuth:
         try:
             password = post_vars['password']
 
