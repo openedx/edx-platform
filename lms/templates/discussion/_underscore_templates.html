@@ -7,7 +7,7 @@
 ## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
-    <article class="discussion-article" data-id="${'<%- id %>'}">
+    <article class="discussion-article" data-id="${'<%- id %>' | n}">
         <div class="thread-wrapper">
             <div class="forum-thread-main-wrapper">
                 <div class="thread-content-wrapper"></div>
@@ -29,10 +29,10 @@
                   ${_("This thread is closed.")}
                 </div>
                 % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
-                <form class="discussion-reply-new" data-id="${'<%- id %>'}">
+                <form class="discussion-reply-new" data-id="${'<%- id %>' | n}">
                     <h4>${_("Post a response:")}</h4>
                     <ul class="discussion-errors"></ul>
-                    <div class="reply-body" data-id="${'<%- id %>'}"></div>
+                    <div class="reply-body" data-id="${'<%- id %>' | n}"></div>
                     <div class="reply-post-control">
                         <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
                     </div>
@@ -59,10 +59,10 @@
     <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
-      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="${_('Title') | h}">
+      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>" | n}" placeholder="${_('Title') | h}">
     </div>
     <div class="form-row">
-      <div class="edit-post-body" name="body">${"<%- body %>"}</div>
+      <div class="edit-post-body" name="body">${"<%- body %>" | n}</div>
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
@@ -71,16 +71,16 @@
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <a href="#" class="action-show-comments">
-        ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(escapejs(_("Show Comments (%(num_comments)s)")))}
+        ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(escapejs(_("Show Comments (%(num_comments)s)"))) | n}
         <i class="icon icon-caret-down"></i>
     </a>
     <ol class="comments">
         <li class="new-comment">
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
-            <form class="comment-form" data-id="${'<%- wmdId %>'}">
+            <form class="comment-form" data-id="${'<%- wmdId %>' | n}">
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
-                <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
+                <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>' | n}"
                 data-placeholder="${_('Add a comment...') | h}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
@@ -94,9 +94,9 @@
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header>
       <div class="response-header-content">
-        ${'<%= author_display %>'}
+        ${'<%= author_display %>' | n}
         <p class="posted-details">
-            <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
+            <span class="timeago" title="${'<%= created_at %>' | n}">${'<%= created_at %>' | n}</span>
             <%
             js_block = u"""
                 interpolate(
@@ -123,7 +123,7 @@
                     discussion_anon_fmt_str=escapejs(_("endorsed %(time_ago)s")),
                 )
             %>
-              ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+              ${"<% if (obj.endorsement) { %> - <%=" | n}${js_block | n}${"%><% } %>" | n}
           </p>
           <div class="post-labels">
               <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
@@ -140,11 +140,11 @@
                         secondaryActions: ['edit', 'delete', 'report']
                     }
                 )
-            %>"""}
+            %>""" | n}
           </div>
     </header>
 
-    <div class="response-body">${"<%- body %>"}</div>
+    <div class="response-body">${"<%- body %>" | n}</div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-edit-template">
@@ -152,7 +152,7 @@
     <h1>${_("Editing response")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
-      <div class="edit-post-body" name="body" data-id="${'<%- id %>'}">${"<%- body %>"}</div>
+      <div class="edit-post-body" name="body" data-id="${'<%- id %>' | n}">${"<%- body %>" | n}</div>
     </div>
     <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
@@ -160,8 +160,8 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="response-comment-show-template">
-  <div id="comment_${'<%- id %>'}">
-    <div class="response-body">${'<%- body %>'}</div>
+  <div id="comment_${'<%- id %>' | n}">
+    <div class="response-body">${'<%- body %>' | n}</div>
     ${"""<%=
         _.template(
             $('#forum-actions').html(),
@@ -172,7 +172,7 @@
                 secondaryActions: ['edit', 'delete', 'report']
             }
         )
-    %>"""}
+    %>""" | n}
     <%
     js_block = u"""
       interpolate(
@@ -185,7 +185,7 @@
       )
     %>
     <p class="posted-details">
-    ${'<%='}${js_block}${'%>'}
+    ${'<%=' | n}${js_block | n}${'%>' | n}
     </p>
     <div class="post-labels">
       <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
@@ -194,11 +194,11 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="response-comment-edit-template">
-  <div class="edit-post-form" id="comment_${'<%- id %>'}">
+  <div class="edit-post-form" id="comment_${'<%- id %>' | n}">
     <h1>${_("Editing comment")}</h1>
     <ul class="edit-comment-form-errors"></ul>
     <div class="form-row">
-      <div class="edit-comment-body" name="body" data-id="${'<%- id %>'}">${"<%- body %>"}</div>
+      <div class="edit-comment-body" name="body" data-id="${'<%- id %>' | n}">${"<%- body %>" | n}</div>
     </div>
     <input type="submit" id="edit-comment-submit" class="post-update" value="${_("Update comment") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
@@ -206,7 +206,7 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
-  <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
+  <li data-id="${'<%- id %>' | n}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>' | n}">
     <a href="#" class="forum-nav-thread-link">
       <div class="forum-nav-thread-wrapper-0">
         ${u"""<%
@@ -228,11 +228,11 @@
             answered_question=escapejs(_("answered question")),
             ## Translators: This is a label for a Question forum thread without a marked answer
             unanswered_question=escapejs(_("unanswered question"))
-        )}
-        <span class="sr">${"<%= sr_text %>"}</span>
-        <i class="icon ${"<%= icon_class %>"}"></i>
+        ) | n}
+        <span class="sr">${"<%= sr_text %>" | n}</span>
+        <i class="icon ${"<%= icon_class %>" | n}"></i>
       </div><div class="forum-nav-thread-wrapper-1">
-        <span class="forum-nav-thread-title">${"<%- title %>"}</span>
+        <span class="forum-nav-thread-title">${"<%- title %>" | n}</span>
         <%
         js_block = u"""
         var labels = "";
@@ -262,7 +262,7 @@
             community_ta_text=escapejs(_("By: Community TA"))
         )
          %>
-        ${"<%"}${js_block}${"%>"}
+        ${"<%" | n}${js_block | n}${"%>" | n}
       </div><div class="forum-nav-thread-wrapper-2">
         <%
         js_block = u"""
@@ -276,7 +276,7 @@
                 escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
             )
         %>
-        <span class="forum-nav-thread-votes-count">+${'<%='}${js_block}${'%>'}</span>
+        <span class="forum-nav-thread-votes-count">+${'<%=' | n}${js_block | n}${'%>' | n}</span>
         <%
         js_block =  u"""
         var fmt;
@@ -300,8 +300,8 @@
                 markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
             )
         %>
-        <span class="forum-nav-thread-comments-count ${'<% if (unread_comments_count > 0) { %>is-unread<% } %>'}">
-            ${'<%'}${js_block}${'%>'}
+        <span class="forum-nav-thread-comments-count ${'<% if (unread_comments_count > 0) { %>is-unread<% } %>' | n}">
+            ${'<%' | n}${js_block | n}${'%>' | n}
         </span>
       </div>
     </a>
@@ -369,9 +369,9 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="search-alert-template">
-    <div class="search-alert" id="search-alert-${'<%- cid %>'}">
+    <div class="search-alert" id="search-alert-${'<%- cid %>' | n}">
         <div class="search-alert-content">
-          <p class="message">${'<%= message %>'}</p>
+          <p class="message">${'<%= message %>' | n}</p>
         </div>
 
         <div class="search-alert-controls">
@@ -384,7 +384,7 @@
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
         <div class="forum-new-post-form-wrapper"></div>
-        ${'<% if (cohort_options) { %>'}
+        ${'<% if (cohort_options) { %>' | n}
         <div class="post-field">
             <label class="field-label">
                 <span class="field-label-text">
@@ -392,15 +392,15 @@
                     ${_("Visible To:")}
                 </span><select class="field-input js-group-select" name="group_id">
                     <option value="">${_("All Groups")}</option>
-                    ${'<% _.each(cohort_options, function(opt) { %>'}
-                    <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
-                    ${'<% }); %>'}
+                    ${'<% _.each(cohort_options, function(opt) { %>' | n}
+                    <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>' | n}>${'<%- opt.text %>' | n}</option>
+                    ${'<% }); %>' | n}
                  </select>
             </label><div class="field-help">
                 ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.")}
             </div>
         </div>
-        ${'<% } %>'}
+        ${'<% } %>' | n}
         <div class="post-field">
             <label class="field-label">
                 <span class="sr">${_("Title:")}</span>
@@ -415,18 +415,18 @@
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
                 <i class="icon icon-star"></i>${_("follow this post")}
             </label>
-            ${'<% if (allow_anonymous) { %>'}
+            ${'<% if (allow_anonymous) { %>' | n}
             <label class="post-option">
                 <input type="checkbox" name="anonymous" class="post-option-input js-anon">
                 ${_("post anonymously")}
             </label>
-            ${'<% } %>'}
-            ${'<% if (allow_anonymous_to_peers) { %>'}
+            ${'<% } %>' | n}
+            ${'<% if (allow_anonymous_to_peers) { %>' | n}
             <label class="post-option">
                 <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
                 ${_("post anonymously to classmates")}
             </label>
-            ${'<% } %>'}
+            ${'<% } %>' | n}
         </div>
         <div>
             <input type="submit" class="submit" value="${_('Add Post')}">
@@ -443,14 +443,14 @@
                 ## select a forum post type
                 ${_("Post type:")}
             </span><fieldset class="field-input">
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
-                <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                <input type="radio" name="${"<%= form_id %>" | n}-post-type" class="post-type-input" id="${"<%= form_id %>" | n}-post-type-question" value="question">
+                <label for="${"<%= form_id %>" | n}-post-type-question" class="post-type-label">
                     <i class="icon icon-question"></i>
                     ## Translators: This is a forum post type
                     ${_("Question")}
                 </label>
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
-                <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                <input type="radio" name="${"<%= form_id %>" | n}-post-type" class="post-type-input" id="${"<%= form_id %>" | n}-post-type-discussion" value="discussion" checked>
+                <label for="${"<%= form_id %>" | n}-post-type-discussion" class="post-type-label">
                     <i class="icon icon-comments"></i>
                     ## Translators: This is a forum post type
                     ${_("Discussion")}
@@ -464,14 +464,14 @@
 
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
     <li role="menuitem" class="topic-menu-item">
-        <a href="#" class="topic-title" data-discussion-id="${'<%- id %>'}" data-cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a>
+        <a href="#" class="topic-title" data-discussion-id="${'<%- id %>' | n}" data-cohorted="${'<%- is_cohorted %>' | n}">${'<%- text %>' | n}</a>
     </li>
 </script>
 
 <script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
     <li role="menuitem" class="topic-menu-item">
-        <span class="topic-title">${'<%- text %>'}</span>
-        <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
+        <span class="topic-title">${'<%- text %>' | n}</span>
+        <ul role="menu" class="topic-submenu">${'<%= entries %>' | n}</ul>
     </li>
 </script>
 
@@ -489,7 +489,7 @@
                     <span class="sr">${_("Filter topics")}</span>
                     <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
                 </label>
-                <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
+                <ul class="topic-menu" role="menu">${'<%= topics_html %>' | n}</ul>
            </div>
        </div>
     </div><span class="field-help">
@@ -570,17 +570,17 @@ ${secondaryAction("edit", "pencil", _("Edit"))}
 ${secondaryAction("delete", "remove", _("Delete"))}
 
 <script type="text/template" id="forum-actions">
-    <ul class="${"<%= contentType %>"}-actions-list">
-        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+    <ul class="${"<%= contentType %>" | n}-actions-list">
+        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>" | n}
         <li class="actions-item is-visible">
             <div class="more-wrapper">
-                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
+                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>" | n}">
                     <span class="action-label">${_("More")}</span>
                     <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
                 </a>
-                <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
+                <div class="actions-dropdown" id="action-menu-${"<%= contentType %>" | n}" aria-expanded="false">
                   <ul class="actions-dropdown-list">
-                    ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+                    ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>" | n}
                   </ul>
                 </div>
             </div>
@@ -589,14 +589,14 @@ ${secondaryAction("delete", "remove", _("Delete"))}
 </script>
 
 <script aria-hidden="true" type="text/template" id="post-user-display-template">
-    ${"<% if (username) { %>"}
-    <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-        ${"<% if (is_community_ta) { %>"}
+    ${"<% if (username) { %>" | n}
+    <a href="${'<%- user_url %>' | n}" class="username">${'<%- username %>' | n}</a>
+        ${"<% if (is_community_ta) { %>" | n}
         <span class="user-label-community-ta">${_("Community TA")}</span>
-        ${"<% } else if (is_staff) { %>"}
+        ${"<% } else if (is_staff) { %>" | n}
         <span class="user-label-staff">${_("Staff")}</span>
-        ${"<% } %>"}
-    ${"<% } else { %>"}
-    ${_('anonymous') | h}
-    ${"<% } %>"}
+        ${"<% } %>" | n}
+    ${"<% } else { %>" | n}
+    ${_('anonymous')}
+    ${"<% } %>" | n}
 </script>

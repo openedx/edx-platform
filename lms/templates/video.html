@@ -104,14 +104,13 @@
   <ul class="wrapper-downloads">
     % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link | n}
         </li>
     % endif
     % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
+            ${('<a href="%s">' + _('Download transcript') + '</a>') % track | n}
             <div class="a11y-menu-container">
                 <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
                 <ol class="a11y-menu-list">
@@ -138,7 +137,7 @@
     % endif
     % if handout:
         <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout | n}
         </li>
     % endif
   </ul>

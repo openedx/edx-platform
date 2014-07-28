@@ -40,7 +40,7 @@ ${page_title_breadcrumbs(course_name())}
     ## all needs to stay together for the Candy.js plugin to work.
     <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
   % endif
-  ${fragment.head_html()}
+  ${fragment.head_html() | n}
 </%block>
 
 <%block name="js_extra">
@@ -165,7 +165,7 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
-${fragment.foot_html()}
+${fragment.foot_html() | n}
 
 </%block>
 
@@ -199,7 +199,7 @@ ${fragment.foot_html()}
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
-            ${accordion}
+            ${accordion | n}
           % else:
             <div class="chapter">${_("No content has been added to this course")}</div>
           % endif
@@ -209,7 +209,7 @@ ${fragment.foot_html()}
 % endif
 
     <section class="course-content" id="course-content">
-      ${fragment.body_html()}
+      ${fragment.body_html() | n}
     </section>
   </div>
 </div>

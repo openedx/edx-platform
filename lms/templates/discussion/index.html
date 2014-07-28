@@ -24,16 +24,16 @@
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
 <section class="discussion container" id="discussion-container"
-         data-roles="${roles}"
-         data-course-id="${course_id | h}"
-         data-user-info="${user_info}"
-         data-threads="${threads}"
+         data-roles="${roles | n}"
+         data-course-id="${course_id}"
+         data-user-info="${user_info | n}"
+         data-threads="${threads | n}"
          data-thread-pages="${thread_pages}"
-         data-content-info="${annotated_content_info}"
-         data-sort-preference="${sort_preference}"
+         data-content-info="${annotated_content_info | n}"
+         data-sort-preference="${sort_preference | n}"
          data-flag-moderator="${flag_moderator}"
          data-user-cohort-id="${user_cohort}"
-         data-course-settings="${course_settings}">
+         data-course-settings="${course_settings | n}">
     <div class="discussion-body">
         <div class="forum-nav"></div>
         <div class="discussion-column">

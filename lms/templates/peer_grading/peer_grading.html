@@ -22,7 +22,7 @@ criteria.{end_li_tag}
             % if success:
                 % if len(problem_list) == 0:
                 <div class="message-container">
-                  ${nothing_to_grade_message}
+                  ${nothing_to_grade_message | n}
                 </div>
                 %else:
                 <div class="problem-list-container">

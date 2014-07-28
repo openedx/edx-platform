@@ -41,7 +41,7 @@ from courseware.courses import course_image_url, get_course_about_section
           <p class="enrollment-text">
             ${_("You've clicked a link for an enrollment code that has already been used."
             " Check your <a href={dashboard_url}>course dashboard</a> to see if you're enrolled in the course,"
-            " or contact your company's administrator.").format(dashboard_url=dashboard_url)}
+            " or contact your company's administrator.").format(dashboard_url=dashboard_url) | n}
           </p>
           % elif redemption_success:
           <p class="enrollment-text">
@@ -52,7 +52,7 @@ from courseware.courses import course_image_url, get_course_about_section
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
             ${_("You're already registered for this course."
-            " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url)}
+            " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url) | n}
           </p>
           % else:
           <p class="enrollment-text">

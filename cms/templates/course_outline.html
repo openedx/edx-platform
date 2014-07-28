@@ -6,6 +6,7 @@ import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
 from contentstore.utils import reverse_usage_url
+from django.utils.html import escapejs
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -14,7 +15,7 @@ from contentstore.utils import reverse_usage_url
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${json.dumps(course_structure) | n}, ${json.dumps(initial_state) | n});
+        OutlineFactory(JSON.parse('${json.dumps(course_structure) | n,escapejs}'), JSON.parse('${json.dumps(initial_state) | n,escapejs}'));
     });
 </%block>
 

@@ -3,7 +3,7 @@
 <%namespace name='static' file='/static_content.html'/>
 
 ## The JS for this is defined in xqa_interface.html
-${block_content}
+${block_content | n}
 %if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool']:
 %  if edit_link:
   <div>
@@ -77,7 +77,7 @@ ${block_content}
     </div>
 
     <div class="staff_info" style="display:block">
-is_released = ${is_released}
+is_released = ${is_released | n}
 location = ${location.to_deprecated_string() | h}
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>

@@ -486,7 +486,7 @@ function goto( mode)
     <p>
     ## Translators: days_early_for_beta should not be translated
     ${_("Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to "
-        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.")}
+        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.") | n}
     </p>
     <p>
     <textarea cols="50" row="30" name="betausers"></textarea>
@@ -506,7 +506,7 @@ function goto( mode)
 
 %if modeflag.get('Email'):
     %if email_msg:
-        <p></p><p>${email_msg}</p>
+        <p></p><p>${email_msg | n}</p>
     %endif
 
     <ul class="list-fields">
@@ -540,7 +540,7 @@ function goto( mode)
       <li class="field">
         <label>Message:</label>
         <div class="email-editor">
-          ${editor}
+          ${editor | n}
         </div>
         <input type="hidden" name="message" value="">
       </li>
@@ -583,7 +583,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if msg:
-    <p></p><p id="idash_msg">${msg}</p>
+    <p></p><p id="idash_msg">${msg | n}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -657,7 +657,7 @@ function goto( mode)
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
 
     <script>
-      ${d3_stacked_bar_graph.body()}
+      ${d3_stacked_bar_graph.body() | n}
     </script>
 
     <div id="metrics"></div>

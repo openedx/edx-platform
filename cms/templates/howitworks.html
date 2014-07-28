@@ -41,12 +41,12 @@
 
         <div class="copy">
           <h3>${_("Keeping Your Course Organized")}</h3>
-          <p>${_("The backbone of your course is how it is organized. Studio offers an <strong>Outline</strong> editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.")}</p>
+          <p>${_("The backbone of your course is how it is organized. Studio offers an <strong>Outline</strong> editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.") | n}</p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Simple Organization For Content")}</h4>
-              <p>${_("Studio uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.")}</p>
+              <p>${_("Studio uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.") | n}</p>
             </li>
 
             <li class="proofpoint">
@@ -56,7 +56,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Go A Week Or A Semester At A Time")}</h4>
-              <p>${_("Build and release <strong>sections</strong> to your students incrementally. You don't have to have it all done at once.")}</p>
+              <p>${_("Build and release <strong>sections</strong> to your students incrementally. You don't have to have it all done at once.") | n}</p>
             </li>
           </ul>
         </div>
@@ -119,7 +119,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Release-On Date Publishing")}</h4>
-              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and Studio takes care of the rest. Build your course incrementally.")}</p>
+              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and Studio takes care of the rest. Build your course incrementally.") | n}</p>
             </li>
 
             <li class="proofpoint">
@@ -141,7 +141,7 @@
 
     <ul class="list-actions">
       <li class="action-item">
-        <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up &amp; Start Making an edX Course")}</a>
+        <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up &amp; Start Making an edX Course") | n}</a>
       </li>
       <li class="action-item">
         <a href="${reverse('login')}" class="action action-secondary">${_("Already have a Studio Account? Sign In")}</a>

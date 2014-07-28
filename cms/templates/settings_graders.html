@@ -78,7 +78,7 @@
 
         <section class="group-settings grade-rules">
           <header>
-            <h2 class="title-2">${_("Grading Rules &amp; Policies")}</h2>
+            <h2 class="title-2">${_("Grading Rules &amp; Policies") | n}</h2>
             <span class="tip">${_("Deadlines, requirements, and logistics around grading student work")}</span>
           </header>
 
@@ -132,7 +132,7 @@
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule") | n}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           % if "split_test" in context_course.advanced_modules:

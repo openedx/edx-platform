@@ -1,6 +1,7 @@
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.html import escapejs %>
 <%! from student.roles import CourseInstructorRole %>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "team" %></%def>
@@ -163,6 +164,6 @@
 
 <%block name="requirejs">
   require(["js/factories/manage_users"], function(ManageUsersFactory) {
-      ManageUsersFactory(${json.dumps([user.email for user in staff])}, "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
+      ManageUsersFactory(JSON.parse('${json.dumps([user.email for user in staff]) | n,escapejs}'), "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
   });
 </%block>

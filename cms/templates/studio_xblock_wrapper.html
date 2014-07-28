@@ -109,11 +109,11 @@ messages = json.dumps(xblock.validate().to_json())
 
 % if is_root or not xblock_url:
     <article class="xblock-render">
-    ${content}
+    ${content | n}
     </article>
 % else:
     <div class="xblock-message-area">
-    ${content}
+    ${content | n}
 % endif
 
 % if not is_root:

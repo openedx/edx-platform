@@ -217,7 +217,7 @@
       </nav>
 
       <div class="inner-wrapper">
-        ${get_course_about_section(course, "overview")}
+        ${get_course_about_section(course, "overview") | n}
       </div>
     </section>
 
@@ -327,7 +327,7 @@
         <section>
           ## "MITOpenCourseware" should *not* be translated
           <h2 class="opencourseware">MITOpenCourseware</h2>
-             ${get_course_about_section(course, "ocw_links")}
+             ${get_course_about_section(course, "ocw_links") | n}
         </section>
       </section>
       %endif

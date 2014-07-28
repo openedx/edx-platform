@@ -17,7 +17,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
 		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
 		</div>
 		<div class="annotatable-section-body annotatable-instructions">
-		    ${instructions_html}
+		    ${instructions_html | n}
 		</div>
 	</div>
 	% endif

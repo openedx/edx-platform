@@ -33,7 +33,7 @@
             faq_link_end='</a>',
             fb_link_start='<a href="{url}">'.format(url=settings.PLATFORM_FACEBOOK_ACCOUNT),
             fb_link_end='</a>'
-	)}
+	) | n}
       </p>
 
       <h2>${_("Technical Inquiries and Feedback")}</h2>
@@ -47,7 +47,7 @@
             tech_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.TECH_SUPPORT_EMAIL),
             bug_email=u'<a href="mailto:{0}">{0}</a>'.format(settings.BUGS_EMAIL),
             platform_name=settings.PLATFORM_NAME
-	)}
+	) | n}
       </p>
 
       <h2>${_("Media")}</h2>
@@ -55,14 +55,14 @@
         link_start=u'<a href="{url}">'.format(url=reverse('faq_edx')),
         link_end='</a>',
         email=u'<a href="mailto:{email}">{email}/a>'.format(email=settings.PRESS_EMAIL),
-        )}</p>
+        ) | n}</p>
 
       <h2>${_("Universities")}</h2>
       <p>
 	${_('If you are a university wishing to collaborate with or if you have questions about {platform_name}, please email {email}.').format(
 	    email=u'<a href="mailto:{url}">{url}</a>'.format(url=settings.UNIVERSITY_EMAIL),
     	    platform_name=settings.PLATFORM_NAME
-	)}
+	) | n}
       </p>
     </div>
   </section>

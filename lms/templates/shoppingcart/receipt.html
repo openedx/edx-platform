@@ -34,7 +34,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           <% dashboard_url = reverse('dashboard') %>
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
           ${_("You have successfully been enrolled for <b>{appended_course_names}</b>. The following receipt has been emailed to"
-          " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
+          " <strong>{appended_recipient_emails}</strong>").format(appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails) | n}
         % elif order_type == 'business':
           % if total_registration_codes > 1 :
             <% code_plural_form = 'codes' %>
@@ -44,7 +44,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           ${_("You have successfully purchased <b>{total_registration_codes} course registration codes</b> "
           "for <b>{appended_course_names}. </b>"
            "The following receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
-           ).format(total_registration_codes=total_registration_codes, appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails)}
+           ).format(total_registration_codes=total_registration_codes, appended_course_names=appended_course_names, appended_recipient_emails=appended_recipient_emails) | n}
         % endif
 
       </div>

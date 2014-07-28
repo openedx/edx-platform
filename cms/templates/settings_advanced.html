@@ -19,7 +19,7 @@
 
 <%block name="requirejs">
     require(["js/factories/settings_advanced"], function(SettingsAdvancedFactory) {
-        SettingsAdvancedFactory(${advanced_dict | n}, "${advanced_settings_url}");
+        SettingsAdvancedFactory(JSON.parse('${advanced_dict | n,escapejs}'), "${advanced_settings_url}");
     });
 </%block>
 
@@ -52,7 +52,7 @@
 
           </header>
 
-          <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.")}</p>
+          <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.") | n}</p>
 
           <div class="wrapper-options">
             <div class="wrapper-deprecated-setting">
@@ -75,7 +75,7 @@
 
         <p>${_("Any policies you modify here override all other information you've defined elsewhere in Studio. Do not edit policies unless you are familiar with both their purpose and syntax.")}</p>
 
-        <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (&quot;) around the string. Do not use single quotation marks (&apos;).").format(em_start='<strong>', em_end="</strong>")}</p>
+        <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (&quot;) around the string. Do not use single quotation marks (&apos;).").format(em_start='<strong>', em_end="</strong>") | n}</p>
       </div>
 
       <div class="bit">
@@ -88,7 +88,7 @@
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule") | n}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
           % if "split_test" in context_course.advanced_modules:

@@ -4,7 +4,7 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
-<%block name="title">${_("Files &amp; Uploads")}</%block>
+<%block name="title">${_("Files &amp; Uploads") | n}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -29,7 +29,7 @@
     <header class="mast has-actions has-subtitle">
         <h1 class="page-header">
             <small class="subtitle">${_("Content")}</small>
-            <span class="sr">&gt; </span>${_("Files &amp; Uploads")}
+            <span class="sr">&gt; </span>${_("Files &amp; Uploads") | n}
         </h1>
 
         <nav class="nav-actions">

@@ -55,21 +55,21 @@ $(document).ready(function(){
         % endif
       % endif
 
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
+      <h1>${_("Course Updates &amp; News") | n}</h1>
+      ${get_course_info_section(request, course, 'updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
+      ${get_course_info_section(request, course, 'handouts') | n}
     </section>
     % else:
     <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'guest_updates')}
+      <h1>${_("Course Updates &amp; News") | n}</h1>
+      ${get_course_info_section(request, course, 'guest_updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, course, 'guest_handouts')}
+      ${get_course_info_section(request, course, 'guest_handouts') | n}
     </section>
     % endif
   </div>

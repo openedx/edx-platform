@@ -4,6 +4,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from django.utils.html import escapejs
   import json
 %>
 <%block name="title">${_("Course Export")}</%block>
@@ -14,7 +15,7 @@
   var hasUnit = ${json.dumps(bool(unit))},
       editUnitUrl = "${edit_unit_url or ""}",
       courseHomeUrl = "${course_home_url or ""}",
-      errMsg = ${json.dumps(raw_err_msg or "")};
+      errMsg = JSON.parse('${json.dumps(raw_err_msg or "") | n,escapejs}');
 
   require(["js/factories/export"], function(ExportFactory) {
       ExportFactory(hasUnit, editUnitUrl, courseHomeUrl, errMsg);
@@ -40,8 +41,8 @@
         <h2 class="title">${_("About Exporting Courses")}</h2>
         <div class="copy">
           ## Translators: ".tar.gz" is a file extension, and should not be translated
-          <p>${_("You can export courses and edit them outside of Studio. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(em_start='<strong>', em_end="</strong>")}</p>
-          <p>${_("{em_start}Caution:{em_end} When you export a course, information such as MATLAB API keys, LTI passports, annotation secret token strings, and annotation storage URLs are included in the exported data. If you share your exported files, you may also be sharing sensitive or license-specific information.").format(em_start='<strong>', em_end="</strong>")}</p>
+          <p>${_("You can export courses and edit them outside of Studio. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.")}</p>
+          <p>${_("{em_start}Caution:{em_end} When you export a course, information such as MATLAB API keys, LTI passports, annotation secret token strings, and annotation storage URLs are included in the exported data. If you share your exported files, you may also be sharing sensitive or license-specific information.").format(em_start='<strong>', em_end="</strong>") | n}</p>
         </div>
       </div>
 
@@ -60,7 +61,7 @@
 
       <div class="export-contents">
         <div class="export-includes">
-          <h3 class="title-3">${_("Data {em_start}exported with{em_end} your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <h3 class="title-3">${_("Data {em_start}exported with{em_end} your course:").format(em_start='<strong>', em_end="</strong>") | n}</h3>
           <ul class="list-details list-export-includes">
             <li class="item-detail">${_("Values from Advanced Settings, including MATLAB API keys and LTI passports")}</li>
             <li class="item-detail">${_("Course Content (all Sections, Sub-sections, and Units)")}</li>
@@ -73,7 +74,7 @@
         </div>
 
         <div class="export-excludes">
-          <h3 class="title-3">${_("Data {em_start}not exported{em_end} with your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <h3 class="title-3">${_("Data {em_start}not exported{em_end} with your course:").format(em_start='<strong>', em_end="</strong>") | n}</h3>
           <ul class="list-details list-export-excludes">
             <li class="item-detail">${_("User Data")}</li>
             <li class="item-detail">${_("Course Team Data")}</li>

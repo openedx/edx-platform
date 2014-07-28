@@ -56,7 +56,7 @@
 
     %if message:
         <section class="dashboard-banner">
-            ${message}
+            ${message | n}
         </section>
     %endif
 
@@ -68,7 +68,7 @@
 
     %if enrollment_message:
         <section class="dashboard-banner">
-            ${enrollment_message}
+            ${enrollment_message | n}
         </section>
     %endif
 </div>
@@ -227,7 +227,7 @@
 
     <header>
       <h2 id="email-settings-title">
-        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>')}
+        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>') | n}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
@@ -377,7 +377,7 @@
 
     <header>
       <h2 id="unenrollment-modal-title">
-        ${_("<span id='track-info'></span> {course_number}?  <span id='refund-info'></span>").format(course_number="<span id='unenroll_course_number'></span>")}
+        ${_("<span id='track-info'></span> {course_number}?  <span id='refund-info'></span>").format(course_number="<span id='unenroll_course_number'></span>") | n}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
