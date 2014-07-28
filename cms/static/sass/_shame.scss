@@ -25,6 +25,22 @@
 
 // ====================
 
+// overriding outline styling for general drag and drop cases
+.outline-section, .outline-subsection {
+
+  // STATE: is dragging
+  &.is-dragging {
+    border-color: $gray-d3;
+  }
+
+  // STATE: is dragging + valid drop
+  &.valid-drop {
+    border-color: $ui-action-primary-color-focus;
+  }
+}
+
+// ====================
+
 // yes we have no boldness today - need to fix the resets
 body strong,
 body b {
