@@ -102,7 +102,7 @@ class RandomizeModule(RandomizeFields, XModule):
             history = json.loads(self.history or '[]')
             children = [c for c in children if c.location.url() not in history]
         children = [c for c in children if not
-                    self._str_to_bool(c.xml_attributes.get('hidden', ''))]
+                    self._str_to_bool(c.xml_attributes.get('suspended', ''))]
         return OrderedDict([(c.location.url(), c) for c in children])
 
     def get_choice_index(self, choice=None, choices=None):
