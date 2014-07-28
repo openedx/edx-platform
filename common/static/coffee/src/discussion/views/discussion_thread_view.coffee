@@ -41,9 +41,9 @@ if Backbone?
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderAddResponseButton()
-      @responses.on("add", (response) => @renderResponseToList(response, ".js-response-list"))
+      @responses.on("add", (response) => @renderResponseToList(response, ".js-response-list", {}))
       if @isQuestion()
-        @markedAnswers.on("add", (response) => @renderResponseToList(response, ".js-marked-answer-list"))
+        @markedAnswers.on("add", (response) => @renderResponseToList(response, ".js-marked-answer-list", {collapseComments: true}))
       if @mode == "tab"
         # Without a delay, jQuery doesn't add the loading extension defined in
         # utils.coffee before safeAjax is invoked, which results in an error
@@ -191,9 +191,9 @@ if Backbone?
           loadMoreButton.click((event) => @loadResponses(responseLimit, loadMoreButton))
           responsePagination.append(loadMoreButton)
 
-    renderResponseToList: (response, listSelector) =>
+    renderResponseToList: (response, listSelector, options) =>
         response.set('thread', @model)
-        view = new ThreadResponseView(model: response)
+        view = new ThreadResponseView($.extend({model: response}, options))
         view.on "comment:add", @addComment
         view.on "comment:endorse", @endorseThread
         view.render()
