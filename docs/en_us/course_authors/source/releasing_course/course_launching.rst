@@ -112,8 +112,8 @@ recipients by selecting one of these predefined groups:
   Email messages are not sent to enrolled students in these circumstances:
 
   * Students can opt not to receive email messages through the **Email
-    Settings** link, which is present on the edX dashboard for each course.
-    Email messages are not sent to these students.
+    Settings** link, which is present for each course on the **Current
+    Courses** dashboard. Email messages are not sent to these students.
 
   * Email is not sent to students who have not replied to an account activation
     email message.

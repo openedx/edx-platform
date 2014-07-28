@@ -354,7 +354,8 @@ responses, and comments. Messages that include spoilers or solutions, or that
 contain inappropriate or off-topic material, should be edited quickly to remove
 text, images, or links.
 
-#. Log in to the course with your discussion administrator username.
+#. Log in to the site and then select the course on your **Current Courses**
+   dashboard.
 
 #. Click the **Edit** button below the post or response or the pencil icon for
    the comment.
@@ -373,7 +374,8 @@ Discussion moderators, community TAs, and discussion admins can delete the
 content of posts, responses, and comments. Posts that include spam or abusive
 language may need to be deleted, rather than edited.
 
-#. Log in to the course with your discussion administrator username.
+#. Log in to the site and then select the course on your **Current Courses**
+   dashboard.
 
 #. Click the **Delete** button below the post or response or the "X" icon for
    the comment.
