@@ -130,8 +130,8 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
-from tempdir import mkdtemp_clean
-MAKO_MODULE_DIR = mkdtemp_clean('mako')
+import tempfile
+MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
