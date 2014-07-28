@@ -587,7 +587,7 @@ def _get_module_info(xblock, rewrite_static_links=True):
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       include_children_predicate=NEVER):
+                       include_edited_by=False, include_published_by=False, include_children_predicate=NEVER):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -640,10 +640,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "edited_by": safe_get_username(xblock.subtree_edited_by),
         "published": published,
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        "published_by": safe_get_username(xblock.published_by),
         'studio_url': xblock_studio_url(xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
@@ -659,6 +657,12 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if child_info:
         xblock_info['child_info'] = child_info
+    # Currently, 'edited_by' and 'published_by' are only used by the container page.  Only compute them when asked to do
+    # so, since safe_get_username() is expensive.
+    if include_edited_by:
+        xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
+    if include_published_by:
+        xblock_info['published_by'] = safe_get_username(xblock.published_by)
     # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
     # We don't add it in general because it is an expensive operation.
     if is_xblock_unit:
