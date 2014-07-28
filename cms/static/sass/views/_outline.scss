@@ -22,6 +22,8 @@
       top: -($baseline/4);
     }
 
+
+
     // TOOD: abstract this out into a Sass placeholder
     .incontext-editor-input {
       @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);
@@ -441,6 +443,11 @@
   // --------------------
   .outline-section {
 
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline/4);
+    }
+
     .draggable-drop-indicator-before {
       top: -($baseline/2);
       left: 0;
@@ -454,6 +461,11 @@
 
   // UI: drag and drop: subsection
   .outline-subsection {
+
+    .ui-splint-indicator {
+      height: ($baseline/10);
+      margin-left: ($baseline*1.25);
+    }
 
     .draggable-drop-indicator-before {
       top: -6px;
