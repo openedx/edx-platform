@@ -529,11 +529,6 @@ $outline-indent-width: $baseline;
   border: 1px solid $gray-l4;
   padding: ($baseline/4) ($baseline/2);
 
-  // STATE: hover/active
-  &:hover, &:active {
-    box-shadow: 0 1px 1px $shadow-l2;
-  }
-
   // header - title
   .unit-title {
     @extend %t-title7;
@@ -542,6 +537,16 @@ $outline-indent-width: $baseline;
 
   .unit-status {
     @extend %outline-item-status;
+  }
+
+  // STATE: hover/active
+  &:hover, &:active {
+    box-shadow: 0 1px 1px $shadow-l2;
+
+    // status - release
+    .unit-status .status-release {
+      opacity: 1.0;
+    }
   }
 }
 
