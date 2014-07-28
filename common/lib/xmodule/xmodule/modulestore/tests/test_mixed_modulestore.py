@@ -859,7 +859,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
-    @ddt.data(('draft', 2, 0), ('split', 5, 0))
+    @ddt.data(('draft', 2, 6), ('split', 5, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """

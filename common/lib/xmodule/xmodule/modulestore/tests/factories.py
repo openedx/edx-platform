@@ -266,7 +266,7 @@ def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
     """
     if mongo_store.get_modulestore_type() == ModuleStoreEnum.Type.mongo:
         with check_exact_number_of_calls(mongo_store.collection, mongo_store.collection.find, num_finds):
-            if num_sends:
+            if num_sends is not None:
                 with check_exact_number_of_calls(
                     mongo_store.database.connection,
                     mongo_store.database.connection._send_message,  # pylint: disable=protected-access
@@ -291,7 +291,7 @@ def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
                 wrap_patch = patch.object(collection, 'find', find_wrap)
                 wrap_patches.append(wrap_patch)
                 wrap_patch.start()
-            if num_sends:
+            if num_sends is not None:
                 connection = mongo_store.db_connection.database.connection
                 with check_exact_number_of_calls(
                     connection,
