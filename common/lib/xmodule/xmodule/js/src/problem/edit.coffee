@@ -10,6 +10,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @customLabel: ""
   @questionHintsBooleanStrings: []
   @questionHintsBooleanExpressions: []
+  @problemHintStrings: []
+  @questionHintsStrings: []
   
   constructor: (element) ->
     @element = element
@@ -263,17 +265,41 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     return returnString                               # return the feedback string but without the custom label, if any
 
   #________________________________________________________________________________
+  # search for any text demarcated as a 'question hint' by the double braces {{..}}
+  # if found, copy the text to an array for later insertion and remove that text
+  # from the xmlString, replacing it with a unique marker for later restoration
+  #
+  @parseForQuestionHints: (xmlString) ->
+    MarkdownEditingDescriptor.questionHintStrings = []    # initialize the strings array
+
+    DOUBLE_LEFT_BRACE_MARKER = '~~~'
+    DOUBLE_RIGHT_BRACE_MARKER = '```'
+
+    xmlString = xmlString.replace(/\{\{/g, DOUBLE_LEFT_BRACE_MARKER)   # replace all double left braces with '~~~~'
+    xmlString = xmlString.replace(/}}/g, DOUBLE_RIGHT_BRACE_MARKER)    # replace all double right braces with '```'
+
+    questionHintMatches = xmlString.match(/~~~[^`]+```/gm)
+    index = 0
+    for questionHintMatch in questionHintMatches
+      xmlString = xmlString.replace( questionHintMatch, '%' + index++ + '%')
+      questionHintMatch = questionHintMatch.replace(/~~~/gm, '')
+      questionHintMatch = questionHintMatch.replace(/```/gm, '')
+      MarkdownEditingDescriptor.questionHintStrings.push(questionHintMatch)   # save the string but no delimiters
+
+    return xmlString
+
+  #________________________________________________________________________________
   # search for any text demarcated as a 'problem hint' by the double vertical bars
   # if found, copy the text to an array for later insertion and remove that text
   # from the xmlString
   #
   @parseForProblemHints: (xmlString) ->
-    MarkdownEditingDescriptor.problemHintsStrings = []    # initialize the strings array
+    MarkdownEditingDescriptor.problemHintStrings = []    # initialize the strings array
     for line in xmlString.split('\n')
       matches = line.match( /\|\|(.+)\|\|/ )      # string surrounded by ||...|| is a match group
       if matches
         problemHint = matches[1]
-        MarkdownEditingDescriptor.problemHintsStrings.push(problemHint)
+        MarkdownEditingDescriptor.problemHintStrings.push(problemHint)
         xmlString = xmlString.replace(matches[0], '')                     # strip out the matched text from the xml
     return xmlString
 
@@ -282,10 +308,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   # element to the xml with a 'hint' element for each item
   #
   @insertProblemHints: (xmlStringUnderConstruction) ->
-    if MarkdownEditingDescriptor.problemHintsStrings
-      if MarkdownEditingDescriptor.problemHintsStrings.length > 0
+    if MarkdownEditingDescriptor.problemHintStrings
+      if MarkdownEditingDescriptor.problemHintStrings.length > 0
         ondemandElement =  '    <demandhint>\n'
-        for problemHint in MarkdownEditingDescriptor.problemHintsStrings
+        for problemHint in MarkdownEditingDescriptor.problemHintStrings
           ondemandElement += '        <hint> ' +  problemHint + '\n'
           ondemandElement += '        </hint>\n'
         ondemandElement +=  '    </demandhint>\n'
@@ -464,77 +490,76 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 #  simpleEditor.replaceSelection(revisedSelection);
 #}
 #
-  @markdownToXml: (markdown)->
-    toXml = `function (markdown) {
-      var xml = markdown,
-          i, splits, scriptFlag;
-
-      // replace headers
-      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
-      xml = xml.replace(/\n^\=\=+$/gm, '');
-
-      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
-
-      //---------------------------------------------------------------------------
-      // checkbox questions
-      //
-      // this question type must be handled FIRST because checkboxes
-      // cannot be combined with any question types--including other checkbox
-      // questions--until an unambiguous syntax is devised
-      //
-      xml = MarkdownEditingDescriptor.parseForCheckbox(xml)
-
-      //---------------------------------------------------------------------------
-      // multiple choice questions
-      //
-      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
-        var choices = '';
-        var shuffle = false;
-        var options = match.split('\n');
-
-        for(var i = 0; i < options.length; i++) {
-          line = options[i].trim();               // trim off leading/trailing whitespace
-          if(line.length > 0) {
-            hintText = '';
-            hintMatches = line.match( /{{(.+)}}/ );  // extract the {{...}} phrase, if any
-            if(hintMatches) {
-              matchString = hintMatches[0];          // group 0 holds the entire matching string (includes delimiters)
-              hintText = hintMatches[1].trim();      // group 1 holds the matching characters (our hint string)
-              hintText = MarkdownEditingDescriptor.extractCustomLabel( hintText );
-              line = line.replace(matchString, '');  // remove the {{...}} phrase, else it will be displayed
-            }
-
-            var value = line.split(/^\s*\(.{0,3}\)\s*/)[1].trim();
-            var inparens = /^\s*\((.{0,3})\)\s*/.exec(line)[1];
-            var correct = /x/i.test(inparens);
-            var fixed = '';
-            if(/@/.test(inparens)) {
-              fixed = ' fixed="true"';
-            }
-            if(/!/.test(inparens)) {
-              shuffle = true;
-            }
-            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '\n';
-            if(hintText) {
-              choices += '        <choicehint ' + MarkdownEditingDescriptor.customLabel + '>' + hintText + '\n'
-              choices += '        </choicehint>\n'
-            }
-            choices += '    </choice>\n';
-          }
-        }
-        var result = '<multiplechoiceresponse>\n';
-        if(shuffle) {
-          result += '  <choicegroup type="MultipleChoice" shuffle="true">\n';
-        }
-        else {
-          result += '  <choicegroup type="MultipleChoice">\n';
-        }
-        result += choices;
-        result += '  </choicegroup>\n';
-        result += '</multiplechoiceresponse>\n\n';
-        return result;
-      });
-
+#  @markdownToXml: (markdown)->
+#    toXml = `function (markdown) {
+#      var xml = markdown,
+#          i, splits, scriptFlag;
+#
+#      // replace headers
+#      xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
+#      xml = xml.replace(/\n^\=\=+$/gm, '');
+#
+#      xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
+#      xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
+#      //---------------------------------------------------------------------------
+#      // checkbox questions
+#      //
+#      // this question type must be handled FIRST because checkboxes
+#      // cannot be combined with any question types--including other checkbox
+#      // questions--until an unambiguous syntax is devised
+#      //
+#      xml = MarkdownEditingDescriptor.parseForCheckbox(xml)
+#
+#      //---------------------------------------------------------------------------
+#      // multiple choice questions
+#      //
+#      xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
+#        var choices = '';
+#        var shuffle = false;
+#        var options = match.split('\n');
+#
+#        for(var i = 0; i < options.length; i++) {
+#          line = options[i].trim();               // trim off leading/trailing whitespace
+#          if(line.length > 0) {
+#            hintText = '';
+#            hintMatches = line.match( /{{(.+)}}/ );  // extract the {{...}} phrase, if any
+#            if(hintMatches) {
+#              matchString = hintMatches[0];          // group 0 holds the entire matching string (includes delimiters)
+#              hintText = hintMatches[1].trim();      // group 1 holds the matching characters (our hint string)
+#              hintText = MarkdownEditingDescriptor.extractCustomLabel( hintText );
+#              line = line.replace(matchString, '');  // remove the {{...}} phrase, else it will be displayed
+#            }
+#
+#            var value = line.split(/^\s*\(.{0,3}\)\s*/)[1].trim();
+#            var inparens = /^\s*\((.{0,3})\)\s*/.exec(line)[1];
+#            var correct = /x/i.test(inparens);
+#            var fixed = '';
+#            if(/@/.test(inparens)) {
+#              fixed = ' fixed="true"';
+#            }
+#            if(/!/.test(inparens)) {
+#              shuffle = true;
+#            }
+#            choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '\n';
+#            if(hintText) {
+#              choices += '        <choicehint ' + MarkdownEditingDescriptor.customLabel + '>' + hintText + '\n'
+#              choices += '        </choicehint>\n'
+#            }
+#            choices += '    </choice>\n';
+#          }
+#        }
+#        var result = '<multiplechoiceresponse>\n';
+#        if(shuffle) {
+#          result += '  <choicegroup type="MultipleChoice" shuffle="true">\n';
+#        }
+#        else {
+#          result += '  <choicegroup type="MultipleChoice">\n';
+#        }
+#        result += choices;
+#        result += '  </choicegroup>\n';
+#        result += '</multiplechoiceresponse>\n\n';
+#        return result;
+#      });
 
 
 
@@ -545,9 +570,37 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       //---------------------------------------------------------------------------
       // text input and numeric input questions
-      xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
+      // the initial regular expression accepts, at the beginning of a line, the
+      // following tokens to indicate individual answer expressions:
+      //     =              equality (primary)
+      //     not=           not equal to
+      //     !=             same as 'not='
+      //     or=            equality (in addition to the primary equality)
+      //
+      // original edx version:   xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
+
+
+      // taking out the unnecessary back slashes and allowing leading whitespace -- THIS WORKS ON THE EXAMPLE
+      //xml = xml.replace(/(^\s*=\s*(.*?$)(\n*or=\s*(.*?$))*)+/gm, function(match, p) {
+
+      // adding in the 'not='  -- THIS WORKS, FIRST REGEX
+      xml = xml.replace(/(^\s*=\s*(.*?$)(\n*(or|not)=\s*(.*?$))*)+/gm, function(match, p) {
+
+
+
+// better:      xml = xml.replace(/(^\s*(or=|=|not=|!=)[^\n]+)+/gm, function(match, p) {
+
+
+
           // Split answers
-          var answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
+          debugger;
+
+          // original edx version:
+          // var answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
+
+
+          // adding in 'not='
+          var answersList = p.replace(/^(or|not)?=\s*/gm, '').split('\n'),
 
               processNumericalResponse = function (value) {
                   var params, answer, string;
