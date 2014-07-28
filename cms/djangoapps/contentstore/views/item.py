@@ -586,16 +586,18 @@ def _get_module_info(xblock, rewrite_static_links=True):
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       include_children_predicate=NEVER):
+                       for_container_page=False, include_children_predicate=NEVER):
     """
     Creates the information needed for client-side XBlockInfo.
 
     If data or metadata are not specified, their information will not be added
     (regardless of whether or not the xblock actually has data or metadata).
 
-    There are two optional boolean parameters:
+    There are three optional boolean parameters:
       include_ancestor_info - if true, ancestor info is added to the response
       include_child_info - if true, direct child info is included in the response
+      for_container_page - if true, "edited-by", "published-by", "currently_visible_to_students", and
+                           "release_date_from" are included in the response.
 
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
@@ -621,7 +623,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Compute the child info first so it can be included in aggregate information for the parent
     if include_child_info and xblock.has_children:
         child_info = _create_xblock_child_info(
-            xblock, include_children_predicate=include_children_predicate
+            xblock,
+            for_container_page=for_container_page,
+            include_children_predicate=include_children_predicate
         )
     else:
         child_info = None
@@ -629,7 +633,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-    currently_visible_to_students = is_currently_visible_to_students(xblock)
 
     is_xblock_unit = is_unit(xblock)
     is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
@@ -639,15 +642,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "edited_by": safe_get_username(xblock.subtree_edited_by),
         "published": published,
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        "published_by": safe_get_username(xblock.published_by),
         'studio_url': xblock_studio_url(xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
-        "release_date_from": _get_release_date_from(xblock) if release_date else None,
-        "currently_visible_to_students": currently_visible_to_students,
         "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     }
     if data is not None:
@@ -658,6 +657,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
     if child_info:
         xblock_info['child_info'] = child_info
+    # Currently, 'edited_by', 'published_by', and 'release_date_from' are only used by the container page.  Only compute
+    # them when building xblock_info for a container page, since they're expensive.
+    if for_container_page:
+        xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
+        xblock_info["published_by"] = safe_get_username(xblock.published_by)
+        xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
+        if release_date:
+            xblock_info["release_date_from"] = _get_release_date_from(xblock)
     # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
     # We don't add it in general because it is an expensive operation.
     if is_xblock_unit:
@@ -760,7 +767,7 @@ def _create_xblock_ancestor_info(xblock):
     }
 
 
-def _create_xblock_child_info(xblock, include_children_predicate=NEVER):
+def _create_xblock_child_info(xblock, for_container_page=False, include_children_predicate=NEVER):
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -775,7 +782,8 @@ def _create_xblock_child_info(xblock, include_children_predicate=NEVER):
     if xblock.has_children and include_children_predicate(xblock):
         child_info['children'] = [
             create_xblock_info(
-                child, include_child_info=True, include_children_predicate=include_children_predicate
+                child, include_child_info=True, for_container_page=for_container_page,
+                include_children_predicate=include_children_predicate
             ) for child in xblock.get_children()
         ]
     return child_info

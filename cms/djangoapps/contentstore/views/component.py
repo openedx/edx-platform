@@ -66,7 +66,7 @@ else:
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
-        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
+        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -198,7 +198,7 @@ def container_handler(request, usage_key_string):
 
         # Fetch the XBlock info for use by the container page. Note that it includes information
         # about the block's ancestors and siblings for use by the Unit Outline.
-        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, for_container_page=True)
 
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
