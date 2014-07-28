@@ -69,21 +69,8 @@
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
 
-    .no-outline-content {
-      @extend %ui-well;
-      padding: ($baseline*2);
-      background-color: $gray-l4;
-      text-align: center;
-      color: $gray;
-
-      .new-button {
-        @include font-size(14);
-        margin-left: $baseline;
-
-        [class^="icon-"] {
-          margin-right: ($baseline/2);
-        }
-      }
+    .no-content {
+      @extend %no-content;
     }
   }
 
