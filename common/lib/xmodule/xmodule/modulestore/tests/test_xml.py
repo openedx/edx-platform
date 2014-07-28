@@ -8,10 +8,8 @@ from glob import glob
 from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 
-from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
@@ -32,15 +30,6 @@ class TestXMLModuleStore(unittest.TestCase):
     """
     Test around the XML modulestore
     """
-    def test_path_to_location(self):
-        """Make sure that path_to_location works properly"""
-
-        print "Starting import"
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
-        print "finished import"
-
-        check_path_to_location(modulestore)
-
     def test_xml_modulestore_type(self):
         store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)

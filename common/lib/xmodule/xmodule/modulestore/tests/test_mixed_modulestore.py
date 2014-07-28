@@ -20,6 +20,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.search import path_to_location
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -666,6 +667,62 @@ class TestMixedModuleStore(unittest.TestCase):
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.draft_preferred),
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
+
+    @ddt.data(('draft', [10, 3], 0), ('split', [14, 6], 0))
+    @ddt.unpack
+    def test_path_to_location(self, default_ms, num_finds, num_sends):
+        """
+        Make sure that path_to_location works
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        course_key = self.course_locations[self.MONGO_COURSEID].course_key
+        should_work = (
+            (self.problem_x1a_2,
+             (course_key, u"Chapter_x", u"Sequential_x1", '1')),
+            (self.chapter_x,
+             (course_key, "Chapter_x", None, None)),
+        )
+
+        mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
+        for location, expected in should_work:
+            with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
+                self.assertEqual(path_to_location(self.store, location), expected)
+
+        not_found = (
+            course_key.make_usage_key('video', 'WelcomeX'),
+            course_key.make_usage_key('course', 'NotHome'),
+        )
+        for location in not_found:
+            with self.assertRaises(ItemNotFoundError):
+                path_to_location(self.store, location)
+
+    def test_xml_path_to_location(self):
+        """
+        Make sure that path_to_location works: should be passed a modulestore
+        with the toy and simple courses loaded.
+        """
+        # only needs course_locations set
+        self.initdb('draft')
+        course_key = self.course_locations[self.XML_COURSEID1].course_key
+        should_work = (
+            (course_key.make_usage_key('video', 'Welcome'),
+             (course_key, "Overview", "Welcome", None)),
+            (course_key.make_usage_key('chapter', 'Overview'),
+             (course_key, "Overview", None, None)),
+        )
+
+        for location, expected in should_work:
+            self.assertEqual(path_to_location(self.store, location), expected)
+
+        not_found = (
+            course_key.make_usage_key('video', 'WelcomeX'),
+            course_key.make_usage_key('course', 'NotHome'),
+        )
+        for location in not_found:
+            with self.assertRaises(ItemNotFoundError):
+                path_to_location(self.store, location)
 
     @ddt.data('draft')
     def test_revert_to_published_root_draft(self, default_ms):

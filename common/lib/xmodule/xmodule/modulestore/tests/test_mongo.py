@@ -31,13 +31,11 @@ from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
-from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
-from xmodule.modulestore.tests.factories import check_mongo_calls
 
 
 log = logging.getLogger(__name__)
@@ -244,11 +242,6 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_not_none(
             self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
-
-    def test_path_to_location(self):
-        '''Make sure that path_to_location works'''
-        with check_mongo_calls(self.draft_store, 9):
-            check_path_to_location(self.draft_store)
 
     def test_xlinter(self):
         '''
