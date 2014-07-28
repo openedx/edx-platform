@@ -142,6 +142,27 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
         self.thread_page.visit()
 
+    def test_marked_answer_comments(self):
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        response_id = "test_response_{}".format(uuid4().hex)
+        comment_id = "test_comment_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(id=thread_id, commentable_id=self.discussion_id, thread_type="question")
+        )
+        thread_fixture.addResponse(
+            Response(id=response_id, endorsed=True),
+            [Comment(id=comment_id)]
+        )
+        thread_fixture.push()
+        self.setup_thread_page(thread_id)
+        self.assertFalse(self.thread_page.is_comment_visible(comment_id))
+        self.assertFalse(self.thread_page.is_add_comment_visible(response_id))
+        self.assertTrue(self.thread_page.is_show_comments_visible(response_id))
+        self.thread_page.show_comments(response_id)
+        self.assertTrue(self.thread_page.is_comment_visible(comment_id))
+        self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
+        self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
 
 @attr('shard_1')
 class DiscussionCommentDeletionTest(UniqueCourseTest):
