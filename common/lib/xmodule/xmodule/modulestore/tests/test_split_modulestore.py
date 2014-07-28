@@ -1687,7 +1687,12 @@ class TestPublish(SplitModuleTest):
             pub_copy = modulestore().get_item(dest_course_loc.make_usage_key("", expected))
             # everything except previous_version & children should be the same
             self.assertEqual(source.category, pub_copy.category)
-            self.assertEqual(source.update_version, pub_copy.update_version)
+            self.assertEqual(
+                source.update_version, pub_copy.source_version,
+                u"Versions don't match for {}: {} != {}".format(
+                    expected, source.update_version, pub_copy.update_version
+                )
+            )
             self.assertEqual(
                 self.user_id, pub_copy.edited_by,
                 "{} edited_by {} not {}".format(pub_copy.location, pub_copy.edited_by, self.user_id)

@@ -508,56 +508,6 @@ class TestMongoModuleStore(unittest.TestCase):
         finally:
             shutil.rmtree(root_dir)
 
-    def test_has_changes_direct_only(self):
-        """
-        Tests that has_changes() returns false when a new xblock in a direct only category is checked
-        """
-        course_location = Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall')
-        chapter_location = Location('edX', 'toy', '2012_Fall', 'chapter', 'vertical_container')
-
-        # Create dummy direct only xblocks
-        self.draft_store.create_item(
-            self.dummy_user,
-            chapter_location.course_key,
-            chapter_location.block_type,
-            block_id=chapter_location.block_id
-        )
-
-        # Check that neither xblock has changes
-        self.assertFalse(self.draft_store.has_changes(course_location))
-        self.assertFalse(self.draft_store.has_changes(chapter_location))
-
-    def test_has_changes(self):
-        """
-        Tests that has_changes() only returns true when changes are present
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'vertical', 'test_vertical')
-
-        # Create a dummy component to test against
-        self.draft_store.create_item(
-            self.dummy_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-
-        # Not yet published, so changes are present
-        self.assertTrue(self.draft_store.has_changes(location))
-
-        # Publish and verify that there are no unpublished changes
-        self.draft_store.publish(location, self.dummy_user)
-        self.assertFalse(self.draft_store.has_changes(location))
-
-        # Change the component, then check that there now are changes
-        component = self.draft_store.get_item(location)
-        component.display_name = 'Changed Display Name'
-        self.draft_store.update_item(component, self.dummy_user)
-        self.assertTrue(self.draft_store.has_changes(location))
-
-        # Publish and verify again
-        self.draft_store.publish(location, self.dummy_user)
-        self.assertFalse(self.draft_store.has_changes(location))
-
     def test_has_changes_missing_child(self):
         """
         Tests that has_changes() returns False when a published parent points to a child that doesn't exist.

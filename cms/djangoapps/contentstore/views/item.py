@@ -23,7 +23,7 @@ import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
