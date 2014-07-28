@@ -57,8 +57,7 @@ Before you re-run a course, verify that:
 
 * You have permission to create courses in Studio.
 
-* You are a member of the course staff for the course that you want to re-
-  run.
+* You are a member of the course staff for the course that you want to re-run.
 
 * The original course was created in Studio, not in XML.
 
