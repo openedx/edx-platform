@@ -1,6 +1,5 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="base.html" />
+<%! from util.markup import HTML, ugettext as _ %>
 <%def name="online_help_token()"><% return "home" %></%def>
 <%block name="title">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
@@ -102,7 +101,7 @@
           </div>
         </form>
       </div>
-      
+
         %if libraries_enabled:
         <div class="wrapper-create-element wrapper-create-library">
           <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
@@ -165,7 +164,7 @@
             %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
             <!-- STATE: re-run is processing -->
             %if course_info['is_in_progress']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -196,8 +195,8 @@
 
               <div class="status-message">
                 <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.').format(
-                    link_start='<a href="#" class="action-reload">',
-                    link_end='</a>',
+                    link_start=HTML('<a href="#" class="action-reload">'),
+                    link_end=HTML('</a>'),
                   )}</p>
               </div>
             </li>
@@ -207,7 +206,7 @@
 
             <!-- STATE: re-run has error -->
             %if course_info['is_failed']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key'] | h}">
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${course_info['display_name']}</h3>
@@ -265,7 +264,7 @@
       <div class="courses courses-tab active">
         <ul class="list-courses">
           %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
-          <li class="course-item" data-course-key="${course_info['course_key'] | h}">
+          <li class="course-item" data-course-key="${course_info['course_key']}">
             <a class="course-link" href="${course_info['url']}">
               <h3 class="course-title">${course_info['display_name']}</h3>
 
@@ -478,8 +477,8 @@
         <p>${_("In order to create courses in {studio_name}, you must {link_start}contact {platform_name} staff to help you create a course{link_end}.").format(
             studio_name=settings.STUDIO_NAME,
             platform_name=settings.PLATFORM_NAME,
-            link_start='<a href="mailto:{email}">'.format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
-            link_end="</a>",
+            link_start=HTML('<a href="mailto:{email}">').format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
+            link_end=HTML("</a>"),
           )}</p>
       </div>
       % endif
@@ -497,13 +496,13 @@
 from django.conf import settings
 
 if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="//{domain}/discussion/new" class="show-tender">'.format(
+  help_link_start = HTML('<a href="//{domain}/discussion/new" class="show-tender">').format(
     domain=settings.TENDER_DOMAIN,
   )
-  help_link_end = '</a>'
+  help_link_end = HTML('</a>')
 else:
-  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
-  help_link_end = '</a>'
+  help_link_start = HTML('<a href="mailto:{email}">').format(email=settings.TECH_SUPPORT_EMAIL)
+  help_link_end = HTML('</a>')
 %>
         <p>${_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.").format(
             studio_name=settings.STUDIO_NAME,

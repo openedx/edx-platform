@@ -39,7 +39,8 @@ class TemplateTestCase(unittest.TestCase):
                                           'templates',
                                           self.TEMPLATE_NAME)
         with open(self.template_path) as f:
-            self.template = MakoTemplate(f.read())
+            self.template = MakoTemplate(f.read(),
+                                         default_filters=['decode.utf8', 'h'])
 
     def render_to_xml(self, context_dict):
         """

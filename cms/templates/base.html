@@ -1,6 +1,6 @@
 ## -*- coding: utf-8 -*-
 <%!
-from django.utils.translation import ugettext as _
+from util.markup import ugettext as _
 from django.template.defaultfilters import escapejs
 import json
 %>
@@ -23,9 +23,9 @@ import json
         <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name_with_default | h} |
+        ${context_course.display_name_with_default } |
         % elif context_library:
-        ${context_library.display_name_with_default | h} |
+        ${context_library.display_name_with_default } |
         % endif
         ${settings.STUDIO_NAME}
     </title>
@@ -94,11 +94,11 @@ import json
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
                       id: "${context_course.id | escapejs}",
-                      name: "${context_course.display_name_with_default | h}",
-                      url_name: "${context_course.location.name | h}",
-                      org: "${context_course.location.org | h}",
-                      num: "${context_course.location.course | h}",
-                      revision: "${context_course.location.revision | h}"
+                      name: "${context_course.display_name_with_default}",
+                      url_name: "${context_course.location.name}",
+                      org: "${context_course.location.org}",
+                      num: "${context_course.location.course}",
+                      revision: "${context_course.location.revision}"
                   });
               });
             % endif

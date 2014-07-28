@@ -49,6 +49,7 @@ lazy==1.1
 lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
+MarkupSafe==0.23
 mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
@@ -138,7 +139,7 @@ nosexcover==1.0.7
 pep8==1.5.7
 pylint==1.4.0
 python-subunit==0.0.16
-rednose==0.3
+rednose==0.4.1
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34

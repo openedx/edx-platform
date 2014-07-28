@@ -1,7 +1,7 @@
 <%inherit file="/main.html" />
 <%!
     from django.core.urlresolvers import reverse
-    from django.utils.translation import ugettext as _
+    from util.markup import ugettext as _
     from django.utils.timezone import utc as UTC
     from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
     from django.conf import settings
@@ -95,7 +95,7 @@ textarea {
 
       %if course_id is not None:
           ## Translators: Git is a version-control system; see http://git-scm.com/about
-          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id) | h}</h2>
+          <h2>${_('Recent git load activity for {course_id}').format(course_id=course_id)}</h2>
           %if error_msg:
               <h3>${_('Error')}:</h3>
               <p>${error_msg}</p>
@@ -130,7 +130,7 @@ textarea {
                 <td>${date}</td>
                 <td>
                   <a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">
-                    ${cil.course_id | h}
+                    ${cil.course_id}
                   </a>
                 </td>
                 <td>
@@ -146,7 +146,7 @@ textarea {
                   <tr class="import-log" id="import-log-${index}">
                     <td colspan="3">
                       <pre>
-                        ${cil.import_log | h}
+                        ${cil.import_log}
                       </pre>
                     </td>
                   </tr>

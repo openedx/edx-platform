@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "login" %></%def>
 <%!
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 %>
 <%block name="title">${_("Sign In")}</%block>
 <%block name="bodyclass">not-signedin view-signin</%block>
@@ -52,8 +52,8 @@ from django.utils.translation import ugettext as _
         <div class="bit">
           <h3 class="title-3">${_("Need Help?")}</h3>
           <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(
-              link_start='<a href="//{domain}" rel="external">'.format(domain=settings.TENDER_DOMAIN),
-              link_end='</a>',
+              link_start=HTML('<a href="//{domain}" rel="external">').format(domain=settings.TENDER_DOMAIN),
+              link_end=HTML('</a>'),
             )}</p>
         </div>
       </aside>

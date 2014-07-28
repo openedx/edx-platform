@@ -1,8 +1,8 @@
 <ul class="list-fields contribution-options">
   % for price in suggested_prices:
   <li class="field contribution-option">
-    <input type="radio" name="contribution" value="${price|h}" ${'checked' if price == chosen_price else ''} id="contribution-${price|h}" />
-    <label for="contribution-${price|h}">
+    <input type="radio" name="contribution" value="${price}" ${'checked' if price == chosen_price else ''} id="contribution-${price}" />
+    <label for="contribution-${price}">
       <span class="deco-denomination">$</span>
       <span class="label-value">${price}</span>
       <span class="denomination-name">${currency}</span>

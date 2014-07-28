@@ -1,6 +1,6 @@
 <%inherit file="shopping_cart_flow.html" />
 <%!
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
@@ -31,29 +31,33 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           <% dashboard_url = reverse('dashboard') %>
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
           <span class="mt-7">
-            ${_(u"You have successfully been enrolled for {course_names}. "
-                u"The following receipt has been emailed to {receipient_emails}").format(
-                  course_names=u"<b>{course_names}</b>".format(
-                    course_names=appended_course_names
-                  ),
-                  receipient_emails=u"<strong>{receipient_emails}</strong>".format(
-                    receipient_emails=appended_recipient_emails
-                  ),
+            ${HTML(_(
+                u"You have successfully been enrolled for {course_names}. "
+                u"The following receipt has been emailed to {receipient_emails}"
+              )).format(
+                course_names=HTML("<b>{course_names}</b>").format(
+                  course_names=appended_course_names
+                ),
+                receipient_emails=HTML("<strong>{receipient_emails}</strong>").format(
+                  receipient_emails=appended_recipient_emails
+                ),
             )}
           </span>
         % elif order_type == 'business':
-          ${ungettext(
-            "You have successfully purchased <b>{number} course registration code</b> for {course_names}.",
-            "You have successfully purchased <b>{number} course registration codes</b> for {course_names}.",
+          ${HTML(ungettext(
+            "You have successfully purchased {em_start}{number} course registration code{em_end} for {course_names}.",
+            "You have successfully purchased {em_start}{number} course registration codes{em_end} for {course_names}.",
             total_registration_codes
-          ).format(
+          )).format(
             number=total_registration_codes,
-            course_names=u"<b>{course_names}</b>".format(
+            course_names=HTML("<strong>{course_names}</strong>").format(
               course_names=appended_course_names
-            )
+            ),
+            em_start=HTML("<strong>"),
+            em_end=HTML("</strong>"),
           )}
-          ${_("The following receipt has been emailed to {receipient_emails}").format(
-            receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+          ${HTML(_("The following receipt has been emailed to {receipient_emails}")).format(
+            receipient_emails=HTML("<strong>{receipient_emails}</strong>").format(
               receipient_emails=appended_recipient_emails,
             )
           )}
@@ -288,7 +292,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <div class="clearfix">
           <div class="image">
             <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Image"/>
+                 alt="${course.display_number_with_default} ${get_course_about_section(course, 'title')} Image"/>
           </div>
           <div class="data-input">
             <h3>${_("Registration for")}:
@@ -364,8 +368,11 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
       <div class="code-text">
         % if any_refunds:
           <span>
-          ## Translators: Please keep the "<del>" and "</del>" tags around your translation of the word "this" in your translation.
-            ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
+            ## Translators: Please keep the "{del_start}" and "{del_end}" tags around your translation of the word "this" in your translation.
+            ${_("Note: items with strikethrough like {del_start}this{del_end} have been refunded.").format(
+              del_start=HTML('<del>'),
+              del_end=HTML('</del>'),
+            )}
           </span>
         % endif
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>

@@ -1,6 +1,6 @@
 ## mako
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
 
@@ -51,11 +51,10 @@
         </p>
       </div>
 
-      ## Translators: '&copy;' is an HTML character code for the copyright symbol. Please don't remove or change it.
-      <p class="copyright">${_("&copy; {copyright_year} {platform_name}, some rights reserved").format(
+      <p class="copyright">${_(u"© {copyright_year} {platform_name}, some rights reserved").format(
         platform_name=settings.PLATFORM_NAME,
         copyright_year=settings.COPYRIGHT_YEAR
-      )}
+      ) | n}
       </p>
         <nav class="nav-legal">
           <ul>

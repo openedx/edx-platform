@@ -2,7 +2,7 @@
 ## We are no longer supporting this file or accepting changes into it.    ##
 ## Please see lms/templates/instructor for instructor dashboard templates ##
 
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -390,7 +390,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if msg:
-    <p></p><p id="idash_msg">${msg}</p>
+    <p></p><p id="idash_msg">${msg | n}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
@@ -464,7 +464,7 @@ function goto( mode)
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
 
     <script>
-      ${d3_stacked_bar_graph.body()}
+      ${d3_stacked_bar_graph.body() | n}
     </script>
 
     <div id="metrics"></div>
@@ -598,17 +598,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${datatable['title'] | h}</h2>
+      <h2>${datatable['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in datatable['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in datatable['data']:
           <tr>
           %for value in row:
-            <td>${value | h}</td>
+            <td>${value}</td>
           %endfor
           </tr>
         %endfor
@@ -660,17 +660,17 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${course_stats['title'] | h}</h2>
+      <h2>${course_stats['title']}</h2>
       <table class="stat_table">
         <tr>
         %for hname in course_stats['header']:
-          <th>${hname | h}</th>
+          <th>${hname}</th>
         %endfor
         </tr>
         %for row in course_stats['data']:
           <tr>
             %for value in row:
-              <td>${value | h}</td>
+              <td>${value}</td>
             %endfor
           </tr>
         %endfor
@@ -721,9 +721,9 @@ function goto( mode)
     %else:
       <ul>
         % for (summary, err) in course_errors:
-        <li>${summary | h}
+        <li>${summary}
         % if err:
-          <ul><li><pre>${err | h}</pre></li></ul>
+          <ul><li><pre>${err}</pre></li></ul>
         % else:
           <p>&nbsp;</p>
         % endif

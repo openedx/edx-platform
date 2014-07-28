@@ -4,6 +4,10 @@
 ## These files assume that several libraries are available and bound to
 ## variables in the global context, so we load those libraries with requirejs
 ## and attach them to the global context manually.
+<%
+import json
+from django.utils.html import escapejs
+%>
 define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
         "jquery.tinymce", "jquery.qtip", "jquery.scrollTo", "jquery.flot",
         "jquery.cookie",
@@ -42,5 +46,5 @@ define(["jquery", "underscore", "mathjax", "codemirror", "tinymce",
         return deferred.promise();
     };
 
-    return requireQueue(${urls});
+    return requireQueue(JSON.parse('${json.dumps(urls) | n,escapejs}'));
 });

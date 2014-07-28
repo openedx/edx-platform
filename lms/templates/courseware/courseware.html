@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
 <%! from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled %>
@@ -41,7 +41,7 @@ ${page_title_breadcrumbs(course_name())}
     ## all needs to stay together for the Candy.js plugin to work.
     <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
   % endif
-  ${fragment.head_html()}
+  ${fragment.head_html() | n}
 </%block>
 
 <%block name="js_extra">
@@ -71,7 +71,9 @@ ${page_title_breadcrumbs(course_name())}
             for (i=0;i<=wordArray.length-1;i++) {
               finalTitle += wordArray[i];
               if (i == (wordArray.length-2)) {
-                finalTitle += "&nbsp;";
+                // Add non-breakable space before last word
+                // TODO: use real filter like widont or typogrify
+                finalTitle += "\xa0";
               } else if (i == (wordArray.length-1)) {
                 // Do nothing
               } else {
@@ -79,7 +81,7 @@ ${page_title_breadcrumbs(course_name())}
               }
             }
           }
-          $(this).html(finalTitle);
+          $(this).text(finalTitle);
         });
       });
   </script>
@@ -166,7 +168,7 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
-${fragment.foot_html()}
+${fragment.foot_html() | n}
 
 </%block>
 
@@ -200,7 +202,7 @@ ${fragment.foot_html()}
       <div id="accordion" style="display: none">
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
-            ${accordion}
+            ${accordion | n}
           % else:
             <div class="chapter">${_("No content has been added to this course")}</div>
           % endif
@@ -210,7 +212,7 @@ ${fragment.foot_html()}
 % endif
 
     <section class="course-content" id="course-content">
-      ${fragment.body_html()}
+      ${fragment.body_html() | n}
     </section>
   </div>
 </div>

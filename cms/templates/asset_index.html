@@ -2,9 +2,9 @@
 <%def name="online_help_token()"><% return "files" %></%def>
 <%!
   from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
 %>
-<%block name="title">${_("Files &amp; Uploads")}</%block>
+<%block name="title">${_("Files & Uploads")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -34,7 +34,7 @@
     <header class="mast has-actions has-subtitle">
         <h1 class="page-header">
             <small class="subtitle">${_("Content")}</small>
-            <span class="sr">&gt; </span>${_("Files &amp; Uploads")}
+            <span class="sr">&gt; </span>${_("Files & Uploads")}
         </h1>
 
         <nav class="nav-actions">
@@ -61,18 +61,30 @@
             <div class="bit">
                 <h3 class="title-3">${_("Adding Files for Your Course")}</h3>
 
-                <p>${_("To add files to use in your course, click {em_start}Upload New File{em_end}. Then follow the prompts to upload a file from your computer.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("To add files to use in your course, click {em_start}Upload New File{em_end}. "
+                        "Then follow the prompts to upload a file from your computer.").format(
+                        em_start=HTML("<strong>"),
+                        em_end=HTML("</strong>"),
+                    )}</p>
 
-                <p>${_("{em_start}Caution{em_end}: {platform_name} recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start='<strong>', em_end="</strong>", platform_name=settings.PLATFORM_NAME)}</p>
+                <p>${_("{em_start}Caution{em_end}: {platform_name} recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"), platform_name=settings.PLATFORM_NAME)}</p>
 
             	<p>${_("The course image, textbook chapters, and files that appear on your Course Handouts sidebar also appear in this list.")}</p>
             </div>
             <div class="bit">
                 <h3 class="title-3">${_("Using File URLs")}</h3>
 
-                <p>${_("Use the {em_start}Embed URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("Use the {em_start}Embed URL{em_end} value to link to the file or image "
+                        "from a component, a course update, or a course handout.").format(
+                        em_start=HTML("<strong>"),
+                        em_end=HTML("</strong>"),
+                    )}</p>
 
-                <p>${_("Use the {em_start}External URL{em_end} value to reference the file or image only from outside of your course.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("Use the {em_start}External URL{em_end} value to reference the file or image "
+                        "only from outside of your course.").format(
+                        em_start=HTML("<strong>"),
+                        em_end=HTML("</strong>"),
+                    )}</p>
                 <p>${_("Click in the Embed URL or External URL column to select the value, then copy it.")}</p>
             </div>
             <div class="bit external-help">

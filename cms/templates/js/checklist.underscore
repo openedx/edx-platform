@@ -5,16 +5,16 @@
     <% } else { %>
     class="course-checklist"
     <% } %>
-    id="<%= 'course-checklist' + checklistIndex %>">
-    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="width: <%= percentChecked %>%;">
+    id="<%- 'course-checklist' + checklistIndex %>">
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="width: <%- percentChecked %>%;">
         <%= _.template(gettext("{number}% of checklists completed"), {number: '<span class="int">' + percentChecked + '</span>'}, {interpolate: /\{(.+?)\}/g}) %>
     </span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
             <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
-            <%= checklistShortDescription %></h3>
+            <%- checklistShortDescription %></h3>
               <span class="checklist-status status">
-                <%= gettext("Tasks Completed:") %> <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
+                <%- gettext("Tasks Completed:") %> <span class="status-count"><%- itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
                 <i class="icon fa fa-check-square-o"></i>
               </span>
     </header>
@@ -31,25 +31,25 @@
             <% } %>
             >
                 <% var taskId = 'course-checklist' + checklistIndex + '-task' + taskIndex; %>
-                <input type="checkbox" class="task-input" data-checklist="<%= checklistIndex %>" data-task="<%= taskIndex %>"
-                name="<%= taskId %>" id="<%= taskId %>"
+                <input type="checkbox" class="task-input" data-checklist="<%- checklistIndex %>" data-task="<%- taskIndex %>"
+                name="<%- taskId %>" id="<%- taskId %>"
                 <% if (checked) { %>
                 checked="checked"
                 <% } %>
                 >
-                <label class="task-details" for="<%= taskId %>">
-                    <h4 class="task-name title title-3"><%= item['short_description'] %></h4>
-                    <p class="task-description"><%= item['long_description'] %></p>
+                <label class="task-details" for="<%- taskId %>">
+                    <h4 class="task-name title title-3"><%- item['short_description'] %></h4>
+                    <p class="task-description"><%- item['long_description'] %></p>
                 </label>
 
                 <% if (item['action_text'] !== '' && item['action_url'] !== '') { %>
                 <ul class="list-actions task-actions">
                     <li class="action-item">
-                        <a href="<%= item['action_url'] %>" class="action action-primary"
+                        <a href="<%- item['action_url'] %>" class="action action-primary"
                         <% if (item['action_external']) { %>
-                        rel="external" title="<%= gettext("This link will open in a new browser window/tab") %>"
+                        rel="external" title="<%- gettext("This link will open in a new browser window/tab") %>"
                         <% } %>
-                        ><%= item['action_text'] %></a>
+                        ><%- item['action_text'] %></a>
                     </li>
                 </ul>
                 <% } %>

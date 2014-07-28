@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
@@ -10,7 +10,7 @@
         <p>
             % if error is 'key_invalid' or error is 'internal':
                 ${_("Something went wrong. Please contact {support} for help.").format(
-                    support="<a href='mailto:{support_email}'>{support_email}</a>".format(
+                    support=HTML("<a href='mailto:{support_email}'>{support_email}</a>").format(
                         support_email=settings.TECH_SUPPORT_EMAIL
                     )
                 )}
@@ -22,8 +22,8 @@
 
         <p>
             ${_("You can try again from the {link_start}account settings{link_end} page.").format(
-                link_start="<a href='{url}'>".format(url=reverse('account_index')),
-                link_end="</a>"
+                link_start=HTML("<a href='{url}'>").format(url=reverse('account_index')),
+                link_end=HTML("</a>")
             )}
         </p>
     </section>

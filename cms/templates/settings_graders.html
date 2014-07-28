@@ -7,7 +7,7 @@
 <%!
   from contentstore import utils
   from contentstore.views.course import should_show_group_configurations_page
-  from django.utils.translation import ugettext as _
+  from util.markup import ugettext as _
 %>
 
 <%block name="header_extras">
@@ -79,7 +79,7 @@
 
         <section class="group-settings grade-rules">
           <header>
-            <h2 class="title-2">${_("Grading Rules &amp; Policies")}</h2>
+            <h2 class="title-2">${_("Grading Rules & Policies")}</h2>
             <span class="tip">${_("Deadlines, requirements, and logistics around grading student work")}</span>
           </header>
 
@@ -133,7 +133,7 @@
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             % if should_show_group_configurations_page(context_course):
               <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>

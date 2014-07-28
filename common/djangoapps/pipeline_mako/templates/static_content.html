@@ -20,7 +20,7 @@ except:
   %>
 
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
-    ${compressed_css(group, raw=raw)}
+    ${compressed_css(group, raw=raw) | n}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
       <link rel="stylesheet" href="${staticfiles_storage.url(filename.replace('.scss', '.css'))}${"?raw" if raw else ""}" type="text/css" media="all" / >
@@ -29,7 +29,7 @@ except:
 </%def>
 <%def name='js(group)'>
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
-    ${compressed_js(group)}
+    ${compressed_js(group) | n}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
       <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
@@ -40,4 +40,4 @@ except:
 <%def name="include(path)"><%
 from django.template.loaders.filesystem import _loader
 source, template_path = _loader.load_template_source(path)
-%>${source}</%def>
+%>${source | n}</%def>

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from courseware.courses import get_course_info_section %>
 
 <%inherit file="../main.html" />
@@ -21,8 +21,8 @@
         <div class="copy">
           <p class='enroll-message'>
             ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
-            link_start=u"<a href={}>".format(url_to_enroll),
-            link_end=u"</a>"
+                link_start=HTML(u"<a href={}>").format(url_to_enroll),
+                link_end=HTML(u"</a>"),
             )}
           </p>
         </div>
@@ -55,21 +55,21 @@ $(document).ready(function(){
         % endif
       % endif
 
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
+      <h1>${_("Course Updates & News")}</h1>
+      ${get_course_info_section(request, course, 'updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
+      ${get_course_info_section(request, course, 'handouts') | n}
     </section>
     % else:
     <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'guest_updates')}
+      <h1>${_("Course Updates & News")}</h1>
+      ${get_course_info_section(request, course, 'guest_updates') | n}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, course, 'guest_handouts')}
+      ${get_course_info_section(request, course, 'guest_handouts') | n}
     </section>
     % endif
   </div>

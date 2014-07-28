@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 % for co in context_list:
     % if co['grader_type'] in grader_type_image_dict:
         <%grader_type=co['grader_type']%>

@@ -1,10 +1,11 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "group_configurations" %></%def>
 <%namespace name='static' file='static_content.html'/>
-<%! import json %>
 <%!
+  import json
   from contentstore import utils
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
+  from django.template.defaultfilters import escapejs
 %>
 
 <%block name="title">${_("Group Configurations")}</%block>
@@ -21,7 +22,7 @@
 <%block name="requirejs">
 % if configurations is not None:
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${json.dumps(configurations)}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(JSON.parse('${json.dumps(configurations) | n,escapejs}'), "${group_configuration_url}", "${course_outline_url}");
   });
 % endif
 </%block>
@@ -66,7 +67,7 @@
 
         <p>${_("A group configuration defines how many groups of students are in an experiment. When you create an experiment, you select the group configuration to use.")}</p>
 
-        <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+        <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
 
         <p>${_("You can delete a group configuration only if it is not in use in an experiment. To delete a configuration, hover over its box and click the delete icon.")}</p>
 
@@ -83,7 +84,7 @@
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${details_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>

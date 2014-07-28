@@ -53,7 +53,7 @@
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
                     <div class="ui-loading is-hidden">
-                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading...</span></p>
+                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading</span></p>
                     </div>
                 </article>
                 <aside class="content-supplementary" role="complementary">

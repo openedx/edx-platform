@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%inherit file="main.html" />
 
@@ -161,8 +161,8 @@
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
-                link_end='</a>')}</label>
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=marketing_link('TOS')),
+                link_end=HTML('</a>'))}</label>
             </div>
 
             % endif
@@ -177,16 +177,16 @@
                   honor_code_path = marketing_link('HONOR')
               %>
               <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
-                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
-                link_end='</a>')}</label>
+                link_start=HTML('<a href="{url}" class="new-vp">').format(url=honor_code_path),
+                link_end=HTML('</a>'))}</label>
             </div>
           </li>
         </ol>
       </fieldset>
 
 % if course_id and enrollment_action:
-      <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
-      <input type="hidden" name="course_id" value="${course_id | h}" />
+      <input type="hidden" name="enrollment_action" value="${enrollment_action}" />
+      <input type="hidden" name="course_id" value="${course_id}" />
 % endif
 
       <div class="form-actions">

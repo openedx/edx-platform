@@ -1,6 +1,7 @@
 <%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.html import escapejs %>
 <%! from student.roles import CourseInstructorRole %>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "team" %></%def>
@@ -153,7 +154,7 @@
       % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
         <h3 class="title-3">${_("Transferring Ownership")}</h3>
-        <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
+        <p>${_("Every course must have an Admin. If you're the Admin and you want to transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>
@@ -163,6 +164,6 @@
 
 <%block name="requirejs">
   require(["js/factories/manage_users"], function(ManageUsersFactory) {
-      ManageUsersFactory(${json.dumps([user.email for user in staff])}, "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
+      ManageUsersFactory(JSON.parse('${json.dumps([user.email for user in staff]) | n,escapejs}'), "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(context_course.id), 'email': '@@EMAIL@@'})}");
   });
 </%block>

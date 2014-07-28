@@ -132,13 +132,42 @@ Mako template files
 .. highlight:: mako
 
 In Mako template files (`templates/*.html`), you can use all of the tools
-available to python programmers. Just make sure to import the relevant
-functions first. Here's a Mako template example::
+available to Python programmers. Just make sure to import the relevant
+functions first. We have helpers in util.markup to get the escaping right
+for text and HTML.  Here's a Mako template example::
 
-    <%! from django.utils.translation import ugettext as _ %>
+    <%! from util.markup import ugettext as _ %>
  
     ## Translators: message to the translator
     ${_("Welcome!")}
+
+All translated strings should be text, not HTML.  Our Mako templates are
+configured to apply HTML escaping by default. If you put an HTML tag into a
+translated string, it will display as angle brackets in the browser, it will
+not be an HTML tag.  You can use string formatting to insert HTML into a
+translated string::
+
+    <%! from util.markup import HTML, ugettext as _ %>
+
+    ${_("Click over to {link_start}the home page{link_end}.").format(
+            link_start=HTML('<a href="/home">'),
+            link_end=HTML('</a>'),
+        )}
+
+You can nest the formatting further.  The rule is, any string which is HTML
+should be wrapped in the HTML() function, and any string which is not wrapped
+in HTML() will be escaped as needed to be interpreter as regular text::
+
+    ${_("Click over to {link_start}the home page{link_end}.").format(
+            link_start=HTML('<a href="{}">').format(home_page_link),
+            link_end=HTML('</a>'),
+        )}
+
+If you have a variable containing HTML, use the ``|n`` filter to insert it into
+the page without escaping:
+
+    ${welcome_html | n}
+
 
 JavaScript files
 ================

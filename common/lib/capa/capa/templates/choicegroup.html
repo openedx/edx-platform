@@ -51,7 +51,7 @@
 
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             % if status in ('correct', 'incorrect') and not show_correctness=='never':
-            <span class="sr status">${choice_description|h} - ${status.display_name}</span>
+            <span class="sr status">${choice_description} - ${status.display_name}</span>
             % endif
             % endif
         </label>

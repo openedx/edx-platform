@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
@@ -33,7 +33,10 @@
     <div class="msg-content">
       <h3 class="title">${_("No Flash Detected")}</h3>
       <div class="copy">
-        <p>${_("You don't seem to have Flash installed. {a_start} Get Flash {a_end} to continue your registration.").format(a_start='<a rel="external" href="http://get.adobe.com/flashplayer/">', a_end="</a>")}</p>
+        <p>${_("You don't seem to have Flash installed. {a_start}Get Flash{a_end} to continue your registration.").format(
+                a_start=HTML('<a rel="external" href="http://get.adobe.com/flashplayer/">'),
+                a_end=HTML('</a>')
+            )}</p>
       </div>
     </div>
   </div>
@@ -144,7 +147,7 @@
 
                 <div class="copy">
                   <p>${_("Make sure your full name on your {platform_name} account ({full_name}) matches the ID you originally submitted. We will also use this as the name on your certificate.").format(
-                    full_name="<span id='full-name'>{name}</span>".format(name=user_full_name),
+                    full_name=HTML("<span id='full-name'>{name}</span>").format(name=user_full_name),
                     platform_name=settings.PLATFORM_NAME,
                   )}</p>
                 </div>
@@ -163,7 +166,13 @@
                 <div class="prompt-verify">
                   <h3 class="title">Before proceeding, please review carefully</h3>
 
-                   <p class="copy"> ${_("Once you verify your photo looks good and your name is correct, you can finish your re-verification and return to your course.  <strong>Note: You will not have another chance to re-verify.</strong>")}</p>
+                  <p class="copy">${_("Once you verify your photo looks good and your name is correct, "
+                                        "you can finish your re-verification and return to your course. "
+                                        "{em_start}Note: You will not have another chance to re-verify.{em_end}").format(
+                                            em_start=HTML("<strong>"),
+                                            em_end=HTML("</strong>"),
+                                        )}
+                  </p>
 
                   <ul class="list-actions">
                     <li class="action action-verify">
@@ -177,8 +186,8 @@
                   <li class="wizard-step step-proceed">
                     <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                      <input type="hidden" name="course_id" value="${course_id | h}">
-                      <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="${_('Submit photos &amp; re-verify')}" name="payment">
+                      <input type="hidden" name="course_id" value="${course_id}">
+                      <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="${_('Submit photos & re-verify')}" name="payment">
                     </form>
                   </li>
                 </ol>

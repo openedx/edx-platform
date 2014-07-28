@@ -2,11 +2,11 @@
 """
 Tests courseware views.py
 """
-import cgi
 from datetime import datetime
 from pytz import UTC
 import unittest
 import ddt
+import markupsafe
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -347,7 +347,7 @@ class ViewsTestCase(TestCase):
 
         # Verify that the checkbox is displayed with the organization name
         # in the label escaped as expected.
-        self._email_opt_in_checkbox(response, cgi.escape(self.org_html))
+        self._email_opt_in_checkbox(response, markupsafe.escape(self.org_html))
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
     def test_mktg_about_language_edx_domain(self):

@@ -1,6 +1,6 @@
 ## mako
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
 ## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
@@ -31,8 +31,7 @@
       </div>
 
       <div class="footer-about-copyright">
-        ## Translators: '&copy;' is an HTML character code for the copyright symbol. Please don't remove or change it.
-        <p>${_("&copy; {copyright_year} {platform_name}, some rights reserved").format(
+        <p>${_(u"© {copyright_year} {platform_name}, some rights reserved").format(
           platform_name=settings.PLATFORM_NAME,
           copyright_year=settings.COPYRIGHT_YEAR
         )}

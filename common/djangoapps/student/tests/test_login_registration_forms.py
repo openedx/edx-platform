@@ -12,6 +12,7 @@ from student.tests.factories import CourseModeFactory
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
+from util.markup import escape
 
 
 # This relies on third party auth being enabled and configured
@@ -33,10 +34,11 @@ def _third_party_login_url(backend_name, auth_entry, course_id=None, redirect_ur
     if course_id:
         params.append(("enroll_course_id", course_id))
 
-    return u"{url}?{params}".format(
+    # This URL will be searched in an HTML tag's attribute, so it will be escaped.
+    return escape(u"{url}?{params}".format(
         url=reverse("social:begin", kwargs={"backend": backend_name}),
         params=urllib.urlencode(params)
-    )
+    ))
 
 
 @ddt.ddt

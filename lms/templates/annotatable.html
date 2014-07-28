@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -14,7 +14,7 @@
             <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_("Collapse Instructions")}</a>
         </div>
         <div class="annotatable-section-body annotatable-instructions">
-            ${instructions_html}
+            ${instructions_html | n}
         </div>
     </div>
     % endif
@@ -25,7 +25,7 @@
             <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">${_("Hide Annotations")}</a>
         </div>
         <div class="annotatable-section-body annotatable-content">
-            ${content_html}
+            ${content_html | n}
         </div>
     </div>
 </div>

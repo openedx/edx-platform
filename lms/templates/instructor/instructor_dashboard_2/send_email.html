@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%page args="section_data"/>
 
 <div class="vert-left send-email" id="section-send-email">
@@ -34,7 +34,7 @@
   <li class="field">
     <label>${_("Message:")}</label>
       <div class="email-editor">
-      ${ section_data['editor'] }
+      ${ section_data['editor'] | n}
       </div>
     <input type="hidden" name="message" value="">
   </li>
