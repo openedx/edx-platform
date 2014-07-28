@@ -20,7 +20,7 @@ any way.
    * - All other course dates
      - Yes.  
    * - Course outline structure (sections, subsections, units)
-     - Yes.
+     - Yes. 
    * - Individual problems and other components
      - Yes.
    * - Files uploaded to the course, including videos and textbooks
@@ -35,15 +35,16 @@ any way.
      - Yes.
    * - Student enrollment data
      - No.
-   * - Course team privileges, including admins, discussion moderators, and
-     beta testers
+   * - Course team privileges, including admins, discussion moderators, and beta testers
      - No. Only your own role (as a course admin and instructor) is defined.
-   * - Discussion posts, responses, comments, other data
+   * - Discussion posts, responses, comments, and other data
      - No.
    * - Student answers, progress, and grading data
      - No.
    * - Certificates
      - No.
+
+.. for the course outline structure row above, indicate that the state remains/does not remain the same (published vs. hidden)
 
 See :ref:`Create a Course Using Rerun` and :ref:`Update the New Course`.
 
@@ -55,7 +56,9 @@ Use Re-Run to Create a Course
 
 Before you re-run a course, verify that:
 
-* You have permission to create courses in Studio.
+* You have permission to create courses in Studio. See :ref:`Use Studio on Edge`.
+
+.. is it appropriate that we don't have an analogous description for getting course creator privs on edx.org?
 
 * You are a member of the course staff for the course that you want to re-run.
 
@@ -88,8 +91,8 @@ To re-run a course:
    can work in other parts of Studio or in the LMS, or on other web sites,
    while the process runs.
 
-  When the configuration of the new course is complete, it is listed on your
-  **My Courses** dashboard in Studio.
+  The new course appears on your **My Courses** dashboard in Studio when
+  configuration is complete.
 
 .. _Update the New Course:
 
@@ -97,9 +100,9 @@ To re-run a course:
 Update the New Course
 ********************************************
 
-When you create a course by re-running another course, careful review of course
-settings and content is needed. At a minimum, you make these changes to prepare
-the new course for release:
+When you create a course by re-running another course, you should carefully
+review the course settings and content. At a minimum, you will need to make
+these changes to prepare the new course for release:
 
 * Add course staff members. See :ref:`Add Course Team Members` or
   :ref:`Course_Staffing`.
@@ -110,6 +113,9 @@ the new course for release:
 * Change the release dates of course sections, subsections, and units. See
   :ref:`Release Dates`.
 
+* Change the due dates of subsections that are part of your grading policy. See
+  :ref:`subsections`.
+
 * Delete or edit posts on the **Course Updates** page in Studio. See :ref:`Add
   a Course Update`.
 
@@ -118,12 +124,12 @@ the new course for release:
 
 * Add initial wiki articles.
 
-* Create initial posts for the discussion topics and an "introduce yourself"
+* Create initial posts for discussion topics and an "introduce yourself"
   post. See :ref:`Discussions`.
   
 You can use the :ref:`course checklists<Use the Course Checklist>` to work
 through the course and verify that it is ready for release.
 
-The courses that you create with the re-run option should be tested thoroughly
-before the release date to assure the same quality student experience. See
-:ref:`Testing Your Course` and :ref:`Beta_Testing`.
+To assure a quality experience for course students, be sure to test a course
+created with the re-run option thoroughly before the course start date.
+See :ref:`Testing Your Course` and :ref:`Beta_Testing`.

@@ -46,11 +46,14 @@ Create a New Course
      :alt: Image of the course creation page
 
   * For **Course Name**, enter the title of your course. For example, the name
-    may be “Sets, Maps and Symmetry Groups". Use title capitalization for the
+    may be “Sets, Maps, and Symmetry Groups". Use title capitalization for the
     course title.
 
-  * For **Organization**, enter the identifier for your university. Do not
-    include spaces or special characters.
+  * For **Organization**, enter the identifier for your university. For
+    example, enter HarvardX or MITx. Do not include spaces or special
+    characters.
+
+.. is it ok to include the Harvard and MIT examples?
 
   * For **Course Number**, enter both a subject abbreviation and a number. For
     example, for public health course number 207, enter **PH207**. For math
@@ -60,12 +63,13 @@ Create a New Course
     .. note:: If your course will be open to the world, be sure to include the
      "x". If it is exclusively an on-campus offering, do not include the "x".*
 
-  * For **Course Run**, enter the term your course will run. Do not include
-    spaces or special characters.
+  * For **Course Run**, enter the term in which your course will run. For
+    example, enter 2014SOND or T2_2014. Do not include spaces or special
+    characters.
 
-    The Course Run value that you enter does not affect the **Course Start
-    Date**.  See :ref:`Set Important Dates for Your Course` for more
-    information.
+    The value that you enter for the run does not affect the course start date
+    that you define for the course. See :ref:`Set Important Dates for Your
+    Course` for more information.
 
 4. Click **Save.**
 
@@ -76,16 +80,19 @@ You then see the empty Course Outline.
 ************************
 Edit Your Course
 ************************
-When you create a new course, the course opens in Studio automatically and you
+
+After you create a course, the course opens in Studio automatically and you
 can begin editing.
 
-If you come back to Studio later, your courses are listed on the Studio **My
-Courses** dashboard page.
+When you return to Studio later, the Studio **My Courses** dashboard page lists
+the courses that you create along with any courses for which you have course
+staff privileges.
 
  .. image:: ../Images/open_course.png
   :alt: Image of the course on the Studio dashboard
  
-To open the course, click the course name. You go to the Course Outline. 
+To open a course, click the course name. The Studio **Course Outline** page
+appears.
 
 .. _Use the Course Checklist:
 
