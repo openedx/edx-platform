@@ -101,7 +101,7 @@ if (statusType === 'warning') {
             <p><%= gettext("You haven't added any content to this course yet.") %>
                 <a href="#" class="button button-new" data-category="<%= childCategory %>"
                    data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
-                    <i class="icon icon-plus"></i><%= addChildLabel %>
+                    <i class="icon-plus"></i><%= addChildLabel %>
                 </a>
             </p>
         </div>
