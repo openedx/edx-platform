@@ -16,6 +16,9 @@ This chapter describes how to create and set up your course:
 * :ref:`Use the Course Checklist`
 * :ref:`Add Course Team Members`
 
+Another way to create a course is to re-run an existing course. See
+:ref:`Rerun a Course`.
+
 You can also :ref:`Export a Course` and :ref:`Import a Course` through Studio.
 You can do this when you need to edit the course in XML.
 
@@ -32,9 +35,6 @@ Create a New Course
 #. Click **New Course**.
 #. Enter course information as needed and click **Create**.
 
-  .. image:: ../Images/new_course_info.png
-     :alt: Image of the course creation page
-
   .. note::  Enter new course information carefully. This information becomes
    part of the URL for your course. To change the URL after the course is
    created, you must contact edX through the Help site
@@ -42,25 +42,28 @@ Create a New Course
    part of your course URL, the total number of characters in the following
    four fields must be 65 or fewer.
 
+  .. image:: ../Images/new_course_info.png
+     :alt: Image of the course creation page
+
   * For **Course Name**, enter the title of your course. For example, the name
     may be “Sets, Maps and Symmetry Groups". Use title capitalization for the
     course title.
 
-  * For **Organization**, enter the name of your university. Do not include
-    whitespace or special characters.
+  * For **Organization**, enter the identifier for your university. Do not
+    include spaces or special characters.
 
   * For **Course Number**, enter both a subject abbreviation and a number. For
     example, for public health course number 207, enter **PH207**. For math
-    course 101x, enter **Math101x**. Do not include whitespace or special
+    course 101x, enter **Math101x**. Do not include spaces or special
     characters in the course number.
 
     .. note:: If your course will be open to the world, be sure to include the
      "x". If it is exclusively an on-campus offering, do not include the "x".*
 
   * For **Course Run**, enter the term your course will run. Do not include
-    whitespace or special characters.
+    spaces or special characters.
 
-    The Course Run date you enter does not affect the default **Course Start
+    The Course Run value that you enter does not affect the **Course Start
     Date**.  See :ref:`Set Important Dates for Your Course` for more
     information.
 
@@ -76,8 +79,8 @@ Edit Your Course
 When you create a new course, the course opens in Studio automatically and you
 can begin editing.
 
-If you come back to Studio later, your courses are listed on the Studio login
-page.
+If you come back to Studio later, your courses are listed on the Studio **My
+Courses** dashboard page.
 
  .. image:: ../Images/open_course.png
   :alt: Image of the course on the Studio dashboard
