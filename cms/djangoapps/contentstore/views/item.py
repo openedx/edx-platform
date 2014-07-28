@@ -687,7 +687,7 @@ class VisibilityState(object):
     """
     live = 'live'
     ready = 'ready'
-    unscheduled = 'unscheduled'  # unscheduled
+    unscheduled = 'unscheduled'
     needs_attention = 'needs_attention'
     staff_only = 'staff_only'
 
@@ -699,6 +699,8 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
     if xblock.visible_to_staff_only:
         return VisibilityState.staff_only
     elif is_unit_with_changes:
+        # Note that a unit that has never been published will fall into this category,
+        # as well as previously published units with draft content.
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
