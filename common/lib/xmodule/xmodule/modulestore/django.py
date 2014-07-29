@@ -137,7 +137,7 @@ class ModuleI18nService(object):
         # right there.  If you are reading this comment after April 1, 2014,
         # then Cale was a liar.
         from util.date_utils import strftime_localized
-        kwargs['coerce_tz'] = settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES
+        kwargs['coerce_tz'] = getattr(settings, 'TIME_ZONE_DISPLAYED_FOR_DEADLINES', None)
         return strftime_localized(*args, **kwargs)
 
 
