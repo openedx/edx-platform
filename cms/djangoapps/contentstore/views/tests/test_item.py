@@ -569,10 +569,6 @@ class TestEditItem(ItemTest):
     def test_republish(self):
         """ Test republishing an item. """
         new_display_name = 'New Display Name'
-        republish_data = {
-            'publish': 'republish',
-            'display_name': new_display_name
-        }
 
         # When the problem is first created, it is only in draft (because of its category).
         self.assertFalse(self._is_location_published(self.problem_usage_key))
@@ -1270,6 +1266,9 @@ class TestXBlockPublishingInfo(ItemTest):
     SECOND_UNIT_PATH = [0, 1]
 
     def _create_child(self, parent, category, display_name, publish_item=False, staff_only=False):
+        """
+        Creates a child xblock for the given parent.
+        """
         return ItemFactory.create(
             parent_location=parent.location, category=category, display_name=display_name,
             user_id=self.user.id, publish_item=publish_item, visible_to_staff_only=staff_only
