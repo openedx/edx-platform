@@ -801,32 +801,77 @@ class ChoiceResponse(LoncapaResponse):
         :param student_answers: the set of answer choices made by the student
         :return:                nothing
         '''
-        for problem in student_answers:
-            problem_hint_shown = False
-            student_answer_list = student_answers[problem]
-            if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-                student_answer_list = [student_answer_list]     # cast it as a true list
 
-            choice_list = self.xml.xpath('//choice')
-            for choice in choice_list:
-                choice_id = choice.get('name')
-                attribute_test = '[@name="' + choice_id + '"]'
-                if choice_id in student_answer_list:            # if this choice was selected by the student
-                    hint_test = '[@selected="True"]'
-                    xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
-                else:                                           # else this choice was not selected by the student
-                    hint_test = '[@selected="False"]'
-                    xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
 
-                hint_text_element = self.xml.xpath(xpath_string)
-                if hint_text_element:
-                    problem_hint_shown = True
-                    hint_text = hint_text_element[0].text.strip()
-                    new_cmap[problem]['msg'] += '<div class="' \
-                                                + QUESTION_HINT_TEXT_STYLE \
-                                                + '">' + hint_text + '</div>'
 
-            self.wrap_hints_correct_or_incorrect(new_cmap, problem, problem_hint_shown)
+        # for problem_id in student_answers:
+        #     if unicode(self.answer_id) == problem_id:
+        #         choiceresponse_test = '[@id="' + problem_id + '"]'
+        #         choice_test = '[@name="' + problem_ids[student_answer] + '"]'
+        #         choice = self.xml.xpath('//choiceresponse' + choiceresponse_test + '/choice' + choice_test)[0]
+        #         choice_hints = self.xml.xpath('//choiceresponse' + choiceresponse_test + '/choice' + choice_test + '/choicehint')
+        #         if choice_hints:
+        #             choice_hint = choice_hints[0]
+        #             choice_hint_text = choice_hint.text.strip()
+        #             if len(choice_hint_text) > 0:
+        #                 choice_hint_label = choice_hint.get('label')
+        #
+        #                 message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
+        #                 if choice.get('correct').upper() == 'TRUE':
+        #                     message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
+        #
+        #                 if choice_hint_label:
+        #                     correctness_string = choice_hint_label + ': '
+        #                 else:
+        #                     correctness_string = 'INCORRECT: '  # assume the answer is incorrect
+        #                     if choice.get('correct').upper() == 'TRUE':
+        #                         correctness_string = 'CORRECT: '
+        #
+        #                 new_cmap[self.answer_id]['msg'] = new_cmap[self.answer_id]['msg'] + \
+        #                     '<div class="' + message_style_class + '">' \
+        #                     + correctness_string + choice_hint_text + '</div>'
+        #         break
+
+
+        for problem_id in student_answers:
+            if unicode(self.answer_id) == problem_id:
+                problem_hint_shown = False
+                student_answer_list = student_answers[problem_id]
+                # if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
+                #     student_answer_list = [student_answer_list]     # cast it as a true list
+
+                choice_list = self.xml.xpath('//choice')
+                for choice in choice_list:
+                    choice_id = choice.get('name')
+                    attribute_test = '[@name="' + choice_id + '"]'
+                    if choice_id in student_answer_list:            # if this choice was selected by the student
+                        hint_test = '[@selected="True"]'
+                        xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+                    else:                                           # else this choice was not selected by the student
+                        hint_test = '[@selected="False"]'
+                        xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+
+                    hint_text_element = self.xml.xpath(xpath_string)
+                    if hint_text_element:
+                        problem_hint_shown = True
+                        hint_text = hint_text_element[0].text.strip()
+                        new_cmap[problem_id]['msg'] += '<div class="' \
+                                                    + QUESTION_HINT_TEXT_STYLE \
+                                                    + '">' + hint_text + '</div>'
+
+                    self.wrap_hints_correct_or_incorrect(new_cmap, problem_id, problem_hint_shown)
+
+
+
+
+
+
+
+
+
+
+
+
 
     def assign_choice_names(self):
         """
@@ -876,40 +921,42 @@ class ChoiceResponse(LoncapaResponse):
         """
         compound_hint_matched = False       # assume we won't find any matching rules
 
-        for problem in student_answers:
-            problem_hint_shown = False
-            selection_id_list = []              # create a list of all the student's selected id's
-            for student_answer in student_answers[problem]:
-                choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
-                if choice_list:             # if we found at least one choice element
-                    choice = choice_list[0]
-                    selection_id_list.append(choice.get('id').upper())
-            selection_id_list.sort()        # sort the list to make comparison easier
+        # for problem in student_answers:
+        for student_answer in student_answers:
+            if unicode(self.answer_id) == student_answer:
+                problem_hint_shown = False
+                selection_id_list = []              # create a list of all the student's selected id's
+                for student_answer in student_answers[student_answer]:
+                    choice_list = self.xml.xpath('checkboxgroup/choice [@name="' + str(student_answer) + '"]')
+                    if choice_list:             # if we found at least one choice element
+                        choice = choice_list[0]
+                        selection_id_list.append(choice.get('id').upper())
+                selection_id_list.sort()        # sort the list to make comparison easier
 
-            for boolean_hint_element in self.xml.xpath("//booleanhint"):
-                boolean_condition_string = boolean_hint_element.get("value").upper()
-                boolean_condition_string = boolean_condition_string.replace("AND", " ")  # delete optional 'AND' operator
-                boolean_condition_string = boolean_condition_string.replace("*", " ")    # delete any '*' operator
+                for boolean_hint_element in self.xml.xpath("//booleanhint"):
+                    boolean_condition_string = boolean_hint_element.get("value").upper()
+                    boolean_condition_string = boolean_condition_string.replace("AND", " ")  # delete optional 'AND' operator
+                    boolean_condition_string = boolean_condition_string.replace("*", " ")    # delete any '*' operator
 
-                boolean_condition_list = []
-                for boolean_conditon_token in boolean_condition_string.split(" "):
-                    if len(boolean_conditon_token.strip()) > 0:
-                        boolean_condition_list.append(boolean_conditon_token)
-                boolean_condition_list.sort()   # sort the list to make comparison easier
+                    boolean_condition_list = []
+                    for boolean_conditon_token in boolean_condition_string.split(" "):
+                        if len(boolean_conditon_token.strip()) > 0:
+                            boolean_condition_list.append(boolean_conditon_token)
+                    boolean_condition_list.sort()   # sort the list to make comparison easier
 
-                if boolean_condition_list == selection_id_list:
-                    compound_hint_matched = True
+                    if boolean_condition_list == selection_id_list:
+                        compound_hint_matched = True
 
-                    hint_label = ''
-                    if boolean_hint_element.get('label'):
-                        hint_label = boolean_hint_element.get('label') + ': '
+                        hint_label = ''
+                        if boolean_hint_element.get('label'):
+                            hint_label = boolean_hint_element.get('label') + ': '
 
-                    new_cmap[problem]['msg'] = '<div class="' + QUESTION_HINT_TEXT_STYLE + '">' \
-                        + hint_label + boolean_hint_element.text.strip() + '</div>'
-                    problem_hint_shown = True
-                    break
+                        new_cmap[self.answer_id]['msg'] = '<div class="' + QUESTION_HINT_TEXT_STYLE + '">' \
+                            + hint_label + boolean_hint_element.text.strip() + '</div>'
+                        problem_hint_shown = True
+                        break
 
-            self.wrap_hints_correct_or_incorrect(new_cmap, problem, problem_hint_shown)
+                self.wrap_hints_correct_or_incorrect(new_cmap, self.answer_id, problem_hint_shown)
 
         return compound_hint_matched
 
