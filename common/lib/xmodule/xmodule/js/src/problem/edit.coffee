@@ -8,8 +8,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
   @customLabel: ""
-  @questionHintsBooleanStrings: []
-  @questionHintsBooleanExpressions: []
 
   constructor: (element) ->
     @element = element
@@ -192,39 +190,39 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
 
 
-  #________________________________________________________________________________
-  @insertBooleanHints: (xmlStringUnderConstruction) ->
-    if MarkdownEditingDescriptor.questionHintsBooleanExpressions
-      index = 0
-      for booleanExpression in MarkdownEditingDescriptor.questionHintsBooleanExpressions
-        hintText = MarkdownEditingDescriptor.questionHintsBooleanStrings[index]
-        booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
-        booleanHintElement += '        </booleanhint>\n'
-        xmlStringUnderConstruction += booleanHintElement
-        index = index + 1
-    return xmlStringUnderConstruction
-
-  #________________________________________________________________________________
-  @parseForCompoundConditionHints: (xmlString) ->
-    for line in xmlString.split('\n')
-      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
-      if matches
-        questionHintString = matches[1]
-        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
-        if splitMatches
-          booleanExpression = splitMatches[1]
-          hintText = splitMatches[2]
-          MarkdownEditingDescriptor.questionHintsBooleanStrings.push(hintText)
-          MarkdownEditingDescriptor.questionHintsBooleanExpressions.push(booleanExpression)
-    return xmlString
+#  #________________________________________________________________________________
+#  @insertBooleanHints: (xmlStringUnderConstruction) ->
+#    if MarkdownEditingDescriptor.questionHintsBooleanExpressions
+#      index = 0
+#      for booleanExpression in MarkdownEditingDescriptor.questionHintsBooleanExpressions
+#        hintText = MarkdownEditingDescriptor.questionHintsBooleanStrings[index]
+#        booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
+#        booleanHintElement += '        </booleanhint>\n'
+#        xmlStringUnderConstruction += booleanHintElement
+#        index = index + 1
+#    return xmlStringUnderConstruction
+#
+#  #________________________________________________________________________________
+#  @parseForCompoundConditionHints: (xmlString) ->
+#    for line in xmlString.split('\n')
+#      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
+#      if matches
+#        questionHintString = matches[1]
+#        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
+#        if splitMatches
+#          booleanExpression = splitMatches[1]
+#          hintText = splitMatches[2]
+#          MarkdownEditingDescriptor.questionHintsBooleanStrings.push(hintText)
+#          MarkdownEditingDescriptor.questionHintsBooleanExpressions.push(booleanExpression)
+#    return xmlString
 
 #________________________________________________________________________________
   @matchCompoundConditionPattern: (testString) ->
     return testString.match( /\{\{(.+)\}\}/ )
 
-  #________________________________________________________________________________
-  @matchBooleanConditionPattern: (testString) ->
-    return testString.match( /\(\((.+)\)\)(.+)/ )
+#  #________________________________________________________________________________
+#  @matchBooleanConditionPattern: (testString) ->
+#    return testString.match( /\(\((.+)\)\)(.+)/ )
 
   #________________________________________________________________________________
   @matchMultipleChoicePattern: (testString) ->
@@ -232,7 +230,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   #________________________________________________________________________________
   @matchCheckboxMarkerPattern: (testString) ->
-    return testString.match( /(\s+\[\s*x?\s*\])(.+)[^\n]+/ )
+    return testString.match( /(\s+\[\s*x?\s*\])([^\n]+)/ )
 
   #________________________________________________________________________________
   @insertParagraphText: (xmlString, reducedXmlString) ->
@@ -341,8 +339,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   #________________________________________________________________________________
   @parseForDropdown: (xmlString) ->
-    # try to parse the supplied string to find a drop down problem
-    # return the string unmodified if this is not a drop down problem
+    # parse the supplied string knowing it is a drop down problem
     dropdownMatches = xmlString.match( /\[\[([^\]]+)\]\]/ )   # try to match an opening and closing double bracket
 
     if dropdownMatches                            # the xml has an opening and closing double bracket [[...]]
@@ -409,70 +406,76 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
   #________________________________________________________________________________
   @parseForCheckbox: (xmlString) ->
-    # try to parse the supplied string to find a checkbox problem
-    # return the string unmodified if this is not a checkbox problem
-    isCheckboxType = false
+    # parse the supplied string knowing it is a checkbox problem
     returnXmlString = ''
     reducedXmlString = ''
+    hintTextSelected = ''
+    hintTextUnselected = ''
+    booleanExpressionStrings = []
+    booleanHintPhrases = []
+
+    debugger
+
+    returnXmlString +=  '    <choiceresponse>\n'
+    returnXmlString += '        <checkboxgroup direction="vertical">\n'
 
     for line in xmlString.split('\n')
+      correctnessText = ''
+      itemText = ''
+
       choiceMatches = @matchCheckboxMarkerPattern( line )
+      if choiceMatches           # this line includes '[...]' so it must be a checkbox choice
+        line = choiceMatches[2]  # remove the [..] phrase, else it will be displayed to student
+        hintMatches = line.match( /%([0-9]+)%/ )  # check for an extracted hint string
+        if hintMatches
+          line = line.replace(hintMatches[0], '')  # remove the {{...}} phrase, else it will be displayed to student
 
-      if choiceMatches              # this line includes '(...)' so it must be a checkbox item
-        isCheckboxType = true
-      else
-        reducedXmlString += line + '\n'    # this line is not an item line, add it to reduced lines string
+          hintIndex = parseInt(hintMatches[1])
+          combinedHintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
+          combinedHintText = combinedHintText.trim()
+          combinedHintText = combinedHintText.replace( /(selected:|s:)/i, "S:")
+          combinedHintText = combinedHintText.replace( /(unselected:|u:)/i, "U:")
+          selectedMatches = combinedHintText.match(/\s*S:\s*([^}]+)/)
+          unselectedMatches = combinedHintText.match(/\s*\{\s*U:\s*([^}]+)/)
 
-    if isCheckboxType
-      returnXmlString = MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
+          if selectedMatches and unselectedMatches  # both a selected and unselected phrase were supplied for this choice
+            hintTextSelected = selectedMatches[1]
+            hintTextUnselected = unselectedMatches[1]
 
-      returnXmlString +=  '    <choiceresponse>\n'
-      returnXmlString += '        <checkboxgroup direction="vertical">\n'
+        correctnessText = 'False'
+        if choiceMatches[1].match(/X/i)
+          correctnessText = 'True'
 
-      for line in xmlString.split('\n')
-        hintTextSelected = ''
-        hintTextUnselected = ''
-        correctnessText = ''
-        itemText = ''
-        choiceMatches = @matchCheckboxMarkerPattern( line )
-        if choiceMatches                          # this line includes '[...]' so it must be a checkbox choice
-          line = choiceMatches[2]  # remove the [..] phrase, else it will be displayed to student
-          isCheckboxType = true
-          hintMatches = line.match(/{{.+/)        # extract the {{...}} phrase, if any
-          if hintMatches
-            matchString = hintMatches[0]          # group 0 holds the entire matching string (includes delimiters)
-            line = line.replace(matchString, '')  # remove the {{...}} phrase, else it will be displayed to student
+        returnXmlString += '          <choice  correct="' + correctnessText + '">'
+        returnXmlString += '              ' + line + '\n'
+        if hintTextSelected.length > 0 and hintTextUnselected.length > 0
+          returnXmlString += '               <choicehint selected="True">' + hintTextSelected + '\n'
+          returnXmlString += '               </choicehint>\n'
+          returnXmlString += '               <choicehint selected="False">' + hintTextUnselected + '\n'
+          returnXmlString += '               </choicehint>\n'
+        returnXmlString += '          </choice>\n'
 
-            combinedHintText = hintMatches[0].trim()
-            combinedHintText = combinedHintText.replace( /(selected:|s:)/i, "S:")
-            combinedHintText = combinedHintText.replace( /(unselected:|u:)/i, "U:")
-            selectedMatches = combinedHintText.match(/\s*\{\s*S:\s*([^}]+)/)
-            unselectedMatches = combinedHintText.match(/\s*\{\s*U:\s*([^}]+)/)
-            if selectedMatches and unselectedMatches
-              hintTextSelected = selectedMatches[1]
-              hintTextUnselected = unselectedMatches[1]
+      else                        # this line is not a checkbox choice, but it may be a combination hint spec line
+        hintMatches = line.match( /%([0-9]+)%/ )  # check for an extracted hint string
+        if hintMatches            # the line does contain an extracted hint string
+          line = line.replace(hintMatches[0], '')  # remove the phrase, else it will be displayed to student
+          hintIndex = parseInt(hintMatches[1])
+          hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
+          hintText = combinedHintText.trim()
+          combinationHintMatch = hintText.match( /\(\((.+)\)\)(.+)/ )
+          if combinationHintMatch                   # the line does contain a combination hint phrase
+            booleanExpressionStrings.push(combinationHintMatch[1])
+            booleanHintPhrases.push(combinationHintMatch[2])
 
-          correctnessText = 'False'
-          if choiceMatches[1].match(/X/i)
-            correctnessText = 'True'
+    returnXmlString += '        </checkboxgroup>\n'
 
-          returnXmlString += '          <choice  correct="' + correctnessText + '">'
-          returnXmlString += '              ' + line + '\n'
-          if hintTextSelected.length > 0 and hintTextUnselected.length > 0
-            returnXmlString += '               <choicehint selected="True">' + hintTextSelected + '\n'
-            returnXmlString += '               </choicehint>\n'
-            returnXmlString += '               <choicehint selected="False">' + hintTextUnselected + '\n'
-            returnXmlString += '               </choicehint>\n'
-          returnXmlString += '          </choice>\n'
+    index = 0
+    for booleanExpression in booleanExpressionStrings
+      booleanHintPhrase = booleanHintPhrases[index++]
+      returnXmlString += '        <booleanhint value="' + booleanExpression + '">' + booleanHintPhrase + '\n'
+      returnXmlString += '        </booleanhint>\n'
 
-      returnXmlString += '        </checkboxgroup>\n'
-
-      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
-
-      returnXmlString += '    </choiceresponse>\n'
-    else
-      returnXmlString = xmlString
+    returnXmlString += '    </choiceresponse>\n'
 
     return returnXmlString
 
@@ -490,9 +493,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
 
-       //_____________________________________________________________________
+      //_____________________________________________________________________
       //
-      // drop down questions
+      // multiple choice questions
       //
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
         var choices = '';
@@ -542,26 +545,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return result;
       });
 
-      // group check answers
-      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
-          var groupString = '<choiceresponse>\n',
-              options, value, correct;
-
-          groupString += '  <checkboxgroup direction="vertical">\n';
-          options = match.split('\n');
-
-          for (i = 0; i < options.length; i += 1) {
-              if(options[i].length > 0) {
-                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
-                  correct = /^\s*\[x\]/i.test(options[i]);
-                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
-              }
-          }
-
-          groupString += '  </checkboxgroup>\n';
-          groupString += '</choiceresponse>\n\n';
-
-          return groupString;
+      //_____________________________________________________________________
+      //
+      // checkbox questions
+      //
+      debugger;
+      xml = xml.replace(/(^\s+(\[[x ]+|%[0-9]+)[^\n]+\n)+/gm, function(match) {
+        return MarkdownEditingDescriptor.parseForCheckbox(match);
       });
 
       // replace string and numerical
@@ -634,7 +624,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
-      debugger;
             var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
 
             return selectString;
