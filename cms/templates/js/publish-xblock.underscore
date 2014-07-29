@@ -19,7 +19,7 @@ if (visibilityState === 'live') {
 
 var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
-<div class="bit-publishing <%= visibilityClass %>">
+<div class="bit-publishing <%= visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
         <%= title %>
     </h3>
