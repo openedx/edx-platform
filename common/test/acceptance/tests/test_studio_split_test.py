@@ -69,16 +69,22 @@ class SplitTest(ContainerBase, SplitTestMixin):
     """
     __test__ = True
 
+    def setUp(self):
+        super(SplitTest, self).setUp()
+        # This line should be called once courseFixture is installed
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
+                    UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
+                ],
+            },
+        })
+
     def populate_course_fixture(self, course_fixture):
         """ Populates the course """
         course_fixture.add_advanced_settings(
-            {
-                u"advanced_modules": {"value": ["split_test"]},
-                u"user_partitions": {"value": [
-                    UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
-                    UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
-                ]}
-            }
+            {u"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -101,15 +107,14 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
-        self.course_fixture.add_advanced_settings(
-            {
-                u"user_partitions": {"value": [
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
                     UserPartition(0, 'Configuration alpha,beta', 'first',
                                   [Group("0", 'alpha'), Group("2", 'gamma')]).to_json()
-                ]}
-            }
-        )
-        self.course_fixture._add_advanced_settings()
+                ],
+            },
+        })
         return self.go_to_container_page()
 
     def test_create_and_select_group_configuration(self):
@@ -267,7 +272,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             u"advanced_modules": {"value": ["split_test"]},
         })
         course_fixture.add_children(
-            XBlockFixtureDesc('chpater', 'Test Section').add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit')
                 )
@@ -302,18 +307,16 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see `description` and `groups` appear and also have correct values
         And I do the same checks for the second group configuration
         """
-        self.course_fixture.add_advanced_settings({
-            u"user_partitions": {
-                "value": [
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
                     UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json()
+                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
                 ],
             },
         })
-        self.course_fixture._add_advanced_settings()
 
         self.page.visit()
-
         config = self.page.group_configurations()[0]
         # no groups when the the configuration is collapsed
         self.assertEqual(len(config.groups), 0)
@@ -496,19 +499,17 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And I click button 'Cancel'
         Then I see that new changes were discarded
         """
-        self.course_fixture.add_advanced_settings({
-            u"user_partitions": {
-                "value": [
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
                     UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
-                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json()
+                    UserPartition(1, 'Name of second Group Configuration', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json(),
                 ],
             },
         })
-        self.course_fixture._add_advanced_settings()
         self.page.visit()
 
         config = self.page.group_configurations()[0]
-
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
         # Add 2 new groups

@@ -499,15 +499,21 @@ class CourseFixture(StudioApiFixture):
         """
         Publish the xblock at `locator`.
         """
+        self._update_xblock(locator, {'publish': 'make_public'})
+
+    def _update_xblock(self, locator, data):
+        """
+        Update the xblock at `locator`.
+        """
         # Create the new XBlock
         response = self.session.put(
             "{}/xblock/{}".format(STUDIO_BASE_URL, locator),
-            data=json.dumps({'publish': 'make_public'}),
+            data=json.dumps(data),
             headers=self.headers,
         )
 
         if not response.ok:
-            msg = "Could not publish {}.  Status was {}".format(locator, response.status_code)
+            msg = "Could not update {} with data {}.  Status was {}".format(locator, data, response.status_code)
             raise CourseFixtureError(msg)
 
     def _encode_post_dict(self, post_dict):
