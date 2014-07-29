@@ -14,8 +14,10 @@ if (visibilityState === 'staff_only') {
         statusType = 'warning';
         if (published && releasedToStudents) {
             statusMessage = gettext('Unpublished changes to live content');
-        } else {
+        } else if (!published) {
             statusMessage = gettext('Unpublished units will not be released');
+        } else {
+            statusMessage = gettext('Unpublished changes to content that will release in the future');
         }
     }
 }
