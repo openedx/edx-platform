@@ -1142,7 +1142,7 @@ class TestXBlockInfo(ItemTest):
         xblock_info = create_xblock_info(
             vertical,
             include_child_info=True,
-            include_edited_by=True,
+            for_container_page=True,
             include_children_predicate=ALWAYS,
             include_ancestor_info=True
         )
@@ -1183,7 +1183,7 @@ class TestXBlockInfo(ItemTest):
 
     def validate_sequential_xblock_info(self, xblock_info, has_child_info=True):
         """
-        Validate that the xblock info is correct for the test chapter.
+        Validate that the xblock info is correct for the test sequential.
         """
         self.assertEqual(xblock_info['category'], 'sequential')
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
@@ -1213,7 +1213,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(ancestors[2], has_child_info=False)
 
         # Finally, validate the entire response for consistency
-        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True, has_edited_by=True)
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True, for_container_page=True)
 
     def validate_component_xblock_info(self, xblock_info):
         """
@@ -1227,7 +1227,7 @@ class TestXBlockInfo(ItemTest):
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info)
 
-    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False, has_edited_by=False):
+    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False, for_container_page=False):
         """
         Validate that the xblock info is internally consistent.
         """
@@ -1251,11 +1251,12 @@ class TestXBlockInfo(ItemTest):
                 for child_response in xblock_info['child_info']['children']:
                     self.validate_xblock_info_consistency(
                         child_response,
-                        has_child_info=(not child_response.get('child_info', None) is None)
+                        has_child_info=(not child_response.get('child_info', None) is None),
+                        for_container_page=for_container_page
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
-        if has_edited_by:
+        if for_container_page:
             self.assertEqual(xblock_info['edited_by'], 'testuser')
         else:
             self.assertIsNone(xblock_info.get('edited_by', None))
