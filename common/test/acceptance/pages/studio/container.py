@@ -104,14 +104,23 @@ class ContainerPage(PageObject):
         """
         click_css(self, 'a.duplicate-button', source_index)
 
-    def delete(self, source_index):
+    def delete(self, group_index=0, xblock_index=0):
         """
-        Delete the item with index source_index (based on vertical placement in page).
-        Only visible items are counted in the source_index.
-        The index of the first item is 0.
+        Delete the item with specified group and xblock indices (based on vertical placement in page).
+        Note:
+            Only visible items are counted.
+            The index of the first item is 0.
         """
+        # For the group index css, add 1 because nth-of-type is 1 based, and 1 more because
+        # there is a hidden div.wrapper-group, before Active Groups and Inactive Groups
+        # For the xblock index css, add 1 because nth-of-type is 1 based.
+        css = 'div.wrapper-groups:nth-of-type({}) section.wrapper-xblock:nth-of-type({}) a.delete-button'.format(
+            group_index + 2,
+            xblock_index + 1
+        )
+
         # Click the delete button
-        click_css(self, 'a.delete-button', source_index, require_notification=False)
+        click_css(self, css, 0, require_notification=False)
 
         # Wait for the warning prompt to appear
         self.wait_for_element_visibility('#prompt-warning', 'Deletion warning prompt is visible')
