@@ -7,6 +7,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
             collapsedClass: "is-collapsed",
+            isCollapsibleClass: "is-collapsible",
 
             /*
              * Determine information about where to drop the currently dragged
@@ -157,7 +158,9 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The y location of the last dragMove event (to determine direction).
                     lastY: 0,
                     // The direction the drag is moving in (negative means up, positive down).
-                    dragDirection: 0
+                    dragDirection: 0,
+                    // Is the element collapsible or not
+                    isCollapsible: ele.hasClass(this.isCollapsibleClass)
                 };
                 if (!ele.hasClass(this.collapsedClass)) {
                     ele.addClass(this.collapsedClass);
@@ -165,6 +168,10 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
+
+                // We should remove these class names before start dragging to
+                // avoid performance issues.
+                ele.removeClass('was-dragging ' + this.isCollapsibleClass);
             },
 
             onDragMove: function (draggie, event, pointer) {
@@ -240,6 +247,12 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                 if (ele.hasClass(this.expandOnDropClass)) {
                     this.expandElement(ele);
                     ele.removeClass(this.expandOnDropClass);
+                }
+
+                // Restore class name if needed that was removed due to
+                // performance issues in onDragStart
+                if (this.dragState.isCollapsible) {
+                    ele.addClass(this.isCollapsibleClass);
                 }
 
                 // Everything in its right place
