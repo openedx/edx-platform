@@ -67,14 +67,20 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
         /**
          * Deletes the specified xblock.
          * @param xblockInfo The model for the xblock to be deleted.
+         * @param xblockType A string representing the type of the xblock to be deleted.
          * @returns {jQuery promise} A promise representing the deletion of the xblock.
          */
-        deleteXBlock = function(xblockInfo) {
+        deleteXBlock = function(xblockInfo, xblockType) {
             var deletion = $.Deferred(),
-                url = ModuleUtils.getUpdateUrl(xblockInfo.id);
-            ViewUtils.confirmThenRunOperation(gettext('Delete this component?'),
-                gettext('Deleting this component is permanent and cannot be undone.'),
-                gettext('Yes, delete this component'),
+                url = ModuleUtils.getUpdateUrl(xblockInfo.id),
+                xblockType = xblockType || gettext('component');
+            ViewUtils.confirmThenRunOperation(
+                interpolate(gettext('Delete this %(xblock_type)s?'), { xblock_type: xblockType }, true),
+                interpolate(
+                    gettext('Deleting this %(xblock_type)s is permanent and cannot be undone.'),
+                    { xblock_type: xblockType }, true
+                ),
+                interpolate(gettext('Yes, delete this %(xblock_type)s'), { xblock_type: xblockType }, true),
                 function() {
                     ViewUtils.runOperationShowingMessage(gettext('Deleting&hellip;'),
                         function() {
