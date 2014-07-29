@@ -174,7 +174,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
-                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
 
                 it('can add a second section', function() {
@@ -232,7 +232,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
                     create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
-                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
 
                 it('remains empty if an add fails', function() {
@@ -298,7 +298,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     requestCount = requests.length;
                     create_sinon.respondWithError(requests);
                     expect(requests.length).toBe(requestCount); // No additional requests should be made
-                    expect(outlinePage.$('.list-sections li').data('locator')).toEqual('mock-section');
+                    expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
 
                 it('can add a subsection', function() {

@@ -6,6 +6,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
+            collapsedClass: "is-collapsed",
+            isCollapsibleClass: "is-collapsible",
 
             /*
              * Determine information about where to drop the currently dragged
@@ -14,7 +16,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
              */
             findDestination: function (ele, yChange) {
                 var eleY = ele.offset().top;
-                var eleYEnd = eleY + ele.height();
+                var eleYEnd = eleY + ele.outerHeight();
                 var containers = $(ele.data('droppable-class'));
 
                 for (var i = 0; i < containers.length; i++) {
@@ -28,7 +30,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // element is on top of its parent list -- don't check the
                     // position of the container
                     var parentList = container.parents(ele.data('parent-location-selector')).first();
-                    if (parentList.hasClass('collapsed')) {
+                    if (parentList.hasClass(this.collapsedClass)) {
                         var parentListTop =  parentList.offset().top;
                         // To make it easier to drop subsections into collapsed sections (which have
                         // a lot of visual padding around them), allow a fudge factor around the
@@ -36,7 +38,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                         var collapseFudge = 10;
                         if (Math.abs(eleY - parentListTop) < collapseFudge ||
                             (eleY > parentListTop &&
-                             eleYEnd - collapseFudge <= parentListTop + parentList.height())
+                             eleYEnd - collapseFudge <= parentListTop + parentList.outerHeight())
                             ) {
                             return {
                                 ele: container,
@@ -65,7 +67,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                             for (var j = 0; j < siblings.length; j++) {
                                 var $sibling = $(siblings[j]);
                                 var siblingY = $sibling.offset().top;
-                                var siblingHeight = $sibling.height();
+                                var siblingHeight = $sibling.outerHeight();
                                 var siblingYEnd = siblingY + siblingHeight;
 
                                 // Facilitate dropping into the beginning or end of a list
@@ -156,14 +158,20 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The y location of the last dragMove event (to determine direction).
                     lastY: 0,
                     // The direction the drag is moving in (negative means up, positive down).
-                    dragDirection: 0
+                    dragDirection: 0,
+                    // Is the element collapsible or not
+                    isCollapsible: ele.hasClass(this.isCollapsibleClass)
                 };
-                if (!ele.hasClass('collapsed')) {
-                    ele.addClass('collapsed');
+                if (!ele.hasClass(this.collapsedClass)) {
+                    ele.addClass(this.collapsedClass);
                     ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
+
+                // We should remove these class names before start dragging to
+                // avoid performance issues.
+                ele.removeClass('was-dragging ' + this.isCollapsibleClass);
             },
 
             onDragMove: function (draggie, event, pointer) {
@@ -241,6 +249,12 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     ele.removeClass(this.expandOnDropClass);
                 }
 
+                // Restore class name if needed that was removed due to
+                // performance issues in onDragStart
+                if (this.dragState.isCollapsible) {
+                    ele.addClass(this.isCollapsibleClass);
+                }
+
                 // Everything in its right place
                 ele.css({
                     top: 'auto',
@@ -251,11 +265,11 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             pointerInBounds: function (pointer, ele) {
-                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.width();
+                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.outerWidth();
             },
 
             expandElement: function (ele) {
-                ele.removeClass('collapsed');
+                ele.removeClass(this.collapsedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
 
@@ -318,27 +332,22 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             /*
-             * Make `type` draggable using `handleClass`, able to be dropped
-             * into `droppableClass`, and with parent type
-             * `parentLocationSelector`.
+             * Make DOM element with class `type` draggable using `handleClass`, able to be dropped
+             * into `droppableClass`, and with parent type `parentLocationSelector`.
              */
-            makeDraggable: function (type, handleClass, droppableClass, parentLocationSelector) {
-                _.each(
-                    $(type),
-                    function (ele) {
-                        // Remember data necessary to reconstruct the parent-child relationships
-                        $(ele).data('droppable-class', droppableClass);
-                        $(ele).data('parent-location-selector', parentLocationSelector);
-                        $(ele).data('child-selector', type);
-                        var draggable = new Draggabilly(ele, {
-                            handle: handleClass,
-                            containment: '.wrapper-dnd'
-                        });
-                        draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
-                        draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
-                        draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
-                    }
-                );
+            makeDraggable: function (element, type, handleClass, droppableClass, parentLocationSelector) {
+                if ($(element).data('droppable-class') !== droppableClass) {
+                    $(element).data('droppable-class', droppableClass);
+                    $(element).data('parent-location-selector', parentLocationSelector);
+                    $(element).data('child-selector', type);
+                    var draggable = new Draggabilly(element, {
+                        handle: handleClass,
+                        containment: '.wrapper-dnd'
+                    });
+                    draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
+                    draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
+                    draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
+                }
             }
         };
 

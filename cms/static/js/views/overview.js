@@ -1,6 +1,6 @@
-define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "js/utils/drag_and_drop",
+define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification",
     "js/utils/cancel_on_escape", "js/utils/get_date", "js/utils/module"],
-    function (domReady, $, ui, _, gettext, NotificationView, ContentDragger, CancelOnEscape,
+    function (domReady, $, ui, _, gettext, NotificationView, CancelOnEscape,
               DateUtils, ModuleUtils) {
 
         var modalSelector = '.edit-section-publish-settings';
@@ -230,27 +230,6 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             $('.new-courseware-section-button').bind('click', addNewSection);
             $('.new-subsection-item').bind('click', addNewSubsection);
 
-            // Section
-            ContentDragger.makeDraggable(
-                '.courseware-section',
-                '.section-drag-handle',
-                '.courseware-overview',
-                'article.courseware-overview'
-            );
-            // Subsection
-            ContentDragger.makeDraggable(
-                '.id-holder',
-                '.subsection-drag-handle',
-                '.subsection-list > ol',
-                '.courseware-section'
-            );
-            // Unit
-            ContentDragger.makeDraggable(
-                '.unit',
-                '.unit-drag-handle',
-                'ol.sortable-unit-list',
-                'li.courseware-subsection, article.subsection-body'
-            );
         });
 
         return {
