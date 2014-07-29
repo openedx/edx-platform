@@ -593,9 +593,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     If data or metadata are not specified, their information will not be added
     (regardless of whether or not the xblock actually has data or metadata).
 
-    There are two optional boolean parameters:
+    There are three optional boolean parameters:
       include_ancestor_info - if true, ancestor info is added to the response
       include_child_info - if true, direct child info is included in the response
+      for_container_page - if true, "edited-by", "published-by", "currently_visible_to_students", and
+                           "release_date_from" are included in the response.
 
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
@@ -658,8 +660,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Currently, 'edited_by', 'published_by', and 'release_date_from' are only used by the container page.  Only compute
     # them when building xblock_info for a container page, since they're expensive.
     if for_container_page:
-        xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
-        xblock_info['published_by'] = safe_get_username(xblock.published_by)
+        xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
+        xblock_info["published_by"] = safe_get_username(xblock.published_by)
         xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
