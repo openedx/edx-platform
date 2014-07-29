@@ -188,34 +188,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-
-
-#  #________________________________________________________________________________
-#  @insertBooleanHints: (xmlStringUnderConstruction) ->
-#    if MarkdownEditingDescriptor.questionHintsBooleanExpressions
-#      index = 0
-#      for booleanExpression in MarkdownEditingDescriptor.questionHintsBooleanExpressions
-#        hintText = MarkdownEditingDescriptor.questionHintsBooleanStrings[index]
-#        booleanHintElement  = '        <booleanhint value="' + booleanExpression + '">' + hintText + '\n'
-#        booleanHintElement += '        </booleanhint>\n'
-#        xmlStringUnderConstruction += booleanHintElement
-#        index = index + 1
-#    return xmlStringUnderConstruction
-#
-#  #________________________________________________________________________________
-#  @parseForCompoundConditionHints: (xmlString) ->
-#    for line in xmlString.split('\n')
-#      matches = @matchCompoundConditionPattern( line )      # string surrounded by {{...}} is a match group
-#      if matches
-#        questionHintString = matches[1]
-#        splitMatches = @matchBooleanConditionPattern(questionHintString)   # surrounded by ((...)) is a boolean condition
-#        if splitMatches
-#          booleanExpression = splitMatches[1]
-#          hintText = splitMatches[2]
-#          MarkdownEditingDescriptor.questionHintsBooleanStrings.push(hintText)
-#          MarkdownEditingDescriptor.questionHintsBooleanExpressions.push(booleanExpression)
-#    return xmlString
-
 #________________________________________________________________________________
   @matchCompoundConditionPattern: (testString) ->
     return testString.match( /\{\{(.+)\}\}/ )
@@ -409,8 +381,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     # parse the supplied string knowing it is a checkbox problem
     returnXmlString = ''
     reducedXmlString = ''
-    hintTextSelected = ''
-    hintTextUnselected = ''
     booleanExpressionStrings = []
     booleanHintPhrases = []
 
@@ -422,6 +392,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     for line in xmlString.split('\n')
       correctnessText = ''
       itemText = ''
+      hintTextSelected = ''
+      hintTextUnselected = ''
 
       choiceMatches = @matchCheckboxMarkerPattern( line )
       if choiceMatches           # this line includes '[...]' so it must be a checkbox choice
@@ -436,7 +408,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           combinedHintText = combinedHintText.replace( /(selected:|s:)/i, "S:")
           combinedHintText = combinedHintText.replace( /(unselected:|u:)/i, "U:")
           selectedMatches = combinedHintText.match(/\s*S:\s*([^}]+)/)
-          unselectedMatches = combinedHintText.match(/\s*\{\s*U:\s*([^}]+)/)
+          unselectedMatches = combinedHintText.match(/\s*U:\s*([^}]+)/)
 
           if selectedMatches and unselectedMatches  # both a selected and unselected phrase were supplied for this choice
             hintTextSelected = selectedMatches[1]
@@ -461,7 +433,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           line = line.replace(hintMatches[0], '')  # remove the phrase, else it will be displayed to student
           hintIndex = parseInt(hintMatches[1])
           hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
-          hintText = combinedHintText.trim()
+          hintText = hintText.trim()
           combinationHintMatch = hintText.match( /\(\((.+)\)\)(.+)/ )
           if combinationHintMatch                   # the line does contain a combination hint phrase
             booleanExpressionStrings.push(combinationHintMatch[1])
@@ -489,6 +461,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
+      xml = xml + '\n';       // add a blank line at the end of the string (just belt and suspenders)
 
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
@@ -549,7 +522,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       //
       // checkbox questions
       //
-      debugger;
       xml = xml.replace(/(^\s+(\[[x ]+|%[0-9]+)[^\n]+\n)+/gm, function(match) {
         return MarkdownEditingDescriptor.parseForCheckbox(match);
       });
