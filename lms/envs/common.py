@@ -1317,6 +1317,9 @@ INSTALLED_APPS = (
 
     # Monitoring functionality
     'monitoring',
+
+    # Course action state
+    'course_action_state'
 )
 
 ######################### MARKETING SITE ###############################

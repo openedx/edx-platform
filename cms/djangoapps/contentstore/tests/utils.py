@@ -95,6 +95,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client = Client()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
+            nonstaff.is_authenticated = True
         return client, nonstaff
 
     def populate_course(self):
