@@ -165,6 +165,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
+
+                $(draggie.element).removeClass('was-dragging');
             },
 
             onDragMove: function (draggie, event, pointer) {

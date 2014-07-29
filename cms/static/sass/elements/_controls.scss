@@ -392,6 +392,9 @@
     box-shadow: 0 1px 2px 0 rgba($ui-action-primary-color-focus, 0.50);
   }
 }
+ .was-dragging {
+  @include transition(transform $tmg-f2 ease-in-out 0);
+ }
 
 // UI: drag target
 .drop-target {
