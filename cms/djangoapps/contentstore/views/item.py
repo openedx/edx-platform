@@ -631,7 +631,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-    currently_visible_to_students = is_currently_visible_to_students(xblock)
 
     is_xblock_unit = is_unit(xblock)
     is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
@@ -646,7 +645,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'studio_url': xblock_studio_url(xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
-        "currently_visible_to_students": currently_visible_to_students,
         "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     }
     if data is not None:
@@ -662,6 +660,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     if for_container_page:
         xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
         xblock_info['published_by'] = safe_get_username(xblock.published_by)
+        xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
     # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
