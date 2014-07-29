@@ -479,7 +479,6 @@ $outline-indent-width: $baseline;
 .outline-subsection {
   @extend %outline-item;
   @extend %outline-subsection;
-  margin-bottom: ($baseline/2);
   border: 1px solid $gray-l4;
   border-left: ($baseline/4) solid $color-draft;
   border-top-left-radius: 0;
