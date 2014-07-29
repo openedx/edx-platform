@@ -671,7 +671,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
     header, data_rows = instructor_analytics.csvs.format_dictlist(registration_codes, query_features)
-    return analytics.csvs.create_csv_response(file_name, header, data_rows)
+    return instructor_analytics.csvs.create_csv_response(file_name, header, data_rows)
 
 
 def random_code_generator():
