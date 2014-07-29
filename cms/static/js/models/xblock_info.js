@@ -25,21 +25,6 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "ancestor_info": null,
             /**
-             * True iff:
-             * 1) Edits have been made to the xblock and no published version exists.
-             * 2) Edits have been made to the xblock since the last published version.
-             */
-            "has_changes": null,
-            /**
-             * True iff a published version of the xblock exists.
-             */
-            "published": null,
-            /**
-             * If true, only course staff can see the xblock regardless of publish status or
-             * release date status.
-             */
-            "visible_to_staff_only": null,
-            /**
              * Date of the last edit to this xblock or any of its descendants.
              */
             "edited_on":null,
@@ -48,6 +33,10 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              */
             "edited_by":null,
             /**
+             * True iff a published version of the xblock exists.
+             */
+            "published": null,
+            /**
              * Date of the last publish of this xblock, or null if never published.
              */
             "published_on": null,
@@ -55,6 +44,17 @@ define(["backbone", "underscore", "js/utils/module"], function(Backbone, _, Modu
              * User who last published the xblock, or null if never published.
              */
             "published_by": null,
+            /**
+             * True if the xblock has changes.
+             * Note: this is not always provided as a performance optimization. It is only provided for
+             * verticals functioning as units.
+             */
+            "has_changes": null,
+            /**
+             * Represents the possible publish states for an xblock. See the documentation
+             * for XBlockVisibility to see a comprehensive enumeration of the states.
+             */
+            "visibility_state": null,
             /**
              * True iff the release date of the xblock is in the past.
              */

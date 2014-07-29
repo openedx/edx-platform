@@ -1,7 +1,7 @@
 """Tests for items views."""
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import ddt
 
 from mock import patch
@@ -21,11 +21,10 @@ from contentstore.views.component import (
     SPLIT_TEST_COMPONENT_TYPE
 )
 
-from contentstore.views.item import create_xblock_info, ALWAYS
+from contentstore.views.item import create_xblock_info, ALWAYS, VisibilityState
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore import PublishState
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -417,18 +416,6 @@ class TestEditItem(ItemTest):
 
         self.course_update_url = reverse_usage_url("xblock_handler", self.usage_key)
 
-    def verify_publish_state(self, usage_key, expected_publish_state):
-        """
-        Helper method that gets the item from the module store and verifies that the publish state is as expected.
-        Returns the item corresponding to the given usage_key.
-        """
-        item = self.get_item_from_modulestore(
-            usage_key,
-            (expected_publish_state == PublishState.private) or (expected_publish_state == PublishState.draft)
-        )
-        self.assertEqual(expected_publish_state, self.store.compute_publish_state(item))
-        return item
-
     def test_delete_field(self):
         """
         Sending null in for a field 'deletes' it
@@ -534,15 +521,35 @@ class TestEditItem(ItemTest):
         self.assertEqual(unit1_usage_key, children[2])
         self.assertEqual(unit2_usage_key, children[1])
 
+    def _is_location_published(self, location):
+        """
+        Returns whether or not the item with given location has a published version.
+        """
+        return modulestore().has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only)
+
+    def _verify_published_with_no_draft(self, location):
+        """
+        Verifies the item with given location has a published version and no draft (unpublished changes).
+        """
+        self.assertTrue(self._is_location_published(location))
+        self.assertFalse(modulestore().has_changes(location))
+
+    def _verify_published_with_draft(self, location):
+        """
+        Verifies the item with given location has a published version and also a draft version (unpublished changes).
+        """
+        self.assertTrue(self._is_location_published(location))
+        self.assertTrue(modulestore().has_changes(location))
+
     def test_make_public(self):
         """ Test making a private problem public (publishing it). """
         # When the problem is first created, it is only in draft (because of its category).
-        self.verify_publish_state(self.problem_usage_key, PublishState.private)
+        self.assertFalse(self._is_location_published(self.problem_usage_key))
         self.client.ajax_post(
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(self.problem_usage_key)
 
     def test_make_draft(self):
         """ Test creating a draft version of a public problem. """
@@ -555,19 +562,16 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'discard_changes'}
         )
-        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(self.problem_usage_key)
+        published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertIsNone(published.due)
 
     def test_republish(self):
         """ Test republishing an item. """
         new_display_name = 'New Display Name'
-        republish_data = {
-            'publish': 'republish',
-            'display_name': new_display_name
-        }
 
         # When the problem is first created, it is only in draft (because of its category).
-        self.verify_publish_state(self.problem_usage_key, PublishState.private)
+        self.assertFalse(self._is_location_published(self.problem_usage_key))
 
         # Republishing when only in draft will update the draft but not cause a public item to be created.
         self.client.ajax_post(
@@ -579,7 +583,7 @@ class TestEditItem(ItemTest):
                 }
             }
         )
-        self.verify_publish_state(self.problem_usage_key, PublishState.private)
+        self.assertFalse(self._is_location_published(self.problem_usage_key))
         draft = self.get_item_from_modulestore(self.problem_usage_key, verify_is_draft=True)
         self.assertEqual(draft.display_name, new_display_name)
 
@@ -600,7 +604,7 @@ class TestEditItem(ItemTest):
                 }
             }
         )
-        self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(self.problem_usage_key)
         published = modulestore().get_item(
             self.problem_usage_key,
             revision=ModuleStoreEnum.RevisionOption.published_only
@@ -616,7 +620,8 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(self.problem_usage_key)
+        published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
 
         # Update the draft version and check that published is different.
         self.client.ajax_post(
@@ -650,7 +655,8 @@ class TestEditItem(ItemTest):
             self.problem_update_url,
             data={'publish': 'make_public'}
         )
-        published = self.verify_publish_state(self.problem_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(self.problem_usage_key)
+        published = modulestore().get_item(self.problem_usage_key, revision=ModuleStoreEnum.RevisionOption.published_only)
 
         # Now make a draft
         self.client.ajax_post(
@@ -695,8 +701,8 @@ class TestEditItem(ItemTest):
 
         # The unit and its children should be private initially
         unit_update_url = reverse_usage_url('xblock_handler', unit_usage_key)
-        self.verify_publish_state(unit_usage_key, PublishState.private)
-        self.verify_publish_state(html_usage_key, PublishState.private)
+        self.assertFalse(self._is_location_published(unit_usage_key))
+        self.assertFalse(self._is_location_published(html_usage_key))
 
         # Make the unit public and verify that the problem is also made public
         resp = self.client.ajax_post(
@@ -704,8 +710,8 @@ class TestEditItem(ItemTest):
             data={'publish': 'make_public'}
         )
         self.assertEqual(resp.status_code, 200)
-        self.verify_publish_state(unit_usage_key, PublishState.public)
-        self.verify_publish_state(html_usage_key, PublishState.public)
+        self._verify_published_with_no_draft(unit_usage_key)
+        self._verify_published_with_no_draft(html_usage_key)
 
         # Make a draft for the unit and verify that the problem also has a draft
         resp = self.client.ajax_post(
@@ -716,8 +722,8 @@ class TestEditItem(ItemTest):
             }
         )
         self.assertEqual(resp.status_code, 200)
-        self.verify_publish_state(unit_usage_key, PublishState.draft)
-        self.verify_publish_state(html_usage_key, PublishState.draft)
+        self._verify_published_with_draft(unit_usage_key)
+        self._verify_published_with_draft(html_usage_key)
 
 
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
@@ -1132,6 +1138,7 @@ class TestXBlockInfo(ItemTest):
         xblock_info = create_xblock_info(
             vertical,
             include_child_info=True,
+            include_edited_by=True,
             include_children_predicate=ALWAYS,
             include_ancestor_info=True
         )
@@ -1166,7 +1173,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1179,7 +1185,6 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/sequential/Lesson_1')
         self.assertEqual(xblock_info['display_name'], 'Lesson 1')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info, has_child_info=has_child_info)
@@ -1204,7 +1209,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(ancestors[2], has_child_info=False)
 
         # Finally, validate the entire response for consistency
-        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True)
+        self.validate_xblock_info_consistency(xblock_info, has_child_info=True, has_ancestor_info=True, has_edited_by=True)
 
     def validate_component_xblock_info(self, xblock_info):
         """
@@ -1214,20 +1219,18 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['id'], 'i4x://MITx/999/video/My_Video')
         self.assertEqual(xblock_info['display_name'], 'My Video')
         self.assertTrue(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
 
         # Finally, validate the entire response for consistency
         self.validate_xblock_info_consistency(xblock_info)
 
-    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False):
+    def validate_xblock_info_consistency(self, xblock_info, has_ancestor_info=False, has_child_info=False, has_edited_by=False):
         """
         Validate that the xblock info is internally consistent.
         """
         self.assertIsNotNone(xblock_info['display_name'])
         self.assertIsNotNone(xblock_info['id'])
         self.assertIsNotNone(xblock_info['category'])
-        self.assertIsNotNone(xblock_info['published'])
-        self.assertEqual(xblock_info['edited_by'], 'testuser')
+        self.assertTrue(xblock_info['published'])
         if has_ancestor_info:
             self.assertIsNotNone(xblock_info.get('ancestor_info', None))
             ancestors = xblock_info['ancestor_info']['ancestors']
@@ -1248,3 +1251,197 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
+        if has_edited_by:
+            self.assertEqual(xblock_info['edited_by'], 'testuser')
+        else:
+            self.assertIsNone(xblock_info.get('edited_by', None))
+
+
+class TestXBlockPublishingInfo(ItemTest):
+    """
+    Unit tests for XBlock's outline handling.
+    """
+    FIRST_SUBSECTION_PATH = [0]
+    FIRST_UNIT_PATH = [0, 0]
+    SECOND_UNIT_PATH = [0, 1]
+
+    def _create_child(self, parent, category, display_name, publish_item=False, staff_only=False):
+        """
+        Creates a child xblock for the given parent.
+        """
+        return ItemFactory.create(
+            parent_location=parent.location, category=category, display_name=display_name,
+            user_id=self.user.id, publish_item=publish_item, visible_to_staff_only=staff_only
+        )
+
+    def _get_child_xblock_info(self, xblock_info, index):
+        """
+        Returns the child xblock info at the specified index.
+        """
+        children = xblock_info['child_info']['children']
+        self.assertTrue(len(children) > index)
+        return children[index]
+
+    def _get_xblock_info(self, location):
+        """
+        Returns the xblock info for the specified location.
+        """
+        return create_xblock_info(
+            modulestore().get_item(location),
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+
+    def _set_release_date(self, location, start):
+        """
+        Sets the release date for the specified xblock.
+        """
+        xblock = modulestore().get_item(location)
+        xblock.start = start
+        self.store.update_item(xblock, self.user.id)
+
+    def _set_staff_only(self, location, staff_only):
+        """
+        Sets staff only for the specified xblock.
+        """
+        xblock = modulestore().get_item(location)
+        xblock.visible_to_staff_only = staff_only
+        self.store.update_item(xblock, self.user.id)
+
+    def _set_display_name(self, location, display_name):
+        """
+        Sets the display name for the specified xblock.
+        """
+        xblock = modulestore().get_item(location)
+        xblock.display_name = display_name
+        self.store.update_item(xblock, self.user.id)
+
+    def _verify_visibility_state(self, xblock_info, expected_state, path=None):
+        """
+        Verify the publish state of an item in the xblock_info. If no path is provided
+        then the root item will be verified.
+        """
+        if path:
+            direct_child_xblock_info = self._get_child_xblock_info(xblock_info, path[0])
+            remaining_path = path[1:] if len(path) > 1 else None
+            self._verify_visibility_state(direct_child_xblock_info, expected_state, remaining_path)
+        else:
+            self.assertEqual(xblock_info['visibility_state'], expected_state)
+
+    def test_empty_chapter(self):
+        empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
+        xblock_info = self._get_xblock_info(empty_chapter.location)
+        self.assertEqual(xblock_info['visibility_state'], VisibilityState.unscheduled)
+
+    def test_empty_sequential(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        self._create_child(chapter, 'sequential', "Empty Sequential")
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled)
+        self._verify_visibility_state(xblock_info, VisibilityState.unscheduled, path=self.FIRST_SUBSECTION_PATH)
+
+    def test_published_unit(self):
+        """
+        Tests the visibility state of a published unit with release date in the future.
+        """
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_released_unit(self):
+        """
+        Tests the visibility state of a published unit with release date in the past.
+        """
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.live)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_unpublished_changes(self):
+        """
+        Tests the visibility state of a published unit with draft (unpublished) changes.
+        """
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        unit = self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        # Setting the display name creates a draft version of unit.
+        self._set_display_name(unit.location, 'Updated Unit')
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_partially_released_section(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        released_sequential = self._create_child(chapter, 'sequential', "Released Sequential")
+        self._create_child(released_sequential, 'vertical', "Released Unit", publish_item=True)
+        self._create_child(released_sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) - timedelta(days=1))
+        published_sequential = self._create_child(chapter, 'sequential', "Published Sequential")
+        self._create_child(published_sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(published_sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(published_sequential.location, datetime.now(UTC) + timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+
+        # Verify the state of the released sequential
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=[0])
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=[0, 0])
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=[0, 1])
+
+        # Verify the state of the published sequential
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=[1])
+        self._verify_visibility_state(xblock_info, VisibilityState.ready, path=[1, 0])
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=[1, 1])
+
+        # Finally verify the state of the chapter
+        self._verify_visibility_state(xblock_info, VisibilityState.ready)
+
+    def test_staff_only(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        unit = self._create_child(sequential, 'vertical', "Published Unit")
+        self._set_staff_only(unit.location, True)
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_UNIT_PATH)
+
+    def test_unscheduled_section_with_live_subsection(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)
+
+    def test_unreleased_section_with_live_subsection(self):
+        chapter = self._create_child(self.course, 'chapter', "Test Chapter")
+        sequential = self._create_child(chapter, 'sequential', "Test Sequential")
+        self._create_child(sequential, 'vertical', "Published Unit", publish_item=True)
+        self._create_child(sequential, 'vertical', "Staff Only Unit", staff_only=True)
+        self._set_release_date(chapter.location, datetime.now(UTC) + timedelta(days=1))
+        self._set_release_date(sequential.location, datetime.now(UTC) - timedelta(days=1))
+        xblock_info = self._get_xblock_info(chapter.location)
+        self._verify_visibility_state(xblock_info, VisibilityState.needs_attention)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_SUBSECTION_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.live, path=self.FIRST_UNIT_PATH)
+        self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.SECOND_UNIT_PATH)

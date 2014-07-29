@@ -586,7 +586,7 @@ def _get_module_info(xblock, rewrite_static_links=True):
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       include_children_predicate=NEVER):
+                       include_edited_by=False, include_published_by=False, include_children_predicate=NEVER):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -600,10 +600,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     In addition, an optional include_children_predicate argument can be provided to define whether or
     not a particular xblock should have its children included.
     """
-    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-
-    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
-    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
 
     def safe_get_username(user_id):
         """
@@ -622,22 +618,35 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
         return None
 
+    # Compute the child info first so it can be included in aggregate information for the parent
+    if include_child_info and xblock.has_children:
+        child_info = _create_xblock_child_info(
+            xblock, include_children_predicate=include_children_predicate
+        )
+    else:
+        child_info = None
+
+    # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
+    release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+    currently_visible_to_students = is_currently_visible_to_students(xblock)
+
+    is_xblock_unit = is_unit(xblock)
+    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
+
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
         "category": xblock.category,
-        "has_changes": modulestore().has_changes(xblock.location),
-        "published": published,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "edited_by": safe_get_username(xblock.subtree_edited_by),
+        "published": published,
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        "published_by": safe_get_username(xblock.published_by),
         'studio_url': xblock_studio_url(xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
         "release_date_from": _get_release_date_from(xblock) if release_date else None,
-        "visible_to_staff_only": xblock.visible_to_staff_only,
-        "currently_visible_to_students": is_currently_visible_to_students(xblock),
+        "currently_visible_to_students": currently_visible_to_students,
+        "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     }
     if data is not None:
         xblock_info["data"] = data
@@ -645,11 +654,89 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info["metadata"] = metadata
     if include_ancestor_info:
         xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock)
-    if include_child_info and xblock.has_children:
-        xblock_info['child_info'] = _create_xblock_child_info(
-            xblock, include_children_predicate=include_children_predicate
-        )
+    if child_info:
+        xblock_info['child_info'] = child_info
+    # Currently, 'edited_by' and 'published_by' are only used by the container page.  Only compute them when asked to do
+    # so, since safe_get_username() is expensive.
+    if include_edited_by:
+        xblock_info['edited_by'] = safe_get_username(xblock.subtree_edited_by)
+    if include_published_by:
+        xblock_info['published_by'] = safe_get_username(xblock.published_by)
+    # On the unit page only, add 'has_changes' to indicate when there are changes that can be discarded.
+    # We don't add it in general because it is an expensive operation.
+    if is_xblock_unit:
+        xblock_info['has_changes'] = is_unit_with_changes
+
     return xblock_info
+
+
+class VisibilityState(object):
+    """
+    Represents the possible visibility states for an xblock:
+
+      live - the block and all of its descendants are live to students (excluding staff only items)
+        Note: Live means both published and released.
+
+      ready - the block is ready to go live and all of its descendants are live or ready (excluding staff only items)
+        Note: content is ready when it is published and scheduled with a release date in the future.
+
+      unscheduled - the block and all of its descendants have no release date (excluding staff only items)
+        Note: it is valid for items to be published with no release date in which case they are still unscheduled.
+
+      needs_attention - the block or its descendants are not fully live, ready or unscheduled (excluding staff only items)
+        For example: one subsection has draft content, or there's both unreleased and released content in one section.
+
+      staff_only - all of the block's content is to be shown to staff only
+        Note: staff only items do not affect their parent's state.
+    """
+    live = 'live'
+    ready = 'ready'
+    unscheduled = 'unscheduled'
+    needs_attention = 'needs_attention'
+    staff_only = 'staff_only'
+
+
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
+    """
+    Returns the current publish state for the specified xblock and its children
+    """
+    if xblock.visible_to_staff_only:
+        return VisibilityState.staff_only
+    elif is_unit_with_changes:
+        # Note that a unit that has never been published will fall into this category,
+        # as well as previously published units with draft content.
+        return VisibilityState.needs_attention
+    is_unscheduled = xblock.start == DEFAULT_START_DATE
+    is_live = datetime.now(UTC) > xblock.start
+    children = child_info and child_info['children']
+    if children and len(children) > 0:
+        all_staff_only = True
+        all_unscheduled = True
+        all_live = True
+        for child in child_info['children']:
+            child_state = child['visibility_state']
+            if child_state == VisibilityState.needs_attention:
+                return child_state
+            elif not child_state == VisibilityState.staff_only:
+                all_staff_only = False
+                if not child_state == VisibilityState.unscheduled:
+                    all_unscheduled = False
+                    if not child_state == VisibilityState.live:
+                        all_live = False
+        if all_staff_only:
+            return VisibilityState.staff_only
+        elif all_unscheduled:
+            return VisibilityState.unscheduled if is_unscheduled else VisibilityState.needs_attention
+        elif all_live:
+            return VisibilityState.live if is_live else VisibilityState.needs_attention
+        else:
+            return VisibilityState.ready if not is_unscheduled else VisibilityState.needs_attention
+    if is_unscheduled:
+        return VisibilityState.unscheduled
+    elif is_live:
+        return VisibilityState.live
+    else:
+        return VisibilityState.ready
 
 
 def _create_xblock_ancestor_info(xblock):

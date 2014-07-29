@@ -94,3 +94,19 @@ body b {
 div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
  display: none;
 }
+
+// ====================
+
+// masthead button hidden states
+.mast.has-actions .nav-actions .button.is-hidden {
+  @extend .is-hidden;
+}
+
+// ====================
+
+// TODOs:
+
+// * font-weight syncing
+// * divorce display: inline-block from base button definitions/placeholders
+// * canned typography class syncing
+

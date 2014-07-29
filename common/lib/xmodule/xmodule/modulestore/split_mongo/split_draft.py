@@ -6,7 +6,6 @@ from ..exceptions import ItemNotFoundError
 from split import SplitMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):

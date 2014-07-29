@@ -113,21 +113,7 @@ def course_image_url(course):
     path = loc.to_deprecated_string()
     return path
 
-
-def compute_publish_state(xblock):
-    """
-    Returns whether this xblock is draft, public, or private.
-
-    Returns:
-        PublishState.draft - content is in the process of being edited, but still has a previous
-            version deployed to LMS
-        PublishState.public - content is locked and deployed to LMS
-        PublishState.private - content is editable and not deployed to LMS
-    """
-
-    return modulestore().compute_publish_state(xblock)
-
-
+# pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """
     Returns true if there is a published version of the xblock that is currently visible to students.

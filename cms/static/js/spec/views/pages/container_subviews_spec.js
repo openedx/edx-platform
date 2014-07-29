@@ -1,7 +1,9 @@
 define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
         "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
-        "js/models/xblock_info"],
-    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, ContainerSubviews, XBlockInfo) {
+        "js/models/xblock_info", "js/views/utils/xblock_utils"],
+    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, ContainerSubviews,
+              XBlockInfo, XBlockUtils) {
+        var VisibilityState = XBlockUtils.VisibilityState;
 
         describe("Container Subviews", function() {
             var model, containerPage, requests, createContainerPage, renderContainerPage,
@@ -25,9 +27,9 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 category: 'vertical',
                 published: false,
                 has_changes: false,
+                visibility_state: VisibilityState.unscheduled,
                 edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe",
                 published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako",
-                visible_to_staff_only: false,
                 currently_visible_to_students: false
             };
 
@@ -79,31 +81,31 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 var viewPublishedCss = '.button-view',
                     previewCss = '.button-preview';
 
-                it('renders correctly for private unit', function () {
+                it('renders correctly for unscheduled unit', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
                 });
 
-                it('updates when published attribute changes', function () {
+                it('updates when publish state changes', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": true});
+                    fetch({published: true});
                     expect(containerPage.$(viewPublishedCss)).not.toHaveClass(disabledCss);
 
-                    fetch({"published": false});
+                    fetch({published: false});
                     expect(containerPage.$(viewPublishedCss)).toHaveClass(disabledCss);
                 });
 
                 it('updates when has_changes attribute changes', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"has_changes": true});
+                    fetch({has_changes: true});
                     expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
 
-                    fetch({"published": true, "has_changes": false});
+                    fetch({published: true, has_changes: false});
                     expect(containerPage.$(previewCss)).toHaveClass(disabledCss);
 
                     // If published is false, preview is always enabled.
-                    fetch({"published": false, "has_changes": false});
+                    fetch({published: false, has_changes: false});
                     expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
                 });
             });
@@ -111,23 +113,26 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             describe("Publisher", function () {
                 var headerCss = '.pub-status',
                     bitPublishingCss = "div.bit-publishing",
-                    publishedBit = "is-published",
-                    draftBit = "is-draft",
-                    staffOnlyBit = "is-staff-only",
+                    liveClass = "is-live",
+                    readyClass = "is-ready",
+                    staffOnlyClass = "is-staff-only",
+                    scheduledClass = "is-scheduled",
+                    unscheduledClass = "",
+                    hasWarningsClass = 'has-warnings',
                     publishButtonCss = ".action-publish",
                     discardChangesButtonCss = ".action-discard",
                     lastDraftCss = ".wrapper-last-draft",
                     releaseDateTitleCss = ".wrapper-release .title",
                     releaseDateContentCss = ".wrapper-release .copy",
-                    promptSpies, sendDiscardChangesToServer;
+                    promptSpies, sendDiscardChangesToServer, verifyPublishingBitUnscheduled;
 
                 sendDiscardChangesToServer = function() {
                     // Helper function to do the discard operation, up until the server response.
                     containerPage.render();
                     respondWithHtml(mockContainerXBlockHtml);
-                    fetch({"published": true, "has_changes": true});
+                    fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(hasWarningsClass);
                     // Click discard changes
                     containerPage.$(discardChangesButtonCss).click();
 
@@ -140,6 +145,15 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     );
                 };
 
+                verifyPublishingBitUnscheduled = function() {
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(liveClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(scheduledClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(unscheduledClass);
+                };
+
                 beforeEach(function() {
                     promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"]);
                     promptSpies.show.andReturn(this.promptSpies);
@@ -150,38 +164,64 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         expect(containerPage.$(headerCss).text()).toContain('Draft (Never published)');
                         expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
                         expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
-                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(draftBit);
-                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(publishedBit);
+                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(scheduledClass);
+                        expect(containerPage.$(bitPublishingCss)).toHaveClass(hasWarningsClass);
                     };
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": false, "has_changes": false});
+                    fetch({published: false, has_changes: false, visibility_state: VisibilityState.needsAttention});
                     verifyPrivateState();
 
-                    fetch({"published": false, "has_changes": true});
+                    fetch({published: false, has_changes: true, visibility_state: VisibilityState.needsAttention});
                     verifyPrivateState();
                 });
 
-                it('renders correctly with public content', function () {
+                it('renders correctly with published content', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": true, "has_changes": false});
+                    fetch({
+                        published: true, has_changes: false, visibility_state: VisibilityState.ready,
+                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                    });
                     expect(containerPage.$(headerCss).text()).toContain('Published');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
 
-                    fetch({"published": true, "has_changes": true});
+                    fetch({
+                        published: true, has_changes: true, visibility_state: VisibilityState.needsAttention,
+                        release_date: "Jul 02, 2030 at 14:20 UTC"
+                    });
                     expect(containerPage.$(headerCss).text()).toContain('Draft (Unpublished changes)');
                     expect(containerPage.$(publishButtonCss)).not.toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass(disabledCss);
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(draftBit);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(hasWarningsClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
+
+                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.live,
+                        release_date: "Jul 02, 1990 at 14:20 UTC"
+                    });
+                    expect(containerPage.$(headerCss).text()).toContain('Published and Live');
+                    expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
+                    expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(liveClass);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
+
+                    fetch({published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
+                        release_date: null
+                    });
+                    expect(containerPage.$(headerCss).text()).toContain('Published');
+                    expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
+                    expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
+                    verifyPublishingBitUnscheduled();
                 });
 
                 it('can publish private content', function () {
                     var notificationSpy = edit_helpers.createNotificationSpy();
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": false, "has_changes": false});
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(draftBit);
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(publishedBit);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(hasWarningsClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(readyClass);
+                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(liveClass);
 
                     // Click publish
                     containerPage.$(publishButtonCss).click();
@@ -197,18 +237,19 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     create_sinon.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
-                    respondWithJson({"id": "locator-container", "published": true, "has_changes": false});
+                    respondWithJson(createXBlockInfo({
+                        published: true, has_changes: false, visibility_state: VisibilityState.ready
+                    }));
 
                     // Verify updates displayed
-                    expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
+                    expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
                     // Verify that the "published" value has been cleared out of the model.
                     expect(containerPage.model.get("publish")).toBeNull();
                 });
 
-                it('can does not fetch if publish fails', function () {
+                it('does not refresh if publish fails', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": false});
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(publishedBit);
+                    verifyPublishingBitUnscheduled();
 
                     // Click publish
                     containerPage.$(publishButtonCss).click();
@@ -219,8 +260,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     expect(requests.length).toEqual(numRequests);
 
-                    // Verify still in draft state.
-                    expect(containerPage.$(bitPublishingCss)).not.toHaveClass(publishedBit);
+                    // Verify still in draft (unscheduled) state.
+                    verifyPublishingBitUnscheduled();
                     // Verify that the "published" value has been cleared out of the model.
                     expect(containerPage.model.get("publish")).toBeNull();
                 });
@@ -264,10 +305,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('does not discard changes on cancel', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published": true, "has_changes": true});
+                    fetch({published: true, has_changes: true, visibility_state: VisibilityState.needsAttention});
                     var numRequests = requests.length;
 
                     // Click discard changes
+                    expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
                     containerPage.$(discardChangesButtonCss).click();
 
                     // Click cancel to confirmation.
@@ -280,14 +322,14 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('renders the last published date and user when there are no changes', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"});
+                    fetch({published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"});
                     expect(containerPage.$(lastDraftCss).text()).
                         toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
                 });
 
                 it('renders the last saved date and user when there are changes', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({"has_changes": true, "edited_on": "Jul 02, 2014 at 14:20 UTC", "edited_by": "joe"});
+                    fetch({has_changes: true, edited_on: "Jul 02, 2014 at 14:20 UTC", edited_by: "joe"});
                     expect(containerPage.$(lastDraftCss).text()).
                         toContain("Draft saved on Jul 02, 2014 at 14:20 UTC by joe");
                 });
@@ -295,8 +337,10 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 describe("Release Date", function() {
                     it('renders correctly when unreleased', function () {
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        fetch({"published": true, "released_to_students": false,
-                            "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"'});
+                        fetch({
+                            visibility_state: VisibilityState.ready, released_to_students: false,
+                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                        });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Scheduled:");
                         expect(containerPage.$(releaseDateContentCss).text()).
                             toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
@@ -304,8 +348,10 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('renders correctly when released', function () {
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        fetch({"published": true, "released_to_students": true,
-                            "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"' });
+                        fetch({
+                            visibility_state: VisibilityState.live, released_to_students: true,
+                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                        });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Released:");
                         expect(containerPage.$(releaseDateContentCss).text()).
                             toContain('Jul 02, 2014 at 14:20 UTC with Section "Week 1"');
@@ -313,17 +359,20 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it('renders correctly when the release date is not set', function () {
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        fetch({"published": true, "released_to_students": false,
-                            "release_date": null, "release_date_from": null });
+                        fetch({
+                            visibility_state: VisibilityState.unscheduled, "released_to_students": false,
+                            release_date: null, release_date_from: null
+                        });
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
                         expect(containerPage.$(releaseDateContentCss).text()).toContain("Unscheduled");
                     });
 
                     it('renders correctly when the unit is not published', function () {
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        fetch({"published": false, "released_to_students": true,
-                            "release_date": "Jul 02, 2014 at 14:20 UTC", "release_date_from": 'Section "Week 1"' });
-                        // Force a render because none of the fetched fields will trigger a render
+                        fetch({
+                            visibility_state: VisibilityState.needsAttention, released_to_students: true,
+                            release_date: "Jul 02, 2014 at 14:20 UTC", release_date_from: 'Section "Week 1"'
+                        });
                         containerPage.xblockPublisher.render();
                         expect(containerPage.$(releaseDateTitleCss).text()).toContain("Release:");
                         expect(containerPage.$(releaseDateContentCss).text()).
@@ -356,7 +405,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         create_sinon.respondWithJson(requests, createXBlockInfo({
                             published: containerPage.model.get('published'),
-                            visible_to_staff_only: isStaffOnly
+                            visibility_state: isStaffOnly ? VisibilityState.staffOnly : VisibilityState.live,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
                         }));
                     };
 
@@ -364,11 +414,12 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         if (isStaffOnly) {
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check');
                             expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff Only');
-                            expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyBit);
+                            expect(containerPage.$(bitPublishingCss)).toHaveClass(staffOnlyClass);
+                            expect(containerPage.$(bitPublishingCss)).toHaveClass(scheduledClass);
                         } else {
                             expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check-empty');
                             expect(containerPage.$('.wrapper-visibility .copy').text()).toBe('Staff and Students');
-                            expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyBit);
+                            expect(containerPage.$(bitPublishingCss)).not.toHaveClass(staffOnlyClass);
                         }
                     };
 
@@ -379,34 +430,27 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     it("can be set to staff only", function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
-                        containerPage.$('.action-staff-lock').click();
                         requestStaffOnly(true);
                         verifyStaffOnly(true);
                     });
 
                     it("can remove staff only setting", function() {
                         promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml);
-                        requestStaffOnly(true);
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            visibility_state: VisibilityState.staffOnly,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
+                        });
                         requestStaffOnly(false);
                         verifyStaffOnly(false);
-                        expect(containerPage.$(bitPublishingCss)).not.toHaveClass(publishedBit);
-                    });
-
-                    it("can remove staff only setting from published unit", function() {
-                        promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml, { published: true });
-                        requestStaffOnly(true);
-                        requestStaffOnly(false);
-                        verifyStaffOnly(false);
-                        expect(containerPage.$(bitPublishingCss)).toHaveClass(publishedBit);
                     });
 
                     it("does not refresh if removing staff only is canceled", function() {
                         var requestCount;
                         promptSpy = edit_helpers.createPromptSpy();
-                        renderContainerPage(this, mockContainerXBlockHtml);
-                        requestStaffOnly(true);
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            visibility_state: VisibilityState.staffOnly,
+                            release_date: "Jul 02, 2000 at 14:20 UTC"
+                        });
                         requestCount = requests.length;
                         containerPage.$('.action-staff-lock').click();
                         edit_helpers.confirmPrompt(promptSpy, true);    // Click 'No' to cancel
@@ -429,25 +473,26 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             describe("PublishHistory", function () {
                 var lastPublishCss = ".wrapper-last-publish";
 
+                it('renders never published when the block is unpublished', function () {
+                    renderContainerPage(this, mockContainerXBlockHtml, {
+                        published: false, published_on: null, published_by: null
+                    });
+                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
+                });
+
                 it('renders the last published date and user when the block is published', function() {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
-                        "published": true, "published_on": "Jul 01, 2014 at 12:45 UTC", "published_by": "amako"
+                        published: true, published_on: "Jul 01, 2014 at 12:45 UTC", published_by: "amako"
                     });
                     expect(containerPage.$(lastPublishCss).text()).
                         toContain("Last published Jul 01, 2014 at 12:45 UTC by amako");
                 });
 
-                it('renders never published when the block is unpublished', function () {
-                    renderContainerPage(this, mockContainerXBlockHtml);
-                    fetch({ "published": false });
-                    expect(containerPage.$(lastPublishCss).text()).toContain("Never published");
-                });
-
                 it('renders correctly when the block is published without publish info', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
                     fetch({
-                        "published": true, "published_on": null, "published_by": null
+                        published: true, published_on: null, published_by: null
                     });
                     expect(containerPage.$(lastPublishCss).text()).toContain("Previously published");
                 });

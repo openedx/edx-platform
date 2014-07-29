@@ -1,24 +1,25 @@
 <%
-var publishClasses = "";
 var title = gettext("Draft (Never published)");
-if (published) {
-    if (published && hasChanges) {
-        publishClasses = publishClasses + " is-draft";
-        title = gettext("Draft (Unpublished changes)");
-    } else {
-        publishClasses = publishClasses + " is-published";
-        title = gettext("Published");
-    }
-}
-if (releaseDate) {
-    publishClasses = publishClasses + " is-scheduled";
-}
-if (visibleToStaffOnly) {
-    publishClasses = publishClasses + " is-staff-only";
+if (visibilityState === 'staff_only') {
     title = gettext("Unpublished (Staff only)");
+} else if (visibilityState === 'live') {
+    title = gettext("Published and Live");
+} else if (published && !hasChanges) {
+    title = gettext("Published");
+} else if (published && hasChanges) {
+    title = gettext("Draft (Unpublished changes)");
 }
+
+var releaseLabel = gettext("Release:");
+if (visibilityState === 'live') {
+    releaseLabel = gettext("Released:");
+} else if (visibilityState === 'ready') {
+    releaseLabel = gettext("Scheduled:");
+}
+
+var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
-<div class="bit-publishing <%= publishClasses %>">
+<div class="bit-publishing <%= visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
     <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
         <%= title %>
     </h3>
@@ -42,17 +43,7 @@ if (visibleToStaffOnly) {
     </div>
 
     <div class="wrapper-release bar-mod-content">
-        <h5 class="title">
-            <% if (published && releaseDate) {
-                if (releasedToStudents) { %>
-                    <%= gettext("Released:") %>
-                <% } else { %>
-                    <%= gettext("Scheduled:") %>
-                <% }
-            } else { %>
-                <%= gettext("Release:") %>
-            <% } %>
-        </h5>
+        <h5 class="title"><%= releaseLabel %></h5>
         <p class="copy">
             <% if (releaseDate) { %>
                 <% var message = gettext("%(release_date)s with %(section_or_subsection)s") %>

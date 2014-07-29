@@ -22,9 +22,9 @@ from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.settings_graders import GradingPage
 from ..pages.studio.signup import SignupPage
 from ..pages.studio.textbooks import TextbooksPage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..fixtures.course import XBlockFixtureDesc
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 class LoggedOutTest(WebAppTest):

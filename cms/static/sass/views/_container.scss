@@ -27,12 +27,21 @@
 
         .is-editable {
 
+          // TOOD: abstract this out into a Sass placeholder
           .incontext-editor-input {
+            @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);
             @extend %t-title4;
-            background: none repeat scroll 0 0 white;
+            @extend %t-strong;
+            width: 100%;
+            background: none repeat scroll 0 0 $white;
             border: 0;
             box-shadow: 0 0 2px 2px $shadow inset;
-            font-weight: 600;
+
+            // STATE: focus
+            &:focus {
+              box-shadow: 0 0 2px 2px rgba($ui-action-primary-color-focus, 0.50) inset;
+              color: $ui-action-primary-color-focus;
+            }
           }
         }
       }
@@ -98,16 +107,27 @@
     .bit-publishing {
       @extend %bar-module;
 
-      &.published,
-      &.is-published {
+      // CASE: content is ready to be made live
+      &.is-ready {
         @extend %bar-module-green;
       }
 
-      &.draft ,
-      &.is-draft {
+      // CASE: content is live
+      &.is-live {
+        @extend %bar-module-blue;
+      }
+
+      // CASE: content has warnings
+      &.has-warnings {
         @extend %bar-module-yellow;
       }
 
+      // CASE: content has erors
+      &.has-errors {
+        @extend %bar-module-red;
+      }
+
+      // CASE: content is staff only
       &.staff-only,
       &.is-staff-only {
         @extend %bar-module-black;
@@ -201,6 +221,7 @@
     // location widget
     .unit-location {
       @extend %bar-module;
+      border-top: none;
 
       .wrapper-unit-id {
 

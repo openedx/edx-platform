@@ -3,6 +3,7 @@
 // Patterns for pieces of content - modules - used throughout the app
 
 // basic gray module with a strong top border and title, with related content box attached
+// --------------------
 %bar-module {
   margin-bottom: $baseline;
   border-top: 5px solid $gray-l1;
@@ -37,6 +38,7 @@
 }
 
 // blue bar and title bg version
+// --------------------
 %bar-module-blue {
   @extend %bar-module;
   border-top: 5px solid $blue;
@@ -47,6 +49,7 @@
 }
 
 // green bar and title bg version
+// --------------------
 %bar-module-green {
   @extend %bar-module;
   border-top: 5px solid $green;
@@ -57,6 +60,7 @@
 }
 
 // yellow bar and title bg version
+// --------------------
 %bar-module-yellow {
   @extend %bar-module;
   border-top: 5px solid $orange-l2;
@@ -67,6 +71,7 @@
 }
 
 // red bar and title bg version
+// --------------------
 %bar-module-red {
   @extend %bar-module;
   border-top: 5px solid $red-l2;
@@ -88,6 +93,7 @@
 
 // Add new component menu with big green buttons
 // outermost wrapper for add a new component menu
+// --------------------
 .add-xblock-component {
   margin: $baseline ($baseline/2);
   border: 1px solid $gray-l3;
@@ -146,6 +152,7 @@
 
   // outer most wrapper div for scroll up component picker menus
   // swaps in when a green button is clicked
+  // --------------------
   .new-component-templates {
     @include clearfix;
     display: none;
@@ -175,6 +182,7 @@
   }
 
   // individual menus
+  // --------------------
   .new-component-template {
     @include clearfix;
 
@@ -207,6 +215,7 @@
   }
 
   // basic and advanced problem tabs - also handled by jquery-ui tabs
+  // --------------------
   .problem-type-tabs {
     @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     list-style-type: none;
@@ -252,4 +261,291 @@
   }
 }
 
+// outline UI
+// --------------------
+
+// outline: utilities
+$outline-indent-width: $baseline;
+
+// UI: section
+%outline-section {
+  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
+  border-left: 1px solid $color-draft;
+  margin-bottom: $baseline;
+  padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline + 4);
+
+  // STATE: is-collapsed
+  &.is-collapsed {
+    border-left-width: ($baseline/4);
+    padding-left: $baseline;
+
+    // CASE: is ready to be live
+    &.is-ready {
+      border-left-color: $color-ready;
+    }
+
+    // CASE: is live
+    &.is-live {
+      border-left-color: $color-live;
+    }
+
+    // CASE: has staff-only content
+    &.is-staff-only {
+      border-left-color: $color-staff-only;
+    }
+
+    // CASE: has unpublished content
+    &.has-warnings {
+      border-left-color: $color-warning;
+    }
+
+    // CASE: has errors
+    &.has-errors {
+      border-left-color: $color-error;
+    }
+  }
+}
+
+// UI: subsection
+%outline-subsection {
+  @include transition(border-left-color $tmg-f2 linear 0s);
+  margin-bottom: ($baseline/2);
+  border: 1px solid $gray-l4;
+  border-left: ($baseline/4) solid $color-draft;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: ($baseline*0.75);
+
+  // CASE: is ready to be live
+  &.is-ready {
+    border-left-color: $color-ready;
+  }
+
+  // CASE: is live
+  &.is-live {
+    border-left-color: $color-live;
+  }
+
+  // CASE: is presented for staff only
+  &.is-staff-only {
+    border-left-color: $color-staff-only;
+  }
+
+  // CASE: has unpublished content
+  &.has-warnings {
+    border-left-color: $color-warning;
+  }
+
+  // CASE: has errors
+  &.has-errors {
+    border-left-color: $color-error;
+  }
+}
+
+%outline-item {
+
+  // UI: item title
+  .item-title {
+    @include transition(color $tmg-f2 ease-in-out 0s);
+  }
+
+  // CASE: last-child in UI
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  // CASE: has staff-only content
+  &.is-staff-only {
+
+    // needed to make sure direct children only
+    > .section-status,
+    > .subsection-status,
+    > .unit-status {
+
+      .icon {
+        color: $color-staff-only;
+      }
+    }
+  }
+
+  // CASE: has unpublished content
+  &.has-warnings {
+
+    // needed to make sure direct children only
+    > .section-status .status-message,
+    > .subsection-status .status-message,
+    > .unit-status .status-message {
+
+      .icon {
+        color: $color-warning;
+      }
+    }
+  }
+
+  // CASE: has errors
+  &.has-errors {
+
+    // needed to make sure direct children only
+    > .section-status .status-message,
+    > .subsection-status .status-message,
+    > .unit-status .status-message,
+    > .section-status .status-message-copy,
+    > .subsection-status .status-message-copy,
+    > .unit-status .status-message-copy {
+      color: $color-error;
+    }
+  }
+}
+
+%outline-item-status {
+  @extend %t-copy-sub2;
+  @extend %t-strong;
+  color: $color-copy-base;
+
+  .icon {
+    @extend %t-icon5;
+    margin-right: ($baseline/4);
+  }
+}
+
+// outline: sections
+.outline-section {
+  @extend %ui-window;
+  @extend %outline-item;
+  @extend %outline-section;
+
+  // header - title
+  .section-title {
+    @extend %t-title5;
+    @extend %t-strong;
+    color: $color-heading-base;
+  }
+
+  // status
+  .section-status {
+    @extend %outline-item-status;
+  }
+
+  // status - release
+  .status-release {
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
+    opacity: 0.65;
+  }
+
+  // status - grading
+  .status-grading {
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
+    opacity: 0.65;
+  }
+
+  .status-grading-value {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .status-grading-date {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: ($baseline/4);
+  }
+
+  // status - message
+  .status-message {
+    margin-top: ($baseline/2);
+    border-top: 1px solid $gray-l4;
+    padding-top: ($baseline/4);
+
+    .icon {
+      margin-right: ($baseline/4);
+    }
+  }
+
+  .status-message-copy {
+    display: inline-block;
+    color: $color-heading-base;
+  }
+
+  // STATE: hover/active
+  &:hover, &:active {
+
+    // status - release
+    > .section-status .status-release {
+      opacity: 1.0;
+    }
+  }
+}
+
+// outline: subsections
+.outline-subsection {
+  @extend %outline-item;
+  @extend %outline-subsection;
+  border: 1px solid $gray-l4;
+  border-left: ($baseline/4) solid $color-draft;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: ($baseline*0.75);
+
+  // STATE: hover/active
+  &:hover, &:active {
+    box-shadow: 0 1px 1px $shadow-l2;
+  }
+
+  // STATE: is-collapsed
+  &.is-collapsed {
+
+  }
+
+  // header - title
+  .subsection-title {
+    @extend %t-title6;
+    color: $color-heading-base;
+  }
+
+  // status
+  .subsection-status {
+    @extend %outline-item-status;
+  }
+
+  // STATE: hover/active
+  &:hover, &:active {
+
+    // status - release
+    > .subsection-status .status-release {
+      opacity: 1.0;
+    }
+
+    // status - grading
+    > .subsection-status .status-grading {
+      opacity: 1.0;
+    }
+  }
+}
+
+// outline: units
+.outline-unit {
+  @extend %outline-item;
+  margin-bottom: ($baseline/2);
+  border: 1px solid $gray-l4;
+  padding: ($baseline/4) ($baseline/2);
+
+  // header - title
+  .unit-title {
+    @extend %t-title7;
+    color: $color-heading-base;
+  }
+
+  .unit-status {
+    @extend %outline-item-status;
+  }
+
+  // STATE: hover/active
+  &:hover, &:active {
+    box-shadow: 0 1px 1px $shadow-l2;
+
+    // status - release
+    .unit-status .status-release {
+      opacity: 1.0;
+    }
+  }
+}
 

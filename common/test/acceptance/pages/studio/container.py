@@ -135,14 +135,18 @@ class ContainerPage(PageObject):
         confirm_prompt(self)
         self.wait_for_ajax()
 
+    @property
+    def is_staff_locked(self):
+        """ Returns True if staff lock is currently enabled, False otherwise """
+        return 'icon-check' in self.q(css='a.action-staff-lock>i').attrs('class')
+
     def toggle_staff_lock(self):
         """
         Toggles "hide from students" which enables or disables a staff-only lock.
 
         Returns True if the lock is now enabled, else False.
         """
-        class_attribute_values = self.q(css='a.action-staff-lock>i').attrs('class')
-        was_locked_initially = 'icon-check' in class_attribute_values
+        was_locked_initially = self.is_staff_locked
         if not was_locked_initially:
             self.q(css='a.action-staff-lock').first.click()
         else:

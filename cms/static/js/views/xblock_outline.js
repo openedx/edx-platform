@@ -21,6 +21,10 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
         var XBlockOutlineView = BaseView.extend({
             // takes XBlockInfo as a model
 
+            options: {
+                collapsedClass: 'is-collapsed'
+            },
+
             templateName: 'xblock-outline',
 
             initialize: function() {
@@ -64,6 +68,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 }
                 html = this.template({
                     xblockInfo: xblockInfo,
+                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(xblockInfo.get('visibility_state')),
+                    typeListClass: XBlockViewUtils.getXBlockListTypeClass(xblockType),
                     parentInfo: this.parentInfo,
                     xblockType: xblockType,
                     parentType: parentType,
@@ -94,8 +100,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.renderedChildren = true;
             },
 
+            getListElement: function() {
+                return this.$('> .outline-content > ol');
+            },
+
             addChildView: function(childView) {
-                this.$('> .sortable-list').append(childView.$el);
+                this.getListElement().append(childView.$el);
             },
 
             addNameEditor: function() {
@@ -136,7 +146,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             addButtonActions: function(element) {
                 var self = this;
                 element.find('.delete-button').click(_.bind(this.handleDeleteEvent, this));
-                element.find('.add-button').click(_.bind(this.handleAddEvent, this));
+                element.find('.button-new').click(_.bind(this.handleAddEvent, this));
             },
 
             shouldRenderChildren: function() {
@@ -163,7 +173,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     xblockType = 'section';
                 } else if (category === 'sequential') {
                     xblockType = 'subsection';
-                } else if (category === 'vertical' && parentInfo && parentInfo.get('category') === 'sequential') {
+                } else if (category === 'vertical' && (!parentInfo || parentInfo.get('category') === 'sequential')) {
                     xblockType = 'unit';
                 }
                 return xblockType;
@@ -192,9 +202,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     } else {
                         locatorElement = this.$('.outline-item[data-locator="' + locatorToShow + '"]');
                     }
-                    ViewUtils.setScrollOffset(locatorElement, scrollOffset);
+                    if (locatorElement.length > 0) {
+                        ViewUtils.setScrollOffset(locatorElement, scrollOffset);
+                    } else {
+                        console.error("Failed to show item with locator " + locatorToShow + "");
+                    }
                     if (editDisplayName) {
-                        locatorElement.find('> .wrapper-xblock-header .xblock-field-value-edit').click();
+                        locatorElement.find('> div[class$="header"] .xblock-field-value-edit').click();
                     }
                 }
                 this.initialState = null;

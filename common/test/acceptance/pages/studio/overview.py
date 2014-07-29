@@ -6,7 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, click_css, confirm_prompt
+from .utils import set_input_value_and_save, click_css, confirm_prompt, set_input_value
 
 
 class CourseOutlineItem(object):
@@ -14,10 +14,11 @@ class CourseOutlineItem(object):
     A mixin class for any :class:`PageObject` shown in a course outline.
     """
     BODY_SELECTOR = None
-    EDIT_BUTTON_SELECTOR = '.xblock-title .xblock-field-value-edit'
+    EDIT_BUTTON_SELECTOR = '.xblock-field-value-edit'
     NAME_SELECTOR = '.xblock-title .xblock-field-value'
-    NAME_INPUT_SELECTOR = '.xblock-title .xblock-field-input'
+    NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
+    STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
 
     def __repr__(self):
         # CourseOutlineItem is also used as a mixin for CourseOutlinePage, which doesn't have a locator
@@ -29,11 +30,16 @@ class CourseOutlineItem(object):
         """
         Returns `selector`, but limited to this particular `CourseOutlineItem` context
         """
-        return '{}[data-locator="{}"] {}'.format(
-            self.BODY_SELECTOR,
-            self.locator,
-            selector
-        )
+        # If the item doesn't have a body selector or locator, then it can't be bounded
+        # This happens in the context of the CourseOutlinePage
+        if self.BODY_SELECTOR and hasattr(self, 'locator'):
+            return '{}[data-locator="{}"] {}'.format(
+                self.BODY_SELECTOR,
+                self.locator,
+                selector
+            )
+        else:
+            return selector
 
     @property
     def name(self):
@@ -46,11 +52,37 @@ class CourseOutlineItem(object):
         else:
             return None
 
+    @property
+    def has_status_message(self):
+        """
+        Returns True if the item has a status message, False otherwise.
+        """
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).first.visible
+
+    @property
+    def status_message(self):
+        """
+        Returns the status message of this item.
+        """
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]
+
+    def edit_name(self):
+        """
+        Puts the item's name into editable form.
+        """
+        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
+
+    def enter_name(self, new_name):
+        """
+        Enters new_name as the item's display name.
+        """
+        set_input_value(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
+
     def change_name(self, new_name):
         """
         Changes the container's name.
         """
-        self.q(css=self._bounded_selector(self.EDIT_BUTTON_SELECTOR)).first.click()
+        self.edit_name()
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
         self.wait_for_ajax()
 
@@ -94,7 +126,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         if not child_class:
             child_class = self.CHILD_CLASS
-        return self.q(css=child_class.BODY_SELECTOR).map(
+        return self.q(css=self._bounded_selector(child_class.BODY_SELECTOR)).map(
             lambda el: child_class(self.browser, el.get_attribute('data-locator'))).results
 
     def child_at(self, index, child_class=None):
@@ -113,7 +145,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         click_css(
             self,
-            self._bounded_selector(".add-xblock-component a.add-button"),
+            self._bounded_selector(".add-item a.button-new"),
             require_notification=require_notification,
         )
 
@@ -125,12 +157,12 @@ class CourseOutlineContainer(CourseOutlineItem):
         self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
-            add_button = self.q(css=self._bounded_selector('> .add-xblock-component a.add-button')).first.results
+            add_button = self.q(css=self._bounded_selector('> .outline-content > .add-item a.button-new')).first.results
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
 
-        self.q(css=self._bounded_selector('.ui-toggle-expansion')).first.click()
+        self.q(css=self._bounded_selector('.ui-toggle-expansion i')).first.click()
 
         EmptyPromise(
             lambda: subsection_expanded() != currently_expanded,
@@ -144,7 +176,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         Return whether this outline item is currently collapsed.
         """
-        return "collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]
+        return "is-collapsed" in self.q(css=self._bounded_selector('')).first.attrs("class")[0]
 
 
 class CourseOutlineChild(PageObject, CourseOutlineItem):
@@ -171,8 +203,8 @@ class CourseOutlineUnit(CourseOutlineChild):
     PageObject that wraps a unit link on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-unit'
-    NAME_SELECTOR = '.xblock-title a'
+    BODY_SELECTOR = '.outline-unit'
+    NAME_SELECTOR = '.unit-title a'
 
     def go_to(self):
         """
@@ -188,7 +220,9 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
     url = None
 
-    BODY_SELECTOR = '.outline-item-subsection'
+    BODY_SELECTOR = '.outline-subsection'
+    NAME_SELECTOR = '.subsection-title'
+    NAME_FIELD_WRAPPER_SELECTOR = '.subsection-header .wrapper-xblock-field'
     CHILD_CLASS = CourseOutlineUnit
 
     def unit(self, title):
@@ -221,7 +255,9 @@ class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
     :class`.PageObject` that wraps a section block on the Studio Course Outline page.
     """
     url = None
-    BODY_SELECTOR = '.outline-item-section'
+    BODY_SELECTOR = '.outline-section'
+    NAME_SELECTOR = '.section-title'
+    NAME_FIELD_WRAPPER_SELECTOR = '.section-header .wrapper-xblock-field'
     CHILD_CLASS = CourseOutlineSubsection
 
     def subsection(self, title):
@@ -264,8 +300,8 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
     """
     url_path = "course"
     CHILD_CLASS = CourseOutlineSection
-    EXPAND_COLLAPSE_CSS = '.toggle-button-expand-collapse'
-    BOTTOM_ADD_SECTION_BUTTON = '.course-outline > .add-xblock-component .add-button'
+    EXPAND_COLLAPSE_CSS = '.button-toggle-expand-collapse'
+    BOTTOM_ADD_SECTION_BUTTON = '.outline > .add-section .button-new'
 
     def is_browser_on_page(self):
         return self.q(css='body.view-outline').present
@@ -299,7 +335,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Clicks the button for adding a section which resides at the top of the screen.
         """
-        click_css(self, '.wrapper-mast nav.nav-actions .add-button')
+        click_css(self, '.wrapper-mast nav.nav-actions .button-new')
 
     def add_section_from_bottom_button(self):
         """
@@ -325,7 +361,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         Returns true if a message informing the user that the course has no content is visible
         """
-        return self.q(css='.course-outline .no-content').is_present()
+        return self.q(css='.outline .no-content').is_present()
 
     @property
     def expand_collapse_link_state(self):

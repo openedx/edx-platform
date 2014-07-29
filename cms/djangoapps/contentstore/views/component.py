@@ -11,8 +11,8 @@ from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import PublishState
 
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -21,7 +21,7 @@ from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
 
-from contentstore.utils import get_lms_link_for_item, compute_publish_state
+from contentstore.utils import get_lms_link_for_item
 from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
 from contentstore.views.item import create_xblock_info
 
@@ -122,8 +122,8 @@ def subsection_handler(request, usage_key_string):
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
-            state = compute_publish_state(unit)
-            if state in (PublishState.public, PublishState.draft):
+            has_published = modulestore().has_item(unit.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+            if has_published:
                 can_view_live = True
                 break
 
@@ -198,7 +198,7 @@ def container_handler(request, usage_key_string):
 
         # Fetch the XBlock info for use by the container page. Note that it includes information
         # about the block's ancestors and siblings for use by the Unit Outline.
-        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, include_edited_by=True, include_published_by=True)
 
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')

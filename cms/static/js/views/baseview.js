@@ -16,6 +16,13 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
                 "click .ui-toggle-expansion": "toggleExpandCollapse"
             },
 
+            options: {
+                // UX is moving towards using 'is-collapsed' in preference over 'collapsed',
+                // but use the old scheme as the default so that existing code doesn't need
+                // to be rewritten.
+                collapsedClass: 'collapsed'
+            },
+
             //override the constructor function
             constructor: function(options) {
                 _.bindAll(this, 'beforeRender', 'render', 'afterRender');
@@ -48,7 +55,7 @@ define(["jquery", "underscore", "backbone", "gettext", "js/utils/handle_iframe_b
                 // this element, e.g. clicking on the element of a child view container in a parent.
                 event.stopPropagation();
                 event.preventDefault();
-                ViewUtils.toggleExpandCollapse(target);
+                ViewUtils.toggleExpandCollapse(target, this.options.collapsedClass);
             },
 
             /**

@@ -13,6 +13,7 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
                 'click .xblock-field-value-edit': 'showInput',
                 'click button[name=submit]': 'onClickSubmit',
                 'click button[name=cancel]': 'onClickCancel',
+                'click .xblock-string-field-editor': 'onClickEditor',
                 'change .xblock-field-input': 'updateField',
                 'focusout .xblock-field-input': 'onInputFocusLost',
                 'keyup .xblock-field-input': 'handleKeyUp'
@@ -54,12 +55,18 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
 
             onClickSubmit: function(event) {
                 event.preventDefault();
+                event.stopPropagation();
                 this.updateField();
             },
 
             onClickCancel: function(event) {
                 event.preventDefault();
+                event.stopPropagation();
                 this.cancelInput();
+            },
+
+            onClickEditor: function(event) {
+                event.stopPropagation();
             },
 
             onChangeField: function() {
@@ -72,8 +79,9 @@ define(["js/views/baseview", "js/views/utils/xblock_utils"],
             showInput: function(event) {
                 var input = this.getInput();
                 event.preventDefault();
+                event.stopPropagation();
                 this.$el.addClass('is-editing');
-                input.focus();
+                input.focus().select();
             },
 
             hideInput: function() {

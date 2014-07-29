@@ -1,13 +1,14 @@
 /**
  * Subviews (usually small side panels) for XBlockContainerPage.
  */
-define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils"],
-    function ($, _, gettext, BaseView, ViewUtils) {
-
-        var disabledCss = "is-disabled";
+define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/view_utils",
+    "js/views/utils/xblock_utils"],
+    function ($, _, gettext, BaseView, ViewUtils, XBlockViewUtils) {
+        var VisibilityState = XBlockViewUtils.VisibilityState,
+            disabledCss = "is-disabled";
 
         /**
-         * A view that calls render when "has_changes" or "published" values in XBlockInfo have changed
+         * A view that refreshes the view when certain values in the XBlockInfo have changed
          * after a server sync operation.
          */
         var ContainerStateListenerView = BaseView.extend({
@@ -99,7 +100,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
-                    'has_changes', 'published', 'edited_on', 'edited_by', 'visible_to_staff_only'
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state'
                 ])) {
                    this.render();
                 }
@@ -107,16 +108,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             render: function () {
                 this.$el.html(this.template({
+                    visibilityState: this.model.get('visibility_state'),
+                    visibilityClass: XBlockViewUtils.getXBlockVisibilityClass(this.model.get('visibility_state')),
                     hasChanges: this.model.get('has_changes'),
-                    published: this.model.get('published'),
                     editedOn: this.model.get('edited_on'),
                     editedBy: this.model.get('edited_by'),
+                    published: this.model.get('published'),
                     publishedOn: this.model.get('published_on'),
                     publishedBy: this.model.get('published_by'),
-                    releasedToStudents: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
-                    releaseDateFrom: this.model.get('release_date_from'),
-                    visibleToStaffOnly: this.model.get('visible_to_staff_only')
+                    releaseDateFrom: this.model.get('release_date_from')
                 }));
 
                 return this;
@@ -138,7 +139,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             discardChanges: function (e) {
-                var xblockInfo = this.model, that=this, renderPage = this.renderPage;
+                var xblockInfo = this.model, renderPage = this.renderPage;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
@@ -164,7 +165,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = !xblockInfo.get('visible_to_staff_only');
+                enableStaffLock = xblockInfo.get('visibility_state') !== VisibilityState.staffOnly;
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);

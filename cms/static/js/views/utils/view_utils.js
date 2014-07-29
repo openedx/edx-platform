@@ -10,9 +10,13 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
         /**
          * Toggles the expanded state of the current element.
          */
-        toggleExpandCollapse = function(target) {
+        toggleExpandCollapse = function(target, collapsedClass) {
+            // Support the old 'collapsed' option until fully switched over to is-collapsed
+            if (!collapsedClass) {
+                collapsedClass = 'collapsed';
+            }
             target.closest('.expand-collapse').toggleClass('expand collapse');
-            target.closest('.is-collapsible, .window').toggleClass('collapsed');
+            target.closest('.is-collapsible, .window').toggleClass(collapsedClass);
             target.closest('.is-collapsible').children('article').slideToggle();
         };
 

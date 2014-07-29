@@ -2,13 +2,17 @@
 Acceptance tests for studio related to the outline page.
 """
 
+from datetime import datetime, timedelta
+import itertools
+from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
+from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..fixtures.course import XBlockFixtureDesc
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 class CourseOutlineTest(StudioCourseTest):
@@ -39,6 +43,208 @@ class CourseOutlineTest(StudioCourseTest):
                 )
             )
         )
+
+
+class WarningMessagesTest(CourseOutlineTest):
+    """
+    Feature: Warning messages on sections, subsections, and units
+    """
+
+    __test__ = True
+
+    STAFF_ONLY_WARNING = 'Contains staff only content'
+    LIVE_UNPUBLISHED_WARNING = 'Unpublished changes to live content'
+    FUTURE_UNPUBLISHED_WARNING = 'Unpublished changes to content that will release in the future'
+    NEVER_PUBLISHED_WARNING = 'Unpublished units will not be released'
+
+    class PublishState:
+        NEVER_PUBLISHED = 1
+        UNPUBLISHED_CHANGES = 2
+        PUBLISHED = 3
+        VALUES = [NEVER_PUBLISHED, UNPUBLISHED_CHANGES, PUBLISHED]
+
+    class UnitState:
+        """ Represents the state of a unit """
+
+        def __init__(self, is_released, publish_state, is_locked):
+            """ Creates a new UnitState with the given properties """
+            self.is_released = is_released
+            self.publish_state = publish_state
+            self.is_locked = is_locked
+
+        @property
+        def name(self):
+            """ Returns an appropriate name based on the properties of the unit """
+            result = "Released " if self.is_released else "Unreleased "
+            if self.publish_state == WarningMessagesTest.PublishState.NEVER_PUBLISHED:
+                result += "Never Published "
+            elif self.publish_state == WarningMessagesTest.PublishState.UNPUBLISHED_CHANGES:
+                result += "Unpublished Changes "
+            else:
+                result += "Published "
+            result += "Locked" if self.is_locked else "Unlocked"
+            return result
+
+    def populate_course_fixture(self, course_fixture):
+        """ Install a course with various configurations that could produce warning messages """
+
+        # Define the dimensions that map to the UnitState constructor
+        features = [
+            [True, False],             # Possible values for is_released
+            self.PublishState.VALUES,  # Possible values for publish_state
+            [True, False]              # Possible values for is_locked
+        ]
+
+        # Add a fixture for every state in the product of features
+        course_fixture.add_children(*[
+            self._build_fixture(self.UnitState(*state)) for state in itertools.product(*features)
+        ])
+
+    def _build_fixture(self, unit_state):
+        """ Returns an XBlockFixtureDesc with a section, subsection, and possibly unit that has the given state. """
+        name = unit_state.name
+        start = (datetime(1984, 3, 4) if unit_state.is_released else datetime.now(UTC) + timedelta(1)).isoformat()
+
+        subsection = XBlockFixtureDesc('sequential', name, metadata={'start': start})
+
+        # Children of never published subsections will be added on demand via _ensure_unit_present
+        return XBlockFixtureDesc('chapter', name).add_children(
+            subsection if unit_state.publish_state == self.PublishState.NEVER_PUBLISHED
+            else subsection.add_children(
+                XBlockFixtureDesc('vertical', name, metadata={'visible_to_staff_only': unit_state.is_locked})
+            )
+        )
+
+    def test_released_never_published_locked(self):
+        """ Tests that released never published locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_released_never_published_unlocked(self):
+        """ Tests that released never published unlocked units display 'Unpublished units will not be released' """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
+            self.NEVER_PUBLISHED_WARNING
+        )
+
+    def test_released_unpublished_changes_locked(self):
+        """ Tests that released unpublished changes locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_released_unpublished_changes_unlocked(self):
+        """ Tests that released unpublished changes unlocked units display 'Unpublished changes to live content' """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
+            self.LIVE_UNPUBLISHED_WARNING
+        )
+
+    def test_released_published_locked(self):
+        """ Tests that released published locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_released_published_unlocked(self):
+        """ Tests that released published unlocked units display no warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=False),
+            None
+        )
+
+    def test_unreleased_never_published_locked(self):
+        """ Tests that unreleased never published locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_unreleased_never_published_unlocked(self):
+        """ Tests that unreleased never published unlocked units display 'Unpublished units will not be released' """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
+            self.NEVER_PUBLISHED_WARNING
+        )
+
+    def test_unreleased_unpublished_changes_locked(self):
+        """ Tests that unreleased unpublished changes locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_unreleased_unpublished_changes_unlocked(self):
+        """
+        Tests that unreleased unpublished changes unlocked units display 'Unpublished changes to content that will
+        release in the future'
+        """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
+            self.FUTURE_UNPUBLISHED_WARNING
+        )
+
+    def test_unreleased_published_locked(self):
+        """ Tests that unreleased published locked units display staff only warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=True),
+            self.STAFF_ONLY_WARNING
+        )
+
+    def test_unreleased_published_unlocked(self):
+        """ Tests that unreleased published unlocked units display no warnings """
+        self._verify_unit_warning(
+            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=False),
+            None
+        )
+
+    def _verify_unit_warning(self, unit_state, expected_status_message):
+        """
+        Verifies that the given unit's messages match the expected messages.
+        If expected_status_message is None, then the unit status message is expected to not be present.
+        """
+        self._ensure_unit_present(unit_state)
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section(unit_state.name)
+        subsection = section.subsection_at(0)
+        subsection.toggle_expand()
+        unit = subsection.unit_at(0)
+        if expected_status_message == self.STAFF_ONLY_WARNING:
+            self.assertEqual(section.status_message, self.STAFF_ONLY_WARNING)
+            self.assertEqual(subsection.status_message, self.STAFF_ONLY_WARNING)
+            self.assertEqual(unit.status_message, self.STAFF_ONLY_WARNING)
+        else:
+            self.assertFalse(section.has_status_message)
+            self.assertFalse(subsection.has_status_message)
+            if expected_status_message:
+                self.assertEqual(unit.status_message, expected_status_message)
+            else:
+                self.assertFalse(unit.has_status_message)
+
+    def _ensure_unit_present(self, unit_state):
+        """ Ensures that a unit with the given state is present on the course outline """
+        if unit_state.publish_state == self.PublishState.PUBLISHED:
+            return
+
+        name = unit_state.name
+        self.course_outline_page.visit()
+        subsection = self.course_outline_page.section(name).subsection(name)
+        subsection.toggle_expand()
+
+        if unit_state.publish_state == self.PublishState.UNPUBLISHED_CHANGES:
+            unit = subsection.unit(name).go_to()
+            add_discussion(unit)
+        elif unit_state.publish_state == self.PublishState.NEVER_PUBLISHED:
+            subsection.add_unit()
+            unit = ContainerPage(self.browser, None)
+            unit.wait_for_page()
+
+        if unit.is_staff_locked != unit_state.is_locked:
+            unit.toggle_staff_lock()
 
 
 class EditNamesTest(CourseOutlineTest):
@@ -130,6 +336,25 @@ class EditNamesTest(CourseOutlineTest):
             '',
             'Test Subsection'
         )
+
+    def test_editing_names_does_not_expand_collapse(self):
+        """
+        Scenario: A section stays in the same expand/collapse state while its name is edited
+            Given that I have created a section
+            And the section is expanded
+            When I click on the name of the section
+            Then the section is expanded
+            And given that I have entered a new name
+            Then the section is expanded
+        """
+        self.course_outline_page.visit()
+        self.assertFalse(self.course_outline_page.section_at(0).in_editable_form())
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).edit_name()
+        self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).enter_name('Changed')
+        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
 class CreateSectionsTest(CourseOutlineTest):
@@ -468,6 +693,22 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.course_outline_page.section_at(0).delete()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.MISSING)
         self.assertTrue(self.course_outline_page.has_no_content_message)
+
+    def test_old_subsection_stays_collapsed_after_creation(self):
+        """
+        Scenario: Collapsed subsection stays collapsed after creating a new subsection
+            Given I have a course with one section and subsection
+            And I navigate to the course outline page
+            Then the subsection is collapsed
+            And when I create a new subsection
+            Then the first subsection is collapsed
+            And the second subsection is expanded
+        """
+        self.course_outline_page.visit()
+        self.assertTrue(self.course_outline_page.section_at(0).subsection_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).add_subsection()
+        self.assertTrue(self.course_outline_page.section_at(0).subsection_at(0).is_collapsed)
+        self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
 class ExpandCollapseEmptyTest(CourseOutlineTest):

@@ -89,11 +89,11 @@ class ModuleStoreEnum(object):
         # user ID to use for tests that do not have a django user available
         test = -3
 
+
 class PublishState(object):
     """
-    The publish state for a given xblock-- either 'draft', 'private', or 'public'.
-
-    Currently in CMS, an xblock can only be in 'draft' or 'private' if it is at or below the Unit level.
+    The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
+    are no longer used in Studio, but they are still referenced in a few places in LMS.
     """
     draft = 'draft'
     private = 'private'

@@ -25,12 +25,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     category: 'vertical',
                     display_name: displayName,
                     studio_url: '/container/mock-unit',
+                    visibility_state: 'unscheduled',
                     ancestor_info: {
                         ancestors: [{
                             id: 'mock-subsection',
                             category: 'sequential',
                             display_name: 'Mock Subsection',
                             studio_url: '/course/mock-course?show=mock-subsection',
+                            visibility_state: 'unscheduled',
                             child_info: {
                                 category: 'vertical',
                                 display_name: 'Unit',
@@ -38,24 +40,28 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                                     id: 'mock-unit',
                                     category: 'vertical',
                                     display_name: displayName,
-                                    studio_url: '/container/mock-unit'
+                                    studio_url: '/container/mock-unit',
+                                    visibility_state: 'unscheduled'
                                 }, {
                                     id: 'mock-unit-2',
                                     category: 'vertical',
                                     display_name: 'Mock Unit 2',
-                                    studio_url: '/container/mock-unit-2'
+                                    studio_url: '/container/mock-unit-2',
+                                    visibility_state: 'unscheduled'
                                 }]
                             }
                         }, {
                             id: 'mock-section',
                             category: 'chapter',
                             display_name: 'Section',
-                            studio_url: '/course/slashes:mock-course?show=mock-section'
+                            studio_url: '/course/slashes:mock-course?show=mock-section',
+                            visibility_state: 'unscheduled'
                         }, {
                             id: 'mock-course',
                             category: 'course',
                             display_name: 'Mock Course',
-                            studio_url: '/course/mock-course'
+                            studio_url: '/course/mock-course',
+                            visibility_state: 'unscheduled'
                         }]
                     },
                     metadata: {
@@ -77,16 +83,16 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
             it('can render itself', function() {
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
-                expect(unitOutlineView.$('.sortable-course-list')).toExist();
-                expect(unitOutlineView.$('.sortable-section-list')).toExist();
-                expect(unitOutlineView.$('.sortable-subsection-list')).toExist();
+                expect(unitOutlineView.$('.list-sections')).toExist();
+                expect(unitOutlineView.$('.list-subsections')).toExist();
+                expect(unitOutlineView.$('.list-units')).toExist();
             });
 
             it('can add a unit', function() {
                 var redirectSpy;
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
                 redirectSpy = spyOn(ViewUtils, 'redirect');
-                unitOutlineView.$('.outline-item-subsection > .add-xblock-component .add-button').click();
+                unitOutlineView.$('.outline-subsection > .outline-content  > .add-unit .button-new').click();
                 create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
                     category: 'vertical',
                     display_name: 'Unit',
@@ -106,8 +112,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 create_sinon.expectJsonRequest(requests, 'GET', '/xblock/mock-unit');
                 create_sinon.respondWithJson(requests,
                     createMockXBlockInfo(updatedDisplayName));
-                unitHeader = unitOutlineView.$('.outline-item-unit .wrapper-xblock-header');
-                expect(unitHeader.find('.xblock-title').first().text().trim()).toBe(updatedDisplayName);
+                expect(unitOutlineView.$('.outline-unit .unit-title').first().text().trim()).toBe(updatedDisplayName);
             });
         });
     });
