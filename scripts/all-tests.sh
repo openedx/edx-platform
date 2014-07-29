@@ -85,9 +85,9 @@ source $HOME/edx-venv/bin/activate
 case "$TEST_SUITE" in
 
     "quality")
-        rake pep8 > pep8.log || { cat pep8.log ; exit 1; }
-        rake pylint > pylint.log || { cat pylint.log; exit 1; }
-        rake quality
+        paver run_pep8 > pep8.log || { cat pep8.log ; exit 1; }
+        paver run_pylint > pylint.log || { cat pylint.log; exit 1; }
+        paver run_quality
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
@@ -101,29 +101,29 @@ END
         ;;
 
     "unit")
-        rake test
-        rake coverage
+        paver test
+        paver coverage
         ;;
 
     "lms-acceptance")
-        rake test:acceptance:lms["-v 3 --tag shard_${SHARD}"]
+        paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
         ;;
 
     "cms-acceptance")
-        rake test:acceptance:cms["-v 3 --tag shard_${SHARD}"]
+        paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
         ;;
 
     "bok-choy")
         case "$SHARD" in
             "1")
-                rake test:bok_choy["-a shard_1"]
+                paver test_bokchoy --extra_args="-a shard_1"
                 ;;
 
             "2")
-                rake test:bok_choy["-a '!shard_1'"]
+                paver test_bokchoy --extra_args="-a '!shard_1'"
                ;;
         esac
-        rake test:bok_choy:coverage
+        paver bokchoy_coverage
         ;;
 
 esac
