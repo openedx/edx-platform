@@ -417,14 +417,11 @@
 
   // CASE: page header - experiment variant A overrides
   .page-header.exp-variant-A {
-    margin-bottom: $baseline;
+    margin-bottom: 0;
     border-bottom: none;
-    border-left: ($baseline/4) solid $m-blue-l1;
-    background-color: $m-blue-l5;
 
     .title {
       margin: 0;
-      padding: $baseline;
     }
 
 
