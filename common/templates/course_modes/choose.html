@@ -18,10 +18,13 @@
 $(document).ready(function() {
   $('.expandable-area').slideUp();
   $('.is-expandable').addClass('is-ready');
-  $('.is-expandable .title-expand').click(function(e) {
+  $('.is-expandable .title-expand').on('click keypress', function(e) {
+    # trigger events on either clicking or pressing enter
+    if (e.which === 13 || e.type === 'click') {
       e.preventDefault();
       $(this).next('.expandable-area').slideToggle();
       $(this).parent().toggleClass('is-expanded');
+    }
   });
 
   $('#contribution-other-amt').focus(function() {
@@ -93,7 +96,7 @@ $(document).ready(function() {
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I want a free honor code certificate?")}</h5>
+                <h5 class="title title-expand" tabindex="0"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I want a free honor code certificate?")}</h5>
 
                 <div class="copy expandable-area">
                   <dl class="list-faq">
