@@ -198,7 +198,7 @@ def container_handler(request, usage_key_string):
 
         # Fetch the XBlock info for use by the container page. Note that it includes information
         # about the block's ancestors and siblings for use by the Unit Outline.
-        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, include_edited_by=True, include_published_by=True, include_release_date_from=True)
+        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page, for_container_page=True)
 
         # Create the link for preview.
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
