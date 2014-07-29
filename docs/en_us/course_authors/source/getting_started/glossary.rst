@@ -161,7 +161,13 @@ D
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialog. Students use the discussion topics to communicate with each other and the course staff in threaded excahnges. 
+  The set of topics defined to promote course-wide or unit-specific
+  conversation. Students use the discussion topics to communicate with each
+  other and the course staff in threaded exchanges.
+
+  A discussion is also a type of contribution that you can make to a topic to
+  start an open-ended dialogue. You can also contribute questions to the
+  discussion topics.
 
   See :ref:`Discussions` for more information.
 
@@ -433,6 +439,29 @@ P
 The page in the learning management system that shows students their scores on graded assignments in the course.
 
 
+
+.. _Public Unit:
+ 
+**Public Unit**
+
+  A unit whose **Visibility** option is set to Public so that the unit is visible to students, if the subsection that contains the unit has been released.
+
+  See :ref:`Public and Private Units` for more information.
+
+.. _Q:
+
+*****
+Q
+*****
+
+**Question**
+
+  A question is a type of contribution that you can make to a course discussion
+  topic to surface an issue that the course staff or other students can
+  resolve. 
+
+  See :ref:`Discussions` for more information.
+  
 .. _R:
 
 ****
