@@ -26,6 +26,7 @@ function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
     var collection = new GroupConfigurationCollection(${json.dumps(configurations)}, { parse: true });
 
     collection.url = "${group_configuration_url}";
+    collection.outlineUrl = "${course_outline_url}";
     new GroupConfigurationsPage({
         el: $('#content'),
         collection: collection

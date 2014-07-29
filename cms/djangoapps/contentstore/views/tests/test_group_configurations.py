@@ -6,8 +6,10 @@ from unittest import skipUnless
 from django.conf import settings
 from contentstore.utils import reverse_course_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
+from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.factories import ItemFactory
 
 
 GROUP_CONFIGURATION_JSON = {
@@ -18,6 +20,44 @@ GROUP_CONFIGURATION_JSON = {
         {u'name': u'Group B'},
     ],
 }
+
+
+class HelperMethods(object):
+    """
+    Mixin that provides useful methods for Group Configuration tests.
+    """
+    def _create_content_experiment(self, cid=None, name_suffix=''):
+        """
+        Create content experiment.
+
+        Assign Group Configuration to the experiment if cid is provided.
+        """
+        vertical = ItemFactory.create(
+            category='vertical',
+            parent_location=self.course.location,
+            display_name='Test Unit {}'.format(name_suffix)
+        )
+        split_test = ItemFactory.create(
+            category='split_test',
+            parent_location=vertical.location,
+            user_partition_id=cid,
+            display_name='Test Content Experiment {}'.format(name_suffix)
+        )
+        self.save_course()
+        return (vertical, split_test)
+
+    def _add_user_partitions(self, count=1):
+        """
+        Create user partitions for the course.
+        """
+        partitions = [
+            UserPartition(
+                i, 'Name ' + str(i), 'Description ' + str(i), [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]
+            ) for i in xrange(count)
+        ]
+
+        self.course.user_partitions = partitions
+        self.save_course()
 
 
 # pylint: disable=no-member
@@ -286,3 +326,118 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
+
+
+# pylint: disable=no-member
+@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
+class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
+    """
+    Tests for usage information of configurations.
+    """
+    def setUp(self):
+        super(GroupConfigurationsUsageInfoTestCase, self).setUp()
+
+    def test_group_configuration_not_used(self):
+        """
+        Test that right data structure will be created if group configuration is not used.
+        """
+        self._add_user_partitions()
+        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+        expected = [{
+            u'id': 0,
+            u'name': u'Name 0',
+            u'description': u'Description 0',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1},
+                {u'id': 2, u'name': u'Group C', u'version': 1},
+            ],
+            u'usage': [],
+        }]
+        self.assertEqual(actual, expected)
+
+    def test_can_get_correct_usage_info(self):
+        """
+        Test if group configurations json updated successfully with usage information.
+        """
+        self._add_user_partitions(count=2)
+        self._create_content_experiment(cid=0, name_suffix='0')
+        self._create_content_experiment(name_suffix='1')
+
+        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+
+        expected = [{
+            u'id': 0,
+            u'name': u'Name 0',
+            u'description': u'Description 0',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1},
+                {u'id': 2, u'name': u'Group C', u'version': 1},
+            ],
+            u'usage': [{
+                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_0',
+                'label': 'Test Unit 0 / Test Content Experiment 0',
+            }],
+        }, {
+            u'id': 1,
+            u'name': u'Name 1',
+            u'description': u'Description 1',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1},
+                {u'id': 2, u'name': u'Group C', u'version': 1},
+            ],
+            u'usage': [],
+        }]
+
+        self.assertEqual(actual, expected)
+
+    def test_can_use_one_configuration_in_multiple_experiments(self):
+        """
+        Test if multiple experiments are present in usage info when they use same
+        group configuration.
+        """
+        self._add_user_partitions()
+        self._create_content_experiment(cid=0, name_suffix='0')
+        self._create_content_experiment(cid=0, name_suffix='1')
+
+        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+
+        expected = [{
+            u'id': 0,
+            u'name': u'Name 0',
+            u'description': u'Description 0',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'Group A', u'version': 1},
+                {u'id': 1, u'name': u'Group B', u'version': 1},
+                {u'id': 2, u'name': u'Group C', u'version': 1},
+            ],
+            u'usage': [{
+                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_0',
+                'label': 'Test Unit 0 / Test Content Experiment 0',
+            }, {
+                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_1',
+                'label': 'Test Unit 1 / Test Content Experiment 1',
+            }],
+        }]
+        self.assertEqual(actual, expected)
+
+    def test_can_handle_without_parent(self):
+        """
+        Test if it possible to handle case when split_test has no parent.
+        """
+        self._add_user_partitions()
+        # Create split test without parent.
+        ItemFactory.create(
+            category='split_test',
+            user_partition_id=0,
+            display_name='Test Content Experiment'
+        )
+        self.save_course()
+        actual = GroupConfiguration._get_usage_info(self.course, self.store)
+        self.assertEqual(actual, {0: []})
