@@ -68,7 +68,8 @@ else:
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
         'edx_sga', # that weird grading xblock thing - remove this next merge
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
-        'recommender' # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
+        'recommender', # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
+        'ooyala-player',
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
