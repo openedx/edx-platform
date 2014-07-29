@@ -14,20 +14,6 @@
   }
 
   .vote-btn {
-    position: relative;
-    z-index: 100;
-    float: right;
-    display: block;
-    height: 27px;
-    padding: 0 8px;
-    border-radius: 5px;
-    border: 1px solid #b2b2b2;
-    @include linear-gradient(top, $white 35%, #ebebeb);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .15);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 25px;
-    color: #333;
 
     .plus-icon {
       display: inline-block;
@@ -207,25 +193,32 @@
 
 // post actions - flagging
 .discussion-flag-abuse, .discussion-delete-comment, .discussion-edit-comment {
-  font-size: 12px;
-  float:right;
-  margin-left: ($baseline/2);
-  font-style: italic;
-  cursor:pointer;
-  color: $dark-gray;
-  opacity: 0.8;
-
-  &:hover, &:focus {
-    @include transition(opacity .2s linear 0s);
-    opacity: 1.0;
-  }
-
-  .flag-label {
-    font-style: italic;
-    margin-left: ($baseline/4);
-  }
 }
 
-.flagged * {
-  color: $pink;
+// ====================
+
+// post actions - following
+.discussion-article {
+
+  .dogear {
+      display: block;
+      width: 52px;
+      height: 51px;
+      background: url(../images/follow-dog-ear.png) 0 -52px no-repeat;
+      @include transition(none);
+    }
+}
+
+// CASE: inline styling
+// currently we hide the follow dogear for inline discussions 
+.discussion-thread {
+  .dogear {
+    display: none;
+  }
+
+  &.expanded {
+    .dogear{
+      display: block;
+    }
+  }
 }

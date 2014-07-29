@@ -3,11 +3,12 @@
 
 .forum-nav {
   @include box-sizing(border-box);
-  float: left;
   position: relative;
+  float: left;
   width: 31%;
-  border: 1px solid #aaa;
+  border: 1px solid $gray-l3;
   border-radius: 3px;
+  background-color: $white;
 }
 
 // ------
@@ -15,7 +16,7 @@
 // ------
 .forum-nav-header {
   @include box-sizing(border-box);
-  display: table;
+  display: block;
   border-bottom: 1px solid $gray-l2;
   background-color: $gray-l3;
 }
@@ -235,9 +236,9 @@
   @include font-size(9);
   display: inline;
   margin-top: ($baseline/4);
+  padding: 1px 6px;
   border: 1px solid;
   border-radius: 3px;
-  padding: 1px 6px;
   text-transform: uppercase;
   white-space: nowrap;
 
@@ -295,25 +296,25 @@
   @extend %forum-nav-thread-wrapper-2-content;
   @extend %t-weight4;
   position: relative;
-  margin-left: ($baseline/4);
   margin-bottom: ($baseline/4); // Because tail is position: absolute
-  border-radius: 2px;
+  margin-left: ($baseline/4);
   padding: ($baseline/10) ($baseline/5);
   min-width: 2em; // Fit most comment counts but allow expansion if necessary
+  border-radius: 2px;
   background-color: $gray-l3;
 
   // Speech bubble tail
   &:after {
-    content: '';
-    display: block;
     position: absolute;
-    bottom: (-$baseline/4);
     right: ($baseline/4);
+    bottom: (-$baseline/4);
+    display: block;
     width: 0;
     height: 0;
-    border-style: solid;
     border-width: 0 ($baseline/4) ($baseline/4) 0;
+    border-style: solid;
     border-color: transparent $gray-l3 transparent transparent;
+    content: '';
   }
 
   &.is-unread {
