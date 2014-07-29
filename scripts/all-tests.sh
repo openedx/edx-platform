@@ -114,7 +114,15 @@ END
         ;;
 
     "bok-choy")
-        rake test:bok_choy
+        case "$SHARD" in
+            "1")
+                rake test:bok_choy["-a shard_1"]
+                ;;
+
+            "2")
+                rake test:bok_choy["-a '!shard_1'"]
+               ;;
+        esac
         rake test:bok_choy:coverage
         ;;
 
