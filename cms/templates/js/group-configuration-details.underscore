@@ -44,14 +44,15 @@
         <li class="action action-edit">
             <button class="edit"><%= gettext("Edit") %></button>
         </li>
-        <% deleteBtnClassName = _.isEmpty(usage) ? '' : 'is-disabled' %>
         <% if (_.isEmpty(usage)) { %>
             <li class="action action-delete wrapper-delete-button">
-        <% } else { %>
-            <li class="action action-delete wrapper-delete-button" title="<%= gettext('Cannot delete when used by experiment') %>" data-tooltip="<%= gettext('Cannot delete when used by experiment') %>">
-        <% } %>
-                <button class="delete action-icon <%= deleteBtnClassName %>"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+                <button class="delete action-icon"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
             </li>
+        <% } else { %>
+            <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when used by experiment') %>">
+                <button class="delete action-icon is-disabled"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+            </li>
+        <% } %>
     </ul>
 </div>
 <% if(showGroups) { %>
