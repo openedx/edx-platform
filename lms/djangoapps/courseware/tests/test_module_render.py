@@ -9,7 +9,6 @@ import json
 from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
@@ -314,24 +313,22 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestTOC(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
-
-        # Toy courses should be loaded
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
-        self.toy_course = modulestore().get_course(self.course_key)
-        self.portal_user = UserFactory()
+        super(TestTOC, self).setUp()
+        self.course_key = self.create_toy_course()
+        self.chapter = 'Overview'
+        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
+        factory = RequestFactory()
+        self.request = factory.get(chapter_url)
+        self.request.user = UserFactory()
+        self.toy_course = self.store.get_course(self.toy_loc)
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.toy_loc, self.request.user, self.toy_course, depth=2)
 
     def test_toc_toy_from_chapter(self):
-        chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
-        factory = RequestFactory()
-        request = factory.get(chapter_url)
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.toy_course.id, self.portal_user, self.toy_course, depth=2)
-
         expected = ([{'active': True, 'sections':
                       [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
@@ -347,19 +344,12 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, field_data_cache)
+        actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, None, self.field_data_cache)
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
     def test_toc_toy_from_section(self):
-        chapter = 'Overview'
-        chapter_url = '%s/%s/%s' % ('/courses', self.course_key, chapter)
         section = 'Welcome'
-        factory = RequestFactory()
-        request = factory.get(chapter_url)
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.toy_course.id, self.portal_user, self.toy_course, depth=2)
-
         expected = ([{'active': True, 'sections':
                       [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
@@ -375,7 +365,7 @@ class TestTOC(TestCase):
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-        actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, field_data_cache)
+        actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache)
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
