@@ -19,7 +19,7 @@ any way.
      - No. Set to January 1, 2030.
    * - All other course dates
      - Yes.  
-   * - Course outline structure (sections, subsections, units)
+   * - Course outline structure (sections, subsections, units) and state (published, hidden)
      - Yes. 
    * - Individual problems and other components
      - Yes.
@@ -44,25 +44,29 @@ any way.
    * - Certificates
      - No.
 
-.. for the course outline structure row above, indicate that the state remains/does not remain the same (published vs. hidden)
+See :ref:`Use Re-Run to Create a Course<Use ReRun to Create a Course>` and
+:ref:`Update the New Course`.
 
-See :ref:`Create a Course Using Rerun` and :ref:`Update the New Course`.
-
-.. _Create a Course Using Rerun:
+.. _Use ReRun to Create a Course:
 
 ********************************************
 Use Re-Run to Create a Course
 ********************************************
 
-Before you re-run a course, verify that:
+Before you re-run a course:
 
-* You have permission to create courses in Studio. See :ref:`Use Studio on Edge`.
+* For a course that is on the `edge.edx.org`_ site, verify that you have
+  permission to create courses in Studio. See :ref:`Use Studio on Edge`.
 
-.. is it appropriate that we don't have an analogous description for getting course creator privs on edx.org?
+  For a course that is on the `edx.org`_ site, contact your Program Manager.
+  Your Program Manager actually creates the new course using the re-run
+  feature, and then works with you to complete the steps to :ref:`update the
+  new course<Update the New Course>`.
 
-* You are a member of the course staff for the course that you want to re-run.
+* Verify that you are a member of the course staff for the course that you want
+  to re-run.
 
-* The original course was created in Studio, not in XML.
+* Verify that the original course was created in Studio, not in XML.
 
 To re-run a course:
 
@@ -133,3 +137,7 @@ through the course and verify that it is ready for release.
 To assure a quality experience for course students, be sure to test a course
 created with the re-run option thoroughly before the course start date.
 See :ref:`Testing Your Course` and :ref:`Beta_Testing`.
+
+
+.. _edg.edx.org: http://edge.edx.org
+.. _edx.org: http://edx.org

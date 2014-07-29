@@ -46,7 +46,7 @@ Create a New Course
      :alt: Image of the course creation page
 
   * For **Course Name**, enter the title of your course. For example, the name
-    may be “Sets, Maps, and Symmetry Groups". Use title capitalization for the
+    may be "Sets, Maps, and Symmetry Groups". Use title capitalization for the
     course title.
 
   * For **Organization**, enter the identifier for your university. For
