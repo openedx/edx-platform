@@ -171,7 +171,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
                 // We should remove these class names before start dragging to
                 // avoid performance issues.
-                ele.removeClass('was-dragging '+  this.isCollapsibleClass]);
+                ele.removeClass('was-dragging ' + this.isCollapsibleClass);
             },
 
             onDragMove: function (draggie, event, pointer) {
