@@ -67,9 +67,9 @@ topics are included in a course, they typically appear below the content they ap
 .. image:: /Images/Discussion_content_specific.png
  :alt: A discussion topic that appears below a video in the course, identified by a "Show Discussion" link
 
-Most courses also include one or more topics for discussions about course-wide
-areas of interest, such as "Frequently Asked Questions" or "Troubleshooting".
-You access these topics on the **Discussion** page of the course.
+Most courses also include one or more topics for course-wide discussions, such
+as "Frequently Asked Questions" and "Troubleshooting". You access these topics
+on the **Discussion** page of the course.
 
 .. image:: /Images/Discussion_course_wide.png
  :alt: Discussion topics are listed on the Discussion page when you click the drop-down list at the left side of the page
@@ -86,9 +86,34 @@ Notice that while you can access content-specific topics both on the
 **Courseware** page, you can only access the course-wide topics on the
 **Discussion** page.
 
-Before you add a post, look through the topics. When add your post to the most
-appropriate topic, others with the same interest can find, read, and respond to
-it more easily.
+Before you add a post, look through the topics. When you add your post to the
+most appropriate topic, others with the same interest can find, read, and
+respond to it more easily.
+
+====================================
+Types of Discussion Posts
+====================================
+
+When you make a contribution to a course discussion topic, it can typically be
+categorized as either a question or a discussion.
+
+* A *question* post raises an issue so that the course staff and community can
+  provide answers.
+
+* A *discussion* post starts a conversation by sharing thoughts and
+  reflections, and inviting community participation.
+
+When you add a post to a discussion topic, you specify whether it is a question
+or a discussion. When you visit the **Discussion** page for your course, a
+question mark image identifies posts that ask questions and a conversation
+bubble image identifies posts that start discussions.
+
+.. image:: ../Images/Post_types_in_list.png
+ :alt: The list of posts with images identifying questions and discussions 
+
+If you have any difficulty deciding which type of post you want to add, think
+about whether you want to get concrete information (a question) or start an
+open-ended conversation (a discussion).
 
 .. _Find Posts:
 
@@ -120,8 +145,8 @@ press Enter, the search tries to find:
   level.
 
 * Any usernames that are an exact match to your text. A "Show posts by
-  {username}" option displays above any posts that have an exact match at any
-  interaction level. Click the username in the message to read that user's
+  {username}" option displays above any posts that have an exact text match at
+  any interaction level. Click the username in the message to read that user's
   posts, responses, and comments.
 
 ==============================================
@@ -133,7 +158,21 @@ To review posts about a particular part of the course or type of issue, click
 down list. (**All Discussions** is selected by default.) Only posts about the
 topic you select appear in the list of posts.
 
-.. add something about endorsed responses(?)
+.. image:: ../Images/Discussion_filters.png
+ :alt: The list of posts with callouts to identify the top filter to select one topic and the filter below it to select by state 
+
+=======================================
+Review Only Unread or Unanswered Posts
+=======================================
+
+To limit the posts shown on the **Discussion** page, you can select one of the filter options. Above the list of posts, the **Show all** filter
+is selected by default. 
+
+* To list only the discussions and questions that you have not yet viewed,
+  select **Unread**.
+
+* To list only question posts that do not yet have any responses marked as
+  answers, select **Unanswered**.
 
 .. _Add a Post:
 
@@ -141,14 +180,12 @@ topic you select appear in the list of posts.
 Add a Post, Response, or Comment
 ************************************
 
-.. this section is likely to be more interesting and valuable when we add the discussion vs. question differentiation
-
 ================================
 Add a Post
 ================================
 
 To make sure that other students and the course team can find and respond to
-your posts, try to add your posts to the most appropriate topic.
+your post, try to select the correct type for your post: either question or discussion.
 
 Add a Post to a Content-Specific Discussion Topic
 **************************************************
@@ -170,7 +207,9 @@ Add a Post to a Content-Specific Discussion Topic
 .. image:: /Images/Discussion_content_specific_post.png
   :alt: Adding a post about specific course content
 
-5. Enter a short, descriptive identifier for your post in the **Title** field.
+5. Select the type of post: click **Question** or **Discussion**.
+
+#. Enter a short, descriptive identifier for your post in the **Title** field.
    The title is the part of your post that others see when they are browsing on
    the **Discussion** page or scrolling through one of the content-specific
    topics.
@@ -188,12 +227,14 @@ discussion topics.
 
 #. Click **New Post**.
 
+#. Select the type of post: click **Question** or **Discussion**.
+
 #. Select the most appropriate discussion topic for your post.
 
-.. image:: /Images/Discussion_course_wide_post.png
-  :alt: Selecting the topic for a new post on the Discussion page 
+  .. image:: /Images/Discussion_course_wide_post.png
+    :alt: Selecting the topic for a new post on the Discussion page 
 
-4. Supply a short, descriptive **Title**. The title is the part of your post
+5. Supply a short, descriptive **Title**. The title is the part of your post
    that others see when they are browsing on the **Discussion** page or
    scrolling through one of the content-specific topics.
 
@@ -268,21 +309,25 @@ identify posts that are new, or that have responses or comments that you have
 not read yet, and to distinguish them from exchanges that you have already read
 completely.
 
-* Posts that you have not read yet have a blue dialog "bubble".
+* Posts that you have not read yet have a blue callout image.
 
-* Posts with responses or comments that you have not read yet have a white
-  dialog "bubble".
+* Posts that you have read, but with responses or comments that you have not
+  read yet, have a white callout image.
  
-* Exchanges that you have read completely have a gray dialog "bubble" and
+* Exchanges that you have read completely have a gray callout image and
   background.
 
  .. image:: ../Images/Discussion_colorcoding.png
-  :alt: The list of posts with posts showing differently colored backgrounds and bubble icons
+  :alt: The list of posts with posts showing differently colored backgrounds and callout images
 
-These color-coded dialog bubbles appear when you sort the list of posts by
+The total number of contributions in the exchange (the post and its responses
+and comments) appears in each callout image. To see the number of contributions
+that you haven't read yet, move your cursor to hover over the callout image.
+
+These color-coded callout images appear when you sort the list of posts by
 recent activity or by most activity. If you sort the list of posts by most
 votes instead, the number of votes that the post has received appears in place
-of the bubble icon. See :ref:`Vote for Posts or Responses`.
+of the callouts. See :ref:`Vote for Posts or Responses`.
 
 ==============================
 Receive Daily Digests
@@ -336,6 +381,29 @@ votes**.
 
 The number of votes that each post has received displays in the list of posts.
 (Votes for responses are not included in the number.)
+
+.. _Answer Questions:
+
+************************************************************
+Answer Questions and Mark Questions as Answered 
+************************************************************
+
+Anyone in a course can answer questions. Just add a response to the post with
+your answer.
+
+The person who posted the question and staff members can mark responses as
+correct: click the **check** (or tick mark) icon that appears at upper right of
+the response.
+
+.. image:: ../Images/Discussion_answer_question.png
+ :alt: 
+
+After at least one response is marked as the answer, a check or tick mark image
+replaces the question mark image for the post in the list on the **Discussion**
+page.
+
+.. image:: ../Images/Discussion_answers_in_list.png
+ :alt: The list of posts with images identifying unanswered and answered questions and discussions 
 
 .. _Report Discussion Misuse:
 
