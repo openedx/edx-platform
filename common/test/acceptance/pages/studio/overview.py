@@ -18,6 +18,7 @@ class CourseOutlineItem(object):
     NAME_SELECTOR = '.xblock-title .xblock-field-value'
     NAME_INPUT_SELECTOR = '.xblock-field-input'
     NAME_FIELD_WRAPPER_SELECTOR = '.xblock-title .wrapper-xblock-field'
+    STATUS_MESSAGE_SELECTOR = '> div[class$="status"] .status-message'
 
     def __repr__(self):
         # CourseOutlineItem is also used as a mixin for CourseOutlinePage, which doesn't have a locator
@@ -45,6 +46,20 @@ class CourseOutlineItem(object):
             return name_element.text[0]
         else:
             return None
+
+    @property
+    def has_status_message(self):
+        """
+        Returns True if the item has a status message, False otherwise.
+        """
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).first.visible
+
+    @property
+    def status_message(self):
+        """
+        Returns the status message of this item.
+        """
+        return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]
 
     def edit_name(self):
         """
@@ -106,7 +121,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         if not child_class:
             child_class = self.CHILD_CLASS
-        return self.q(css=child_class.BODY_SELECTOR).map(
+        return self.q(css=self._bounded_selector(child_class.BODY_SELECTOR)).map(
             lambda el: child_class(self.browser, el.get_attribute('data-locator'))).results
 
     def child_at(self, index, child_class=None):
