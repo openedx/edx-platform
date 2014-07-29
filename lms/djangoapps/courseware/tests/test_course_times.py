@@ -10,7 +10,7 @@ from xmodule.tests.test_course_module import get_dummy_course
 
 NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
 
-class CourseStartTimeTests(unittest.TestCase):
+class CourseTimeTests(unittest.TestCase):
 
     def setUp(self):
         datetime_patcher = patch.object(
@@ -83,3 +83,11 @@ class CourseStartTimeTests(unittest.TestCase):
         for s in self.australia_timezone_start_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_text, s[2])
+
+    def test_end_date_text(self):
+        # No end date set, returns empty string.
+        d = get_dummy_course('2012-12-02T12:00')
+        self.assertEqual('', d.end_date_text)
+
+        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+        self.assertEqual('Sep 04, 2014', d.end_date_text)

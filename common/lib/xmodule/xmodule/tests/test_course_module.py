@@ -282,13 +282,13 @@ class IsNewCourseTestCase(unittest.TestCase):
         descriptor = get_dummy_course(start='2012-12-31T12:00')
         assert(descriptor.is_newish is True)
 
-    def test_end_date_text(self):
-        # No end date set, returns empty string.
-        d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', d.end_date_text)
-
-        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014', d.end_date_text)
+    # def test_end_date_text(self):
+    #     # No end date set, returns empty string.
+    #     d = get_dummy_course('2012-12-02T12:00')
+    #     self.assertEqual('', d.end_date_text)
+    #
+    #     d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
+    #     self.assertEqual('Sep 04, 2014', d.end_date_text)
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):
