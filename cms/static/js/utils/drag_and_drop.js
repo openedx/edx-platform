@@ -160,7 +160,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The direction the drag is moving in (negative means up, positive down).
                     dragDirection: 0,
                     // Is the element collapsible or not
-                    isCallapsible: ele.hasClass(this.isCollapsibleClass)
+                    isCollapsible: ele.hasClass(this.isCollapsibleClass)
                 };
                 if (!ele.hasClass(this.collapsedClass)) {
                     ele.addClass(this.collapsedClass);
@@ -251,7 +251,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
                 // Restore class name if needed that was removed due to
                 // performance issues in onDragStart
-                if (this.dragState.isCallapsible) {
+                if (this.dragState.isCollapsible) {
                     ele.addClass(this.isCollapsibleClass);
                 }
 
