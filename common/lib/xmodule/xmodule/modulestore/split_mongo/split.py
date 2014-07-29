@@ -77,6 +77,8 @@ from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.split_mongo import encode_key_for_mongo, decode_key_from_mongo
+import types
+from _collections import defaultdict
 
 
 log = logging.getLogger(__name__)
@@ -1006,7 +1008,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise DuplicateCourseError(locator, index)
 
         partitioned_fields = self.partition_fields_by_scope(root_category, fields)
-        block_fields = partitioned_fields.setdefault(Scope.settings, {})
+        block_fields = partitioned_fields[Scope.settings]
         if Scope.children in partitioned_fields:
             block_fields.update(partitioned_fields[Scope.children])
         definition_fields = self._serialize_fields(root_category, partitioned_fields.get(Scope.content, {}))
@@ -1106,14 +1108,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         original_structure = self._lookup_course(descriptor.location)['structure']
         index_entry = self._get_index_if_valid(descriptor.location, force)
 
-        definition_fields = descriptor.get_explicitly_set_fields_by_scope(Scope.content)
+        partitioned_fields = self.partition_xblock_fields_by_scope(descriptor)
+        definition_fields = partitioned_fields[Scope.content]
         descriptor.definition_locator, is_updated = self.update_definition_from_data(
             descriptor.definition_locator, definition_fields, user_id
         )
 
         original_entry = self._get_block_from_structure(original_structure, descriptor.location.block_id)
         # check metadata
-        settings = descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
+        settings = partitioned_fields[Scope.settings]
         settings = self._serialize_fields(descriptor.category, settings)
         if not is_updated:
             is_updated = self._compare_settings(settings, original_entry['fields'])
@@ -1235,7 +1238,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
-        new_def_data = self._serialize_fields(xblock.category, xblock.get_explicitly_set_fields_by_scope(Scope.content))
+        partitioned_fields = self.partition_xblock_fields_by_scope(xblock)
+        new_def_data = self._serialize_fields(xblock.category, partitioned_fields[Scope.content])
         is_updated = False
         if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
@@ -1270,7 +1274,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     children.append(child.block_id)
             is_updated = is_updated or structure_blocks[encoded_block_id]['fields']['children'] != children
 
-        block_fields = xblock.get_explicitly_set_fields_by_scope(Scope.settings)
+        block_fields = partitioned_fields[Scope.settings]
         block_fields = self._serialize_fields(xblock.category, block_fields)
         if not is_new and not is_updated:
             is_updated = self._compare_settings(block_fields, structure_blocks[encoded_block_id]['fields'])
@@ -1697,6 +1701,18 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         index_entry['versions'][branch] = new_id
         self.db_connection.update_course_index(index_entry)
 
+    def partition_xblock_fields_by_scope(self, xblock):
+        """
+        Return a dictionary of scopes mapped to this xblock's explicitly set fields w/o any conversions
+        """
+        # explicitly_set_fields_by_scope converts to json; so, avoiding it
+        # the existing partition_fields_by_scope works on a dict not an xblock
+        result = defaultdict(dict)
+        for field in xblock.fields.itervalues():
+            if field.is_set_on(xblock):
+                result[field.scope][field.name] = field.read_from(xblock)
+        return result
+
     def _serialize_fields(self, category, fields):
         """
         Convert any references to their serialized form.
@@ -1708,6 +1724,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         assert isinstance(fields, dict)
         xblock_class = XBlock.load_class(category, self.default_class)
         xblock_class = self.mixologist.mix(xblock_class)
+
         for field_name, value in fields.iteritems():
             if value:
                 if isinstance(xblock_class.fields[field_name], Reference):
@@ -1719,6 +1736,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 elif isinstance(xblock_class.fields[field_name], ReferenceValueDict):
                     for key, subvalue in value.iteritems():
                         value[key] = subvalue.block_id
+                # should this recurse down dicts and lists just in case they contain datetime?
+                elif not isinstance(value, datetime.datetime):  # don't convert datetimes!
+                    fields[field_name] = xblock_class.fields[field_name].to_json(value)
 
         # I think these are obsolete conditions; so, I want to confirm that. Thus the warnings
         if 'location' in fields:

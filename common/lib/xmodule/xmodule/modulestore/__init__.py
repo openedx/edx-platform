@@ -568,10 +568,10 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         :param category: the xblock category
         :param fields: the dictionary of {fieldname: value}
         """
-        if fields is None:
-            return {}
-        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
         result = collections.defaultdict(dict)
+        if fields is None:
+            return result
+        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
         for field_name, value in fields.iteritems():
             field = getattr(cls, field_name)
             result[field.scope][field_name] = value
