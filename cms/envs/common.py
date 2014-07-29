@@ -547,6 +547,9 @@ INSTALLED_APPS = (
 
     # Monitoring signals
     'monitoring',
+
+    # Course action state
+    'course_action_state'
 )
 
 
