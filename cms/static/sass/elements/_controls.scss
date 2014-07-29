@@ -393,11 +393,6 @@
   }
 }
 
-// UI: drag state - was dragging
-.was-dragging {
-  @include transition(transform $tmg-f2 ease-in-out 0);
-}
-
 // UI: drag target
 .drop-target {
 
