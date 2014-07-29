@@ -447,12 +447,12 @@
     }
 
     .draggable-drop-indicator-before {
-      top: -($baseline/2);
+      top: -($baseline*0.75);
       left: 0;
     }
 
     .draggable-drop-indicator-after {
-      bottom: -13px;
+      bottom: -($baseline*0.75);
       left: 0;
     }
   }
@@ -466,11 +466,11 @@
     }
 
     .draggable-drop-indicator-before {
-      top: -6px;
+      top: -($baseline*0.75);
     }
 
     .draggable-drop-indicator-after {
-      bottom: -7px;
+      bottom: -($baseline*0.75);
     }
   }
 
@@ -478,11 +478,11 @@
   .outline-unit {
 
     .draggable-drop-indicator-before {
-      top: -7px;
+      top: -($baseline*0.75);
     }
 
     .draggable-drop-indicator-after {
-      bottom: -6px;
+      bottom: -($baseline*0.75);
     }
   }
 

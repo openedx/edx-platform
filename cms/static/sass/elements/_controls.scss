@@ -348,7 +348,7 @@
 
 // UI: elem is draggable
 .is-draggable {
-  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0);
+  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0, margin $tmg-f2 ease-in-out 0);
   position: relative;
 
   .draggable-drop-indicator {
@@ -400,6 +400,7 @@
 .drop-target {
 
   &.drop-target-before {
+    margin-top: ($baseline*1.5);
 
     > .draggable-drop-indicator-before {
       opacity: 1.0;
@@ -407,6 +408,7 @@
   }
 
   &.drop-target-after {
+    margin-bottom: ($baseline*1.5);
 
     > .draggable-drop-indicator-after {
       opacity: 1.0;
