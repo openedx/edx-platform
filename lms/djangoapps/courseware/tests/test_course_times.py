@@ -11,7 +11,7 @@ from xmodule.tests.test_course_module import get_dummy_course
 NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
 
 class CourseTimeTests(unittest.TestCase):
-
+    """ Ensure course start and end times are returned correctly """
     def setUp(self):
         datetime_patcher = patch.object(
             xmodule.course_module, 'datetime',
@@ -33,6 +33,7 @@ class CourseTimeTests(unittest.TestCase):
 
     @patch('xmodule.course_module.datetime.now')
     def test_start_date_text(self, gmtime_mock):
+        """ Test start date returned correctly default (UTC) TZ """
         gmtime_mock.return_value = NOW
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
@@ -40,6 +41,7 @@ class CourseTimeTests(unittest.TestCase):
             self.assertEqual(d.start_date_text, s[2])
 
     def test_start_date_is_default(self):
+        """ Test use of default start date """
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_is_still_default, s[3])
@@ -53,6 +55,7 @@ class CourseTimeTests(unittest.TestCase):
 
     @patch('django.conf.settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES', new="US/Pacific")
     def test_start_date_text_pacific_timezone(self):
+        """ Test use of set timezone, US/Pacific """
         for s in self.pacific_timezone_start_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_text, s[2])
@@ -66,6 +69,7 @@ class CourseTimeTests(unittest.TestCase):
 
     @patch('django.conf.settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES', new="US/Eastern")
     def test_start_date_text_eastern_timezone(self):
+        """ Test use of set timezone, US/Eastern """
         for s in self.eastern_timezone_start_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_text, s[2])
@@ -80,6 +84,7 @@ class CourseTimeTests(unittest.TestCase):
 
     @patch('django.conf.settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES', new="Australia/Sydney")
     def test_start_date_text_australia_timezone(self):
+        """ Test use of set timezone, international """
         for s in self.australia_timezone_start_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             self.assertEqual(d.start_date_text, s[2])
