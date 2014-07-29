@@ -226,12 +226,6 @@ class ContainerPage(PageObject):
         """
         return _click_edit(self)
 
-    def add_discussion(self):
-        """
-        Adds a discussion to this unit
-        """
-        click_css(self, 'a>span.large-discussion-icon')
-
     def add_missing_groups(self):
         """
         Click the "add missing groups" link.

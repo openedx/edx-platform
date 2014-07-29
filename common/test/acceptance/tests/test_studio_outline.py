@@ -8,6 +8,7 @@ from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
+from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..fixtures.course import XBlockFixtureDesc
 
@@ -106,6 +107,7 @@ class WarningMessagesTest(CourseOutlineTest):
 
         subsection = XBlockFixtureDesc('sequential', name, metadata={'start': start})
 
+        # Children of never published subsections will be added on demand via _ensure_unit_present
         return XBlockFixtureDesc('chapter', name).add_children(
             subsection if unit_state.publish_state == self.PublishState.NEVER_PUBLISHED
             else subsection.add_children(
@@ -116,63 +118,63 @@ class WarningMessagesTest(CourseOutlineTest):
     def test_released_never_published_locked(self):
         """ Tests that released never published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.NEVER_PUBLISHED, True),
+            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_never_published_unlocked(self):
         """ Tests that released never published unlocked units display 'Unpublished units will not be released' """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.NEVER_PUBLISHED, False),
+            self.UnitState(is_released=True, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
             self.NEVER_PUBLISHED_WARNING
         )
 
     def test_released_unpublished_changes_locked(self):
         """ Tests that released unpublished changes locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.UNPUBLISHED_CHANGES, True),
+            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_unpublished_changes_unlocked(self):
         """ Tests that released unpublished changes unlocked units display 'Unpublished changes to live content' """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.UNPUBLISHED_CHANGES, False),
+            self.UnitState(is_released=True, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
             self.LIVE_UNPUBLISHED_WARNING
         )
 
     def test_released_published_locked(self):
         """ Tests that released published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.PUBLISHED, True),
+            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
     def test_released_published_unlocked(self):
         """ Tests that released published unlocked units display no warnings """
         self._verify_unit_warning(
-            self.UnitState(True, self.PublishState.PUBLISHED, False),
+            self.UnitState(is_released=True, publish_state=self.PublishState.PUBLISHED, is_locked=False),
             None
         )
 
     def test_unreleased_never_published_locked(self):
         """ Tests that unreleased never published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.NEVER_PUBLISHED, True),
+            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
     def test_unreleased_never_published_unlocked(self):
         """ Tests that unreleased never published unlocked units display 'Unpublished units will not be released' """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.NEVER_PUBLISHED, False),
+            self.UnitState(is_released=False, publish_state=self.PublishState.NEVER_PUBLISHED, is_locked=False),
             self.NEVER_PUBLISHED_WARNING
         )
 
     def test_unreleased_unpublished_changes_locked(self):
         """ Tests that unreleased unpublished changes locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.UNPUBLISHED_CHANGES, True),
+            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
@@ -182,21 +184,21 @@ class WarningMessagesTest(CourseOutlineTest):
         release in the future'
         """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.UNPUBLISHED_CHANGES, False),
+            self.UnitState(is_released=False, publish_state=self.PublishState.UNPUBLISHED_CHANGES, is_locked=False),
             self.FUTURE_UNPUBLISHED_WARNING
         )
 
     def test_unreleased_published_locked(self):
         """ Tests that unreleased published locked units display staff only warnings """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.PUBLISHED, True),
+            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=True),
             self.STAFF_ONLY_WARNING
         )
 
     def test_unreleased_published_unlocked(self):
         """ Tests that unreleased published unlocked units display no warnings """
         self._verify_unit_warning(
-            self.UnitState(False, self.PublishState.PUBLISHED, False),
+            self.UnitState(is_released=False, publish_state=self.PublishState.PUBLISHED, is_locked=False),
             None
         )
 
@@ -235,7 +237,7 @@ class WarningMessagesTest(CourseOutlineTest):
 
         if unit_state.publish_state == self.PublishState.UNPUBLISHED_CHANGES:
             unit = subsection.unit(name).go_to()
-            unit.add_discussion()
+            add_discussion(unit)
         elif unit_state.publish_state == self.PublishState.NEVER_PUBLISHED:
             subsection.add_unit()
             unit = ContainerPage(self.browser, None)
