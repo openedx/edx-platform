@@ -172,13 +172,6 @@ def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
-    def course_permission_filter(course_key):
-        """Filter out courses that user doesn't have access to"""
-        if GlobalStaff().has_user(request.user):
-            return True
-        else:
-            return has_course_access(request.user, course_key)
-
     def course_filter(course):
         """
         Filter out unusable and inaccessible courses
@@ -191,15 +184,15 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        return course_permission_filter(course.id)
+        return has_course_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
     unsucceeded_course_actions = [
-        crs for crs in
+        course for course in
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
-        if course_permission_filter(crs.course_key)
+        if has_course_access(request.user, course.course_key)
     ]
     return courses, unsucceeded_course_actions
 
