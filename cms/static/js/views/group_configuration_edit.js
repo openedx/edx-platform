@@ -47,7 +47,6 @@ function(BaseView, _, $, gettext, GroupEdit) {
                 error: this.model.validationError
             }));
             this.addAll();
-
             return this;
         },
 
