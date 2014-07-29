@@ -12,6 +12,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from collections import namedtuple
 import datetime
 import pytz
+from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 
 
 def mixed_store_config(data_dir, mappings):
@@ -91,7 +92,7 @@ def split_mongo_store_config(data_dir):
     store = {
         'default': {
             'NAME': 'draft',
-            'ENGINE': 'xmodule.modulestore.split_mongo.split.SplitMongoModuleStore',
+            'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
             'DOC_STORE_CONFIG': {
                 'host': 'localhost',
                 'db': 'test_xmodule',
@@ -422,23 +423,6 @@ class ModuleStoreTestCase(TestCase):
         clear_existing_modulestores()
         TestCase.setUpClass()
 
-    @classmethod
-    def tearDownClass(cls):
-        """
-        Drop the existing modulestores, causing them to be reloaded.
-        Clean up any data stored in Mongo.
-        """
-        # Clean up by flushing the Mongo modulestore
-        cls.drop_mongo_collections()
-
-        # Clear out the existing modulestores,
-        # which will cause them to be re-created
-        # the next time they are accessed.
-        # We do this at *both* setup and teardown just to be safe.
-        clear_existing_modulestores()
-
-        TestCase.tearDownClass()
-
     def _pre_setup(self):
         """
         Flush the ModuleStore.
@@ -455,6 +439,11 @@ class ModuleStoreTestCase(TestCase):
         Flush the ModuleStore after each test.
         """
         self.drop_mongo_collections()
+        # Clear out the existing modulestores,
+        # which will cause them to be re-created
+        # the next time they are accessed.
+        # We do this at *both* setup and teardown just to be safe.
+        clear_existing_modulestores()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
@@ -501,13 +490,13 @@ class ModuleStoreTestCase(TestCase):
                 "display_name" : "Toy Course",
                 "graded" : True,
                 "tabs" : [
-                     {"type" : "courseware", "name" : "Courseware"},
-                     {"type" : "course_info", "name" : "Course Info"},
-                     {"type" : "static_tab", "name" : "Syllabus", "url_slug" : "syllabus"},
-                     {"type" : "static_tab", "name" : "Resources", "url_slug" : "resources"},
-                     {"type" : "discussion", "name" : "Discussion"},
-                     {"type" : "wiki", "name" : "Wiki"},
-                     {"type" : "progress", "name" : "Progress"}
+                     CoursewareTab(),  # {"type" : "courseware", "name" : "Courseware"},
+                     CourseInfoTab(),  # {"type" : "course_info", "name" : "Course Info"},
+                     StaticTab(name="Syllabus", url_slug="syllabus"),
+                     StaticTab(name="Resources", url_slug="resources"),
+                     DiscussionTab(),
+                     WikiTab(),
+                     ProgressTab(),
                 ],
                 "discussion_topics" : {"General" : {"id" : "i4x-edX-toy-course-2012_Fall"}},
                 "graceperiod" : datetime.timedelta(days=2, seconds=21599),
