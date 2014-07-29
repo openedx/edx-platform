@@ -68,8 +68,9 @@ topics are included in a course, they typically appear below the content they ap
  :alt: A discussion topic that appears below a video in the course, identified by a "Show Discussion" link
 
 Most courses also include one or more topics for discussions about course-wide
-areas of interest, such as "Frequently Asked Questions" or "Troubleshooting".
-You access these topics on the **Discussion** page of the course.
+areas of interest, such as the answers to "Frequently Asked Questions" or ideas
+for "Troubleshooting". You access these topics on the **Discussion** page of
+the course.
 
 .. image:: /Images/Discussion_course_wide.png
  :alt: Discussion topics are listed on the Discussion page when you click the drop-down list at the left side of the page
@@ -86,9 +87,34 @@ Notice that while you can access content-specific topics both on the
 **Courseware** page, you can only access the course-wide topics on the
 **Discussion** page.
 
-Before you add a post, look through the topics. When add your post to the most
-appropriate topic, others with the same interest can find, read, and respond to
-it more easily.
+Before you add a post, look through the topics. When you add your post to the
+most appropriate topic, others with the same interest can find, read, and
+respond to it more easily.
+
+====================================
+Types of Discussion Posts
+====================================
+
+When you make a contribution to a course discussion topic, it can typically be
+categorized as either a question or a discussion.
+
+* A *question* post raises an issue so that the course staff and community can
+  provide answers.
+
+* A *discussion* post starts a conversation by sharing thoughts and
+  reflections, and inviting community participation.
+
+When you add a post to a discussion topic, you specify whether it is a question
+or a discussion. When you visit the **Discussion** page for your course, a
+question mark image identifies posts that ask questions and a conversation
+bubble image identifies posts that start discussions.
+
+.. image:: ../Images/Post_types_in_list.png
+ :alt: The list of posts with images identifying questions and discussions 
+
+If you have any difficulty deciding which type of post you want to add, think
+about whether you want to get concrete information (a question) or start an
+open-ended conversation (a discussion).
 
 .. _Find Posts:
 
@@ -141,14 +167,13 @@ topic you select appear in the list of posts.
 Add a Post, Response, or Comment
 ************************************
 
-.. this section is likely to be more interesting and valuable when we add the discussion vs. question differentiation
-
 ================================
 Add a Post
 ================================
 
 To make sure that other students and the course team can find and respond to
-your posts, try to add your posts to the most appropriate topic.
+your post, try to characterize the post with the right type and add your post
+to the most appropriate topic.
 
 Add a Post to a Content-Specific Discussion Topic
 **************************************************
@@ -170,7 +195,9 @@ Add a Post to a Content-Specific Discussion Topic
 .. image:: /Images/Discussion_content_specific_post.png
   :alt: Adding a post about specific course content
 
-5. Enter a short, descriptive identifier for your post in the **Title** field.
+5. Select the type of post: click **Question** or **Discussion**.
+
+#. Enter a short, descriptive identifier for your post in the **Title** field.
    The title is the part of your post that others see when they are browsing on
    the **Discussion** page or scrolling through one of the content-specific
    topics.
@@ -188,12 +215,14 @@ discussion topics.
 
 #. Click **New Post**.
 
+#. Select the type of post: click **Question** or **Discussion**.
+
 #. Select the most appropriate discussion topic for your post.
 
-.. image:: /Images/Discussion_course_wide_post.png
-  :alt: Selecting the topic for a new post on the Discussion page 
+  .. image:: /Images/Discussion_course_wide_post.png
+    :alt: Selecting the topic for a new post on the Discussion page 
 
-4. Supply a short, descriptive **Title**. The title is the part of your post
+5. Supply a short, descriptive **Title**. The title is the part of your post
    that others see when they are browsing on the **Discussion** page or
    scrolling through one of the content-specific topics.
 
@@ -336,6 +365,27 @@ votes**.
 
 The number of votes that each post has received displays in the list of posts.
 (Votes for responses are not included in the number.)
+
+.. _Answer Questions:
+
+************************************************************
+Answer Questions and Mark Questions as Answered 
+************************************************************
+
+Anyone in a course can answer questions: add a response to the post with your
+answer.
+
+The person who posted the question and staff members can mark responses as
+correct: click the **check** that appears at upper right of the response.
+
+.. image:: ../Images/Discussion_answer_question.png
+ :alt: 
+
+After at least one response is marked as the answer, a check image replaces the
+question mark image for the post in the list on the **Discussion** page.
+
+.. image:: ../Images/Discussion_answers_in_list.png
+ :alt: The list of posts with images identifying unanswered and answered questions and discussions 
 
 .. _Report Discussion Misuse:
 
