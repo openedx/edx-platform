@@ -576,8 +576,8 @@ def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
-        return analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
+        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
+        return instructor_analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
 
 
 @ensure_csrf_cookie
