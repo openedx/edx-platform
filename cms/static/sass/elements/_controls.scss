@@ -133,6 +133,27 @@
   }
 }
 
+// white secondary button
+%btn-secondary-white {
+  @extend %ui-btn-secondary;
+  border-color: $white-t2;
+  color: $white-t3;
+
+  &:hover, &:active {
+    border-color: $white;
+    color: $white;
+  }
+
+  &.current, &.active {
+    background: $gray-d2;
+    color: $gray-l5;
+
+    &:hover, &:active {
+      background: $gray-d2;
+    }
+  }
+}
+
 // green secondary button
 %btn-secondary-green {
   @extend %ui-btn-secondary;
@@ -209,17 +230,6 @@
       color: $blue-s1;
     }
   }
-}
-
-// ====================
-
-// calls-to-action
-
-// ====================
-
-// specific buttons - view live
-%view-live-button {
-  @extend %t-action4;
 }
 
 // ====================
