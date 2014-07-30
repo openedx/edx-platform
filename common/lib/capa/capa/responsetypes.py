@@ -802,42 +802,13 @@ class ChoiceResponse(LoncapaResponse):
         :return:                nothing
         '''
 
-
-
-        # for problem_id in student_answers:
-        #     if unicode(self.answer_id) == problem_id:
-        #         choiceresponse_test = '[@id="' + problem_id + '"]'
-        #         choice_test = '[@name="' + problem_ids[student_answer] + '"]'
-        #         choice = self.xml.xpath('//choiceresponse' + choiceresponse_test + '/choice' + choice_test)[0]
-        #         choice_hints = self.xml.xpath('//choiceresponse' + choiceresponse_test + '/choice' + choice_test + '/choicehint')
-        #         if choice_hints:
-        #             choice_hint = choice_hints[0]
-        #             choice_hint_text = choice_hint.text.strip()
-        #             if len(choice_hint_text) > 0:
-        #                 choice_hint_label = choice_hint.get('label')
-        #
-        #                 message_style_class = QUESTION_HINT_INCORRECT_STYLE         # assume the answer was incorrect
-        #                 if choice.get('correct').upper() == 'TRUE':
-        #                     message_style_class = QUESTION_HINT_CORRECT_STYLE       # guessed wrong, answer was correct
-        #
-        #                 if choice_hint_label:
-        #                     correctness_string = choice_hint_label + ': '
-        #                 else:
-        #                     correctness_string = 'INCORRECT: '  # assume the answer is incorrect
-        #                     if choice.get('correct').upper() == 'TRUE':
-        #                         correctness_string = 'CORRECT: '
-        #
-        #                 new_cmap[self.answer_id]['msg'] = new_cmap[self.answer_id]['msg'] + \
-        #                     '<div class="' + message_style_class + '">' \
-        #                     + correctness_string + choice_hint_text + '</div>'
-        #         break
-
-
         for problem_id in student_answers:
             if unicode(self.answer_id) == problem_id:
+                print '>> problem id: ' + problem_id
+                print(etree.tostring(self.xml, pretty_print=True))
+
                 problem_hint_shown = False
                 student_answer_list = student_answers[problem_id]
-
                 choice_list = self.xml.xpath('//choice')
                 for choice in choice_list:
                     choice_id = choice.get('name')
@@ -853,6 +824,7 @@ class ChoiceResponse(LoncapaResponse):
                     if hint_text_element:
                         problem_hint_shown = True
                         hint_text = hint_text_element[0].text.strip()
+                        print '>>             hint: ' + hint_text
                         new_cmap[problem_id]['msg'] += '<div class="' \
                                                     + QUESTION_HINT_TEXT_STYLE \
                                                     + '">' + hint_text + '</div>'
