@@ -57,8 +57,7 @@ def initialize_permissions(course_key, user_who_created_course):
 
 def remove_all_instructors(course_key):
     """
-    Removes given user as instructor and staff to the given course,
-    after verifying that the requesting_user has permission to do so.
+    Removes all instructor and staff users from the given course.
     """
     staff_role = CourseStaffRole(course_key)
     staff_role.remove_users(*staff_role.users_with_role())

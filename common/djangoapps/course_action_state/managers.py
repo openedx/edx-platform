@@ -96,7 +96,7 @@ class CourseActionUIStateManager(CourseActionStateManager):
         """
         Updates the should_display field with the given value for the entry for the given id.
         """
-        self.update(id=entry_id, updated_user=user, should_display=should_display)
+        return self.update(id=entry_id, updated_user=user, should_display=should_display)
 
 
 class CourseRerunUIStateManager(CourseActionUIStateManager):
