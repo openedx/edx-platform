@@ -1272,7 +1272,7 @@ class MultipleChoiceResponse(LoncapaResponse):
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
-    tags = ['trueFalseresponse']
+    tags = ['truefalseresponse']
 
     def mc_setup_response(self):
         i = 0
@@ -1366,12 +1366,6 @@ class OptionResponse(LoncapaResponse):
                                     '<div class="' + message_style_class + '">' \
                                     + correctness_string + option_hint_text + '</div>'
                 break
-
-
-
-
-
-
 #-----------------------------------------------------------------------------
 
 
