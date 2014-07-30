@@ -12,10 +12,11 @@ import uuid
 from urllib import urlencode
 from mock import patch
 
-from django.utils.translation import ugettext as _
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import Client
 from django.test.utils import override_settings
+from django.utils.translation import ugettext as _
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
@@ -1385,10 +1386,22 @@ class UsersApiTests(ModuleStoreTestCase):
 
         # filter roleset by course
         course_id = {'course_id': '{}'.format(unicode(course3.id))}
-        test_uri = '{}?{}'.format(test_uri, urlencode(course_id))
-        response = self.do_get(test_uri)
+        course_filter_uri = '{}?{}'.format(test_uri, urlencode(course_id))
+        response = self.do_get(course_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
+
+        # filter roleset by role
+        role = {'role': 'instructor'}
+        role_filter_uri = '{}?{}'.format(test_uri, urlencode(role))
+        response = self.do_get(role_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        role = {'role': 'invalid_role'}
+        role_filter_uri = '{}?{}'.format(test_uri, urlencode(role))
+        response = self.do_get(role_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
 
     def test_users_roles_list_get_invalid_user(self):
         test_uri = '/api/users/23423/roles/'
@@ -1414,6 +1427,11 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
+
+        # Confirm this user also has forum moderation permissions
+        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
+        has_role = role.users.get(id=self.user.id)
+        self.assertTrue(has_role)
 
     def test_users_roles_list_post_invalid_user(self):
         test_uri = '/api/users/2131/roles/'
@@ -1524,6 +1542,14 @@ class UsersApiTests(ModuleStoreTestCase):
 
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 0)
+
+        # Confirm this user no longer has forum moderation permissions
+        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
+        try:
+            has_role = role.users.get(id=self.user.id)
+            self.assertTrue(False)
+        except ObjectDoesNotExist:
+            pass
 
     def test_users_roles_courses_detail_delete_invalid_course(self):
         test_uri = '/api/users/{}/roles/'.format(self.user.id)
