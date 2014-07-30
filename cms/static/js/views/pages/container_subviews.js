@@ -38,12 +38,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['currently_visible_to_students']);
+                return ViewUtils.hasChangedAttributes(model, ['currently_visible_to_students', 'has_changes']);
             },
 
             render: function() {
                 this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
+                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students'),
+                    hasChanges: this.model.get('has_changes')
                 }));
                 return this;
             }
@@ -116,6 +117,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     published: this.model.get('published'),
                     publishedOn: this.model.get('published_on'),
                     publishedBy: this.model.get('published_by'),
+                    released: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
                     releaseDateFrom: this.model.get('release_date_from')
                 }));
@@ -144,7 +146,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     e.preventDefault();
                 }
                 ViewUtils.confirmThenRunOperation(gettext("Discard Changes"),
-                    gettext("Are you sure you want to discard changes and revert to the last published version?"),
+                    gettext("Are you sure you want to revert to the last published version of the unit? You cannot undo this action."),
                     gettext("Discard Changes"),
                     function () {
                         ViewUtils.runOperationShowingMessage(gettext('Discarding Changes&hellip;'),
@@ -187,14 +189,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
                 this.checkStaffLock(enableStaffLock);
                 if (enableStaffLock) {
-                    ViewUtils.runOperationShowingMessage(gettext('Setting Staff Lock&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Hiding Unit from Students&hellip;'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else {
-                    ViewUtils.confirmThenRunOperation(gettext("Remove Staff Lock"),
-                        gettext("Are you sure you want to remove the staff lock? Once you publish this unit, it will be released to students on the release date."),
-                        gettext("Remove Staff Lock"),
+                    ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
+                        gettext("If you make this unit visible to students, students will be able to see its content after the release date has passed and you have published the unit. Do you want to proceed?"),
+                        gettext("Make Visible to Students"),
                         function() {
-                            ViewUtils.runOperationShowingMessage(gettext('Removing Staff Lock&hellip;'),
+                            ViewUtils.runOperationShowingMessage(gettext('Making Visible to Students&hellip;'),
                                 _.bind(saveAndPublishStaffLock, self));
                         },
                         function() {

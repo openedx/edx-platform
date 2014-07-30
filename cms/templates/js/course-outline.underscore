@@ -39,7 +39,8 @@ if (statusType === 'warning') {
 
     <div class="<%= xblockType %>-header">
         <% if (includesChildren) { %>
-            <h3 class="<%= xblockType %>-header-details expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion" title="<%= gettext('Collapse/Expand this Checklist') %>">
+            <h3 class="<%= xblockType %>-header-details expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion"
+                title="<%= interpolate(gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true) %>">
                 <i class="icon-caret-down icon"></i>
         <% } else { %>
             <h3 class="<%= xblockType %>-header-details">
@@ -128,7 +129,8 @@ if (statusType === 'warning') {
         <div class="no-content add-section">
             <p><%= gettext("You haven't added any content to this course yet.") %>
                 <a href="#" class="button button-new" data-category="<%= childCategory %>"
-                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
                     <i class="icon-plus"></i><%= addChildLabel %>
                 </a>
             </p>
@@ -144,7 +146,8 @@ if (statusType === 'warning') {
             <% if (childType) { %>
                 <div class="add-<%= childType %> add-item">
                     <a href="#" class="button button-new" data-category="<%= childCategory %>"
-                       data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                       data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                       title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
                         <i class="icon icon-plus"></i><%= addChildLabel %>
                     </a>
                 </div>
