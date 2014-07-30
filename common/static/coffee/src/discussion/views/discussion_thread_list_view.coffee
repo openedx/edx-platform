@@ -364,10 +364,6 @@ if Backbone?
         @discussionIds = ""
         @$('.forum-nav-filter-cohort').show()
         @retrieveAllThreads()
-      else if item.hasClass("forum-nav-browse-menu-flagged")
-        @discussionIds = ""
-        @$('.forum-nav-filter-cohort').hide()
-        @retrieveFlaggedThreads() 
       else if item.hasClass("forum-nav-browse-menu-following")
         @retrieveFollowed()
         @$('.forum-nav-filter-cohort').hide()
@@ -414,12 +410,6 @@ if Backbone?
     retrieveFirstPage: (event)->
       @collection.current_page = 0
       @collection.reset()
-      @loadMorePages(event)
-
-    retrieveFlaggedThreads: (event)->
-      @collection.current_page = 0
-      @collection.reset()
-      @mode = 'flagged'
       @loadMorePages(event)
 
     sortThreads: (event) ->
