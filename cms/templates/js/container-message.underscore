@@ -2,7 +2,11 @@
     <div class="message has-warnings">
         <p class="warning">
             <i class="icon-warning-sign"></i>
-            <%= gettext("This content is live for students. Edit with caution.") %>
+            <% if (hasChanges) { %>
+                <%= gettext("Caution: The last published version of this unit is live. By publishing changes you will change the student experience.") %>
+            <% } else { %>
+                <%= gettext("This unit is visible to students. If you edit the unit, you must re-publish it for students to see your changes.") %>
+            <% } %>
         </p>
     </div>
 <% } %>

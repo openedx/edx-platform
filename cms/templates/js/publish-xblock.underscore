@@ -1,11 +1,11 @@
 <%
 var title = gettext("Draft (Never published)");
 if (visibilityState === 'staff_only') {
-    title = gettext("Unpublished (Staff only)");
+    title = gettext("Visible to Staff Only");
 } else if (visibilityState === 'live') {
     title = gettext("Published and Live");
 } else if (published && !hasChanges) {
-    title = gettext("Published");
+    title = gettext("Published (not yet released)");
 } else if (published && hasChanges) {
     title = gettext("Draft (Unpublished changes)");
 }
@@ -57,7 +57,13 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
     </div>
 
     <div class="wrapper-visibility bar-mod-content">
-        <h5 class="title"><%= gettext("Will Be Visible To:") %></h5>
+        <h5 class="title">
+            <% if (released && published && !hasChanges) { %>
+                <%= gettext("Is Visible To:") %>
+            <% } else { %>
+                <%= gettext("Will Be Visible To:") %>
+            <% } %>
+        </h5>
         <% if (visibleToStaffOnly) { %>
             <p class="copy"><%= gettext("Staff Only") %></p>
         <% } else { %>

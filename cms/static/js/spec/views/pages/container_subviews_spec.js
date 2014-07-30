@@ -182,7 +182,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         published: true, has_changes: false, visibility_state: VisibilityState.ready,
                         release_date: "Jul 02, 2030 at 14:20 UTC"
                     });
-                    expect(containerPage.$(headerCss).text()).toContain('Published');
+                    expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(bitPublishingCss)).toHaveClass(readyClass);
@@ -210,7 +210,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     fetch({published: true, has_changes: false, visibility_state: VisibilityState.unscheduled,
                         release_date: null
                     });
-                    expect(containerPage.$(headerCss).text()).toContain('Published');
+                    expect(containerPage.$(headerCss).text()).toContain('Published (not yet released)');
                     expect(containerPage.$(publishButtonCss)).toHaveClass(disabledCss);
                     expect(containerPage.$(discardChangesButtonCss)).toHaveClass(disabledCss);
                     verifyPublishingBitUnscheduled();
@@ -381,7 +381,8 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 describe("Content Visibility", function () {
-                    var requestStaffOnly, verifyStaffOnly, promptSpy;
+                    var requestStaffOnly, verifyStaffOnly, promptSpy,
+                        visibilityTitleCss = '.wrapper-visibility .title';
 
                     requestStaffOnly = function(isStaffOnly) {
                         containerPage.$('.action-staff-lock').click();
@@ -426,6 +427,24 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     it("is initially shown to all", function() {
                         renderContainerPage(this, mockContainerXBlockHtml);
                         verifyStaffOnly(false);
+                    });
+
+                    it("displays 'Is Visible To' when released and published", function() {
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            released_to_students: true,
+                            published: true,
+                            has_changes: false
+                        });
+                        expect(containerPage.$(visibilityTitleCss).text()).toContain('Is Visible To');
+                    });
+
+                    it("displays 'Will Be Visible To' when not released or fully published", function() {
+                        renderContainerPage(this, mockContainerXBlockHtml, {
+                            released_to_students: false,
+                            published: true,
+                            has_changes: true
+                        });
+                        expect(containerPage.$(visibilityTitleCss).text()).toContain('Will Be Visible To')
                     });
 
                     it("can be set to staff only", function() {
@@ -500,25 +519,37 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             describe("Message Area", function() {
                 var messageSelector = '.container-message .warning',
-                    warningMessage = 'This content is live for students. Edit with caution.';
+                    unchangedWarningMessage = 'This unit is visible to students. If you edit the unit, you must re-publish it for students to see your changes.',
+                    hasChangesWarningMessage = 'Caution: The last published version of this unit is live. By publishing changes you will change the student experience.';
 
                 it('is empty for a unit that is not currently visible to students', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {
-                        currently_visible_to_students: false
+                        currently_visible_to_students: false,
+                        has_changes: false
                     });
                     expect(containerPage.$(messageSelector).text().trim()).toBe('');
                 });
 
-                it('shows a message for a unit that is currently visible to students', function() {
+                it('shows a message for a unit that is currently visible to students and is unchanged', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {
-                        currently_visible_to_students: true
+                        currently_visible_to_students: true,
+                        has_changes: false
                     });
-                    expect(containerPage.$(messageSelector).text().trim()).toBe(warningMessage);
+                    expect(containerPage.$(messageSelector).text().trim()).toBe(unchangedWarningMessage);
+                });
+
+                it('shows a message for a unit that is currently visible to students and has changes', function() {
+                    renderContainerPage(this, mockContainerXBlockHtml, {
+                        currently_visible_to_students: true,
+                        has_changes: true
+                    });
+                    expect(containerPage.$(messageSelector).text().trim()).toBe(hasChangesWarningMessage);
                 });
 
                 it('hides the message when the unit is hidden from students', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {
-                        currently_visible_to_students: true
+                        currently_visible_to_students: true,
+                        has_changes: false
                     });
                     fetch({ currently_visible_to_students: false });
                     expect(containerPage.$(messageSelector).text().trim()).toBe('');
@@ -526,10 +557,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                 it('shows a message when a unit is made visible', function() {
                     renderContainerPage(this, mockContainerXBlockHtml, {
-                        currently_visible_to_students: false
+                        currently_visible_to_students: false,
+                        has_changes: false
                     });
                     fetch({ currently_visible_to_students: true });
-                    expect(containerPage.$(messageSelector).text().trim()).toBe(warningMessage);
+                    expect(containerPage.$(messageSelector).text().trim()).toBe(unchangedWarningMessage);
                 });
             });
         });
