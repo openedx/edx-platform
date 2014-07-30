@@ -47,8 +47,6 @@ from course_modes.models import CourseMode
 
 from ratelimitbackend import admin
 
-import analytics
-
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -708,7 +706,6 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
-
         if activation_changed:
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
@@ -722,7 +719,7 @@ class CourseEnrollment(models.Model):
 
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
-                
+
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
                 dog_stats_api.increment(
@@ -752,16 +749,6 @@ class CourseEnrollment(models.Model):
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
-
-                if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
-                    analytics.track(self.user_id, event_name, {
-                        'category': 'conversion',
-                        'label': self.course_id.to_deprecated_string(),
-                        'org': self.course_id.org,
-                        'course': self.course_id.course,
-                        'run': self.course_id.run,
-                        'mode': self.mode,
-                    })
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
@@ -786,8 +773,6 @@ class CourseEnrollment(models.Model):
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
-
-        Also emits relevant events for analytics purposes.
         """
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)

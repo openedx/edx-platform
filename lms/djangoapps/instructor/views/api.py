@@ -47,9 +47,9 @@ from instructor.enrollment import (
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
-import instructor_analytics.basic
-import instructor_analytics.distributions
-import instructor_analytics.csvs
+import analytics.basic
+import analytics.distributions
+import analytics.csvs
 import csv
 
 from submissions import api as sub_api # installed from the edx-submissions repository
@@ -538,7 +538,7 @@ def get_grading_config(request, course_id):
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
-    grading_config_summary = instructor_analytics.basic.dump_grading_context(course)
+    grading_config_summary = analytics.basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -561,14 +561,14 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    available_features = instructor_analytics.basic.AVAILABLE_FEATURES
+    available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = [
         'id', 'username', 'name', 'email', 'language', 'location',
         'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
         'goals',
     ]
 
-    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
+    student_data = analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -598,8 +598,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
+        return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
 @ensure_csrf_cookie
@@ -610,8 +610,8 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
     # TODO: the User.objects query and CSV generation here could be
-    # centralized into instructor_analytics. Currently instructor_analytics 
-    # has similar functionality but not quite what's needed.
+    # centralized into analytics. Currently analytics has similar functionality
+    # but not quite what's needed.
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
@@ -655,7 +655,7 @@ def get_distribution(request, course_id):
     else:
         feature = str(feature)
 
-    available_features = instructor_analytics.distributions.AVAILABLE_PROFILE_FEATURES
+    available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
         return HttpResponseBadRequest(strip_tags(
@@ -666,12 +666,12 @@ def get_distribution(request, course_id):
         'course_id': course_id.to_deprecated_string(),
         'queried_feature': feature,
         'available_features': available_features,
-        'feature_display_names': instructor_analytics.distributions.DISPLAY_NAMES,
+        'feature_display_names': analytics.distributions.DISPLAY_NAMES,
     }
 
     p_dist = None
     if not feature is None:
-        p_dist = instructor_analytics.distributions.profile_distribution(course_id, feature)
+        p_dist = analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
             'feature': p_dist.feature,
             'feature_display_name': p_dist.feature_display_name,

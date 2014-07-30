@@ -59,16 +59,16 @@
             next = decodeURIComponent(next);
           }
           if (next && !isExternal(next)) {
-            location.href=appendParameter(next, "signin", "return");
+            location.href=next;
           }  else if(json.redirect_url){
-            location.href=appendParameter(json.redirect_url, "signin", "return");
+            location.href=json.redirect_url;
           } else {
-            location.href=appendParameter("${reverse('dashboard')}", "signin", "return");
+            location.href="${reverse('dashboard')}";
           }
         } else if(json.hasOwnProperty('redirect')) {
           var u=decodeURI(window.location.search);
           if (!isExternal(json.redirect)) { // a paranoid check.  Our server is the one providing json.redirect
-              location.href=appendParameter(json.redirect+u, "signin", "return");
+              location.href=json.redirect+u;
           } // else we just remain on this page, which is fine since this particular path implies a login failure
             // that has been generated via packet tampering (json.redirect has been messed with).
         } else {
@@ -103,7 +103,7 @@
 
     function thirdPartySignin(event, url) {
       event.preventDefault();
-      window.location.href = appendParameter(url, "signin", "return");
+      window.location.href = url;
     }
 
     (function post_form_if_pipeline_running(pipeline_running) {

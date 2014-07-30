@@ -95,6 +95,8 @@
 
   <%include file="${google_analytics_file}" />
 
+  <%include file="widgets/segment-io.html" />
+
 
 % if style_overrides_file:
   <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
@@ -121,8 +123,6 @@
   <%static:js group='module-js'/>
 
   <%block name="js_extra"/>
-
-  <%include file="widgets/segment-io.html" />
 </body>
 </html>
 

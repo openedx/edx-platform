@@ -128,8 +128,7 @@ class @Sequence
       analytics.pageview @id
 
       # navigation by clicking the tab directly
-      analytics.track "edx.bi.course.sequential.direct.clicked",
-        category: "courseware"
+      analytics.track "Accessed Sequential Directly",
         sequence_id: @id
         current_sequential: @position
         target_sequential: new_position
@@ -168,10 +167,9 @@ class @Sequence
 
     # navigation using the next or previous arrow button.
     tracking_messages =
-      seq_prev: "edx.bi.course.sequential.previous.clicked"
-      seq_next: "edx.bi.course.sequential.next.clicked"
+      seq_prev: "Accessed Previous Sequential"
+      seq_next: "Accessed Next Sequential"
     analytics.track tracking_messages[direction],
-      category: "courseware"
       sequence_id: @id
       current_sequential: @position
       target_sequential: new_position
