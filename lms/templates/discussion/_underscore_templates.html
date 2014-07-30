@@ -4,29 +4,42 @@
 
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <div class="thread-content-wrapper"></div>
-        <div class="response-count"/>
-        <div class="add-response">
-            <button class="button add-response-btn">
-                <i class="icon icon-reply"></i>
-                <span class="add-response-btn-text">${_('Add A Response')}</span>
-            </button>
-        </div>
-        <ol class="responses"/>
-        <div class="response-pagination"/>
-        <div class="post-status-closed bottom-post-status" style="display: none">
-          ${_("This thread is closed.")}
-        </div>
-        % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
-        <form class="discussion-reply-new" data-id="${'<%- id %>'}">
-            <h4>${_("Post a response:")}</h4>
-            <ul class="discussion-errors"></ul>
-            <div class="reply-body" data-id="${'<%- id %>'}"></div>
-            <div class="reply-post-control">
-                <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
+        <div class="thread-wrapper">
+            <div class="forum-thread-main-wrapper">
+                <div class="thread-content-wrapper"></div>
+                <div class="post-extended-content">
+                    <ol class="responses js-marked-answer-list"></ol>
+                </div>
             </div>
-        </form>
-        % endif
+            <div class="post-extended-content">
+                <div class="response-count"/>
+                <div class="add-response">
+                    <button class="button add-response-btn">
+                        <i class="icon icon-reply"></i>
+                        <span class="add-response-btn-text">${_('Add A Response')}</span>
+                    </button>
+                </div>
+                <ol class="responses js-response-list"/>
+                <div class="response-pagination"/>
+                <div class="post-status-closed bottom-post-status" style="display: none">
+                  ${_("This thread is closed.")}
+                </div>
+                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
+                <form class="discussion-reply-new" data-id="${'<%- id %>'}">
+                    <h4>${_("Post a response:")}</h4>
+                    <ul class="discussion-errors"></ul>
+                    <div class="reply-body" data-id="${'<%- id %>'}"></div>
+                    <div class="reply-post-control">
+                        <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
+                    </div>
+                </form>
+                % endif
+            </div>
+        </div>
+        <div class="post-tools">
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> ${_("Expand discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> ${_("Collapse discussion")}</a>
+        </div>
     </article>
 </script>
 
@@ -45,7 +58,15 @@
               ${"<% } else { %>"}
               ${_('anonymous') | h}
               ${"<% } %>"}
-              <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
+              ## This part is incredibly gross but necessary to combine i18n in
+              ## mako with logic in underscore.
+              ## Translators: post_type describes the kind of post this is
+              ## (e.g. "question" or "discussion"); time_ago is how much time
+              ## has passed since the post was created (e.g. "4 hours ago")
+              ${"{post_type} posted {time_ago}".format(
+                  post_type="<%- thread_type %>",
+                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>"
+              )}
 
               <span class="post-status-closed top-post-status" style="display: none">
                 ${_("&bull; This thread is closed.")}
@@ -80,15 +101,17 @@
                   escapejs(_("(this post is about %(courseware_title_linked)s)"))
               )
       %>
-      ${'<% if (obj.courseware_url) { %>'}
+      ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
           <div class="post-context">${'<%'}${js_block}${'%>'}</div>
       ${'<% } %>'}
 
-      <ul class="moderator-actions">
-          <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
-          <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
-          <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
-      </ul>
+      <div class="post-extended-content">
+          <ul class="moderator-actions">
+              <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
+              <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
+              <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
+          </ul>
+      </div>
   </div>
 </script>
 
@@ -110,8 +133,12 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
+    <a href="#" class="action-show-comments">
+        ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(_("Show Comments (%(num_comments)s)"))}
+        <i class="icon icon-caret-down"></i>
+    </a>
     <ol class="comments">
-        <li class="new-comment response-local">
+        <li class="new-comment">
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
@@ -128,21 +155,54 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
-    <header class="response-local">
+    <header>
         <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
-        <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <%
+            tooltip_expr = u"<%- thread.get('thread_type') == 'question' ? '{mark_answer}' : '{endorse}' %>".format(
+                endorse=_("endorse"),
+                mark_answer=_("mark as answer")
+            )
+        %>
+        <a
+            href="javascript:void(0)"
+            class="endorse-btn action-endorse ${"<%= thread.get('thread_type') == 'question' ? 'mark-answer' : '' %>"}"
+            data-tooltip="${tooltip_expr}"
+        >
+            <span class="check-icon"></span>
+        </a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
         ${"<% } else { %>"}
         <span class="anonymous"><em>${_('anonymous')}</em></span>
         ${"<% } %>"}
-        <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
+        <p class="posted-details">
+            <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
+            <%
+            js_block = u"""
+                interpolate(
+                    endorsement.username ? "{user_fmt_str}" : "{anon_fmt_str}",
+                    {{
+                        'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
+                        'user': endorsement.username
+                    }},
+                    true
+                )""".format(
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                )
+            %>
+            ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+        </p>
     </header>
-    <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
+    <div class="response-body">${"<%- body %>"}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
     </div>
-    <ul class="moderator-actions response-local">
+    <ul class="moderator-actions">
         <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
         <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
         <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
@@ -207,7 +267,30 @@
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
   <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
     <a href="#" class="forum-nav-thread-link">
-      <div class="forum-nav-thread-wrapper-1">
+      <div class="forum-nav-thread-wrapper-0">
+        ${u"""<%
+        var icon_class, sr_text;
+        if (thread_type == "discussion") {{
+            icon_class = "icon-comments";
+            sr_text = "{discussion}";
+        }} else if (endorsed) {{
+            icon_class = "icon-ok";
+            sr_text = "{answered_question}";
+        }} else {{
+            icon_class = "icon-question";
+            sr_text = "{unanswered_question}";
+        }}
+        %>""".format(
+            ## Translators: This is a label for a Discussion forum thread
+            discussion=escapejs(_("discussion")),
+            ## Translators: This is a label for a Question forum thread with a marked answer
+            answered_question=escapejs(_("answered question")),
+            ## Translators: This is a label for a Question forum thread without a marked answer
+            unanswered_question=escapejs(_("unanswered question"))
+        )}
+        <span class="sr">${"<%= sr_text %>"}</span>
+        <i class="icon ${"<%= icon_class %>"}"></i>
+      </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
         js_block = u"""
@@ -240,10 +323,6 @@
          %>
         ${"<%"}${js_block}${"%>"}
       </div><div class="forum-nav-thread-wrapper-2">
-        ${"<% if (endorsed) { %>"}
-          ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
-          <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">${_("Endorsed response")}</span></span>
-        ${"<% } %>"}
         <%
         js_block = u"""
             interpolate(
@@ -363,6 +442,30 @@
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
+        <div class="post-field">
+            <div class="field-label">
+                <span class="field-label-text">
+                    ## Translators: This is the label for a control to
+                    ## select a forum post type
+                    ${_("Post type:")}
+                </span><fieldset class="field-input">
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
+                    <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                        <i class="icon icon-question"></i>
+                        ## Translators: This is a forum post type
+                        ${_("Question")}
+                    </label>
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
+                    <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                        <i class="icon icon-comments"></i>
+                        ## Translators: This is a forum post type
+                        ${_("Discussion")}
+                    </label>
+                </fieldset>
+            </div><span class="field-help">
+                ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
+            </span>
+        </div>
         ${'<% if (mode=="tab") { %>'}
         <div class="post-field">
             ## Using div here instead of label because we are using a non-native control

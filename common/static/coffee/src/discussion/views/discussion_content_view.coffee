@@ -8,16 +8,6 @@ if Backbone?
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
   
     attrRenderer:
-      endorsed: (endorsed) ->
-        if endorsed
-          @$(".action-endorse").show().addClass("is-endorsed")
-        else
-          if @model.get('ability')?.can_endorse
-            @$(".action-endorse").show()
-          else
-            @$(".action-endorse").hide()
-          @$(".action-endorse").removeClass("is-endorsed")
-
       closed: (closed) ->
         return if not @$(".action-openclose").length
         return if not @$(".post-status-closed").length
@@ -56,15 +46,6 @@ if Backbone?
       can_delete:
         enable: -> @$(".action-delete").closest("li").show()
         disable: -> @$(".action-delete").closest("li").hide()
-      can_endorse:
-        enable: ->
-          @$(".action-endorse").show().css("cursor", "auto")
-        disable: ->
-          @$(".action-endorse").css("cursor", "default")
-          if not @model.get('endorsed')
-            @$(".action-endorse").hide()
-          else
-            @$(".action-endorse").show()
       can_openclose:
         enable: -> @$(".action-openclose").closest("li").show()
         disable: -> @$(".action-openclose").closest("li").hide()
@@ -78,15 +59,6 @@ if Backbone?
       for attr, value of @model.attributes
         if @attrRenderer[attr]
           @attrRenderer[attr].apply(@, [value])
-
-    $: (selector) ->
-      @$local.find(selector)
-
-    initLocal: ->
-      @$local = @$el.children(".local")
-      if not @$local.length
-        @$local = @$el
-      @$delegateElement = @$local
 
     makeWmdEditor: (cls_identifier) =>
       if not @$el.find(".wmd-panel").length
@@ -103,7 +75,6 @@ if Backbone?
       
 
     initialize: ->
-      @initLocal()
       @model.bind('change', @renderPartialAttrs, @)
       
      

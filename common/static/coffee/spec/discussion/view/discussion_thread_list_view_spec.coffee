@@ -6,7 +6,23 @@ describe "DiscussionThreadListView", ->
         <script type="text/template" id="thread-list-item-template">
           <li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
             <a href="#" class="forum-nav-thread-link">
-              <div class="forum-nav-thread-wrapper-1">
+              <div class="forum-nav-thread-wrapper-0">
+                <%
+                var icon_class, sr_text;
+                if (thread_type == "discussion") {
+                    icon_class = "icon-comments";
+                    sr_text = "discussion";
+                } else if (endorsed) {
+                    icon_class = "icon-ok";
+                    sr_text = "answered question";
+                } else {
+                    icon_class = "icon-question";
+                    sr_text = "unanswered question";
+                }
+                %>
+                <span class="sr"><%= sr_text %></span>
+                <i class="icon <%= icon_class %>"></i>
+              </div><div class="forum-nav-thread-wrapper-1">
                 <span class="forum-nav-thread-title"><%- title %></span>
                 <%
                 var labels = "";
@@ -27,9 +43,6 @@ describe "DiscussionThreadListView", ->
                 }
                 %>
               </div><div class="forum-nav-thread-wrapper-2">
-                <% if (endorsed) { %>
-                  <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">Endorsed response</span></span>
-                <% } %>
                 <span class="forum-nav-thread-votes-count">+<%=
                     interpolate(
                         '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
@@ -150,21 +163,21 @@ describe "DiscussionThreadListView", ->
         <div class="forum-nav"></div>
         """
         @threads = [
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "1",
             title: "Thread1",
             votes: {up_count: '20'},
             comments_count: 1,
             created_at: '2013-04-03T20:08:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "2",
             title: "Thread2",
             votes: {up_count: '42'},
             comments_count: 2,
             created_at: '2013-04-03T20:07:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "3",
             title: "Thread3",
             votes: {up_count: '12'},
@@ -179,20 +192,8 @@ describe "DiscussionThreadListView", ->
         @view = new DiscussionThreadListView({collection: @discussion, el: $(".forum-nav")})
         @view.render()
 
-    makeThreadWithProps = (props) ->
-      # Minimal set of properties necessary for rendering
-      thread = {
-        id: "dummy_id",
-        pinned: false,
-        endorsed: false,
-        votes: {up_count: '0'},
-        unread_comments_count: 0,
-        comments_count: 0,
-      }
-      $.extend(thread, props)
-
     renderSingleThreadWithProps = (props) ->
-      makeView(new Discussion([new Thread(makeThreadWithProps(props))])).render()
+      makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render()
 
     makeView = (discussion) ->
       return new DiscussionThreadListView(
@@ -384,14 +385,21 @@ describe "DiscussionThreadListView", ->
             expect($.ajax).toHaveBeenCalled()
             expect(@view.addSearchAlert).not.toHaveBeenCalled()
 
-    describe "endorsed renders correctly", ->
-      it "when absent", ->
-        renderSingleThreadWithProps({})
-        expect($(".forum-nav-thread-endorsed").length).toEqual(0)
+    describe "post type renders correctly", ->
+      it "for discussion", ->
+        renderSingleThreadWithProps({thread_type: "discussion"})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-comments")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("discussion")
 
-      it "when present", ->
-        renderSingleThreadWithProps({endorsed: true})
-        expect($(".forum-nav-thread-endorsed").length).toEqual(1)
+      it "for answered question", ->
+        renderSingleThreadWithProps({thread_type: "question", endorsed: true})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-ok")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("answered question")
+
+      it "for unanswered question", ->
+        renderSingleThreadWithProps({thread_type: "question", endorsed: false})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-question")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("unanswered question")
 
     describe "post labels render correctly", ->
       beforeEach ->

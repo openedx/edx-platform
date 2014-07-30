@@ -441,7 +441,8 @@ body.discussion {
         font-weight: 700;
       }
 
-      span {
+      .timeago, .top-post-status {
+        color: inherit;
         font-style: italic;
       }
     }
@@ -473,10 +474,7 @@ body.discussion {
   }
 
   .discussion-post {
-    padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
-    box-shadow: 0 1px 3px $shadow;
-    background-color: $white;
-    border-radius: 3px 3px 0 0;
+    padding: ($baseline*2) ($baseline*2) 0 ($baseline*2);
 
     > header .vote-btn {
       position: relative;
@@ -497,6 +495,10 @@ body.discussion {
   }
 
   .responses {
+    &:empty {
+      display: none;
+    }
+
     list-style: none;
     margin-top: $baseline;
     padding: 0px ($baseline*2);
@@ -645,6 +647,11 @@ body.discussion {
     border: 1px solid #a0a0a0;
     @include linear-gradient(top, $white 35%, $gray-l4);
     box-shadow: 0 1px 1px $shadow-l1;
+    cursor: default;
+
+    &.is-clickable {
+      cursor: auto;
+    }
 
     .check-icon {
       display: block;
@@ -652,6 +659,11 @@ body.discussion {
       height: 12px;
       margin: 8px auto;
       background: url(../images/endorse-icon.png) no-repeat;
+      pointer-events: none;
+    }
+
+    &.mark-answer .check-icon {
+      background: url(../images/answer-icon.png) no-repeat;
     }
 
     &.is-endorsed {
@@ -661,6 +673,11 @@ body.discussion {
 
       .check-icon {
         background-position: 0 -12px;
+      }
+
+      &.mark-answer {
+        @include linear-gradient(top, tint(#1d9348, 60%), tint(#1d9348, 20%));
+        border: 1px solid #1d9348;
       }
     }
   }
@@ -1007,7 +1024,8 @@ body.discussion {
           max-height: 600px;
 
           .group-visibility-label {
-            margin: $baseline ($baseline*1.5) ($baseline*-0.5);
+            font-weight: 400;
+            margin-bottom: ($baseline*0.5);
           }
 
           .discussion-post {
@@ -1043,10 +1061,10 @@ body.discussion {
                 }
               }
 
-              h3 {
+              h1 {
                 font-size: 19px;
                 font-weight: 700;
-                margin-bottom: 0px;
+                margin-bottom: 0px !important; // Override courseware CSS
               }
 
               h4 {
@@ -1235,7 +1253,11 @@ body.discussion {
 }
 
 .discussion-user-threads {
-  @extend .discussion-module
+  @extend .discussion-module;
+
+  .discussion-post {
+    padding-bottom: $baseline !important;
+  }
 }
 
 // post actions - pinning

@@ -1,6 +1,7 @@
 if Backbone?
   class @ThreadResponseView extends DiscussionContentView
     tagName: "li"
+    className: "forum-response"
 
     events:
         "click .discussion-submit-comment": "submitComment"
@@ -9,7 +10,8 @@ if Backbone?
     $: (selector) ->
       @$el.find(selector)
 
-    initialize: ->
+    initialize: (options) ->
+      @collapseComments = options.collapseComments
       @createShowView()
 
     renderTemplate: ->
@@ -65,6 +67,15 @@ if Backbone?
           collectComments(child)
       @model.get('comments').each collectComments
       comments.each (comment) => @renderComment(comment, false, null)
+      if @collapseComments && comments.length
+        @$(".comments").hide()
+        @$(".action-show-comments").on("click", (event) =>
+          event.preventDefault()
+          @$(".action-show-comments").hide()
+          @$(".comments").show()
+        )
+      else
+        @$(".action-show-comments").hide()
 
     renderComment: (comment) =>
       comment.set('thread', @model.get('thread'))
@@ -155,6 +166,7 @@ if Backbone?
       @showView = new ThreadResponseShowView(model: @model)
       @showView.bind "response:_delete", @_delete
       @showView.bind "response:edit", @edit
+      @showView.on "comment:endorse", => @trigger("comment:endorse")
 
     renderShowView: () ->
       @renderSubView(@showView)

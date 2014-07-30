@@ -1,4 +1,19 @@
 class @DiscussionViewSpecHelper
+    @makeThreadWithProps = (props) ->
+        # Minimal set of properties necessary for rendering
+        thread = {
+          id: "dummy_id",
+          thread_type: "discussion",
+          pinned: false,
+          endorsed: false,
+          votes: {up_count: '0'},
+          unread_comments_count: 0,
+          comments_count: 0,
+          abuse_flaggers: [],
+          body: ""
+        }
+        $.extend(thread, props)
+
     @expectVoteRendered = (view, voted) ->
         button = view.$el.find(".vote-btn")
         if voted
