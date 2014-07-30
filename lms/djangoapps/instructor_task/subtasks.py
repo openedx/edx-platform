@@ -35,21 +35,31 @@ def generate_lists_from_queryset(queryset, items_per_query, ordering_key, item_f
     Returns only those fields specified in `item_fields`.
     """
     total_num_items = queryset.count()
-    num_queries = int(math.ceil(float(total_num_items) / float(items_per_query)))
     if ordering_key not in item_fields:
         item_fields.append(ordering_key)
     queryset = queryset.order_by(ordering_key).values(*item_fields)
     last_key = queryset[0][ordering_key] - 1
 
-    for query_number in range(num_queries):
-        item_sublist = queryset.filter(**{ordering_key + "__gt": last_key})
-        if query_number < num_queries - 1:
-            item_sublist = list(item_sublist[:items_per_query])
-        else:
-            item_sublist = list(item_sublist)
-
+    item_subquery = queryset.filter(**{ordering_key + "__gt": last_key})
+    while item_subquery.count() >= items_per_query:
+        item_sublist = list(item_subquery[:items_per_query])
         yield item_sublist
         last_key = item_sublist[-1][ordering_key]
+        item_subquery = queryset.filter(**{ordering_key + "__gt": last_key})
+    # if there are any left, just return them:
+    if item_subquery.exists():
+        yield list(item_subquery)
+
+
+def ceil_div(numerator, denominator):
+    """
+    Divides `numerator` by `denominator`.
+    If they do not divide cleanly, rounds up.
+    """
+    quotient, remainder = divmod(numerator, denominator)
+    if remainder > 0:
+        return quotient + 1
+    return quotient
 
 
 def get_number_of_subtasks_for_queryset(total_num_items, items_per_query, items_per_task):
@@ -63,13 +73,15 @@ def get_number_of_subtasks_for_queryset(total_num_items, items_per_query, items_
     by the generate_items_for_subtask generator.
     """
     total_num_tasks = 0
-    num_queries = int(math.ceil(float(total_num_items) / float(items_per_query)))
-    num_items_remaining = total_num_items
-    for _ in range(num_queries):
-        num_items_this_query = min(num_items_remaining, items_per_query)
-        num_items_remaining -= num_items_this_query
-        num_tasks_this_query = int(math.ceil(float(num_items_this_query) / float(items_per_task)))
-        total_num_tasks += num_tasks_this_query
+    num_full_queries, extra_items = divmod(total_num_items, items_per_query)
+
+    tasks_per_full_query = ceil_div(items_per_query, items_per_task)
+
+
+    total_num_tasks = num_full_queries * tasks_per_full_query
+    if extra_items > 0:
+        tasks_for_extra_query = ceil_div(extra_items, items_per_task)
+        total_num_tasks += tasks_for_extra_query
 
     return total_num_tasks
 

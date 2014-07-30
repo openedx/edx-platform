@@ -102,28 +102,18 @@ def _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
     `recipient_fields` refers to the fields that each query will return
 
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
-    will be properly deduped.
+    will have been properly deduped in the call to `_get_querysets_for_to_option`.
     """
-    if to_option in [SEND_TO_MYSELF, SEND_TO_STAFF]:
-        # for these options, _get_querysets_for_to_option only returns one queryset
-        recipient_qset = _get_querysets_for_to_option(to_option, course_id, user_id)[0]
-        yield list(recipient_qset.values(*recipient_fields))
-
-    elif to_option == SEND_TO_ALL:
-        unenrolled_staff_instr_qset, enrollment_qset = _get_querysets_for_to_option(
-            to_option, course_id, user_id
-        )
-        if unenrolled_staff_instr_qset.exists():
-            yield list(unenrolled_staff_instr_qset.values(*recipient_fields))
-
+    recipient_qsets = _get_querysets_for_to_option(to_option, course_id, user_id)
+    non_empty_querysets = [qset for qset in recipient_qsets if qset.exists()]
+    for queryset in non_empty_querysets:
         for item_sublist in generate_lists_from_queryset(
-            enrollment_qset.select_related('courseenrollment__id'),
+            queryset.select_related('courseenrollment__id'),
             settings.BULK_EMAIL_EMAILS_PER_QUERY,
             'courseenrollment__id',
             recipient_fields
         ):
             yield item_sublist
-
 
 def _get_querysets_for_to_option(to_option, course_id, user_id):
     """
@@ -140,8 +130,7 @@ def _get_querysets_for_to_option(to_option, course_id, user_id):
             return [use_read_replica_if_available(staff_and_instructor_qset)]
 
         elif to_option == SEND_TO_ALL:
-            # first email unenrolled staff members (no need to chunk these,
-            # since they should be pretty rare)
+            # first email unenrolled staff members
             unenrolled_staff_instr_qset = use_read_replica_if_available(
                 staff_and_instructor_qset.exclude(
                     courseenrollment__course_id=course_id,
