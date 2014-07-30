@@ -56,9 +56,14 @@ Coming Soon
 
 We're pleased to announce two upcoming features that will release in the next few weeks:
 
-In Studio, new capabilities will make it easier for course authors to edit and publish content. We've simplified the publishing workflow and added clear indications to the UI so you'll know at a glance whether your content is published and released--and whether students can see it.
+* In Studio, new capabilities will make it easier for course authors to edit
+  and publish content. We've simplified the publishing workflow and added clear
+  indications to the UI so you'll know at a glance whether your content is
+  published and released--and whether students can see it.
 
-* In addition to the existing Discussion post type, course discussions will soon include a new Question post type. Students and course teams will also be able to filter posts by unanswered questions.
+* In addition to the existing Discussion post type, course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts by unanswered questions.
 
 **************************
 edX Documentation
