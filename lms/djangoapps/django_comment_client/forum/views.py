@@ -22,10 +22,10 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
+    is_commentable_cohorted,
+    get_cohorted_commentables,
 )
 from courseware.tabs import EnrolledTab
-from course_groups.cohorts import (is_course_cohorted, get_cohort_id, get_cohorted_threads_privacy,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 
