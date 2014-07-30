@@ -40,7 +40,8 @@ class UtilitiesTestCase(CourseTestCase):
         response = self.client.get(self.utilities_url)
         self.assertContains(response, "Bulk Operations")
         # Verify expansion of action URL happened.
-        self.assertContains(response, '/utility/captions/slashes:mitX+333+Utilities_Course')
+        #self.assertContains(response, '/utility/captions/slashes:mitX+333+Utilities_Course')
+        self.assertContains(response, '/utility/captions/mitX/333/Utilities_Course')
         # Verify persisted utility does NOT have expanded URL.
         utility_0 = self.get_persisted_utilities()[0]
         self.assertEqual('utility_captions_handler', get_action_url(utility_0, 0))
@@ -104,7 +105,8 @@ class UtilitiesTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(utility, index), stored)
 
-        test_expansion(settings.COURSE_UTILITIES[0], 0, 'utility_captions_handler', '/utility/captions/slashes:mitX+333+Utilities_Course')
+        #test_expansion(settings.COURSE_UTILITIES[0], 0, 'utility_captions_handler', '/utility/captions/slashes:mitX+333+Utilities_Course')
+        test_expansion(settings.COURSE_UTILITIES[0], 0, 'utility_captions_handler', '/utility/captions/mitX/333/Utilities_Course')
 
 
 def get_first_item(utility):
