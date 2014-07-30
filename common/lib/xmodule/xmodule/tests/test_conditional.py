@@ -96,7 +96,7 @@ class ConditionalFactory(object):
         cond_descriptor = ConditionalDescriptor(
             descriptor_system,
             field_data,
-            ScopeIds(None, 'conditional', cond_location, cond_location)
+            ScopeIds(None, cond_location.block_type, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
         system.get_module = lambda desc: desc
