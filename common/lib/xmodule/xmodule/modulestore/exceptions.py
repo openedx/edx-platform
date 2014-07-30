@@ -41,18 +41,17 @@ class DuplicateItemError(Exception):
     Attempted to create an item which already exists.
     """
     def __init__(self, element_id, store=None, collection=None):
-        super(DuplicateItemError, self).__init__()
+        super(DuplicateItemError, self).__init__(
+            u'{store}[{collection}] already has {element_id!r}'.format(
+                store=store,
+                collection=collection,
+                element_id=element_id
+            )
+        )
         self.element_id = element_id
         self.store = store
         self.collection = collection
 
-    def __str__(self, *args, **kwargs):
-        """
-        Print info about what's duplicated
-        """
-        return '{0.store}[{0.collection}] already has {0.element_id!r}'.format(
-            self, Exception.__str__(self, *args, **kwargs)
-        )
 
 class VersionConflictError(Exception):
     """
