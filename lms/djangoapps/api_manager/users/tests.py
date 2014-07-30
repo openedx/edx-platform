@@ -110,6 +110,17 @@ class UsersApiTests(ModuleStoreTestCase):
             uri, headers=headers, content_type='application/json', data=json_data)
         return response
 
+    def do_put(self, uri, data):
+        """Submit an HTTP PUT request"""
+        headers = {
+            'X-Edx-Api-Key': str(TEST_API_KEY),
+        }
+        json_data = json.dumps(data)
+
+        response = self.client.put(
+            uri, headers=headers, content_type='application/json', data=json_data)
+        return response
+
     def do_get(self, uri):
         """Submit an HTTP GET request"""
         headers = {
@@ -1414,12 +1425,88 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = '/api/users/{}/roles/'.format(self.user.id)
         data = {'course_id': self.test_bogus_course_id, 'role': 'instructor'}
         response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_users_roles_list_post_invalid_role(self):
         test_uri = '/api/users/{}/roles/'.format(self.user.id)
         data = {'course_id': unicode(self.course.id), 'role': 'invalid_role'}
         response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_users_roles_list_put(self):
+        course2 = CourseFactory.create(
+            display_name="TEST COURSE2",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30)
+        )
+        Role.objects.get_or_create(
+            name=FORUM_ROLE_MODERATOR,
+            course_id=course2.id)
+
+        course3 = CourseFactory.create(
+            display_name="TEST COURSE3",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30)
+        )
+        Role.objects.get_or_create(
+            name=FORUM_ROLE_MODERATOR,
+            course_id=course3.id)
+
+        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 0)
+
+        data = [
+            {'course_id': unicode(self.course.id), 'role': 'instructor'},
+            {'course_id': unicode(course2.id), 'role': 'instructor'},
+            {'course_id': unicode(course3.id), 'role': 'instructor'}
+        ]
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 3)
+        for role in response.data['results']:
+            self.assertEqual(role['role'], 'instructor')
+
+        data = [
+            {'course_id': unicode(self.course.id), 'role': 'staff'},
+            {'course_id': unicode(course2.id), 'role': 'staff'},
+        ]
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
+        for role in response.data['results']:
+            self.assertEqual(role['role'], 'staff')
+
+    def test_users_roles_list_put_invalid_user(self):
+        test_uri = '/api/users/2131/roles/'
+        data = [{'course_id': unicode(self.course.id), 'role': 'instructor'}]
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_users_roles_list_put_invalid_course(self):
+        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        data = {'course_id': unicode(self.course.id), 'role': 'instructor'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        data = [{'course_id': self.test_bogus_course_id, 'role': 'instructor'}]
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['course_id'], unicode(self.course.id))
+
+    def test_users_roles_list_put_invalid_roles(self):
+        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        data = []
+        response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_users_roles_courses_detail_delete(self):
