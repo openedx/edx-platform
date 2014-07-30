@@ -412,7 +412,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component.location))
 
-    @ddt.data(('draft', 7, 2), ('split', 3, 2))
+    @ddt.data(('draft', 7, 2), ('split', 13, 4))
     @ddt.unpack
     def test_delete_item(self, default_ms, max_find, max_send):
         """
@@ -431,7 +431,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
 
-    @ddt.data(('draft', 8, 2), ('split', 3, 2))
+    @ddt.data(('draft', 8, 2), ('split', 13, 4))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -478,7 +478,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
 
-    @ddt.data(('draft', 4, 1), ('split', 3, 2))
+    @ddt.data(('draft', 4, 1), ('split', 5, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
         """
@@ -916,7 +916,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
-    @ddt.data(('draft', 2, 6), ('split', 5, 2))
+    @ddt.data(('draft', 2, 6), ('split', 7, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """
