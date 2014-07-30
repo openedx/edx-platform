@@ -137,6 +137,14 @@ describe "DiscussionThreadListView", ->
             </div>
             <div class="forum-nav-thread-list-wrapper">
                 <div class="forum-nav-refine-bar">
+                    <span class="forum-nav-filter-main">
+                        <select class="forum-nav-filter-main-control">
+                            <option value="all">Show all</option>
+                            <option value="unread">Show unread</option>
+                            <option value="unanswered">Show unanswered</option>
+                            <option value="flagged">Show flagged</option>
+                        </select>
+                    </span>
                     <span class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
                             <option value="date">by recent activity</option>
@@ -200,6 +208,22 @@ describe "DiscussionThreadListView", ->
           el: $(".forum-nav"),
           collection: discussion
       )
+
+    describe "should filter correctly", ->
+        _.each(["all", "unread", "unanswered", "flagged"], (filterVal) ->
+            it "for #{filterVal}", ->
+                $.ajax.andCallFake((params) ->
+                    _.each(["unread", "flagged"], (paramName)->
+                        if paramName == filterVal
+                            expect(params.data[paramName]).toEqual(true)
+                        else
+                            expect(params.data[paramName]).toBeUndefined()
+                    )
+                    {always: ->}
+                )
+                @view.$(".forum-nav-filter-main-control").val(filterVal).change()
+                expect($.ajax).toHaveBeenCalled()
+        )
 
     checkThreadsOrdering =  (view, sort_order, type) ->
       expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)

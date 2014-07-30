@@ -20,12 +20,28 @@
     <%include file="_filter_dropdown.html" />
     <div class="forum-nav-thread-list-wrapper">
         <div class="forum-nav-refine-bar">
+            <span class="forum-nav-filter-main">
+                <select class="forum-nav-filter-main-control">
+                    ## Translators: This is a menu option for showing all forum threads unfiltered
+                    <option value="all">${_("Show all")}</option>
+                    ## Translators: This is a menu option for showing only unread forum threads
+                    <option value="unread">${_("Show unread")}</option>
+                    ## Translators: This is a menu option for showing only unanswered forum
+                    ## question threads
+                    <option value="unanswered">${_("Show unanswered")}</option>
+                    %if flag_moderator:
+                        ## Translators: This is a menu option for showing only forum threads flagged
+                        ## for abuse
+                        <option value="flagged">${_("Show flagged")}</option>
+                    %endif
+                </select>
+            </span>
             %if is_course_cohorted and is_moderator:
             <span class="forum-nav-filter-cohort">
                 <select class="forum-nav-filter-cohort-control">
-                    <option value="all">${_("View all cohorts")}</option>
+                    <option value="all">${_("in all cohorts")}</option>
                         %for c in cohorts:
-                            <option value="${c['id']}">${_("View as {cohort_name}").format(cohort_name=c['name'])}</option>
+                            <option value="${c['id']}">${_("as {cohort_name}").format(cohort_name=c['name'])}</option>
                         %endfor
                 </select>
             </span>

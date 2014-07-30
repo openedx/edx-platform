@@ -136,6 +136,10 @@
   font: inherit;
 }
 
+.forum-nav-filter-main-control {
+  @extend %forum-nav-select;
+}
+
 .forum-nav-filter-cohort-control {
   @extend %forum-nav-select;
 }

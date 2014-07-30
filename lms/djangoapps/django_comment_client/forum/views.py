@@ -103,11 +103,24 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #so by default, a moderator sees all items, and a student sees his cohort
 
-    query_params = merge_dict(default_query_params,
-                              strip_none(extract(request.GET,
-                                                 ['page', 'sort_key',
-                                                  'sort_order', 'text',
-                                                  'commentable_ids', 'flagged'])))
+    query_params = merge_dict(
+        default_query_params,
+        strip_none(
+            extract(
+                request.GET,
+                [
+                    'page',
+                    'sort_key',
+                    'sort_order',
+                    'text',
+                    'commentable_ids',
+                    'flagged',
+                    'unread',
+                    'unanswered',
+                ]
+            )
+        )
+    )
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
