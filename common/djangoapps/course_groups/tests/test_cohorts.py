@@ -265,7 +265,7 @@ class TestCohorts(django.test.TestCase):
         Test workgroup cohorts.
         """
 
-        course = modulestore().get_course("edX/toy/2012_Fall")
+        course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
         user = User.objects.create(username="test", email="a@b.com")
