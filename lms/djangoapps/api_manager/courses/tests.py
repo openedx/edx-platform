@@ -11,6 +11,7 @@ from urllib import urlencode
 
 from django.contrib.auth.models import Group
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
@@ -1476,7 +1477,6 @@ class CoursesApiTests(TestCase):
 
     def test_coursemodulecompletions_get_invalid_course(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        print completion_uri
         response = self.do_get(completion_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -1796,10 +1796,22 @@ class CoursesApiTests(TestCase):
 
         # filter roleset by user
         user_id = {'user_id': '{}'.format(self.users[0].id)}
-        test_uri = '{}?{}'.format(test_uri, urlencode(user_id))
-        response = self.do_get(test_uri)
+        user_filter_uri = '{}?{}'.format(test_uri, urlencode(user_id))
+        response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+
+        # filter roleset by role
+        role = {'role': 'instructor'}
+        role_filter_uri = '{}?{}'.format(test_uri, urlencode(role))
+        response = self.do_get(role_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        role = {'role': 'invalid_role'}
+        role_filter_uri = '{}?{}'.format(test_uri, urlencode(role))
+        response = self.do_get(role_filter_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
 
     def test_courses_roles_list_get_invalid_course(self):
         test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
@@ -1818,6 +1830,11 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
+
+        # Confirm this user also has forum moderation permissions
+        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
+        has_role = role.users.get(id=self.users[0].id)
+        self.assertTrue(has_role)
 
     def test_courses_roles_list_post_invalid_course(self):
         test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
@@ -1844,16 +1861,22 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
 
         response = self.do_get(test_uri)
-        print response.data
         self.assertEqual(len(response.data), 1)
 
         delete_uri = '{}instructor/users/{}'.format(test_uri, self.users[0].id)
-        print delete_uri
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 204)
 
         response = self.do_get(test_uri)
         self.assertEqual(len(response.data), 0)
+
+        # Confirm this user no longer has forum moderation permissions
+        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
+        try:
+            has_role = role.users.get(id=self.users[0].id)
+            self.assertTrue(False)
+        except ObjectDoesNotExist:
+            pass
 
     def test_courses_roles_users_detail_delete_invalid_course(self):
         test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
@@ -1870,6 +1893,5 @@ class CoursesApiTests(TestCase):
     def test_courses_roles_users_detail_delete_invalid_role(self):
         test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
         delete_uri = '{}invalid_role/users/{}'.format(test_uri, self.users[0].id)
-        print delete_uri
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)
