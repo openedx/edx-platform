@@ -177,12 +177,28 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
             workgroup = self.get_object()
             workgroup.users.add(user)
+
             # add user to the workgroup cohort
             course_descriptor, course_key, course_content = _get_course(self.request, user, workgroup.project.course_id)  # pylint: disable=W0612
             cohort = get_cohort_by_name(course_key,
                                         workgroup.cohort_name, CourseUserGroup.WORKGROUP)
             add_user_to_cohort(cohort, user.username)
+
             workgroup.save()
+
+            # add user to the workgroup cohort, create it if it doesn't exist (for cases where there is a legacy
+            # workgroup)
+            try:
+                cohort = get_cohort_by_name(workgroup.project.course_id,
+                                            workgroup.cohort_name, CourseUserGroup.WORKGROUP)
+                add_user_to_cohort(cohort, user.username)
+            except ObjectDoesNotExist:
+                # This use case handles cases where a workgroup might have been created before
+                # the notion of a cohorted discussion. So we need to backfill in the data
+                cohort = add_cohort(workgroup.project.course_id, workgroup.cohort_name, CourseUserGroup.WORKGROUP)
+                for workgroup_user in workgroup.users.all():
+                    add_user_to_cohort(cohort, workgroup_user.username)
+
             return Response({}, status=status.HTTP_201_CREATED)
         else:
             user_id = request.DATA.get('id')

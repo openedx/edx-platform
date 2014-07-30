@@ -39,12 +39,19 @@ class Workgroup(TimeStampedModel):
 
     @property
     def cohort_name(self):
-        return 'Group Project {} Workgroup {} ({})'.format(
+        return Workgroup.cohort_name_for_workgroup(
             self.project.id,
             self.id,
             self.name
         )
 
+    @classmethod
+    def cohort_name_for_workgroup(cls, project_id, workgroup_id, workgroup_name):
+        return 'Group Project {} Workgroup {} ({})'.format(
+            project_id,
+            workgroup_id,
+            workgroup_name
+        )
 
 class WorkgroupReview(TimeStampedModel):
     """
