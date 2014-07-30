@@ -126,7 +126,7 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
-urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
+urlpatterns += patterns('', url(r'^administrator/', include(admin.site.urls)),)
 
 # enable automatic login
 if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
