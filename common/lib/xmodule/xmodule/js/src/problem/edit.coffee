@@ -3,7 +3,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- 0.001_\n"
+  @numberInputTemplate: "= answer +- 0.001%\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
@@ -166,6 +166,17 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
+# We may wish to add insertHeader. Here is Tom's code.
+# function makeHeader() {
+#  var selection = simpleEditor.getSelection();
+#  var revisedSelection = selection + '\n';
+#  for(var i = 0; i < selection.length; i++) {
+#revisedSelection += '=';
+#  }
+#  simpleEditor.replaceSelection(revisedSelection);
+#}
+#
+ 
   @insertStringInput: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.stringInputTemplate)
 
@@ -383,8 +394,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     booleanExpressionStrings = []
     booleanHintPhrases = []
 
-    debugger
-
     returnXmlString +=  '    <choiceresponse>\n'
     returnXmlString += '        <checkboxgroup direction="vertical">\n'
 
@@ -465,7 +474,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     hintElementString = ''
     numericHintElementString = ''
 
-    debugger
     for line in xmlString.split('\n')
       numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
       if numericMatch
@@ -602,65 +610,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         return MarkdownEditingDescriptor.parseForNumeric(match);
       });
 
-
-///          // Split answers
-///          debugger;
-///          var answersList = p.replace(/^(or)?=[^\n]+/gm, '').split('\n'),
-///
-///              processNumericalResponse = function (value) {
-///                  var params, answer, string;
-///
-///                  if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
-///                    // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
-///                    // = (5*2)*3 should not be used as range tolerance
-///                    string = '<numericalresponse answer="' + value +  '">\n';
-///                    string += '  <formulaequationinput />\n';
-///                    string += '</numericalresponse>\n\n';
-///                    return string;
-///                  }
-///
-///                  if (isNaN(parseFloat(value))) {
-///                      return false;
-///                  }
-///
-///                  // Tries to extract parameters from string like 'expr +- tolerance'
-///                  params = /(.*?)\+\-\s*(.*?$)/.exec(value);
-///
-///                  if(params) {
-///                      answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
-///                      string = '<numericalresponse answer="' + answer + '">\n';
-///                      string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-///                  } else {
-///                      answer = value.replace(/\s+/g, ''); // support inputs like 5*2
-///                      string = '<numericalresponse answer="' + answer + '">\n';
-///                  }
-///
-///                  string += '  <formulaequationinput />\n';
-///                  string += '</numericalresponse>\n\n';
-///
-///                  return string;
-///              },
-///
-///              processStringResponse = function (values) {
-///                  var firstAnswer = values.shift(), string;
-///
-///                  if (firstAnswer[0] === '|') { // this is regexp case
-///                      string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n';
-///                  } else {
-///                      string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n';
-///                  }
-///
-///                  for (i = 0; i < values.length; i += 1) {
-///                      string += '  <additional_answer>' + values[i] + '</additional_answer>\n';
-///                  }
-///
-///                  string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
-///
-///                  return string;
-///              };
-///
-///          return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
-///      });
 
       //_____________________________________________________________________
       //

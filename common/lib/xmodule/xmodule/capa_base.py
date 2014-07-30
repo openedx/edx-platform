@@ -231,8 +231,6 @@ class CapaMixin(CapaFields):
         try:
             # TODO (vshnayder): move as much as possible of this work and error
             # checking to descriptor load time
-
-
             self.lcp = self.new_lcp(self.get_state_for_lcp())
 
             # At this point, we need to persist the randomization seed
@@ -622,17 +620,6 @@ class CapaMixin(CapaFields):
         else:
             raise NotFoundError('Marker pattern not found')
         return html
-
-    # def _insert_problem_hint(self, html, show_problem_hint):
-    #     '''
-    #     If the student has requested a program hint, find the next hint to display
-    #     for this problem and insert it into the html stream. This function is only
-    #     called when the student requests a hint so there is no need to verify conditions.
-    #     :param html:    The original html string (with the special string '> <' embedded therein)
-    #     :return:        The hint text, or an empty string if no hint text
-    #     '''
-    #
-    #     return hint_text
 
     def get_problem_html(self, encapsulate=True, show_problem_hint=False):
         '''
@@ -1146,7 +1133,7 @@ class CapaMixin(CapaFields):
         #       'success' will always be incorrect
         event_info['grade'] = published_grade['grade']
         event_info['max_grade'] = published_grade['max_grade']
-        event_info['correct_map'] = correct_map.get_dict() 
+        event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
