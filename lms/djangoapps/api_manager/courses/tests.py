@@ -17,6 +17,8 @@ from django.test.utils import override_settings
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from instructor.access import allow_access
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -188,6 +190,10 @@ class CoursesApiTests(TestCase):
 
         self.client = SecureClient()
         cache.clear()
+
+        Role.objects.get_or_create(
+            name=FORUM_ROLE_MODERATOR,
+            course_id=self.course.id)
 
     def do_get(self, uri):
         """Submit an HTTP GET request"""
@@ -1778,3 +1784,90 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['city'], 'Denver')
         self.assertEqual(response.data['results'][0]['count'], 5)
+
+    def test_courses_roles_list_get(self):
+        allow_access(self.course, self.users[0], 'staff')
+        allow_access(self.course, self.users[1], 'instructor')
+        allow_access(self.course, self.users[2], 'staff')
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        # filter roleset by user
+        user_id = {'user_id': '{}'.format(self.users[0].id)}
+        test_uri = '{}?{}'.format(test_uri, urlencode(user_id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_courses_roles_list_get_invalid_course(self):
+        test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_roles_list_post(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+        data = {'user_id': self.users[0].id, 'role': 'instructor'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_courses_roles_list_post_invalid_course(self):
+        test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
+        data = {'user_id': self.users[0].id, 'role': 'instructor'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_roles_list_post_invalid_user(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        data = {'user_id': 23423, 'role': 'instructor'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_roles_list_post_invalid_role(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        data = {'user_id': self.users[0].id, 'role': 'invalid_role'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_courses_roles_users_detail_delete(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        data = {'user_id': self.users[0].id, 'role': 'instructor'}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(len(response.data), 1)
+
+        delete_uri = '{}instructor/users/{}'.format(test_uri, self.users[0].id)
+        response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 204)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(len(response.data), 0)
+
+    def test_courses_roles_users_detail_delete_invalid_course(self):
+        test_uri = '/api/courses/{}/roles/'.format(self.test_bogus_course_id)
+        delete_uri = '{}instructor/users/{}'.format(test_uri, self.users[0].id)
+        response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_roles_users_detail_delete_invalid_user(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        delete_uri = '{}instructor/users/291231'.format(test_uri)
+        response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_roles_users_detail_delete_invalid_role(self):
+        test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
+        delete_uri = '{}invalid_role/users/{}'.format(test_uri, self.users[0].id)
+        print delete_uri
+        response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 404)
