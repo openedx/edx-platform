@@ -837,8 +837,6 @@ class ChoiceResponse(LoncapaResponse):
             if unicode(self.answer_id) == problem_id:
                 problem_hint_shown = False
                 student_answer_list = student_answers[problem_id]
-                # if not isinstance(student_answer_list, list):       # if the 'list' is not yet a list
-                #     student_answer_list = [student_answer_list]     # cast it as a true list
 
                 choice_list = self.xml.xpath('//choice')
                 for choice in choice_list:
@@ -859,7 +857,7 @@ class ChoiceResponse(LoncapaResponse):
                                                     + QUESTION_HINT_TEXT_STYLE \
                                                     + '">' + hint_text + '</div>'
 
-                    self.wrap_hints_correct_or_incorrect(new_cmap, problem_id, problem_hint_shown)
+                self.wrap_hints_correct_or_incorrect(new_cmap, problem_id, problem_hint_shown)
 
 
 
