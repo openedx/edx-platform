@@ -247,6 +247,24 @@ class CourseSalesAdminRole(CourseRole):
 
 
 @register_access_role
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'

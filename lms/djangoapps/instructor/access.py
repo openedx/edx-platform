@@ -17,14 +17,15 @@ from student.roles import (
     CourseInstructorRole,
     CourseCcxCoachRole,
     CourseStaffRole,
+    CourseObserverRole,
 )
-
 
 log = logging.getLogger(__name__)
 
 ROLES = {
     'beta': CourseBetaTesterRole,
     'instructor': CourseInstructorRole,
+    'observer': CourseObserverRole,
     'staff': CourseStaffRole,
     'ccx_coach': CourseCcxCoachRole,
 }
