@@ -2,7 +2,6 @@
 Classes used for defining and running nose test suites
 """
 import os
-from paver.easy import call_task
 from pavelib.utils.test import utils as test_utils
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
