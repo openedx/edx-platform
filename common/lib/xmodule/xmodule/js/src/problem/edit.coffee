@@ -455,71 +455,77 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @parseForNumeric: (xmlString) ->
     # try to parse the supplied string to find a numeric problem
     # return the string unmodified if this is not a drop down problem
-    returnXmlString = ''
-    reducedXmlString = ''
-    answerLines = []
+    returnXmlString = xmlString
     operator = ''
     answerExpression = ''
     answerString = ''
     plusMinus = ''
     tolerance = ''
-    isNumeric = false
     responseParameterElementString = ''
-    correctHintElementString = ''
+    hintElementString = ''
     numericHintElementString = ''
 
     debugger
-    for line in xmlString.split('\n')
-      numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
-      if numericMatch
-        isNumeric = true
-        answerLines.push(line)
-      else
-        reducedXmlString += line + '\n'
+    numericMatch = xmlString.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
+    if numericMatch
+      if numericMatch[1]
+        operator = numericMatch[1]
+      if numericMatch[2]
+        answerExpression = numericMatch[2]
+      if numericMatch[3]
+        plusMinus = numericMatch[3]
+      if numericMatch[4]
+        tolerance = numericMatch[4]
 
-    if isNumeric                    # if this is a numeric problem
-      for line in answerLines
-        numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
-        if numericMatch
-          if numericMatch[1]
-            operator = numericMatch[1]
-          if numericMatch[2]
-            answerExpression = numericMatch[2]
-          if numericMatch[3]
-            plusMinus = numericMatch[3]
-          if numericMatch[4]
-            tolerance = numericMatch[4]
+      if (operator == '=') or (operator == 'or=')
+        if answerExpression
+          hintMatches = xmlString.match( /_([0-9]+)_/ ) # check for an extracted hint string
+          if hintMatches                                # the line does contain an extracted hint string
+            xmlString = xmlString.replace(hintMatches[0], '')  # remove the phrase, else it will be displayed to student
+            hintIndex = parseInt(hintMatches[1])
+            hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
+            hintText = hintText.trim()
 
-          if operator == '='
-            if answerExpression
-              if answerString == ''           # if this is the *first* answer supplied
-                answerString = answerExpression
-                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
-                  responseParameterElementString = '<responseparam type="tolerance" default="' + tolerance + '"/>\n'
-                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-                  if hintMatches
-                    hintText = hintMatches[1].trim()
-                    correctHintElementString = "<correcthint>\n" + hintText + "\n</correcthint>\n"
-                else
-                  responseParameterElementString = '<responseparam type="equal"/>\n'
-              else                            # else this is not the first answer
-                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
-                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
-                  if hintMatches
-                    hintText = hintMatches[1].trim()
-                    numericHintElementString += '<numerichint answer="' + answerExpression + '" tolerance="' + tolerance + '">' + hintText + '\n</numerichint>\n'
-                else
-                  responseParameterElementString = '<responseparam type="equal"/>\n'
+            if operator == '='
+              hintElementString = '<correcthint>' + hintText + '\n</correcthint>\n'
+            else
+              if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
+                hintElementString = '<numerichint  answer="' + answerString + '" tolerance="' + tolerance + '">' + hintText + '\n</numerichint>\n'
+              else
+                hintElementString = '<numerichint  answer="' + answerString + '">' + hintText + '\n</numerichint>\n'
 
-      returnXmlString += MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
-      returnXmlString +=  '    <numericalresponse answer="' + answerString  + '">\n'
+          if answerString == ''           # if this is the *first* answer supplied
+            answerString = answerExpression
+
+            if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
+              responseParameterElementString = '<responseparam type="tolerance" default="' + tolerance + '"/>\n'
+            else
+              responseParameterElementString = '<responseparam type="equal"/>\n'
+          else                            # else this is not the first answer
+            if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
+              hintMatches = xmlString.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+              if hintMatches
+                hintText = hintMatches[1].trim()
+                numericHintElementString += '<numerichint answer="' + answerExpression + '" tolerance="' + tolerance + '">' + hintText + '\n</numerichint>\n'
+            else
+              responseParameterElementString = '<responseparam type="equal"/>\n'
+
+
+
+
+
+
+
+
+
+
+
+      returnXmlString  =  '    <numericalresponse answer="' + answerString  + '">\n'
       returnXmlString += '        ' + responseParameterElementString
       returnXmlString += '        <formulaequationinput/>\n'
-      returnXmlString += '        ' + correctHintElementString
+      returnXmlString += '        ' + hintElementString
       returnXmlString += '        ' + numericHintElementString
       returnXmlString +=  '    </numericalresponse>\n'
-    else                        # else this is not a numeric problem
-      returnXmlString = xmlString
     return returnXmlString
 
 
@@ -536,10 +542,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
-
- debugger;
- 
-      //xml = MarkdownEditingDescriptor.parseForNumeric(xml);
 
       //_____________________________________________________________________
       //
@@ -607,7 +609,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       //
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match) {
-        debugger;
         return MarkdownEditingDescriptor.parseForNumeric(match);
       });
 
