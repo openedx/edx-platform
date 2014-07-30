@@ -3,7 +3,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- 0.001%\n"
+  @numberInputTemplate: "= answer +- 0.001_\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
@@ -250,7 +250,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     if questionHintMatches
       index = 0
       for questionHintMatch in questionHintMatches
-        xmlString = xmlString.replace( questionHintMatch, '%' + index++ + '%')
+        xmlString = xmlString.replace( questionHintMatch, '_' + index++ + '_')
         questionHintMatch = questionHintMatch.replace(/~~~/gm, '')
         questionHintMatch = questionHintMatch.replace(/```/gm, '')
         @questionHintStrings.push(questionHintMatch)   # save the string but no delimiters
@@ -335,7 +335,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           hintText = ''
           correctnessText = ''
           itemText = ''
-          hintMatches = line.match( /%([0-9]+)%/ ); # check for an extracted hint string
+          hintMatches = line.match( /_([0-9]+)_/ ); # check for an extracted hint string
           if hintMatches                            # if we found one
             hintIndex = parseInt(hintMatches[1])
             hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
@@ -397,7 +397,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       choiceMatches = @matchCheckboxMarkerPattern( line )
       if choiceMatches           # this line includes '[...]' so it must be a checkbox choice
         line = choiceMatches[2]  # remove the [..] phrase, else it will be displayed to student
-        hintMatches = line.match( /%([0-9]+)%/ )  # check for an extracted hint string
+        hintMatches = line.match( /_([0-9]+)_/ )  # check for an extracted hint string
         if hintMatches
           line = line.replace(hintMatches[0], '')  # remove the {{...}} phrase, else it will be displayed to student
 
@@ -427,7 +427,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         returnXmlString += '          </choice>\n'
 
       else                        # this line is not a checkbox choice, but it may be a combination hint spec line
-        hintMatches = line.match( /%([0-9]+)%/ )  # check for an extracted hint string
+        hintMatches = line.match( /_([0-9]+)_/ )  # check for an extracted hint string
         if hintMatches            # the line does contain an extracted hint string
           line = line.replace(hintMatches[0], '')  # remove the phrase, else it will be displayed to student
           hintIndex = parseInt(hintMatches[1])
@@ -450,6 +450,77 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     return returnXmlString
 
+    
+      #________________________________________________________________________________
+  @parseForNumeric: (xmlString) ->
+    # try to parse the supplied string to find a numeric problem
+    # return the string unmodified if this is not a drop down problem
+    returnXmlString = ''
+    reducedXmlString = ''
+    answerLines = []
+    operator = ''
+    answerExpression = ''
+    answerString = ''
+    plusMinus = ''
+    tolerance = ''
+    isNumeric = false
+    responseParameterElementString = ''
+    correctHintElementString = ''
+    numericHintElementString = ''
+
+    for line in xmlString.split('\n')
+      numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
+      if numericMatch
+        isNumeric = true
+        answerLines.push(line)
+      else
+        reducedXmlString += line + '\n'
+
+    if isNumeric                    # if this is a numeric problem
+      for line in answerLines
+        numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
+        if numericMatch
+          if numericMatch[1]
+            operator = numericMatch[1]
+          if numericMatch[2]
+            answerExpression = numericMatch[2]
+          if numericMatch[3]
+            plusMinus = numericMatch[3]
+          if numericMatch[4]
+            tolerance = numericMatch[4]
+
+          if operator == '='
+            if answerExpression
+              if answerString == ''           # if this is the *first* answer supplied
+                answerString = answerExpression
+                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
+                  responseParameterElementString = '<responseparam type="tolerance" default="' + tolerance + '"/>\n'
+                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+                  if hintMatches
+                    hintText = hintMatches[1].trim()
+                    correctHintElementString = "<correcthint>\n" + hintText + "\n</correcthint>\n"
+                else
+                  responseParameterElementString = '<responseparam type="equal"/>\n'
+              else                            # else this is not the first answer
+                if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
+                  hintMatches = line.match( /{{(.+)}}/ )  # extract the {{...}} phrase, if any
+                  if hintMatches
+                    hintText = hintMatches[1].trim()
+                    numericHintElementString += '<numerichint answer="' + answerExpression + '" tolerance="' + tolerance + '">' + hintText + '\n</numerichint>\n'
+                else
+                  responseParameterElementString = '<responseparam type="equal"/>\n'
+
+      returnXmlString += MarkdownEditingDescriptor.insertParagraphText(xmlString, reducedXmlString)
+      returnXmlString +=  '    <numericalresponse answer="' + answerString  + '">\n'
+      returnXmlString += '        ' + responseParameterElementString
+      returnXmlString += '        <formulaequationinput/>\n'
+      returnXmlString += '        ' + correctHintElementString
+      returnXmlString += '        ' + numericHintElementString
+      returnXmlString +=  '    </numericalresponse>\n'
+    else                        # else this is not a numeric problem
+      returnXmlString = xmlString
+    return returnXmlString
+
 
 
   @markdownToXml: (markdown)->
@@ -466,6 +537,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
 
  debugger;
+ 
+      xml = MarkdownEditingDescriptor.parseForNumeric(xml);
 
       //_____________________________________________________________________
       //
@@ -490,7 +563,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             }
 
             hintText = '';
-            hintMatches = options[i].match( /%([0-9]+)%/ ); // check for an extracted hint string
+            hintMatches = options[i].match( /_([0-9]+)_/ ); // check for an extracted hint string
             if(hintMatches) {                               // if we found one
               hintIndex = parseInt(hintMatches[1]);
               hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ];
@@ -523,70 +596,70 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       //
       // checkbox questions
       //
-      xml = xml.replace(/(^\s+(\[[x ]+|%[0-9]+)[^\n]+\n)+/gm, function(match) {
+      xml = xml.replace(/(^\s+(\[[x ]+|_[0-9]+)[^\n]+\n)+/gm, function(match) {
         return MarkdownEditingDescriptor.parseForCheckbox(match);
       });
 
-      // replace string and numerical
-      xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
-          // Split answers
-          debugger;
-          var answersList = p.replace(/^(or)?=[^\n]+/gm, '').split('\n'),
-
-              processNumericalResponse = function (value) {
-                  var params, answer, string;
-
-                  if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
-                    // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
-                    // = (5*2)*3 should not be used as range tolerance
-                    string = '<numericalresponse answer="' + value +  '">\n';
-                    string += '  <formulaequationinput />\n';
-                    string += '</numericalresponse>\n\n';
-                    return string;
-                  }
-
-                  if (isNaN(parseFloat(value))) {
-                      return false;
-                  }
-
-                  // Tries to extract parameters from string like 'expr +- tolerance'
-                  params = /(.*?)\+\-\s*(.*?$)/.exec(value);
-
-                  if(params) {
-                      answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
-                      string = '<numericalresponse answer="' + answer + '">\n';
-                      string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-                  } else {
-                      answer = value.replace(/\s+/g, ''); // support inputs like 5*2
-                      string = '<numericalresponse answer="' + answer + '">\n';
-                  }
-
-                  string += '  <formulaequationinput />\n';
-                  string += '</numericalresponse>\n\n';
-
-                  return string;
-              },
-
-              processStringResponse = function (values) {
-                  var firstAnswer = values.shift(), string;
-
-                  if (firstAnswer[0] === '|') { // this is regexp case
-                      string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n';
-                  } else {
-                      string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n';
-                  }
-
-                  for (i = 0; i < values.length; i += 1) {
-                      string += '  <additional_answer>' + values[i] + '</additional_answer>\n';
-                  }
-
-                  string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
-
-                  return string;
-              };
-
-          return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
-      });
+//      // replace string and numerical
+//      xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
+//          // Split answers
+//          debugger;
+//          var answersList = p.replace(/^(or)?=[^\n]+/gm, '').split('\n'),
+//
+//              processNumericalResponse = function (value) {
+//                  var params, answer, string;
+//
+//                  if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
+//                    // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
+//                    // = (5*2)*3 should not be used as range tolerance
+//                    string = '<numericalresponse answer="' + value +  '">\n';
+//                    string += '  <formulaequationinput />\n';
+//                    string += '</numericalresponse>\n\n';
+//                    return string;
+//                  }
+//
+//                  if (isNaN(parseFloat(value))) {
+//                      return false;
+//                  }
+//
+//                  // Tries to extract parameters from string like 'expr +- tolerance'
+//                  params = /(.*?)\+\-\s*(.*?$)/.exec(value);
+//
+//                  if(params) {
+//                      answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
+//                      string = '<numericalresponse answer="' + answer + '">\n';
+//                      string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+//                  } else {
+//                      answer = value.replace(/\s+/g, ''); // support inputs like 5*2
+//                      string = '<numericalresponse answer="' + answer + '">\n';
+//                  }
+//
+//                  string += '  <formulaequationinput />\n';
+//                  string += '</numericalresponse>\n\n';
+//
+//                  return string;
+//              },
+//
+//              processStringResponse = function (values) {
+//                  var firstAnswer = values.shift(), string;
+//
+//                  if (firstAnswer[0] === '|') { // this is regexp case
+//                      string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n';
+//                  } else {
+//                      string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n';
+//                  }
+//
+//                  for (i = 0; i < values.length; i += 1) {
+//                      string += '  <additional_answer>' + values[i] + '</additional_answer>\n';
+//                  }
+//
+//                  string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
+//
+//                  return string;
+//              };
+//
+//          return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
+//      });
 
       //_____________________________________________________________________
       //
