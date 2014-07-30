@@ -1577,18 +1577,19 @@ class NumericalResponse(LoncapaResponse):
         :return:                True if a single choice hint was found
         """
         hint_found = False
-        for problem in student_answers:
-            student_answer_string = student_answers[problem]
-            student_float = float(student_answer_string )
 
-            if new_cmap.cmap[problem]['correctness'] == 'correct':  # if the grader liked the student's answer
-                for correct_hint in self.original_xml.xpath('//numericalresponse/correcthint'):
-                    correctness_string = self._get_hint_label(correct_hint, True)
-                    new_cmap[problem]['msg'] = new_cmap[problem]['msg'] + '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' + correctness_string + correct_hint.text.strip() + '</div>'
-                    hint_found = True
-            else:                                                   # else the grader counted student's answer wrong
-                for numerichint_element in self.xml.xpath('//numericalresponse/numerichint'):
-                    hint_found = self._test_answer_for_hint(new_cmap, numerichint_element, problem, student_float)
+        for problem_id in student_answers:
+            if unicode(self.answer_id) == problem_id:
+                if new_cmap.cmap[problem_id]['correctness'] == 'correct':  # if the grader liked the student's answer
+                    correct_hints = self.original_xml.xpath('//numericalresponse/correcthint')
+                    if correct_hints:
+                        for correct_hint in correct_hints:
+                            correctness_string = self._get_hint_label(correct_hint, True)
+                            new_cmap[problem_id]['msg'] += \
+                                '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' + \
+                                correctness_string + correct_hint.text.strip() + '</div>'
+                            hint_found = True
+        return hint_found
 
     def _test_answer_for_hint(self, new_cmap, hint_element, problem, student_float):
         """

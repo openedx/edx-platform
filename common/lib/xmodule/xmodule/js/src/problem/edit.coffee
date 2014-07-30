@@ -247,12 +247,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     xmlString = xmlString.replace(/}}/g, DOUBLE_RIGHT_BRACE_MARKER)    # replace all double right braces with '```'
 
     questionHintMatches = xmlString.match(/~~~[^`]+```/gm)
-    index = 0
-    for questionHintMatch in questionHintMatches
-      xmlString = xmlString.replace( questionHintMatch, '%' + index++ + '%')
-      questionHintMatch = questionHintMatch.replace(/~~~/gm, '')
-      questionHintMatch = questionHintMatch.replace(/```/gm, '')
-      @questionHintStrings.push(questionHintMatch)   # save the string but no delimiters
+    if questionHintMatches
+      index = 0
+      for questionHintMatch in questionHintMatches
+        xmlString = xmlString.replace( questionHintMatch, '%' + index++ + '%')
+        questionHintMatch = questionHintMatch.replace(/~~~/gm, '')
+        questionHintMatch = questionHintMatch.replace(/```/gm, '')
+        @questionHintStrings.push(questionHintMatch)   # save the string but no delimiters
 
     return xmlString
 
@@ -466,6 +467,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = MarkdownEditingDescriptor.parseForProblemHints(xml);    // pull out any problem hints
       xml = MarkdownEditingDescriptor.parseForQuestionHints(xml);    // pull out any problem hints
 
+ debugger;
+
       //_____________________________________________________________________
       //
       // multiple choice questions
@@ -529,7 +532,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
           // Split answers
-          var answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
+          debugger;
+          var answersList = p.replace(/^(or)?=[^\n]+/gm, '').split('\n'),
 
               processNumericalResponse = function (value) {
                   var params, answer, string;
