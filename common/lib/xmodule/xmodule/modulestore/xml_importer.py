@@ -241,17 +241,6 @@ def import_from_xml(
                             dest_course.id.run,
                         )
 
-                # cdodge: more hacks (what else). Seems like we have a
-                # problem when importing a course (like 6.002) which
-                # does not have any tabs defined in the policy file.
-                # The import goes fine and then displays fine in LMS,
-                # but if someone tries to add a new tab in the CMS, then
-                # the LMS barfs because it expects that -- if there are
-                # *any* tabs -- then there at least needs to be
-                # some predefined ones
-                if dest_course.tabs is None or len(dest_course.tabs) == 0:
-                    CourseTabList.initialize_default(dest_course)
-
                 store.update_item(dest_course, user_id)
 
                 course_items.append(dest_course)
