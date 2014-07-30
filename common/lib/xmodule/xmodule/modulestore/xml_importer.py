@@ -15,7 +15,6 @@ from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
-from xmodule.tabs import CourseTabList
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
