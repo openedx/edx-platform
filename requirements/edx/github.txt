@@ -17,7 +17,7 @@
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 
 # Our libraries:
--e git+https://github.com/edx-solutions/XBlock.git@b4a5a1165495b148ceaca495e6d5db2f6e580a54#egg=XBlock
+-e git+https://github.com/edx-solutions/XBlock.git@ff6e0f186e09819837ea4eb404e4d6c0e06bf886#egg=XBlock
 -e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.4.1#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
