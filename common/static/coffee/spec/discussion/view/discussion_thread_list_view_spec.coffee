@@ -97,9 +97,6 @@ describe "DiscussionThreadListView", ->
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
                         <a href="#" class="forum-nav-browse-title">All Discussions</a>
                     </li>
-                    <li class="forum-nav-browse-menu-item forum-nav-browse-menu-flagged">
-                        <a href="#" class="forum-nav-browse-title"><i class="icon icon-flag"></i>Flagged Discussions</a>
-                    </li>
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
                         <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>Posts I'm Following</a>
                     </li>
@@ -528,7 +525,7 @@ describe "DiscussionThreadListView", ->
             expect(visibleItems).toEqual(expectedItems)
 
           it "should be case-insensitive", ->
-            checkFilter("flagged", ["Flagged Discussions"])
+            checkFilter("other", ["Other Category"])
 
           it "should match partial words", ->
             checkFilter("ateg", ["Other Category"])
