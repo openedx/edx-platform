@@ -1,5 +1,5 @@
 #
-# File:   courseware/capa/responsetypes.py  (post rebase)
+# File:   courseware/capa/responsetypes.py
 #
 """
 Problem response evaluation.  Handles checking of student responses,
@@ -7,7 +7,6 @@ of a variety of types.
 
 Used by capa_problem.py
 """
-
 
 # standard library imports
 import abc
@@ -139,7 +138,6 @@ class LoncapaResponse(object):
     max_inputfields = None
     allowed_inputfields = []
     required_attributes = []
-    
 
     def __init__(self, xml, inputfields, context, system):
         """
@@ -500,6 +498,8 @@ class LoncapaResponse(object):
         return hasattr(self, '_has_answerpool')
 
 #-----------------------------------------------------------------------------
+
+
 @registry.register
 class JavascriptResponse(LoncapaResponse):
     """
@@ -731,13 +731,13 @@ class ChoiceResponse(LoncapaResponse):
 
     <choiceresponse>
         <radiogroup>
-            <choice correct="False">
+            <choice correct="false">
                 <text>This is a wrong answer.</text>
             </choice>
-            <choice correct="True">
+            <choice correct="true">
                 <text>This is the right answer.</text>
             </choice>
-            <choice correct="False">
+            <choice correct="false">
                 <text>This is another wrong answer.</text>
             </choice>
         </radiogroup>
@@ -830,18 +830,6 @@ class ChoiceResponse(LoncapaResponse):
                                                     + '">' + hint_text + '</div>'
 
                 self.wrap_hints_correct_or_incorrect(new_cmap, problem_id, problem_hint_shown)
-
-
-
-
-
-
-
-
-
-
-
-
 
     def assign_choice_names(self):
         """
