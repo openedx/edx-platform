@@ -588,7 +588,7 @@ def _get_module_info(xblock, rewrite_static_links=True):
 
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
-                       course_outline=False, include_children_predicate=NEVER):
+                       course_outline=False, include_children_predicate=NEVER, parent_xblock=None):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -622,8 +622,15 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
         return None
 
+    if parent_xblock:
+        is_xblock_unit = parent_xblock.category == 'sequential' and xblock.category == 'vertical'
+    else:
+        is_xblock_unit = is_unit(xblock)
+    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
+
     # Compute the child info first so it can be included in aggregate information for the parent
-    if include_child_info and xblock.has_children:
+    should_visit_children = include_child_info and (course_outline and not is_xblock_unit or not course_outline)
+    if should_visit_children and xblock.has_children:
         child_info = _create_xblock_child_info(
             xblock,
             course_outline,
@@ -635,9 +642,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-
-    is_xblock_unit = is_unit(xblock)
-    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -784,7 +788,8 @@ def _create_xblock_child_info(xblock, course_outline, include_children_predicate
         child_info['children'] = [
             create_xblock_info(
                 child, include_child_info=True, course_outline=course_outline,
-                include_children_predicate=include_children_predicate
+                include_children_predicate=include_children_predicate,
+                parent_xblock=xblock
             ) for child in xblock.get_children()
         ]
     return child_info
