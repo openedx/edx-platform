@@ -104,30 +104,37 @@ def _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
     Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
     will have been properly deduped in the call to `_get_querysets_for_to_option`.
     """
-    recipient_qsets = _get_querysets_for_to_option(to_option, course_id, user_id)
-    non_empty_querysets = [qset for qset in recipient_qsets if qset.exists()]
-    for queryset in non_empty_querysets:
+    recipient_qsets_and_ordering_keys = _get_qsets_and_ordering_keys_for_to_option(
+        to_option, course_id, user_id
+    )
+    non_empty_querysets = [
+        (qset, ordering_key) for qset, ordering_key in recipient_qsets_and_ordering_keys if qset.exists()
+    ]
+    for queryset, ordering_key in non_empty_querysets:
         for item_sublist in generate_lists_from_queryset(
-            queryset.select_related('courseenrollment__id'),
+            queryset.select_related(ordering_key),
             settings.BULK_EMAIL_EMAILS_PER_QUERY,
-            'courseenrollment__id',
+            ordering_key,
             recipient_fields
         ):
             yield item_sublist
 
-def _get_querysets_for_to_option(to_option, course_id, user_id):
+def _get_qsets_and_ordering_keys_for_to_option(to_option, course_id, user_id):
     """
-    Returns a list of querysets corresponding for each to_option
+    Returns a list of tuples: querysets and their ordering keys 
+    corresponding for each to_option (i.e. [(queryset, ordering_key)])
     """
     if to_option == SEND_TO_MYSELF:
-        return [use_read_replica_if_available(User.objects.filter(id=user_id))]
+        queryset = use_read_replica_if_available(User.objects.filter(id=user_id))
+        return [(queryset, 'pk')]
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
         staff_and_instructor_qset = (staff_qset | instructor_qset).distinct()
 
         if to_option == SEND_TO_STAFF:
-            return [use_read_replica_if_available(staff_and_instructor_qset)]
+            queryset = use_read_replica_if_available(staff_and_instructor_qset)
+            return [(queryset, 'pk')]
 
         elif to_option == SEND_TO_ALL:
             # first email unenrolled staff members
@@ -144,7 +151,19 @@ def _get_querysets_for_to_option(to_option, course_id, user_id):
                     courseenrollment__is_active=True
                 )
             )
-            return [unenrolled_staff_instr_qset, enrollment_qset]
+            return [
+                (unenrolled_staff_instr_qset, 'pk'),
+                (enrollment_qset, 'courseenrollment__id')
+            ]
+
+
+def _get_querysets_for_to_option(to_option, course_id, user_id):
+    """Returns a list of querysets corresponding to each to_option"""
+    return [
+        queryset for queryset, _ in _get_qsets_and_ordering_keys_for_to_option(
+            to_option, course_id, user_id
+        )
+    ]
 
 
 def _get_num_items_for_to_option(to_option, course_id, user_id):
