@@ -395,6 +395,16 @@ def add_user_to_cohort(cohort, username_or_email):
     return (user, membership.previous_cohort_name)
 
 
+def is_user_in_cohort(cohort, user_id, group_type=CourseUserGroup.COHORT):
+    """
+    Returns True or False if a user is in a cohort
+    """
+    return CourseUserGroup.objects.filter(
+        course_id=cohort.course_id,
+        users__id=user_id,
+        group_type=group_type).exists()
+
+
 def get_group_info_for_cohort(cohort, use_cached=False):
     """
     Get the ids of the group and partition to which this cohort has been linked
