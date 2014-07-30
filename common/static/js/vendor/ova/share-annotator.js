@@ -141,7 +141,7 @@ Annotator.Plugin.Share = (function(_super) {
             event.preventDefault(); //  disable normal link function so that it doesn't refresh the page
             annotation = share.getAnnotationFromId(event.currentTarget.attributes.annotationid);
             var _field = this;
-            var ovaId = annotation.id,
+            var ovaId = annotation.id;
             var title;
             if (method == 1) {
             	title = 'Share';
@@ -221,7 +221,7 @@ Annotator.Plugin.Share = (function(_super) {
             source=this.annotation.id;
         } else {// method 2
             var annotator = this.annotator;
-            var editor = annotator.editor,
+            var editor = annotator.editor;
             var textarea = $(editor.element).find('textarea')[0];
 
             if (source == 'ovaText')
@@ -258,7 +258,7 @@ Annotator.Plugin.Share = (function(_super) {
         The first option is to give a known id of an annotation
         Example http:// url.com/#id=rTcpOjIMT2aF1apDtboC-Q
         */
-        var API = {},
+        var API = {};
         var ovaId = this.getParameterByName('ovaId'); // Method 1 (Obligatory)
         var start = this.getParameterByName('ovaStart'); // Method 2 (Obligatory)
         var end = this.getParameterByName('ovaEnd'); // Method 2 (Obligatory)
