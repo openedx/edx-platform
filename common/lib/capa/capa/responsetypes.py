@@ -959,7 +959,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         cxml = xml.xpath('//*[@id=$id]//choice', id=xml.get('id'))
 
         # contextualize correct attribute and then select ones for which
-        # correct = "True"
+        # correct = "true"
         self.correct_choices = [
             contextualize_text(choice.get('name'), self.context)
             for choice in cxml
@@ -1092,7 +1092,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         """
         # The tree is already pared down to this <multichoiceresponse> so this query just
         # gets the child choicegroup (i.e. no leading //)
-        choicegroups = tree.xpath('choicegroup[@shuffle="True"]')
+        choicegroups = tree.xpath('choicegroup[@shuffle="true"]')
         if choicegroups:
             choicegroup = choicegroups[0]
             if choicegroup.get('answer-pool') is not None:
@@ -1117,11 +1117,11 @@ class MultipleChoiceResponse(LoncapaResponse):
         """
         Returns a list of choice nodes with the shuffling done,
         using the provided random number generator.
-        Choices with 'fixed'='True' are held back from the shuffle.
+        Choices with 'fixed'='true' are held back from the shuffle.
         """
         # Separate out a list of the stuff to be shuffled
-        # vs. the head/tail of fixed==True choices to be held back from the shuffle.
-        # Rare corner case: A fixed==True choice "island" in the middle is lumped in
+        # vs. the head/tail of fixed==true choices to be held back from the shuffle.
+        # Rare corner case: A fixed==true choice "island" in the middle is lumped in
         # with the tail group of fixed choices.
         # Slightly tricky one-pass implementation using a state machine
         head = []
@@ -1129,11 +1129,11 @@ class MultipleChoiceResponse(LoncapaResponse):
         tail = []
         at_head = True
         for choice in choices:
-            if at_head and choice.get('fixed') == 'True':
+            if at_head and choice.get('fixed') == 'true':
                 head.append(choice)
                 continue
             at_head = False
-            if choice.get('fixed') == 'True':
+            if choice.get('fixed') == 'true':
                 tail.append(choice)
             else:
                 middle.append(choice)
