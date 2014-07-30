@@ -1788,7 +1788,7 @@ class CoursesApiTests(TestCase):
     def test_courses_roles_list_get(self):
         allow_access(self.course, self.users[0], 'staff')
         allow_access(self.course, self.users[1], 'instructor')
-        allow_access(self.course, self.users[2], 'staff')
+        allow_access(self.course, self.users[2], 'observer')
         test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1829,7 +1829,7 @@ class CoursesApiTests(TestCase):
         test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
         data = {'user_id': 23423, 'role': 'instructor'}
         response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def test_courses_roles_list_post_invalid_role(self):
         test_uri = '/api/courses/{}/roles/'.format(unicode(self.course.id))
@@ -1844,9 +1844,11 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
 
         response = self.do_get(test_uri)
+        print response.data
         self.assertEqual(len(response.data), 1)
 
         delete_uri = '{}instructor/users/{}'.format(test_uri, self.users[0].id)
+        print delete_uri
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 204)
 

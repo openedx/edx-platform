@@ -25,7 +25,7 @@ from lang_pref import LANGUAGE_KEY
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
-from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
+from student.roles import CourseInstructorRole, CourseObserverRole, CourseStaffRole, UserBasedRole
 from user_api.models import UserPreference
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.password_policy_validators import (
@@ -92,6 +92,30 @@ def _save_content_position(request, user, course_key, position):
     save_child_position(parent_content, child_content.location.name)
     saved_content = get_current_child(parent_content)
     return unicode(saved_content.scope_ids.usage_id)
+
+
+def _manage_role(course_descriptor, user, role, action):
+    """
+    Helper method for managing course/forum roles
+    """
+    forum_moderator_roles = ('instructor', 'staff')
+    if action is 'allow':
+        allow_access(course_descriptor, user, role)
+        if role in forum_moderator_roles:
+            update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
+    elif action is 'revoke':
+        if role in forum_moderator_roles:
+            # There's a possibilty that the user may play more than one role in a course
+            # And that more than one of these roles allow for forum moderation
+            # So we need to confirm the current role is the only one for this user for this course
+            # Before we can safely remove the corresponding forum moderator role
+            user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+            user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+            queryset = user_instructor_courses | user_staff_courses
+            queryset = queryset.filter(course_id=course_descriptor.id)
+            if len(queryset) == 1:
+                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        revoke_access(course_descriptor, user, role)
 
 
 class UsersList(SecureListAPIView):
@@ -1085,16 +1109,20 @@ class UsersRolesList(SecureListAPIView):
     ### The UsersRolesList view allows clients to interact with the User's roleset
     - URI: ```/api/users/{user_id}/courses/{course_id}/roles```
     - GET: Returns a JSON representation of the specified Course roleset
+    - POST: Adds a new role to the User's roleset
+    - PUT: Replace the existing roleset with the provided roleset
 
     ### Use Cases/Notes:
     * Use the UsersRolesList view to manage a User's TA status
     * Use GET to retrieve the set of roles a User plays for a particular course
+    * Use POST to grant a role to a particular User
+    * Use PUT to perform a batch replacement of all roles assigned to a User
     """
 
     serializer_class = UserRolesSerializer
 
     def get_queryset(self):
-        user_id = self.kwargs['user_id']
+        user_id = self.kwargs.get('user_id')
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
@@ -1102,11 +1130,12 @@ class UsersRolesList(SecureListAPIView):
 
         instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
         staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
-        queryset = instructor_courses | staff_courses
+        observer_courses = UserBasedRole(user, CourseObserverRole.ROLE).courses_with_role()
+        queryset = instructor_courses | staff_courses | observer_courses
 
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
         if course_id:
-            course_descriptor, course_key, course_content = get_course(self.request, user, course_id, depth=None)  # pylint: disable=W0612
+            course_descriptor, course_key, course_content = get_course(self.request, user, course_id)  # pylint: disable=W0612
             if not course_descriptor:
                 raise Http404
             queryset = queryset.filter(course_id=course_key)
@@ -1117,24 +1146,53 @@ class UsersRolesList(SecureListAPIView):
         """
         POST /api/users/{user_id}/roles/
         """
-        user_id = self.kwargs['user_id']
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             raise Http404
 
         course_id = request.DATA.get('course_id', None)
-        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id, depth=None)  # pylint: disable=W0612
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
-            raise Http404
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
         role = request.DATA.get('role', None)
         try:
-            allow_access(course_descriptor, user, role)
-            update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'allow')
+            _manage_role(course_descriptor, user, role, 'allow')
         except ValueError:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+    def put(self, request, user_id):
+        """
+        PUT /api/users/{user_id}/roles/
+        """
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        if not len(request.DATA):
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        current_roles = self.get_queryset()
+        for current_role in current_roles:
+            course_descriptor, course_key, course_content = get_course(request, user, unicode(current_role.course_id))  # pylint: disable=W0612
+            _manage_role(course_descriptor, user, current_role.role, 'revoke')
+        for role in request.DATA:
+            try:
+                course_id = role['course_id']
+                course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+                if not course_descriptor:
+                    raise ValueError  # ValueError is also thrown by the following role setters
+                _manage_role(course_descriptor, user, role['role'], 'allow')
+            except ValueError:
+                # Restore the current roleset to the User
+                for current_role in current_roles:
+                    course_descriptor, course_key, course_content = get_course(
+                        request, user, unicode(current_role.course_id))  # pylint: disable=W0612
+                    _manage_role(course_descriptor, user, current_role.role, 'allow')
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(request.DATA, status=status.HTTP_200_OK)
 
 
 class UsersRolesCoursesDetail(SecureAPIView):
@@ -1149,23 +1207,19 @@ class UsersRolesCoursesDetail(SecureAPIView):
         """
         DELETE /api/users/{user_id}/roles/{role}/courses/{course_id}
         """
-        course_id = self.kwargs['course_id']
-        print course_id
-        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id, depth=None)  # pylint: disable=W0612
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        user_id = self.kwargs['user_id']
-        print user_id
         try:
             user = User.objects.get(id=user_id)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        role = self.kwargs['role']
         try:
             revoke_access(course_descriptor, user, role)
-            update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'revoke')
+            if role in ('instructor', 'staff'):
+                update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'revoke')
         except ValueError:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
