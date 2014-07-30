@@ -6,7 +6,6 @@ import itertools
 from lxml import etree
 from StringIO import StringIO
 
-
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -22,9 +21,9 @@ from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
-from instructor.access import allow_access, revoke_access, update_forum_role
+from instructor.access import revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
+from student.roles import CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
 
 from xmodule.modulestore.django import modulestore
 
@@ -279,24 +278,30 @@ def _manage_role(course_descriptor, user, role, action):
     """
     Helper method for managing course/forum roles
     """
+    supported_roles = ('instructor', 'staff', 'observer')
     forum_moderator_roles = ('instructor', 'staff')
+    if role not in supported_roles:
+        raise ValueError
     if action is 'allow':
-        allow_access(course_descriptor, user, role)
+        existing_role = CourseAccessRole.objects.filter(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+        if not existing_role:
+            new_role = CourseAccessRole(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+            new_role.save()
         if role in forum_moderator_roles:
             update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
     elif action is 'revoke':
+        revoke_access(course_descriptor, user, role)
         if role in forum_moderator_roles:
             # There's a possibilty that the user may play more than one role in a course
             # And that more than one of these roles allow for forum moderation
-            # So we need to confirm the current role is the only one for this user for this course
+            # So we need to confirm the removed role was the only role for this user for this course
             # Before we can safely remove the corresponding forum moderator role
             user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
             user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
             queryset = user_instructor_courses | user_staff_courses
             queryset = queryset.filter(course_id=course_descriptor.id)
-            if len(queryset) <= 1:
-                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
-        revoke_access(course_descriptor, user, role)
+            if len(queryset) == 0:
+                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
 
 
 class CourseContentList(SecureAPIView):
@@ -1329,7 +1334,6 @@ class CourseModuleCompletionList(SecureListAPIView):
         stage = self.request.QUERY_PARAMS.get('stage', None)
         course_id = self.kwargs['course_id']
         course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
-        print course_descriptor
         if not course_descriptor:
             raise Http404
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)
@@ -1711,6 +1715,10 @@ class CoursesRolesList(SecureAPIView):
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
         if user_id:
             response_data = list([item for item in response_data if int(item['id']) == int(user_id)])
+
+        role = self.request.QUERY_PARAMS.get('role', None)
+        if role:
+            response_data = list([item for item in response_data if item['role'] == role])
 
         return Response(response_data, status=status.HTTP_200_OK)
 
