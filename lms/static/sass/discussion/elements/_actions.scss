@@ -1,17 +1,178 @@
 // discussion - elements - actions
 // ====================
 
-// vote and endorse buttons
-.container .discussion-body {
+// UI: general action list
+.post-actions-list, .response-actions-list, .comment-actions-list {
+  @extend %ui-no-list;
+  text-align: right;
 
-  .discussion-post {
-    > header .vote-btn {
-      position: relative;
-      z-index: 100;
-      margin-top: ($baseline/4);
-      margin-left: ($baseline*2);
+  .actions-item {
+    @include box-sizing(border-box);
+    vertical-align: top;
+    display: inline-block;
+    margin: 0 ($baseline/4);
+
+    &.is-visible {
+      display: inline-block;
     }
   }
+}
+
+// CASE: comment actions
+.comment-actions-list .actions-item {
+  height: auto;
+}
+
+// ====================
+
+// UI: general actions dropdown
+.post-actions-dropdown, .response-actions-dropdown, .comment-actions-dropdown {
+  @extend %ui-no-list;
+  text-align: left;
+
+  &.is-collapsed {
+    display: none;
+  }
+
+  &.is-expanded {
+    display: inline-block;
+    box-shadow: 0 0 2px $shadow;
+    border-radius: 3px;
+  }
+
+  .actions-item {
+    display: block;
+    margin: 0;
+  }
+}
+
+// ====================
+
+// UI: general action
+.action-button {
+  @include box-sizing(border-box);
+  border-radius: 3px;
+  text-align: center;
+  padding: ($baseline/4);
+  display: inline-block;
+  height: ($baseline*2.5);
+  min-width: ($baseline*2.5);
+  width: auto;
+  text-align: center;
+
+  // STATE: hover styling
+  &:hover {
+    box-shadow: 0 0 2px $shadow;
+    border-radius: 3px;
+
+    .action-label {
+      color: $black;
+    }
+  }
+
+  &:focus {
+    box-shadow: 0 0 3px $blue;
+  }
+
+  .action-icon {
+    display: block;
+    @include font-size(16);
+    @include line-height(16);
+
+  }
+
+  .action-label {
+    @include font-size(10);
+    @include line-height(10);
+    display: block;
+    text-transform: uppercase;
+    color: $gray-l2 ;
+  }
+
+  // STATE: enabled action
+  &.is-enabled {
+    box-shadow: 0 2px $shadow inset;
+
+    .action-icon, .action-label {
+      color: $white;
+    }
+
+    // CASE: follow action
+    &.action-follow {
+      background-color: $forum-color-following;
+    }
+
+    // CASE: vote action
+    &.action-vote {
+      background-color: $green;
+    }
+
+    // CASE: endorse action
+    &.action-endorse {
+      background-color: $blue;
+    }
+
+    // CASE: answer action
+    &.action-answer {
+      background-color: $green;
+    }
+  }
+
+  // CASE: more button
+  &.action-more {
+
+    .action-icon {
+      color: $gray-l2;
+    }
+
+    &:hover .action-icon {
+      color: $black;
+    }
+  }
+}
+
+// ====================
+
+// UI: secondary action
+.action-list-item {
+  margin: 0;
+  display: block;
+  padding: ($baseline/4);
+
+  &:focus {
+
+  }
+
+  &:hover {
+    background-color: $gray-l4;
+  }
+  .action-icon {
+    display: inline-block;
+    width: ($baseline/2);
+    @include font-size(10);
+    @include line-height(10);
+  }
+
+  .action-label {
+    @include font-size(10);
+    @include line-height(10);
+    display: inline-block;
+    text-transform: uppercase;
+  }
+}
+
+// CASE: comment action
+.comment-actions-list .action-button.action-more {
+  height: ($baseline*1.5);
+}
+
+// ====================
+
+// TO-DO refactor all styling below this actions line.
+
+
+// vote and endorse buttons
+.container .discussion-body {
 
   .vote-btn {
 
@@ -26,32 +187,9 @@
       color: #17b429;
       overflow: hidden;
     }
-
-    &.is-cast {
-      border-color: #379a42;
-      @include linear-gradient(top, #50cc5e, #3db84b);
-      color: $white;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, .4) inset, 0 1px 2px $shadow;
-
-      .plus-icon {
-        background-position: 0 -10px;
-        color: #336a39;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
-      }
-    }
   }
 
   .endorse-btn {
-    display: block;
-    float: right;
-    width: 27px;
-    height: 27px;
-    margin-right: ($baseline/2);
-    border-radius: 27px;
-    border: 1px solid #a0a0a0;
-    @include linear-gradient(top, $white 35%, $gray-l4);
-    box-shadow: 0 1px 1px $shadow-l1;
 
     .check-icon {
       display: block;
@@ -61,164 +199,8 @@
       background: url(../images/endorse-icon.png) no-repeat;
     }
 
-    &.is-endorsed {
-      border: 1px solid #4697c1;
-      @include linear-gradient(top, #6dccf1, #38a8e5);
-      box-shadow: 0 1px 1px $shadow-l1, 0 1px 0 rgba(255, 255, 255, .4) inset;
-
-      .check-icon {
-        background-position: 0 -12px;
-      }
-    }
-  }
-}
-
-// moderator actions
-.container .discussion-body {
-
-  .moderator-actions {
-    margin: 0;
-    padding: $baseline 0;
-    @include clearfix;
-
-    li {
-      float: left;
-      margin-right: ($baseline/2);
-      list-style: none;
-    }
-
-    a {
-      @include white-button;
-      height: 26px;
-      @include linear-gradient(top, $white 35%, #ebebeb);
-      font-size: 13px;
-      line-height: 24px;
-      color: #737373;
-      font-weight: normal;
-      box-shadow: 0 1px 1px $shadow-l1;
-
-      &:hover, &:focus {
-        @include linear-gradient(top, $white 35%, #ddd);
-      }
-
-      .delete-icon {
-        display: block;
-        float: left;
-        width: 10px;
-        height: 10px;
-        margin: 8px 4px 0 0;
-        background: url(../images/moderator-delete-icon.png) no-repeat;
-      }
-
-      .edit-icon {
-        display: block;
-        float: left;
-        width: 10px;
-        height: 10px;
-        margin: 7px 4px 0 0;
-        background: url(../images/moderator-edit-icon.png) no-repeat;
-      }
-    }
-  }
-}
-
-// ====================
-
-// post actions - pinning
-.discussion-pin {
-  font-size: 12px;
-  float: right;
-  padding-right: ($baseline/4);
-  font-style: italic;
-  margin-right: ($baseline/2);
-  opacity: 0.8;
-
-  &.admin-pin {
-    cursor: pointer;
-
-    &:hover, &:focus {
-      @include transition(opacity .2s linear 0s);
-      opacity: 1.0;
-    }
-  }
-}
-
-.discussion-pin-inline {
-  font-size: 12px;
-  float:right;
-  font-style: italic;
-  position: relative;
-  right:-20px;
-  top:-13px;
-  margin-right:35px;
-  margin-top:13px;
-  opacity: 1.0;
-}
-
-.notpinned .icon {
-  display: block;
-  float: left;
-  margin: 3px;
-  width: 10px;
-  height: 14px;
-  padding-right: 3px;
-  color: #333;
-}
-
-.pinned .icon {
-  display: block;
-  float: left;
-  margin: 3px;
-  width: 10px;
-  height: 14px;
-  padding-right: 3px;
-  color: $pink;
-}
-
-.pinned span {
-  color: $pink;
-  font-style: italic;
-}
-
-.notpinned span {
-  color: #333;
-  font-style: italic;
-}
-
-.pinned-false {
-  display:none;
-}
-
-// ====================
-
-// post actions - flagging
-.discussion-flag-abuse, .discussion-delete-comment, .discussion-edit-comment {
-}
-
-// ====================
-
-// post actions - following
-.discussion-article {
-
-  .dogear {
-      display: block;
-      width: 52px;
-      height: 51px;
-      background: url(../images/follow-dog-ear.png) 0 -52px no-repeat;
-      @include transition(none);
-    }
-}
-
-// CASE: inline styling
-// currently we hide the follow dogear for inline discussions 
-.discussion-thread {
-  .dogear {
-    display: none;
-  }
-
-  &.expanded {
-    .dogear{
-      display: block;
+    &.is-endorsed .check-icon {
+      background-position: 0 -12px;
     }
   }
 }

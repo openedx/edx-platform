@@ -1,5 +1,104 @@
 // discussion - main app styling
 // ====================
+// TO-DO: determine whether these new top level styles should be moved to a general threads view file
+
+// ====================
+
+// general thread layout
+body.discussion, .discussion-module {
+
+  // post layout
+  .discussion-post {
+    padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
+    border-radius: 3px 3px 0 0;
+    background-color: $white;
+    box-shadow: 0 1px 3px $shadow;
+
+    .post-header {
+      display: inline-block;
+      width: flex-grid(8,12);
+    }
+
+    // layout styling for thread-actions
+    .post-actions-list {
+      display: inline-block;
+      width: flex-grid(4,12);
+      vertical-align: top;
+      float: right;
+    }
+
+    .post-body {
+    }
+  }
+
+  // response layout
+  .discussion-response {
+
+    .response-header {
+      display: inline-block;
+      width: flex-grid(8,12);
+    }
+
+    .response-actions-list {
+      display: inline-block;
+      width: flex-grid(4,12);
+      vertical-align: top;
+    }
+  }
+
+  // comments layout
+  .comments {
+    @extend %ui-no-list;
+    border-radius: 0 0 3px 3px;
+    background: $gray-l6;
+    box-shadow: 0 1px 3px -1px $shadow inset;
+
+    > li {
+      border-top: 1px solid $gray-l4;
+      padding: ($baseline/2) $baseline;
+    }
+
+
+    blockquote {
+      background: $gray-l4;
+      border-radius: 3px;
+      padding: ($baseline/4) ($baseline/2);
+      font-size: 14px;
+    }
+
+    .response-body {
+      display: inline-block;
+      margin-bottom: ($baseline/2);
+      width: flex-grid(10,12);
+      font-size: 13px;
+
+      p + p {
+        margin-top: 12px;
+      }
+    }
+
+    .comment-actions-list {
+      display: inline-block;
+      width: flex-grid(2,12);
+      vertical-align: top;
+    }
+
+    //TO-DO : clean up posted-details styling, currently reused by responses and comments
+    .posted-details {
+      margin-top: 0;
+    }
+  }
+}
+
+
+// UI: primary post area
+
+// UI: responses
+
+// UI: comments
+
+
+// TO-DO: clean up styles below this list, expect to treat these styles as an extension of shame.scss for the time being.
 
 body.discussion {
 
@@ -13,8 +112,7 @@ body.discussion {
 
     .new-post-icon {
       margin: 8px 7px 0 0;
-      font-size: 16px;
-      vertical-align: middle;
+      font-size: 13px;
       color: $white;
     }
   }
@@ -52,7 +150,6 @@ body.discussion {
     min-height: 500px;
     border: 1px solid #aaa;
     border-radius: 3px;
-    background: $white;
     box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
   }
 
@@ -79,6 +176,7 @@ body.discussion {
     position: relative;
     min-height: 500px;
     background-image: url(../images/bg-texture.png);
+    background: $blue-l4;
 
     a {
       word-wrap: break-word;
@@ -120,22 +218,9 @@ body.discussion {
     }
   }
 
-  .discussion-post {
-    padding: ($baseline*2) ($baseline*2) 0 ($baseline*2);
-
-    .post-tools {
-      @include clearfix;
-      margin-top: 15px;
-    }
-  }
-
   .discussion-post header,
   .responses li header {
     margin-bottom: $baseline;
-  }
-
-  .discussion-post header {
-    
   }
 
   .responses {
@@ -151,7 +236,7 @@ body.discussion {
       @include animation(fadeIn .3s);
       position: relative;
       margin: 0 -10px 30px;
-      border: 1px solid #b2b2b2;
+      border: 1px solid #cccccc;
       border-radius: 3px;
       box-shadow: 0 0 1px $shadow;
 
@@ -166,19 +251,18 @@ body.discussion {
       }
 
       .staff-banner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 14px;
         padding: 1px 5px;
         @include box-sizing(border-box);
-        border-radius: 2px 2px 0 0;
+        border-radius: 3px;
         background: #009fe2;
         font-size: 9px;
         font-weight: 700;
         color: $white;
         text-transform: uppercase;
+        vertical-align: top;
+        display: inline-block;
+        margin: 3px ($baseline/2);
+
       }
 
       .community-ta-banner{
@@ -209,31 +293,33 @@ body.discussion {
     .discussion-response {
       @include box-sizing(border-box);
       border-radius: 3px 3px 0 0;
-      padding: $baseline $baseline 0;
+      padding: $baseline $baseline ($baseline/2);
       background-color: $white;
     }
+
     .posted-by {
       font-weight: 700;
     }
   }
 
-  .add-response {
+  .add-response-btn {
+    display: inline-block;
     margin-top: $baseline;
-    padding: 0 ($baseline*1.5);
+    text-align: left;
+    font-size: 14px;
+    color: $link-color;
 
-    .add-response-btn {
-      @include white-button;
-      @include linear-gradient(top, $white 35%, #ebebeb);
-      position: relative;
-      border: 1px solid #b2b2b2;
-      padding: 0 18px;
-      width: 100%;
-      box-shadow: 0 1px 1px $shadow-l1;
-      text-align: left;
-      font-size: 13px;
+    &:hover {
+      cursor: pointer;
+      color: $link-hover;
+    }
 
-      span.add-response-btn-text {
-        padding-left: ($baseline/5);
+    .add-response-btn-text {
+      padding-left: ($baseline/5);
+      color: $link-color;
+
+      &:hover {
+        color :$link-hover;
       }
     }
   }
@@ -245,51 +331,20 @@ body.discussion {
     font-size: 14px;
   }
 
-  .comments {
-    margin: 0;
-    border-radius: 0 0 3px 3px;
-    padding: 0;
-    background: $gray-l6;
-    box-shadow: 0 1px 3px -1px $shadow inset;
-    list-style: none;
+  .posted-details {
+    font-size: 11px;
+  }
 
-    > li {
-      border-top: 1px solid $gray-l4;
-      padding: ($baseline/2) $baseline;
-    }
-
-
-    blockquote {
-      background: $gray-l4;
-      border-radius: 3px;
-      padding: ($baseline/4) ($baseline/2);
-      font-size: 14px;
-    }
-
-    .response-body {
-      font-size: 13px;
-      margin-bottom: ($baseline/2);
-
-      p + p {
-        margin-top: 12px;
-      }
-    }
-
-    .posted-details {
-      font-size: 11px;
-    }
-
-    .staff-label {
-      margin-left: ($baseline/10);
-      padding: 0 ($baseline/5);
-      border-radius: 2px;
-      background: #009FE2;
-      font-size: 9px;
-      font-weight: 700;
-      font-style: normal;
-      color: white;
-      text-transform: uppercase;
-    }
+  .staff-label {
+    margin-left: ($baseline/4);
+    padding: 0 ($baseline/5);
+    border-radius: 2px;
+    background: #009FE2;
+    font-size: 9px;
+    font-weight: 700;
+    font-style: normal;
+    color: white;
+    text-transform: uppercase;
   }
 
   .community-ta-label{
@@ -303,7 +358,6 @@ body.discussion {
     color: white;
     text-transform: uppercase;
   }
-
 
   .main-article.new {
     display: none;
@@ -594,9 +648,8 @@ body.discussion {
     width: 16px;
     height: 17px;
     margin: 8px 7px 0 0;
-    font-size: 16px;
+    font-size: 13px;
     padding-right: $baseline/2;
-    vertical-align: middle;
     color: $white;
   }
 
@@ -644,6 +697,7 @@ body.discussion {
 
 // post pagination
 .response-count {
+  display: inline-block;
   margin-top: $baseline;
   padding: 0 ($baseline*1.5);
   color: $gray;

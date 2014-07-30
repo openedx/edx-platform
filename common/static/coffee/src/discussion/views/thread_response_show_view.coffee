@@ -50,10 +50,10 @@ if Backbone?
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.addClass("staff")
-        @$el.prepend('<div class="staff-banner">' + gettext('staff') + '</div>')
+        @$el.prepend('<span class="staff-banner">' + gettext('staff') + '</span>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.addClass("community-ta")
-        @$el.prepend('<div class="community-ta-banner">' + gettext('Community TA') + '</div>')
+        @$el.prepend('<span class="community-ta-banner">' + gettext('Community TA') + '</span>')
 
     edit: (event) ->
         @trigger "response:edit", event
@@ -85,10 +85,10 @@ if Backbone?
         data: data
         type: "POST"
 
-            
+
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
-        @$("[data-role=thread-flag]").addClass("flagged")  
+        @$("[data-role=thread-flag]").addClass("flagged")
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported, click to remove report"))
@@ -98,7 +98,11 @@ if Backbone?
         ###
         @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
       else
-        @$("[data-role=thread-flag]").removeClass("flagged")  
-        @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$("[data-role=thread-flag]").removeClass("flagged")
+        @$("[data-role=thread-flag]").addClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
+
+    updateModelDetails: =>
+      @renderVote()
+      @renderFlagged()
