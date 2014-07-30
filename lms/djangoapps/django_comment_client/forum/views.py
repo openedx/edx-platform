@@ -103,11 +103,24 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #so by default, a moderator sees all items, and a student sees his cohort
 
-    query_params = merge_dict(default_query_params,
-                              strip_none(extract(request.GET,
-                                                 ['page', 'sort_key',
-                                                  'sort_order', 'text',
-                                                  'commentable_ids', 'flagged'])))
+    query_params = merge_dict(
+        default_query_params,
+        strip_none(
+            extract(
+                request.GET,
+                [
+                    'page',
+                    'sort_key',
+                    'sort_order',
+                    'text',
+                    'commentable_ids',
+                    'flagged',
+                    'unread',
+                    'unanswered',
+                ]
+            )
+        )
+    )
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
@@ -368,12 +381,29 @@ def followed_threads(request, course_id, user_id):
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 
-        query_params = {
-            'page': request.GET.get('page', 1),
+        default_query_params = {
+            'page': 1,
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
-            'sort_key': request.GET.get('sort_key', 'date'),
-            'sort_order': request.GET.get('sort_order', 'desc'),
+            'sort_key': 'date',
+            'sort_order': 'desc',
         }
+
+        query_params = merge_dict(
+            default_query_params,
+            strip_none(
+                extract(
+                    request.GET,
+                    [
+                        'page',
+                        'sort_key',
+                        'sort_order',
+                        'flagged',
+                        'unread',
+                        'unanswered',
+                    ]
+                )
+            )
+        )
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
         query_params['page'] = page
