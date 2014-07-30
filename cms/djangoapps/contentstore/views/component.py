@@ -372,7 +372,7 @@ def get_component_templates(course):
             if category in ADVANCED_COMPONENT_TYPES and not category in categories:
                 # boilerplates not supported for advanced components
                 try:
-                    component_display_name = get_component_display_name(category)
+                    component_display_name = get_component_display_name(category, default_display_name=category)
                     advanced_component_templates['templates'].append(
                         create_template_dict(
                             component_display_name,
