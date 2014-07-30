@@ -39,13 +39,13 @@ edX Website
 
   Former user profile area:
 
-  .. image:: /Images/StDash_Old.png
+  .. image:: /images/StDash_Old.png
      :width: 350
      :alt: User profile in the old student dashboard
 
   Current user profile area:
 
-  .. image:: /Images/StDash_New.png
+  .. image:: /images/StDash_New.png
      :width: 350
      :alt: User profile in the new student dashboard
 
