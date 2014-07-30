@@ -270,7 +270,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     manager.assertEqual(
                         exp_pub_state,
                         act_pub_state,
-                        'Published states for usages {} and {} differ: {!r} != {!r}'.format(
+                        u'Published states for usages {} and {} differ: {!r} != {!r}'.format(
                             expected_item.location,
                             actual_item.location,
                             exp_pub_state,
@@ -279,7 +279,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     )
 
                 # compare fields
-                manager.assertEqual(expected_item.fields, actual_item.fields, 'Fields for {} and {} differ'.format(
+                manager.assertEqual(expected_item.fields, actual_item.fields, u'Fields for {} and {} differ'.format(
                     expected_item.location,
                     actual_item.location
                 ))
@@ -300,7 +300,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     manager.assertEqual(
                         exp_value,
                         actual_value,
-                        "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
+                        u"Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
                             field_name,
                             expected_item.scope_ids.usage_id,
                             actual_item.scope_ids.usage_id,
@@ -313,7 +313,7 @@ class CourseComparisonTest(BulkAssertionTest):
                 manager.assertEqual(
                     expected_item.has_children,
                     actual_item.has_children,
-                    'has_children for {} and {} differ'.format(
+                    u'has_children for {} and {} differ'.format(
                         expected_item.location,
                         actual_item.location
                     )
@@ -327,7 +327,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     manager.assertEqual(
                         expected_children,
                         actual_item.children,
-                        'children for {} and {} differ'.format(
+                        u'children for {} and {} differ'.format(
                             expected_item.location,
                             actual_item.location
                         )
