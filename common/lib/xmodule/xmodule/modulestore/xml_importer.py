@@ -23,6 +23,9 @@ from xmodule.modulestore import ModuleStoreEnum
 log = logging.getLogger(__name__)
 
 
+IMPORT_SCOPES = (Scope.content, Scope.settings)
+
+
 def import_static_content(
         course_data_path, static_content_store,
         target_course_id, subpath='static', verbose=False):
@@ -333,6 +336,9 @@ def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, d
             return reference
 
     for field_name, field in source_block.fields.iteritems():
+        if field.scope not in IMPORT_SCOPES:
+            continue
+
         if field.is_set_on(source_block):
             if isinstance(field, Reference):
                 new_ref = _convert_reference_fields_to_new_namespace(field.read_from(source_block))
@@ -369,6 +375,8 @@ def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, d
                 ))
             else:
                 field.write_to(dest_block, field.read_from(source_block))
+        else:
+            field.delete_from(dest_block)
 
 
 def _import_module_and_update_references(
@@ -804,10 +812,7 @@ def _update_module_location(module, new_location):
     if isinstance(module, XModuleDescriptor):
         rekey_fields = []
     else:
-        rekey_fields = (
-            module.get_explicitly_set_fields_by_scope(Scope.content).keys() +
-            module.get_explicitly_set_fields_by_scope(Scope.settings).keys()
-        )
+        rekey_fields = sum((module.get_explicitly_set_fields_by_scope(scope).keys() for scope in IMPORT_SCOPES), [])
 
     module.location = new_location
 
