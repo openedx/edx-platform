@@ -371,6 +371,44 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
+    def _option_elements_to_attribute_string(self):
+        """
+        Check the problem XML for the schema to which the problem adheres. If it is the expected
+        schema, find all the option elements, create the old-style 'options' attribute string from
+        those elements, and insert the manufactured attribute string into the XML file. Thus, while
+        the XML storage format has changed this function hides that fact, making the XML look like
+        it did previously so no code is broken.
+        :return: None
+        """
+        problem_element_list = self.xml.xpath('//problem')
+        if problem_element_list:
+            problem_element = problem_element_list[0]
+
+            if 'schema' in problem_element.attrib:
+                schema = problem_element.attrib['schema']
+                if schema and (schema == 'edXML/1.0'):
+                    options_string = "("
+                    correct_option = ''
+                    delimiter = ''
+                    for option_element in self.xml.xpath('//optioninput [@id="' + self.input_id + '"]/option'):
+                        option_name = option_element.text.strip()
+                        options_string += delimiter + "'" + option_name + "'"
+                        delimiter = ','
+                        if option_element.attrib['correct'] == 'True':
+                            correct_option = option_name
+
+                    options_string += ')'
+                    option_input_elements = self.xml.xpath('//optioninput [@id="' + self.input_id + '"]')
+                    if option_input_elements:
+                        option_input_element = option_input_elements[0]
+                        option_input_element.attrib.update({'options':options_string})
+                        option_input_element.attrib.update({'correct':correct_option})
+
+
+    def __init__(self, system, xml, state):
+        super(OptionInput, self).__init__(system, xml, state)
+        self._option_elements_to_attribute_string()          # if the problem follows the latest schema...
+
     @staticmethod
     def parse_options(options):
         """
