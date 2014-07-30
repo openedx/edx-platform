@@ -47,7 +47,8 @@
   } else {
     // This event serves as a catch-all, firing when any other page is viewed
     analytics.track("edx.bi.page.other.viewed", {
-      category: "pageview"
+      category: "pageview",
+      url: location.host + location.pathname + location.search
     });
   }
 
