@@ -4,6 +4,8 @@ Unit tests for instructor_task subtasks.
 from uuid import uuid4
 
 from mock import Mock, patch
+from django.test.utils import override_settings
+from django.conf import settings
 
 from student.models import CourseEnrollment
 
@@ -30,6 +32,11 @@ class TestSubtasks(InstructorTaskCourseTestCase):
             random_id = uuid4().hex[:8]
             self.create_student(username='student{0}'.format(random_id))
 
+    def item_list_generator(self, queryset, items_per_query, ordering_key, all_item_fields):
+        for item_list in generate_lists_from_queryset(queryset, items_per_query, ordering_key, all_item_fields):
+            for item in item_list:
+                yield item
+
     def _queue_subtasks(self, create_subtask_fcn, items_per_query, items_per_task, initial_count, extra_count):
         """Queue subtasks while enrolling more students into course in the middle of the process."""
 
@@ -44,12 +51,7 @@ class TestSubtasks(InstructorTaskCourseTestCase):
         self._enroll_students_in_course(self.course.id, initial_count)
         task_queryset = CourseEnrollment.objects.filter(course_id=self.course.id)
 
-        def item_list_generator(queryset, items_per_query, ordering_key, all_item_fields):
-            for item_list in generate_lists_from_queryset(queryset, items_per_query, ordering_key, all_item_fields):
-                for item in item_list:
-                    yield item
-
-        item_generator = item_list_generator(task_queryset, items_per_query, 'pk', ['pk'])
+        item_generator = self.item_list_generator(task_queryset, items_per_query, 'pk', ['pk'])
         total_num_items=task_queryset.count()
         total_num_subtasks=get_number_of_subtasks_for_queryset(total_num_items, items_per_query, items_per_task)
 
@@ -108,3 +110,42 @@ class TestSubtasks(InstructorTaskCourseTestCase):
         self.assertEqual(len(mock_create_subtask_fcn_args[1][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[2][0][0]), 3)
         self.assertEqual(len(mock_create_subtask_fcn_args[3][0][0]), 5)
+
+
+    def _test_number_queries(self, students, number_of_queries):
+        """
+        `generate_lists_from_queryset` does the following queries:
+        1) counts how many items are in the queryset
+        2) initializes the `last_key` value
+        3) generates 2n + 1 queries, where n is the amount of iterations
+        of the while loop (note the +1 comes from the fact that
+        the loop's condition does a query)
+        3) Then, it does a query to see if there are any 'left over' items
+        4) If so, it executes that query
+
+        So if there are 50 people in a course, and we do 7 emails per task,
+        we'll have the following queries at each step:
+        1) 1
+        2) 1
+        3) 2 * (50 / 7) + 1 = 15
+        4) 1
+        5) 1 if 50 % 7 != 0 else 0
+        = 19
+        """
+        self._enroll_students_in_course(self.course.id, 50)
+        queryset = CourseEnrollment.objects.filter(course_id=self.course.id)
+        item_generator = self.item_list_generator(
+            queryset, settings.BULK_EMAIL_EMAILS_PER_QUERY, 'pk', ['pk']
+        )
+
+        with self.assertNumQueries(19):
+            for item in item_generator:
+                pass
+
+    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
+    def test_number_queries_1(self):
+        self._test_number_queries(50, 19)
+
+    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
+    def test_number_queries_2(self):
+        self._test_number_queries(49, 18)
