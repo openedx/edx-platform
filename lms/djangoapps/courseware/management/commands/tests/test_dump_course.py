@@ -57,7 +57,7 @@ class CommandsTestBase(TestCase):
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
         if SlashSeparatedCourseKey.from_deprecated_string(TEST_COURSE_ID) not in [c.id for c in courses]:
-            import_from_xml(store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, ['toy', 'simple'])
+            import_from_xml(store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, ['toy', 'simple'], create_new_course_if_not_present=True)
 
         return [course.id for course in store.get_courses()]
 

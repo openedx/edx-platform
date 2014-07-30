@@ -214,6 +214,9 @@ def import_from_xml(
                 log.debug('course data_dir={0}'.format(course_from_xml.data_dir))
 
                 dest_course = store.get_course(dest_course_id)
+                if dest_course is None:
+                    raise ItemNotFoundError(dest_course_id)
+
                 _copy_fields(course_key, dest_course_id, course_from_xml, dest_course, do_import_static=do_import_static)
 
                 for entry in dest_course.pdf_textbooks:

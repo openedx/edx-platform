@@ -135,7 +135,7 @@ class CourseTestCase(ModuleStoreTestCase):
         Imports the test toy course and populates it with additional test data
         """
         content_store = contentstore()
-        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, create_new_course_if_not_present=True)
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # create an Orphan
