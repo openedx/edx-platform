@@ -6,6 +6,7 @@ import itertools
 from lxml import etree
 from StringIO import StringIO
 
+
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,7 +21,11 @@ from rest_framework.response import Response
 from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
+from django_comment_common.models import FORUM_ROLE_MODERATOR
+from instructor.access import allow_access, revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.roles import CourseInstructorRole, CourseStaffRole
+
 from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child
@@ -31,7 +36,6 @@ from api_manager.users.serializers import UserSerializer, UserCountByCitySeriali
 from api_manager.utils import generate_base_uri
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
-
 from .serializers import CourseModuleCompletionSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
@@ -975,7 +979,7 @@ class CoursesUsersList(SecureAPIView):
 
     def get(self, request, course_id):
         """
-        GET /api/courses/{course_id}
+        GET /api/courses/{course_id}/users
         """
         orgs = request.QUERY_PARAMS.get('organizations')
         groups = request.QUERY_PARAMS.get('groups', None)
@@ -1644,3 +1648,96 @@ class CoursesCitiesMetrics(SecureListAPIView):
         queryset = queryset.values('profile__city').annotate(count=Count('profile__city'))\
             .filter(count__gt=0).order_by('-count')
         return queryset
+
+
+class CoursesRolesList(SecureAPIView):
+    """
+    ### The CoursesRolesList view allows clients to interact with the Course's roleset
+    - URI: ```/api/courses/{course_id}/roles```
+    - GET: Returns a JSON representation of the specified Course roleset
+
+    ### Use Cases/Notes:
+    * Use the CoursesRolesList view to manage a User's TA status
+    * Use GET to retrieve the set of roles configured for a particular course
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/roles/
+        """
+        course_id = self.kwargs['course_id']
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id, depth=None)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
+
+        response_data = []
+
+        instructors = CourseInstructorRole(course_key).users_with_role()
+        for instructor in instructors:
+            response_data.append({'id': instructor.id, 'role': 'instructor'})
+
+        staff = CourseStaffRole(course_key).users_with_role()
+        for admin in staff:
+            response_data.append({'id': admin.id, 'role': 'staff'})
+
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        if user_id:
+            response_data = list([item for item in response_data if int(item['id']) == int(user_id)])
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def post(self, request, course_id):
+        """
+        POST /api/courses/{course_id}/roles/
+        """
+        course_id = self.kwargs['course_id']
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id, depth=None)  # pylint: disable=W0612
+        if not course_descriptor:
+            raise Http404
+
+        user_id = request.DATA.get('user_id', None)
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            raise Http404
+
+        role = request.DATA.get('role', None)
+        try:
+            allow_access(course_descriptor, user, role)
+            update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'allow')
+        except ValueError:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(request.DATA, status=status.HTTP_201_CREATED)
+
+
+class CoursesRolesUsersDetail(SecureAPIView):
+    """
+    ### The CoursesUsersRolesDetail view allows clients to interact with a specific Course Role
+    - URI: ```/api/courses/{course_id}/roles/{role}/users/{user_id}```
+    - DELETE: Removes an existing Course Role specification
+    ### Use Cases/Notes:
+    * Use the DELETE operation to revoke a particular role for the specified user
+    """
+    def delete(self, request, course_id, role, user_id):  # pylint: disable=W0613
+        """
+        DELETE /api/courses/{course_id}/roles/{role}/users/{user_id}
+        """
+        course_id = self.kwargs['course_id']
+        course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id, depth=None)  # pylint: disable=W0612
+        if not course_descriptor:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        user_id = self.kwargs['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        role = self.kwargs['role']
+        try:
+            revoke_access(course_descriptor, user, role)
+            update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'revoke')
+        except ValueError:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
