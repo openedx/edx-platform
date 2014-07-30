@@ -29,6 +29,7 @@ from django_comment_client.utils import (
     safe_content
 )
 from course_groups.models import CourseUserGroup
+from course_groups.cohorts import get_cohort, is_commentable_cohorted
 
 from django_comment_client.utils import JsonResponse, JsonError, extract, add_courseware_context
 

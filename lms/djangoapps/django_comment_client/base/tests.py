@@ -11,6 +11,7 @@ from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from course_groups.cohorts import CourseUserGroup
 from django_comment_client.base import views
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
@@ -589,7 +590,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
                 thread["group_id"] = group_id
 
             url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
-                                                   'course_id': self.course_id})
+                                                   'course_id': self.course_id.to_deprecated_string()})
             response = self.client.post(url, data=thread)
             assert_true(mock_request.called)
             assert_equal(response.status_code, 200)
