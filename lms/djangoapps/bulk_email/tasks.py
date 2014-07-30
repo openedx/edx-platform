@@ -301,8 +301,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     recipient_fields = ['pk', 'profile__name', 'email', 'courseenrollment__id']
 
     if to_option not in TO_OPTIONS:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+        raise ValueError("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
     item_generator = recipient_generator(user_id, to_option, course_id, recipient_fields)
     total_num_items = _get_num_items_for_to_option(to_option, course_id, user_id)
