@@ -1084,7 +1084,7 @@ class MultipleChoiceResponse(LoncapaResponse):
 
     def do_shuffle(self, tree, problem):
         """
-        For a choicegroup with shuffle="True", shuffles the choices in-place in the given tree
+        For a choicegroup with shuffle="true", shuffles the choices in-place in the given tree
         based on the seed. Otherwise does nothing.
         Raises LoncapaProblemError if both shuffle and answer-pool are active:
         a problem should use one or the other but not both.
@@ -1237,7 +1237,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             else:
                 incorrect_choices.append(choice)
                 # In my small test, capa seems to treat the absence of any correct=
-                # attribute as equivalent to ="False", so that's what we do here.
+                # attribute as equivalent to ="false", so that's what we do here.
 
         # We raise an error if the problem is highly ill-formed.
         # There must be at least one correct and one incorrect choice.
@@ -1272,7 +1272,7 @@ class MultipleChoiceResponse(LoncapaResponse):
 @registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
-    tags = ['TrueFalseresponse']
+    tags = ['trueFalseresponse']
 
     def mc_setup_response(self):
         i = 0
@@ -1674,8 +1674,6 @@ class StringResponse(LoncapaResponse):
         for el in self.xml.findall('incorrect_answer'):
             self.xml.remove(el)
 
-
-
     def get_score(self, student_answers):
         """Grade a string response """
         student_answer = student_answers[self.answer_id].strip()
@@ -1771,8 +1769,8 @@ class StringResponse(LoncapaResponse):
         """
         Find given in expected.
 
-        If self.regexp is True, regular expression search is used.
-        if self.case_insensitive is True, case insensitive search is used, otherwise case sensitive search is used.
+        If self.regexp is true, regular expression search is used.
+        if self.case_insensitive is true, case insensitive search is used, otherwise case sensitive search is used.
         Spaces around values of attributes are stripped in XML parsing step.
 
         Args:
@@ -3253,7 +3251,7 @@ class ChoiceTextResponse(LoncapaResponse):
         context = self.context
         self.answer_values = {self.answer_id: []}
         self.assign_choice_names()
-        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="True"]',
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                      id=self.xml.get('id'))
 
         for node in correct_xml:
@@ -3306,12 +3304,12 @@ class ChoiceTextResponse(LoncapaResponse):
 
         Before the function is called `self.xml` =
         <radiotextgroup>
-            <choice correct = "True">
+            <choice correct = "true">
                 The number
                     <numtolerance_input answer="5"/>
                 Is the mean of the list.
             </choice>
-            <choice correct = "False">
+            <choice correct = "false">
                 False demonstration choice
             </choice>
         </radiotextgroup>
@@ -3320,13 +3318,13 @@ class ChoiceTextResponse(LoncapaResponse):
         attribute initialized and self.xml will be:
 
         <radiotextgroup>
-        <choice correct = "True" name ="1_2_1_choiceinput_0bc">
+        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
             The number
                 <numtolerance_input name = "1_2_1_choiceinput0_numtolerance_input_0"
                  answer="5"/>
             Is the mean of the list.
         </choice>
-        <choice correct = "False" name = "1_2_1_choiceinput_1bc>
+        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
             False demonstration choice
         </choice>
         </radiotextgroup>
@@ -3569,37 +3567,3 @@ __all__ = [CodeResponse,
            JavascriptResponse,
            AnnotationResponse,
            ChoiceTextResponse]
-
-
-#-----------------------------------------------------------------------------
-# Test cases to remember:
-#
-#     * no items selected by the student
-#         - with at least one item marked correct by author
-#         - with none of the items marked correct by author
-#
-#     * all items selected by the student
-#         - every hint string is shown to student if no compound condition includes all choices
-#         - compound case if specified
-#
-#     * hint is reused via <hint idref="otherHintId"
-#
-#     * CORRECT/INCORRECT
-#         - appears properly to match green check/red X
-#               . compound conditions
-#               . no compound matches
-#         - override works properly to match green check/red X
-#               . compound conditions
-#               . no compound matches
-#
-#     * no single item hints provided in the question
-#     * no compound hints provided in the question
-#
-#     * Jane's instructor request (see her email from 6/24)
-#       - student provides no answer (all blank)
-#
-#     * text input: what if both a correct and incorrect answer is provided?
-#       - with answer="France" and incorrect hint for "Germany"
-#       - student answer: France and Germany
-#       - what's the correct response from the system?
-#
