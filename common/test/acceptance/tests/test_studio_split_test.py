@@ -6,6 +6,7 @@ import json
 import os
 import math
 from unittest import skip, skipUnless
+from nose.plugins.attrib import attr
 
 from xmodule.partitions.partitions import Group, UserPartition
 from bok_choy.promise import Promise, EmptyPromise
@@ -65,6 +66,7 @@ class SplitTestMixin(object):
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
 
+@attr('shard_1')
 class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
@@ -175,6 +177,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
+@attr('shard_1')
 @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class SettingsMenuTest(StudioCourseTest):
     """
@@ -223,6 +226,7 @@ class SettingsMenuTest(StudioCourseTest):
         self.assertFalse(self.advanced_settings.q(css=link_css).present)
 
 
+@attr('shard_1')
 @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """

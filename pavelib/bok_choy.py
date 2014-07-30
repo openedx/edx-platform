@@ -20,6 +20,7 @@ __test__ = False  # do not collect
 @cmdopts([
     ('test_spec=', 't', 'Specific test to run'),
     ('fasttest', 'a', 'Skip some setup'),
+    ('extra_args=', 'e', 'adds as extra args to the test command'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
@@ -39,7 +40,8 @@ def test_bokchoy(options):
     opts = {
         'test_spec': getattr(options, 'test_spec', None),
         'fasttest': getattr(options, 'fasttest', False),
-        'verbosity': getattr(options, 'verbosity', 2)
+        'verbosity': getattr(options, 'verbosity', 2),
+        'extra_args': getattr(options, 'extra_args', ''),
     }
 
     test_suite = BokChoyTestSuite('bok-choy', **opts)

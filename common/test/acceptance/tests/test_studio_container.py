@@ -1,6 +1,7 @@
 """
 Acceptance tests for Studio related to the container page.
 """
+from nose.plugins.attrib import attr
 
 from ..pages.studio.overview import CourseOutlinePage
 from ..fixtures.course import XBlockFixtureDesc
@@ -9,10 +10,10 @@ from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.utils import add_discussion
 
 from unittest import skip
-
 from acceptance.tests.base_studio_test import StudioCourseTest
 
 
+@attr('shard_1')
 class ContainerBase(StudioCourseTest):
     """
     Base class for tests that do operations on the container page.
@@ -143,6 +144,7 @@ class NestedVerticalTest(ContainerBase):
         )
 
 
+@attr('shard_1')
 class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
@@ -224,6 +226,7 @@ class DragAndDropTest(NestedVerticalTest):
         self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
+@attr('shard_1')
 class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
@@ -264,6 +267,7 @@ class AddComponentTest(NestedVerticalTest):
         self.add_and_verify(container_menu, expected_ordering)
 
 
+@attr('shard_1')
 class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
@@ -310,6 +314,7 @@ class DuplicateComponentTest(NestedVerticalTest):
         self.do_action_and_verify(duplicate_twice, expected_ordering)
 
 
+@attr('shard_1')
 class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
@@ -333,6 +338,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
+@attr('shard_1')
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
