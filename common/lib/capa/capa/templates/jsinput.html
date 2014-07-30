@@ -3,6 +3,9 @@
     % if saved_state:
     data-stored="${saved_state|x}"
     % endif
+    % if initial_state:
+    data-initial-state="${initial_state|x}"
+    % endif
     % if get_statefn:
     data-getstate="${get_statefn}"
     % endif
