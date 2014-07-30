@@ -208,6 +208,15 @@ class CourseFinanceAdminRole(CourseRole):
     def __init__(self, *args, **kwargs):
         super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
+
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'
