@@ -369,8 +369,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       returnXmlString += '        </optioninput>\n'
       returnXmlString = returnXmlString.replace('OPTIONS_PLACEHOLDER', optionsString)  # poke the options in
-      MarkdownEditingDescriptor.parseForCompoundConditionHints(xmlString)  # pull out any compound condition hints
-      returnXmlString = MarkdownEditingDescriptor.insertBooleanHints(returnXmlString)
       returnXmlString += '    </optionresponse>\n'
     else
       returnXmlString = xmlString
