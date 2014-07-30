@@ -10,16 +10,27 @@ TO DO sync instructor and staff flags
 """
 
 import logging
-
 from django_comment_common.models import Role
-from lms.djangoapps.instructor.enrollment import enroll_email, get_email_params
-from student.roles import CourseBetaTesterRole, CourseCcxCoachRole, CourseInstructorRole, CourseStaffRole
+
+from student.roles import (
+    CourseBetaTesterRole,
+    CourseInstructorRole,
+    CourseCcxCoachRole,
+    CourseStaffRole,
+    CourseObserverRole,
+)
+
+from lms.djangoapps.instructor.enrollment import (
+    enroll_email,
+    get_email_params,
+)
 
 log = logging.getLogger(__name__)
 
 ROLES = {
     'beta': CourseBetaTesterRole,
     'instructor': CourseInstructorRole,
+    'observer': CourseObserverRole,
     'staff': CourseStaffRole,
     'ccx_coach': CourseCcxCoachRole,
 }
