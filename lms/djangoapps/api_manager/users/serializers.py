@@ -21,3 +21,9 @@ class UserCountByCitySerializer(serializers.Serializer):
     """ Serializer for user count by city """
     city = serializers.CharField(source='profile__city')
     count = serializers.IntegerField()
+
+
+class UserRolesSerializer(serializers.Serializer):
+    """ Serializer for user roles """
+    course_id = serializers.CharField(source='course_id')
+    role = serializers.CharField(source='role')
