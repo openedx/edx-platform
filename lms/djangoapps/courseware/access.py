@@ -170,10 +170,10 @@ def _has_access_course_desc(user, action, course):
         else:
             reg_method_ok = True  # if not using this access check, it's always OK.
 
-        if reg_method_ok and within_enrollment_period():
-            # in enrollment period, so any user is allowed to enroll.
-            debug("Allow: in enrollment period")
-            return True
+        #if reg_method_ok and within_enrollment_period():
+        #    # in enrollment period, so any user is allowed to enroll.
+        #    debug("Allow: in enrollment period")
+        #    return True
 
         now = datetime.now(UTC())
         start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
