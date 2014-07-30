@@ -48,7 +48,7 @@ from contentstore.utils import reverse_usage_url
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
                         <i class="icon-plus"></i>${_('New Section')}
                     </a>
                 </li>
@@ -59,7 +59,8 @@ from contentstore.utils import reverse_usage_url
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+                    <a href="${lms_link}" rel="external" class="button view-button view-live-button"
+                       title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
                 </li>
             </ul>
         </nav>

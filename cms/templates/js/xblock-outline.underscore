@@ -6,7 +6,8 @@
     <div class="wrapper-xblock-header">
         <div class="wrapper-xblock-header-primary">
             <% if (includesChildren) { %>
-                <h3 class="xblock-title expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %>" title="<%= gettext('Collapse/Expand this Checklist') %>">
+                <h3 class="xblock-title expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %>"
+                    title="<%= interpolate(gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true) %>">
                     <i class="icon-caret-down ui-toggle-expansion"></i>
             <% } else { %>
                 <h3 class="xblock-title">
@@ -52,7 +53,8 @@
         <div class="no-content add-xblock-component">
             <p><%= gettext("You haven't added any content to this course yet.") %>
                 <a href="#" class="button button-new" data-category="<%= childCategory %>"
-                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
                     <i class="icon-plus"></i><%= addChildLabel %>
                 </a>
             </p>
@@ -64,7 +66,8 @@
         <% if (childType) { %>
             <div class="add-xblock-component">
                 <a href="#" class="button button-new" data-category="<%= childCategory %>"
-                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>">
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
                     <i class="icon-plus"></i><%= addChildLabel %>
                 </a>
             </div>

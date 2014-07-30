@@ -17,12 +17,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section">
+                        <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
                             <i class="icon-plus"></i>New Section
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
+                        <a href="#" rel="external" class="button view-button view-live-button" title="Click to open the courseware in the LMS in a new tab">View Live</a>
                     </li>
                 </ul>
             </nav>
@@ -36,7 +36,7 @@
                     <article class="outline" data-locator="mock-course" data-course-key="slashes:MockCourse">
                         <div class="no-content add-xblock-component">
                             <p>You haven't added any content to this course yet.
-                                <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section">
+                                <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
                                     <i class="icon-plus"></i>Add Section
                                 </a>
                             </p>
