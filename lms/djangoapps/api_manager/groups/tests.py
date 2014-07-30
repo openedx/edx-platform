@@ -893,7 +893,6 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/{}/courses/{}'.format(self.base_groups_uri, group_id, self.test_course_id)
-        print test_uri
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = '{}{}/{}/courses/{}'.format(

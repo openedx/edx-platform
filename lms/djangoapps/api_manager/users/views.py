@@ -20,14 +20,13 @@ from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 from courseware.views import save_child_position, get_current_child
 from django_comment_common.models import FORUM_ROLE_MODERATOR
-from instructor.access import allow_access, revoke_access, update_forum_role
+from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from openedx.core.djangoapps.user_api.models import UserPreference
-from student.roles import CourseInstructorRole, CourseStaffRole, UserBasedRole
-from student.roles import CourseInstructorRole, CourseObserverRole, CourseStaffRole, UserBasedRole
+from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, UserBasedRole
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
@@ -99,24 +98,30 @@ def _manage_role(course_descriptor, user, role, action):
     """
     Helper method for managing course/forum roles
     """
+    supported_roles = ('instructor', 'staff', 'observer')
     forum_moderator_roles = ('instructor', 'staff')
+    if role not in supported_roles:
+        raise ValueError
     if action is 'allow':
-        allow_access(course_descriptor, user, role)
+        existing_role = CourseAccessRole.objects.filter(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+        if not existing_role:
+            new_role = CourseAccessRole(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+            new_role.save()
         if role in forum_moderator_roles:
             update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
     elif action is 'revoke':
+        revoke_access(course_descriptor, user, role)
         if role in forum_moderator_roles:
             # There's a possibilty that the user may play more than one role in a course
             # And that more than one of these roles allow for forum moderation
-            # So we need to confirm the current role is the only one for this user for this course
+            # So we need to confirm the removed role was the only role for this user for this course
             # Before we can safely remove the corresponding forum moderator role
             user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
             user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
             queryset = user_instructor_courses | user_staff_courses
             queryset = queryset.filter(course_id=course_descriptor.id)
-            if len(queryset) == 1:
-                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
-        revoke_access(course_descriptor, user, role)
+            if len(queryset) == 0:
+                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
 
 
 class UsersList(SecureListAPIView):
@@ -1139,6 +1144,10 @@ class UsersRolesList(SecureListAPIView):
                 raise Http404
             queryset = queryset.filter(course_id=course_key)
 
+        role = self.request.QUERY_PARAMS.get('role', None)
+        if role:
+            queryset = queryset.filter(role=role)
+
         return queryset
 
     def post(self, request, user_id):
@@ -1216,9 +1225,7 @@ class UsersRolesCoursesDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            revoke_access(course_descriptor, user, role)
-            if role in ('instructor', 'staff'):
-                update_forum_role(course_key, user, FORUM_ROLE_MODERATOR, 'revoke')
+            _manage_role(course_descriptor, user, role, 'revoke')
         except ValueError:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
