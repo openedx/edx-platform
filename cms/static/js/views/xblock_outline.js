@@ -167,14 +167,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 });
             },
 
-            getXBlockType: function(category, parentInfo) {
+            getXBlockType: function(category, parentInfo, translate) {
                 var xblockType = category;
                 if (category === 'chapter') {
-                    xblockType = 'section';
+                    xblockType = translate ? gettext('section') : 'section';
                 } else if (category === 'sequential') {
-                    xblockType = 'subsection';
+                    xblockType = translate ? gettext('subsection') : 'subsection';
                 } else if (category === 'vertical' && (!parentInfo || parentInfo.get('category') === 'sequential')) {
-                    xblockType = 'unit';
+                    xblockType = translate ? gettext('unit') : 'unit';
                 }
                 return xblockType;
             },
@@ -243,7 +243,8 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 var self = this,
                     parentView = this.parentView;
                 event.preventDefault();
-                XBlockViewUtils.deleteXBlock(this.model).done(function() {
+                var xblockType = this.getXBlockType(this.model.get('category'), parentView.model, true);
+                XBlockViewUtils.deleteXBlock(this.model, xblockType).done(function() {
                     if (parentView) {
                         parentView.onChildDeleted(self, event);
                     }
