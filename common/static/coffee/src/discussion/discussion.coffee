@@ -34,6 +34,8 @@ if Backbone?
 
     retrieveAnotherPage: (mode, options={}, sort_options={}, error=null)->
       data = { page: @current_page + 1 }
+      if _.contains(["unread", "unanswered", "flagged"], options.filter)
+        data[options.filter] = true
       switch mode
         when 'search'
           url = DiscussionUtil.urlFor 'search'

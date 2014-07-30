@@ -10,6 +10,7 @@ if Backbone?
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
+      "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
 
     initialize: ->
@@ -173,7 +174,7 @@ if Backbone?
       loadingElem = loadMoreElem.find(".forum-nav-loading")
       DiscussionUtil.makeFocusTrap(loadingElem)
       loadingElem.focus()
-      options = {}
+      options = {filter: @filter}
       switch @mode
         when 'search'
           options.search_text = @current_search
@@ -378,11 +379,13 @@ if Backbone?
         @retrieveDiscussions(discussionIds)
         @$(".forum-nav-filter-cohort").toggle(item.data('cohorted') == true)
 
-    chooseCohort: (event) ->
+    chooseFilter: (event) =>
+      @filter = $(".forum-nav-filter-main-control :selected").val()
+      @retrieveFirstPage()
+
+    chooseCohort: (event) =>
       @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
-      @collection.current_page = 0
-      @collection.reset()
-      @loadMorePages(event)
+      @retrieveFirstPage()
       
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
@@ -434,6 +437,7 @@ if Backbone?
 
     searchFor: (text) ->
       @clearSearchAlerts()
+      @clearFilters()
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
@@ -499,6 +503,10 @@ if Backbone?
     clearSearch: ->
       @$(".forum-nav-search-input").val("")
       @current_search = ""
+
+    clearFilters: ->
+     @$(".forum-nav-filter-main-control").val("all")
+     @$(".forum-nav-filter-cohort-control").val("all")
 
     retrieveFollowed: () =>
       @mode = 'followed'

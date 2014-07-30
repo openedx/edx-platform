@@ -66,9 +66,16 @@
 // navigation - sort and filter bar
 // --------------------------------
 
-// Override global span rules
-.forum-nav-sort-label {
-  color: inherit;
+// Override global label rules
+.forum-nav-filter-main, .forum-nav-filter-cohort, .forum-nav-sort {
+  font: inherit;
+  line-height: 1em;
+  margin-bottom: 0;
+}
+
+// Override global select rules
+.forum-nav-filter-main-control, .forum-nav-filter-cohort-control, .forum-nav-sort-control {
+  font: inherit;
 }
 
 // --------------------------------
