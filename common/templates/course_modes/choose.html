@@ -18,7 +18,13 @@
 var expandCallback = function(event) {
   event.preventDefault();
   $(this).next('.expandable-area').slideToggle();
-  $(this).parent().toggleClass('is-expanded');
+  var title = $(this).parent();
+  title.toggleClass('is-expanded');
+  if (title.attr("aria-expanded") === "false") {
+    title.attr("aria-expanded", "true");
+  } else {
+    title.attr("aria-expanded", "false");
+  }
 }
 
 $(document).ready(function() {
@@ -111,7 +117,10 @@ $(document).ready(function() {
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand" tabindex="0"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I want a free honor code certificate?")}</h5>
+                <h5 class="title title-expand" tabindex="0" aria-expanded="false" role="link">
+                  <i class="icon-caret-down expandable-icon"></i>
+                  ${_("Why do I have to pay? What if I want a free honor code certificate?")}
+                </h5>
 
                 <div class="copy expandable-area">
                   <dl class="list-faq">
