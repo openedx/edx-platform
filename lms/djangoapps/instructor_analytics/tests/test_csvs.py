@@ -3,7 +3,7 @@
 from django.test import TestCase
 from nose.tools import raises
 
-from analytics.csvs import create_csv_response, format_dictlist, format_instances
+from instructor_analytics.csvs import create_csv_response, format_dictlist, format_instances
 
 
 class TestAnalyticsCSVS(TestCase):

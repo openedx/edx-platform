@@ -4,7 +4,6 @@ from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 import django.contrib.auth.views
-
 from microsite_configuration import microsite
 
 # Uncomment the next two lines to enable the admin:
