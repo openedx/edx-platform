@@ -175,7 +175,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha'], [], verify_missing_groups_not_present=False)
 
 
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
+#@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class SettingsMenuTest(StudioCourseTest):
     """
     Tests that Setting menu is rendered correctly in Studio
@@ -223,7 +223,7 @@ class SettingsMenuTest(StudioCourseTest):
         self.assertFalse(self.advanced_settings.q(css=link_css).present)
 
 
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
+#@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -648,6 +648,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         usage = config.usages[0]
         config.click_unit_anchor()
 
+        unit = UnitPage(self.browser, vertical.locator)
         # Waiting for the page load and verify that we've landed on the unit page
         EmptyPromise(
             lambda: unit.is_browser_on_page(), "loaded page {!r}".format(unit),
@@ -655,3 +656,71 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         ).fulfill()
 
         self.assertIn(unit.name, usage)
+
+    def test_can_delete_unused_group_configuration(self):
+        """
+        Scenario: Ensure that the user can delete unused group configuration.
+        Given I have a course with 2 group configurations
+        And I go to the Group Configuration page
+        When I delete the Group Configuration with name "Configuration 1"
+        Then I see that there is one Group Configuration
+        When I edit the Group Configuration with name "Configuration 2"
+        And I delete the Group Configuration with name "Configuration 2"
+        Then I see that the are no Group Configurations
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, 'Configuration 1', 'Description of the group configuration.', [Group("0", 'Group 0'), Group("1", 'Group 1')]).to_json(),
+                    UserPartition(1, 'Configuration 2', 'Second group configuration.', [Group("0", 'Alpha'), Group("1", 'Beta'), Group("2", 'Gamma')]).to_json()
+                ],
+            },
+        })
+        self.page.visit()
+
+        self.assertEqual(len(self.page.group_configurations), 2)
+        config = self.page.group_configurations[1]
+        # Delete first group configuration via detail view
+        config.delete()
+        self.assertEqual(len(self.page.group_configurations), 1)
+
+        config = self.page.group_configurations[0]
+        config.edit()
+        self.assertFalse(config.delete_is_disabled())
+        # Delete first group configuration via edit view
+        config.delete()
+        self.assertEqual(len(self.page.group_configurations), 0)
+
+    def test_cannot_delete_used_group_configuration(self):
+        """
+        Scenario: Ensure that the user cannot delete unused group configuration.
+        Given I have a course with group configuration that is used in the Content Experiment
+        When I go to the Group Configuration page
+        Then I do not see delete button and I see a note about that
+        When I edit the Group Configuration
+        Then I do not see delete button and I see the note about that
+        """
+        # Create a new group configurations
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, "Name", "Description.", [Group("0", "Group A"), Group("1", "Group B")]).to_json()
+                ],
+            },
+        })
+
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+        self.course_fixture.create_xblock(
+            vertical.locator,
+            XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+        )
+        # Go to the Group Configuration Page and click unit anchor
+        self.page.visit()
+
+        config = self.page.group_configurations[0]
+        self.assertTrue(config.delete_is_disabled())
+        self.assertIn('Cannot delete when used by experiment', config.delete_note)
+
+        config.edit()
+        self.assertTrue(config.delete_is_disabled())
+        self.assertIn('Cannot delete when used by experiment', config.delete_note)

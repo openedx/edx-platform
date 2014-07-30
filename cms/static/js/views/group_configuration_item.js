@@ -10,6 +10,9 @@ define([
         attributes: {
             'tabindex': -1
         },
+        events: {
+            'click .delete': 'deleteConfiguration'
+        },
 
         className: function () {
             var index = this.model.collection.indexOf(this.model);
@@ -24,6 +27,24 @@ define([
         initialize: function() {
             this.listenTo(this.model, 'change:editing', this.render);
             this.listenTo(this.model, 'remove', this.remove);
+        },
+
+        deleteConfiguration: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            var self = this;
+            this.confirmThenRunOperation(
+                gettext('Delete this Group Configuration?'),
+                gettext('Deleting this Group Configuration is permanent and cannot be undone.'),
+                gettext('Delete'),
+                function() {
+                    return self.runOperationShowingMessage(
+                        gettext('Deleting') + '&hellip;',
+                        function () {
+                            return self.model.destroy({ wait: true });
+                        }
+                    );
+                }
+            );
         },
 
         render: function() {
