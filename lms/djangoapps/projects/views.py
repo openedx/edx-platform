@@ -160,6 +160,7 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             workgroup = self.get_object()
             workgroup.users.add(user)
             workgroup.save()
+
             return Response({}, status=status.HTTP_201_CREATED)
         else:
             user_id = request.DATA.get('id')

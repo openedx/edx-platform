@@ -14,9 +14,12 @@ from django.test import Client
 from django.test.utils import override_settings
 
 from api_manager.models import GroupProfile
-from projects.models import Project
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from projects.models import Project, Workgroup
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from openedx.core.djangoapps.course_groups.cohorts import (get_cohort_by_name, remove_user_from_cohort,
+                                   delete_empty_cohort, is_user_in_cohort, get_course_cohort_names)
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -163,6 +166,15 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
+        # make sure a discussion cohort was created
+        cohort_name = Workgroup.cohort_name_for_workgroup(
+            self.test_project.id,
+            response.data['id'],
+            self.test_workgroup_name
+        )
+        cohort = get_cohort_by_name(self.test_project.course_id, cohort_name, CourseUserGroup.WORKGROUP)
+        self.assertIsNotNone(cohort)
+
     def test_workgroups_detail_get(self):
         data = {
             'name': self.test_workgroup_name,
@@ -247,6 +259,65 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users'][0]['id'], self.test_user.id)
+
+        # make sure a discussion cohort was created
+        cohort_name = Workgroup.cohort_name_for_workgroup(
+            self.test_project.id,
+            response.data['id'],
+            self.test_workgroup_name
+        )
+        cohort = get_cohort_by_name(self.test_project.course_id, cohort_name, CourseUserGroup.WORKGROUP)
+        self.assertIsNotNone(cohort)
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+
+    def test_workgroups_users_post_with_cohort_backfill(self):
+        """
+        This test asserts a case where a workgroup was created before the existence of a cohorted discussion
+        """
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users'][0]['id'], self.test_user.id)
+
+        cohort_name = Workgroup.cohort_name_for_workgroup(
+            self.test_project.id,
+            response.data['id'],
+            self.test_workgroup_name
+        )
+
+        # now let's remove existing cohort users
+        cohort = get_cohort_by_name(self.test_project.course_id, cohort_name, CourseUserGroup.WORKGROUP)
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+
+        remove_user_from_cohort(cohort, self.test_user.username, CourseUserGroup.WORKGROUP)
+        self.assertFalse(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+
+        # delete cohort
+        delete_empty_cohort(self.test_project.course_id, cohort_name, CourseUserGroup.WORKGROUP)
+        self.assertEqual(0, len(get_course_cohort_names(self.test_project.course_id, CourseUserGroup.WORKGROUP)))
+
+        # add a 2nd user and make sure a discussion cohort was created and users were backfilled
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user2.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # now inspect cohort and assert that things are as we anticipate (i.e. both users are in there)
+        cohort = get_cohort_by_name(self.test_project.course_id, cohort_name, CourseUserGroup.WORKGROUP)
+        self.assertIsNotNone(cohort)
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+        self.assertTrue(is_user_in_cohort(cohort, self.test_user2.id, CourseUserGroup.WORKGROUP))
 
     def test_workgroups_users_delete(self):
         data = {
