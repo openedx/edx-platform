@@ -1,16 +1,5 @@
 # Requirements for edx.org that aren't necessarily needed for Open edX.
 
--e git+ssh://git@github.com/jazkarta/edX-jsdraw.git@9fcd333aaa2ac3df65dd247b601ce0b56bb10cad#egg=edx-jsdraw
--e git+https://github.com/gsehub/xblock-mentoring.git@b779446e9f51b9a1576d514cc14166907316a106#egg=xblock-mentoring
-
-# Prototype XBlocks from edX learning sciences limited roll-outs and user testing. 
-# Concept XBlock, in particular, is nowhere near finished and an early prototype. 
-
--e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
--e git+https://github.com/pmitros/DoneXBlock.git@1ce0ac14d9f3df3083b951262ec82e84b58d16d1#egg=done-xblock
--e git+https://github.com/pmitros/AudioXBlock.git@1fbf19cc21613aead62799469e1593adb037fdd9#egg=audio-xblock
--e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
-
 # This XBlock shows a list of recommendations. 
 # It is an R&D prototype, intended for roll-out one location in one course. 
 # It should not be used without learning sciences support in the current state. 

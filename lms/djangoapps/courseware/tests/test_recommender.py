@@ -1,5 +1,5 @@
 """
-This test file will run through some LMS test scenarios regarding access and navigation of the LMS
+This test file will run through some XBlock test scenarios regarding the recommender system
 """
 import json
 import tempfile
@@ -23,13 +23,10 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly.
     """
-
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     def setUp(self):
-
-        self.test_course = CourseFactory.create(display_name='Robot_Sub_Course')
-        self.course = CourseFactory.create(display_name='Robot_Super_Course')
+        self.course = CourseFactory.create(display_name='Recommender_Test_Course ')
         self.chapter = ItemFactory.create(parent=self.course,
                                           display_name='Overview')
         self.section = ItemFactory.create(parent=self.chapter,
@@ -39,8 +36,13 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.xblock = ItemFactory.create(parent=self.unit,
                                          category='recommender',
                                          display_name='recommender')
+        self.xblock2 = ItemFactory.create(parent=self.unit,
+                                          category='recommender',
+                                          display_name='recommender_second')
 
-        self.default_recommendations = [
+        self.xblock_names = ['recommender', 'recommender_second']
+
+        self.test_recommendations = [
             {"title": "Covalent bonding and periodic trends", "url": "https://courses.edx.org/courses/MITx/3.091X/2013_Fall/courseware/SP13_Week_4/SP13_Periodic_Trends_and_Bonding/", "description": "http://people.csail.mit.edu/swli/edx/recommendation/img/videopage1.png", "descriptionText": "short description for Covalent bonding and periodic trends"},
             {"title": "Polar covalent bonds and electronegativity", "url": "https://courses.edx.org/courses/MITx/3.091X/2013_Fall/courseware/SP13_Week_4/SP13_Covalent_Bonding/", "description": "http://people.csail.mit.edu/swli/edx/recommendation/img/videopage2.png", "descriptionText": "short description for Polar covalent bonds and electronegativity"}
         ]
@@ -54,13 +56,13 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.staff_user = GlobalStaffFactory()
 
-    def get_handler_url(self, handler):
+    def get_handler_url(self, handler, xblock_name='recommender'):
         """
         Get url for the specified xblock handler
         """
         return reverse('xblock_handler', kwargs={
             'course_id': self.course.id.to_deprecated_string(),
-            'usage_id': quote_slashes(self.course.id.make_usage_key('recommender', 'recommender').to_deprecated_string()),
+            'usage_id': quote_slashes(self.course.id.make_usage_key('recommender', xblock_name).to_deprecated_string()),
             'handler': handler,
             'suffix': ''
         })
@@ -82,12 +84,12 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.login(email, password)
         self.enroll(self.course, True)
 
-    def add_resource(self, resource):
+    def add_resource(self, resource, xblock_name='recommender'):
         """
         Add resource to RecommenderXBlock
         """
         return json.loads(self.client.post(
-            self.get_handler_url('add_resource'),
+            self.get_handler_url('add_resource', xblock_name),
             json.dumps(resource), '').content)
 
     def check_for_get_xblock_page_code(self, code):
@@ -118,58 +120,152 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             decode_dict[key] = value
         return decode_dict
 
-    def check_ajax_event_result(self, data, handler, expected_result):
+    def check_ajax_event_result(self, data, handler, expected_result, xblock_name='recommender'):
         """
         Check whether the return of ajax event is the same as expected
         """
         result = json.loads(self.client.post(
-            self.get_handler_url(handler),
+            self.get_handler_url(handler, xblock_name),
             json.dumps(data), '').content, object_hook=self._decode_dict)
         self.assertDictEqual(result, expected_result)
         self.check_for_get_xblock_page_code(200)
+
+    def test_endorse_resource(self):
+        """
+        Verify that the endorsement of an entry is successful
+        """
+        self.enroll_student(self.STUDENT_INFO[0])
+        # Add resources, assume correct here, tested in test_add_resource
+        for resource in self.test_recommendations:
+            for xblock_name in self.xblock_names:
+                self.add_resource(resource, xblock_name)
+
+        test_cases = [
+            [
+                {
+                    'expected_result': {
+                        'Success': False,
+                        'error': 'Endorse resource without permission'
+                    },
+                    'data': {'id': 0}
+                }
+            ],  # Students have no right to endorse an entry
+            [
+                {
+                    'expected_result': {
+                        'Success': False,
+                        'error': 'bad id',
+                        'id': 100
+                    },
+                    'data': {'id': 100}  # Endorse a non-existing entry
+                },
+                {
+                    'expected_result': {
+                        'Success': True,
+                        'status': 'endorsement',
+                        'id': 1
+                    },
+                    'data': {'id': 1}  # Endorse an entry
+                },
+                {
+                    'expected_result': {
+                        'Success': True,
+                        'status': 'undo endorsement',
+                        'id': 1
+                    },
+                    'data': {'id': 1}  # Un-endorse an entry
+                },
+                {
+                    'expected_result': {
+                        'Success': True,
+                        'status': 'endorsement',
+                        'id': 1
+                    },
+                    'data': {'id': 1}  # Endorse an entry
+                },
+                {
+                    'expected_result': {
+                        'Success': True,
+                        'status': 'endorsement',
+                        'id': 0
+                    },
+                    'data': {'id': 0}  # Endorse a diffenent entry
+                }
+            ]  # Staff has the right to endorse an entry
+        ]
+
+        for index in range(0, len(test_cases)):
+            for index2 in range(0, len(test_cases[index])):
+                for xblock_name in self.xblock_names:
+                    self.check_ajax_event_result(test_cases[index][index2]['data'],
+                                                 'endorse_resource',
+                                                 test_cases[index][index2]['expected_result'],
+                                                 xblock_name)  # Test whether the two blocks affect each other
+            if index == 0:
+                self.logout()
+                self.enroll_staff(self.staff_user)
 
     def test_delete_resource(self):
         """
         Verify that the deletion of an entry is successful
         """
-        # Staff has the right to delete an entry
-        self.enroll_staff(self.staff_user)
+        self.enroll_student(self.STUDENT_INFO[0])
         # Add resources, assume correct here, tested in test_add_resource
-        for resource in self.default_recommendations:
-            self.add_resource(resource)
+        for resource in self.test_recommendations:
+            for xblock_name in self.xblock_names:
+                self.add_resource(resource, xblock_name)
 
         test_cases = [
-            {
-                'expected_result': {
-                    'Success': False,
-                    'error': 'bad id',
-                    'id': 100
+            [
+                {
+                    'expected_result': {
+                        'Success': False,
+                        'error': 'Delete resource without permission'
+                    },
+                    'data': {'id': 0}
+                }
+            ],  # Students have no right to delete an entry
+            [
+                {
+                    'expected_result': {
+                        'Success': False,
+                        'error': 'bad id',
+                        'id': 100
+                    },
+                    'data': {'id': 100}  # Delete a non-existing entry
                 },
-                'data': {'id': 100}  # Delete a non-existing entry
-            },
-            {
-                'expected_result': {
-                    'Success': True,
-                    'upvotes': 0,
-                    'downvotes': 0,
-                    'id': 1
+                {
+                    'expected_result': {
+                        'Success': True,
+                        'upvotes': 0,
+                        'downvotes': 0,
+                        'id': 1
+                    },
+                    'data': {'id': 1}  # Delete an entry
                 },
-                'data': {'id': 1}  # Delete an entry
-            },
-            {
-                'expected_result': {
-                    'Success': False,
-                    'error': 'bad id',
-                    'id': 1
-                },
-                'data': {'id': 1}  # Delete an previously removed (thus, non-existing) entry
-            }
+                {
+                    'expected_result': {
+                        'Success': False,
+                        'error': 'bad id',
+                        'id': 1
+                    },
+                    'data': {'id': 1}  # Delete an previously removed (thus, non-existing) entry
+                }
+            ]  # Staff has the right to delete an entry
         ]
-        for field in self.default_recommendations[1]:
-            test_cases[1]['expected_result'][field] = self.default_recommendations[1][field]
+        for field in self.test_recommendations[1]:
+            test_cases[1][1]['expected_result'][field] = self.test_recommendations[1][field]
 
         for index in range(0, len(test_cases)):
-            self.check_ajax_event_result(test_cases[index]['data'], 'delete_resource', test_cases[index]['expected_result'])
+            for index2 in range(0, len(test_cases[index])):
+                for xblock_name in self.xblock_names:
+                    self.check_ajax_event_result(test_cases[index][index2]['data'],
+                                                 'delete_resource',
+                                                 test_cases[index][index2]['expected_result'],
+                                                 xblock_name)
+            if index == 0:
+                self.logout()
+                self.enroll_staff(self.staff_user)
 
     def test_handle_vote(self):
         """
@@ -177,8 +273,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.enroll_staff(self.staff_user)
         # Add resources, assume correct here, tested in test_add_resource
-        for resource in self.default_recommendations:
-            self.add_resource(resource)
+        for resource in self.test_recommendations:
+            for xblock_name in self.xblock_names:
+                self.add_resource(resource, xblock_name)
 
         test_cases = [
             [
@@ -291,7 +388,11 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.logout()
             self.enroll_student(self.STUDENT_INFO[index])
             for index2 in range(0, len(test_cases[index])):
-                self.check_ajax_event_result(test_cases[index][index2]['data'], test_cases[index][index2]['handler'], test_cases[index][index2]['expected_result'])
+                for xblock_name in self.xblock_names:
+                    self.check_ajax_event_result(test_cases[index][index2]['data'],
+                                                 test_cases[index][index2]['handler'],
+                                                 test_cases[index][index2]['expected_result'],
+                                                 xblock_name)
 
     def test_add_resource(self):
         """
@@ -299,37 +400,41 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.enroll_student(self.STUDENT_INFO[0])
         # Check whether adding new resource is successful
-        for index, resource in enumerate(self.default_recommendations):
-            result = self.add_resource(resource)
+        for index, resource in enumerate(self.test_recommendations):
+            for xblock_name in self.xblock_names:
+                result = self.add_resource(resource, xblock_name)
 
-            expected_result = {
-                'Success': True,
-                'upvotes': 0,
-                'downvotes': 0,
-                'id': index
-            }
-            for field in resource:
-                expected_result[field] = resource[field]
+                expected_result = {
+                    'Success': True,
+                    'upvotes': 0,
+                    'downvotes': 0,
+                    'id': index
+                }
+                for field in resource:
+                    expected_result[field] = resource[field]
 
-            self.assertDictEqual(result, expected_result)
-            self.check_for_get_xblock_page_code(200)
+                self.assertDictEqual(result, expected_result)
+                self.check_for_get_xblock_page_code(200)
 
         # Check whether adding redundant resource (url) is rejected
         url_suffixes = ['', '#IAmSuffix', '%23IAmSuffix']
         for suffix in url_suffixes:
-            resource = self.default_recommendations[0].copy()
-            resource['url'] += suffix
-            result = self.add_resource(resource)
+            for xblock_name in self.xblock_names:
+                resource = self.test_recommendations[0].copy()
+                resource['url'] += suffix
+                result = self.add_resource(resource, xblock_name)
 
-            expected_result = {
-                'Success': False,
-                'error': 'redundant resource',
-            }
-            for field in resource:
-                expected_result[field] = resource[field]
+                expected_result = {
+                    'Success': False,
+                    'error': 'redundant resource',
+                    'dup_id': 0
+                }
+                for field in resource:
+                    expected_result[field] = resource[field]
+                    expected_result['dup_' + field] = self.test_recommendations[0][field]
 
-            self.assertDictEqual(result, expected_result)
-            self.check_for_get_xblock_page_code(200)
+                self.assertDictEqual(result, expected_result)
+                self.check_for_get_xblock_page_code(200)
 
     def test_edit_resource(self):
         """
@@ -337,19 +442,20 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.enroll_student(self.STUDENT_INFO[0])
         # Add resources, assume correct here, tested in test_add_resource
-        for resource in self.default_recommendations:
-            self.add_resource(resource)
+        for resource in self.test_recommendations:
+            for xblock_name in self.xblock_names:
+                self.add_resource(resource, xblock_name)
 
         # Data for reset
         original_data = {}
         original_data['id'] = 0
-        for key, value in self.default_recommendations[0].iteritems():
+        for key, value in self.test_recommendations[0].iteritems():
             original_data[key] = value
 
         # Check whether editing a resource with non-existing id fails
         data = {}
         data['id'] = 100
-        for key, value in self.default_recommendations[0].iteritems():
+        for key, value in self.test_recommendations[0].iteritems():
             data[key] = value + ' edited'
 
         test_cases = []
@@ -376,12 +482,12 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                     'dup_id': 1
                 }
             }
-            test_case['data']['url'] = self.default_recommendations[1]['url'] + suffix
+            test_case['data']['url'] = self.test_recommendations[1]['url'] + suffix
 
-            for field in self.default_recommendations[0]:
+            for field in self.test_recommendations[0]:
                 test_case['expected_result'][field] = test_case['data'][field]
-                test_case['expected_result']['old_' + field] = self.default_recommendations[0][field]
-                test_case['expected_result']['dup_' + field] = self.default_recommendations[1][field]
+                test_case['expected_result']['old_' + field] = self.test_recommendations[0][field]
+                test_case['expected_result']['dup_' + field] = self.test_recommendations[1][field]
 
             test_cases.append(test_case)
 
@@ -393,9 +499,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'id': data['id'],
             }
         }
-        for field in self.default_recommendations[0]:
+        for field in self.test_recommendations[0]:
             test_case['expected_result'][field] = test_case['data'][field]
-            test_case['expected_result']['old_' + field] = self.default_recommendations[0][field]
+            test_case['expected_result']['old_' + field] = self.test_recommendations[0][field]
 
         test_cases.append(test_case)
 
@@ -409,7 +515,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'expected_result': expected_result_temp.copy()
             }
             test_case['data'][fixed_field[index]] = ''
-            test_case['data']['url'] = self.default_recommendations[0]['url'] + url_suffixes[index]
+            test_case['data']['url'] = self.test_recommendations[0]['url'] + url_suffixes[index]
 
             test_case['expected_result']['url'] = test_case['data']['url']
             test_case['expected_result'][fixed_field[index]] = expected_result_temp['old_' + fixed_field[index]]
@@ -417,9 +523,14 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             test_cases.append(test_case)
 
         for index in range(0, len(test_cases)):
-            self.check_ajax_event_result(test_cases[index]['data'], 'edit_resource', test_cases[index]['expected_result'])
+            for xblock_name in self.xblock_names:
+                self.check_ajax_event_result(test_cases[index]['data'],
+                                             'edit_resource',
+                                             test_cases[index]['expected_result'],
+                                             xblock_name)
             # Reset resource 0
-            self.client.post(self.get_handler_url('edit_resource'), json.dumps(original_data), '')
+                self.client.post(self.get_handler_url('edit_resource', xblock_name),
+                                 json.dumps(original_data), '')
 
     def test_flag_resource(self):
         """
@@ -427,8 +538,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.enroll_staff(self.staff_user)
         # Add resources, assume correct here, tested in test_add_resource
-        for resource in self.default_recommendations:
-            self.add_resource(resource)
+        for resource in self.test_recommendations:
+            for xblock_name in self.xblock_names:
+                self.add_resource(resource, xblock_name)
 
         test_cases = [
             [
@@ -492,12 +604,17 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.logout()
             self.enroll_student(self.STUDENT_INFO[index])
             for index2 in range(0, len(test_cases[index])):
-                self.check_ajax_event_result(test_cases[index][index2]['data'], 'flag_resource', test_cases[index][index2]['expected_result'])
+                for xblock_name in self.xblock_names:
+                    self.check_ajax_event_result(test_cases[index][index2]['data'],
+                                                 'flag_resource',
+                                                 test_cases[index][index2]['expected_result'],
+                                                 xblock_name)
 
     def test_student_is_user_staff(self):
         """
         Verify student is not a staff
         """
+        # Check only one block since this handler only retrieves user-scope variable
         self.enroll_student(self.STUDENT_INFO[0])
         result = json.loads(self.client.post(
             self.get_handler_url('is_user_staff'),
@@ -508,6 +625,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verify staff is a staff
         """
+        # Check only one block since this handler only retrieves user-scope variable
         self.enroll_staff(self.staff_user)
         result = json.loads(self.client.post(
             self.get_handler_url('is_user_staff'),
@@ -518,8 +636,22 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verify the s3 information setting
         """
+        # Check only one block since we can't tell whether the two blocks affect each
+        # other from the return in this handler (will be checked in test_upload_screenshot)
         self.enroll_student(self.STUDENT_INFO[0])
         test_cases = [
+            {
+                'expected_result': {
+                    'Success': False,
+                    'error': 'Set S3 information without permission'
+                },
+                'data': {
+                    'aws_access_key': 'access key',
+                    'aws_secret_key': 'secret key',
+                    'bucketName': 'bucket name',
+                    'uploadedFileDir': '/'
+                }
+            },  # Students have no right to set s3 information
             {
                 'expected_result': {'Success': True},
                 'data': {
@@ -528,12 +660,15 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                     'bucketName': 'bucket name',
                     'uploadedFileDir': '/'
                 }
-            }
+            }  # Staff has the right to set s3 information
         ]
-        # Staff has the right to set s3 information
-        self.logout()
-        self.enroll_staff(self.staff_user)
+        for key, value in test_cases[1]['data'].iteritems():
+            test_cases[1]['expected_result'][key] = value
+
         for index in range(0, len(test_cases)):
+            if index == 1:
+                self.logout()
+                self.enroll_staff(self.staff_user)
             self.check_ajax_event_result(test_cases[index]['data'], 'set_s3_info', test_cases[index]['expected_result'])
 
     def test_upload_screenshot(self):
@@ -542,39 +677,44 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         We don't check whether the file is uploaded successfully to S3 or not
         """
         self.enroll_staff(self.staff_user)
-        # Upload file when the information of s3 is not set
-        temp = tempfile.NamedTemporaryFile(prefix='upload_', suffix='.csv')
-        data = {}
-        data['file'] = temp
-        response = self.client.post(self.get_handler_url('upload_screenshot'), data)
-        self.assertEqual(response.content, 'IMPROPER_S3_SETUP')
-        self.check_for_get_xblock_page_code(200)
+        # Check whether the s3 information setting is independent in the two blocks
+        for xblock_name in self.xblock_names:
+            # Upload file when the information of s3 is not set
+            temp = tempfile.NamedTemporaryFile(prefix='upload_', suffix='.csv')
+            data = {}
+            data['file'] = temp
+            response = self.client.post(self.get_handler_url('upload_screenshot',
+                                                             xblock_name), data)
+            self.assertEqual(response.content, 'IMPROPER_S3_SETUP')
+            self.check_for_get_xblock_page_code(200)
 
-        # Set fake s3 information
-        expected_result = {'Success': True}
-        data = {}
-        data['aws_access_key'] = 'access key'
-        data['aws_secret_key'] = 'secret key'
-        data['bucketName'] = 'bucket name'
-        data['uploadedFileDir'] = '/'
-        self.check_ajax_event_result(data, 'set_s3_info', expected_result)
+            # Set fake s3 information
+            # Assume correct, test in test_set_s3_info
+            data = {}
+            data['aws_access_key'] = 'access key'
+            data['aws_secret_key'] = 'secret key'
+            data['bucketName'] = 'bucket name'
+            data['uploadedFileDir'] = '/'
+            self.client.post(self.get_handler_url('set_s3_info', xblock_name),
+                             json.dumps(data), '')
 
-        testcases = {
-            'suffixes': ['.png', '.gif', '.jpg'],
-            'magic_number': ['89504e470d0a1a0a', '474946383761', 'ffd8ffd9']
-        }
-        # Upload file with correct extension name but wrong magic number
-        for index in range(0, len(testcases['suffixes'])):
-            for index2 in range(0, len(testcases['suffixes'])):
-                if index == index2:
-                    continue
-                temp = tempfile.NamedTemporaryFile(prefix='upload_', suffix=testcases['suffixes'][index], delete=False)
-                temp.seek(0)
-                temp.write(testcases['magic_number'][index2].decode('hex'))
-                temp.flush()
-                response = self.client.post(self.get_handler_url('upload_screenshot'), {'file': open(temp.name, 'r')})
-                self.assertEqual(response.content, 'FILE_TYPE_ERROR')
-                self.check_for_get_xblock_page_code(200)
+            testcases = {
+                'suffixes': ['.png', '.gif', '.jpg'],
+                'magic_number': ['89504e470d0a1a0a', '474946383761', 'ffd8ffd9']
+            }
+            # Upload file with correct extension name but wrong magic number
+            for index in range(0, len(testcases['suffixes'])):
+                for index2 in range(0, len(testcases['suffixes'])):
+                    if index == index2:
+                        continue
+                    temp = tempfile.NamedTemporaryFile(prefix='upload_', suffix=testcases['suffixes'][index], delete=False)
+                    temp.seek(0)
+                    temp.write(testcases['magic_number'][index2].decode('hex'))
+                    temp.flush()
+                    response = self.client.post(self.get_handler_url('upload_screenshot', xblock_name),
+                                                {'file': open(temp.name, 'r')})
+                    self.assertEqual(response.content, 'FILE_TYPE_ERROR')
+                    self.check_for_get_xblock_page_code(200)
 
         testcases = {
             'suffixes': ['.csv', '.png', '.gif', '.gif', '.jpg'],
