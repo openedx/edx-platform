@@ -262,7 +262,7 @@ def add_user_to_cohort(cohort, username_or_email):
     """
     user = get_user_by_username_or_email(username_or_email)
     previous_cohort = None
-
+    
     course_cohorts = CourseUserGroup.objects.filter(
         course_id=cohort.course_id,
         users__id=user.id,
@@ -279,6 +279,16 @@ def add_user_to_cohort(cohort, username_or_email):
 
     cohort.users.add(user)
     return (user, previous_cohort)
+
+
+def is_user_in_cohort(cohort, user_id, group_type=CourseUserGroup.COHORT):
+    """
+    Returns True or False if a user is in a cohort
+    """
+    return CourseUserGroup.objects.filter(
+        course_id=cohort.course_id,
+        users__id=user_id,
+        group_type=group_type).exists()
 
 
 def get_course_cohort_names(course_key):
