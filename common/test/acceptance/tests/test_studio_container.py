@@ -379,10 +379,10 @@ class UnitPublishingTest(ContainerBase):
     """
     __test__ = True
 
-    PUBLISHED_STATUS = "Publishing Status\nPublished"
+    PUBLISHED_STATUS = "Publishing Status\nPublished (not yet released)"
     PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
     DRAFT_STATUS = "Publishing Status\nDraft (Unpublished changes)"
-    LOCKED_STATUS = "Publishing Status\nUnpublished (Staff only)"
+    LOCKED_STATUS = "Publishing Status\nVisible to Staff Only"
     RELEASE_TITLE_RELEASED = "RELEASED:"
     RELEASE_TITLE_RELEASE = "RELEASE:"
 
@@ -673,11 +673,11 @@ class UnitPublishingTest(ContainerBase):
         Scenario: The publish title displays correctly for units that are not live
             Given I have a published unit with no unpublished changes that releases in the future
             When I go to the unit page in Studio
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published (not yet released)"
             And when I add a component to the unit
             Then the title in the Publish information box is "Draft (Unpublished changes)"
             And when I click the Publish button
-            Then the title in the Publish information box is "Published"
+            Then the title in the Publish information box is "Published (not yet released)"
         """
         unit = self.go_to_unit_page('Unreleased Section', 'Unreleased Subsection', 'Unreleased Unit')
         self._verify_publish_title(unit, self.PUBLISHED_STATUS)
