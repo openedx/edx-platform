@@ -300,7 +300,8 @@ class @Problem
     Logger.log 'problem_check', @answers
 
     # Segment.io
-    analytics.track "Problem Checked",
+    analytics.track "edx.bi.course.problem.checked",
+      category: "courseware"
       problem_id: @id
       answers: @answers
 

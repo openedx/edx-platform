@@ -285,7 +285,7 @@ def _section_send_email(course_key, access, course):
 def _section_analytics(course_key, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'section_key': 'analytics',
+        'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),

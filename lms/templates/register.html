@@ -55,7 +55,7 @@
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         var url = json.redirect_url || "${reverse('dashboard')}";
-        location.href = url;
+        location.href = appendParameter(url, "signin", "initial");
       });
 
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
