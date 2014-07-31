@@ -71,6 +71,99 @@ def load_data_str(rel_path):
         return data_file.read()
 
 
+def disable_animations(page):
+    """
+    Disable jQuery and CSS3 animations.
+    """
+    disable_jquery_animations(page)
+    disable_css_animations(page)
+
+
+def enable_animations(page):
+    """
+    Enable jQuery and CSS3 animations.
+    """
+    enable_jquery_animations(page)
+    enable_css_animations(page)
+
+
+def disable_jquery_animations(page):
+    """
+    Disable jQuery animations.
+    """
+    page.browser.execute_script("jQuery.fx.off = true;")
+
+
+def enable_jquery_animations(page):
+    """
+    Enable jQuery animations.
+    """
+    page.browser.execute_script("jQuery.fx.off = false;")
+
+
+def disable_css_animations(page):
+    """
+    Disable CSS3 animations, transitions, transforms.
+    """
+    page.browser.execute_script("""
+        var id = 'no-transitions';
+
+        // if styles were already added, just do nothing.
+        if (document.getElementById(id)) {
+            return;
+        }
+
+        var css = [
+                '* {',
+                    '-webkit-transition: none !important;',
+                    '-moz-transition: none !important;',
+                    '-o-transition: none !important;',
+                    '-ms-transition: none !important;',
+                    'transition: none !important;',
+                    '-webkit-transition-property: none !important;',
+                    '-moz-transition-property: none !important;',
+                    '-o-transition-property: none !important;',
+                    '-ms-transition-property: none !important;',
+                    'transition-property: none !important;',
+                    '-webkit-transform: none !important;',
+                    '-moz-transform: none !important;',
+                    '-o-transform: none !important;',
+                    '-ms-transform: none !important;',
+                    'transform: none !important;',
+                    '-webkit-animation: none !important;',
+                    '-moz-animation: none !important;',
+                    '-o-animation: none !important;',
+                    '-ms-animation: none !important;',
+                    'animation: none !important;',
+                '}'
+            ].join(''),
+            head = document.head || document.getElementsByTagName('head')[0],
+            styles = document.createElement('style');
+
+        styles.id = id;
+        styles.type = 'text/css';
+        if (styles.styleSheet){
+          styles.styleSheet.cssText = css;
+        } else {
+          styles.appendChild(document.createTextNode(css));
+        }
+
+        head.appendChild(styles);
+    """)
+
+
+def enable_css_animations(page):
+    """
+    Enable CSS3 animations, transitions, transforms.
+    """
+    page.browser.execute_script("""
+        var styles = document.getElementById('no-transitions'),
+            head = document.head || document.getElementsByTagName('head')[0];
+
+        head.removeChild(styles)
+    """)
+
+
 class UniqueCourseTest(WebAppTest):
     """
     Test that provides a unique course ID.
