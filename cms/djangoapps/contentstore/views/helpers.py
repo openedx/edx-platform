@@ -55,19 +55,20 @@ def get_parent_xblock(xblock):
     return modulestore().get_item(parent_location)
 
 
-def is_unit(xblock):
+def is_unit(xblock, parent_xblock=None):
     """
     Returns true if the specified xblock is a vertical that is treated as a unit.
     A unit is a vertical that is a direct child of a sequential (aka a subsection).
     """
     if xblock.category == 'vertical':
-        parent_xblock = get_parent_xblock(xblock)
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
         parent_category = parent_xblock.category if parent_xblock else None
         return parent_category == 'sequential'
     return False
 
 
-def xblock_has_own_studio_page(xblock):
+def xblock_has_own_studio_page(xblock, parent_xblock=None):
     """
     Returns true if the specified xblock has an associated Studio page. Most xblocks do
     not have their own page but are instead shown on the page of their parent. There
@@ -80,21 +81,22 @@ def xblock_has_own_studio_page(xblock):
     """
     category = xblock.category
 
-    if is_unit(xblock):
+    if is_unit(xblock, parent_xblock):
         return True
     elif category == 'vertical':
-        parent_xblock = get_parent_xblock(xblock)
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
         return is_unit(parent_xblock) if parent_xblock else False
 
     # All other xblocks with children have their own page
     return xblock.has_children
 
 
-def xblock_studio_url(xblock):
+def xblock_studio_url(xblock, parent_xblock=None):
     """
     Returns the Studio editing URL for the specified xblock.
     """
-    if not xblock_has_own_studio_page(xblock):
+    if not xblock_has_own_studio_page(xblock, parent_xblock):
         return None
     category = xblock.category
     if category == 'course':
