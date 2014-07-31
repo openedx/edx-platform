@@ -113,7 +113,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
         FAILED = "failed"
         SUCCEEDED = "succeeded"
 
-    def initiated(self, source_course_key, destination_course_key, user):
+    def initiated(self, source_course_key, destination_course_key, user, display_name):
         """
         To be called when a new rerun is initiated for the given course by the given user.
         """
@@ -123,6 +123,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
             user=user,
             allow_not_found=True,
             source_course_key=source_course_key,
+            display_name=display_name,
         )
 
     def succeeded(self, course_key):
