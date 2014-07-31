@@ -298,4 +298,12 @@ def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
         finally:
             map(lambda wrap_patch: wrap_patch.stop(), wrap_patches)
             call_count = sum([find_wrap.call_count for find_wrap in find_wraps])
-            assert_equal(call_count, num_finds)
+            assert_equal(
+                call_count,
+                num_finds,
+                "Expected {} calls, {} were made. Calls: {}".format(
+                    num_finds,
+                    call_count,
+                    [find_wrap.call_args_list for find_wrap in find_wraps]
+                )
+            )

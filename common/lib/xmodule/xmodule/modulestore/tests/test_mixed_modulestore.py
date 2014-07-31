@@ -127,15 +127,16 @@ class TestMixedModuleStore(unittest.TestCase):
         Create a course w/ one item in the persistence store using the given course & item location.
         """
         # create course
-        self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
-        if isinstance(self.course.id, CourseLocator):
-            self.course_locations[self.MONGO_COURSEID] = self.course.location
-        else:
-            self.assertEqual(self.course.id, course_key)
+        with self.store.bulk_write_operations(course_key):
+            self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
+            if isinstance(self.course.id, CourseLocator):
+                self.course_locations[self.MONGO_COURSEID] = self.course.location
+            else:
+                self.assertEqual(self.course.id, course_key)
 
-        # create chapter
-        chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
-        self.writable_chapter_location = chapter.location
+            # create chapter
+            chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
+            self.writable_chapter_location = chapter.location
 
     def _create_block_hierarchy(self):
         """
@@ -188,8 +189,9 @@ class TestMixedModuleStore(unittest.TestCase):
                 create_sub_tree(block, tree)
             setattr(self, block_info.field_name, block.location)
 
-        for tree in trees:
-            create_sub_tree(self.course, tree)
+        with self.store.bulk_write_operations(self.course.id):
+            for tree in trees:
+                create_sub_tree(self.course, tree)
 
     def _course_key_from_string(self, string):
         """
@@ -349,10 +351,9 @@ class TestMixedModuleStore(unittest.TestCase):
             )
 
     # draft: 2 to look in draft and then published and then 5 for updating ancestors.
-    # split: 3 to get the course structure & the course definition (show_calculator is scope content)
-    #  before the change. 1 during change to refetch the definition. 3 afterward (b/c it calls get_item to return the "new" object).
+    # split: 1 for the course index, 1 for the course structure before the change, 1 for the structure after the change
     #  2 sends to update index & structure (calculator is a setting field)
-    @ddt.data(('draft', 7, 5), ('split', 6, 2))
+    @ddt.data(('draft', 7, 5), ('split', 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
@@ -434,7 +435,7 @@ class TestMixedModuleStore(unittest.TestCase):
         component = self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component))
 
-    @ddt.data(('draft', 7, 2), ('split', 13, 4))
+    @ddt.data(('draft', 7, 2), ('split', 2, 4))
     @ddt.unpack
     def test_delete_item(self, default_ms, max_find, max_send):
         """
@@ -453,7 +454,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
 
-    @ddt.data(('draft', 8, 2), ('split', 13, 4))
+    @ddt.data(('draft', 8, 2), ('split', 2, 4))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -499,7 +500,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
 
-    @ddt.data(('draft', 4, 1), ('split', 5, 2))
+    @ddt.data(('draft', 4, 1), ('split', 1, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
         """
@@ -579,7 +580,7 @@ class TestMixedModuleStore(unittest.TestCase):
             xml_store.create_course("org", "course", "run", self.user_id)
 
     # draft is 2 to compute inheritance
-    # split is 3 b/c it gets the definition to check whether wiki is set
+    # split is 3 (one for the index, one for the definition to check if the wiki is set, and one for the course structure
     @ddt.data(('draft', 2, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_course(self, default_ms, max_find, max_send):
@@ -884,7 +885,7 @@ class TestMixedModuleStore(unittest.TestCase):
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
             found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
-        self.assertEqual(set(found_orphans), set(orphan_locations))
+        self.assertItemsEqual(found_orphans, orphan_locations)
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
@@ -953,7 +954,9 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
-    @ddt.data(('draft', 2, 6), ('split', 7, 2))
+    # Split takes 1 query to read the course structure, deletes all of the entries in memory, and loads the module from an in-memory cache
+    # Only writes the course structure back to the database once
+    @ddt.data(('draft', 2, 6), ('split', 1, 1))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """

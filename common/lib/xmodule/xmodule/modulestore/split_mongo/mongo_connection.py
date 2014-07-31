@@ -76,6 +76,12 @@ class MongoConnection(object):
         """
         self.structures.update({'_id': structure['_id']}, structure)
 
+    def upsert_structure(self, structure):
+        """
+        Update the db record for structure, creating that record if it doesn't already exist
+        """
+        self.structures.update({'_id': structure['_id']}, structure, upsert=True)
+
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
@@ -101,13 +107,21 @@ class MongoConnection(object):
         """
         self.course_index.insert(course_index)
 
-    def update_course_index(self, course_index):
+    def update_course_index(self, course_index, from_index=None):
         """
-        Update the db record for course_index
+        Update the db record for course_index.
+
+        Arguments:
+            from_index: If set, only update an index if it matches the one specified in `from_index`.
         """
         self.course_index.update(
-            son.SON([('org', course_index['org']), ('course', course_index['course']), ('run', course_index['run'])]),
-            course_index
+            from_index or son.SON([
+                ('org', course_index['org']),
+                ('course', course_index['course']),
+                ('run', course_index['run'])
+            ]),
+            course_index,
+            upsert=False,
         )
 
     def delete_course_index(self, course_index):

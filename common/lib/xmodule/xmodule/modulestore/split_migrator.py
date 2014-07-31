@@ -55,24 +55,25 @@ class SplitMigrator(object):
             new_run = source_course_key.run
 
         new_course_key = CourseLocator(new_org, new_course, new_run, branch=ModuleStoreEnum.BranchName.published)
-        new_fields = self._get_fields_translate_references(original_course, new_course_key, None)
-        if fields:
-            new_fields.update(fields)
-        new_course = self.split_modulestore.create_course(
-            new_org, new_course, new_run, user_id,
-            fields=new_fields,
-            master_branch=ModuleStoreEnum.BranchName.published,
-            skip_auto_publish=True,
-            **kwargs
-        )
-
-        with self.split_modulestore.bulk_write_operations(new_course.id):
-            self._copy_published_modules_to_course(
-                new_course, original_course.location, source_course_key, user_id, **kwargs
+        with self.split_modulestore.bulk_write_operations(new_course_key):
+            new_fields = self._get_fields_translate_references(original_course, new_course_key, None)
+            if fields:
+                new_fields.update(fields)
+            new_course = self.split_modulestore.create_course(
+                new_org, new_course, new_run, user_id,
+                fields=new_fields,
+                master_branch=ModuleStoreEnum.BranchName.published,
+                skip_auto_publish=True,
+                **kwargs
             )
-        # create a new version for the drafts
-        with self.split_modulestore.bulk_write_operations(new_course.id):
-            self._add_draft_modules_to_course(new_course.location, source_course_key, user_id, **kwargs)
+
+            with self.split_modulestore.bulk_write_operations(new_course.id):
+                self._copy_published_modules_to_course(
+                    new_course, original_course.location, source_course_key, user_id, **kwargs
+                )
+
+                # create a new version for the drafts
+                self._add_draft_modules_to_course(new_course.location, source_course_key, user_id, **kwargs)
 
         return new_course.id
 
@@ -101,7 +102,6 @@ class SplitMigrator(object):
                     fields=self._get_fields_translate_references(
                         module, course_version_locator, new_course.location.block_id
                     ),
-                    continue_version=True,
                     skip_auto_publish=True,
                     **kwargs
                 )
@@ -109,7 +109,7 @@ class SplitMigrator(object):
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
         versions[ModuleStoreEnum.BranchName.draft] = versions[ModuleStoreEnum.BranchName.published]
-        self.split_modulestore.update_course_index(index_info)
+        self.split_modulestore.update_course_index(course_version_locator, index_info)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
