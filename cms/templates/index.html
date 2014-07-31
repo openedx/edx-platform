@@ -139,7 +139,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <!-- STATE: re-run is processing -->
             <li class="wrapper-course has-status">
               <div class="course-item course-rerun is-processing">
-                <a class="course-link" href="#">
+                <div class="course-details" href="#">
                   <h3 class="course-title">China (Part 2): The Creation and End of a Centralized Empire</h3>
 
                   <div class="course-metadata">
@@ -154,7 +154,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                       <span class="label">${_("Course Run:")}</span> <span class="value">T2_2014</span>
                     </span>
                   </div>
-                </a>
+                </div>
 
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
@@ -175,7 +175,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <!-- STATE: re-run has error -->
             <li class="wrapper-course has-status">
               <div class="course-item course-rerun has-error">
-                <a class="course-link" href="#">
+                <div class="course-details" href="#">
                   <h3 class="course-title">China (Part 2): The Creation and End of a Centralized Empire</h3>
 
                   <div class="course-metadata">
@@ -190,7 +190,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                       <span class="label">${_("Course Run:")}</span> <span class="value">T2_2014</span>
                     </span>
                   </div>
-                </a>
+                </div>
 
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
@@ -206,9 +206,9 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
-                    <a href="#" rel="external" class="button dismiss-button">
-                      <i class="icon-remove-sign"></i>
-                      <span class="">${_("Remove from listings")}</span>
+                    <a href="#" class="button dismiss-button">
+                      <i class="icon icon-remove-sign"></i>
+                      <span class="button-copy">${_("Dimiss")}</span>
                     </a>
                   </li>
                 </ul>
@@ -242,7 +242,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
             <ul  class="item-actions course-actions">
               <li class="action action-rerun">
-                <a href="#" rel="external" class="button rerun-button">${_("Re-run Course")}</a>
+                <a href="#" class="button rerun-button">${_("Re-run Course")}</a>
               </li>
               <li class="action action-view">
                 <a href="#" rel="external" class="button view-button">${_("View Live")}</a>
