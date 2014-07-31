@@ -105,12 +105,21 @@ def instructor_dashboard_2(request, course_id):
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 
+    analytics_dashboard_message = None
+    if settings.ANALYTICS_DASHBOARD_URL:
+        # Construct a URL to the external analytics dashboard
+        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
+        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
+        analytics_dashboard_message = _("To gain insights into student enrollment and participation, {link_start}visit the new dashboard for course analytics{link_end}.")
+        analytics_dashboard_message = analytics_dashboard_message.format(link_start=link_start, link_end="</a>")
+
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
+        'analytics_dashboard_message': analytics_dashboard_message
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)

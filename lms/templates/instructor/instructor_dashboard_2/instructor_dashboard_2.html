@@ -76,6 +76,12 @@
         <p>${_("We've changed the look and feel of the Instructor Dashboard. During this transition time, you can still access the old Instructor Dashboard by clicking the 'Revert to Legacy Dashboard' button above.")}</p>
     </div>
 
+    %if analytics_dashboard_message:
+      <div class="wrapper-msg urgency-low is-shown">
+          <p>${analytics_dashboard_message}</p>
+      </div>
+    %endif
+
   ## links which are tied to idash-sections below.
   ## the links are activated and handled in instructor_dashboard.coffee
   ## when the javascript loads, it clicks on the first section
