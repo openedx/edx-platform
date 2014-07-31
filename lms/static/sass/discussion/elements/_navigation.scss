@@ -141,13 +141,13 @@
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
+  text-align: right;
 }
 
 %forum-nav-select {
   border: none;
   max-width: 100%;
   background-color: transparent;
-  font: inherit;
 }
 
 .forum-nav-filter-main-control {
