@@ -605,7 +605,7 @@ def policy_key(location):
     Get the key for a location in a policy file.  (Since the policy file is
     specific to a course, it doesn't need the full location url).
     """
-    return '{cat}/{name}'.format(cat=location.category, name=location.name)
+    return u'{cat}/{name}'.format(cat=location.category, name=location.name)
 
 
 Template = namedtuple("Template", "metadata data children")

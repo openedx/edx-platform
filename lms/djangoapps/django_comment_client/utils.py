@@ -16,7 +16,8 @@ import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
-from opaque_keys.edx.locations import i4xEncoder, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey
 import json
 
 log = logging.getLogger(__name__)
@@ -135,6 +136,9 @@ def get_discussion_category_map(course):
 
     modules = _get_discussion_modules(course)
 
+    is_course_cohorted = course.is_cohorted
+    cohorted_discussion_ids = course.cohorted_discussions
+
     for module in modules:
         id = module.discussion_id
         title = module.discussion_target
@@ -179,7 +183,8 @@ def get_discussion_category_map(course):
         for entry in entries:
             node[level]["entries"][entry["title"]] = {"id": entry["id"],
                                                       "sort_key": entry["sort_key"],
-                                                      "start_date": entry["start_date"]}
+                                                      "start_date": entry["start_date"],
+                                                      "is_cohorted": is_course_cohorted}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
@@ -187,7 +192,8 @@ def get_discussion_category_map(course):
     for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
-                                          "start_date": datetime.now(UTC())}
+                                          "start_date": datetime.now(UTC()),
+                                          "is_cohorted": is_course_cohorted and entry["id"] in cohorted_discussion_ids}
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
@@ -309,7 +315,7 @@ def render_mustache(template_name, dictionary, *args, **kwargs):
 
 
 def permalink(content):
-    if isinstance(content['course_id'], SlashSeparatedCourseKey):
+    if isinstance(content['course_id'], CourseKey):
         course_id = content['course_id'].to_deprecated_string()
     else:
         course_id = content['course_id']
@@ -355,7 +361,7 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content):
+def safe_content(content, is_staff=False):
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
@@ -367,7 +373,7 @@ def safe_content(content):
 
     ]
 
-    if (content.get('anonymous') is False) and (content.get('anonymous_to_peers') is False):
+    if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
         fields += ['username', 'user_id']
 
     if 'children' in content:

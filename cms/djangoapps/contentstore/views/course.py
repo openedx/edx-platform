@@ -13,7 +13,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound
+from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from util.json_request import JsonResponse
 from edxmako.shortcuts import render_to_response
 
@@ -21,6 +21,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
+from xmodule.partitions.partitions import UserPartition, Group
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
@@ -44,7 +45,8 @@ from .access import has_course_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
-    ADVANCED_COMPONENT_POLICY_KEY
+    ADVANCED_COMPONENT_POLICY_KEY,
+    SPLIT_TEST_COMPONENT_TYPE,
 )
 
 from django_comment_common.models import assign_default_role
@@ -65,7 +67,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
-           'textbooks_list_handler', 'textbooks_detail_handler']
+           'textbooks_list_handler', 'textbooks_detail_handler',
+           'group_configurations_list_handler', 'group_configurations_detail_handler']
 
 
 class AccessListFallback(Exception):
@@ -107,7 +110,7 @@ def course_handler(request, course_key_string=None):
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        offering. Return same json as above.
+        course, run. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -267,7 +270,6 @@ def course_index(request, course_key):
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
 
-
     return render_to_response('overview.html', {
         'context_course': course_module,
         'lms_link': lms_link,
@@ -335,7 +337,9 @@ def create_new_course(request):
         # Creating the course raises InvalidLocationError if an existing course with this org/name is found
         new_course = modulestore().create_course(
             course_key.org,
-            course_key.offering,
+            course_key.course,
+            course_key.run,
+            request.user.id,
             fields=fields,
         )
 
@@ -604,7 +608,7 @@ def _config_course_advanced_components(request, course_module):
                         # Indicate that tabs should not be filtered out of
                         # the metadata
                         filter_tabs = False  # Set this flag to avoid the tab removal code below.
-                    found_ac_type = True  #break
+                    found_ac_type = True  # break
 
             # If we did not find a module type in the advanced settings,
             # we may need to remove the tab from the course.
@@ -852,6 +856,186 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
         course_module.pdf_textbooks = remaining_textbooks
         store.update_item(course_module, request.user.id)
         return JsonResponse()
+
+
+class GroupConfigurationsValidationError(Exception):
+    """
+    An error thrown when a group configurations input is invalid.
+    """
+    pass
+
+
+class GroupConfiguration(object):
+    """
+    Prepare Group Configuration for the course.
+    """
+    def __init__(self, json_string, course, configuration_id=None):
+        """
+        Receive group configuration as a json (`json_string`), deserialize it
+        and validate.
+        """
+        self.configuration = GroupConfiguration.parse(json_string)
+        self.course = course
+        self.assign_id(configuration_id)
+        self.assign_group_ids()
+        self.validate()
+
+    @staticmethod
+    def parse(json_string):
+        """
+        Deserialize given json that represents group configuration.
+        """
+        try:
+            configuration = json.loads(json_string)
+        except ValueError:
+            raise GroupConfigurationsValidationError(_("invalid JSON"))
+
+        return configuration
+
+    def validate(self):
+        """
+        Validate group configuration representation.
+        """
+        if not self.configuration.get("name"):
+            raise GroupConfigurationsValidationError(_("must have name of the configuration"))
+        if len(self.configuration.get('groups', [])) < 2:
+            raise GroupConfigurationsValidationError(_("must have at least two groups"))
+
+    def generate_id(self):
+        """
+        Generate unique id for the group configuration.
+        If this id is already used, we generate new one.
+        """
+        used_ids = self.get_used_ids()
+        cid = random.randint(100, 10 ** 12)
+
+        while cid in used_ids:
+            cid = random.randint(100, 10 ** 12)
+
+        return cid
+
+    def assign_id(self, configuration_id=None):
+        """
+        Assign id for the json representation of group configuration.
+        """
+        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id()
+
+    def assign_group_ids(self):
+        """
+        Assign ids for the group_configuration's groups.
+        """
+        # this is temporary logic, we are going to build default groups on front-end
+        if not self.configuration.get('groups'):
+            self.configuration['groups'] = [
+                {'name': 'Group A'}, {'name': 'Group B'},
+            ]
+
+        # Assign ids to every group in configuration.
+        for index, group in enumerate(self.configuration.get('groups', [])):
+            group['id'] = index
+
+    def get_used_ids(self):
+        """
+        Return a list of IDs that already in use.
+        """
+        return set([p.id for p in self.course.user_partitions])
+
+    def get_user_partition(self):
+        """
+        Get user partition for saving in course.
+        """
+        groups = [Group(g["id"], g["name"]) for g in self.configuration["groups"]]
+
+        return UserPartition(
+            self.configuration["id"],
+            self.configuration["name"],
+            self.configuration["description"],
+            groups
+        )
+
+
+@require_http_methods(("GET", "POST"))
+@login_required
+@ensure_csrf_cookie
+def group_configurations_list_handler(request, course_key_string):
+    """
+    A RESTful handler for Group Configurations
+
+    GET
+        html: return Group Configurations list page (Backbone application)
+    POST
+        json: create new group configuration
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
+    store = modulestore()
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+        return render_to_response('group_configurations.html', {
+            'context_course': course,
+            'group_configuration_url': group_configuration_url,
+            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
+        })
+    elif "application/json" in request.META.get('HTTP_ACCEPT'):
+        if request.method == 'POST':
+        # create a new group configuration for the course
+            try:
+                new_configuration = GroupConfiguration(request.body, course).get_user_partition()
+            except GroupConfigurationsValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
+
+            course.user_partitions.append(new_configuration)
+            response = JsonResponse(new_configuration.to_json(), status=201)
+
+            response["Location"] = reverse_course_url(
+                'group_configurations_detail_handler',
+                course.id,
+                kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
+            )
+            store.update_item(course, request.user.id)
+            return response
+    else:
+        return HttpResponse(status=406)
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("POST", "PUT"))
+def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
+    """
+    JSON API endpoint for manipulating a group configuration via its internal ID.
+    Used by the Backbone application.
+
+    POST or PUT
+        json: update group configuration based on provided information
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course = _get_course_module(course_key, request.user)
+    store = modulestore()
+    matching_id = [p for p in course.user_partitions
+                   if unicode(p.id) == unicode(group_configuration_id)]
+    if matching_id:
+        configuration = matching_id[0]
+    else:
+        configuration = None
+
+    if request.method in ('POST', 'PUT'):  # can be either and sometimes
+                                        # django is rewriting one to the other
+        try:
+            new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
+        except GroupConfigurationsValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
+
+        if configuration:
+            index = course.user_partitions.index(configuration)
+            course.user_partitions[index] = new_configuration
+        else:
+            course.user_partitions.append(new_configuration)
+        store.update_item(course, request.user.id)
+        return JsonResponse(new_configuration.to_json(), status=201)
 
 
 def _get_course_creator_status(user):

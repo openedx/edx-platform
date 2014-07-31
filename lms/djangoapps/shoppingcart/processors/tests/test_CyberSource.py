@@ -10,6 +10,8 @@ from shoppingcart.models import Order, OrderItem
 from shoppingcart.processors.CyberSource import *
 from shoppingcart.processors.exceptions import *
 from mock import patch, Mock
+from microsite_configuration import microsite
+import mock
 
 
 TEST_CC_PROCESSOR = {
@@ -19,9 +21,27 @@ TEST_CC_PROCESSOR = {
         'SERIAL_NUMBER': '12345',
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
+        'microsites': {
+            'test_microsite': {
+                'SHARED_SECRET': 'secret_override',
+                'MERCHANT_ID': 'edx_test_override',
+                'SERIAL_NUMBER': '12345_override',
+                'ORDERPAGE_VERSION': '7',
+                'PURCHASE_ENDPOINT': '',
+            }
+        }
     }
 }
 
+
+def fakemicrosite(name, default=None):
+    """
+    This is a test mocking function to return a microsite configuration
+    """
+    if name == 'cybersource_config_key':
+        return 'test_microsite'
+    else:
+        return None
 
 @override_settings(CC_PROCESSOR=TEST_CC_PROCESSOR)
 class CyberSourceTests(TestCase):
@@ -32,6 +52,15 @@ class CyberSourceTests(TestCase):
     def test_override_settings(self):
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['MERCHANT_ID'], 'edx_test')
         self.assertEqual(settings.CC_PROCESSOR['CyberSource']['SHARED_SECRET'], 'secret')
+
+    def test_microsite_no_override_settings(self):
+        self.assertEqual(get_cybersource_config()['MERCHANT_ID'], 'edx_test')
+        self.assertEqual(get_cybersource_config()['SHARED_SECRET'], 'secret')
+
+    @mock.patch("microsite_configuration.microsite.get_value", fakemicrosite)
+    def test_microsite_override_settings(self):
+        self.assertEqual(get_cybersource_config()['MERCHANT_ID'], 'edx_test_override')
+        self.assertEqual(get_cybersource_config()['SHARED_SECRET'], 'secret_override')
 
     def test_hash(self):
         """

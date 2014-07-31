@@ -50,9 +50,9 @@ The following documentation is available:
   download the entire guide as a PDF.
 
   * Instructions for adding a table of contents for a video file are now
-    available in the :ref:`TOC Transcripts` section.  (BLD-933)
+    available in the `Video Table of Contents`_ section.  (BLD-933)
 
-  * The example report in the :ref:`View and download student data` section now
+  * The example report in the `Download or view student data`_ section now
     includes the new User ID column.
        
 * `edX Research Guide`_

@@ -30,9 +30,10 @@ import imp
 import json
 
 from path import path
+from warnings import simplefilter
 
 from .discussionsettings import *
-from .modulestore_settings import *
+from xmodule.modulestore.modulestore_settings import update_module_store_settings
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 
@@ -271,7 +272,15 @@ FEATURES = {
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Analytics Data API (for active student count)
+    # Default to false here b/c dev environments won't have the api, will override in aws.py
+    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+
 }
+
+# Ignore static asset files on import which match this pattern
+ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
 
 # Used for A/B testing
 DEFAULT_GROUPS = []
@@ -417,6 +426,14 @@ COURSE_SETTINGS = {
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
+# They are used so that URLs with deprecated-format strings still work.
+COURSE_ID_PATTERN = r'(?P<course_id>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
+COURSE_KEY_PATTERN = r'(?P<course_key_string>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
+USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
+ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
+USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
 
 ############################## EVENT TRACKING #################################
@@ -634,6 +651,7 @@ LANGUAGES = (
     ('fa', u'فارسی'),  # Persian
     ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
     ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fil', u'Filipino'),  # Filipino
     ('fr', u'Français'),  # French
     ('gl', u'Galego'),  # Galician
     ('gu', u'ગુજરાતી'),  # Gujarati
@@ -652,6 +670,7 @@ LANGUAGES = (
     ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
     ('ml', u'മലയാളം'),  # Malayalam
     ('mn', u'Монгол хэл'),  # Mongolian
+    ('mr', u'मराठी'),  # Marathi
     ('ms', u'Bahasa Melayu'),  # Malay
     ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
     ('ne', u'नेपाली'),  # Nepali
@@ -665,12 +684,15 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('sr', u'Српски'),  # Serbian
     ('ta', u'தமிழ்'),  # Tamil
+    ('te', u'తెలుగు'),  # Telugu
     ('th', u'ไทย'),  # Thai
     ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
     ('uk', u'Українська'),  # Ukranian
     ('ur', u'اردو'),  # Urdu
     ('vi', u'Tiếng Việt'),  # Vietnamese
+    ('uz', u'Ўзбек'),  # Uzbek
     ('zh-cn', u'中文 (简体)'),  # Chinese (China)
     ('zh-hk', u'中文 (香港)'),  # Chinese (Hong Kong)
     ('zh-tw', u'中文 (台灣)'),  # Chinese (Taiwan)
@@ -771,8 +793,13 @@ MOCK_PEER_GRADING = False
 # Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
 
-################################# Jasmine ###################################
+################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+
+################################# Deprecation warnings #####################
+
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
+simplefilter('ignore')
 
 ################################# Waffle ###################################
 
@@ -876,6 +903,7 @@ courseware_js = (
         'coffee/src/' + pth + '.js'
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
+    ['js/' + pth + '.js' for pth in ['ajax-error']] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
@@ -1433,6 +1461,9 @@ LINKEDIN_API = {
 # By default, don't use a file prefix
 ORA2_FILE_PREFIX = None
 
+# Default File Upload Storage bucket and prefix. Used by the FileUpload Service.
+FILE_UPLOAD_STORAGE_BUCKET_NAME = 'edxuploads'
+FILE_UPLOAD_STORAGE_PREFIX = 'submissions_attachments'
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
@@ -1642,6 +1673,7 @@ OPTIONAL_APPS = (
     'submissions',
     'openassessment',
     'openassessment.assessment',
+    'openassessment.fileupload',
     'openassessment.workflow',
     'openassessment.xblock'
 )
@@ -1666,3 +1698,11 @@ THIRD_PARTY_AUTH = {}
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+### External auth usage -- prefixes for ENROLLMENT_DOMAIN
+SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+OPENID_DOMAIN_PREFIX = 'openid:'
+
+### Analytics data api settings
+ANALYTICS_DATA_URL = ""
+ANALYTICS_DATA_TOKEN = ""

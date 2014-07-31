@@ -199,10 +199,17 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
-        tools.set_due_date_extension(self.course, self.week1, self.user,
-                                     extended)
+        tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         self.assertEqual(self.extended_due(self.week1), extended)
         self.assertEqual(self.extended_due(self.homework), extended)
+
+    def test_set_due_date_extension_create_studentmodule(self):
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        user = UserFactory.create()  # No student modules for this user
+        tools.set_due_date_extension(self.course, self.week1, user, extended)
+        extended_due = functools.partial(get_extended_due, self.course, student=user)
+        self.assertEqual(extended_due(self.week1), extended)
+        self.assertEqual(extended_due(self.homework), extended)
 
     def test_reset_due_date_extension(self):
         tools.set_due_date_extension(self.course, self.week1, self.user, None)

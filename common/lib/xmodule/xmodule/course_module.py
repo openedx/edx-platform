@@ -9,6 +9,7 @@ import dateutil.parser
 from lazy import lazy
 
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import UsageKey
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -248,7 +249,7 @@ class CourseFields(object):
         scope=Scope.settings
     )
     discussion_blackouts = List(
-        display_name="Discussion Blackout Dates",
+        display_name=_("Discussion Blackout Dates"),
         help=_("Enter pairs of dates between which students cannot post to discussion forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to include the \"T\" between the date and time)."),
         scope=Scope.settings
     )
@@ -590,6 +591,11 @@ class CourseFields(object):
                                        default=False,
                                        scope=Scope.settings)
 
+    invitation_only = Boolean(display_name=_("Invitation Only"),
+                              help="Whether to restrict enrollment to invitation by the course staff.",
+                              default=False,
+                              scope=Scope.settings)
+
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
 
@@ -601,7 +607,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, Location):
+            if isinstance(self.location, UsageKey):
                 self.wiki_slug = self.location.course
             elif isinstance(self.location, CourseLocator):
                 self.wiki_slug = self.id.offering or self.display_name

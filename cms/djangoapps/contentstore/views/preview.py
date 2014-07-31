@@ -95,6 +95,20 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return local_resource_url(block, uri)
 
 
+class StudioUserService(object):
+    """
+    Provides a Studio implementation of the XBlock user service.
+    """
+
+    def __init__(self, request):
+        super(StudioUserService, self).__init__()
+        self._request = request
+
+    @property
+    def user_id(self):
+        return self._request.user.id
+
+
 def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -116,6 +130,8 @@ def _preview_module_system(request, descriptor):
         partial(replace_static_urls, None, course_id=course_id),
         _studio_wrap_xblock,
     ]
+
+    descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,

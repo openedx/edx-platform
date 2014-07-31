@@ -127,8 +127,8 @@ def is_mysql_running():
     """
     # We use the MySQL CLI client and capture its stderr
     # If the client cannot connect successfully, stderr will be non-empty
-    output = os.popen('mysql -e "" 2>&1').read()
-    return output == ""
+    output = os.popen('status mysql 2>&1').read()
+    return output.startswith("mysql start/running, process")
 
 
 def clear_mongo():

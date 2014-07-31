@@ -43,6 +43,7 @@ log = logging.getLogger(__name__)
 
 # NOTE: unit_handler assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
+SPLIT_TEST_COMPONENT_TYPE = 'split_test'
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
@@ -61,13 +62,13 @@ else:
         # XBlocks from pmitros repos are prototypes. They should not be used
         # except for edX Learning Sciences experiments on edge.edx.org without
         # further work to make them robust, maintainable, finalize data formats,
-        # etc. 
+        # etc.
         'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
-        'split_test',
-        'edx_sga',
-        'ooyala-player'
+        SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
+        'recommender', # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
+        'ooyala-player',
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
@@ -99,7 +100,7 @@ def subsection_handler(request, usage_key_string):
         except ItemNotFoundError:
             return HttpResponseBadRequest()
 
-        preview_link = get_lms_link_for_item(usage_key, preview=True)
+        preview_link = get_lms_link_for_item(item.location, preview=True)
 
         # make sure that location references a 'sequential', otherwise return
         # BadRequest
@@ -136,9 +137,9 @@ def subsection_handler(request, usage_key_string):
                 'new_unit_category': 'vertical',
                 'lms_link': lms_link,
                 'preview_link': preview_link,
-                'course_graders': json.dumps(CourseGradingModel.fetch(usage_key.course_key).graders),
+                'course_graders': json.dumps(CourseGradingModel.fetch(item.location.course_key).graders),
                 'parent_item': parent,
-                'locator': usage_key,
+                'locator': item.location,
                 'policy_metadata': policy_metadata,
                 'subsection_units': subsection_units,
                 'can_view_live': can_view_live
@@ -213,7 +214,7 @@ def unit_handler(request, usage_key_string):
         return render_to_response('unit.html', {
             'context_course': course,
             'unit': item,
-            'unit_usage_key': usage_key,
+            'unit_usage_key': item.location,
             'child_usage_keys': [block.scope_ids.usage_id for block in xblocks],
             'component_templates': json.dumps(component_templates),
             'draft_preview_link': preview_lms_link,
@@ -269,7 +270,7 @@ def container_handler(request, usage_key_string):
             'context_course': course,  # Needed only for display of menus at top of page.
             'xblock': xblock,
             'unit_publish_state': unit_publish_state,
-            'xblock_locator': usage_key,
+            'xblock_locator': xblock.location,
             'unit': None if not ancestor_xblocks else ancestor_xblocks[0],
             'ancestor_xblocks': ancestor_xblocks,
             'component_templates': json.dumps(component_templates),
@@ -410,6 +411,9 @@ def _get_item_in_course(request, usage_key):
 
     Verifies that the caller has permission to access this item.
     """
+    # usage_key's course_key may have an empty run property
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+
     course_key = usage_key.course_key
 
     if not has_course_access(request.user, course_key):
@@ -417,7 +421,7 @@ def _get_item_in_course(request, usage_key):
 
     course = modulestore().get_course(course_key)
     item = modulestore().get_item(usage_key, depth=1)
-    lms_link = get_lms_link_for_item(usage_key)
+    lms_link = get_lms_link_for_item(item.location)
 
     return course, item, lms_link
 
@@ -450,8 +454,8 @@ def component_handler(request, usage_key_string, handler, suffix=''):
         log.info("XBlock %s attempted to access missing handler %r", descriptor, handler, exc_info=True)
         raise Http404
 
-    # unintentional update to handle any side effects of handle call; so, request user didn't author
-    # the change
-    modulestore().update_item(descriptor, None)
+    # unintentional update to handle any side effects of handle call
+    # could potentially be updating actual course data or simply caching its values
+    modulestore().update_item(descriptor, request.user.id)
 
     return webob_to_django_response(resp)

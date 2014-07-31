@@ -324,11 +324,11 @@ def export_handler(request, course_key_string):
         try:
             export_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
 
-            logging.debug('tar file being generated at {0}'.format(export_file.name))
+            logging.debug(u'tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
         except SerializationError as exc:
-            log.exception('There was an error exporting course %s', course_module.id)
+            log.exception(u'There was an error exporting course %s', course_module.id)
             unit = None
             failed_item = None
             parent = None
@@ -369,7 +369,7 @@ def export_handler(request, course_key_string):
 
         wrapper = FileWrapper(export_file)
         response = HttpResponse(wrapper, content_type='application/x-tgz')
-        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name.encode('utf-8'))
         response['Content-Length'] = os.path.getsize(export_file.name)
         return response
 

@@ -15,10 +15,9 @@ from django.core.management.base import CommandError
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
@@ -161,9 +160,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
                             self.TEST_BRANCH)
 
         # Delete to test branching back to master
-        delete_course(def_ms, contentstore(),
-                      self.TEST_BRANCH_COURSE,
-                      True)
+        def_ms.delete_course(self.TEST_BRANCH_COURSE, ModuleStoreEnum.UserID.test)
         self.assertIsNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
         git_import.add_repo(self.TEST_REPO,
                             repo_dir / 'edx4edx_lite',

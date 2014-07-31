@@ -2,6 +2,8 @@
 Instructor Dashboard Views
 """
 
+import logging
+
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -24,14 +26,20 @@ from courseware.courses import get_course_by_id, get_cms_course_link, get_course
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
+from shoppingcart.models import Coupon, PaidCourseRegistration
+from course_modes.models import CourseMode
+from student.roles import CourseFinanceAdminRole
+
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from analyticsclient.client import RestClient
+from analyticsclient.client import RestClient, ClientError
 from analyticsclient.course import Course
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+log = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -45,6 +53,7 @@ def instructor_dashboard_2(request, course_id):
     access = {
         'admin': request.user.is_staff,
         'instructor': has_access(request.user, 'instructor', course),
+        'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'staff': has_access(request.user, 'staff', course),
         'forum_admin': has_forum_access(
             request.user, course_key, FORUM_ROLE_ADMINISTRATOR
@@ -62,6 +71,12 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_key, access),
     ]
 
+    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
+    course_mode_has_price = False
+    if course_honor_mode and course_honor_mode.min_price > 0:
+        course_mode_has_price = True
+
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
 
@@ -72,6 +87,11 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to Metrics tab by featue flag and staff authorization
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
         sections.append(_section_metrics(course_key, access))
+
+     # Gate access to Ecommerce tab
+    if course_mode_has_price:
+        sections.append(_section_e_commerce(course_key, access))
+
 
     studio_url = None
     if is_studio_course:
@@ -105,6 +125,29 @@ The dictionary must include at least {
 section_key will be used as a css attribute, javascript tie-in, and template import filename.
 section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
+
+
+def _section_e_commerce(course_key, access):
+    """ Provide data for the corresponding dashboard section """
+    coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
+    total_amount = None
+    if access['finance_admin']:
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
+
+    section_data = {
+        'section_key': 'e-commerce',
+        'section_display_name': _('E-Commerce'),
+        'access': access,
+        'course_id': course_key.to_deprecated_string(),
+        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'coupons': coupons,
+        'total_amount': total_amount,
+    }
+    return section_data
 
 
 def _section_course_info(course_key, access):
@@ -250,22 +293,7 @@ def _section_analytics(course_key, access):
     }
 
     if settings.FEATURES.get('ENABLE_ANALYTICS_ACTIVE_COUNT'):
-        auth_token = settings.ANALYTICS_DATA_TOKEN
-        base_url = settings.ANALYTICS_DATA_URL
-
-        client = RestClient(base_url=base_url, auth_token=auth_token)
-        course = Course(client, course_key)
-
-        section_data['active_student_count'] = course.recent_active_user_count['count']
-
-        def format_date(value):
-            return value.split('T')[0]
-
-        start = course.recent_active_user_count['interval_start']
-        end = course.recent_active_user_count['interval_end']
-
-        section_data['active_student_count_start'] = format_date(start)
-        section_data['active_student_count_end'] = format_date(end)
+        _update_active_students(course_key, section_data)
 
     return section_data
 
@@ -284,3 +312,30 @@ def _section_metrics(course_key, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+def _update_active_students(course_key, section_data):
+    auth_token = settings.ANALYTICS_DATA_TOKEN
+    base_url = settings.ANALYTICS_DATA_URL
+
+    section_data['active_student_count'] = 'N/A'
+    section_data['active_student_count_start'] = 'N/A'
+    section_data['active_student_count_end'] = 'N/A'
+
+    try:
+        client = RestClient(base_url=base_url, auth_token=auth_token)
+        course = Course(client, course_key.to_deprecated_string())
+
+        section_data['active_student_count'] = course.recent_active_user_count['count']
+
+        def format_date(value):
+            return value.split('T')[0]
+
+        start = course.recent_active_user_count['interval_start']
+        end = course.recent_active_user_count['interval_end']
+
+        section_data['active_student_count_start'] = format_date(start)
+        section_data['active_student_count_end'] = format_date(end)
+
+    except (ClientError, KeyError) as e:
+        log.exception(e)

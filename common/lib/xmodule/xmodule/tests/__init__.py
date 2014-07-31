@@ -19,7 +19,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
-from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
@@ -154,3 +154,156 @@ class LogicTest(unittest.TestCase):
     def ajax_request(self, dispatch, data):
         """Call Xmodule.handle_ajax."""
         return json.loads(self.xmodule.handle_ajax(dispatch, data))
+
+
+class CourseComparisonTest(unittest.TestCase):
+    """
+    Mixin that has methods for comparing courses for equality.
+    """
+
+    def setUp(self):
+        self.field_exclusions = set()
+        self.ignored_asset_keys = set()
+
+    def exclude_field(self, usage_id, field_name):
+        """
+        Mark field ``field_name`` of expected block usage ``usage_id`` as ignored
+
+        Args:
+            usage_id (:class:`opaque_keys.edx.UsageKey` or ``None``). If ``None``, skip, this field in all blocks
+            field_name (string): The name of the field to skip
+        """
+        self.field_exclusions.add((usage_id, field_name))
+
+    def ignore_asset_key(self, key_name):
+        """
+        Add an asset key to the list of keys to be ignored when comparing assets.
+
+        Args:
+            key_name: The name of the key to ignore.
+        """
+        self.ignored_asset_keys.add(key_name)
+
+    def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
+        """
+        Assert that the courses identified by ``expected_course_key`` in ``expected_store`` and
+        ``actual_course_key`` in ``actual_store`` are identical (ignore differences related
+        owing to the course_keys being different).
+
+        Any field value mentioned in ``self.field_exclusions`` by the key (usage_id, field_name)
+        will be ignored for the purpose of equality checking.
+        """
+        expected_items = expected_store.get_items(expected_course_key)
+        actual_items = actual_store.get_items(actual_course_key)
+        self.assertGreater(len(expected_items), 0)
+        self.assertEqual(len(expected_items), len(actual_items))
+
+        actual_item_map = {item.location: item for item in actual_items}
+
+        for expected_item in expected_items:
+            actual_item_location = expected_item.location.map_into_course(actual_course_key)
+            if expected_item.location.category == 'course':
+                actual_item_location = actual_item_location.replace(name=actual_item_location.run)
+            actual_item = actual_item_map.get(actual_item_location)
+
+            # compare published state
+            exp_pub_state = expected_store.compute_publish_state(expected_item)
+            act_pub_state = actual_store.compute_publish_state(actual_item)
+            self.assertEqual(
+                exp_pub_state,
+                act_pub_state,
+                'Published states for usages {} and {} differ: {!r} != {!r}'.format(
+                    expected_item.location,
+                    actual_item.location,
+                    exp_pub_state,
+                    act_pub_state
+                )
+            )
+
+            # compare fields
+            self.assertEqual(expected_item.fields, actual_item.fields)
+
+            for field_name in expected_item.fields:
+                if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
+                    continue
+
+                if (None, field_name) in self.field_exclusions:
+                    continue
+
+                # Children are handled specially
+                if field_name == 'children':
+                    continue
+
+                exp_value = getattr(expected_item, field_name)
+                actual_value = getattr(actual_item, field_name)
+                self.assertEqual(
+                    exp_value,
+                    actual_value,
+                    "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
+                        field_name,
+                        expected_item.scope_ids.usage_id,
+                        actual_item.scope_ids.usage_id,
+                        exp_value,
+                        actual_value,
+                    )
+                )
+
+            # compare children
+            self.assertEqual(expected_item.has_children, actual_item.has_children)
+            if expected_item.has_children:
+                expected_children = []
+                for course1_item_child in expected_item.children:
+                    expected_children.append(
+                        course1_item_child.map_into_course(actual_course_key)
+                    )
+                self.assertEqual(expected_children, actual_item.children)
+
+    def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
+        """
+        Assert that two assets are equal, allowing for differences related to their being from different courses.
+        """
+        for key in self.ignored_asset_keys:
+            if key in expected_asset:
+                del expected_asset[key]
+            if key in actual_asset:
+                del actual_asset[key]
+
+        expected_key = expected_asset.pop('asset_key')
+        actual_key = actual_asset.pop('asset_key')
+        self.assertEqual(expected_key.map_into_course(actual_course_key), actual_key)
+        self.assertEqual(expected_key, actual_key.map_into_course(expected_course_key))
+
+        expected_filename = expected_asset.pop('filename')
+        actual_filename = actual_asset.pop('filename')
+        self.assertEqual(expected_key.to_deprecated_string(), expected_filename)
+        self.assertEqual(actual_key.to_deprecated_string(), actual_filename)
+        self.assertEqual(expected_asset, actual_asset)
+
+    def _assertAssetsEqual(self, expected_course_key, expected_assets, actual_course_key, actual_assets):  # pylint: disable=invalid-name
+        """
+        Private helper method for assertAssetsEqual
+        """
+        self.assertEqual(len(expected_assets), len(actual_assets))
+
+        actual_assets_map = {asset['asset_key']: asset for asset in actual_assets}
+        for expected_item in expected_assets:
+            actual_item = actual_assets_map[expected_item['asset_key'].map_into_course(actual_course_key)]
+            self.assertAssetEqual(expected_course_key, expected_item, actual_course_key, actual_item)
+
+    def assertAssetsEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
+        """
+        Assert that the course assets identified by ``expected_course_key`` in ``expected_store`` and
+        ``actual_course_key`` in ``actual_store`` are identical, allowing for differences related
+        to their being from different course keys.
+        """
+
+        expected_content, expected_count = expected_store.get_all_content_for_course(expected_course_key)
+        actual_content, actual_count = actual_store.get_all_content_for_course(actual_course_key)
+
+        self.assertEqual(expected_count, actual_count)
+        self._assertAssetsEqual(expected_course_key, expected_content, actual_course_key, actual_content)
+
+        expected_thumbs = expected_store.get_all_content_thumbnails_for_course(expected_course_key)
+        actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
+
+        self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)

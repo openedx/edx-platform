@@ -53,8 +53,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 log = logging.getLogger("edx.external_auth")
 AUDIT_LOG = logging.getLogger("audit")
 
-SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
-OPENID_DOMAIN_PREFIX = 'openid:'
+SHIBBOLETH_DOMAIN_PREFIX = settings.SHIBBOLETH_DOMAIN_PREFIX
+OPENID_DOMAIN_PREFIX = settings.OPENID_DOMAIN_PREFIX
 
 # -----------------------------------------------------------------------------
 # OpenID Common

@@ -31,7 +31,7 @@ from xmodule_django.models import CourseKeyField
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException)
 
 from microsite_configuration import microsite
 
@@ -87,15 +87,17 @@ class Order(models.Model):
         return cart_order
 
     @classmethod
-    def user_cart_has_items(cls, user):
+    def user_cart_has_items(cls, user, item_type=None):
         """
         Returns true if the user (anonymous user ok) has
         a cart with items in it.  (Which means it should be displayed.
+        If a item_type is passed in, then we check to see if the cart has at least one of
+        those types of OrderItems
         """
         if not user.is_authenticated():
             return False
         cart = cls.get_cart_for_user(user)
-        return cart.has_items()
+        return cart.has_items(item_type)
 
     @property
     def total_cost(self):
@@ -105,11 +107,19 @@ class Order(models.Model):
         """
         return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))  # pylint: disable=E1101
 
-    def has_items(self):
+    def has_items(self, item_type=None):
         """
         Does the cart have any items in it?
+        If an item_type is passed in then we check to see if there are any items of that class type
         """
-        return self.orderitem_set.exists()  # pylint: disable=E1101
+        if not item_type:
+            return self.orderitem_set.exists()  # pylint: disable=E1101
+        else:
+            items = self.orderitem_set.all().select_subclasses()
+            for item in items:
+                if isinstance(item, item_type):
+                    return True
+            return False
 
     def clear(self):
         """
@@ -217,6 +227,7 @@ class OrderItem(models.Model):
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    list_price = models.DecimalField(decimal_places=2, max_digits=30, null=True)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True, db_index=True)
@@ -304,6 +315,78 @@ class OrderItem(models.Model):
         return ''
 
 
+class CourseRegistrationCode(models.Model):
+    """
+    This table contains registration codes
+    With registration code, a user can register for a course for free
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
+    created_by = models.ForeignKey(User, related_name='created_by_user')
+    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    redeemed_by = models.ForeignKey(User, null=True, related_name='redeemed_by_user')
+    redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
+
+
+class Coupon(models.Model):
+    """
+    This table contains coupon codes
+    A user can get a discount offer on course if provide coupon code
+    """
+    code = models.CharField(max_length=32, db_index=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    course_id = CourseKeyField(max_length=255)
+    percentage_discount = models.IntegerField(default=0)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    is_active = models.BooleanField(default=True)
+
+
+class CouponRedemption(models.Model):
+    """
+    This table contain coupon redemption info
+    """
+    order = models.ForeignKey(Order, db_index=True)
+    user = models.ForeignKey(User, db_index=True)
+    coupon = models.ForeignKey(Coupon, db_index=True)
+
+    @classmethod
+    def get_discount_price(cls, percentage_discount, value):
+        """
+        return discounted price against coupon
+        """
+        discount = Decimal("{0:.2f}".format(Decimal(percentage_discount / 100.00) * value))
+        return value - discount
+
+    @classmethod
+    def add_coupon_redemption(cls, coupon, order):
+        """
+        add coupon info into coupon_redemption model
+        """
+        cart_items = order.orderitem_set.all().select_subclasses()
+
+        for item in cart_items:
+            if getattr(item, 'course_id'):
+                if item.course_id == coupon.course_id:
+                    coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
+                    if not created:
+                        log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
+                                      .format(coupon.code, order.user.username, order.id))
+                        raise CouponAlreadyExistException
+
+                    discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
+                    item.list_price = item.unit_cost
+                    item.unit_cost = discount_price
+                    item.save()
+                    log.info("Discount generated for user {0} against order id '{1}' "
+                             .format(order.user.username, order.id))
+                    return coupon_redemption
+
+        log.warning("Course item does not exist for coupon '{0}'".format(coupon.code))
+        raise ItemDoesNotExistAgainstCouponException
+
+
 class PaidCourseRegistration(OrderItem):
     """
     This is an inventory item for paying for a course registration
@@ -318,6 +401,19 @@ class PaidCourseRegistration(OrderItem):
         """
         return course_id in [item.paidcourseregistration.course_id
                              for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
+
+    @classmethod
+    def get_total_amount_of_purchased_item(cls, course_key):
+        """
+        This will return the total amount of money that a purchased course generated
+        """
+        total_cost = 0
+        result = cls.objects.filter(course_id=course_key, status='purchased').aggregate(total=Sum('unit_cost', field='qty * unit_cost'))  # pylint: disable=E1101
+
+        if result['total'] is not None:
+            total_cost = result['total']
+
+        return total_cost
 
     @classmethod
     @transaction.commit_on_success

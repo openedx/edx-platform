@@ -563,3 +563,4 @@ class TestXmlAttributes(XModuleXmlImportTest):
     def test_inheritable_attributes(self):
         self.check_inheritable_attribute('days_early_for_beta', 2)
         self.check_inheritable_attribute('max_attempts', 5)
+        self.check_inheritable_attribute('visible_to_staff_only', True)

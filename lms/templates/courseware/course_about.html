@@ -17,7 +17,6 @@
 <%! from microsite_configuration import microsite %>
 
 <%inherit file="../main.html" />
-
 <%block name="headextra">
 
   <%
@@ -142,7 +141,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
+<%block name="pagetitle">${get_course_about_section(course, "title")}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -151,7 +150,7 @@
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
+            ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
@@ -197,6 +196,13 @@
           <span class="register disabled">
             ${_("Course is full")}
           </span>
+        % elif invitation_only and not can_enroll:
+          <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
+        ## Shib courses need the enrollment button to be displayed even when can_enroll is False,
+        ## because AnonymousUsers cause can_enroll for shib courses to be False, but we need them to be able to click
+        ## so that they can register and become a real user that can enroll.
+        % elif not is_shib_course and not can_enroll:
+          <span class="register disabled">${_("Enrollment is Closed")}</span>
         %else:
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}
@@ -381,7 +387,10 @@
   </section>
 </section>
 
-%if not regularly_registered:
+## Need to put this hidden form on the page so that the registration button works.
+## Since it's no harm to display a hidden form, we display it with the most permissive conditional
+## which is when the student is not registered.
+%if active_reg_button or is_shib_course:
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">

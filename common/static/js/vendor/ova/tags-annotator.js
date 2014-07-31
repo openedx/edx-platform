@@ -1032,12 +1032,13 @@ Annotator.Plugin.HighlightTags = (function(_super) {
             if (typeof anns.tags != "undefined" && this.colors !== {}) {
                 
                 for(var index = 0; index < anns.tags.length; ++index){
-                    
-                    if (typeof this.colors[anns.tags[index]] != "undefined") {
-                        var finalcolor = this.colors[anns.tags[index]];
-                        $(annotations[annNum]).css("background","rgba("+finalcolor.red+","+finalcolor.green+","+finalcolor.blue+",0.3");
-                    }else{
-                        $(annotations[annNum]).css("background","");
+                    if(anns.tags[index].indexOf("flagged-") == -1){
+                        if (typeof this.colors[anns.tags[index]] != "undefined") {
+                            var finalcolor = this.colors[anns.tags[index]];
+                            $(annotations[annNum]).css("background","rgba("+finalcolor.red+","+finalcolor.green+","+finalcolor.blue+",0.3");
+                        }else{
+                            $(annotations[annNum]).css("background","");
+                        }
                     }
                 }
                 

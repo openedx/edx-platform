@@ -137,32 +137,29 @@ could advertise the start date as **Spring, 2014**.
 To set an advertised start date:
 
 #. From the **Settings** menu, select **Advanced Settings**.
-#. Find the policy key **advertised_start**. The default value is **null**.
-#. Enter the date you want as an advertised start date.  You can use any string,
-   enclosed in double quotation marks. If you format the string as a date (for
-   example, as 02/01/2014), the value is parsed and presented to students as a
-   date.
+#. Find the **Course Advertised Start Date** policy key. The default value is
+   **null**.
+#. Enter the value you want to display as the advertised start date. You can
+   use any string, enclosed in double quotation marks. If you format the string
+   as a date (for example, as 02/01/2014), the value is parsed and presented to
+   students as a date.
 
   .. image:: ../Images/advertised_start.png
-   :alt: Image of the advertised start date policy key
+   :alt: Image of the advertised start date policy key with a value of "anytime, self-paced"
 
 4. Click **Save Changes** at the bottom of the page.
 
-The start date shown on the student's dashboard is now the value of the
-advertised_start policy key:
+  The start date shown on the dashboard is now the value of the **Course
+  Advertised Start Date** policy key:
 
-.. image:: ../Images/dashboard-course_adver_start.png
- :alt: An image of a course listing in the student dashboard, with the
+  .. image:: ../Images/dashboard-course_adver_start.png
+   :alt: An image of a course listing in the student dashboard, with the
      advertised start date circled.
 
 If you do not change the default course start date (01/01/2030), and the
-**advertised_start** policy value is ``null``, then the student dashboard does
-not list a start date for the course.  Students just see that the course has not
-yet started:
-
-.. image:: ../Images/dashboard-course_not_started.png
- :alt: Image of a course listing in the student dashboard, with no start date
-
+**Course Advertised Start Date** policy value is ``null``, then the student
+dashboard does not list a start date for the course. Students just see that
+the course has not yet started.
 
 .. _The Course End Date:
 
@@ -170,27 +167,42 @@ yet started:
 The Course End Date
 ***********************************
 
-When your course is completed, students see the course end date on their
-dashboards.
+The course end date is the date after which students can no longer earn credit
+toward certificates. Students who have earned certificates can view them after
+the course end date.
 
-.. note:: For courses on edX.org_, you must communicate the course end date to
+.. important::
+ If you do not set a course end date, students will not be able to access
+ earned certificates.
+
+.. note:: 
+ For courses on edX.org_, you must communicate the course end date to
  your edX Program Manager, to ensure the date is accurate on the course
  summary page.
 
-If grades and certificates are not yet issued, or if students enroll in an
-archived course after it has ended, the course appears in the dashboard as in
-the following example:
+After grades and certificates are finalized, students see the course end date
+on their personal dashboards, as shown in the following examples.
 
-.. image:: ../Images/dashboard-wrapping-course.png
- :alt: Image of a course on the student dashboard that has ended, but not been
-     graded
+* If grades and certificates are not yet finalized, students can see the course
+  end date and a message:
 
-If grades are complete and certificates are issued, students see the course, the
-end date, and the message as in the following example:
+  .. image:: ../Images/dashboard-wrapping-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
 
-.. image:: ../Images/dashboard-completed-course.png
- :alt: Image of a course on the student dashboard that has ended, but not been
-     graded
+* When grades and certificates are finalized, students who have not earned a
+  certificate see their score and the score required to earn a certificate:
+  
+  .. image:: ../Images/dashboard-no-cert-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
+
+* Students whose final score is equal to or higher than the required score can
+  click **Download Certificate** to get their certificates as PDFs:
+
+  .. image:: ../Images/dashboard-completed-course.png
+   :alt: Image of a course on the student dashboard that has ended, but not
+     been graded
 
 
 .. _Describe Your Course:

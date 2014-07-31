@@ -8,10 +8,11 @@
   padding-left: 20px;
   padding-top: 20px;
   padding-bottom: 20px;
+  
   .notification {
     @include news-font;
     margin-top: 15px;
-    margin-botton: 15px;
+    margin-bottom: 15px;
 
     a {
       @include news-font;

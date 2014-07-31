@@ -28,6 +28,8 @@
 
 .. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
+.. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
+
 .. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
 
 .. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#view-your-live-course
@@ -77,6 +79,8 @@
 .. _Beta Testing a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/beta_testing.html#beta-testing
 
 .. _Student Data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#student-data
+
+.. _Track Student Activity: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#track-student-activity
 
 .. _Add the Beta Testers: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/beta_testing.html#add-testers
 
@@ -138,6 +142,8 @@
 
 .. _Discussions: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/discussions.html  
 
+.. _Participating in Course Discussions: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/discussions_students.html
+
 .. _Guidance for Discussion Moderators: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/discussion_guidance_moderators.html
 
 .. _External Graders: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html
@@ -175,6 +181,10 @@
 
 .. _Review Grades for Enrolled Students (Small Courses): http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#gradebook
 
+.. _Video Table of Contents: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#video-toc
+
+.. _Download or view student data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#view-and-download-student-data
+
 .. DATA DOCUMENTATION
 
 .. _Student Info and Progress Data: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/sql_schema.html#student-info
@@ -204,3 +214,5 @@
 .. _Analytics: http://edx.readthedocs.org/projects/userdocs/en/latest/analytics.html
 
 .. _Opaque Keys: https://github.com/edx/edx-platform/wiki/Opaque-Keys
+
+.. _Ubuntu installation instructions: https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-64-bit-Installation
