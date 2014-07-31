@@ -467,15 +467,16 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     returnXmlString = xmlString
     operator = ''
     answerExpression = ''
-    answerString = ''
+    primaryAnswerString = ''
     plusMinus = ''
     tolerance = ''
     responseParameterElementString = ''
     hintElementString = ''
     numericHintElementString = ''
 
+    debugger
     for line in xmlString.split('\n')
-      numericMatch = line.match( /^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]+)\s*([\d\.]+)/ )
+      numericMatch = line.match(/^\s*([=!]+)\s*([\d\.*/+-]+)\s+([+-]*)\s*([\d\.]*)/)
       if numericMatch
         if numericMatch[1]
           operator = numericMatch[1]
@@ -495,8 +496,8 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               hintText = MarkdownEditingDescriptor.questionHintStrings[ hintIndex ]
               hintText = hintText.trim()
 
-            if answerString == ''           # if this is the *first* answer supplied
-              answerString = answerExpression
+            if primaryAnswerString == ''           # if this is the *first* answer supplied
+              primaryAnswerString = answerExpression
               hintElementString = '<correcthint>' + hintText + '\n        </correcthint>\n'
               if plusMinus and tolerance    # author has supplied a tolerance specification on the *first* answer
                 responseParameterElementString = '<responseparam type="tolerance" default="' + tolerance + '"/>\n'
@@ -510,15 +511,10 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               else
                 hintElementString += '\n        <numerichint  answer="' +
                   answerExpression + '">' + hintText + '\n        </numerichint>\n'
+        else
+          # handle the other operator cases here
 
-
-
-
-
-
-
-
-    returnXmlString  =  '    <numericalresponse answer="' + answerString  + '">\n'
+    returnXmlString  =  '    <numericalresponse answer="' + primaryAnswerString  + '">\n'
     returnXmlString += '        ' + responseParameterElementString
     returnXmlString += '        <formulaequationinput/>\n'
     returnXmlString += '        ' + hintElementString
