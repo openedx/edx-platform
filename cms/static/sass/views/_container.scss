@@ -240,6 +240,29 @@
 
       .wrapper-unit-tree-location {
         // tree location-specific styles should go here
+
+        .outline-section{
+          box-shadow: none;
+          border: 0;
+          padding: 0;
+        }
+
+        .outline-subsection {
+          border-left: 1px solid $gray-l4;
+          padding: ($baseline/2);
+
+          .subsection-header {
+            margin-bottom: ($baseline/2);
+          }
+        }
+
+        .item-title a {
+            color: $color-heading-base;
+
+          &:hover {
+            color: $blue;
+          }
+        }
       }
     }
   }
