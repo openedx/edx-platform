@@ -646,7 +646,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     @contextmanager
     def bulk_write_operations(self, course_id):
         """
-        A context manager for notifying the store of bulk write events.
+        A context manager for notifying the store of bulk write events. This affects only the current thread.
 
         In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
         until the bulk operation is completed.
