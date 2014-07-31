@@ -72,9 +72,6 @@ urlpatterns += patterns(
         r'^course_info_update/{}/(?P<provided_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
         'course_info_update_handler'
     ),
-    #url(r'^utilities/(?P<course_key_string>[^/]+)$', 'utility_handler'),
-    #url(r'^utility/captions/(?P<course_key_string>[^/]+)$', 'utility_captions_handler'),
-    #url(r'^utility/bulksettings/(?P<course_key_string>[^/]+)$', 'utility_bulksettings_handler'),
     url(r'^utilities/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_handler'),
     url(r'^utility/captions/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_captions_handler'),
     url(r'^utility/bulksettings/{}$'.format(settings.COURSE_KEY_PATTERN), 'utility_bulksettings_handler'),
