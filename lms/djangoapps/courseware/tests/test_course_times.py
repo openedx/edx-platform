@@ -1,5 +1,5 @@
 """
-Tests displaying of course start time
+Tests displaying of course start time for LMS
 """
 import unittest
 from datetime import datetime, timedelta
@@ -10,7 +10,8 @@ from xmodule.tests.test_course_module import get_dummy_course
 
 NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
 
-class CourseTimeTests(unittest.TestCase):
+
+class LMSCourseTimeTests(unittest.TestCase):
     """ Ensure course start and end times are returned correctly """
     def setUp(self):
         datetime_patcher = patch.object(
