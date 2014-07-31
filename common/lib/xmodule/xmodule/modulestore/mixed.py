@@ -491,18 +491,12 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 modulestore._drop_database()  # pylint: disable=protected-access
 
     @strip_key
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
+    def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module.
-
-        :param location: a Location--must have a category
-        :param definition_data: can be empty. The initial definition_data for the kvs
-        :param metadata: can be empty, the initial metadata for the kvs
-        :param runtime: if you already have an xblock from the course, the xblock.runtime value
-        :param fields: a dictionary of field names and values for the new xmodule
         """
-        store = self._verify_modulestore_support(location.course_key, 'create_xmodule')
-        return store.create_xmodule(location, definition_data, metadata, runtime, fields, **kwargs)
+        store = self._verify_modulestore_support(course_key, 'create_xblock')
+        return store.create_xblock(runtime, course_key, block_type, block_id, fields or {}, **kwargs)
 
     @strip_key
     def get_courses_for_wiki(self, wiki_slug, **kwargs):

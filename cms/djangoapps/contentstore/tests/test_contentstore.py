@@ -1412,17 +1412,14 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = course.id.make_usage_key('html', 'new_component')
-
         # crate a new module and add it as a child to a vertical
-        new_object = self.store.create_xmodule(new_component_location)
-        self.store.update_item(new_object, self.user.id, allow_not_found=True)
         parent = verticals[0]
-        parent.children.append(new_component_location)
-        self.store.update_item(parent, self.user.id)
+        new_module = self.store.create_child(
+            self.user.id, parent.location, 'html', 'new_component'
+        )
 
         # flush the cache
-        new_module = self.store.get_item(new_component_location)
+        new_module = self.store.get_item(new_module.location)
 
         # check for grace period definition which should be defined at the course level
         self.assertEqual(parent.graceperiod, new_module.graceperiod)
@@ -1438,7 +1435,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.store.update_item(new_module, self.user.id)
 
         # flush the cache and refetch
-        new_module = self.store.get_item(new_component_location)
+        new_module = self.store.get_item(new_module.location)
 
         self.assertEqual(timedelta(1), new_module.graceperiod)
 
