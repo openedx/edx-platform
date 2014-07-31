@@ -39,7 +39,7 @@ class VidoComponentPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='div{0}'.format(CLASS_SELECTORS['video_xmodule'])).present
 
-    def _wait_for(self, check_func, desc, result=False, timeout=200):
+    def _wait_for(self, check_func, desc, result=False, timeout=200, try_interval=0.5):
         """
         Calls the method provided as an argument until the Promise satisfied or BrokenPromise
 
@@ -51,17 +51,17 @@ class VidoComponentPage(PageObject):
 
         """
         if result:
-            return Promise(check_func, desc, timeout=timeout).fulfill()
+            return Promise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
         else:
-            return EmptyPromise(check_func, desc, timeout=timeout).fulfill()
+            return EmptyPromise(check_func, desc, timeout=timeout, try_interval=try_interval).fulfill()
 
     def wait_for_video_component_render(self):
         """
         Wait until video component rendered completely
         """
-        self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_init']).present, 'Video Player Initialized')
-        self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible, 'Video Buffering Completed')
-        self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible')
+        self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_init']).present, 'Video Player Initialized', try_interval=10)
+        self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible, 'Video Buffering Completed', try_interval=10)
+        self._wait_for(lambda: self.q(css=CLASS_SELECTORS['video_controls']).visible, 'Player Controls are Visible', try_interval=10)
 
     def click_button(self, button_name):
         """
