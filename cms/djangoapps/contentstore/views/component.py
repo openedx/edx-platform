@@ -66,6 +66,7 @@ else:
         'concept',  # Concept mapper. See https://github.com/pmitros/ConceptXBlock
         'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
         'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
+        'edx_sga', # that weird grading xblock thing - remove this next merge
         SPLIT_TEST_COMPONENT_TYPE,  # Adds A/B test support
         'recommender', # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course. 
         'ooyala-player',
