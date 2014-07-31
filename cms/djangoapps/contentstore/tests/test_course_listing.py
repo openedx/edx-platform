@@ -329,7 +329,9 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # simulate initiation of course actions
         for course in courses_in_progress:
-            CourseRerunState.objects.initiated(sourse_course_key, destination_course_key=course.id, user=self.user)
+            CourseRerunState.objects.initiated(
+                sourse_course_key, destination_course_key=course.id, user=self.user, display_name="test course"
+            )
 
         # verify return values
         for method in (_accessible_courses_list_from_groups, _accessible_courses_list):

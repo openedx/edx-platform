@@ -98,28 +98,10 @@ form {
   }
 }
 
-// ELEM: form wrapper
-.wrapper-create-element {
-  height: 0;
-  margin-bottom: $baseline;
-  opacity: 0.0;
-  pointer-events: none;
-  overflow: hidden;
-
-  &.animate {
-    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
-  }
-
-  &.is-shown {
-    height: auto; // define a specific height for the animating version of this UI to work properly
-    opacity: 1.0;
-    pointer-events: auto;
-  }
-}
-
 // ELEM: form
 // form styling for creating a new content item (course, user, textbook)
-form[class^="create-"] {
+// TODO: refactor this into a placeholder to extend.
+.form-create {
   @extend %ui-window;
 
   .title {
@@ -214,10 +196,17 @@ form[class^="create-"] {
 
       .tip {
         @extend %t-copy-sub2;
-        @include transition(color, 0.15s, ease-in-out);
+        @include transition(color 0.15s ease-in-out);
+
+
         display: block;
         margin-top: ($baseline/4);
         color: $gray-l3;
+      }
+
+      .tip-note {
+        display: block;
+        margin-top: ($baseline/4);
       }
 
       .tip-error {
@@ -326,7 +315,6 @@ form[class^="create-"] {
   }
 }
 
-
 // form - inline xblock name edit on unit, container, outline
 
 // TOOD: abstract this out into a Sass placeholder
@@ -360,6 +348,25 @@ form[class^="create-"] {
     .incontext-editor-form {
       display: inline-block;
     }
+  }
+}
+
+// ELEM: form wrapper
+.wrapper-create-element {
+  height: 0;
+  margin-bottom: $baseline;
+  opacity: 0.0;
+  pointer-events: none;
+  overflow: hidden;
+
+  &.animate {
+    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
+  }
+
+  &.is-shown {
+    height: auto; // define a specific height for the animating version of this UI to work properly
+    opacity: 1.0;
+    pointer-events: auto;
   }
 }
 
