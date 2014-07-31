@@ -37,9 +37,9 @@ from contentstore.utils import reverse_usage_url
 </%block>
 
 <%block name="page_alert">
-  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown has-actions">
-    <div class="alert announcement">
-      <i class="icon-bullhorn"></i>
+  <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
+    <div class="alert announcement has-actions">
+      <i class="alert-symbol icon-bullhorn"></i>
 
       <div class="copy">
         <h2 class="title title-3">This course was created as a re-run. Some manual configuration is needed.</h2>
@@ -48,10 +48,10 @@ from contentstore.utils import reverse_usage_url
       </div>
 
       <ul class="nav-actions">
-        <li class="action action-alert-close">
-          <a href="#" rel="external" class="button dismiss-button">
-            <i class="icon-remove-sign"></i>
-            <span class="sr">${_("Dimiss this message")}</span>
+        <li class="action action-dismiss">
+          <a href="#" class="button dismiss-button">
+            <i class="icon icon-remove-sign"></i>
+            <span class="button-copy">${_("Dimiss")}</span>
           </a>
         </li>
       </ul>

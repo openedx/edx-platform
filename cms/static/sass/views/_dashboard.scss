@@ -301,7 +301,6 @@
       border-bottom: 1px solid $gray-l3;
       padding-bottom: ($baseline/2);
       color: $gray-l2;
-      font-weight: 600;
     }
 	}
 
@@ -379,6 +378,15 @@
             .icon,.button-copy {
               display: inline-block;
               vertical-align: middle;
+            }
+
+            .icon {
+              @extend %t-icon4;
+              margin-right: ($baseline/4);
+            }
+
+            .button-copy {
+              @extend %t-copy-sub1;
             }
           }
         }
@@ -494,6 +502,10 @@
       }
 
       // course re-run button
+      .action-rerun {
+        margin-right: $baseline;
+      }
+
       .rerun-button {
         font-weight: 600;
         // TODO: sync up button styling and add secondary style here
@@ -550,6 +562,16 @@
     .course-item {
       border: none;
     }
+
+    // course details (replacement for course-link when a course cannot be linked)
+    .course-details {
+      @extend %ui-depth2;
+      display: inline-block;
+      vertical-align: middle;
+      width: flex-grid(6, 9);
+      margin-right: flex-gutter();
+    }
+
   }
 
   // ====================

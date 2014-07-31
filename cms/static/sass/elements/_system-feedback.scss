@@ -527,7 +527,7 @@
   &.wrapper-alert-warning {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange;
 
-    [class^="icon"] {
+    .alert-symbol {
       color: $orange;
     }
   }
@@ -535,7 +535,7 @@
   &.wrapper-alert-error {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1;
 
-    [class^="icon"] {
+    .alert-symbol {
       color: $red-l1;
     }
   }
@@ -543,7 +543,7 @@
   &.wrapper-alert-confirmation {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green;
 
-    [class^="icon"] {
+    .alert-symbol {
       color: $green;
     }
   }
@@ -551,7 +551,7 @@
   &.wrapper-alert-announcement {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
 
-    [class^="icon"] {
+    .alert-symbol {
       color: $blue;
     }
   }
@@ -559,7 +559,7 @@
   &.wrapper-alert-step-required {
     box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink;
 
-    [class^="icon"] {
+    .alert-symbol {
       color: $pink;
     }
   }
@@ -579,11 +579,11 @@
     font-weight: 700;
   }
 
-  [class^="icon"], .copy {
+  .alert-symbol, .copy {
     float: left;
   }
 
-  [class^="icon"] {
+  .alert-symbol {
     @include transition (color 0.50s ease-in-out 0s);
     @include font-size(22);
     width: flex-grid(1, 12);
@@ -605,7 +605,7 @@
   // with actions
   &.has-actions {
 
-    [class^="icon"] {
+    .alert-symbol {
       width: flex-grid(1, 12);
     }
 
@@ -665,6 +665,28 @@
 
     &:hover {
       background: $gray-d1;
+    }
+  }
+
+  // with dismiss (to sunset action-alert-clos)
+  .action-dismiss {
+
+    .button {
+      @extend %btn-secondary-white;
+    }
+
+    .icon,.button-copy {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .icon {
+      @extend %t-icon4;
+      margin-right: ($baseline/4);
+    }
+
+    .button-copy {
+      @extend %t-copy-sub1;
     }
   }
 }
