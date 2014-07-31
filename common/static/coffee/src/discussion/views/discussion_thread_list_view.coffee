@@ -427,6 +427,7 @@ if Backbone?
 
     searchFor: (text) ->
       @clearSearchAlerts()
+      @clearFilters()
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
@@ -492,6 +493,10 @@ if Backbone?
     clearSearch: ->
       @$(".forum-nav-search-input").val("")
       @current_search = ""
+
+    clearFilters: ->
+     @$(".forum-nav-filter-main-control").val("all")
+     @$(".forum-nav-filter-cohort-control").val("all")
 
     retrieveFollowed: () =>
       @mode = 'followed'

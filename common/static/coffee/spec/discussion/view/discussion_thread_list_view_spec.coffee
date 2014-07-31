@@ -206,21 +206,30 @@ describe "DiscussionThreadListView", ->
           collection: discussion
       )
 
+    expectFilter = (filterVal) ->
+        $.ajax.andCallFake((params) ->
+            _.each(["unread", "unanswered", "flagged"], (paramName)->
+                if paramName == filterVal
+                    expect(params.data[paramName]).toEqual(true)
+                else
+                    expect(params.data[paramName]).toBeUndefined()
+            )
+            {always: ->}
+        )
+
     describe "should filter correctly", ->
         _.each(["all", "unread", "unanswered", "flagged"], (filterVal) ->
             it "for #{filterVal}", ->
-                $.ajax.andCallFake((params) ->
-                    _.each(["unread", "flagged"], (paramName)->
-                        if paramName == filterVal
-                            expect(params.data[paramName]).toEqual(true)
-                        else
-                            expect(params.data[paramName]).toBeUndefined()
-                    )
-                    {always: ->}
-                )
+                expectFilter(filterVal)
                 @view.$(".forum-nav-filter-main-control").val(filterVal).change()
                 expect($.ajax).toHaveBeenCalled()
         )
+
+    it "search should clear filter", ->
+        expectFilter(null)
+        @view.$(".forum-nav-filter-main-control").val("flagged")
+        @view.searchFor("foobar")
+        expect(@view.$(".forum-nav-filter-main-control").val()).toEqual("all")
 
     checkThreadsOrdering =  (view, sort_order, type) ->
       expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)
