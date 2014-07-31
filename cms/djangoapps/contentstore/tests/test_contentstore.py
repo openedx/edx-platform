@@ -1595,8 +1595,11 @@ class RerunCourseTest(ContentStoreTestCase):
             json_resp = parse_json(response)
             self.assertNotIn('ErrMsg', json_resp)
             destination_course_key = CourseKey.from_string(json_resp['destination_course_key'])
-
         return destination_course_key
+
+    def create_course_listing_html(self, course_key):
+        """Creates html fragment that is created for the given course_key in the course listing section"""
+        return '<a class="course-link" href="/course/{}"'.format(course_key)
 
     def create_unsucceeded_course_action_html(self, course_key):
         """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
@@ -1631,6 +1634,7 @@ class RerunCourseTest(ContentStoreTestCase):
         rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
         expected_states = {
             'state': CourseRerunUIStateManager.State.SUCCEEDED,
+            'display_name': self.destination_course_data['display_name'],
             'source_course_key': source_course.id,
             'course_key': destination_course_key,
             'should_display': True,

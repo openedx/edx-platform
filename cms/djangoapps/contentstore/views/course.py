@@ -585,7 +585,7 @@ def _rerun_course(request, org, number, run, fields):
     add_instructor(destination_course_key, request.user, request.user)
 
     # Mark the action as initiated
-    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user)
+    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Rerun the course as a new celery task
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, fields)

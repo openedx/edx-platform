@@ -5,6 +5,7 @@ This file contains celery tasks for contentstore views
 from celery.task import task
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
+
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
 from contentstore.utils import initialize_permissions
@@ -32,13 +33,11 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
 
         # update state: Succeeded
         CourseRerunState.objects.succeeded(course_key=destination_course_key)
-
         return "succeeded"
 
     except DuplicateCourseError as exc:
         # do NOT delete the original course, only update the status
         CourseRerunState.objects.failed(course_key=destination_course_key, exception=exc)
-
         return "duplicate course"
 
     # catch all exceptions so we can update the state and properly cleanup the course.
