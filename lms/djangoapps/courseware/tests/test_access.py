@@ -102,6 +102,7 @@ class AccessTestCase(TestCase):
         """
         mock_unit = Mock()
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
+        mock_unit.category = "problem"
 
         def verify_access(student_should_have_access):
             """ Verify the expected result from _has_access_descriptor """
