@@ -1,4 +1,4 @@
-# Custom requirements to be customized by individual OpenEdX instances
+# Custom requirements to be customized by individual OpenEdX instances 
 
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@085f008fae86d0cd2a342fdd912836931cff008e#egg=xblock-mentoring
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@b4bd1577e9f02d5a9364b39689dae06b9b44114a#egg=xblock-image-explorer
