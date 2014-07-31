@@ -23,7 +23,7 @@ from xmodule.modulestore import ModuleStoreEnum
 log = logging.getLogger(__name__)
 
 
-IMPORT_SCOPES = (Scope.content, Scope.settings)
+IMPORT_SCOPES = (Scope.content, Scope.settings, Scope.children)
 
 
 def import_static_content(
@@ -165,28 +165,30 @@ def import_from_xml(
     course_items = []
 
     for course_key in xml_module_store.modules.keys():
-        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
 
-            if target_course_id is not None:
-                dest_course_id = target_course_id
-            else:
-                dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
+        # create the course
+        if target_course_id is not None:
+            dest_course_id = target_course_id
+        else:
+            dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
 
-            # Creates a new course if it doesn't already exist
-            if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
-                try:
-                    course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
-                    dest_course_id = course.id
-                except InvalidLocationError:
-                    # course w/ same org and course exists
-                    log.debug(
-                        "Skipping import of course with id, {0},"
-                        "since it collides with an existing one".format(dest_course_id)
-                    )
-                    continue
+        # Creates a new course if it doesn't already exist
+        if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
+            try:
+                course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+                dest_course_id = course.id
+            except InvalidLocationError:
+                # course w/ same org and course exists
+                log.debug(
+                    "Skipping import of course with id, {0},"
+                    "since it collides with an existing one".format(dest_course_id)
+                )
+                continue
 
-            # Once bulk_write_operations works in all modulestores, this can be removed.
-            dest_course_id = dest_course_id.version_agnostic()
+        # Once bulk_write_operations works in all modulestores, this can be removed.
+        dest_course_id = dest_course_id.version_agnostic()
+
+        with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
 
             with store.bulk_write_operations(dest_course_id):
                 course_data_path = None
@@ -215,11 +217,15 @@ def import_from_xml(
 
                 log.debug('course data_dir={0}'.format(course_from_xml.data_dir))
 
-                dest_course = store.get_course(dest_course_id)
-                if dest_course is None:
+                check_dest_course = store.get_course(dest_course_id)
+                if check_dest_course is None:
                     raise ItemNotFoundError(dest_course_id)
+                runtime = check_dest_course.runtime
 
-                _copy_fields(course_key, dest_course_id, course_from_xml, dest_course, do_import_static=do_import_static)
+                fields = _convert_fields(course_key, dest_course_id, course_from_xml, do_import_static=do_import_static)
+                dest_course = store.create_xblock(
+                    runtime, dest_course_id, 'course', dest_course_id.run, fields=fields
+                )
 
                 for entry in dest_course.pdf_textbooks:
                     for chapter in entry.get('chapters', []):
@@ -246,8 +252,6 @@ def import_from_xml(
                 store.update_item(dest_course, user_id)
 
                 course_items.append(dest_course)
-
-                # TODO: shouldn't this raise an exception if course wasn't found?
 
                 # then import all the static content
                 if static_content_store is not None and do_import_static:
@@ -317,9 +321,9 @@ def import_from_xml(
     return xml_module_store, course_items
 
 
-def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, do_import_static=True):
+def _convert_fields(source_course_key, dest_course_key, source_block, do_import_static=True):
     """
-    Copy fields from source_block to dest_block, mapping any ReferenceFields from
+    Convert and return explicitly set fields from source_block mapping any ReferenceFields from
     source_course_key to dest_course_key
     """
     def _convert_reference_fields_to_new_namespace(reference):
@@ -335,26 +339,24 @@ def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, d
         else:
             return reference
 
+    result = {}
     for field_name, field in source_block.fields.iteritems():
         if field.scope not in IMPORT_SCOPES:
             continue
 
         if field.is_set_on(source_block):
             if isinstance(field, Reference):
-                new_ref = _convert_reference_fields_to_new_namespace(field.read_from(source_block))
-                field.write_to(dest_block, new_ref)
+                result[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(source_block))
             elif isinstance(field, ReferenceList):
                 references = field.read_from(source_block)
-                new_references = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
-                field.write_to(dest_block, new_references)
+                result[field_name] = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
             elif isinstance(field, ReferenceValueDict):
                 reference_dict = field.read_from(source_block)
-                new_reference_dict = {
+                result[field_name] = {
                     key: _convert_reference_fields_to_new_namespace(reference)
                     for key, reference
                     in reference_dict.items()
                 }
-                field.write_to(dest_block, new_reference_dict)
             elif field_name == 'xml_attributes':
                 value = field.read_from(source_block)
                 # remove any export/import only xml_attributes
@@ -364,43 +366,36 @@ def _copy_fields(source_course_key, dest_course_key, source_block, dest_block, d
 
                 if 'index_in_children_list' in value:
                     del value['index_in_children_list']
-                field.write_to(dest_block, value)
+                result[field_name] = value
             elif do_import_static and field_name == 'data' and isinstance(field, xblock.fields.String):
                 # we want to convert all 'non-portable' links in the module_data
                 # (if it is a string) to portable strings (e.g. /static/)
-                field.write_to(dest_block, rewrite_nonportable_content_links(
+                result[field_name] = rewrite_nonportable_content_links(
                     source_course_key,
                     dest_course_key,
                     field.read_from(source_block)
-                ))
+                )
             else:
-                field.write_to(dest_block, field.read_from(source_block))
-        else:
-            field.delete_from(dest_block)
-
+                result[field_name] = field.read_from(source_block)
+    return result
 
 def _import_module_and_update_references(
-        module, store, user_id,
+        source_module, store, user_id,
         source_course_id, dest_course_id,
         revision,
         do_import_static=True, runtime=None):
 
-    logging.debug(u'processing import of module {}...'.format(module.location.to_deprecated_string()))
+    logging.debug(u'processing import of module {}...'.format(source_module.location.to_deprecated_string()))
 
-    # Move the module to a new course
-    block_type = module.scope_ids.block_type
-    block_id = module.scope_ids.usage_id.block_id
-    try:
-        new_module = store.get_item(dest_course_id.make_usage_key(block_type, block_id))
-    except ItemNotFoundError:
-        new_module = store.create_item(
-            user_id,
-            dest_course_id,
-            block_type,
-            block_id,
-            runtime=runtime
-        )
-    _copy_fields(source_course_id, dest_course_id, module, new_module, do_import_static=do_import_static)
+    # Move the source_module to a new course
+    block_type = source_module.scope_ids.block_type
+    block_id = source_module.scope_ids.usage_id.block_id
+
+    fields = _convert_fields(source_course_id, dest_course_id, source_module, do_import_static=do_import_static)
+    # use create and update to keep to fully overwrite any existing persisted version
+    new_module = store.create_xblock(
+        runtime, dest_course_id, block_type, block_id, fields=fields
+    )
     return store.update_item(new_module, user_id, allow_not_found=True)
 
 
@@ -504,7 +499,7 @@ def _import_course_draft(
                         # attributes (they are normally in the parent object,
                         # aka sequential), so we have to replace the location.name
                         # with the XML filename that is part of the pack
-                        fn, fileExtension = os.path.splitext(filename)
+                        fn, __ = os.path.splitext(filename)
                         descriptor.location = descriptor.location.replace(name=fn)
 
                         index = int(descriptor.xml_attributes['index_in_children_list'])
@@ -517,53 +512,55 @@ def _import_course_draft(
                     logging.exception('Error while parsing course xml.')
 
         # For each index_in_children_list key, there is a list of vertical descriptors.
-        for key in sorted(drafts.iterkeys()):
-            for descriptor in drafts[key]:
-                course_key = descriptor.location.course_key
-                try:
-                    def _import_module(module):
-                        # IMPORTANT: Be sure to update the module location in the NEW namespace
-                        module_location = module.location.map_into_course(target_course_id)
-                        # Update the module's location to DRAFT revision
-                        # We need to call this method (instead of updating the location directly)
-                        # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
-
-                        # make sure our parent has us in its list of children
-                        # this is to make sure private only verticals show up
-                        # in the list of children since they would have been
-                        # filtered out from the non-draft store export.
-                        # Note though that verticals nested below the unit level will not have
-                        # a parent_sequential_url and do not need special handling.
-                        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
-                            non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
-                            sequential_url = module.xml_attributes['parent_sequential_url']
-                            index = int(module.xml_attributes['index_in_children_list'])
-
-                            seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
-
-                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
-                            seq_location = seq_location.map_into_course(target_course_id)
-                            sequential = store.get_item(seq_location, depth=0)
-
-                            if non_draft_location not in sequential.children:
-                                sequential.children.insert(index, non_draft_location)
-                                store.update_item(sequential, user_id)
-
-                        _import_module_and_update_references(
-                            module, store, user_id,
-                            source_course_id,
-                            target_course_id,
-                            revision=ModuleStoreEnum.RevisionOption.draft_only,
-                            runtime=mongo_runtime,
-                        )
-                        for child in module.get_children():
-                            _import_module(child)
-
-                    _import_module(descriptor)
-
-                except Exception:
-                    logging.exception('There while importing draft descriptor %s', descriptor)
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, target_course_id):
+            for key in sorted(drafts.iterkeys()):
+                for descriptor in drafts[key]:
+                    course_key = descriptor.location.course_key
+                    try:
+                        def _import_module(module):
+                            # IMPORTANT: Be sure to update the module location in the NEW namespace
+#                             module_location = module.location.map_into_course(target_course_id)
+                            # Update the module's location to DRAFT revision
+                            # We need to call this method (instead of updating the location directly)
+                            # to ensure that pure XBlock field data is updated correctly.
+                            # TODO remove this section?
+    #                         _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
+    
+                            # make sure our parent has us in its list of children
+                            # this is to make sure private only verticals show up
+                            # in the list of children since they would have been
+                            # filtered out from the non-draft store export.
+                            # Note though that verticals nested below the unit level will not have
+                            # a parent_sequential_url and do not need special handling.
+                            if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
+                                non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
+                                sequential_url = module.xml_attributes['parent_sequential_url']
+                                index = int(module.xml_attributes['index_in_children_list'])
+    
+                                seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
+    
+                                # IMPORTANT: Be sure to update the sequential in the NEW namespace
+                                seq_location = seq_location.map_into_course(target_course_id)
+                                sequential = store.get_item(seq_location, depth=0)
+    
+                                if non_draft_location not in sequential.children:
+                                    sequential.children.insert(index, non_draft_location)
+                                    store.update_item(sequential, user_id)
+    
+                            _import_module_and_update_references(
+                                module, store, user_id,
+                                source_course_id,
+                                target_course_id,
+                                revision=ModuleStoreEnum.RevisionOption.draft_only,
+                                runtime=mongo_runtime,
+                            )
+                            for child in module.get_children():
+                                _import_module(child)
+    
+                        _import_module(descriptor)
+    
+                    except Exception:
+                        logging.exception('There while importing draft descriptor %s', descriptor)
 
 
 def allowed_metadata_by_category(category):

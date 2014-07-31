@@ -931,14 +931,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     course['_id'] for course in courses
                 ]))
 
-        location = course_id.make_usage_key('course', course_id.run)
-        course = self.create_item(user_id, course_id, 'course', fields=fields, **kwargs)
+        course = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
         # clone a default 'about' overview module as well
-        about_location = location.replace(
-            category='about',
-            name='overview'
-        )
+        about_location = course_id.make_usage_key('about', 'overview')
         overview_template = AboutDescriptor.get_template('overview.yaml')
         self.create_item(
             user_id,
