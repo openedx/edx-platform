@@ -401,7 +401,7 @@ def _import_module_and_update_references(
             runtime=runtime
         )
     _copy_fields(source_course_id, dest_course_id, module, new_module, do_import_static=do_import_static)
-    return store.update_item(new_module, user_id, revision=revision, allow_not_found=True)
+    return store.update_item(new_module, user_id, allow_not_found=True)
 
 
 def _import_course_draft(

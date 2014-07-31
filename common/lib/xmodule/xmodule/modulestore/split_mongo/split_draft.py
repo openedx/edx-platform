@@ -68,7 +68,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             # version_agnostic b/c of above assumption in docstring
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, revision=None, **kwargs):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         new_usage_key = self._map_revision_to_branch(descriptor.location)
         descriptor.location = new_usage_key
         item = super(DraftVersioningModuleStore, self).update_item(

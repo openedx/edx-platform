@@ -89,7 +89,8 @@ class TemplateTests(unittest.TestCase):
         )
 
         test_chapter = self.split_store.create_xblock(
-            test_course.system, 'chapter', {'display_name': 'chapter n'}, parent_xblock=test_course
+            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            parent_xblock=test_course
         )
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
@@ -98,7 +99,8 @@ class TemplateTests(unittest.TestCase):
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
         test_problem = self.split_store.create_xblock(
-            test_course.system, 'problem', {'data': test_def_content}, parent_xblock=test_chapter
+            test_course.system, test_course.id, 'problem', fields={'data': test_def_content},
+            parent_xblock=test_chapter
         )
         self.assertIsInstance(test_problem, CapaDescriptor)
         self.assertEqual(test_problem.data, test_def_content)
@@ -115,13 +117,14 @@ class TemplateTests(unittest.TestCase):
             display_name='fun test course', user_id='testbot'
         )
         test_chapter = self.split_store.create_xblock(
-            test_course.system, 'chapter', {'display_name': 'chapter n'}, parent_xblock=test_course
+            test_course.system, test_course.id, 'chapter', fields={'display_name': 'chapter n'},
+            parent_xblock=test_course
         )
         self.assertEqual(test_chapter.display_name, 'chapter n')
         test_def_content = '<problem>boo</problem>'
         # create child
         new_block = self.split_store.create_xblock(
-            test_course.system,
+            test_course.system, test_course.id,
             'problem',
             fields={
                 'data': test_def_content,
