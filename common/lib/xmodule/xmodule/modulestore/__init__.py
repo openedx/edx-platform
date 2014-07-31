@@ -657,14 +657,22 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         # it's ok if the cached metadata in the memcache is invalid when another
         # request comes in for the same course.
         try:
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._begin_bulk_write_operation(course_id)
+            self._begin_bulk_write_operation(course_id)
             yield
         finally:
-            # check for the begin method here,
-            # since it's an error if an end method is not defined when a begin method is
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._end_bulk_write_operation(course_id)
+            self._end_bulk_write_operation(course_id)
+
+    def _begin_bulk_write_operation(self, course_id):
+        """
+        Begin a bulk write operation on course_id.
+        """
+        pass
+
+    def _end_bulk_write_operation(self, course_id):
+        """
+        End the active bulk write operation on course_id.
+        """
+        pass
 
 
 def only_xmodules(identifier, entry_points):
