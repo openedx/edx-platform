@@ -24,12 +24,6 @@ edX Studio
 * Problem components have a new **Correct or Past Due** setting. With this setting, course staff can configure a problem so that students can only see the answer if they have answered the problem correctly or the problem's due date has passed.
 
 ***************************************
-edX Learning Management System
-***************************************
-   
-* The display name for an open response assessment now appears in the course ribbon. (ORA-51)
-
-***************************************
 edX Website
 ***************************************
 
