@@ -6,4 +6,4 @@
 
 # Packages to install in the Python sandbox for secured execution.
 scipy==0.14.0
-lxml==3.0.1
+lxml==3.3.5
