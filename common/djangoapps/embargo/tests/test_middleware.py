@@ -64,6 +64,7 @@ class EmbargoMiddlewareTests(TestCase):
             '3.0.0.0': 'SY',
             '4.0.0.0': 'SD',
             '5.0.0.0': 'AQ',  # Antartica
+            '2001:250::': 'CN',
         }
         return ip_dict.get(ip_addr, 'US')
 

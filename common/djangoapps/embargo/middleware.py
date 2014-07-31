@@ -89,8 +89,13 @@ class EmbargoMiddleware(object):
 
                 log.info(msg)
                 return response
-
-            country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
+                
+            # ipv6 support    
+            if new_ip_address.find(':') >= 0:
+                country_code_from_ip = pygeoip.GeoIP(settings.GEOIPv6_PATH).country_code_by_addr(new_ip_address)
+            else:
+                country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(new_ip_address)
+           
             is_embargoed = country_code_from_ip in EmbargoedState.current().embargoed_countries_list
             # Fail if country is embargoed and the ip address isn't explicitly whitelisted
             if is_embargoed and ip_addr not in IPFilter.current().whitelist_ips:
