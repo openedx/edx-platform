@@ -846,7 +846,6 @@ CatchAnnotation.prototype = {
                 var bounds = new OpenSeadragon.Rect(an.bounds.x, an.bounds.y, an.bounds.width, an.bounds.height);
                 osda.viewer.viewport.fitBounds(bounds, false);
 
-                console.log(an.target.container);
                 $('html,body').animate({scrollTop: $("#"+an.target.container).offset().top},
                                         'slow');
                 //signifies a selected annotation once OSD has zoomed in on the
