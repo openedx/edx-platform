@@ -820,6 +820,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
+        # split handles all the fields in one dict not separated by scope
+        fields = kwargs.get('fields', {})
+        fields.update(kwargs.pop('metadata', {}) or {})
+        fields.update(kwargs.pop('definition_data', {}) or {})
+        kwargs['fields'] = fields
+
         # find course_index entry if applicable and structures entry
         index_entry = self._get_index_if_valid(course_key, force, continue_version)
         structure = self._lookup_course(course_key)['structure']
@@ -1844,6 +1850,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             destination_block['edit_info']['previous_version'] = previous_version
             destination_block['edit_info']['update_version'] = destination_version
             destination_block['edit_info']['edited_by'] = user_id
+            destination_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
         else:
             destination_block = self._new_block(
                 user_id, new_block['category'],

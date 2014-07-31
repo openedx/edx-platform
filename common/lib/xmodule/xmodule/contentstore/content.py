@@ -11,6 +11,7 @@ from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
 from opaque_keys.edx.locations import AssetLocation
+from opaque_keys.edx.locator import AssetLocator
 from opaque_keys.edx.keys import CourseKey
 from PIL import Image
 
@@ -52,12 +53,11 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
-        return AssetLocation(
-            course_key.org, course_key.course, course_key.run,
+        return AssetLocator(
+            course_key,
             'asset' if not is_thumbnail else 'thumbnail',
-            AssetLocation.clean_keeping_underscores(path),
-            revision
-        )
+            AssetLocation.clean_keeping_underscores(path)
+        ).for_branch(None)
 
     def get_id(self):
         return self.location
@@ -104,7 +104,8 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, CourseKey))
-        return course_key.make_asset_key('asset', '').to_deprecated_string()
+        # create a dummy asset location and then strip off the last 2 characters: '/a'
+        return course_key.make_asset_key('asset', 'a').to_deprecated_string()[:-2]
 
     @staticmethod
     def get_location_from_path(path):
