@@ -35,19 +35,20 @@
                         <option value="flagged">${_("Show flagged")}</option>
                     %endif
                 </select>
-            </span>
+            </span>\
             %if is_course_cohorted and is_moderator:
-            <span class="forum-nav-filter-cohort">
+## Lack of indentation is intentional to avoid whitespace between this and siblings
+<span class="forum-nav-filter-cohort">
                 <select class="forum-nav-filter-cohort-control">
                     <option value="all">${_("in all cohorts")}</option>
                         %for c in cohorts:
                             <option value="${c['id']}">${_("as {cohort_name}").format(cohort_name=c['name'])}</option>
                         %endfor
                 </select>
-            </span>
+            </span>\
             %endif
-
-            <span class="forum-nav-sort">
+## Lack of indentation is intentional to avoid whitespace between this and siblings
+<span class="forum-nav-sort">
                 <select class="forum-nav-sort-control">
                     ## Translators: This is a menu option for sorting forum threads
                     <option value="date">${_("by recent activity")}</option>

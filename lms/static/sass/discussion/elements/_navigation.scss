@@ -127,6 +127,20 @@
   background-color: $gray-l5;
   padding: ($baseline/4) ($baseline/2);
   color: $black;
+  text-align: right;
+}
+
+.forum-nav-filter-main {
+  @include box-sizing(border-box);
+  display: inline-block;
+  width: 50%;
+  text-align: left;
+}
+
+.forum-nav-filter-cohort, .forum-nav-sort {
+  @include box-sizing(border-box);
+  display: inline-block;
+  width: 50%;
 }
 
 %forum-nav-select {
@@ -142,10 +156,6 @@
 
 .forum-nav-filter-cohort-control {
   @extend %forum-nav-select;
-}
-
-.forum-nav-sort {
-  float: right;
 }
 
 .forum-nav-sort-control {
