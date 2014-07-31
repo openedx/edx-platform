@@ -223,7 +223,7 @@ To run JavaScript tests in your default browser:
     paver test_js_dev -s common
 
 
-These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
+These paver commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
 
 ### Running Bok Choy Acceptance Tests
@@ -287,7 +287,7 @@ installed to run the tests in Chrome.  The tests are confirmed to run
 with Chrome (not Chromium) version 34.0.1847.116 with ChromeDriver version 2.6.232917.
 
 To run all the acceptance tests:
-    rake test:acceptance
+    paver test_acceptance
 
 To run only for lms or cms:
 
@@ -309,7 +309,7 @@ To start the debugger on failure, add the `--pdb` option to extra_args:
 To run tests faster by not collecting static files, you can use
 `paver test_acceptance -s lms --fasttest` and `paver test_acceptance -s cms --fasttest`.
 
-Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
+Acceptance tests will run on a randomized port and can be run in the background of paver cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
 as well as the port listed in cms/djangoapps/contentstore/feature/upload.py
 

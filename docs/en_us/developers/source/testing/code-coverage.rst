@@ -15,7 +15,7 @@ we can ensure that pull requests have a very high percentage of test coverage
 To check the coverage of your pull request, just go to the top level of the
 edx-platform codebase and run::
 
-    $ rake coverage
+    $ paver coverage
 
 This will print a coverage report for your branch. We aim for
 a coverage report score of 95% or higher. We also encourage you to write

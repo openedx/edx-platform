@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-gem 'rake', '~> 10.0.3'
 gem 'sass', '3.3.5'
 gem 'bourbon', '~> 4.0.2'
 gem 'neat', '~> 1.6.0'
