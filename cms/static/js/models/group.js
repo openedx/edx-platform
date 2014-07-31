@@ -1,10 +1,15 @@
 define([
-    'backbone', 'gettext', 'backbone.associations'
-], function(Backbone, gettext) {
+    'backbone', 'underscore', 'underscore.string', 'gettext',
+    'backbone.associations'
+], function(Backbone, _, str, gettext) {
     'use strict';
     var Group = Backbone.AssociatedModel.extend({
         defaults: function() {
-            return { name: '' };
+            return {
+                name: '',
+                version: null,
+                order: null
+             };
         },
 
         isEmpty: function() {
@@ -12,11 +17,15 @@ define([
         },
 
         toJSON: function() {
-            return { name: this.get('name') };
+            return {
+                id: this.get('id'),
+                name: this.get('name'),
+                version: this.get('version')
+             };
         },
 
         validate: function(attrs) {
-            if (!attrs.name) {
+            if (!str.trim(attrs.name)) {
                 return {
                     message: gettext('Group name is required'),
                     attributes: { name: true }

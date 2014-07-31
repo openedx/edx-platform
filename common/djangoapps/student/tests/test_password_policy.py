@@ -236,3 +236,39 @@ class TestPasswordPolicy(TestCase):
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])
+
+
+class TestUsernamePasswordNonmatch(TestCase):
+    """
+    Test that registration username and password fields differ
+    """
+    def setUp(self):
+        super(TestUsernamePasswordNonmatch, self).setUp()
+        self.url = reverse('create_account')
+
+        self.url_params = {
+            'username': 'username',
+            'email': 'foo_bar@bar.com',
+            'name': 'username',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        }
+
+    def test_with_username_password_match(self):
+        self.url_params['username'] = "foobar"
+        self.url_params['password'] = "foobar"
+        response = self.client.post(self.url, self.url_params)
+        self.assertEquals(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Username and password fields cannot match",
+        )
+
+    def test_with_username_password_nonmatch(self):
+        self.url_params['username'] = "foobar"
+        self.url_params['password'] = "nonmatch"
+        response = self.client.post(self.url, self.url_params)
+        self.assertEquals(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])

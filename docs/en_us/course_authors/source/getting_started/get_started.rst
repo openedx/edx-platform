@@ -62,7 +62,7 @@ Create Your First Course
 
 When you receive notice that you can create courses, log in to Studio_.
 
-You see the following page:
+You see the following page, which is your **My Courses** dashboard:
 
 .. image:: ../Images/first_course.png
  :width: 600
@@ -98,11 +98,12 @@ The rest of this documentation describes how you now build and run your course. 
 ************************
 View Your Course on Edge
 ************************
+
 You can now view the course you just created, even though it doesn't have any content.
 
 In the Course Outline in Studio, click **View Live**. The course opens on Edge.
 
-You can also go directly to Edge_. Log in if prompted. You see the course you just created listed:
+You can also go directly to Edge_. Log in if prompted. You see the course you just created listed on your **My Courses** dashboard:
 
 .. image:: ../Images/new_course.png
  :width: 600

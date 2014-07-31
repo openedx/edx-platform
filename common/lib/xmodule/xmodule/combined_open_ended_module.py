@@ -204,10 +204,10 @@ class CombinedOpenEndedFields(object):
         scope=Scope.user_state
     )
     old_task_states = List(
-        help=_("A list of lists of state dictionaries for student states that are saved."
-               "This field is only populated if the instructor changes tasks after"
-               "the module is created and students have attempted it (for example changes a self assessed problem to "
-               "self and peer assessed."),
+        help=_("A list of lists of state dictionaries for student states that are saved. "
+               "This field is only populated if the instructor changes tasks after "
+               "the module is created and students have attempted it (for example, if a self assessed problem is "
+               "changed to self and peer assessed)."),
         scope = Scope.user_state
     )
     task_states = List(

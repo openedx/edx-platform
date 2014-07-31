@@ -31,7 +31,7 @@ import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
     USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
-    update_module_store_settings
+    update_module_store_settings, ASSET_IGNORE_REGEX
 )
 from path import path
 from warnings import simplefilter
@@ -130,8 +130,8 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
-from tempdir import mkdtemp_clean
-MAKO_MODULE_DIR = mkdtemp_clean('mako')
+import tempfile
+MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
@@ -547,6 +547,9 @@ INSTALLED_APPS = (
 
     # Monitoring signals
     'monitoring',
+
+    # Course action state
+    'course_action_state'
 )
 
 

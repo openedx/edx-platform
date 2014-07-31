@@ -23,9 +23,20 @@ set -e
 #       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number (1, 2, or 3) indicating which subset of the tests
-#       to build.  Currently, "lms-acceptance" has two shards (1 and 2),
-#       "cms-acceptance" has three shards (1, 2, and 3), and all the
-#       other test suites have one shard.
+#       to build.  Currently, "lms-acceptance" and "bok-choy" each have two
+#       shards (1 and 2), "cms-acceptance" has three shards (1, 2, and 3), 
+#       and all the other test suites have one shard.  
+# 
+#       For the "bok-choy", the tests are put into shard groups using the nose 
+#       'attr' decorator (e.g. "@attr('shard_1')").  Currently, anything with 
+#       the 'shard_1' attribute will run in the first shard.  All other bok-choy
+#       tests will run in shard 2.
+# 
+#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they 
+#       are decorated with "@shard_{}" (e.g. @shard_1 for the first shard).
+#       The lettuce tests must have a shard specified to be run in jenkins,
+#       as there is no shard that runs unspecified tests.
+# 
 #
 #   Jenkins configuration:
 #
@@ -85,9 +96,9 @@ source $HOME/edx-venv/bin/activate
 case "$TEST_SUITE" in
 
     "quality")
-        rake pep8 > pep8.log || { cat pep8.log ; exit 1; }
-        rake pylint > pylint.log || { cat pylint.log; exit 1; }
-        rake quality
+        paver run_pep8 > pep8.log || { cat pep8.log ; exit 1; }
+        paver run_pylint > pylint.log || { cat pylint.log; exit 1; }
+        paver run_quality
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
@@ -101,21 +112,29 @@ END
         ;;
 
     "unit")
-        rake test
-        rake coverage
+        paver test
+        paver coverage
         ;;
 
     "lms-acceptance")
-        rake test:acceptance:lms["-v 3 --tag shard_${SHARD}"]
+        paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
         ;;
 
     "cms-acceptance")
-        rake test:acceptance:cms["-v 3 --tag shard_${SHARD}"]
+        paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
         ;;
 
     "bok-choy")
-        rake test:bok_choy
-        rake test:bok_choy:coverage
+        case "$SHARD" in
+            "1")
+                paver test_bokchoy --extra_args="-a shard_1"
+                ;;
+
+            "2")
+                paver test_bokchoy --extra_args="-a '!shard_1'"
+               ;;
+        esac
+        paver bokchoy_coverage
         ;;
 
 esac

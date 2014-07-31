@@ -42,124 +42,164 @@
       outline: none;
 
       .group-configuration-details {
-        padding: $baseline ($baseline*1.5);
+        .wrapper-group-configuration {
+          padding: $baseline ($baseline*1.5);
 
-        .group-configuration-header {
-          margin-bottom: 0;
-          border-bottom: 0;
-        }
-
-        .group-configuration-title {
-          @extend %t-title;
-          @include font-size(22);
-          @include line-height(22);
-          overflow: hidden;
-          text-overflow: ellipsis;
-          margin-right: ($baseline*14);
-          font-weight: bold;
-
-          .group-toggle {
-            display: inline-block;
-            padding-left: $baseline;
-            color: $black;
-
-            &:hover, &:focus {
-              color: $blue;
-            }
-          }
-        }
-
-        .group-configuration-info {
-          @extend %t-copy-sub1;
-          color: $gray-l1;
-          margin-left: $baseline;
-
-          &.group-configuration-info-inline {
-            display: table;
-            width: 70%;
-            margin: ($baseline/4) 0 ($baseline/2) $baseline;
-
-            li {
-              @include box-sizing(border-box);
-              display: table-cell;
-              margin-right: 1%;
-            }
+          .group-configuration-header {
+            margin-bottom: 0;
+            border-bottom: 0;
           }
 
-          &.group-configuration-info-block {
-            li {
-              padding: ($baseline/4) 0;
-            }
-          }
-
-          .group-configuration-label {
-            text-transform: uppercase;
-          }
-
-          .group-configuration-description {
+          .group-configuration-title {
+            @extend %t-title;
+            @include font-size(22);
+            @include line-height(22);
             overflow: hidden;
             text-overflow: ellipsis;
-          }
-        }
+            margin-right: ($baseline*14);
+            font-weight: bold;
 
-        .ui-toggle-expansion {
-          @include transition(rotate .15s ease-in-out .25s);
-          @include font-size(21);
-          display: inline-block;
-          width: ($baseline*0.75);
-          vertical-align: baseline;
-          margin-left: -$baseline;
-        }
+            .group-toggle {
+              display: inline-block;
+              padding-left: $baseline;
+              color: $black;
 
-        &.is-selectable {
-          cursor: pointer;
-
-          &:hover {
-            color: $blue;
-
-            .ui-toggle-expansion {
-              color: $blue;
+              &:hover, &:focus {
+                color: $blue;
+              }
             }
           }
-        }
 
-        .groups {
-          margin-left: $baseline;
-          margin-bottom: ($baseline*0.75);
+          .group-configuration-info {
+            @extend %t-copy-sub1;
+            color: $gray-l1;
+            margin-left: $baseline;
 
-          .group {
-            @extend %t-copy-sub2;
-            @include font-size(18);
-            @include line-height(16);
-            padding: ($baseline/7) 0 ($baseline/4);
-            border-top: 1px solid $gray-l4;
-            white-space: nowrap;
+            &.group-configuration-info-inline {
+              display: table;
+              width: 70%;
+              margin: ($baseline/4) 0 ($baseline/2) $baseline;
 
-            &:first-child {
-              border-top: none;
+              li {
+                @include box-sizing(border-box);
+                display: table-cell;
+                margin-right: 1%;
+
+                &.group-configuration-usage-count {
+                  font-style: italic;
+                }
+              }
             }
 
-            .group-name {
+            &.group-configuration-info-block {
+              li {
+                padding: ($baseline/4) 0;
+              }
+            }
+
+            .group-configuration-label {
+              text-transform: uppercase;
+            }
+
+            .group-configuration-description {
               overflow: hidden;
               text-overflow: ellipsis;
-              display: inline-block;
-              vertical-align: middle;
-              width: 75%;
-              margin-right: 5%;
             }
+          }
 
-            .group-allocation {
+          .ui-toggle-expansion {
+            @include transition(rotate .15s ease-in-out .25s);
+            @include font-size(21);
+            display: inline-block;
+            width: ($baseline*0.75);
+            vertical-align: baseline;
+            margin-left: -$baseline;
+          }
+
+          &.is-selectable {
+            cursor: pointer;
+
+            &:hover {
+              color: $blue;
+
+              .ui-toggle-expansion {
+                color: $blue;
+              }
+            }
+          }
+
+          .groups {
+            margin-left: $baseline;
+            margin-bottom: ($baseline*0.75);
+
+            .group {
+              @extend %t-copy-sub2;
+              @include font-size(18);
+              @include line-height(16);
+              padding: ($baseline/7) 0 ($baseline/4);
+              border-top: 1px solid $gray-l4;
+              white-space: nowrap;
+
+              &:first-child {
+                border-top: none;
+              }
+
+              .group-name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: inline-block;
+                vertical-align: middle;
+                width: 75%;
+                margin-right: 5%;
+              }
+
+              .group-allocation {
+                display: inline-block;
+                vertical-align: middle;
+                width: 20%;
+                color: $gray-l1;
+                text-align: right;
+              }
+            }
+          }
+
+          .actions {
+            @include transition(opacity .15s .25s ease-in-out);
+            opacity: 0.0;
+            position: absolute;
+            top: $baseline;
+            right: $baseline;
+
+            .action {
               display: inline-block;
-              vertical-align: middle;
-              width: 20%;
-              color: $gray-l1;
-              text-align: right;
+              margin-right: ($baseline/4);
+
+              .edit {
+                @include blue-button;
+                @extend %t-action4;
+              }
+            }
+          }
+        }
+
+        .wrapper-group-configuration-usages {
+          @include font-size(14);
+          background-color: #f8f8f8;
+          box-shadow: 0 2px 2px 0 $shadow inset;
+          padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
+
+          .group-configuration-usage {
+            color: $gray-l1;
+            margin-left: $baseline;
+
+            .group-configuration-usage-unit {
+              padding: ($baseline/4) 0;
             }
           }
         }
       }
 
-      &:hover .actions {
+      &:hover .wrapper-group-configuration .actions {
         opacity: 1.0;
       }
     }
@@ -232,6 +272,7 @@
         }
       }
 
+      .groups-fields,
       .group-configuration-fields {
         @extend %cont-no-list;
 
@@ -322,6 +363,30 @@
 
           &.add-group-configuration-name label {
             @extend %t-title5;
+            display: inline-block;
+            width: 50%;
+            padding-right: 5%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+          }
+
+          .group-configuration-id {
+            display: inline-block;
+            width: 45%;
+            text-align: right;
+            vertical-align: top;
+            color: $gray-l1;
+
+            .group-configuration-value {
+              font-weight: 600;
+              white-space: nowrap;
+              margin-left: ($baseline*0.5);
+            }
+          }
+
+          &.group-allocation {
+            color: $gray-l1;
           }
         }
 
@@ -333,10 +398,66 @@
             content: "*";
           }
         }
+
+        .field-group {
+          @include clearfix();
+          margin: 0 0 ($baseline/2) 0;
+          padding: ($baseline/4) 0 0 0;
+
+          .group-allocation,
+          .field {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 3% 0 0;
+          }
+
+          .group-allocation {
+            max-width: 10%;
+            min-width: 5%;
+            color: $gray-l1;
+          }
+
+          .field {
+            position: relative;
+
+            &.long {
+              width: 80%;
+            }
+
+            &.short {
+              width: 10%;
+            }
+          }
+
+          .action-close {
+            @include transition(color 0.25s ease-in-out);
+            @include font-size(22);
+            display: inline-block;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: $blue-l3;
+            vertical-align: middle;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+        }
       }
 
       .group-configuration-fields {
         margin-bottom: $baseline;
+      }
+
+      .action-add-group {
+        @extend %ui-btn-flat-outline;
+        @include font-size(16);
+        display: block;
+        width: 100%;
+        margin: ($baseline*1.5) 0 0 0;
+        padding: ($baseline/2);
+        font-weight: 600;
       }
     }
   }

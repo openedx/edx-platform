@@ -89,6 +89,9 @@ class CourseOutlineUnit(CourseOutlineChild):
         """
         return UnitPage(self.browser, self.locator).visit()
 
+    def is_browser_on_page(self):
+        return self.q(css=self.BODY_SELECTOR).present
+
 
 class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
@@ -197,4 +200,3 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Open release date edit modal of first section in course outline
         """
         self.q(css='div.section-published-date a.edit-release-date').first.click()
-

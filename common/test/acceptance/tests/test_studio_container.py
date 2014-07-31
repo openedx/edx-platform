@@ -1,19 +1,20 @@
 """
 Acceptance tests for Studio related to the container page.
 """
+from nose.plugins.attrib import attr
 
-from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..fixtures.course import XBlockFixtureDesc
 
-from .helpers import UniqueCourseTest
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.utils import add_discussion
 
 from unittest import skip
-from bok_choy.promise import Promise
+from acceptance.tests.base_studio_test import StudioCourseTest
 
-class ContainerBase(UniqueCourseTest):
+
+@attr('shard_1')
+class ContainerBase(StudioCourseTest):
     """
     Base class for tests that do operations on the container page.
     """
@@ -32,21 +33,6 @@ class ContainerBase(UniqueCourseTest):
             self.course_info['number'],
             self.course_info['run']
         )
-
-        self.setup_fixtures()
-
-        self.auth_page = AutoAuthPage(
-            self.browser,
-            staff=False,
-            username=self.user.get('username'),
-            email=self.user.get('email'),
-            password=self.user.get('password')
-        )
-
-        self.auth_page.visit()
-
-    def setup_fixtures(self):
-        pass
 
     def go_to_container_page(self, make_draft=False):
         """
@@ -93,30 +79,6 @@ class ContainerBase(UniqueCourseTest):
                     break
         self.assertEqual(len(blocks_checked), len(xblocks))
 
-    def verify_groups(self, container, active_groups, inactive_groups):
-        """
-        Check that the groups appear and are correctly categorized as to active and inactive.
-
-        Also checks that the "add missing groups" button/link is not present unless a value of False is passed
-        for verify_missing_groups_not_present.
-        """
-        def wait_for_xblocks_to_render():
-            # First xblock is the container for the page, subtract 1.
-            return (len(active_groups) + len(inactive_groups) == len(container.xblocks) - 1, len(active_groups))
-
-        Promise(wait_for_xblocks_to_render, "Number of xblocks on the page are incorrect").fulfill()
-
-        def check_xblock_names(expected_groups, actual_blocks):
-            self.assertEqual(len(expected_groups), len(actual_blocks))
-            for idx, expected in enumerate(expected_groups):
-                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
-
-        check_xblock_names(active_groups, container.active_xblocks)
-        check_xblock_names(inactive_groups, container.inactive_xblocks)
-
-        # Verify inactive xblocks appear after active xblocks
-        check_xblock_names(active_groups + inactive_groups, container.xblocks[1:])
-
     def do_action_and_verify(self, action, expected_ordering):
         """
         Perform the supplied action and then verify the resulting ordering.
@@ -134,10 +96,10 @@ class ContainerBase(UniqueCourseTest):
 class NestedVerticalTest(ContainerBase):
     __test__ = False
 
-    """
-    Sets up a course structure with nested verticals.
-    """
-    def setup_fixtures(self):
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with nested verticals.
+        """
         self.container_title = ""
         self.group_a = "Expand or Collapse\nGroup A"
         self.group_b = "Expand or Collapse\nGroup B"
@@ -161,14 +123,7 @@ class NestedVerticalTest(ContainerBase):
         self.duplicate_label = "Duplicate of '{0}'"
         self.discussion_label = "Discussion"
 
-        course_fix = CourseFixture(
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run'],
-            self.course_info['display_name']
-        )
-
-        course_fix.add_children(
+        course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
@@ -186,11 +141,10 @@ class NestedVerticalTest(ContainerBase):
                     )
                 )
             )
-        ).install()
-
-        self.user = course_fix.user
+        )
 
 
+@attr('shard_1')
 class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
@@ -272,6 +226,7 @@ class DragAndDropTest(NestedVerticalTest):
         self.do_action_and_verify(add_new_components_and_rearrange, expected_ordering)
 
 
+@attr('shard_1')
 class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
@@ -312,6 +267,7 @@ class AddComponentTest(NestedVerticalTest):
         self.add_and_verify(container_menu, expected_ordering)
 
 
+@attr('shard_1')
 class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
@@ -358,6 +314,7 @@ class DuplicateComponentTest(NestedVerticalTest):
         self.do_action_and_verify(duplicate_twice, expected_ordering)
 
 
+@attr('shard_1')
 class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
@@ -381,6 +338,7 @@ class DeleteComponentTest(NestedVerticalTest):
         self.delete_and_verify(group_a_item_1_delete_index, expected_ordering)
 
 
+@attr('shard_1')
 class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.

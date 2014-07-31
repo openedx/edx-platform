@@ -49,7 +49,6 @@ OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
-PIPELINE = True
 
 # Silence noisy logs
 import logging

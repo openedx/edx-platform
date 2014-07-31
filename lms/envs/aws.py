@@ -207,6 +207,7 @@ TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
 # Translation overrides
 LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
+LANGUAGE_DICT = dict(LANGUAGES)
 LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)
 USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 
@@ -223,7 +224,6 @@ local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
-                            syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             local_loglevel=local_loglevel,
                             debug=False,
                             service_variant=SERVICE_VARIANT)
@@ -252,6 +252,8 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
         CODE_JAIL[name] = value
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
+
+ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:

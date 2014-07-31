@@ -29,7 +29,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation, CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -46,6 +46,7 @@ from student.models import CourseEnrollment
 from student.roles import CourseCreatorRole, CourseInstructorRole
 from opaque_keys import InvalidKeyError
 from contentstore.tests.utils import get_url
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -575,7 +576,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         location = course.id.make_usage_key('chapter', 'neuvo')
         # Ensure draft mongo store does not create drafts for things that shouldn't be draft
-        newobject = draft_store.create_and_save_xmodule(location, self.user.id)
+        newobject = draft_store.create_item(self.user.id, location.course_key, location.block_type, location.block_id)
         self.assertFalse(getattr(newobject, 'is_draft', False))
         with self.assertRaises(InvalidVersionError):
             draft_store.convert_to_draft(location, self.user.id)
@@ -1392,12 +1393,9 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_forum_id_generation(self):
         course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        new_component_location = course.id.make_usage_key('discussion', 'new_component')
 
         # crate a new module and add it as a child to a vertical
-        self.store.create_and_save_xmodule(new_component_location, self.user.id)
-
-        new_discussion_item = self.store.get_item(new_component_location)
+        new_discussion_item = self.store.create_item(self.user.id, course.id, 'discussion', 'new_component')
 
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
@@ -1562,6 +1560,107 @@ class MetadataSaveTestCase(ContentStoreTestCase):
         # TODO: create the same test as `test_metadata_not_persistence`,
         # but check persistence for some other module.
         pass
+
+
+class RerunCourseTest(ContentStoreTestCase):
+    """
+    Tests for Rerunning a course via the view handler
+    """
+    def setUp(self):
+        super(RerunCourseTest, self).setUp()
+        self.destination_course_data = {
+            'org': 'MITx',
+            'number': '111',
+            'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
+        }
+        self.destination_course_key = _get_course_id(self.destination_course_data)
+
+    def post_rerun_request(self, source_course_key, response_code=200):
+        """Create and send an ajax post for the rerun request"""
+
+        # create data to post
+        rerun_course_data = {'source_course_key': unicode(source_course_key)}
+        rerun_course_data.update(self.destination_course_data)
+
+        # post the request
+        course_url = get_url('course_handler', self.destination_course_key, 'course_key_string')
+        response = self.client.ajax_post(course_url, rerun_course_data)
+
+        # verify response
+        self.assertEqual(response.status_code, response_code)
+        if response_code == 200:
+            self.assertNotIn('ErrMsg', parse_json(response))
+
+    def create_course_listing_html(self, course_key):
+        """Creates html fragment that is created for the given course_key in the course listing section"""
+        return '<a class="course-link" href="/course/{}"'.format(course_key)
+
+    def create_unsucceeded_course_action_html(self, course_key):
+        """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
+        # TODO LMS-11011 Update this once the Rerun UI is implemented.
+        return '<div class="unsucceeded-course-action" href="/course/{}"'.format(course_key)
+
+    def assertInCourseListing(self, course_key):
+        """
+        Asserts that the given course key is in the accessible course listing section of the html
+        and NOT in the unsucceeded course action section of the html.
+        """
+        course_listing_html = self.client.get_html('/course/')
+        self.assertIn(self.create_course_listing_html(course_key), course_listing_html.content)
+        self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+
+    def assertInUnsucceededCourseActions(self, course_key):
+        """
+        Asserts that the given course key is in the unsucceeded course action section of the html
+        and NOT in the accessible course listing section of the html.
+        """
+        course_listing_html = self.client.get_html('/course/')
+        self.assertNotIn(self.create_course_listing_html(course_key), course_listing_html.content)
+        # TODO Uncomment this once LMS-11011 is implemented.
+        # self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+
+    def test_rerun_course_success(self):
+        source_course = CourseFactory.create()
+        self.post_rerun_request(source_course.id)
+
+        # Verify that the course rerun action is marked succeeded
+        rerun_state = CourseRerunState.objects.find_first(course_key=self.destination_course_key)
+        self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
+
+        # Verify that the creator is now enrolled in the course.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.destination_course_key))
+
+        # Verify both courses are in the course listing section
+        self.assertInCourseListing(source_course.id)
+        self.assertInCourseListing(self.destination_course_key)
+
+    def test_rerun_course_fail(self):
+        existent_course_key = CourseFactory.create().id
+        non_existent_course_key = CourseLocator("org", "non_existent_course", "run")
+        self.post_rerun_request(non_existent_course_key)
+
+        # Verify that the course rerun action is marked failed
+        rerun_state = CourseRerunState.objects.find_first(course_key=self.destination_course_key)
+        self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+        self.assertIn("Cannot find a course at", rerun_state.message)
+
+        # Verify that the creator is not enrolled in the course.
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, non_existent_course_key))
+
+        # Verify that the existing course continues to be in the course listings
+        self.assertInCourseListing(existent_course_key)
+
+        # Verify that the failed course is NOT in the course listings
+        self.assertInUnsucceededCourseActions(non_existent_course_key)
+
+    def test_rerun_with_permission_denied(self):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            source_course = CourseFactory.create()
+            auth.add_users(self.user, CourseCreatorRole(), self.user)
+            self.user.is_staff = False
+            self.user.save()
+            self.post_rerun_request(source_course.id, 403)
 
 
 class EntryPageTestCase(TestCase):

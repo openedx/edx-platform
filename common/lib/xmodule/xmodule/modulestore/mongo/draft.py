@@ -17,9 +17,10 @@ from xmodule.modulestore.exceptions import (
 )
 from xmodule.modulestore.mongo.base import (
     MongoModuleStore, MongoRevisionKey, as_draft, as_published,
-    DIRECT_ONLY_CATEGORIES, SORT_REVISION_FAVOR_DRAFT
+    SORT_REVISION_FAVOR_DRAFT
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
 
@@ -46,16 +47,6 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-
-    def __init__(self, *args, **kwargs):
-        """
-        Args:
-            branch_setting_func: a function that returns the branch setting to use for this store's operations.
-                This should be an attribute from ModuleStoreEnum.Branch
-        """
-        super(DraftModuleStore, self).__init__(*args, **kwargs)
-        self.branch_setting_func = kwargs.pop('branch_setting_func', lambda: ModuleStoreEnum.Branch.published_only)
-
     def get_item(self, usage_key, depth=0, revision=None):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
@@ -104,10 +95,10 @@ class DraftModuleStore(MongoModuleStore):
         elif revision == ModuleStoreEnum.RevisionOption.draft_only:
             return get_draft()
 
-        elif self.branch_setting_func() == ModuleStoreEnum.Branch.published_only:
+        elif self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
             return get_published()
 
-        else:
+        elif revision is None:
             # could use a single query wildcarding revision and sorting by revision. would need to
             # use prefix form of to_deprecated_son
             try:
@@ -116,6 +107,9 @@ class DraftModuleStore(MongoModuleStore):
             except ItemNotFoundError:
                 # otherwise, fall back to the published version
                 return get_published()
+
+        else:
+            raise UnsupportedRevisionError()
 
     def has_item(self, usage_key, revision=None):
         """
@@ -137,13 +131,17 @@ class DraftModuleStore(MongoModuleStore):
 
         if revision == ModuleStoreEnum.RevisionOption.draft_only:
             return has_draft()
-        elif revision == ModuleStoreEnum.RevisionOption.published_only \
-                or self.branch_setting_func() == ModuleStoreEnum.Branch.published_only:
+        elif (
+                revision == ModuleStoreEnum.RevisionOption.published_only or
+                self.get_branch_setting() == ModuleStoreEnum.Branch.published_only
+        ):
             return has_published()
-        else:
+        elif revision is None:
             key = usage_key.to_deprecated_son(prefix='_id.')
             del key['_id.revision']
             return self.collection.find(key).count() > 0
+        else:
+            raise UnsupportedRevisionError()
 
     def delete_course(self, course_key, user_id):
         """
@@ -157,7 +155,7 @@ class DraftModuleStore(MongoModuleStore):
         course_query = self._course_key_to_son(course_key)
         self.collection.remove(course_query, multi=True)
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         Only called if cloning within this store or if env doesn't set up mixed.
         * copy the courseware
@@ -179,13 +177,20 @@ class DraftModuleStore(MongoModuleStore):
             )
 
         # clone the assets
-        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
         # get the whole old course
         new_course = self.get_course(dest_course_id)
         if new_course is None:
             # create_course creates the about overview
-            new_course = self.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+            new_course = self.create_course(
+                dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
+            )
+        else:
+            # update fields on existing course
+            for key, value in fields.iteritems():
+                setattr(new_course, key, value)
+            self.update_item(new_course, user_id)
 
         # Get all modules under this namespace which is (tag, org, course) tuple
         modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
@@ -283,11 +288,11 @@ class DraftModuleStore(MongoModuleStore):
         '''
         if revision is None:
             revision = ModuleStoreEnum.RevisionOption.published_only \
-                if self.branch_setting_func() == ModuleStoreEnum.Branch.published_only \
+                if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only \
                 else ModuleStoreEnum.RevisionOption.draft_preferred
         return super(DraftModuleStore, self).get_parent_location(location, revision, **kwargs)
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}):
+    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator if
         the category allows drafts. If the category does not allow drafts, just creates a published module.
@@ -306,7 +311,7 @@ class DraftModuleStore(MongoModuleStore):
             super(DraftModuleStore, self).create_xmodule(location, definition_data, metadata, runtime, fields)
         )
 
-    def get_items(self, course_key, settings=None, content=None, revision=None, **kwargs):
+    def get_items(self, course_key, revision=None, **kwargs):
         """
         Performance Note: This is generally a costly operation, but useful for wildcard searches.
 
@@ -318,8 +323,6 @@ class DraftModuleStore(MongoModuleStore):
 
         Args:
             course_key (CourseKey): the course identifier
-            settings: not used
-            content: not used
             revision:
                 ModuleStoreEnum.RevisionOption.published_only - returns only Published items
                 ModuleStoreEnum.RevisionOption.draft_only - returns only Draft items
@@ -352,11 +355,13 @@ class DraftModuleStore(MongoModuleStore):
         if revision == ModuleStoreEnum.RevisionOption.draft_only:
             return draft_items()
         elif revision == ModuleStoreEnum.RevisionOption.published_only \
-                or self.branch_setting_func() == ModuleStoreEnum.Branch.published_only:
+                or self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
             return published_items([])
-        else:
+        elif revision is None:
             draft_items = draft_items()
             return draft_items + published_items(draft_items)
+        else:
+            raise UnsupportedRevisionError()
 
     def convert_to_draft(self, location, user_id):
         """
@@ -483,6 +488,7 @@ class DraftModuleStore(MongoModuleStore):
                 ModuleStoreEnum.RevisionOption.published_only - removes only Published versions
                 ModuleStoreEnum.RevisionOption.all - removes both Draft and Published parents
                     currently only provided by contentstore.views.item.orphan_handler
+                Otherwise, raises a ValueError.
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
@@ -527,8 +533,16 @@ class DraftModuleStore(MongoModuleStore):
             as_functions = [as_draft, as_published]
         elif revision == ModuleStoreEnum.RevisionOption.published_only:
             as_functions = [as_published]
-        else:
+        elif revision is None:
             as_functions = [as_draft]
+        else:
+            raise UnsupportedRevisionError(
+                [
+                    None,
+                    ModuleStoreEnum.RevisionOption.published_only,
+                    ModuleStoreEnum.RevisionOption.all
+                ]
+            )
         self._delete_subtree(location, as_functions)
 
     def _delete_subtree(self, location, as_functions):
@@ -630,7 +644,12 @@ class DraftModuleStore(MongoModuleStore):
             """
             Depth first publishing from the given location
             """
-            item = self.get_item(item_location)
+            try:
+                # handle child does not exist w/o killing publish
+                item = self.get_item(item_location)
+            except ItemNotFoundError:
+                log.warning('Cannot find: %s', item_location)
+                return
 
             # publish the children first
             if item.has_children:
@@ -740,7 +759,7 @@ class DraftModuleStore(MongoModuleStore):
         for non_draft in to_process_non_drafts:
             to_process_dict[Location._from_deprecated_son(non_draft["_id"], course_key.run)] = non_draft
 
-        if self.branch_setting_func() == ModuleStoreEnum.Branch.draft_preferred:
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
             # now query all draft content in another round-trip
             query = []
             for item in items:
@@ -794,7 +813,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         Raises an exception if the current branch setting does not match the expected branch setting.
         """
-        actual_branch_setting = self.branch_setting_func()
+        actual_branch_setting = self.get_branch_setting()
         if actual_branch_setting != expected_branch_setting:
             raise InvalidBranchSetting(
                 expected_setting=expected_branch_setting,

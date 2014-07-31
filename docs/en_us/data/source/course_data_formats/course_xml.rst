@@ -391,13 +391,14 @@ Inherited
   When this content should be shown to students.  Note that anyone with staff access to the course will always see everything.
 
 `showanswer`
-  When to show answer. Values: never, attempted, answered, closed, finished, past_due, always. Default: closed. Optional.
+  When to show answer. Values: never, attempted, answered, closed, finished, correct_or_past_due, past_due, always. Default: closed. Optional.
     - `never`: never show answer
     - `attempted`: show answer after first attempt
     - `answered` : this is slightly different from `attempted` -- resetting the problems makes "done" False, but leaves attempts unchanged.
     - `closed` : show answer after problem is closed, ie due date is past, or maximum attempts exceeded.
     - `finished` : show answer after problem closed, or is correctly answered.
     - `past_due` : show answer after problem due date is past.
+    - `correct_or_past_due` : like `past_due`, but also allow solution to be seen immediately if the problem is correctly answered.
     - `always` : always allow answer to be shown.
 
 `graded`

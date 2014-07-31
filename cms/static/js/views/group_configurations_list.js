@@ -34,6 +34,7 @@ define([
 
                 this.$el.html([frag]);
             }
+
             return this;
         },
 
@@ -55,7 +56,7 @@ define([
 
         addOne: function(event) {
             if(event && event.preventDefault) { event.preventDefault(); }
-            this.collection.add([{editing: true}]);
+            this.collection.add([{ editing: true }]);
         }
     });
 

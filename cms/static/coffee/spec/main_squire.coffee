@@ -176,5 +176,6 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 define([
     "coffee/spec/views/assets_spec",
     "js/spec/video/translations_editor_spec",
-    "js/spec/video/file_uploader_editor_spec"
+    "js/spec/video/file_uploader_editor_spec",
+    "js/spec/models/group_configuration_spec"
     ])

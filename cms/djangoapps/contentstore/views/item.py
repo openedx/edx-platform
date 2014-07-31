@@ -23,7 +23,7 @@ import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
@@ -60,6 +60,15 @@ def hash_resource(resource):
     md5 = hashlib.md5()
     md5.update(repr(resource))
     return md5.hexdigest()
+
+
+def usage_key_with_run(usage_key_string):
+    """
+    Converts usage_key_string to a UsageKey, adding a course run if necessary
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    return usage_key
 
 
 # pylint: disable=unused-argument
@@ -100,9 +109,7 @@ def xblock_handler(request, usage_key_string):
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
-        usage_key = UsageKey.from_string(usage_key_string)
-        # usage_key's course_key may have an empty run property
-        usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+        usage_key = usage_key_with_run(usage_key_string)
 
         if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
@@ -137,16 +144,8 @@ def xblock_handler(request, usage_key_string):
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
-            parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
-            # usage_key's course_key may have an empty run property
-            parent_usage_key = parent_usage_key.replace(
-                course_key=modulestore().fill_in_run(parent_usage_key.course_key)
-            )
-            duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
-            # usage_key's course_key may have an empty run property
-            duplicate_source_usage_key = duplicate_source_usage_key.replace(
-                course_key=modulestore().fill_in_run(duplicate_source_usage_key.course_key)
-            )
+            parent_usage_key = usage_key_with_run(request.json['parent_locator'])
+            duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
@@ -177,9 +176,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    usage_key = UsageKey.from_string(usage_key_string)
-    # usage_key's course_key may have an empty run property
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    usage_key = usage_key_with_run(usage_key_string)
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -287,7 +284,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            existing_item = store.create_and_save_xmodule(usage_key, user.id)
+            existing_item = store.create_item(user.id, usage_key.course_key, usage_key.block_type, usage_key.block_id)
         else:
             raise
     except InvalidLocationError:
@@ -319,8 +316,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
     if children is not None:
         children_usage_keys = []
         for child in children:
-            child_usage_key = UsageKey.from_string(child)
-            child_usage_key = child_usage_key.replace(course_key=modulestore().fill_in_run(child_usage_key.course_key))
+            child_usage_key = usage_key_with_run(child)
             children_usage_keys.append(child_usage_key)
         existing_item.children = children_usage_keys
 
@@ -387,9 +383,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 @expect_json
 def _create_item(request):
     """View for create items."""
-    usage_key = UsageKey.from_string(request.json['parent_locator'])
-    # usage_key's course_key may have an empty run property
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    usage_key = usage_key_with_run(request.json['parent_locator'])
     category = request.json['category']
 
     display_name = request.json.get('display_name')
@@ -416,9 +410,11 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    created_block = store.create_and_save_xmodule(
-        dest_usage_key,
+    created_block = store.create_child(
         request.user.id,
+        usage_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=data,
         metadata=metadata,
         runtime=parent.runtime,
@@ -428,6 +424,7 @@ def _create_item(request):
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
     if category == 'static_tab':
+        display_name = display_name or _("Empty") # Prevent name being None
         course = store.get_course(dest_usage_key.course_key)
         course.tabs.append(
             StaticTab(
@@ -436,11 +433,6 @@ def _create_item(request):
             )
         )
         store.update_item(course, request.user.id)
-
-    # TODO replace w/ nicer accessor
-    if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(created_block.location)
-        store.update_item(parent, request.user.id)
 
     return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
@@ -465,11 +457,11 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         else:
             duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
-    dest_module = store.create_and_save_xmodule(
-        dest_usage_key,
-
-
+    dest_module = store.create_item(
         user.id,
+        dest_usage_key.course_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
         runtime=source_item.runtime,
@@ -531,7 +523,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_course_access(request.user, course_usage_key):
-            return JsonResponse(modulestore().get_orphans(course_usage_key))
+            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -539,11 +531,9 @@ def orphan_handler(request, course_key_string):
             store = modulestore()
             items = store.get_orphans(course_usage_key)
             for itemloc in items:
-                # get_orphans returns the deprecated string format w/o revision
-                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
                 # need to delete all versions
-                store.delete_item(usage_key, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
-            return JsonResponse({'deleted': items})
+                store.delete_item(itemloc, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
+            return JsonResponse({'deleted': [unicode(item) for item in items]})
         else:
             raise PermissionDenied()
 
@@ -559,7 +549,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
-            module = store.create_and_save_xmodule(usage_key, user.id)
+            module = store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
         else:
             raise
 

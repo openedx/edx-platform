@@ -1,0 +1,95 @@
+###################################
+July 21, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of July 21,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* In edX Studio, URL formats have changed. If you previously bookmarked a page
+  in Studio, that bookmark will no longer work. You must update the URL.
+
+  Following is a sample of this format change:
+
+  * Old URL: ``https://studio.edx.org/unit/location:MITx+7.00x+2013_SOND+vertical+Coming_Soon_Explore_a_Protein``
+
+  * New URL:
+    ``https://studio.edx.org/unit/i4x://MITx/7.00x/vertical/Coming_Soon_Explore_a_Protein``
+  
+  This change does not affect student-visible URLs.
+
+* In open response assessments, instructors can now create assignments that allow students to upload an image file as well as write a text response. For more information, see `Creating Peer Assessments`_.
+
+* In open response assessments, instructors can now create a criterion that includes a field for comments, but no options. For more information, see `Creating Peer Assessments`_.
+
+* In some cases, deleting a unit from a subsection caused server errors. This bug has been fixed. (STUD-1962)
+
+***************************************
+edX Learning Management System
+***************************************
+   
+* The Instructor Dashboard **Analytics** tab now includes the number of students who interacted with the course by visiting pages, playing videos, contributing to discussions, submitting answers to problems, or completing other course activites. The active student count is updated each week.
+
+* Some links on the right side of the course wiki appeared to be disabled. This has been fixed. (LMS-1308)
+
+* Forum posts created by anonymous users appeared with a "by Staff" label. This bug has been fixed. (FOR-156)
+
+* When a student selected **Post anonymously to classmates** check box in the forums, the post appeared as anonymous to both students and staff. This bug has been fixed. (FOR-122)
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  * The `Running Your Course`_ section now includes a `Participating in Course Discussions`_ chapter that provides information for both students and staff. 
+
+  * The `Discussions`_ chapter has been updated to reflect changes in the UI.
+       
+* `edX Research Guide`_
+
+  Recent changes include: 
+
+  * The `Track Student Activity`_ section has been added to the `Student Data`_ chapter.
+
+* `edX Developer's Guide`_
+
+   * The link to the `Ubuntu installation instructions`_ has been updated.
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst
