@@ -5,11 +5,9 @@ import json
 import random
 import string  # pylint: disable=W0402
 import logging
-
 from django.utils.translation import ugettext as _
 import django.utils
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
@@ -25,11 +23,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition, Group
-
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.keys import CourseKey
 
+from django_future.csrf import ensure_csrf_cookie
+from util.json_request import JsonResponse
+from edxmako.shortcuts import render_to_response
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
     add_instructor,
@@ -47,7 +48,6 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-
 from .access import has_course_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
@@ -56,10 +56,8 @@ from .component import (
     SPLIT_TEST_COMPONENT_TYPE,
     ADVANCED_COMPONENT_TYPES,
 )
-from .tasks import rerun_course
+from contentstore.tasks import rerun_course
 from .item import create_xblock_info
-
-from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import (
@@ -68,11 +66,11 @@ from student.roles import (
 from student import auth
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_action_state.managers import CourseActionStateItemNotFoundError
-
 from microsite_configuration import microsite
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
+           'course_rerun_handler',
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
@@ -233,6 +231,25 @@ def course_handler(request, course_key_string=None):
     else:
         return HttpResponseNotFound()
 
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(["GET"])
+def course_rerun_handler(request, course_key_string):
+    """
+    The restful handler for course reruns.
+    GET
+        html: return html page with form to rerun a course for the given course id
+    """
+    course_key = CourseKey.from_string(course_key_string)
+    course_module = _get_course_module(course_key, request.user, depth=3)
+    if request.method == 'GET':
+        return render_to_response('course-create-rerun.html', {
+            'source_course_key': course_key,
+            'display_name': course_module.display_name,
+            'user': request.user,
+            'course_creator_status': _get_course_creator_status(request.user),
+            'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+        })
 
 def _course_outline_json(request, course_module):
     """
@@ -340,9 +357,26 @@ def course_listing(request):
             course.display_name,
             reverse_course_url('course_handler', course.id),
             get_lms_link_for_item(course.location),
+            _get_rerun_link_for_item(course.id),
             course.display_org_with_default,
             course.display_number_with_default,
-            course.location.name
+            course.location.run
+        )
+
+    def format_unsucceeded_course_for_view(uca):
+        """
+        return tuple of the data which the view requires for each unsucceeded course
+        """
+        return (
+            uca.display_name,
+            uca.course_key.org,
+            uca.course_key.course,
+            uca.course_key.run,
+            True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
+                'action_state_id': uca.id,
+            }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         )
 
     # remove any courses in courses that are also in the unsucceeded_course_actions list
@@ -353,6 +387,8 @@ def course_listing(request):
         if not isinstance(c, ErrorDescriptor) and (c.id not in unsucceeded_action_course_keys)
     ]
 
+    unsucceeded_course_actions = [format_unsucceeded_course_for_view(uca) for uca in unsucceeded_course_actions]
+
     return render_to_response('index.html', {
         'courses': courses,
         'unsucceeded_course_actions': unsucceeded_course_actions,
@@ -361,6 +397,10 @@ def course_listing(request):
         'course_creator_status': _get_course_creator_status(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
     })
+
+
+def _get_rerun_link_for_item(course_key):
+    return '/course_rerun/{}/{}/{}'.format(course_key.org, course_key.course, course_key.run)
 
 
 @login_required
@@ -398,6 +438,9 @@ def course_index(request, course_key):
         'rerun_notification_id': current_action.id if current_action else None,
         'course_release_date': course_release_date,
         'settings_url': settings_url,
+        'notification_dismiss_url': reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+                'action_state_id': current_action.id,
+            }) if current_action else None,
     })
 
 
@@ -554,7 +597,7 @@ def _rerun_course(request, org, number, run, fields):
     add_instructor(destination_course_key, request.user, request.user)
 
     # Mark the action as initiated
-    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user)
+    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Rerun the course as a new celery task
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, fields)
