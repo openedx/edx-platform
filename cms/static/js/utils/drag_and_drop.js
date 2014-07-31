@@ -71,7 +71,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
                                 // Facilitate dropping into the beginning or end of a list
                                 // (coming from opposite direction) via a "fudge factor". Math.min is for Jasmine test.
-                                var fudge = Math.min(Math.ceil(siblingHeight / 2), 20);
+                                var fudge = Math.min(Math.ceil(siblingHeight / 2), 35);
 
                                 // Dragging to top or bottom of a list with only one element is tricky
                                 // because the element being dragged may be the same size as the sibling.
