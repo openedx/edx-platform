@@ -132,8 +132,10 @@ class CourseMode(models.Model):
 
 class CourseModesArchive(models.Model):
     """
-    Store the CourseModesArchives in this model
-
+    Store the past values of course_mode that a course had in the past. We decided on having
+    separate model, because there is a uniqueness contraint on (course_mode, course_id)
+    field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
+    such as course price changes
     """
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True)
