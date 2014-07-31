@@ -134,15 +134,15 @@ describe "DiscussionThreadListView", ->
             </div>
             <div class="forum-nav-thread-list-wrapper">
                 <div class="forum-nav-refine-bar">
-                    <span class="forum-nav-filter-main">
+                    <label class="forum-nav-filter-main">
                         <select class="forum-nav-filter-main-control">
                             <option value="all">Show all</option>
-                            <option value="unread">Show unread</option>
-                            <option value="unanswered">Show unanswered</option>
-                            <option value="flagged">Show flagged</option>
+                            <option value="unread">Unread</option>
+                            <option value="unanswered">Unanswered</option>
+                            <option value="flagged">Flagged</option>
                         </select>
                     </span>
-                    <span class="forum-nav-sort">
+                    <label class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
                             <option value="date">by recent activity</option>
                             <option value="comments">by most activity</option>
