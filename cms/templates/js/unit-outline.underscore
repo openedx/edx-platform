@@ -3,7 +3,7 @@
         data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
         <div class="<%= xblockType %>-header">
             <h3 class="<%= xblockType %>-header-details">
-                <span class="unit-title item-title">
+                <span class="<%= xblockType %>-title item-title">
                     <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
                 </span>
             </h3>
