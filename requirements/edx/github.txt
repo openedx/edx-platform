@@ -31,3 +31,4 @@
 -e git+https://github.com/edx/opaque-keys.git@c63412fc939cd094ddbc9c2ef71acb345e3b4eb7#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@f5303e82dff368c7595884d9325aeea1d802da25#egg=i18n-tools
+-e git+https://github.com/pmitros/RecommenderXBlock.git@04d0ff033020c4d363cc52f365cf14bb0370da4b#egg=recommender-xblock
