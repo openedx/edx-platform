@@ -23,6 +23,7 @@ NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/github.txt',
+    'requirements/edx/custom.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/paver.txt',
