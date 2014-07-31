@@ -212,7 +212,6 @@ define([
 
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
-    "js/spec/models/group_configuration_spec",
     "js/spec/models/xblock_info_spec",
 
     "js/spec/utils/drag_and_drop_spec",
