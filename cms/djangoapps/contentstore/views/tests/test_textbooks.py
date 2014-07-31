@@ -65,6 +65,7 @@ class TextbookIndexTestCase(CourseTestCase):
         )
         self.assertEqual(resp.status_code, 200)
         obj = json.loads(resp.content)
+
         self.assertEqual(content, obj)
 
     def test_view_index_xhr_put(self):

@@ -214,6 +214,7 @@ define([
 
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
+    "js/spec/models/group_configuration_spec",
 
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
@@ -229,9 +230,12 @@ define([
     "js/spec/views/xblock_editor_spec",
 
     "js/spec/views/pages/container_spec",
+    "js/spec/views/pages/group_configurations_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
+
+    "js/spec/views/group_configuration_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",
 

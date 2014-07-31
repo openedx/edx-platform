@@ -17,7 +17,7 @@ The following documentation is available:
 
   You can also download the guide as a PDF from the edX Studio user interface.
 
-* `edX Data Documentation`_
+* `edX Research Guide`_
 
 
 * `edX Developer's Guide`_

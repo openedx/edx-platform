@@ -9,6 +9,7 @@ import os
 import traceback
 import struct
 import sys
+import re
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
@@ -18,6 +19,7 @@ except ImportError:
     dog_stats_api = None
 
 from pkg_resources import resource_string
+from lxml import etree
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
@@ -198,7 +200,7 @@ class CapaFields(object):
              "This key is granted for exclusive use by this course for the specified duration. "
              "Please do not share the API key with other courses and notify MathWorks immediately "
              "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report and issue, please contact moocsupport@mathworks.com",
+             "or to report an issue, please contact moocsupport@mathworks.com",
         scope=Scope.settings
     )
 
@@ -207,6 +209,9 @@ class CapaMixin(CapaFields):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
+
+    show_hint_button = False
+    next_hint_index = 0
 
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
@@ -599,14 +604,51 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def get_problem_html(self, encapsulate=True):
-        """
-        Return html for the problem.
+    def _tally_problem_hints(self):
+        '''
+        Count the number of problem hints specified in the problem XML, saving
+        that value in self.problem_hints_counts
+        :return: Number of problem hints found
+        '''
+        hint_elements_list = self.lcp.tree.xpath("//problem/demandhint/hint")
+        self.problem_hints_count = len(hint_elements_list)
+        self.show_hint_button = (self.problem_hints_count > 0)
+        return self.problem_hints_count
 
-        Adds check, reset, save buttons as necessary based on the problem config and state.
+    def _replace_div_text(self, hint_text, html):
         """
+        This is a clumsy way of inserting the text of a problem hint into the html stream.
+        We're relying here on a very specific pattern appearing in the html. That pattern is
+        replaced by the new hint text embedded in some of the html that was in the match pattern.
+
+        If the magic pattern is not found in the html string, an exception is thrown.
+
+        There is probably a better way to do this but I couldn't think anything better this far
+        downstream.
+        :param hint_text:   the text of the hint to be inserted
+        :param html:        the existing html string to be modified
+        :return:            the modified version of the html string
+        """
+        MARKER_PATTERN = '<div hidden class="problem_hint">MARKER</div>'  # this appears verbatim in problem.html
+        REPLACEMENT_STRING = '<div        class="problem_hint">' + hint_text + '</div>'
+        if str(html).__contains__(MARKER_PATTERN):
+            html = html.replace(MARKER_PATTERN, REPLACEMENT_STRING)  # replace the marker pattern (see problem.html)
+        else:
+            raise NotFoundError('Marker pattern not found')
+        return html
+
+    def get_problem_html(self, encapsulate=True, show_problem_hint=False):
+        '''
+        Return html for the problem.
+        Displays check, reset, save, and hint buttons as necessary.
+
+        :param encapsulate:         true -- embed the html in a problem <div>
+        :param show_problem_hint:   true -- present the next sequential problem hint to the student
+        :return:                    the updated html string
+        '''
 
         try:
+            self._tally_problem_hints()
             html = self.lcp.get_html()
 
         # If we cannot construct the problem HTML,
@@ -646,6 +688,14 @@ class CapaMixin(CapaFields):
             'weight': self.weight,
         }
 
+        hint_text = ''
+        if show_problem_hint:                       # if the student has requested a problem hint
+            hint_element = self.lcp.tree.xpath("//problem/demandhint/hint")[ self.next_hint_index ]
+            hint_text = hint_element.text.strip()
+            self.next_hint_index += 1                               # increment the index
+            if self.next_hint_index == self.problem_hints_count:    # if all hints have been shown
+                self.next_hint_index = 0                            # reset back to the first hint again
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
@@ -659,9 +709,14 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'show_hint_button': self.show_hint_button,
+            'next_hint_index':self.next_hint_index,
         }
 
         html = self.runtime.render_template('problem.html', context)
+
+        if hint_text != '':
+            html = self._replace_div_text(hint_text, html)
 
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
@@ -677,7 +732,55 @@ class CapaMixin(CapaFields):
         if self.runtime.replace_jump_to_id_urls:
             html = self.runtime.replace_jump_to_id_urls(html)
 
+        html = self._strip_hints_from_xml(html)
+
         return html
+
+    def _strip_element(self, element_name, html):
+        """
+        Using a bit of regex magic, strip out of an html string an entire XML element. How this
+        works is a bit obscure but it does work. Suppose our html has this element in it somewhere:
+                    <foo/>
+                    <demandhint>
+                        <hint> blah blah </hint>
+                    </demandhint>
+                    <bar/>
+        will be reduced to this:
+                    <foo/>
+                    <bar/>
+        when this funtion is called with element_name = 'demandhint'
+        :param element_name: the name of the element to excise
+        :param html:         the string representation of the XML to operate on
+        :return:             a potentially modified string representation of the XML
+        """
+        length_start = len(html)
+        html = re.sub(r'</' + element_name + '>','~', html)
+        html = re.sub(r'<' + element_name + '[^~]+~', '', html)
+        return html
+
+    def _strip_hints_from_xml(self, html):
+        html = self._strip_element('demandhint', html)
+        html = self._strip_element('choicehint', html)
+        html = self._strip_element('optionhint', html)
+        html = self._strip_element('stringhint', html)
+        html = self._strip_element('numerichint', html)
+        html = self._strip_element('optionhint', html)
+        html = self._strip_element('correcthint', html)
+        html = self._strip_element('regexphint', html)
+        html = self._strip_element('additional_answer', html)
+        html = self._strip_element('stringequalhint', html)
+        html = self._strip_element('booleanhint', html)
+        html = self._strip_element('stringequalhint', html)
+        return html
+
+    def hint_button(self, data):
+        self.next_hint_index = int(data['next_hint_index'])
+        html = self.get_problem_html(encapsulate=False, show_problem_hint=True)
+
+        return {
+            'success': True,
+            'contents': html,
+        }
 
     def exceeded_time_limit(self):
         """

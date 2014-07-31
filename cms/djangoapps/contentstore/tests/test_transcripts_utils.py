@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -151,8 +151,6 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
     def tearDown(self):
         self.clear_subs_content()
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -188,10 +186,6 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     def setUp(self):
         self.course = CourseFactory.create(
             org=self.org, number=self.number, display_name=self.display_name)
-
-    def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
     def test_success_downloading_subs(self):
 

@@ -9,7 +9,6 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.mixed import store_branch_setting
 from fs.osfs import OSFS
 from json import dumps
 import json
@@ -45,7 +44,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     root = lxml.etree.Element('unknown')
 
     # export only the published content
-    with store_branch_setting(course.runtime.modulestore, ModuleStoreEnum.Branch.published_only):
+    with modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
         course.add_xml_to_node(root)
 
     with export_fs.open('course.xml', 'w') as course_xml:

@@ -152,7 +152,7 @@ def instructor_dashboard(request, course_id):
         """Outputs a CSV file from the contents of a datatable."""
         if file_pointer is None:
             response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(func)
+            response['Content-Disposition'] = (u'attachment; filename={0}'.format(func)).encode('utf-8')
         else:
             response = file_pointer
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
@@ -1033,7 +1033,7 @@ def instructor_dashboard(request, course_id):
         'course_errors': modulestore().get_course_errors(course.id),
         'instructor_tasks': instructor_tasks,
         'offline_grade_log': offline_grades_available(course_key),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key': course_key.to_deprecated_string()}),
+        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
 
         'analytics_results': analytics_results,
         'disable_buttons': disable_buttons,

@@ -436,10 +436,8 @@ To create an HTML component that contains LaTeX code:
 #. Enable the policy key in your course.
 
    #. In Studio, click **Settings**, and then click **Advanced Settings**.
-   #. On the **Advanced Settings** page, scroll down to the
-      **use_latex_compiler** policy key.
-   #. In the **Policy Value** field next to the **use_latex_compiler** policy
-      key, change **false** to **true**.
+   #. In the field for the **Enable LaTeX Compiler** policy key, change
+      **false** to **true**.
    #. At the bottom of the page, click **Save Changes**.
 
 #. In the unit where you want to create the component, click **html** under

@@ -1,23 +1,20 @@
 if Backbone?
   class @DiscussionThreadListView extends Backbone.View
     events:
-      "click .search": "showSearch"
-      "click .home": "goHome"
-      "click .browse": "toggleTopicDrop"
-      "keydown .post-search-field": "performSearch"
-      "focus .post-search-field": "showSearch"
-      "click .sort-bar a": "sortThreads"
-      "click .browse-topic-drop-menu": "filterTopic"
-      "click .browse-topic-drop-search-input": "ignoreClick"
-      "click .post-list .list-item a": "threadSelected"
-      "click .post-list .more-pages a": "loadMorePages"
-      "change .cohort-options": "chooseCohort"
-      'keyup .browse-topic-drop-search-input': DiscussionFilter.filterDrop
+      "click .forum-nav-browse": "toggleBrowseMenu"
+      "keypress .forum-nav-browse-filter-input": (event) => DiscussionUtil.ignoreEnterKey(event)
+      "keyup .forum-nav-browse-filter-input": "filterTopics"
+      "click .forum-nav-browse-menu-wrapper": "ignoreClick"
+      "click .forum-nav-browse-title": "selectTopic"
+      "keydown .forum-nav-search-input": "performSearch"
+      "change .forum-nav-sort-control": "sortThreads"
+      "click .forum-nav-thread-link": "threadSelected"
+      "click .forum-nav-load-more-link": "loadMorePages"
+      "change .forum-nav-filter-cohort-control": "chooseCohort"
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
-      @sortBy = "date"
       @discussionIds=""
       @collection.on "reset", (discussion) =>
         board = $(".current-board").html()
@@ -30,7 +27,6 @@ if Backbone?
         #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
       @sidebar_padding = 10
-      @sidebar_header_height = 87
       @boardName
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
@@ -68,9 +64,10 @@ if Backbone?
       @clearSearchAlerts()
       thread_id = thread.get('id')
       content = @renderThread(thread)
-      current_el = @$("a[data-id=#{thread_id}]")
-      active = current_el.hasClass("active")
+      current_el = @$(".forum-nav-thread[data-id=#{thread_id}]")
+      active = current_el.has(".forum-nav-thread-link.is-active").length != 0
       current_el.replaceWith(content)
+      @showMetadataAccordingToSort()
       if active
         @setActiveThread(thread_id)
 
@@ -78,8 +75,8 @@ if Backbone?
     #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
       commentable_id = thread.get("commentable_id")
-      commentable = @$(".board-name[data-discussion_id]").filter(-> $(this).data("discussion_id").id == commentable_id)
-      @setTopicHack(commentable)
+      menuItem = @$(".forum-nav-browse-menu-item[data-discussion-id]").filter(-> $(this).data("discussion-id").id == commentable_id)
+      @setCurrentTopicDisplay(@getPathText(menuItem))
       @retrieveDiscussion commentable_id, =>
         @trigger "thread:created", thread.get('id')
 
@@ -88,18 +85,15 @@ if Backbone?
       scrollTop = $(window).scrollTop();
       windowHeight = $(window).height();
 
-      discussionBody = $(".discussion-article")
+      discussionBody = $(".discussion-column")
       discussionsBodyTop = if discussionBody[0] then discussionBody.offset().top
       discussionsBodyBottom = discussionsBodyTop + discussionBody.outerHeight()
 
-      sidebar = $(".sidebar")
+      sidebar = $(".forum-nav")
       if scrollTop > discussionsBodyTop - @sidebar_padding
         sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
       else
         sidebar.css('top', '0');
-
-      sidebarWidth = .31 * $(".discussion-body").width();
-      sidebar.css('width', sidebarWidth + 'px');
 
       sidebarHeight = windowHeight - Math.max(discussionsBodyTop - scrollTop, @sidebar_padding)
 
@@ -111,19 +105,23 @@ if Backbone?
       sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
       sidebar.css 'height', sidebarHeight
 
-      postListWrapper = @$('.post-list-wrapper')
-      postListWrapper.css('height', (sidebarHeight - @sidebar_header_height - 4) + 'px')
+      headerHeight = @$(".forum-nav-header").outerHeight()
+      refineBarHeight = @$(".forum-nav-refine-bar").outerHeight()
+      browseFilterHeight = @$(".forum-nav-browse-filter").outerHeight()
+      @$('.forum-nav-thread-list').css('height', (sidebarHeight - headerHeight - refineBarHeight - 2) + 'px')
+      @$('.forum-nav-browse-menu').css('height', (sidebarHeight - headerHeight - browseFilterHeight - 2) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
-    # closed, we need to ignore clicks in the search field and stop propagation.
-    # Without this, clicking the search field would also close the menu.
+    # closed, we need to stop propagation of a click in any part of the menu
+    # that is not a link.
     ignoreClick: (event) ->
         event.stopPropagation()
 
     render: ->
       @timer = 0
       @$el.html(@template())
+      @$(".forum-nav-sort-control").val(@collection.sort_preference)
 
       $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
@@ -132,36 +130,49 @@ if Backbone?
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
       @renderThreads()
-      sort_element = @$('.sort-bar a[data-sort="' + this.collection.sort_preference + '"]')
-      sort_element.attr('aria-checked',true)
-      sort_element.addClass('active')
       @
 
     renderThreads: =>
-      @$(".post-list").html("")
+      @$(".forum-nav-thread-list").html("")
       rendered = $("<div></div>")
       for thread in @displayedCollection.models
         content = @renderThread(thread)
         rendered.append content
-        content.wrap("<li class='list-item' data-id='\"#{thread.get('id')}\"' />")
 
-      @$(".post-list").html(rendered.html())
+      @$(".forum-nav-thread-list").html(rendered.html())
+      @showMetadataAccordingToSort()
+
       @renderMorePages()
       @updateSidebar()
       @trigger "threads:rendered"
 
+    showMetadataAccordingToSort: () =>
+      # Ensure that threads display metadata appropriate for the current sort
+      voteCounts = @$(".forum-nav-thread-votes-count")
+      commentCounts = @$(".forum-nav-thread-comments-count")
+      voteCounts.hide()
+      commentCounts.hide()
+      switch @$(".forum-nav-sort-control").val()
+        when "date", "comments"
+          commentCounts.show()
+        when "votes"
+          voteCounts.show()
+
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
-        @$(".post-list").append("<li class='more-pages'><a href='#'>" + gettext("Load more") + "</a></li>")
+        @$(".forum-nav-thread-list").append("<li class='forum-nav-load-more'><a href='#' class='forum-nav-load-more-link'>" + gettext("Load more") + "</a></li>")
 
-    loadMorePages: (event) ->
+    getLoadingContent: (srText) ->
+      return '<div class="forum-nav-loading" tabindex="0"><span class="icon-spinner icon-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
+
+    loadMorePages: (event) =>
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation" tabindex=0><span class="sr" role="alert">' + gettext('Loading more threads') + '</span></div>')
-      @$(".more-pages").addClass("loading")
-      loadingDiv = @$(".more-pages .loading-animation")
-      DiscussionUtil.makeFocusTrap(loadingDiv)
-      loadingDiv.focus()
+      loadMoreElem = @$(".forum-nav-load-more")
+      loadMoreElem.html(@getLoadingContent(gettext("Loading more threads")))
+      loadingElem = loadMoreElem.find(".forum-nav-loading")
+      DiscussionUtil.makeFocusTrap(loadingElem)
+      loadingElem.focus()
       options = {}
       switch @mode
         when 'search'
@@ -184,57 +195,40 @@ if Backbone?
       if lastThread
         # Pagination; focus the first thread after what was previously the last thread
         @once("threads:rendered", ->
-          $(".post-list li:has(a[data-id='#{lastThread}']) + li a").focus()
+          $(".forum-nav-thread[data-id='#{lastThread}'] + .forum-nav-thread .forum-nav-thread-link").focus()
         )
       else
         # Totally refreshing the list (e.g. from clicking a sort button); focus the first thread
         @once("threads:rendered", ->
-          $(".post-list a").first()?.focus()
+          $(".forum-nav-thread-link").first()?.focus()
         )
 
       error = =>
         @renderThreads()
         DiscussionUtil.discussionAlert(gettext("Sorry"), gettext("We had some trouble loading more threads. Please try again."))
 
-      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy}, error)
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @$(".forum-nav-sort-control").val()}, error)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
-      if thread.get('subscribed')
-        content.addClass("followed")
-      if thread.get('endorsed')
-        content.addClass("resolved")
-      if thread.get('read')
-        content.addClass("read")
-      unreadCount = thread.get('unread_comments_count')
+      unreadCount = thread.get('unread_comments_count') + (if thread.get("read") then 0 else 1)
       if unreadCount > 0
-        content.find('.comments-count').addClass("unread").attr(
+        content.find('.forum-nav-thread-comments-count').attr(
           "data-tooltip",
           interpolate(
             ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', unreadCount),
-            {unread_count: thread.get('unread_comments_count')},
+            {unread_count: unreadCount},
             true
           )
         )
-      @highlight(content)
-
-
-    highlight: (el) ->
-      el.html(el.html().replace(/&lt;mark&gt;/g, "<mark>").replace(/&lt;\/mark&gt;/g, "</mark>"))
-
-    renderThreadListItem: (thread) =>
-      view = new ThreadListItemView(model: thread)
-      view.on "thread:selected", @threadSelected
-      view.on "thread:removed", @threadRemoved
-      view.render()
-      @$(".post-list").append(view.el)
+      content
 
     threadSelected: (e) =>
       # Use .attr('data-id') rather than .data('id') because .data does type
       # coercion. Usually, this is fine, but when Mongo gives an object id with
       # no letters, it casts it to a Number.
 
-      thread_id = $(e.target).closest("a").attr("data-id")
+      thread_id = $(e.target).closest(".forum-nav-thread").attr("data-id")
       @setActiveThread(thread_id)
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
@@ -243,21 +237,13 @@ if Backbone?
       @trigger("thread:removed", thread_id)
 
     setActiveThread: (thread_id) ->
-      @$(".post-list a[data-id!='#{thread_id}']").removeClass("active")
-      @$(".post-list a[data-id='#{thread_id}']").addClass("active")
-
-    showSearch: ->
-      @$(".browse").removeClass('is-dropped')
-      @hideTopicDrop()
-
-      @$(".search").addClass('is-open')
-      @$(".browse").removeClass('is-open')
-      setTimeout (-> @$(".post-search-field").focus()), 200 unless @$(".post-search-field").is(":focus")
+      @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
+      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
       $(".discussion-column").html(@template)
-      $(".post-list a").removeClass("active")
+      $(".forum-nav-thread-list a").removeClass("is-active")
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
@@ -272,51 +258,66 @@ if Backbone?
       @trigger("thread:removed")  
       #select all threads
 
+    isBrowseMenuVisible: =>
+      @$(".forum-nav-browse-menu-wrapper").is(":visible")
 
-    toggleTopicDrop: (event) =>
+    showBrowseMenu: =>
+      if not @isBrowseMenuVisible()
+        @$(".forum-nav-browse").addClass("is-active")
+        @$(".forum-nav-browse-menu-wrapper").show()
+        @$(".forum-nav-thread-list-wrapper").hide()
+        $(".forum-nav-browse-filter-input").focus()
+        $("body").bind "click", @hideBrowseMenu
+        @updateSidebar()
+
+    hideBrowseMenu: =>
+      if @isBrowseMenuVisible()
+        @$(".forum-nav-browse").removeClass("is-active")
+        @$(".forum-nav-browse-menu-wrapper").hide()
+        @$(".forum-nav-thread-list-wrapper").show()
+        $("body").unbind "click", @hideBrowseMenu
+        @updateSidebar()
+
+    toggleBrowseMenu: (event) =>
       event.preventDefault()
       event.stopPropagation()
-      if @current_search != ""
-        @clearSearch()
-      @$(".search").removeClass('is-open')
-      @$(".browse").addClass('is-open')
-      @$(".browse").toggleClass('is-dropped')
 
-      if @$(".browse").hasClass('is-dropped')
-        @$(".browse-topic-drop-menu-wrapper").show()
-        $(".browse-topic-drop-search-input").focus()
-        $("body").bind "click", @toggleTopicDrop
-        $("body").bind "keydown", @setActiveItem
+      if @isBrowseMenuVisible()
+        @hideBrowseMenu()
       else
-        @hideTopicDrop()
+        @showBrowseMenu()
 
-    hideTopicDrop: ->
-      @$(".browse-topic-drop-menu-wrapper").hide()
-      $("body").unbind "click", @toggleTopicDrop
-      $("body").unbind "keydown", @setActiveItem
+    # Given a menu item, get the text for it and its ancestors
+    # (starting from the root, separated by " / ")
+    getPathText: (item) ->
+      path = item.parents(".forum-nav-browse-menu-item").andSelf()
+      pathTitles = path.children(".forum-nav-browse-title").map((i, elem) -> $(elem).text()).get()
+      pathText = pathTitles.join(" / ")
 
-    # TODO get rid of this asap
-    setTopicHack: (boardNameContainer) ->
-      item = $(boardNameContainer).closest('a')
-      boardName = item.find(".board-name").html()
-      _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
-        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
-      @$(".current-board").html(@fitName(boardName))
+    filterTopics: (event) =>
+      query = $(event.target).val()
+      items = @$(".forum-nav-browse-menu-item")
+      if query.length == 0
+        items.show()
+      else
+        # If all filter terms occur in the path to an item then that item and
+        # all its descendants are displayed
+        items.hide()
+        items.each (i, item) =>
+          item = $(item)
+          if not item.is(":visible")
+            pathText = @getPathText(item).toLowerCase()
+            if query.split(" ").every((term) -> pathText.search(term.toLowerCase()) != -1)
+              path = item.parents(".forum-nav-browse-menu-item").andSelf()
+              path.add(item.find(".forum-nav-browse-menu-item")).show()
 
-    setTopic: (event) ->
-      item = $(event.target).closest('a')
-      boardName = item.find(".board-name").html()
-      _.each item.parents('ul').not('.browse-topic-drop-menu'), (parent) ->
-        boardName = $(parent).siblings('a').find('.board-name').html() + ' / ' + boardName
-      @$(".current-board").html(@fitName(boardName))
-
-    setSelectedTopic: (name) ->
-      @$(".current-board").html(@fitName(name))
+    setCurrentTopicDisplay: (text) ->
+      @$(".forum-nav-browse-current").text(@fitName(text))
 
     getNameWidth: (name) ->
       test = $("<div>")
       test.css
-        "font-size": @$(".current-board").css('font-size')
+        "font-size": @$(".forum-nav-browse-current").css('font-size')
         opacity: 0
         position: 'absolute'
         left: -1000
@@ -328,54 +329,57 @@ if Backbone?
       return width
 
     fitName: (name) ->
-      @maxNameWidth = (@$el.width() * .8) - 50
+      @maxNameWidth = @$(".forum-nav-browse").width() -
+        parseInt(@$(".forum-nav-browse").css("padding-left")) -
+        parseInt(@$(".forum-nav-browse").css("padding-right")) -
+        @$(".forum-nav-browse .icon").outerWidth(true) -
+        @$(".forum-nav-browse-drop-arrow").outerWidth(true)
       width = @getNameWidth(name)
       if width < @maxNameWidth
         return name
       path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
+      prefix = ""
       while path.length > 1
+        prefix = gettext("…") + "/"
         path.shift()
-        partialName = gettext("…") + "/" + path.join("/")
+        partialName = prefix + path.join("/")
         if  @getNameWidth(partialName) < @maxNameWidth
           return partialName
       rawName = path[0]
-      name = gettext("…") + "/" + rawName
+      name = prefix + rawName
       while @getNameWidth(name) > @maxNameWidth
         rawName = rawName[0...rawName.length-1]
-        name =  gettext("…") + "/" + rawName + gettext("…")
+        name =  prefix + rawName + gettext("…")
       return name
 
-    filterTopic: (event) ->
-      if @current_search != ""
-        @setTopic(event)
-        @clearSearch @filterTopic, event
+    selectTopic: (event) ->
+      event.preventDefault()
+      @hideBrowseMenu()
+      @clearSearch()
+
+      item = $(event.target).closest('.forum-nav-browse-menu-item')
+      @setCurrentTopicDisplay(@getPathText(item))
+      if item.hasClass("forum-nav-browse-menu-all")
+        @discussionIds = ""
+        @$('.forum-nav-filter-cohort').show()
+        @retrieveAllThreads()
+      else if item.hasClass("forum-nav-browse-menu-flagged")
+        @discussionIds = ""
+        @$('.forum-nav-filter-cohort').hide()
+        @retrieveFlaggedThreads() 
+      else if item.hasClass("forum-nav-browse-menu-following")
+        @retrieveFollowed()
+        @$('.forum-nav-filter-cohort').hide()
       else
-        @setTopic(event)  # just sets the title for the dropdown
-        item = $(event.target).closest('li')
-        discussionId = item.find("span.board-name").data("discussion_id")
-        if discussionId == "#all"
-          @discussionIds = ""
-          @$(".post-search-field").val("")
-          @$('.cohort').show()                    
-          @retrieveAllThreads()
-        else if discussionId == "#flagged"
-          @discussionIds = ""
-          @$(".post-search-field").val("")
-          @$('.cohort').hide() 
-          @retrieveFlaggedThreads() 
-        else if discussionId == "#following"
-          @retrieveFollowed(event)
-          @$('.cohort').hide()
-        else
-          discussionIds = _.map item.find(".board-name[data-discussion_id]"), (board) -> $(board).data("discussion_id").id
-          
-          if $(event.target).attr('cohorted') == "True"
-            @retrieveDiscussions(discussionIds, "function(){$('.cohort').show();}")
-          else
-            @retrieveDiscussions(discussionIds, "function(){$('.cohort').hide();}")
-    
+        allItems = item.find(".forum-nav-browse-menu-item").andSelf()
+        discussionIds = allItems.filter("[data-discussion-id]").map(
+          (i, elem) -> $(elem).data("discussion-id").id
+        ).get()
+        @retrieveDiscussions(discussionIds)
+        @$(".forum-nav-filter-cohort").toggle(item.data('cohorted') == true)
+
     chooseCohort: (event) ->
-      @group_id = @$('.cohort-options :selected').val()
+      @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
       @collection.current_page = 0
       @collection.reset()
       @loadMorePages(event)
@@ -416,23 +420,19 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      activeSort = @$(".sort-bar a.active")
-      activeSort.removeClass("active")
-      activeSort.attr("aria-checked", "false")
-      newSort = $(event.target)
-      newSort.addClass("active")
-      newSort.attr("aria-checked", "true")
-      @sortBy = newSort.data("sort")
-      @displayedCollection.setSortComparator(@sortBy)
+      @displayedCollection.setSortComparator(@$(".forum-nav-sort-control").val())
+
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
       if event.which == 13
         event.preventDefault()
-        text = @$(".post-search-field").val()
+        @hideBrowseMenu()
+        @setCurrentTopicDisplay(gettext("Search Results"))
+        text = @$(".forum-nav-search-input").val()
         @searchFor(text)
 
-    searchFor: (text, callback, value) ->
+    searchFor: (text) ->
       @clearSearchAlerts()
       @mode = 'search'
       @current_search = text
@@ -441,17 +441,16 @@ if Backbone?
       # Mainly because this currently does not reset any pagination variables which could cause problems.
       # This doesn't use pagination either.
       DiscussionUtil.safeAjax
-        $elem: @$(".post-search-field")
+        $elem: @$(".forum-nav-search-input")
         data: { text: text }
         url: url
         type: "GET"
         dataType: 'json'
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">' + gettext('Loading thread list') + '</span></div></li>')
+          @$(".forum-nav-thread-list").html("<li class='forum-nav-load-more'>" + @getLoadingContent(gettext("Loading thread list")) + "</li>")
         loadedCallback: =>
-          if callback
-            callback.apply @, [value]
+          @$(".forum-nav-thread-list .forum-nav-load-more").remove()
         success: (response, textStatus) =>
           if textStatus == 'success'
             # TODO: Augment existing collection?
@@ -497,40 +496,13 @@ if Backbone?
             )
             @addSearchAlert(message)
 
-    clearSearch: (callback, value) ->
-      @$(".post-search-field").val("")
-      @searchFor("", callback, value)
+    clearSearch: ->
+      @$(".forum-nav-search-input").val("")
+      @current_search = ""
 
-    setActiveItem: (event) ->
-      if event.which == 13
-        $(".browse-topic-drop-menu-wrapper .focused").click()
-        return
-      if event.which != 40 && event.which != 38
-        return
-
-      event.preventDefault()
-
-      items = $.makeArray($(".browse-topic-drop-menu-wrapper a").not(".hidden"))
-      index = items.indexOf($('.browse-topic-drop-menu-wrapper .focused')[0])
-
-      if event.which == 40
-          index = Math.min(index + 1, items.length - 1)
-      if event.which == 38
-          index = Math.max(index - 1, 0)
-
-      $(".browse-topic-drop-menu-wrapper .focused").removeClass("focused")
-      $(items[index]).addClass("focused")
-
-      itemTop = $(items[index]).parent().offset().top
-      scrollTop = $(".browse-topic-drop-menu").scrollTop()
-      itemFromTop = $(".browse-topic-drop-menu").offset().top - itemTop
-      scrollTarget = Math.min(scrollTop - itemFromTop, scrollTop)
-      scrollTarget = Math.max(scrollTop - itemFromTop - $(".browse-topic-drop-menu").height() + $(items[index]).height(), scrollTarget)
-      $(".browse-topic-drop-menu").scrollTop(scrollTarget)
-
-    retrieveFollowed: (event)=>
+    retrieveFollowed: () =>
       @mode = 'followed'
-      @retrieveFirstPage(event)
+      @retrieveFirstPage()
 
     updateEmailNotifications: () =>
       if $('input.email-setting').attr('checked')

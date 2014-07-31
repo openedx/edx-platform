@@ -343,6 +343,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
+@XBlock.wants('user')
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
@@ -553,11 +554,12 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         for group in user_partition.groups:
             str_group_id = unicode(group.id)
             if str_group_id not in self.group_id_to_child:
-                self._create_vertical_for_group(group, request.user.id)
+                user_id = self.runtime.service(self, 'user').user_id
+                self._create_vertical_for_group(group, user_id)
                 changed = True
 
         if changed:
-            # request does not have a user attribute, so pass None for user.
+            # TODO user.id - to be fixed by Publishing team
             self.system.modulestore.update_item(self, None)
         return Response()
 
@@ -567,16 +569,18 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         This appends the new vertical to the end of children, and updates group_id_to_child.
         A mutable modulestore is needed to call this method (will need to update after mixed
-        modulestore work, currently relies on mongo's create_and_save_xmodule method).
+        modulestore work, currently relies on mongo's create_item method).
         """
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_and_save_xmodule'), \
+        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
         metadata = {'display_name': group.name}
-        modulestore.create_and_save_xmodule(
-            dest_usage_key,
+        modulestore.create_item(
             user_id,
+            self.location.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
             runtime=self.system,

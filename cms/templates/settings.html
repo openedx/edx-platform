@@ -83,7 +83,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
-              <label for="course-name">${_("Course Name")}</label>
+              <label for="course-name">${_("Course Run")}</label>
               <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-name" readonly />
             </li>
@@ -363,6 +363,9 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
+          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
+          % endif
           </ul>
         </nav>
      % endif

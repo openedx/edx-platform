@@ -15,6 +15,7 @@ import os
 
 from path import path
 from dealer.git import git
+from xmodule.modulestore.modulestore_settings import convert_module_store_setting_if_needed
 
 # SERVICE_VARIANT specifies name of the variant used, which decides what JSON
 # configuration files are read during startup.
@@ -150,6 +151,8 @@ TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
+ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
+
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 
@@ -229,7 +232,7 @@ if AWS_SECRET_ACCESS_KEY == "":
     AWS_SECRET_ACCESS_KEY = None
 
 DATABASES = AUTH_TOKENS['DATABASES']
-MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS['MODULESTORE'])
+MODULESTORE = convert_module_store_setting_if_needed(AUTH_TOKENS.get('MODULESTORE', MODULESTORE))
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
 DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
 # Datadog for events!

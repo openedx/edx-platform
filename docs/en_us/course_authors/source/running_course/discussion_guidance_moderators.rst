@@ -68,11 +68,14 @@ Time sensitive problems
 
 * Please alert the course staff about problems that need to be dealt with quickly, such as problems with a graded assignment. Setting up a course email address that is checked frequently is a good way to manage these alerts. 
 
-* Content Questions 
+============================
+Content Questions 
+============================
 
- - Assist with content questions sensitively, but be careful not to post spoilers. Do not ask students to post their solutions!
+* Assist with content questions sensitively, but be careful not to post
+  spoilers. Do not ask students to post their solutions!
 
- - A good guiding question can be better than an answer.
+* A good guiding question can be better than an answer.
 
 ============================
 Redundant posts 

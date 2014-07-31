@@ -21,3 +21,21 @@ class IgnoredFilesTestCase(unittest.TestCase):
         self.assertIn("example.txt", name_val)
         self.assertNotIn("example.txt~", name_val)
         self.assertIn("GREEN", name_val["example.txt"])
+
+    def test_ignore_dot_underscore_static_files(self):
+        """
+        Test for ignored Mac OS metadata files (filename starts with "._")
+        """
+        course_dir = DATA_DIR / "dot-underscore"
+        course_id = SlashSeparatedCourseKey("edX", "dot-underscore", "2014_Fall")
+        content_store = Mock()
+        content_store.generate_thumbnail.return_value = ("content", "location")
+        import_static_content(course_dir, content_store, course_id)
+        saved_static_content = [call[0][0] for call in content_store.save.call_args_list]
+        name_val = {sc.name: sc.data for sc in saved_static_content}
+        self.assertIn("example.txt", name_val)
+        self.assertIn(".example.txt", name_val)
+        self.assertNotIn("._example.txt", name_val)
+        self.assertNotIn(".DS_Store", name_val)
+        self.assertIn("GREEN", name_val["example.txt"])
+        self.assertIn("BLUE", name_val[".example.txt"])

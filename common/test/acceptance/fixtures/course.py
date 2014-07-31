@@ -2,6 +2,7 @@
 Fixture to create a course and course components (XBlocks).
 """
 
+import mimetypes
 import json
 import re
 import datetime
@@ -265,14 +266,14 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course.
         """
-        return "slashes:{org}+{number}+{run}".format(**self._course_dict)
+        return "{org}/{number}/{run}".format(**self._course_dict)
 
     @property
     def _course_location(self):
         """
         Return the locator string for the course.
         """
-        return "location:{org}+{number}+{run}+course+{run}".format(**self._course_dict)
+        return "i4x://{org}/{number}/course/{run}".format(**self._course_dict)
 
     @property
     def _assets_url(self):
@@ -286,7 +287,7 @@ class CourseFixture(StudioApiFixture):
         """
         Return the locator string for the course handouts
         """
-        return "location:{org}+{number}+{run}+course_info+handouts".format(**self._course_dict)
+        return "i4x://{org}/{number}/course_info/handouts".format(**self._course_dict)
 
     def _create_course(self):
         """
@@ -407,10 +408,10 @@ class CourseFixture(StudioApiFixture):
         test_dir = path(__file__).abspath().dirname().dirname().dirname()
 
         for asset_name in self._assets:
-            srt_path = test_dir + '/data/uploads/' + asset_name
+            asset_file_path = test_dir + '/data/uploads/' + asset_name
 
-            asset_file = open(srt_path)
-            files = {'file': (asset_name, asset_file)}
+            asset_file = open(asset_file_path)
+            files = {'file': (asset_name, asset_file, mimetypes.guess_type(asset_file_path)[0])}
 
             headers = {
                 'Accept': 'application/json',

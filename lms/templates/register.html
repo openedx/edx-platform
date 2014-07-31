@@ -15,7 +15,8 @@
 <%! from third_party_auth import pipeline, provider %>
 <%! import calendar %>
 
-<%block name="pagetitle">${_("Create your {platform_name} learning and research account!").format(platform_name=platform_name)}</%block>
+<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
+
 <%block name="bodyclass">view-register</%block>
 
 <%block name="js_extra">
@@ -94,8 +95,8 @@
 <section class="introduction">
   <header>
     <h1 class="title">
-      <span class="title-super">${_("Welcome to the {platform_name} Learning and Research Community").format(platform_name=platform_name)}</span>
-      <span class="title-sub">${_("Create your account")}</span>
+      <span class="title-super">${_("Welcome!")}</span>
+      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
     </h1>
   </header>
 </section>
@@ -166,6 +167,17 @@
             <input class="" id="email" type="email" name="email" value="${email}" placeholder="${_('example: username@domain.com')}" required aria-required="true" />
           </li>
 
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+          </li>
+          <li class="field required text" id="field-username">
+            <label for="username">${_('Public Username')}</label>
+            <input id="username" type="text" name="username" value="${username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
+          </li>
+
           % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:
 
           <li class="is-disabled field optional password" id="field-password" hidden>
@@ -181,23 +193,6 @@
           </li>
 
           % endif
-
-          <li class="field required text" id="field-username">
-            <label for="username">${_('Public Username')}</label>
-            <input id="username" type="text" name="username" value="${username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
-            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
-          </li>
-          <li class="field required text" id="field-name">
-            <label for="name">${_('Full Name')}</label>
-            <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">
-              % if self.stanford_theme_enabled():
-                ${_("Needed for any Statements of Accomplishment you may earn")}
-              % else:
-                ${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")} 
-              % endif
-            </span>
-          </li>
         </ol>
 
         % else:
@@ -323,9 +318,7 @@
           % endif
         </ol>
       </div>
-      % if self.stanford_theme_enabled():
-          <%include file='theme-register-research.html' />
-      % endif
+
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
 
@@ -335,11 +328,9 @@
             % if has_extauth_info is UNDEFINED or ask_for_tos :
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_('I agree to the {link_start1}Terms of Service{link_end} and {link_start2}Privacy Policy{link_end}').format(
-                link_start1='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
-                link_end='</a>',
-                link_start2='<a href="{url}#privacy" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
-                )}</label>
+              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+                link_start='<a href="{url}" class="new-vp" tabindex="-1">'.format(url=marketing_link('TOS')),
+                link_end='</a>')}</label>
             </div>
             % endif
 

@@ -8,6 +8,7 @@
 
 <section class="container cart-list">
   <h2>${_("Your selected items:")}</h2>
+    <h3 class="cart-errors" id="cart-error">Error goes here.</h3>
   % if shoppingcart_items:
     <table class="cart-table">
       <thead>
@@ -24,24 +25,39 @@
         <tr class="cart-items">
           <td>${item.qty}</td>
           <td>${item.line_desc}</td>
-          <td>${"{0:0.2f}".format(item.unit_cost)}</td>
+          <td>
+              ${"{0:0.2f}".format(item.unit_cost)}
+              % if item.list_price != None:
+                <span class="old-price"> ${"{0:0.2f}".format(item.list_price)}</span>
+              % endif
+          </td>
           <td>${"{0:0.2f}".format(item.line_cost)}</td>
           <td>${item.currency.upper()}</td>
           <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td>
         </tr>
         % endfor
-        <tr class="cart-headings">
-          <td colspan="4"></td>
-          <th>${_("Total Amount")}</th>
+        <tr class="always-gray">
+          <td colspan="3"></td>
+            <td colspan="3" valign="middle" class="cart-total" align="right">
+                <b>${_("Total Amount")}: <span> ${"{0:0.2f}".format(amount)} </span> </b>
+            </td>
         </tr>
-        <tr class="cart-totals">
-          <td colspan="4"></td>
-          <td class="cart-total-cost">${"{0:0.2f}".format(amount)}</td>
-        </tr>
+
       </tbody>
+      <tfoot>
+        <tr class="always-white">
+            <td colspan="2">
+                 <input type="text" placeholder="Enter coupon code here" name="coupon_code" id="couponCode">
+                 <input type="button" value="Use Coupon" id="cart-coupon">
+            </td>
+            <td colspan="4" align="right">
+                ${form_html}
+            </td>
+        </tr>
+
+      </tfoot>
     </table>
     <!-- <input id="back_input" type="submit" value="Return" /> -->
-    ${form_html}
   % else:
     <p>${_("You have selected no items for purchase.")}</p>
   % endif
@@ -60,9 +76,39 @@
       });
     });
 
+    $('#cart-coupon').click(function(event){
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.use_coupon')}";
+      $.post(post_url,{
+               "coupon_code" :  $('#couponCode').val(),
+                beforeSend: function(xhr, options){
+                 if($('#couponCode').val() == "") {
+                     showErrorMsgs('Must contain a valid coupon code')
+                     xhr.abort();
+                    }
+                }
+               }
+      )
+      .success(function(data) {
+                 location.reload(true);
+              })
+      .error(function(data,status) {
+                  if(status=="parsererror"){
+                       location.reload(true);
+                  }else{
+                        showErrorMsgs(data.responseText)
+                      }
+             })
+    });
+
     $('#back_input').click(function(){
       history.back();
     });
+
+    function showErrorMsgs(msg){
+        $(".cart-errors").css('display', 'block');
+        $("#cart-error").html(msg);
+    }
   });
 </script>
 

@@ -3,18 +3,18 @@ Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
 import logging
 from datetime import datetime, timedelta
+import pytz
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
-from opaque_keys.edx.locations import Location
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
 
-from student.models import CourseEnrollmentAllowed, UserProfile
+from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
@@ -23,7 +23,7 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -42,6 +42,7 @@ def has_access(user, action, obj, course_key=None):
 
     Things this module understands:
     - start dates for modules
+    - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
 
@@ -85,7 +86,7 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
 
-    if isinstance(obj, Location):
+    if isinstance(obj, UsageKey):
         return _has_access_location(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
@@ -126,22 +127,11 @@ def _has_access_course_desc(user, action, course):
         """
         return (
             can_load() and
-            UserProfile.has_registered(user) and
             (
                 CourseEnrollment.is_enrolled(user, course.id) or
                 _has_staff_access_to_descriptor(user, course, course.id)
             )
         )
-
-    def within_enrollment_period():
-        """
-        Just a time boundary check, handles if start or stop were set to None
-        """
-        now = datetime.now(UTC())
-        start = course.enrollment_start
-        end = course.enrollment_end
-
-        return (start is None or now > start) and (end is None or now < end)
 
     def can_enroll():
         """
@@ -150,12 +140,14 @@ def _has_access_course_desc(user, action, course):
         If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap
             was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
         Rest of requirements:
-        Enrollment can only happen in the course enrollment period, if one exists.
-            or
-
         (CourseEnrollmentAllowed always overrides)
+          or
         (staff can always enroll)
+          or
+        Enrollment can only happen in the course enrollment period, if one exists, and
+        course is not invitation only.
         """
+
         # if using registration method to restrict (say shibboleth)
         if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             if user is not None and user.is_authenticated() and \
@@ -165,12 +157,11 @@ def _has_access_course_desc(user, action, course):
             else:
                 reg_method_ok = False
         else:
-            reg_method_ok = True #if not using this access check, it's always OK.
+            reg_method_ok = True  # if not using this access check, it's always OK.
 
-        if reg_method_ok and within_enrollment_period():
-            # in enrollment period, so any user is allowed to enroll.
-            debug("Allow: in enrollment period")
-            return True
+        now = datetime.now(UTC())
+        start = course.enrollment_start or datetime.min.replace(tzinfo=pytz.UTC)
+        end = course.enrollment_end or datetime.max.replace(tzinfo=pytz.UTC)
 
         # if user is in CourseEnrollmentAllowed with right course key then can also enroll
         # (note that course.id actually points to a CourseKey)
@@ -180,8 +171,17 @@ def _has_access_course_desc(user, action, course):
             if CourseEnrollmentAllowed.objects.filter(email=user.email, course_id=course.id):
                 return True
 
-        # otherwise, need staff access
-        return _has_staff_access_to_descriptor(user, course, course.id)
+        if _has_staff_access_to_descriptor(user, course, course.id):
+            return True
+
+        # Invitation_only doesn't apply to CourseEnrollmentAllowed or has_staff_access_access
+        if course.invitation_only:
+            debug("Deny: invitation only")
+            return False
+
+        if reg_method_ok and start < now < end:
+            debug("Allow: in enrollment period")
+            return True
 
     def see_exists():
         """
@@ -210,7 +210,6 @@ def _has_access_course_desc(user, action, course):
         'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
-        'within_enrollment_period': within_enrollment_period,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
         'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
     }
@@ -237,47 +236,6 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
-NONREGISTERED_CATEGORY_WHITELIST = [
-    "about",
-    "chapter",
-    "course",
-    "course_info",
-    "problem",
-    "sequential",
-    "vertical",
-    "videoalpha",
-#    "combinedopenended",
-#    "discussion",
-    "html",
-#    "peergrading",
-    "static_tab",
-    "video",
-#    "annotatable",
-    "book",
-    "conditional",
-#    "crowdsource_hinter",
-    "custom_tag_template",
-#    "discuss",
-#    "error",
-    "hidden",
-    "image",
-    "problemset",
-    "randomize",
-    "raw",
-    "section",
-    "slides",
-    "timelimit",
-    "videodev",
-    "videosequence",
-    "word_cloud",
-    "wrapper",
-]
-
-
-def _can_load_descriptor_nonregistered(descriptor):
-    return descriptor.category in NONREGISTERED_CATEGORY_WHITELIST
-
-
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -297,6 +255,8 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
+            return False
 
         # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
@@ -312,10 +272,9 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
                 course_key=course_key
             )
             if now > effective_start:
-                # after start date, all registered users can see it
-                # nonregistered users shouldn't be able to access certain descriptor types
+                # after start date, everyone can see it
                 debug("Allow: now > effective start date")
-                return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
+                return True
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor, course_key)
 

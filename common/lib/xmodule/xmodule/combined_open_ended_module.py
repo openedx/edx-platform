@@ -204,10 +204,10 @@ class CombinedOpenEndedFields(object):
         scope=Scope.user_state
     )
     old_task_states = List(
-        help=_("A list of lists of state dictionaries for student states that are saved."
-               "This field is only populated if the instructor changes tasks after"
-               "the module is created and students have attempted it (for example changes a self assessed problem to "
-               "self and peer assessed."),
+        help=_("A list of lists of state dictionaries for student states that are saved. "
+               "This field is only populated if the instructor changes tasks after "
+               "the module is created and students have attempted it (for example, if a self assessed problem is "
+               "changed to self and peer assessed)."),
         scope = Scope.user_state
     )
     task_states = List(
@@ -496,8 +496,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
-
-    metadata_attributes = RawDescriptor.metadata_attributes
 
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
     js_module_name = "OpenEndedMarkdownEditingDescriptor"

@@ -1,5 +1,6 @@
 describe "DiscussionUserProfileView", ->
     beforeEach ->
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures(
             """
             <script type="text/template" id="_user_profile">
@@ -46,7 +47,6 @@ describe "DiscussionUserProfileView", ->
             <div class="user-profile-fixture"/>
             """
         )
-        window.$$course_id = "dummy_course_id"
         spyOn(DiscussionThreadProfileView.prototype, "render")
 
     makeView = (threads, page, numPages) ->

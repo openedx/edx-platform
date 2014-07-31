@@ -209,10 +209,10 @@
     <section class="user-info">
       <ul>
         <li class="info--username">
-          <span class="title"><div class="icon name-icon"></div>${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
+          <span class="title">${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li class="info--email">
-          <span class="title"><div class="icon email-icon"></div>${_("Email")}
+          <span class="title">${_("Email")}
             % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
             (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
             % endif
@@ -272,7 +272,7 @@
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">
-          <span class="title"><div class="icon"></div><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
+          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->

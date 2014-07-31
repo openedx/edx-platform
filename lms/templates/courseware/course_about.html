@@ -3,21 +3,17 @@
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
   from django.conf import settings
-  from student.models import UserProfile
   from edxmako.shortcuts import marketing_link
 
   if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
   else:
       cart_link = ""
-
-
 %>
 <%namespace name='static' file='../static_content.html'/>
 <%! from microsite_configuration import microsite %>
 
 <%inherit file="../main.html" />
-
 <%block name="headextra">
 
   <%
@@ -43,26 +39,6 @@
   (function() {
     $(".register").click(function(event) {
       $("#class_enroll_form").submit();
-      event.preventDefault();
-    });
-
-    sneakpeek_handler = function(jqXHR) {
-      if (jqXHR.status == 200) {
-        location.href = "${course_target}";
-      }
-      else {
-        $("#register_error")
-        .html("${_('An error occurred. Please try again later.')}")
-        .css("display", "block");
-      }
-    };
-
-    $(".course_sneakpeek").click(function(event) {
-      $.ajax({
-        url: "${reverse('course_sneakpeek', args=[course.id.to_deprecated_string()])}",
-        type: "POST",
-        complete: sneakpeek_handler
-      });
       event.preventDefault();
     });
 
@@ -142,7 +118,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
+<%block name="pagetitle">${get_course_about_section(course, "title")}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -151,18 +127,15 @@
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
+            ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
           </h1>
-	  % if self.carnegie_theme_enabled():
-	    <br /><h2>learn to use this user-friendly technology from experts</h2>
-	  % endif
         </hgroup>
 
         <div class="main-cta">
-        %if regularly_registered:
+        %if user.is_authenticated() and registered:
           %if show_courseware_link:
             <a href="${course_target}">
           %endif
@@ -197,15 +170,17 @@
           <span class="register disabled">
             ${_("Course is full")}
           </span>
+        % elif invitation_only and not can_enroll:
+          <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
+        ## Shib courses need the enrollment button to be displayed even when can_enroll is False,
+        ## because AnonymousUsers cause can_enroll for shib courses to be False, but we need them to be able to click
+        ## so that they can register and become a real user that can enroll.
+        % elif not is_shib_course and not can_enroll:
+          <span class="register disabled">${_("Enrollment is Closed")}</span>
         %else:
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}
           </a>
-          % if sneakpeek_allowed and not regularly_registered:
-            <a href="#" class="course_sneakpeek"</a>
-              <span class="sneakpeek" title="${_("By exploring the course, you are agreeing to our Terms of Service. Please read them carefully.")}">${_("Explore Course")} *</span>
-            </a>
-          % endif
           <div id="register_error"></div>
         %endif
         </div>
@@ -230,19 +205,13 @@
   </header>
 
   <section class="container">
-
-    % if self.carnegie_theme_enabled():
-      <section class="details" style="float: none; width: 100%; margin: 0 auto;">
-    % else:
-      <section class="details">
-    % endif
-
-    % if staff_access and studio_url is not None:
-      <div class="wrap-instructor-info studio-view">
-        <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
-      </div>
-    % endif
-  
+    <section class="details">
+      % if staff_access and studio_url is not None:
+        <div class="wrap-instructor-info studio-view">
+          <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
+        </div>
+      % endif
+      
       <nav>
         <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>
@@ -255,18 +224,8 @@
       <div class="inner-wrapper">
         ${get_course_about_section(course, "overview")}
       </div>
-      % if sneakpeek_allowed and not regularly_registered:
-        <section class="unauth-tos" id="unauth-tos">
-          <p>
-            * ${_("By exploring the course, you are agreeing to our")}
-            <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a> and <a href="${marketing_link('TOS')}#privacy">${_("Privacy Policy")}</a>.
-            ${_("Please read them carefully.")}
-          </p>
-        </section>
-      % endif
     </section>
 
-    % if not self.carnegie_theme_enabled():
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
@@ -349,39 +308,43 @@
                 </span>
             </li>
             % endif
-      
-            ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
-      
-            % if get_course_about_section(course, "prerequisites"):
-              <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
-            % endif
+
+          % if get_course_about_section(course, "effort"):
+            <li><div class="icon effort"></div><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+          % endif
+
+          ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
+
+          % if get_course_about_section(course, "prerequisites"):
+            <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+          % endif
         </ol>
-      % if self.stanford_theme_enabled():
-          <%include file="theme-course_about_research.html" />
-      % endif
       </section>
-  
-  
-        ## For now, ocw links are the only thing that goes in additional resources
-        % if get_course_about_section(course, "ocw_links"):
-          <section class="additional-resources">
-            <header>
-              <h1>${_("Additional Resources")}</h1>
-            </header>
-        
-            <section>
-              ## "MITOpenCourseware" should *not* be translated
-              <h2 class="opencourseware">MITOpenCourseware</h2>
-                 ${get_course_about_section(course, "ocw_links")}
-            </section>
-          </section>
-        %endif
+
+
+      ## For now, ocw links are the only thing that goes in additional resources
+      % if get_course_about_section(course, "ocw_links"):
+      <section class="additional-resources">
+        <header>
+          <h1>${_("Additional Resources")}</h1>
+        </header>
+
+        <section>
+          ## "MITOpenCourseware" should *not* be translated
+          <h2 class="opencourseware">MITOpenCourseware</h2>
+             ${get_course_about_section(course, "ocw_links")}
+        </section>
+      </section>
+      %endif
     </section>
-    % endif
+
   </section>
 </section>
 
-%if not regularly_registered:
+## Need to put this hidden form on the page so that the registration button works.
+## Since it's no harm to display a hidden form, we display it with the most permissive conditional
+## which is when the student is not registered.
+%if active_reg_button or is_shib_course:
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">

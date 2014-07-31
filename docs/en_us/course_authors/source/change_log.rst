@@ -2,6 +2,34 @@
 Change Log
 ############
 
+
+***********
+July, 2014
+***********
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 07/22/14
+     - Added :ref:`Example Messages to Students` to the :ref:`Launch` chapter.
+   * - 07/15/14
+     - Added the :ref:`Discussions for Students and Staff` chapter.
+   * - 07/11/14
+     - Added :ref:`Track Student Activity` to the :ref:`Student Data`
+       chapter.
+   * - 07/10/14
+     - Updated the :ref:`Discussions` chapter to add an
+       :ref:`Overview_discussions` section and to reflect changes to the
+       Discussion list and to the Advanced Settings page in Studio.
+   * - 07/01/14
+     - Updated :ref:`The Course End Date` to specify when students can earn and
+       access certificates.
+   
+
+
 ***********
 June, 2014
 ***********
@@ -13,7 +41,8 @@ June, 2014
    * - Date
      - Change
    * - 06/20/14
-     - Added a :ref:`Preface` with resources for course teams, developers, researchers, and students. 
+     - Added a :ref:`Preface` with resources for course teams, developers,
+       researchers, and students.
    * - 06/18/14    
      - In the :ref:`View and download student data` section, updated the
        example report to include the new User ID column.

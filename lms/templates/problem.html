@@ -31,18 +31,29 @@ from django.conf import settings
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
-    % if reset_button:
-    <input class="reset" type="button" value="${_('Reset')}" />
-    % endif
-    % if save_button:
-    <input class="save" type="button" value="${_('Save')}" />
-    % endif
+
+    <div hidden class="problem_hint">MARKER</div>
+
     % if check_button:
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
     % endif
+
+    % if show_hint_button:
+    <input class="hint_button" type="button" value="${_('Hint')}" next_hint_index="${ next_hint_index }"/>
+    % endif
+
+    % if reset_button:
+    <input class="reset" type="button" value="${_('Reset')}" />
+    % endif
+
+    % if save_button:
+    <input class="save" type="button" value="${_('Save')}" />
+    % endif
+
     % if answer_available:
     <button class="show"><span class="show-label" aria-hidden="true">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>
     % endif
+
     % if attempts_allowed :
     <div class="submission_feedback">
       ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}

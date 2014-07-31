@@ -33,8 +33,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-06-19 00:15-0400\n"
-"PO-Revision-Date: 2014-06-19 04:17+0000\n"
+"POT-Creation-Date: 2014-07-11 16:03-0400\n"
+"PO-Revision-Date: 2014-07-10 19:41+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/edx-platform/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -60,6 +60,7 @@ msgstr ""
 #: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Cancel"
@@ -371,6 +372,10 @@ msgstr ""
 msgid "Turn off captions"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
+msgid "Creating missing groups&hellip;"
+msgstr ""
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -416,7 +421,6 @@ msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/new_post_view.js
@@ -478,6 +482,10 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Search Results"
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
 msgstr ""
 
@@ -485,6 +493,14 @@ msgstr ""
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "No threads matched your query."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
@@ -784,6 +800,7 @@ msgid "Reply"
 msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
@@ -981,6 +998,7 @@ msgid "<%= num_students %> students scored."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
 msgstr ""
 
@@ -1532,6 +1550,10 @@ msgstr ""
 msgid "Heading"
 msgstr ""
 
+#: lms/static/js/ajax-error.js
+msgid "You have been logged out of your edX account. "
+msgstr ""
+
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
 msgstr ""
@@ -1642,6 +1664,10 @@ msgstr ""
 msgid "Yes, delete this component"
 msgstr ""
 
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
+msgid "OpenAssessment Save Error"
+msgstr ""
+
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
 msgstr ""
@@ -1686,6 +1712,22 @@ msgstr ""
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
+msgstr ""
+
+#: cms/static/js/models/group.js
+msgid "Group name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Group Configuration name is required"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "Please add at least one group"
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a name"
 msgstr ""
 
 #: cms/static/js/models/uploads.js
@@ -1807,6 +1849,15 @@ msgstr ""
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
 msgstr ""
+
+#. Translators: 'count' is number of groups that the group configuration
+#. contains.
+#: cms/static/js/views/group_configuration_details.js
+msgid "Contains %(count)s group"
+msgid_plural "Contains %(count)s groups"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
@@ -1930,6 +1981,7 @@ msgid "Editor"
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr ""
 
@@ -1938,6 +1990,7 @@ msgid "Adding&hellip;"
 msgstr ""
 
 #: cms/static/js/views/modals/base_modal.js
+#: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/section-name-edit.underscore
 msgid "Save"
@@ -1949,6 +2002,10 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
+msgstr ""
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to "
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -2012,6 +2069,10 @@ msgstr ""
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
+msgstr ""
+
+#: cms/templates/js/advanced_entry.underscore
+msgid "Deprecated"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -2108,6 +2169,10 @@ msgid "total exercises that won't be graded"
 msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
+msgid "Course Handouts"
+msgstr ""
+
+#: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
 msgstr ""
 
@@ -2179,6 +2244,10 @@ msgstr ""
 msgid "Add a Chapter"
 msgstr ""
 
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr ""
+
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
 #: cms/templates/js/video/metadata-translations-entry.underscore
@@ -2205,6 +2274,10 @@ msgstr ""
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Download"
+msgstr ""
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
 msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
@@ -2235,6 +2308,10 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore

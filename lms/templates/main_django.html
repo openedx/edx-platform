@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
-  <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
+ <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
 
   {% compressed_css 'style-vendor' %}
   {% compressed_css 'style-app' %}
@@ -18,11 +18,9 @@
   {% compressed_js 'main_vendor' %}
   {% endblock %}
   {% block headextra %}{% endblock %}
-  {% if FEATURES.USE_CUSTOM_THEME %}
-    {% include "theme-head-extra.html" %}
-  {% endif %}
   {% render_block "css" %}
 
+  {% microsite_css_overrides_file %}
 
   <!--[if lt IE 9]>
   <script src="{% static 'js/html5shiv.js' %}"></script>
@@ -32,24 +30,15 @@
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
-  <a class="nav-skip" href="#content">{% trans "Skip to this view's content" %}</a>
-  {% if FEATURES.USE_CUSTOM_THEME %}
-    {% include "theme-header.html" %}
-  {% else %}
-    {% include "navigation.html" %}
-  {% endif %}
-
+  <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to this view's content" %}</a>
+  {% include "navigation.html" %}
   <div class="content-wrapper" id="content">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
   </div>
 
-  {% if FEATURES.USE_CUSTOM_THEME %}
-    {% include "theme-footer.html" %}
-  {% else %}
-    {% include "footer.html" %}
-  {% endif %}
-    
+  {% include "edx_footer.html" %}
+
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
 

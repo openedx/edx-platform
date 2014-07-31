@@ -77,7 +77,11 @@
     header_extra_file = None
     header_file = microsite.get_template_path('navigation.html')
     google_analytics_file = microsite.get_template_path('google_analytics.html')
-    footer_file = microsite.get_template_path('footer.html')
+
+    if getattr(settings, 'SITE_NAME', '').endswith('edx.org'):
+      footer_file = microsite.get_template_path('edx_footer.html')
+    else:
+      footer_file = microsite.get_template_path('footer.html')
 
     style_overrides_file = microsite.get_value('css_overrides_file')
 %>
@@ -132,5 +136,3 @@
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>
-
-

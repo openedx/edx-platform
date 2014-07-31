@@ -1,5 +1,6 @@
 describe "DiscussionThreadShowView", ->
     beforeEach ->
+        DiscussionSpecHelper.setUpGlobals()
         setFixtures(
             """
             <div class="discussion-post">
@@ -14,8 +15,6 @@ describe "DiscussionThreadShowView", ->
             """
         )
 
-        window.$$course_id = "TestOrg/TestCourse/TestRun"
-        window.user = new DiscussionUser({id: "567", upvoted_ids: []})
         @threadData = {
             id: "dummy",
             user_id: user.id,

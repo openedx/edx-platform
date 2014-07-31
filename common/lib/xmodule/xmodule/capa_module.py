@@ -56,6 +56,7 @@ class CapaModule(CapaMixin, XModule):
           <other request-specific values here > }
         """
         handlers = {
+            'hint_button':self.hint_button,
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
             'problem_reset': self.reset_problem,
@@ -125,11 +126,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         ]
     }
 
-    # Capa modules have some additional metadata:
-    # TODO (vshnayder): do problems have any other metadata?  Do they
-    # actually use type and points?
-    metadata_attributes = RawDescriptor.metadata_attributes + ('type', 'points')
-
     # The capa format specifies that what we call max_attempts in the code
     # is the attribute `attempts`. This will do that conversion
     metadata_translations = dict(RawDescriptor.metadata_translations)
@@ -189,6 +185,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     get_problem_html = module_attr('get_problem_html')
     get_state_for_lcp = module_attr('get_state_for_lcp')
     handle_input_ajax = module_attr('handle_input_ajax')
+    hint_button = module_attr('hint_button')
     handle_problem_html_error = module_attr('handle_problem_html_error')
     handle_ungraded_response = module_attr('handle_ungraded_response')
     is_attempted = module_attr('is_attempted')

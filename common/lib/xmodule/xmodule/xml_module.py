@@ -123,17 +123,6 @@ class XmlDescriptor(XModuleDescriptor):
     # Note -- url_name isn't in this list because it's handled specially on
     # import and export.
 
-    # TODO (vshnayder): Do we need a list of metadata we actually
-    # understand?  And if we do, is this the place?
-    # Related: What's the right behavior for clean_metadata?
-    metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-                           'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-                           'ispublic',  # if True, then course is listed for all users; see
-                           'xqa_key',  # for xqaa server access
-                           'giturl',  # url of git server for origin of file
-                           # VS[compat] Remove once unused.
-                           'name', 'slug')
-
     metadata_to_strip = ('data_dir',
                          'tabs', 'grading_policy', 'published_by', 'published_date',
                          'discussion_blackouts',
@@ -157,12 +146,12 @@ class XmlDescriptor(XModuleDescriptor):
     @classmethod
     def clean_metadata_from_xml(cls, xml_object):
         """
-        Remove any attribute named in cls.metadata_attributes from the supplied
+        Remove any attribute named for a field with scope Scope.settings from the supplied
         xml_object
         """
-        for attr in cls.metadata_attributes:
-            if xml_object.get(attr) is not None:
-                del xml_object.attrib[attr]
+        for field_name, field in cls.fields.items():
+            if field.scope == Scope.settings and xml_object.get(field_name) is not None:
+                del xml_object.attrib[field_name]
 
     @classmethod
     def file_to_xml(cls, file_object):
@@ -219,6 +208,9 @@ class XmlDescriptor(XModuleDescriptor):
                         break
 
             definition_xml = cls.load_file(filepath, system.resources_fs, def_id)
+
+            # Add the attributes from the pointer node
+            definition_xml.attrib.update(xml_object.attrib)
 
         definition_metadata = get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)

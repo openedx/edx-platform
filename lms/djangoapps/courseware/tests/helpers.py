@@ -70,7 +70,7 @@ class LoginEnrollmentTestCase(TestCase):
         self.email = 'foo@test.com'
         self.password = 'bar'
         self.username = 'test'
-        self.create_account(self.username,
+        self.user = self.create_account(self.username,
                             self.email, self.password)
         self.activate_user(self.email)
         self.login(self.email, self.password)
@@ -110,7 +110,9 @@ class LoginEnrollmentTestCase(TestCase):
         data = json.loads(resp.content)
         self.assertEqual(data['success'], True)
         # Check both that the user is created, and inactive
-        self.assertFalse(User.objects.get(email=email).is_active)
+        user = User.objects.get(email=email)
+        self.assertFalse(user.is_active)
+        return user
 
     def activate_user(self, email):
         """

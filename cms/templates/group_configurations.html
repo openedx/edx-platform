@@ -1,0 +1,104 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "group_configurations" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%! import json %>
+<%!
+  from contentstore import utils
+  from django.utils.translation import ugettext as _
+%>
+
+<%block name="title">${_("Group Configurations")}</%block>
+<%block name="bodyclass">is-signedin course view-group-configurations</%block>
+
+<%block name="header_extras">
+% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "basic-modal", "modal-button"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+require(["domReady!", "js/collections/group_configuration", "js/views/pages/group_configurations"],
+function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
+  % if configurations is not None:
+    var collection = new GroupConfigurationCollection(${json.dumps(configurations)});
+
+    collection.url = "${group_configuration_url}";
+    new GroupConfigurationsPage({
+        el: $('#content'),
+        collection: collection
+    }).render();
+  % endif
+});
+</script>
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Settings")}</small>
+        <span class="sr">&gt; </span>${_("Group Configurations")}
+      </h1>
+      <nav class="nav-actions">
+        <h3 class="sr">${_("Page Actions")}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Group Configuration")}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+      % if configurations is None:
+        <div class="notice notice-incontext notice-moduledisabled">
+            <p class="copy">
+                ${_("This module is disabled at the moment.")}
+            </p>
+        </div>
+      % else:
+        <div class="ui-loading">
+            <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+        </div>
+      % endif
+      </article>
+      <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("What can I do on this page?")}</h3>
+        <p>${_("You can create and edit group configurations.")}</p>
+
+        <p>${_("A group configuration defines how many groups of students are in an experiment. When you create a content experiment, you select the group configuration to use.")}</p>
+
+        <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit an existing configuration, hover over its box and click {em_start}Edit{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+        <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Learn More")}</a></p>
+      </div>
+      <div class="bit">
+      % if context_course:
+        <%
+          details_url = utils.reverse_course_url('settings_handler', context_course.id)
+          grading_url = utils.reverse_course_url('grading_handler', context_course.id)
+          course_team_url = utils.reverse_course_url('course_team_handler', context_course.id)
+          advanced_settings_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
+        %>
+      <h3 class="title-3">${_("Other Course Settings")}</h3>
+        <nav class="nav-related">
+          <ul>
+            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
+          </ul>
+        </nav>
+      % endif
+      </div>
+      </aside>
+    </section>
+  </div>
+</%block>

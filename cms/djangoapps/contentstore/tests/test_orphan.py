@@ -33,8 +33,14 @@ class TestOrphan(CourseTestCase):
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
         location = self.course.location.replace(category=category, name=name)
         store = modulestore()
-        store.create_and_save_xmodule(
-            location, self.user.id, definition_data=data, metadata=metadata, runtime=runtime
+        store.create_item(
+            self.user.id,
+            location.course_key,
+            location.block_type,
+            location.block_id,
+            definition_data=data,
+            metadata=metadata,
+            runtime=runtime
         )
         if parent_name:
             # add child to parent in mongo

@@ -68,7 +68,7 @@ class Command(BaseCommand):
         fp = open(fn, 'w')
 
         writer = csv.writer(fp, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        writer.writerow(datatable['header'])
+        writer.writerow([unicode(s).encode('utf-8') for s in datatable['header']])
         for datarow in datatable['data']:
             encoded_row = [unicode(s).encode('utf-8') for s in datarow]
             writer.writerow(encoded_row)
