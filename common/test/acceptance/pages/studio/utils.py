@@ -2,6 +2,7 @@
 Utility methods useful for Studio page tests.
 """
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import disable_animations
 
 
 def click_css(page, css, source_index=0, require_notification=True):
@@ -18,9 +19,8 @@ def click_css(page, css, source_index=0, require_notification=True):
         # because otherwise you will trigger a extra query on a remote element.
         return el.is_displayed() and all(size > 0 for size in el.size.itervalues())
 
-    # Disable jQuery animations for faster testing with more reliable synchronization
-    page.browser.execute_script("jQuery.fx.off = true;")
-
+    # Disable all animations for faster testing with more reliable synchronization
+    disable_animations(page)
     # Click on the element in the browser
     page.q(css=css).filter(lambda el: _is_visible(el)).nth(source_index).click()
 
