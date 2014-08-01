@@ -523,10 +523,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.respondWithJson(requests, mockServerValuesJson);
 
                     expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .due-date")).toContainText("Due date: Jul 10, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .policy")).toContainText("Policy: Lab");
+                    expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
 
-                    expect($(".outline-item .outline-subsection .policy")).toContainText("Policy: Lab");
+                    expect($(".outline-item .outline-subsection .status-grading-value")).toContainText("Lab");
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
                     expect($("#start_date").val()).toBe('7/9/2014');
                     expect($("#due_date").val()).toBe('7/10/2014');
@@ -545,8 +545,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     create_sinon.respondWithJson(requests, mockServerValuesJson);
 
                     expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .due-date")).toContainText("Due date: Jul 10, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .policy")).toContainText("Policy: Lab");
+                    expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
 
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#start_date").val()).toBe('7/9/2014');
@@ -571,8 +571,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         ])
                     );
                     expect($(".outline-subsection .status-release-value")).not.toContainText("Jul 09, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .due-date")).not.toExist();
-                    expect($(".outline-subsection .policy")).not.toExist();
+                    expect($(".outline-subsection .status-grading-date")).not.toExist();
+                    expect($(".outline-subsection .status-grading-value")).not.toExist();
                 });
             });
 

@@ -302,8 +302,8 @@ class EditingSectionsTest(CourseOutlineTest):
 
         modal.save()
         self.assertIn(u'Released: Mar 12, 1972', subsection.release_date)
-        self.assertIn(u'Due date: Jul 21, 2014', subsection.due_date)
-        self.assertIn(u'Policy: Lab', subsection.policy)
+        self.assertIn(u'Due: Jul 21, 2014', subsection.due_date)
+        self.assertIn(u'Lab', subsection.policy)
 
     def test_can_edit_section(self):
         """
