@@ -637,7 +637,7 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
         # only automatically enroll people if the only mode is 'honor'
-        if current_mode.slug != 'honor':
+        if current_mode.slug == 'verified':
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )

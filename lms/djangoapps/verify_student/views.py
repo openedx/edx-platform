@@ -75,7 +75,7 @@ class VerifyView(View):
             progress_state = "start"
 
         modes_dict = CourseMode.modes_for_course_dict(course_id)
-        verify_mode = modes_dict['verified']
+        verify_mode = modes_dict.get('verified', None)
         # if the course doesn't have a verified mode, we want to kick them
         # from the flow
         if not verify_mode:
@@ -125,7 +125,7 @@ class VerifiedView(View):
             return redirect(reverse('dashboard'))
 
         modes_dict = CourseMode.modes_for_course_dict(course_id)
-        verify_mode = modes_dict['verified']
+        verify_mode = modes_dict.get('verified', None)
 
         if verify_mode is None:
             return redirect(reverse('dashboard'))
