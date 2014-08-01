@@ -14,9 +14,9 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
 
         renderPage: function() {
             var hash = this.getLocationHash();
-            this.$el.append(this.listView.render().el);
+            this.$('.content-primary').append(this.listView.render().el);
             this.addButtonActions();
-            this.addWindowActions();           
+            this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match
                 this.expandConfiguration(hash.replace('#', ''));

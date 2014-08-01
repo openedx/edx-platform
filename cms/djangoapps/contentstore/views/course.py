@@ -1136,7 +1136,7 @@ class GroupConfiguration(object):
                 continue
 
             unit_url = reverse_usage_url(
-                'unit_handler',
+                'container_handler',
                 course.location.course_key.make_usage_key(unit.location.block_type, unit.location.name)
             )
             usage_info[split_test.user_partition_id].append({
