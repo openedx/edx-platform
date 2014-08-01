@@ -1,3 +1,25 @@
+"""
+Each store has slightly different semantics wrt draft v published. XML doesn't officially recognize draft
+but does hold it in a subdir. Old mongo has a virtual but not physical draft for every unit in published state.
+Split mongo has a physical for every unit in every state.
+
+Given that, here's a table of semantics and behaviors where - means no record and letters indicate values.
+For xml, (-, x) means the item is published and can be edited. For split, it means the item's
+been deleted from draft and will be deleted from published the next time it gets published. old mongo
+can't represent that virtual state (2nd row in table)
+
+In the table body, the tuples represent virtual modulestore result. The row headers represent the pre-import
+modulestore state.
+
+Modulestore virtual  \           XML physical (draft, published)
+(draft, published)    \  (-, -) | (x, -) | (x, x) | (x, y) | (-, x)
+----------------------+--------------------------------------------
+             (-, -)   |  (-, -) | (x, -) | (x, x) | (x, y) | (-, x)
+             (-, a)   |  (-, a) | (x, a) | (x, x) | (x, y) | (-, x) : deleted from draft before import
+             (a, -)   |  (a, -) | (x, -) | (x, x) | (x, y) | (a, x)
+             (a, a)   |  (a, a) | (x, a) | (x, x) | (x, y) | (a, x)
+             (a, b)   |  (a, b) | (x, b) | (x, x) | (x, y) | (a, x)
+"""
 import logging
 import os
 import mimetypes
@@ -170,10 +192,12 @@ def import_from_xml(
         else:
             dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
 
+        runtime = None
         # Creates a new course if it doesn't already exist
         if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
             try:
-                store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+                new_course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
+                runtime = new_course.runtime
             except DuplicateCourseError:
                 # course w/ same org and course exists
                 log.debug(
@@ -185,7 +209,9 @@ def import_from_xml(
         with store.bulk_write_operations(dest_course_id):
             # STEP 1: find and import course module
             course, course_data_path = _import_course_module(
-                xml_module_store, store, user_id, data_dir, course_key, dest_course_id, do_import_static, verbose
+                xml_module_store, store, runtime, user_id,
+                data_dir, course_key, dest_course_id, do_import_static,
+                verbose
             )
             new_courses.append(course)
 
@@ -230,7 +256,8 @@ def import_from_xml(
 
 
 def _import_course_module(
-        xml_module_store, store, user_id, data_dir, course_key, dest_course_id, do_import_static, verbose
+        xml_module_store, store, runtime, user_id, data_dir, course_key, dest_course_id, do_import_static,
+        verbose,
 ):
     if verbose:
         log.debug("Scanning {0} for course module...".format(course_key))
@@ -260,7 +287,8 @@ def _import_course_module(
                 module, store, user_id,
                 course_key,
                 dest_course_id,
-                do_import_static=do_import_static
+                do_import_static=do_import_static,
+                runtime=runtime,
             )
 
             for entry in course.pdf_textbooks:
@@ -352,13 +380,6 @@ def _import_module_and_update_references(
         )
 
     # Move the module to a new course
-    new_usage_key = module.scope_ids.usage_id.map_into_course(dest_course_id)
-    if new_usage_key.category == 'course':
-        block_id = dest_course_id.run
-    else:
-        block_id = module.location.block_id
-    new_module = store.create_xblock(runtime, dest_course_id, new_usage_key.category, block_id)
-
     def _convert_reference_fields_to_new_namespace(reference):
         """
         Convert a reference to the new namespace, but only
@@ -372,25 +393,23 @@ def _import_module_and_update_references(
         else:
             return reference
 
+    fields = {}
     for field_name, field in module.fields.iteritems():
         if field.is_set_on(module):
             if isinstance(field, Reference):
-                new_ref = _convert_reference_fields_to_new_namespace(getattr(module, field_name))
-                setattr(new_module, field_name, new_ref)
+                fields[field_name] = _convert_reference_fields_to_new_namespace(field.read_from(module))
             elif isinstance(field, ReferenceList):
-                references = getattr(module, field_name)
-                new_references = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
-                setattr(new_module, field_name, new_references)
+                references = field.read_from(module)
+                fields[field_name] = [_convert_reference_fields_to_new_namespace(reference) for reference in references]
             elif isinstance(field, ReferenceValueDict):
-                reference_dict = getattr(module, field_name)
-                new_reference_dict = {
+                reference_dict = field.read_from(module)
+                fields[field_name] = {
                     key: _convert_reference_fields_to_new_namespace(reference)
                     for key, reference
                     in reference_dict.items()
                 }
-                setattr(new_module, field_name, new_reference_dict)
             elif field_name == 'xml_attributes':
-                value = getattr(module, field_name)
+                value = field.read_from(module)
                 # remove any export/import only xml_attributes
                 # which are used to wire together draft imports
                 if 'parent_sequential_url' in value:
@@ -398,11 +417,11 @@ def _import_module_and_update_references(
 
                 if 'index_in_children_list' in value:
                     del value['index_in_children_list']
-                setattr(new_module, field_name, value)
+                fields[field_name] = value
             else:
-                setattr(new_module, field_name, getattr(module, field_name))
-    store.update_item(new_module, user_id, allow_not_found=True)
-    return new_module
+                fields[field_name] = field.read_from(module)
+
+    return store.import_xblock(user_id, dest_course_id, module.category, module.location.block_id, fields, runtime)
 
 
 def _import_course_draft(
@@ -505,7 +524,7 @@ def _import_course_draft(
                         # attributes (they are normally in the parent object,
                         # aka sequential), so we have to replace the location.name
                         # with the XML filename that is part of the pack
-                        fn, fileExtension = os.path.splitext(filename)
+                        fn, __ = os.path.splitext(filename)
                         descriptor.location = descriptor.location.replace(name=fn)
 
                         index = int(descriptor.xml_attributes['index_in_children_list'])
@@ -537,7 +556,6 @@ def _import_course_draft(
                         # Note though that verticals nested below the unit level will not have
                         # a parent_sequential_url and do not need special handling.
                         if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
-                            non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -547,6 +565,7 @@ def _import_course_draft(
                             seq_location = seq_location.map_into_course(target_course_id)
                             sequential = store.get_item(seq_location, depth=0)
 
+                            non_draft_location = module.location.map_into_course(target_course_id)
                             if non_draft_location not in sequential.children:
                                 sequential.children.insert(index, non_draft_location)
                                 store.update_item(sequential, user_id)

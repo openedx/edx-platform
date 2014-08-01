@@ -453,6 +453,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)
 
     @strip_key
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+        """
+        Defer to the course's modulestore if it supports this method
+        """
+        store = self._verify_modulestore_support(course_key, 'import_xblock')
+        return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime)
+
+    @strip_key
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):
         """
         Update the xblock persisted to be the same as the given for all types of fields

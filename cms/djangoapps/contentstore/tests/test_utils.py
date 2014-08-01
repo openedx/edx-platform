@@ -253,7 +253,7 @@ class XBlockVisibilityTestCase(TestCase):
         course_key = CourseLocator('edX', 'visibility', '2012_Fall')
 
         vertical = modulestore().create_item(
-            self.dummy_user, course_key, 'vertical', name, 
+            self.dummy_user, course_key, 'vertical', name,
             fields={'start': start_date, 'visible_to_staff_only': visible_to_staff_only}
         )
 

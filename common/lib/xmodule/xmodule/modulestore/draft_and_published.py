@@ -103,6 +103,17 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
     def convert_to_draft(self, location, user_id):
         raise NotImplementedError
 
+    @abstractmethod
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+        """
+        Import the given xblock into the current branch setting: import completely overwrites any
+        existing block of the same id.
+
+        In ModuleStoreDraftAndPublished, importing a published block ensures that access from the draft
+        will get a block (either the one imported or a preexisting one). See xml_importer
+        """
+        raise NotImplementedError
+
 
 class   UnsupportedRevisionError(ValueError):
     """

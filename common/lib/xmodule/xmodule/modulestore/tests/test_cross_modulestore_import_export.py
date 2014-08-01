@@ -16,20 +16,19 @@ import ddt
 import itertools
 import random
 from contextlib import contextmanager, nested
-from unittest import SkipTest
 from shutil import rmtree
 from tempfile import mkdtemp
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.tests import CourseComparisonTest
 
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 
 COMMON_DOCSTORE_CONFIG = {
     'host': 'localhost'
@@ -101,9 +100,7 @@ class MongoModulestoreBuilder(object):
             yield modulestore
         finally:
             # Delete the created database
-            db = modulestore.database
-            db.connection.drop_database(db)
-            db.connection.close()
+            modulestore._drop_database()
 
             # Delete the created directory on the filesystem
             rmtree(fs_root)
@@ -127,7 +124,6 @@ class VersioningModulestoreBuilder(object):
                 all of its assets.
         """
         # pylint: disable=unreachable
-        raise SkipTest("DraftVersioningModuleStore doesn't yet support the same interface as the rest of the modulestores")
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='split_module',
@@ -136,7 +132,7 @@ class VersioningModulestoreBuilder(object):
         # Set up a temp directory for storing filesystem content created during import
         fs_root = mkdtemp()
 
-        modulestore = SplitMongoModuleStore(
+        modulestore = DraftVersioningModuleStore(
             contentstore,
             doc_store_config,
             fs_root,
@@ -147,9 +143,7 @@ class VersioningModulestoreBuilder(object):
             yield modulestore
         finally:
             # Delete the created database
-            db = modulestore.db
-            db.connection.drop_database(db)
-            db.connection.close()
+            modulestore._drop_database()
 
             # Delete the created directory on the filesystem
             rmtree(fs_root)
@@ -220,9 +214,7 @@ class MongoContentstoreBuilder(object):
             yield contentstore
         finally:
             # Delete the created database
-            db = contentstore.fs_files.database
-            db.connection.drop_database(db)
-            db.connection.close()
+            contentstore._drop_database()
 
     def __repr__(self):
         return 'MongoContentstoreBuilder()'
@@ -301,7 +293,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             create_new_course_if_not_present=True,
                         )
 
-                        self.exclude_field(source_course_key.make_usage_key('course', 'key'), 'wiki_slug')
+                        self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')

@@ -1067,6 +1067,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return xblock
 
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+        """
+        Simple implementation of overwriting any existing xblock
+        """
+        if block_type == 'course':
+            block_id = course_key.run
+        xblock = self.create_xblock(runtime, course_key, block_type, block_id, fields)
+        return self.update_item(xblock, user_id, allow_not_found=True)
+
     def _get_course_for_item(self, location, depth=0):
         '''
         for a given Xmodule, return the course that it belongs to
