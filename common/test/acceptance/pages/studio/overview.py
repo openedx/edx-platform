@@ -129,6 +129,7 @@ class CourseOutlineContainer(CourseOutlineItem):
     CHILD_CLASS must be a :class:`CourseOutlineChild` subclass.
     """
     CHILD_CLASS = None
+    ADD_BUTTON_SELECTOR = '> .outline-content > .add-item a.button-new'
 
     def child(self, title, child_class=None):
         """
@@ -171,7 +172,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         """
         click_css(
             self,
-            self._bounded_selector(".add-item a.button-new"),
+            self._bounded_selector(self.ADD_BUTTON_SELECTOR),
             require_notification=require_notification,
         )
 
@@ -183,7 +184,7 @@ class CourseOutlineContainer(CourseOutlineItem):
         self.browser.execute_script("jQuery.fx.off = true;")
 
         def subsection_expanded():
-            add_button = self.q(css=self._bounded_selector('> .outline-content > .add-item a.button-new')).first.results
+            add_button = self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).first.results
             return add_button and add_button[0].is_displayed()
 
         currently_expanded = subsection_expanded()
@@ -276,7 +277,7 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
         """
         Adds a unit to this subsection
         """
-        self.add_child(require_notification=False)
+        self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).click()
 
 
 class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
