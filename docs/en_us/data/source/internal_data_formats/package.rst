@@ -141,7 +141,7 @@ Download Weekly Files
    For information about providing your credentials to connect to Amazon S3,
    see :ref:`Access Amazon S3`.
 
-#. Download the ``{org}-{date}.zip`` database data file from the **course-
+2. Download the ``{org}-{date}.zip`` database data file from the **course-
    data** bucket.
 
    The **course-data** bucket also contains the weekly, cumulative
