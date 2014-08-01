@@ -6,6 +6,7 @@ Run these tests @ Devstack:
 from datetime import datetime
 import json
 import uuid
+import mock
 from random import randint
 from urllib import urlencode
 
@@ -27,7 +28,8 @@ from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, 
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
 
 TEST_API_KEY = str(uuid.uuid4())
-USER_COUNT = 4
+USER_COUNT = 5
+SAMPLE_GRADE_DATA_COUNT = 4
 
 
 class SecureClient(Client):
@@ -141,9 +143,10 @@ class CoursesApiTests(TestCase):
             user_profile = user.profile
             user_profile.avatar_url = 'http://example.com/{}.png'.format(user.id)
             user_profile.title = 'Software Engineer {}'.format(user.id)
+            user_profile.city = 'Cambridge'
             user_profile.save()
 
-        for i in xrange(USER_COUNT - 1):
+        for i in xrange(SAMPLE_GRADE_DATA_COUNT - 1):
             category = 'mentoring'
             module_type = 'mentoring'
             if i % 2 is 0:
@@ -1480,7 +1483,36 @@ class CoursesApiTests(TestCase):
         response = self.do_get(completion_uri)
         self.assertEqual(response.status_code, 404)
 
+    def _fake_get_get_course_social_stats(course_id):
+        return {
+            '1': {'foo':'bar'},
+            '2': {'one': 'two'}
+        }
+
+    @mock.patch("lms.lib.comment_client.user.get_course_social_stats", _fake_get_get_course_social_stats)
+    def test_social_metrics(self):
+        test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.data.keys()), 2)
+        self.assertIn('1', response.data)
+        self.assertIn('2', response.data)
+
+        # make the first user an observer to asset that its content is being filtered out from
+        # the aggregates
+        allow_access(self.course, self.users[0], 'observer')
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.data.keys()), 1)
+        self.assertNotIn('1', response.data)
+        self.assertIn('2', response.data)
+
     def test_courses_leaders_list_get(self):
+        # make the last user an observer to asset that its content is being filtered out from
+        # the aggregates
+        allow_access(self.course, self.users[USER_COUNT-1], 'observer')
+
         test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1535,6 +1567,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_courses_completions_leaders_list_get(self):
+
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
         users = []
         for i in xrange(1, 5):
@@ -1548,6 +1581,9 @@ class CoursesApiTests(TestCase):
             response = self.do_post(self.base_users_uri, data)
             self.assertEqual(response.status_code, 201)
             users.append(response.data['id'])
+
+        # make the last user an observer to make sure that data is being filtered out
+        allow_access(self.course, self.users[USER_COUNT-1], 'observer')
 
         for i in xrange(1, 26):
             local_content_name = 'Video_Sequence{}'.format(i)
@@ -1565,9 +1601,16 @@ class CoursesApiTests(TestCase):
                 user_id = users[2]
             else:
                 user_id = users[3]
+
             content_id = unicode(local_content.scope_ids.usage_id)
             completions_data = {'content_id': content_id, 'user_id': user_id}
             response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+            # observer should complete everything, so we can assert that it is filtered out
+            response = self.do_post(completion_uri, {
+                'content_id': content_id, 'user_id': self.users[USER_COUNT-1].id
+            })
             self.assertEqual(response.status_code, 201)
 
         test_uri = '{}/{}/metrics/completions/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=6')
@@ -1760,6 +1803,11 @@ class CoursesApiTests(TestCase):
             response = self.do_get(user_uri)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.data['city'], city)
+
+        # make all the classwide users an observer to assert that its content is being filtered out from
+        # the aggregates
+        for user in self.users:
+            allow_access(self.course, user, 'observer')
 
         response = self.do_get('{}{}{}'.format('/api/courses/', self.test_course_id, '/metrics/cities/'))
         self.assertEqual(response.status_code, 200)
