@@ -112,12 +112,12 @@ class CourseOutlineItem(object):
 
     @property
     def due_date(self):
-        element = self.q(css=self._bounded_selector(".due-date"))
+        element = self.q(css=self._bounded_selector(".status-grading-date"))
         return element.first.text[0] if element.present else None
 
     @property
     def policy(self):
-        element = self.q(css=self._bounded_selector(".policy"))
+        element = self.q(css=self._bounded_selector(".status-grading-value"))
         return element.first.text[0] if element.present else None
 
 
