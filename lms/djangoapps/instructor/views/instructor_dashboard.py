@@ -97,7 +97,7 @@ def instructor_dashboard_2(request, course_id):
     if is_studio_course:
         studio_url = get_cms_course_link(course)
 
-    enrollment_count = sections[0]['enrollment_count']
+    enrollment_count = sections[0]['enrollment_count']['total']
     disable_buttons = False
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
@@ -160,7 +160,7 @@ def _section_course_info(course_key, access):
         'access': access,
         'course_id': course_key,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.num_enrolled_in(course_key),
+        'enrollment_count': CourseEnrollment.enrollment_counts(course_key),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
