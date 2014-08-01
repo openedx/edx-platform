@@ -3,7 +3,6 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
         var saveRerunCourse = function (e) {
             e.preventDefault();
-            alert('saving rerun');
             // One final check for empty values
             var errors = _.reduce(
                 ['.rerun-course-name', '.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
@@ -42,19 +41,20 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 },
                 function (data) {
                     if (data.url !== undefined) {
-                        window.location = data.url;
+                        window.location = data.url
                     } else if (data.ErrMsg !== undefined) {
                         $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
                         $('#course_rerun_error').html('<p>' + data.ErrMsg + '</p>');
-                        $('.rerun-course-save').addClass('is-disabled');
+                        $('.rerun-course-save').addClass('is-disabled').removeClass('is-processing').html(gettext('Create Re-run'));
+                        $('.action-cancel').removeClass('is-hidden');
                     }
                 }
             );
             // Go into creating re-run state
             $('.rerun-course-save').addClass('is-disabled').addClass('is-processing').html(
-                gettext('Processing Re-run Request')
+               '<i class="icon-refresh icon-spin"></i>' + gettext('Processing Re-run Request')
             );
-            $('.action-cancel').addClass('is-hidden')
+            $('.action-cancel').addClass('is-hidden');
         };
 
         var cancelRerunCourse = function (e) {

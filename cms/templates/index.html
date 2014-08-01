@@ -220,34 +220,6 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          <!-- STATE: course can be re-run -->
-          <li class="course-item can-rerun">
-            <a class="course-link" href="#">
-              <h3 class="course-title">China (Part 2): The Creation and End of a Centralized Empire</h3>
-
-              <div class="course-metadata">
-                <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">HarvardX</span>
-                </span>
-                <span class="course-num metadata-item">
-                  <span class="label">${_("Course Number:")}</span>
-                  <span class="value">SW12.2x</span>
-                </span>
-                <span class="course-run metadata-item">
-                  <span class="label">${_("Course Run:")}</span> <span class="value">T2_2014</span>
-                </span>
-              </div>
-            </a>
-
-            <ul  class="item-actions course-actions">
-              <li class="action action-rerun">
-                <a href="#" rel="external" class="button rerun-button">${_("Re-run Course")}</a>
-              </li>
-              <li class="action action-view">
-                <a href="#" rel="external" class="button view-button">${_("View Live")}</a>
-              </li>
-            </ul>
-          </li>
           %for course, url, lms_link, rerun_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
           <li class="course-item">
             <a class="course-link" href="${url}">

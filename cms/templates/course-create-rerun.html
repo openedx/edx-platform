@@ -21,7 +21,7 @@ TODO:
 <%! from django.core.urlresolvers import reverse %>
 
 <%block name="title">${_("Create a Course Rerun of:")}</%block>
-<%block name="bodyclass">is-signedin view-course-create-rerun</%block>
+<%block name="bodyclass">is-signedin view-course-create view-course-create-rerun</%block>
 
 <%block name="jsextra">
 <script type="text/javascript">
@@ -38,9 +38,9 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
 <%block name="content">
 <div id="content">
   <div class="wrapper-mast wrapper">
-    <header class="mast has-actions">
+    <header class="mast mast-wizard has-actions">
       <h1 class="page-header">
-        <span class="page-header-sub">${_("Create a re-run of a course:")}</span>
+        <span class="page-header-sub">${_("Create a re-run of a course")}</span>
       </h1>
 
       <nav class="nav-actions">
@@ -62,19 +62,21 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
 
   <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
-      <section class="content-area">
+      <section class="content">
         <article class="content-primary">
           <div class="introduction">
             <div class="copy">
-              <p>${_("Provide identifying information for this re-run of the course. The original course is not affected in any way by a re-run. Note: Together, the organization, course number, and course run must uniquely identify this new course instance.")}</p>
+              <p>
+                ${_("Provide identifying information for this re-run of the course. The original course is not affected in any way by a re-run.")}
+                <strong>${_("Note: Together, the organization, course number, and course run must uniquely identify this new course instance.")}</strong>
+              <p>
             </div>
           </div><!-- /introduction -->
 
           <!-- - - - -->
 
-          <!-- STATE: initial form -->
           <div class="wrapper-rerun-course">
-            <form class="rerun-course course-info" id="rerun-course-form" name="rerun-course-form">
+            <form class="form-create rerun-course course-info" id="rerun-course-form" name="rerun-course-form">
               <!-- NOTE: this element's contents should be only included when they are needed and not kept in the DOM for all states -->
               <div class="wrapper-error is-hidden">
                 <div id="course_rerun_error" name="course_rerun_error" class="message message-status error" role="alert">
@@ -99,29 +101,31 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                       <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                       <span class="tip">
                         ${_("The name of the organization sponsoring the new course. (This name is often the same as the original organization name.)")}
-                        <strong>${_("Note: No spaces or special characters are allowed.")}</strong>
+                        <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
                       </span>
                       <span class="tip tip-error is-hidden"></span>
                     </li>
 
-                    <li class="field text required" id="field-course-number">
-                      <label for="rerun-course-number">${_("Course Number")}</label>
-                      <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
-                      <span class="tip">
-                        ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
-                        <strong>${_("Note: No spaces or special characters are allowed.")}</strong>
-                      </span>
-                      <span class="tip tip-error is-hidden"></span>
-                    </li>
+                    <li class="row">
+                      <div class="column field text required" id="field-course-number">
+                        <label for="rerun-course-number">${_("Course Number")}</label>
+                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
+                        <span class="tip">
+                          ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
+                          <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
+                        </span>
+                        <span class="tip tip-error is-hidden"></span>
+                      </div>
 
-                    <li class="field text required" id="field-course-run">
-                      <label for="rerun-course-run">${_("Course Run")}</label>
-                      <input class="rerun-course-run" id="rerun-course-run" type="text" name="rerun-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
-                      <span class="tip">
-                        ${_("The term in which the new course will run. (This value is often different than the original course run value.)")}
-                        <strong>${_("Note: No spaces or special characters are allowed.")}</strong>
-                      </span>
-                      <span class="tip tip-error is-hidden"></span>
+                      <div class="column field text required" id="field-course-run">
+                        <label for="rerun-course-run">${_("Course Run")}</label>
+                        <input class="rerun-course-run" id="rerun-course-run" type="text" name="rerun-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
+                        <span class="tip">
+                          ${_("The term in which the new course will run. (This value is often different than the original course run value.)")}
+                          <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
+                        </span>
+                        <span class="tip tip-error is-hidden"></span>
+                      </div>
                     </li>
                   </ol>
 
@@ -134,7 +138,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                 <button type="button" class="action action-secondary action-cancel rerun-course-cancel">${_('Cancel and Return to Dashboard')}</button>
               </div>
             </form>
-          </div><!-- /rerun-course -->
+          </div>
 
         </article><!-- /content-primary -->
 

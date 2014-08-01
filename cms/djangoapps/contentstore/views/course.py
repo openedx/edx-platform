@@ -364,16 +364,17 @@ def course_listing(request):
             course.location.name
         )
 
-    def format_unsucceeded_course_for_view(uca, course):
+    def format_unsucceeded_course_for_view(uca):
         """
         return tuple of the data which the view requires for each unsucceeded course
         """
         return (
-            course.display_name,
-            course.display_org_with_default,
-            course.display_number_with_default,
-            course.location.name,
-
+            uca.display_name,
+            uca.course_key.org,
+            uca.course_key.course,
+            uca.course_key.run,
+            True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
         )
 
     # remove any courses in courses that are also in the unsucceeded_course_actions list
