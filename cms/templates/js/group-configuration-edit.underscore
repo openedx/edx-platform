@@ -36,5 +36,16 @@
     <div class="actions">
         <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
         <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+        <% if (!isNew) { %>
+            <% if (_.isEmpty(usage)) { %>
+                <span class="wrapper-delete-button">
+                    <a class="button action-delete delete" href="#"><%= gettext("Delete") %></a>
+                </span>
+            <% } else { %>
+                <span class="wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when in use by an experiment') %>">
+                    <a class="button action-delete delete is-disabled" href="#"><%= gettext("Delete") %></a>
+                </span>
+            <% } %>
+        <% } %>
     </div>
 </form>

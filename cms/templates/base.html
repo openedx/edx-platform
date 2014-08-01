@@ -81,6 +81,7 @@
             "draggabilly": "js/vendor/draggabilly.pkgd",
             "URI": "js/vendor/URI.min",
             "ieshim": "js/src/ie_shim",
+            "tooltip_manager": "coffee/src/discussion/tooltip_manager",
 
             // externally hosted files
             "tender": [
@@ -234,7 +235,7 @@
         deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim", "tooltip_manager"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }
