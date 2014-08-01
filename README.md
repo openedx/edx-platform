@@ -23,6 +23,13 @@ otherwise noted. Please see the
 [`LICENSE`](https://github.com/edx/edx-platform/blob/master/LICENSE) file
 for details.
 
+Issue Tracker
+-------------
+
+[We use JIRA for our issue tracker](https://openedx.atlassian.net/), not
+GitHub Issues. To file a bug, request a new feature, or ask for help, please
+make a free account on our JIRA and create a new issue!
+
 Documentation
 ------------
 
