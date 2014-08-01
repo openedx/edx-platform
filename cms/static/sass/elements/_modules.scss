@@ -12,8 +12,8 @@
   .bar-mod-title {
     @extend %t-title6;
     display: block;
-    background-color: $gray-l4;
     padding: ($baseline/2) ($baseline*.75);
+    background-color: $gray-l4;
     font-weight: 600;
   }
 
@@ -267,12 +267,39 @@
 // outline: utilities
 $outline-indent-width: $baseline;
 
+// UI: general outline
+.outline-content {
+  margin-top: 5px;
+
+  .unit-content {
+    margin-top: 0;
+  }
+
+  // add/new items
+  .add-item {
+    margin-top: ($baseline*0.75);
+
+    .button-new {
+      @extend %ui-btn-flat-outline;
+      padding: ($baseline/2) $baseline;
+      display: block;
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/2);
+      }
+    }
+  }
+}
+
+
 // UI: section
 %outline-section {
   @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
   border-left: 1px solid $color-draft;
   margin-bottom: $baseline;
-  padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline + 4);
+  padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
 
   // STATE: is-collapsed
   &.is-collapsed {
@@ -314,7 +341,7 @@ $outline-indent-width: $baseline;
   border-left: ($baseline/4) solid $color-draft;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  padding: ($baseline*0.75);
+  padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
 
   // CASE: is ready to be live
   &.is-ready {

@@ -180,6 +180,10 @@
   // --------------------
   .outline {
 
+    .outline-content {
+      margin-top: 0;
+    }
+
     // add/new items
     .add-item {
       margin-top: ($baseline*0.75);
@@ -261,6 +265,7 @@
   // outline: sections
   // --------------------
   .outline-section {
+    padding: ($baseline*0.75) $baseline ($baseline*0.75) ($baseline + 4);
 
     // header
     .section-header {
@@ -344,6 +349,7 @@
   }
 
   .outline-subsection {
+    padding: ($baseline*0.75);
 
     // header
     .subsection-header {
