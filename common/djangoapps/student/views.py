@@ -632,10 +632,16 @@ def change_enrollment(request):
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
             return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': course_id.to_deprecated_string()})
+                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )
 
         current_mode = available_modes[0]
+        # only automatically enroll people if the only mode is 'honor'
+        if current_mode.slug != 'honor':
+            return HttpResponse(
+                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+            )
+
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
