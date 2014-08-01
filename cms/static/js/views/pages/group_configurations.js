@@ -13,7 +13,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
         },
 
         renderPage: function() {
-            this.$el.append(this.listView.render().el);
+            this.$('.content-primary').append(this.listView.render().el);
             this.addButtonActions();
             this.addWindowActions();
             return $.Deferred().resolve().promise();
