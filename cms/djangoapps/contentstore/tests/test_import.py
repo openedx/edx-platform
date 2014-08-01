@@ -64,7 +64,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # edx/course can be imported into a namespace with an org/course
         # like edx/course_name
         module_store, __, course = self.load_test_import_course()
-        __, course_items = import_from_xml(
+        course_items = import_from_xml(
             module_store,
             self.user.id,
             'common/test/data',
@@ -139,7 +139,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        _, courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -157,10 +157,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         # we try to refresh the inheritance tree for each update_item in the import
-        with check_exact_number_of_calls(store, store.refresh_cached_metadata_inheritance_tree, 46):
+        with check_exact_number_of_calls(store, store.refresh_cached_metadata_inheritance_tree, 28):
 
-            # the post-publish step loads each item in the subtree, which calls _get_cached_metadata_inheritance_tree
-            with check_exact_number_of_calls(store, store._get_cached_metadata_inheritance_tree, 22):
+            # _get_cached_metadata_inheritance_tree should be called only once
+            with check_exact_number_of_calls(store, store._get_cached_metadata_inheritance_tree, 1):
 
                 # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
                 # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.

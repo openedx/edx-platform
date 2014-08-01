@@ -89,7 +89,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         component_types should cause 'Video' to be present.
         """
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course = course_items[0]
         course.advanced_modules = component_types
         store.update_item(course, self.user.id)
@@ -116,7 +116,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_malformed_edit_unit_request(self):
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
 
         # just pick one vertical
         usage_key = course_items[0].id.make_usage_key('vertical', None)
@@ -126,7 +126,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def check_edit_unit(self, test_course_name):
         """Verifies the editing HTML in all the verticals in the given test course"""
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
 
         items = self.store.get_items(course_items[0].id, qualifiers={'category': 'vertical'})
         self._check_verticals(items)
@@ -148,7 +148,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         both draft and non-draft copies.
         '''
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
         html_usage_key = course_key.make_usage_key('html', 'test_html')
 
@@ -263,7 +263,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertEqual(num_drafts, 1)
 
     def test_no_static_link_rewrites_on_import(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course = course_items[0]
 
         handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
@@ -287,7 +287,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
     def test_import_polls(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
 
         items = self.store.get_items(course_key, qualifiers={'category': 'poll_question'})
@@ -307,7 +307,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         Tests the ajax callback to render an XModule
         """
         direct_store = self.store
-        _, course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
         usage_key = course_items[0].id.make_usage_key('vertical', 'vertical_test')
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         resp = self.client.get_json(
@@ -357,7 +357,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
         effort = self.store.get_item(course_key.make_usage_key('about', 'effort'))
         self.assertEqual(effort.data, '6 hours')
@@ -460,7 +460,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         content_store = contentstore()
         trash_store = contentstore('trashcan')
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
         location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
@@ -618,7 +618,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         course_id = course_items[0].id
 
@@ -845,7 +845,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_course_handouts_rewrites(self):
         # import a test course
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         handouts_location = course_id.make_usage_key('course_info', 'handouts')
@@ -895,7 +895,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         # Create toy course
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         root_dir = path(mkdtemp_clean())
@@ -1271,7 +1271,7 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
@@ -1400,7 +1400,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
 
         course = course_items[0]
         verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
@@ -1466,7 +1466,7 @@ class ContentStoreTest(ContentStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        __, courses = import_from_xml(
+        courses = import_from_xml(
             self.store,
             self.user.id,
             'common/test/data/',

@@ -40,7 +40,7 @@ class Command(BaseCommand):
             dis=do_import_static))
         mstore = modulestore()
 
-        _, course_items = import_from_xml(
+        course_items = import_from_xml(
             mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, course_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
             do_import_static=do_import_static,
