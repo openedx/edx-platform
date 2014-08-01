@@ -389,7 +389,7 @@ $outline-indent-width: $baseline;
     > .subsection-status,
     > .unit-status {
 
-      .icon {
+      .status-message .icon {
         color: $color-staff-only;
       }
     }
