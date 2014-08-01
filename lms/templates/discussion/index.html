@@ -1,3 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import django_comment_client.helpers as helpers %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.template.defaultfilters import escapejs %>
+
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
