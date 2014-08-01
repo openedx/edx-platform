@@ -30,6 +30,11 @@ if (statusType === 'warning') {
 } else if (statusType === 'staff-only') {
     statusIconClass = 'icon-lock';
 }
+
+var gradingType = gettext('Not Graded');
+if (xblockInfo.get('graded')) {
+    gradingType = xblockInfo.get('format')
+}
 %>
 <% if (parentInfo) { %>
 <li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
@@ -101,19 +106,20 @@ if (statusType === 'warning') {
                             <%= xblockInfo.get('release_date') %>
                         <% } %>
                     </span>
-                    <% if (xblockInfo.get('due_date')) { %>
-                        <span class="due-date">
-                            <i class="icon-time"></i>
-                            <%= gettext('Due date:') %> <%= xblockInfo.get('due_date') %>
-                        </span>
-                    <% } %>
-                    <% if (xblockInfo.get('graded')) { %>
-                        <span class="policy">
-                            <%= gettext('Policy:') %> <%= xblockInfo.get('format') %>
-                        </span>
-                    <% } %>
                 </p>
             </div>
+            <% if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
+                <div class="status-grading">
+                    <p>
+                        <span class="sr status-grading-label"> <%= gettext('Graded as:') %> </span>
+                        <i class="icon icon-ok"></i>
+                        <span class="status-grading-value"> <%= gradingType %> </span>
+                        <% if (xblockInfo.get('due_date')) { %>
+                            <span class="status-grading-date"> <%= gettext('Due:') %> <%= xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+            <% } %>
         <% } %>
 
         <% if (statusMessage) { %>
