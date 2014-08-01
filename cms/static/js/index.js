@@ -1,5 +1,16 @@
 require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
     function (domReady, $, _, CancelOnEscape) {
+
+        var dismissNotification = function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $('.dismiss-button').data('dismiss-link'),
+                type: 'DELETE',
+                success: function(result) {
+                    window.location.reload()
+                }
+            });
+        };
         var saveNewCourse = function (e) {
             e.preventDefault();
 
@@ -164,5 +175,6 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
         domReady(function () {
             $('.new-course-button').bind('click', addNewCourse);
+            $('.dismiss-button').bind('click', dismissNotification);
         });
     });

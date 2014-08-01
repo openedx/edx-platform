@@ -5,6 +5,17 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var modalSelector = '.edit-section-publish-settings';
 
+        var dismissNotification = function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $('.dismiss-button').data('dismiss-link'),
+                type: 'GET',
+                success: function(result) {
+                    $('.wrapper-alert-announcement').remove()
+                }
+            });
+        };
+
         var toggleSections = function(e) {
             e.preventDefault();
 
@@ -221,6 +232,8 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             });
             $('.toggle-button-sections').bind('click', toggleSections);
             $('.expand-collapse').bind('click', toggleSubmodules);
+
+            $('.dismiss-button').bind('click', dismissNotification);
 
             var $body = $('body');
             $body.on('click', '.section-published-date .edit-release-date', editSectionPublishDate);

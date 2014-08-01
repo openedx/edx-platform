@@ -136,22 +136,24 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           <h3 class="title">Courses Being Processed</h3>
 
           <ul class="list-courses">
+            %for display_name, org, num, run, state_failed, state_in_progress, dismiss_link in sorted(unsucceeded_course_actions, key=lambda s: s[0].lower() if s[0] is not None else ''):
             <!-- STATE: re-run is processing -->
+            %if state_in_progress:
             <li class="wrapper-course has-status">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">China (Part 2): The Creation and End of a Centralized Empire</h3>
+                  <h3 class="course-title">${display_name}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
-                      <span class="label">${_("Organization:")}</span> <span class="value">HarvardX</span>
+                      <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
                     </span>
                     <span class="course-num metadata-item">
                       <span class="label">${_("Course Number:")}</span>
-                      <span class="value">SW12.2x</span>
+                      <span class="value">${num}</span>
                     </span>
                     <span class="course-run metadata-item">
-                      <span class="label">${_("Course Run:")}</span> <span class="value">T2_2014</span>
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
                     </span>
                   </div>
                 </div>
@@ -169,25 +171,27 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <p class="copy">${_("The new course will be added to your course list in 5-10 minutes. Return to this page or refresh it to update the course list. The new course will need some manual configuration.")}</p>
               </div>
             </li>
+            %endif
 
             <!-- - - - -->
 
             <!-- STATE: re-run has error -->
+            %if state_failed:
             <li class="wrapper-course has-status">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">China (Part 2): The Creation and End of a Centralized Empire</h3>
+                  <h3 class="course-title">${display_name}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
-                      <span class="label">${_("Organization:")}</span> <span class="value">HarvardX</span>
+                      <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
                     </span>
                     <span class="course-num metadata-item">
                       <span class="label">${_("Course Number:")}</span>
-                      <span class="value">SW12.2x</span>
+                      <span class="value">${num}</span>
                     </span>
                     <span class="course-run metadata-item">
-                      <span class="label">${_("Course Run:")}</span> <span class="value">T2_2014</span>
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
                     </span>
                   </div>
                 </div>
@@ -206,14 +210,16 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
-                    <a href="#" class="button dismiss-button">
+                    <a href="#" class="button dismiss-button" data-dismiss-link="${dismiss_link}">
                       <i class="icon icon-remove-sign"></i>
-                      <span class="button-copy">${_("Dimiss")}</span>
+                      <span class="button-copy">${_("Dismiss")}</span>
                     </a>
                   </li>
                 </ul>
               </div>
             </li>
+            %endif
+            %endfor
           </ul>
       </div>
 

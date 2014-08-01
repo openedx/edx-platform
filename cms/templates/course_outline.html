@@ -37,6 +37,7 @@ from contentstore.utils import reverse_usage_url
 </%block>
 
 <%block name="page_alert">
+  %if notification_dismiss_url is not None:
   <div class="wrapper wrapper-alert wrapper-alert-announcement is-shown">
     <div class="alert announcement has-actions">
       <i class="alert-symbol icon-bullhorn"></i>
@@ -49,7 +50,7 @@ from contentstore.utils import reverse_usage_url
 
       <ul class="nav-actions">
         <li class="action action-dismiss">
-          <a href="#" class="button dismiss-button">
+          <a href="#" class="button dismiss-button" data-dismiss-link='${notification_dismiss_url}'>
             <i class="icon icon-remove-sign"></i>
             <span class="button-copy">${_("Dimiss")}</span>
           </a>
@@ -57,6 +58,7 @@ from contentstore.utils import reverse_usage_url
       </ul>
     </div>
   </div>
+  %endif
 </%block>
 
 <%block name="content">

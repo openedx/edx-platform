@@ -375,6 +375,9 @@ def course_listing(request):
             uca.course_key.run,
             True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
             True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
+                'action_state_id': uca.id,
+            }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         )
 
     # remove any courses in courses that are also in the unsucceeded_course_actions list
@@ -384,6 +387,8 @@ def course_listing(request):
         for c in courses
         if not isinstance(c, ErrorDescriptor) and (c.id not in unsucceeded_action_course_keys)
     ]
+
+    unsucceeded_course_actions = [format_unsucceeded_course_for_view(uca) for uca in unsucceeded_course_actions]
 
     return render_to_response('index.html', {
         'courses': courses,
@@ -430,6 +435,9 @@ def course_index(request, course_key):
             CourseGradingModel.fetch(course_key).graders
         ),
         'rerun_notification_id': current_action.id if current_action else None,
+        'notification_dismiss_url': reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+                'action_state_id': current_action.id,
+            }) if current_action else None,
     })
 
 
