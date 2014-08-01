@@ -145,8 +145,8 @@ press Enter, the search tries to find:
   level.
 
 * Any usernames that are an exact match to your text. A "Show posts by
-  {username}" option displays above any posts that have an exact match at any
-  interaction level. Click the username in the message to read that user's
+  {username}" option displays above any posts that have an exact text match at
+  any interaction level. Click the username in the message to read that user's
   posts, responses, and comments.
 
 ==============================================
@@ -295,21 +295,21 @@ identify posts that are new, or that have responses or comments that you have
 not read yet, and to distinguish them from exchanges that you have already read
 completely.
 
-* Posts that you have not read yet have a blue dialog "bubble".
+* Posts that you have not read yet have a blue callout image.
 
 * Posts with responses or comments that you have not read yet have a white
-  dialog "bubble".
+  callout image.
  
-* Exchanges that you have read completely have a gray dialog "bubble" and
+* Exchanges that you have read completely have a gray callout image and
   background.
 
  .. image:: ../Images/Discussion_colorcoding.png
-  :alt: The list of posts with posts showing differently colored backgrounds and bubble icons
+  :alt: The list of posts with posts showing differently colored backgrounds and callout images
 
-These color-coded dialog bubbles appear when you sort the list of posts by
+These color-coded callout images appear when you sort the list of posts by
 recent activity or by most activity. If you sort the list of posts by most
 votes instead, the number of votes that the post has received appears in place
-of the bubble icon. See :ref:`Vote for Posts or Responses`.
+of the callouts. See :ref:`Vote for Posts or Responses`.
 
 ==============================
 Receive Daily Digests

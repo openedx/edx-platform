@@ -64,7 +64,7 @@ history.
 .. _Organizing_discussions:
 
 *************************************************
-Set Up Discussions for Your Course
+Set Up Discussion Topics for Your Course
 *************************************************
 
 Discussions in an edX course include both the specific topics that you add to
@@ -77,11 +77,12 @@ Add Units With a Discussion Component
 ============================================
 
 Typically, all units are added during the design and creation of your course in
-Studio. To add a discussion component to a unit, follow the instructions in
-:ref:`Working with Discussion Components`.
+Studio. To add a discussion topic to a unit, you add a discussion component.
+Follow the instructions in :ref:`Working with Discussion Components`.
 
-This type of discussion is subject to the release date of the section that
-contains it. Students cannot contribute to these discussions until that date.
+This type of discussion topic is subject to the release date of the section
+that contains it. Students cannot contribute to these discussion topics until
+that date.
 
 =====================================
 Create Course-Wide Discussion Topics

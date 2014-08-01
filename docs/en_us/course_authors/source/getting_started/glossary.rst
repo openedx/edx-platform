@@ -160,7 +160,7 @@ D
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialogue.
+  The set of topics defined to promote course-wide or unit-specific dialog.
   Students use the discussion topics to communicate with each other and the
   course staff in threaded exchanges.
 
