@@ -804,30 +804,47 @@ class ChoiceResponse(LoncapaResponse):
 
         for problem_id in student_answers:
             if unicode(self.answer_id) == problem_id:
-                print '>> problem id: ' + problem_id
-                print(etree.tostring(self.xml, pretty_print=True))
-
                 problem_hint_shown = False
+
                 student_answer_list = student_answers[problem_id]
-                choice_list = self.xml.xpath('//choice')
-                for choice in choice_list:
-                    choice_id = choice.get('name')
-                    attribute_test = '[@name="' + choice_id + '"]'
-                    if choice_id in student_answer_list:            # if this choice was selected by the student
+
+                for choice in self.xml.findall('.//checkboxgroup/choice'):
+                    choice_name = choice.get('name')
+                    if choice_name in student_answer_list:          # if this choice was selected by student
                         hint_test = '[@selected="True"]'
-                        xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
                     else:                                           # else this choice was not selected by the student
                         hint_test = '[@selected="False"]'
-                        xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+                    hints_list = self.xml.xpath('./choicehint' + hint_test)
+                    if hints_list:
+                        hint_text = hints_list[0].text
+                        new_cmap[problem_id]['msg'] += \
+                            '<div class="' + QUESTION_HINT_TEXT_STYLE + '">' + hint_text + '</div>'
 
-                    hint_text_element = self.xml.xpath(xpath_string)
-                    if hint_text_element:
-                        problem_hint_shown = True
-                        hint_text = hint_text_element[0].text.strip()
-                        print '>>             hint: ' + hint_text
-                        new_cmap[problem_id]['msg'] += '<div class="' \
-                                                    + QUESTION_HINT_TEXT_STYLE \
-                                                    + '">' + hint_text + '</div>'
+
+
+
+
+
+
+
+
+                # choice_list = self.xml.xpath('//checkboxgroup [@id="' + problem_id + '"]/choice')
+                # for choice in choice_list:
+                #   choice_id = choice.get('name')
+                #   for choicehint in self.xml.xpath('//checkboxgroup [@id="' + problem_id + '"]/choice [@name="' + choice_id + '"] /choicehint'):
+                #     attribute_test = '[@name="' + choice_id + '"]'
+                #     if choice_id in student_answer_list:            # if this choice was selected by the student
+                #         hint_test = '[@selected="True"]'
+                #     else:                                           # else this choice was not selected by the student
+                #         hint_test = '[@selected="False"]'
+                #     xpath_string = '//choice' + attribute_test + '/choicehint' + hint_test
+                #     hint_text_element = self.xml.xpath(xpath_string)
+                #     if hint_text_element:
+                #         problem_hint_shown = True
+                #         hint_text = hint_text_element[0].text.strip()
+                #         new_cmap[problem_id]['msg'] += '<div class="' \
+                #                                     + QUESTION_HINT_TEXT_STYLE \
+                #                                     + '">' + hint_text + '</div>'
 
                 self.wrap_hints_correct_or_incorrect(new_cmap, problem_id, problem_hint_shown)
 
