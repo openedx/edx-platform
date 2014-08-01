@@ -4,10 +4,14 @@ This test file will verify proper password policy enforcement, which is an optio
 """
 import json
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from mock import patch
+from django.utils.importlib import import_module
 from django.test.utils import override_settings
-
+from django.conf import settings
+from mock import patch
+from student.views import create_account
+from external_auth.models import ExternalAuthMap
 
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class TestPasswordPolicy(TestCase):
@@ -17,7 +21,7 @@ class TestPasswordPolicy(TestCase):
     def setUp(self):
         super(TestPasswordPolicy, self).setUp()
         self.url = reverse('create_account')
-
+        self.request_factory = RequestFactory()
         self.url_params = {
             'username': 'username',
             'email': 'foo_bar@bar.com',
@@ -233,6 +237,25 @@ class TestPasswordPolicy(TestCase):
     def test_with_unicode(self):
         self.url_params['password'] = u'四節比分和七年前'
         response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @override_settings(PASSWORD_MIN_LENGTH=6, SESSION_ENGINE='django.contrib.sessions.backends.cache')
+    def test_ext_auth_password_length_too_short(self):
+        """
+        Tests that even if password policy is enforced, ext_auth registrations aren't subject to it
+        """
+        self.url_params['password'] = 'aaa'  # shouldn't pass validation
+        request = self.request_factory.post(self.url, self.url_params)
+        # now indicate we are doing ext_auth by setting 'ExternalAuthMap' in the session.
+        request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
+        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
+                                  external_email='withmap@stanford.edu',
+                                  internal_password=self.url_params['password'],
+                                  external_domain='shib:https://idp.stanford.edu/')
+        request.session['ExternalAuthMap'] = extauth
+        response = create_account(request)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)
         self.assertTrue(obj['success'])
