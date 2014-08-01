@@ -181,7 +181,9 @@ class User(models.Model):
 
 
 def get_course_social_stats(course_id):
-
+    """
+    Helper method to get the social stats from the comment service
+    """
     url = _url_for_course_social_stats()
     params = {'course_id': course_id}
     response = perform_request(
