@@ -158,7 +158,21 @@ To review posts about a particular part of the course or type of issue, click
 down list. (**All Discussions** is selected by default.) Only posts about the
 topic you select appear in the list of posts.
 
-.. add something about endorsed responses(?)
+.. image:: ../Images/Discussion_filters.png
+ :alt: The list of posts with callouts to identify the top filter to select one topic and the filter below it to select by state 
+
+=======================================
+Review Only Unread or Unanswered Posts
+=======================================
+
+To limit the posts shown on the **Discussion** page, you can select one of the filter options. Above the list of posts, the **Show all** filter
+is selected by default. 
+
+* To list only the discussions and questions that you have not yet viewed,
+  select **Unread**.
+
+* To list only question posts that do not yet have any responses marked as
+  answers, select **Unanswered**.
 
 .. _Add a Post:
 

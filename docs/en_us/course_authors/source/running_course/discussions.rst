@@ -207,9 +207,9 @@ Run a Discussion
 *********************
 
 On an ongoing basis, the members of your discussion team run the course
-discussion by making contributions, endorsing responses, and guiding student
-messages into pertinent threads. Techniques that you can use throughout your
-course to make discussions successful follow.
+discussion by making contributions, endorsing responses, marking answers as
+correct, and guiding student messages into pertinent threads. Techniques that
+you can use throughout your course to make discussions successful follow.
 
 ==========================================
 Use Conventions in Discussion Subjects
@@ -231,8 +231,8 @@ Both your discussion team and your students can use tags like these to search
 the discussions more effectively.
 
 When a post is created its type must be selected: either "question" or
-"discussion". Members of the discussion team should be careful when selecting
-the type for their posts, and encourage students to do the same. See
+"discussion". Members of the discussion team should be thoughtful when
+selecting the type for their posts, and encourage students to do the same. See
 :ref:`Find Question Posts and Discussion Posts`.
 
 .. future: changing the type of a post, maybe resequence or separate  conventions from post types
@@ -242,8 +242,9 @@ Seed Discussion Topics
 ========================
 
 To help students learn how to get the most out of course discussions, and find
-the best discussion topic to use for their questions, you can seed discussion
-topics by adding posts before your course starts. Some examples follow.
+the best discussion topic to use for their questions and conversations, you can
+seed discussion topics by adding posts before your course starts. Some examples
+follow.
 
 * In the General topic (which is included in every course by default), add an
   [INTRO] post to initiate a thread for student and staff introductions.
@@ -254,8 +255,8 @@ topics by adding posts before your course starts. Some examples follow.
   create their own posts.
 
 * If you include discussion components along with problem components in a unit,
-  you can add a post that encourages students to use the discussion topic to
-  ask for help with the problems, but reminds them not to post the answers.
+  you can add a post that encourages students to use the topic to ask for help
+  with the problems, but reminds them not to post the answers.
 
 ======================================
 Minimize Thread Proliferation
@@ -276,22 +277,27 @@ discussion.
      :alt: Image of the pin icon for discussion posts
 
 * Endorse a response. Endorsing a response indicates that it provides value to
-  the discussion or that it is the correct answer to a question. Click the
-  **check** (or tick mark) icon that displays at upper right of the response.
+  the discussion. Click the **check** (or tick) mark icon that displays at
+  upper right of the response.
 
     .. image:: ../Images/Endorse_Discussion.png
      :alt: Image of the Endorse button for discussion posts
 
-.. replace this image ^ when new one is available     
+.. replace this image ^ when new one is available
+
+* Mark a question as answered. You use the same procedure to mark a response as
+  the correct answer to a question as you do to endorse contributions to a
+  discussion. Click the **check** (or tick) mark icon for correct answers.
 
 * Close a post. You can respond to a redundant post by (optionally) pasting in
   a link to the post that you prefer students to contribute to, and prevent
   further interaction by closing the post. Click the **Close** button that
   displays below the post to close it.
 
-* Provide post/response/comment guidelines. A set of :ref:`guidelines for
-  discussion moderators<Guidance for Discussion Moderators>` or a post in a
-  course-wide discussion topic (such as General) can provide guidance about
+* Provide post/response/comment guidelines. You can post information from the
+  :ref:`overview<Overview_discussions>` in this chapter, or the :ref:`anatomy
+  of edX discussions<Anatomy of edX Course Discussions>` in the next chapter,
+  in a course-wide discussion topic (such as General) to provide guidance about
   when to start a new thread by adding a post, responding to an existing post,
   or commenting on a response.
 
@@ -323,6 +329,11 @@ You can develop a set of best practices for discussion participation and make
 them available to students as a course handout file or on a defined page in
 your course. These guidelines can define your expectations and optionally
 introduce features of edX discussions.
+
+You can also share the :ref:`Discussions for Students and Staff` chapter with
+your students. It describes features that are available to all discussion
+participants, and may be useful to students who are new to online discussion
+forums.
 
 .. For a template that you can use to develop your own guidelines, see
 .. :ref:`Discussion Forum Guidelines`.
@@ -366,7 +377,7 @@ moderators, see :ref:`Guidance for Discussion Moderators`.
 .. _Find Question Posts and Discussion Posts:
 
 ==========================================
-Find Question Posts and Discussion Posts
+Find Questions and Discussions
 ==========================================
 
 When students create posts, they specify the type of post to indicate whether
@@ -379,11 +390,18 @@ discussions. When an answer is provided and marked as correct for a question, a
 check or tick mark image replaces the question mark image. See :ref:`Answer
 Questions`.
 
-You use the images in the list of posts on the **Discussion** page to find any
-unanswered questions.
+In addition to these visual cues, filters can help you find questions and
+discussions that need review. Above the list of posts, the **Show all** filter
+is selected by default. You can also select:
+
+* **Unanswered**, to list only questions that do not yet have any responses
+  marked as answers.
+
+* **Unread**, to list only the discussions and questions that you have not yet
+  viewed.
 
 ==================
-Edit Messages 
+Edit Messages
 ==================
 
 Discussion moderators, community TAs, and admins can edit the content of posts,
@@ -434,7 +452,8 @@ that have been flagged in this way and edit or delete them as needed.
 #. View the live version of your course and click **Discussion** at the top of
    the page.
 
-#. On the drop-down Discussion list click **Flagged Discussions**.
+#. In the list of posts on the left side of the page, use the filter drop-down
+   (set to **Show all** by default) to select **Flagged**.
 
 #. Review each post listed as a flagged discussion. Posts and responses show a
    flag and **Misuse Reported** in red font; comments show only a red flag.
