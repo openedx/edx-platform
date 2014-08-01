@@ -13,15 +13,6 @@ NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzin
 
 class CMSCourseStartTimeTests(unittest.TestCase):
     """ Test that course start time is returned correctly """
-    def setUp(self):
-        datetime_patcher = patch.object(
-            xmodule.course_module, 'datetime',
-            Mock(wraps=datetime)
-        )
-        mocked_datetime = datetime_patcher.start()
-        mocked_datetime.now.return_value = NOW
-        self.addCleanup(datetime_patcher.stop)
-
     start_times = [
         # start time, expected return in UTC
         ('2012-12-02T12:00', 'Dec 02, 2012'),
@@ -30,10 +21,8 @@ class CMSCourseStartTimeTests(unittest.TestCase):
         ('2014-07-31T18:00', 'Jul 31, 2014'),
     ]
 
-    @patch('xmodule.course_module.datetime.now')
-    def test_cms_start_date(self, gmtime_mock):
+    def test_cms_start_date(self):
         """ Test start date text in cms, should just convert to date format"""
-        gmtime_mock.return_value = NOW
         for times in self.start_times:
             course = get_dummy_course(start=times[0])
             self.assertEqual(course.start_date_text, times[1])

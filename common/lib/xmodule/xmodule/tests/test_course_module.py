@@ -11,7 +11,6 @@ import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.utils.timezone import UTC
-from xmodule.modulestore.django import ModuleI18nService
 
 
 ORG = 'test_org'
@@ -38,7 +37,6 @@ class DummySystem(ImportSystem):
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()
-        services = {'i18n': ModuleI18nService()}
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
@@ -48,7 +46,6 @@ class DummySystem(ImportSystem):
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
             field_data=KvsFieldData(DictKeyValueStore()),
-            services=services,
         )
 
 

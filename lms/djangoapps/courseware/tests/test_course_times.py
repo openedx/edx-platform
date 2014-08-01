@@ -13,14 +13,6 @@ NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzin
 
 class LMSCourseTimeTests(unittest.TestCase):
     """ Ensure course start and end times are returned correctly """
-    def setUp(self):
-        datetime_patcher = patch.object(
-            xmodule.course_module, 'datetime',
-            Mock(wraps=datetime)
-        )
-        mocked_datetime = datetime_patcher.start()
-        mocked_datetime.now.return_value = NOW
-        self.addCleanup(datetime_patcher.stop)
 
     start_advertised_settings = [
         # start, advertised, result, is_still_default
@@ -32,10 +24,8 @@ class LMSCourseTimeTests(unittest.TestCase):
         (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False),
     ]
 
-    @patch('xmodule.course_module.datetime.now')
-    def test_start_date_text(self, gmtime_mock):
+    def test_start_date_text(self):
         """ Test start date returned correctly default (UTC) TZ """
-        gmtime_mock.return_value = NOW
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             print "Checking start=%s advertised=%s" % (s[0], s[1])
