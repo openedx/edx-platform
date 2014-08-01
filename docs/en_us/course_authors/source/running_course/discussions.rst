@@ -229,7 +229,7 @@ body of a response or comment. Examples follow.
 Both your discussion team and your students can use tags like these to search
 the discussions more effectively.
 
-When a post is created, its type must be selected: either "question" or
+When a post is created its type must be selected: either "question" or
 "discussion". Members of the discussion team should be careful when selecting
 the type for their posts, and encourage students to do the same. See
 :ref:`Find Question Posts and Discussion Posts`.
@@ -237,12 +237,12 @@ the type for their posts, and encourage students to do the same. See
 .. future: changing the type of a post, maybe resequence or separate  conventions from post types
 
 ========================
-Seed Discussions
+Seed Discussion Topics
 ========================
 
 To help students learn how to get the most out of course discussions, and find
-the best discussion topic to use for their questions, you can seed discussions
-by adding posts before your course starts. Some examples follow.
+the best discussion topic to use for their questions, you can seed discussion
+topics by adding posts before your course starts. Some examples follow.
 
 * In the General topic (which is included in every course by default), add an
   [INTRO] post to initiate a thread for student and staff introductions.
@@ -275,11 +275,13 @@ discussion.
      :alt: Image of the pin icon for discussion posts
 
 * Endorse a response. Endorsing a response indicates that it provides value to
-  the discussion, or that it is the correct answer to a question. Click the
-  **check mark** that displays at upper right of the response.
+  the discussion or that it is the correct answer to a question. Click the
+  **check** (or tick mark) icon that displays at upper right of the response.
 
     .. image:: ../Images/Endorse_Discussion.png
      :alt: Image of the Endorse button for discussion posts
+
+.. replace this image ^ when new one is available     
 
 * Close a post. You can respond to a redundant post by (optionally) pasting in
   a link to the post that you prefer students to contribute to, and prevent
@@ -371,9 +373,10 @@ they are asking for concrete information (a question) or starting an open-ended
 conversation (a discussion). 
 
 On the **Discussion** page, a question mark image identifies posts that ask
-questions and a conversation bubble image identifies posts that start
+questions, and a conversation bubble image identifies posts that start
 discussions. When an answer is provided and marked as correct for a question, a
-check image replaces the question mark image. See :ref:`Answer Questions`.
+check or tick mark image replaces the question mark image. See :ref:`Answer
+Questions`.
 
 You use the images in the list of posts on the **Discussion** page to find any
 unanswered questions.
@@ -390,7 +393,7 @@ text, images, or links.
 #. Log in to the site and then select the course on your **Current Courses**
    dashboard.
 
-#. Click the **Edit** button below the post or response or click the pencil
+#. Click the **Edit** button below the post or response, or click the pencil
    icon for the comment.
 
 #. Remove the problematic portion of the message, or replace it with standard

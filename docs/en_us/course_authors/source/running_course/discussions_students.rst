@@ -67,10 +67,9 @@ topics are included in a course, they typically appear below the content they ap
 .. image:: /Images/Discussion_content_specific.png
  :alt: A discussion topic that appears below a video in the course, identified by a "Show Discussion" link
 
-Most courses also include one or more topics for discussions about course-wide
-areas of interest, such as the answers to "Frequently Asked Questions" or ideas
-for "Troubleshooting". You access these topics on the **Discussion** page of
-the course.
+Most courses also include one or more topics for course-wide discussions, such
+as "Frequently Asked Questions" and "Troubleshooting". You access these topics
+on the **Discussion** page of the course.
 
 .. image:: /Images/Discussion_course_wide.png
  :alt: Discussion topics are listed on the Discussion page when you click the drop-down list at the left side of the page
@@ -172,8 +171,7 @@ Add a Post
 ================================
 
 To make sure that other students and the course team can find and respond to
-your post, try to characterize the post with the right type and add your post
-to the most appropriate topic.
+your post, try to select the correct type for your post: either question or discussion.
 
 Add a Post to a Content-Specific Discussion Topic
 **************************************************
@@ -372,17 +370,19 @@ The number of votes that each post has received displays in the list of posts.
 Answer Questions and Mark Questions as Answered 
 ************************************************************
 
-Anyone in a course can answer questions: add a response to the post with your
-answer.
+Anyone in a course can answer questions. Just add a response to the post with
+your answer.
 
 The person who posted the question and staff members can mark responses as
-correct: click the **check** that appears at upper right of the response.
+correct: click the **check** (or tick mark) icon that appears at upper right of
+the response.
 
 .. image:: ../Images/Discussion_answer_question.png
  :alt: 
 
-After at least one response is marked as the answer, a check image replaces the
-question mark image for the post in the list on the **Discussion** page.
+After at least one response is marked as the answer, a check or tick mark image
+replaces the question mark image for the post in the list on the **Discussion**
+page.
 
 .. image:: ../Images/Discussion_answers_in_list.png
  :alt: The list of posts with images identifying unanswered and answered questions and discussions 

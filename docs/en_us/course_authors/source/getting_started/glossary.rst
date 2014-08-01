@@ -160,7 +160,9 @@ D
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialog. Students use the discussion topics to communicate with each other and the course staff in threaded exchanges. 
+  The set of topics defined to promote course-wide or unit-specific dialogue.
+  Students use the discussion topics to communicate with each other and the
+  course staff in threaded exchanges.
 
   A discussion is also a type of contribution that you can make to a discussion
   topic to start an open-ended conversation. You can also contribute questions
