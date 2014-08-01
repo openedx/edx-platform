@@ -25,8 +25,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
 
             shouldExpandChildren: function() {
                 // Expand the children if this xblock's locator is in the initially expanded state
-                if (this.initialState && _.contains(this.initialState.expanded_locators, this.model.id)) {
-                    return true;
+                if (this.initialState) {
+                    return _.contains(this.initialState.expanded_locators, this.model.id);
                 }
                 // Only expand the course and its chapters (aka sections) initially
                 return this.model.isCourse() || this.model.isChapter();
@@ -55,6 +55,9 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         expandedLocators.push(element.data('locator'));
                     }
                 });
+                if (!this.$el.hasClass('is-collapsed')) {
+                    expandedLocators.push(this.$el.data('locator'));
+                }
                 return expandedLocators;
             },
 
@@ -66,6 +69,15 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
              * @returns {jQuery promise} A promise representing the refresh operation.
              */
             refresh: function(viewState) {
+                return this.updateInitialState(viewState).model.fetch({});
+            },
+
+            /**
+             * Updates the initial state of the chapter containing this view, then returns the view.
+             * @param viewState The desired initial state of the view, or null if none.
+             * @returns The view whose initial state was updated
+             */
+            updateInitialState: function(viewState) {
                 var getViewToRefresh, view, expandedLocators;
 
                 getViewToRefresh = function(view) {
@@ -80,7 +92,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 viewState = viewState || {};
                 viewState.expanded_locators = expandedLocators.concat(viewState.expanded_locators || []);
                 view.initialState = viewState;
-                return view.model.fetch({});
+                return view;
             },
 
             onChildAdded: function(locator, category, event) {
@@ -189,6 +201,11 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         refresh: this.refresh.bind(this)
                     });
                 }
+            },
+
+            onXBlockChange: function() {
+                // Ensure that initial state is updated before rendering so that expand collapse state is correct
+                XBlockOutlineView.prototype.onXBlockChange.call(this.updateInitialState());
             }
         });
 
