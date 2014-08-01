@@ -13,11 +13,10 @@ from bok_choy.promise import Promise, EmptyPromise
 
 from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.overview import CourseOutlinePage
+from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ..pages.studio.utils import add_advanced_component
-from ..pages.studio.unit import UnitPage
 from ..pages.xblock.utils import wait_for_xblock_initialization
 
 from .base_studio_test import StudioCourseTest
@@ -45,7 +44,7 @@ class SplitTestMixin(object):
         def check_xblock_names(expected_groups, actual_blocks):
             self.assertEqual(len(expected_groups), len(actual_blocks))
             for idx, expected in enumerate(expected_groups):
-                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
+                self.assertEqual(expected, actual_blocks[idx].name)
 
         check_xblock_names(active_groups, container.active_xblocks)
         check_xblock_names(inactive_groups, container.inactive_xblocks)
@@ -65,22 +64,29 @@ class SplitTestMixin(object):
 
         Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
 
+
 @attr('shard_1')
-class SplitTest(ContainerBase):
+class SplitTest(ContainerBase, SplitTestMixin):
     """
     Tests for creating and editing split test instances in Studio.
     """
     __test__ = True
 
-    def populate_course_fixture(self, course_fixture):
-        course_fixture.add_advanced_settings(
-            {
-                u"advanced_modules": {"value": ["split_test"]},
-                u"user_partitions": {"value": [
+    def setUp(self):
+        super(SplitTest, self).setUp()
+        # This line should be called once courseFixture is installed
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
                     UserPartition(0, 'Configuration alpha,beta', 'first', [Group("0", 'alpha'), Group("1", 'beta')]).to_json(),
                     UserPartition(1, 'Configuration 0,1,2', 'second', [Group("0", 'Group 0'), Group("1", 'Group 1'), Group("2", 'Group 2')]).to_json()
-                ]}
-            }
+                ],
+            },
+        })
+
+    def populate_course_fixture(self, course_fixture):
+        course_fixture.add_advanced_settings(
+            {u"advanced_modules": {"value": ["split_test"]}}
         )
 
         course_fixture.add_children(
@@ -441,9 +447,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'New Group Configuration Name')
@@ -460,7 +466,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         self.assertEqual(
@@ -645,7 +651,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             vertical.locator,
             XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
         )
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = CourseOutlineUnit(self.browser, vertical.locator)
 
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
