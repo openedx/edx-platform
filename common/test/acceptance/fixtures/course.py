@@ -499,6 +499,7 @@ class CourseFixture(StudioApiFixture):
         try:
             loc = response.json().get('locator')
             xblock_desc.locator = loc
+
         except ValueError:
             raise CourseFixtureError("Could not decode JSON from '{0}'".format(response.content))
 

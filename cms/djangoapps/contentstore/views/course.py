@@ -1075,7 +1075,7 @@ class GroupConfiguration(object):
         )
 
     @staticmethod
-    def get_usage_info(course, store):
+    def _get_usage_info(course, modulestore):
         """
         Get all units names and their urls that have experiments and associated
         with configurations.
@@ -1089,18 +1089,18 @@ class GroupConfiguration(object):
         }
         """
         usage_info = {}
-        descriptors = store.get_items(course.id, category='split_test')
+        descriptors = modulestore.get_items(course.id, category='split_test')
         for split_test in descriptors:
             if split_test.user_partition_id not in usage_info:
                 usage_info[split_test.user_partition_id] = []
 
-            unit_location = store.get_parent_location(split_test.location)
+            unit_location = modulestore.get_parent_location(split_test.location)
             if not unit_location:
                 log.warning("Parent location of split_test module not found: %s", split_test.location)
                 continue
 
             try:
-                unit = store.get_item(unit_location)
+                unit = modulestore.get_item(unit_location)
             except ItemNotFoundError:
                 log.warning("Unit not found: %s", unit_location)
                 continue
@@ -1116,13 +1116,13 @@ class GroupConfiguration(object):
         return usage_info
 
     @staticmethod
-    def add_usage_info(course, store):
+    def add_usage_info(course, modulestore):
         """
         Add usage information to group configurations json.
 
         Returns json of group configurations updated with usage information.
         """
-        usage_info = GroupConfiguration.get_usage_info(course, store)
+        usage_info = GroupConfiguration._get_usage_info(course, modulestore)
         configurations = []
         for partition in course.user_partitions:
             configuration = partition.to_json()
@@ -1184,7 +1184,7 @@ def group_configurations_list_handler(request, course_key_string):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("POST", "PUT", "DELETE"))
+@require_http_methods(("POST", "PUT"))
 def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
     """
     JSON API endpoint for manipulating a group configuration via its internal ID.
@@ -1217,22 +1217,6 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             course.user_partitions.append(new_configuration)
         store.update_item(course, request.user.id)
         return JsonResponse(new_configuration.to_json(), status=201)
-    elif request.method == "DELETE":
-        if not configuration:
-            return JsonResponse(status=404)
-
-        # Verify that group configuration is not already in use.
-        usages = GroupConfiguration.get_usage_info(course, store)
-        if usages.get(int(group_configuration_id)):
-            return JsonResponse(
-                {"error": _("This Group Configuration is already in use and cannot be removed.")},
-                status=400
-            )
-
-        index = course.user_partitions.index(configuration)
-        course.user_partitions.pop(index)
-        store.update_item(course, request.user.id)
-        return JsonResponse(status=204)
 
 
 def _get_course_creator_status(user):

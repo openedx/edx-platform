@@ -22,7 +22,6 @@ GROUP_CONFIGURATION_JSON = {
 }
 
 
-# pylint: disable=no-member
 class HelperMethods(object):
     """
     Mixin that provides useful methods for Group Configuration tests.
@@ -138,7 +137,7 @@ class GroupConfigurationsBaseTestCase(object):
 
 # pylint: disable=no-member
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase):
     """
     Test cases for group_configurations_list_handler.
     """
@@ -234,7 +233,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
 
 # pylint: disable=no-member
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase):
     """
     Test cases for group_configurations_detail_handler.
     """
@@ -295,7 +294,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         """
         Edit group configuration and check its id and modified fields.
         """
-        self._add_user_partitions()
+        self.course.user_partitions = [
+            UserPartition(self.ID, 'First name', 'First description', [Group(0, 'Group A'), Group(1, 'Group B'), Group(2, 'Group C')]),
+        ]
         self.save_course()
 
         expected = {
@@ -326,65 +327,6 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(user_partititons[0].groups[0].name, u'New Group Name')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group C')
 
-    def test_can_delete_group_configuration(self):
-        """
-        Delete group configuration and check user partitions.
-        """
-        self._add_user_partitions(count=2)
-        self.save_course()
-
-        response = self.client.delete(
-            self._url(cid=0),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 204)
-        self.reload_course()
-        # Verify that user_partitions is properly updated in the course.
-        user_partititons = self.course.user_partitions
-        self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'Name 1')
-
-    def test_cannot_delete_used_group_configuration(self):
-        """
-        Cannot delete group configuration if it is in use.
-        """
-        self._add_user_partitions(count=2)
-        self._create_content_experiment(cid=0)
-
-        response = self.client.delete(
-            self._url(cid=0),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 400)
-        content = json.loads(response.content)
-        self.assertTrue(content['error'])
-        self.reload_course()
-        # Verify that user_partitions is still the same.
-        user_partititons = self.course.user_partitions
-        self.assertEqual(len(user_partititons), 2)
-        self.assertEqual(user_partititons[0].name, u'Name 0')
-
-    def test_cannot_delete_non_existent_group_configuration(self):
-        """
-        Cannot delete group configuration if it is doesn't exist.
-        """
-        self._add_user_partitions(count=2)
-        response = self.client.delete(
-            self._url(cid=999),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(response.status_code, 404)
-        # Verify that user_partitions is still the same.
-        user_partititons = self.course.user_partitions
-        self.assertEqual(len(user_partititons), 2)
-        self.assertEqual(user_partititons[0].name, u'Name 0')
-
 
 # pylint: disable=no-member
 @skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
@@ -393,9 +335,6 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     Tests for usage information of configurations.
     """
     def setUp(self):
-        """
-        Set up group configurations and split test module.
-        """
         super(GroupConfigurationsUsageInfoTestCase, self).setUp()
 
     def test_group_configuration_not_used(self):
@@ -500,5 +439,5 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
             display_name='Test Content Experiment'
         )
         self.save_course()
-        actual = GroupConfiguration.get_usage_info(self.course, self.store)
+        actual = GroupConfiguration._get_usage_info(self.course, self.store)
         self.assertEqual(actual, {0: []})
