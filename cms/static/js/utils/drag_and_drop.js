@@ -273,7 +273,13 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     newParentEle = element.parents(parentSelector).first(),
                     newParentLocator = newParentEle.data('locator'),
                     oldParentLocator = element.data('parent'),
-                    oldParentEle, saving;
+                    oldParentEle, saving, refreshParent;
+
+                refreshParent = function (element) {
+                    var refresh = element.data('refresh');
+                    if (_.isFunction(refresh)) { refresh(); }
+
+                };
                 // If the parent has changed, update the children of the old parent.
                 if (newParentLocator !== oldParentLocator) {
                     // Find the old parent element.
@@ -282,10 +288,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     });
                     this.saveItem(oldParentEle, childrenSelector, function () {
                         element.data('parent', newParentLocator);
-                        _.each([oldParentEle, newParentEle], function (element) {
-                            var refresh = element.data('refresh');
-                            if (_.isFunction(refresh)) { refresh(); }
-                        });
+                        refreshParent(oldParentEle);
                     });
                 }
                 saving = new NotificationView.Mini({
@@ -299,6 +302,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                 }, 1000);
                 this.saveItem(newParentEle, childrenSelector, function () {
                     saving.hide();
+                    refreshParent(newParentEle);
                 });
             },
 
