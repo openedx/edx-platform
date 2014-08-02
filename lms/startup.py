@@ -10,6 +10,7 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 from django_startup import autostartup
 import edxmako
 import logging
+from monkey_patch import django_utils_translation
 import analytics
 
 log = logging.getLogger(__name__)
@@ -19,6 +20,8 @@ def run():
     """
     Executed during django startup
     """
+    django_utils_translation.patch()
+
     autostartup()
 
     add_mimetypes()
