@@ -241,7 +241,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 });
                 it("calls handleReorder on a successful drag", function () {
                     ContentDragger.dragState.dropDestination = $('#unit-2');
-                    ContentDragger.dragState.attachMethod = "before";
+                    ContentDragger.dragState.attachMethod = "after";
                     ContentDragger.dragState.parentList = $('#subsection-1');
                     $('#unit-1').offset({
                         top: $('#unit-1').offset().top + 10,
@@ -298,7 +298,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 afterEach(function () {
                     this.clock.restore();
                 });
-                it("should send an update on reorder", function () {
+                it("should send an update on reorder from one parent to another", function () {
                     var requests, savingOptions;
                     requests = create_sinon["requests"](this);
                     ContentDragger.dragState.dropDestination = $('#unit-4');
@@ -332,6 +332,31 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     expect($('#subsection-1').data('refresh')).toHaveBeenCalled();
                     // target
                     expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
+                });
+                it("should send an update on reorder within the same parent", function () {
+                    var requests = create_sinon["requests"](this);
+                    ContentDragger.dragState.dropDestination = $('#unit-2');
+                    ContentDragger.dragState.attachMethod = "after";
+                    ContentDragger.dragState.parentList = $('#subsection-1');
+                    $('#unit-1').offset({
+                        top: $('#unit-1').offset().top + 10,
+                        left: $('#unit-1').offset().left
+                    });
+                    ContentDragger.onDragEnd({
+                        element: $('#unit-1')
+                    }, null, {
+                        clientX: $('#unit-1').offset().left
+                    });
+                    expect(requests.length).toEqual(1);
+                    expect($('#unit-1')).toHaveClass('was-dropped');
+                    expect(requests[0].requestBody).toEqual(
+                        '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
+                    );
+                    requests[0].respond(200);
+                    this.clock.tick(1001);
+                    expect($('#unit-1')).not.toHaveClass('was-dropped');
+                    // parent
+                    expect($('#subsection-1').data('refresh')).toHaveBeenCalled();
                 });
             });
         });
