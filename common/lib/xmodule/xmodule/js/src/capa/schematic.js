@@ -40,17 +40,14 @@ var cktsim = (function() {
 	function Circuit() {
 	    this.node_map = new Array();
 	    this.ntypes = [];
-	    this.initial_conditions = [];  // ic's for each element
-
-	    this.devices = [];  // list of devices
-	    this.device_map = new Array();  // map name -> device
-	    this.voltage_sources = [];  // list of voltage sources
-	    this.current_sources = [];  // list of current sources
-
+        this.initial_conditions = [];
+        this.devices = [];
+        this.device_map = new Array();
+        this.voltage_sources = [];
+        this.current_sources = [];
 	    this.finalized = false;
 	    this.diddc = false;
 	    this.node_index = -1;
-
 	    this.periods = 1
 	}
 
@@ -186,7 +183,6 @@ var cktsim = (function() {
 		return false;
 	    }
 	    return true;
-	    
 	}
 
 	// if converges: updates this.solution, this.soln_max, returns iter count
@@ -221,7 +217,6 @@ var cktsim = (function() {
 		    use_limiting = true;
 		}
 	        else {  // Compute the Newton delta
-		    //d_sol = mat_solve(this.matrix,rhs);
 		    d_sol = mat_solve_rq(this.matrix,rhs);
 
 		    // If norm going down for ten iters, stop limiting
@@ -267,12 +262,10 @@ var cktsim = (function() {
 		    }
 		}
 
-		//alert(numeric.prettyPrint(this.solution);)
                 if (converged == true) {
 		    for (var i = this.N - 1; i >= 0; --i) 
 			if (Math.abs(soln[i]) > this.soln_max[i])
 			    this.soln_max[i] = Math.abs(soln[i]);
-		    
 		    return iter+1;
 		}
 	    }
@@ -281,7 +274,6 @@ var cktsim = (function() {
 
 	// DC analysis
 	Circuit.prototype.dc = function() {
-
 	    // Allocation matrices for linear part, etc.
 	    if (this.finalize() == false)
 		return undefined;
@@ -348,7 +340,6 @@ var cktsim = (function() {
 		for (var i = ckt.N-1; i >= 0; --i) {
 		    var dqdt = ckt.alpha0*ckt.q[i] + ckt.alpha1*ckt.oldq[i] + 
 			ckt.alpha2*ckt.old2q[i];
-		    //alert(numeric.prettyPrint(dqdt));
 		    rhs[i] = ckt.beta0[i]*ckt.c[i] + ckt.beta1[i]*ckt.oldc[i] - dqdt;
 		}
 		// matrix = beta0*G + alpha0*C.
@@ -401,7 +392,7 @@ var cktsim = (function() {
 		}
 		return new_step;
 	    }
-	    
+
 	    // Standard to do a dc analysis before transient
 	    // Otherwise, do the setup also done in dc.
 	    no_dc = false;
@@ -473,9 +464,7 @@ var cktsim = (function() {
 		    period = Math.min(period, per);
 	    }
 	    this.periods = Math.ceil((tstop - tstart)/period);
-	    //alert('number of periods ' + this.periods);
 
-	
 	    this.time = tstart;
 	    // ntpts adjusted by numbers of periods in input
 	    this.max_step = (tstop - tstart)/(this.periods*ntpts);
@@ -495,7 +484,6 @@ var cktsim = (function() {
 		this.oldc[i] = this.c[i]; 
 	    }
 
-	    
 	    var beta0,beta1;
 	    // Start with two pseudo-Euler steps, maximum 50000 steps/period
 	    var max_nsteps = this.periods*50000;
@@ -511,7 +499,6 @@ var cktsim = (function() {
 		    this.old3q[i] = this.oldq[i];
 		    this.old2q[i] = this.oldq[i];
 		    this.oldq[i] = this.q[i];
-
 		}
 
 		if (step_index < 0) {  // Take a prestep using BE
@@ -572,7 +559,6 @@ var cktsim = (function() {
 			if (step_index > 0) new_step = time_step_increase_factor*this.min_step;
 			break;
 		    } else if (iterations == undefined) {  // NR nonconvergence, shrink by factor
-			//alert('timestep nonconvergence ' + this.time + ' ' + step_index);
 			this.time = this.oldt + 
 			    (this.time - this.oldt)/nr_step_decrease_factor;
 		    } else {  // Check the LTE and shrink step if needed.
@@ -695,7 +681,6 @@ var cktsim = (function() {
 	    return result;
 	}
 
-
         // Helper for adding devices to a circuit, warns on duplicate device names.
         Circuit.prototype.add_device = function(d,name) {
 	    // Add device to list of devices and to device map
@@ -737,7 +722,6 @@ var cktsim = (function() {
 		return this.add_device(d, name);
 	    } // zero area diodes discarded.
 	}
-
 
 	Circuit.prototype.c = function(n1,n2,v,name) {
 	    // try to convert string value into numeric value, barf if we can't
@@ -900,7 +884,7 @@ var cktsim = (function() {
         function mat_v_mult(M,x,b,scale) {
 	    var n = M.length;
 	    var m = M[0].length;
-	    
+
 	    if (n != b.length || m != x.length)
 		throw 'Rows of M mismatched to b or cols mismatch to x.';
 
@@ -915,7 +899,7 @@ var cktsim = (function() {
         function mat_scale_add(A, B, scalea, scaleb, C) {
 	    var n = A.length;
 	    var m = A[0].length;
-	    
+
 	    if (n > B.length || m > B[0].length)
 		throw 'Row or columns of A to large for B';
 	    if (n > C.length || m > C[0].length)
@@ -970,7 +954,6 @@ var cktsim = (function() {
 		for (var j = 0; j < m; j++)
 		    dest[i][j] = src[i][j];
 	}
-	    
         // Copy and transpose A -> using the bounds of A
 	function mat_copy_transposed(src,dest) {
 	    var n = src.length;
@@ -1035,7 +1018,6 @@ var cktsim = (function() {
 		}
 	    }
 
-	    // return the rank
 	    return the_rank;
 	}
 
@@ -1088,7 +1070,6 @@ var cktsim = (function() {
 		    break;
 		}
 
-
 		// Nonzero row, eliminate from rows below
 		var Mr = M[row];
 		for (var col =  Nc-1; col >= 0; --col) // Scale rhs also
@@ -1114,7 +1095,6 @@ var cktsim = (function() {
 		}
 	    }
 
-	    // Return solution.
 	    return x;
 	}
 
@@ -1170,7 +1150,6 @@ var cktsim = (function() {
 		x[i] = temp/M[i][i];
 	    }
 
-	    // return solution
 	    return x;
 	}
 
@@ -1287,7 +1266,6 @@ var cktsim = (function() {
 		    return result*multiplier;
 		}
 	    }
-    
 	    // read decimal integer or floating-point number
 	    while (true) {
 		if (s.charAt(index) >= '0' && s.charAt(index) <= '9')
@@ -1376,7 +1354,7 @@ var cktsim = (function() {
 	//   inflection_point(t) -- compute time after t when a time point is needed
 	//   dc -- value at time 0
 	//   period -- repeat period for periodic sources (0 if not periodic)
-	
+
 	function parse_source(v) {
 	    // generic parser: parse v as either <value> or <fun>(<value>,...)
 	    var src = new Object();
@@ -1518,7 +1496,7 @@ var cktsim = (function() {
 		    else return undefined;
 		}
 	    }
-	
+
 	    // object has all the necessary info to compute the source value and inflection points
 	    src.dc = src.value(0);   // DC value is value at time 0
 	    return src;
@@ -1591,7 +1569,6 @@ var cktsim = (function() {
 
         function VSource(npos,nneg,branch,v) {
 	    Device.call(this);
-	    
 	    this.src = parse_source(v);
 	    this.npos = npos;
 	    this.nneg = nneg;
@@ -1631,7 +1608,6 @@ var cktsim = (function() {
 
 	function ISource(npos,nneg,v) {
 	    Device.call(this);
-
 	    this.src = parse_source(v);
 	    this.npos = npos;
 	    this.nneg = nneg;
@@ -1830,7 +1806,6 @@ var cktsim = (function() {
 	}
 
 
-
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Simple Voltage-Controlled Voltage Source Op Amp model 
@@ -1850,7 +1825,6 @@ var cktsim = (function() {
 
 	Opamp.prototype = new Device();
         Opamp.prototype.constructor = Opamp;
-        
         Opamp.prototype.load_linear = function(ckt) {
             // MNA stamp for VCVS: 1/A(v(no) - v(ng)) - (v(np)-v(nn))) = 0.
 	    var invA = 1.0/this.gain;
@@ -1873,13 +1847,11 @@ var cktsim = (function() {
 	}
 
 
-
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Simplified MOS FET with no bulk connection and no body effect.
 	//
 	///////////////////////////////////////////////////////////////////////////////
-
 
         function Fet(d,g,s,ratio,name,type) {
 	    Device.call(this);
@@ -2024,16 +1996,6 @@ function add_schematic_handler(other_onload) {
 	update_schematics();
     }
 }
-/*
- * THK: Attaching update_schematic to window.onload is rather presumptuous...
- *      The function is called for EVERY page load, whether in courseware or in
- *      course info, in 6.002x or the public health course. It is also redundant
- *      because courseware includes an explicit call to update_schematic after
- *      each ajax exchange. In this case, calling update_schematic twice appears 
- *      to contribute to a bug in Firefox that does not render the schematic
- *      properly depending on timing.
- */
-//window.onload = add_schematic_handler(window.onload);
 
 // ask each schematic input widget to update its value field for submission
 function prepare_schematics() {
@@ -2092,7 +2054,6 @@ schematic = (function() {
 	    if (this.origin_y == undefined) this.origin_y = 0;
 	    this.cursor_x = 0;
 	    this.cursor_y = 0;
-
 	    this.window_list = [];  // list of pop-up windows in increasing z order
 
 	    // use user-supplied list of parts if supplied
@@ -2181,7 +2142,7 @@ schematic = (function() {
 		    this.tran_tstop = '1';
 		}
 	    }
- 
+
 	    // set up diagram canvas
 	    this.canvas = document.createElement('canvas');
 	    this.width = input.getAttribute('width');
@@ -2234,11 +2195,9 @@ schematic = (function() {
 
 	    this.connection_points = new Array();  // location string => list of cp's
 	    this.components = [];
-
 	    this.dragging = false;
 	    this.select_rect = undefined;
 	    this.wire = undefined;
-
 	    this.operating_point = undefined;  // result from DC analysis
 	    this.dc_results = undefined;   // saved analysis results for submission
 	    this.ac_results = undefined;   // saved analysis results for submission
@@ -2279,7 +2238,7 @@ schematic = (function() {
 		    if (tool != null) td.appendChild(tool);
 		}
 	    }
-	    
+
 	    // add canvas and parts bin to DOM
 	    tr = document.createElement('tr');
 	    table.appendChild(tr);
@@ -2344,7 +2303,6 @@ schematic = (function() {
 
 	Schematic.prototype.add_component = function(new_c) {
 	    this.components.push(new_c);
-
 	    // create undoable edit record here
 	}
 
@@ -2357,7 +2315,6 @@ schematic = (function() {
 	    return this.connection_points[cp.location];
 	}
 
-	// add connection point to list of connection points at that location
 	Schematic.prototype.add_connection_point = function(cp) {
 	    var cplist = this.connection_points[cp.location];
 	    if (cplist) cplist.push(cp);
@@ -2366,11 +2323,9 @@ schematic = (function() {
 		this.connection_points[cp.location] = cplist;
 	    }
 
-	    // return list of conincident connection points
 	    return cplist;
 	}
 
-	// remove connection point from the list points at the old location
 	Schematic.prototype.remove_connection_point = function(cp,old_location) {
 	    // remove cp from list at old location
 	    var cplist = this.connection_points[old_location];
@@ -2386,13 +2341,11 @@ schematic = (function() {
 	    }
 	}
 
-	// connection point has changed location: remove, then add
 	Schematic.prototype.update_connection_point = function(cp,old_location) {
 	    this.remove_connection_point(cp,old_location);
 	    return this.add_connection_point(cp);
 	}
 
-	// add a wire to the schematic
 	Schematic.prototype.add_wire = function(x1,y1,x2,y2) {
 	    var new_wire = new Wire(x1,y1,x2,y2);
 	    new_wire.add(this);
@@ -2463,7 +2416,6 @@ schematic = (function() {
 
 	Schematic.prototype.unselect_all = function(which) {
 	    this.operating_point = undefined;  // remove annotations
-
 	    for (var i = this.components.length - 1; i >= 0; --i)
 		if (i != which) this.components[i].set_select(false);
 	}
@@ -2488,7 +2440,6 @@ schematic = (function() {
 		if (component.selected) component.move_end();
 	    }
 	    this.dragging = false;
-
 	    this.clean_up_wires();
 	    this.redraw_background();
 	}
@@ -2508,11 +2459,6 @@ schematic = (function() {
 	    this.origin_x += cx*(this.scale - nscale);
 	    this.origin_y += cy*(this.scale - nscale);
 	    this.scale = nscale;
-
-
-	    //this.origin_x = cx - this.width/(2*this.scale);
-	    //this.origin_y = cy - this.height/(2*this.scale);
-
 	    this.redraw_background();
 	}
 
@@ -2529,7 +2475,6 @@ schematic = (function() {
 
 	Schematic.prototype.zoomin = function() {
 	    var nscale = this.scale * zoom_factor;
-
 	    if (nscale < zoom_max) {
 		// keep center of view unchanged
 		this.origin_x += (this.width/2)*(1.0/this.scale - 1.0/nscale);
@@ -2541,7 +2486,6 @@ schematic = (function() {
 
 	Schematic.prototype.zoomout = function() {
 	    var nscale = this.scale / zoom_factor;
-
 	    if (nscale > zoom_min) {
 		// keep center of view unchanged
 		this.origin_x += (this.width/2)*(1.0/this.scale - 1.0/nscale);
@@ -2631,7 +2575,6 @@ schematic = (function() {
 		new_c.add(this);
 	    }
 
-	    // see what we've wrought
 	    this.redraw();
 	}
 
@@ -2646,7 +2589,6 @@ schematic = (function() {
 	    // use default value if no schematic info in value
 	    if (value == undefined || value.indexOf('[') == -1)
 		value = initial_value;
-	    
 	    if (value && value.indexOf('[') != -1) {
 		// convert string value into data structure
 		var json = JSON.parse(value);
@@ -2655,12 +2597,6 @@ schematic = (function() {
 		for (var i = json.length - 1; i >= 0; --i) {
 		    var c = json[i];
 		    if (c[0] == 'view') {
-			// special hack: view component lets us recreate view
-			// ignore saved view parameters as they sometimes screw students
-			//this.origin_x = c[1];
-			//this.origin_y = c[2];
-			//this.scale = c[3];
-			//this.ac_npts = c[4];
 			this.ac_fstart = c[5];
 			this.ac_fstop = c[6];
 			this.ac_source_name = c[7];
@@ -2683,20 +2619,15 @@ schematic = (function() {
 			var coords = c[1];
 			var properties = c[2];
 
-			// make the part
 			var part = new parts_map[type][0](coords[0],coords[1],coords[2]);
-
-			// give it its properties
 			for (var name in properties)
 			    part.properties[name] = properties[name];
 
-			// add component to the diagram
 			part.add(this);
 		    }
 		}
 	    }
 
-	    // see what we've got!
 	    this.redraw_background();
 	}
 
@@ -2720,7 +2651,6 @@ schematic = (function() {
 		this.components[i].label_connections();
 	}
 
-	// generate a new label
 	Schematic.prototype.get_next_label = function() {
 	    // generate next label in sequence
 	    this.next_label += 1;
@@ -2745,7 +2675,6 @@ schematic = (function() {
 	    this.input.value = JSON.stringify(this.json_with_analyses());
 	}
 
-	// produce a JSON representation of the diagram
 	Schematic.prototype.json = function() {
 	    var json = [];
 
@@ -2763,7 +2692,6 @@ schematic = (function() {
 	    return json;
 	}
 
-	// produce a JSON representation of the diagram
 	Schematic.prototype.json_with_analyses = function() {
 	    var json = this.json();
 
@@ -2840,14 +2768,13 @@ schematic = (function() {
 	    var fstart_lbl = 'Starting frequency (Hz)';
 	    var fstop_lbl = 'Ending frequency (Hz)';
 	    var source_name_lbl = 'Name of V or I source for ac'
-    
+
 	    if (this.find_probes().length == 0) {
 		alert("AC Analysis: there are no voltage probes in the diagram!");
 		return;
 	    }
 
 	    var fields = new Array();
-	    //fields[npts_lbl] = build_input('text',10,this.ac_npts);
 	    fields[fstart_lbl] = build_input('text',10,this.ac_fstart);
 	    fields[fstop_lbl] = build_input('text',10,this.ac_fstop);
 	    fields[source_name_lbl] = build_input('text',10,this.ac_source_name);
@@ -2860,7 +2787,6 @@ schematic = (function() {
 		    var sch = content.sch;
 
 		    // retrieve parameters, remember for next time
-		    //sch.ac_npts = content.fields[npts_lbl].value;
 		    sch.ac_fstart = content.fields[fstart_lbl].value;
 		    sch.ac_fstop = content.fields[fstop_lbl].value;
 		    sch.ac_source_name = content.fields[source_name_lbl].value;
@@ -2872,9 +2798,7 @@ schematic = (function() {
 		});
 	}
 
-	// perform ac analysis
 	Schematic.prototype.ac_analysis = function(npts,fstart,fstop,ac_source_name) {
-	    // run the analysis
 	    var ckt = this.extract_circuit();
 	    if (ckt === null) return;
 	    var results = ckt.ac(npts,fstart,fstop,ac_source_name);
@@ -2887,7 +2811,6 @@ schematic = (function() {
 		// x axis will be a log scale
 		for (var i = x_values.length - 1; i >= 0; --i)
 		    x_values[i] = Math.log(x_values[i])/Math.LN10;
-
 
 		if (this.submit_analyses != undefined) {
 		    var submit = this.submit_analyses['ac'];
@@ -2918,7 +2841,6 @@ schematic = (function() {
 		var y_values = [];  // list of [color, result_array]
 		var z_values = [];  // list of [color, result_array]
 		var probes = this.find_probes();
-
 		var probe_maxv = [];
 		var probe_color = [];
 
@@ -2930,8 +2852,8 @@ schematic = (function() {
 		    var v = results[label];
 		    probe_maxv[i] = array_max(v); // magnitudes always > 0
 		}
-		var all_max = array_max(probe_maxv);
 
+        var all_max = array_max(probe_maxv);
 		if (all_max < 1.0e-16) {
 		    alert('Zero ac response, -infinity on DB scale.');
 		} else {
@@ -2949,7 +2871,6 @@ schematic = (function() {
 		    var color = probes[i][0];
 		    var label = probes[i][1];
 		    var offset = cktsim.parse_number(probes[i][2]);
-
 		    var v = results[label];
 		    // convert values into dB relative to source amplitude
 		    var v_max = 1;
@@ -2976,7 +2897,6 @@ schematic = (function() {
 
 	    var npts_lbl = 'Minimum number of timepoints';
 	    var tstop_lbl = 'Stop Time (seconds)';
-    
 	    var probes = this.find_probes();
 	    if (probes.length == 0) {
 		alert("Transient Analysis: there are no probes in the diagram!");
@@ -2984,7 +2904,6 @@ schematic = (function() {
 	    }
 
 	    var fields = new Array();
-	    //fields[npts_lbl] = build_input('text',10,this.tran_npts);
 	    fields[tstop_lbl] = build_input('text',10,this.tran_tstop);
 
 	    var content = build_table(fields);
@@ -2997,7 +2916,6 @@ schematic = (function() {
 		    if (ckt === null) return;
 
 		    // retrieve parameters, remember for next time
-		    //sch.tran_npts = content.fields[npts_lbl].value;
 		    sch.tran_tstop = content.fields[tstop_lbl].value;
 
 		    // gather a list of nodes that are being probed.  These
@@ -3108,7 +3026,6 @@ schematic = (function() {
 		}
 	    }
 
-	    // update diagram
 	    this.redraw_background();
 	}
 
@@ -3160,7 +3077,6 @@ schematic = (function() {
 		}
 	    }
 	    this.unsel_bbox = [min_x,min_y,max_x,max_y];
-
 	    this.redraw();   // background changed, redraw on screen
 	}
 
@@ -3199,7 +3115,7 @@ schematic = (function() {
 		var cplist = this.connection_points[location];
 		cplist[0].draw(c,cplist.length);
 	    }
-    
+
 	    // draw new wire
 	    if (this.wire) {
 		var r = this.wire;
@@ -3220,7 +3136,7 @@ schematic = (function() {
 		c.lineTo(r[0],r[1]);
 		c.stroke();
 	    }
-    
+
 	    // display operating point results
 	    if (this.operating_point) {
 		if (typeof this.operating_point == 'string')
@@ -3240,7 +3156,7 @@ schematic = (function() {
 			this.components[i].display_current(c,temp)
 		}
 	    }
-	    
+
 	    // add scrolling/zooming control
 	    if (!this.diagram_only) {
 		var r = this.sctl_r;
@@ -3350,11 +3266,10 @@ schematic = (function() {
 			totalOffsetY += currentElement.offsetTop;
 		    }
 		    while (currentElement = currentElement.offsetParent);
-	
+
 		    // now compute relative position of click within the canvas
 		    this.mouse_x = event.pageX - totalOffsetX;
 		    this.mouse_y = event.pageY - totalOffsetY;
-	
 		    this.page_x = event.pageX;
 		    this.page_y = event.pageY;
 		 }
@@ -3593,12 +3508,10 @@ schematic = (function() {
 		// update moving corner of selection rectangle
 		sch.select_rect[2] = sch.canvas.mouse_x;
 		sch.select_rect[3] = sch.canvas.mouse_y;
-		//sch.message(sch.select_rect.toString());
 	    }
-    
+
 	    // just redraw dynamic components
 	    sch.redraw();
-	    //sch.message(sch.canvas.page_x + ',' + sch.canvas.page_y + ';' + sch.canvas.mouse_x + ',' + sch.canvas.mouse_y + ';' + sch.cursor_x + ',' + sch.cursor_y);
 
 	    return false;
 	}
@@ -3635,7 +3548,7 @@ schematic = (function() {
 		    var s = [r[0]/sch.scale + sch.origin_x, r[1]/sch.scale + sch.origin_y,
 			     r[2]/sch.scale + sch.origin_x, r[3]/sch.scale + sch.origin_y];
 		    canonicalize(s);
-	    
+
 		    if (!event.shiftKey) sch.unselect_all();
 
 		    // select components that intersect selection rectangle
@@ -3706,7 +3619,7 @@ schematic = (function() {
 	Schematic.prototype.append_message = function(message) {
 	    this.status.nodeValue += ' / '+message;
 	}
-    
+
 	// set up a dialog with specified title, content and two buttons at
 	// the bottom: OK and Cancel.  If Cancel is clicked, dialog goes away
 	// and we're done.  If OK is clicked, dialog goes away and the
@@ -3736,7 +3649,6 @@ schematic = (function() {
 	    body.style.padding = '5px';
 	    dialog.appendChild(body);
 
-	    // OK button
 	    var ok_button = document.createElement('span');
 	    ok_button.appendChild(document.createTextNode('OK'));
 	    ok_button.dialog = dialog;   // for the handler to use
@@ -3746,7 +3658,6 @@ schematic = (function() {
 	    ok_button.style.padding = '5px';
 	    ok_button.style.margin = '10px';
 
-	    // cancel button
 	    var cancel_button = document.createElement('span');
 	    cancel_button.appendChild(document.createTextNode('Cancel'));
 	    cancel_button.dialog = dialog;   // for the handler to use
@@ -3769,7 +3680,6 @@ schematic = (function() {
 	    this.window(title,dialog);
 	}
 
-	// callback when user click "Cancel" in a dialog
 	function dialog_cancel(event) {
 	    if (!event) event = window.event;
 	    var dialog = (window.event) ? event.srcElement.dialog : event.target.dialog;
@@ -3777,14 +3687,12 @@ schematic = (function() {
 	    window_close(dialog.win);
 	}
 
-	// callback when user click "OK" in a dialog
 	function dialog_okay(event) {
 	    if (!event) event = window.event;
 	    var dialog = (window.event) ? event.srcElement.dialog : event.target.dialog;
 
 	    window_close(dialog.win);
 
-	    // invoke the callback with the dialog contents as the argument
 	    if (dialog.callback) dialog.callback(dialog.content);
 	}
 
@@ -3823,7 +3731,6 @@ schematic = (function() {
 	    return tbl;
 	}
 
-	// build an input field
 	function build_input(type,size,value) {
 	    var input = document.createElement('input');
 	    input.type = type;
@@ -3889,7 +3796,6 @@ schematic = (function() {
 
 	    // add to DOM
 	    win.style.background = 'white';
-	    //win.style.zIndex = '1000';
 	    win.style.position = 'absolute';
 	    win.style.left = win.left + 'px';
 	    win.style.top = win.top + 'px';
@@ -3942,7 +3848,7 @@ schematic = (function() {
 	    document.addEventListener('mousemove',window_mouse_move,false);
 	    document.addEventListener('mouseup',window_mouse_up,false);
 	    document.tracking_window = win;
-    
+
 	    // remember where mouse is so we can compute dx,dy during drag
 	    win.drag_x = event.pageX;
 	    win.drag_y = event.pageY;
@@ -3952,7 +3858,7 @@ schematic = (function() {
 
 	function window_mouse_up(event) {
 	    var win = document.tracking_window;
-    
+
 	    // show's over folks...
 	    document.removeEventListener('mousemove',window_mouse_move,false);
 	    document.removeEventListener('mouseup',window_mouse_up,false);
@@ -3964,7 +3870,7 @@ schematic = (function() {
 
 	function window_mouse_move(event) {
 	    var win = document.tracking_window;
-    
+
 	    if (win.drag_x) {
 		var dx = event.pageX - win.drag_x;
 		var dy = event.pageY - win.drag_y;
@@ -3974,7 +3880,7 @@ schematic = (function() {
 		win.top += dy;
 		win.style.left = win.left + 'px';
 		win.style.top = win.top + 'px';
-	
+
 		// update reference point
 		win.drag_x += dx;
 		win.drag_y += dy;
@@ -4107,10 +4013,9 @@ schematic = (function() {
 			    var gt = function (a, b) { return a >= b; };
 			    var capmin = function (a, b) { return Math.min(a, b); };
 			    var capmax = function (a, b) { return Math.max(a, b); };
-		
 			    var checkX = { thereYet: gt, cap: capmin };
 			    var checkY = { thereYet: gt, cap: capmin };
-		
+
 			    if (fromY - toY > 0) {
 				checkY.thereYet = lt;
 				checkY.cap = capmax;
@@ -4119,7 +4024,7 @@ schematic = (function() {
 				checkX.thereYet = lt;
 				checkX.cap = capmax;
 			    }
-		
+
 			    this.moveTo(fromX, fromY);
 			    var offsetX = fromX;
 			    var offsetY = fromY;
@@ -4127,13 +4032,13 @@ schematic = (function() {
 			    while (!(checkX.thereYet(offsetX, toX) && checkY.thereYet(offsetY, toY))) {
 				var ang = Math.atan2(toY - fromY, toX - fromX);
 				var len = pattern[idx];
-		
+
 				offsetX = checkX.cap(toX, offsetX + (Math.cos(ang) * len));
 				offsetY = checkY.cap(toY, offsetY + (Math.sin(ang) * len));
-		
+
 				if (dash) this.lineTo(offsetX, offsetY);
 				else this.moveTo(offsetX, offsetY);
-		
+
 				idx = (idx + 1) % pattern.length;
 				dash = !dash;
 			    }
@@ -4412,7 +4317,7 @@ schematic = (function() {
 		    var values = z_values[plot][2];
 		    if (values == undefined) continue;  // no data points
 		    var offset = z_values[plot][1];
-		    
+
 		    x = plot_x(x_values[0]);
 		    z = plot_z(values[0] + offset);
 		    c.beginPath();
@@ -4541,13 +4446,13 @@ schematic = (function() {
 			var values = graph.y_values[plot][2];
 			var color = probe_colors_rgb[graph.y_values[plot][0]];
 			if (values == undefined || color == undefined) continue;  // no data points or x-axis
-		    
+
 			// interpolate signal value at graph_x using values[index-1] and values[index]
 			var y1 = (index == 0) ? values[0] : values[index-1];
 			var y2 = values[index];
 			var y = y1;
 			if (graph_x != x1) y += (graph_x - x1)*(y2 - y1)/(x2 - x1);
-		    
+
 			// annotate plot with value of signal at marker
 			c.fillStyle = element_style;
 			c.fillText('\u2588\u2588\u2588\u2588\u2588',tx-3,ty);
@@ -4565,13 +4470,13 @@ schematic = (function() {
 			var values = graph.z_values[plot][2];
 			var color = probe_colors_rgb[graph.z_values[plot][0]];
 			if (values == undefined || color == undefined) continue;  // no data points or x-axis
-		    
+
 			// interpolate signal value at graph_x using values[index-1] and values[index]
 			var z1 = (index == 0) ? values[0]: values[index-1];
 			var z2 = values[index];
 			var z = z1;
 			if (graph_x != x1) z += (graph_x - x1)*(z2 - z1)/(x2 - x1);
-		    
+
 			// annotate plot with value of signal at marker
 			c.fillStyle = element_style;
 			c.fillText('\u2588\u2588\u2588\u2588\u2588',tx+3,ty);
@@ -4848,7 +4753,7 @@ schematic = (function() {
 		r[3] = temp;
 	    }
 	}
-    
+
 	function between(x,x1,x2) {
 	    return x1 <= x && x <= x2;
 	}
@@ -4944,7 +4849,7 @@ schematic = (function() {
 	    this.y += dy;
 	    this.update_coords();
 	}
-    
+
 	Component.prototype.move_end = function() {
 	    var dx = this.x - this.move_x;
 	    var dy = this.y - this.move_y;
@@ -5098,7 +5003,7 @@ schematic = (function() {
 		// create an undoable edit record here
 	    }
 	}
-    
+
 	Component.prototype.select = function(x,y,shiftKey) {
 	    this.was_previously_selected = this.selected;
 	    if (this.near(x,y)) {
@@ -5147,7 +5052,6 @@ schematic = (function() {
 	    } else return false;
 	}
 
-	// clear the labels on all connections
 	Component.prototype.clear_labels = function() {
 	    for (var i = this.connections.length - 1; i >=0; --i) {
 		this.connections[i].clear_label();
@@ -5257,7 +5161,7 @@ schematic = (function() {
 	    var v = vmap[this.label];
 	    if (v != undefined) {
 		var label = v.toFixed(2) + 'V';
-		
+
 		// first draw some solid blocks in the background
 		c.globalAlpha = 0.85;
 		this.parent.draw_text(c,'\u2588\u2588\u2588',this.offset_x,this.offset_y,
@@ -5315,7 +5219,7 @@ schematic = (function() {
 	Wire.prototype.toString = function() {
 	    return '<Wire ('+this.x+','+this.y+') ('+(this.x+this.dx)+','+(this.y+this.dy)+')>';
 	}
-    
+
 	// return connection point at other end of wire from specified cp
 	Wire.prototype.other_end = function(cp) {
 	    if (cp == this.connections[0]) return this.connections[1];
@@ -5428,7 +5332,7 @@ schematic = (function() {
 	Ground.prototype.toString = function() {
 	    return '<Ground ('+this.x+','+this.y+')>';
 	}
-    
+
 	Ground.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,8);
@@ -5469,7 +5373,7 @@ schematic = (function() {
 	Label.prototype.toString = function() {
 	    return '<Label'+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Label.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,8);
@@ -5518,7 +5422,7 @@ schematic = (function() {
 	Probe.prototype.toString = function() {
 	    return '<Probe ('+this.x+','+this.y+')>';
 	}
-    
+
 	Probe.prototype.draw = function(c) {
 	    // draw outline
 	    this.draw_line(c,0,0,4,-4);
@@ -5597,7 +5501,7 @@ schematic = (function() {
 	Ammeter.prototype.toString = function() {
 	    return '<Ammeter ('+this.x+','+this.y+')>';
 	}
-    
+
 	Ammeter.prototype.move_end = function() {
 	    Component.prototype.move_end.call(this);   // do the normal processing
 
@@ -5691,7 +5595,7 @@ schematic = (function() {
 	Resistor.prototype.toString = function() {
 	    return '<Resistor '+this.properties['r']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Resistor.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,12);
@@ -5734,7 +5638,7 @@ schematic = (function() {
 	Capacitor.prototype.toString = function() {
 	    return '<Capacitor '+this.properties['r']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Capacitor.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,22);
@@ -5772,7 +5676,7 @@ schematic = (function() {
 	Inductor.prototype.toString = function() {
 	    return '<Inductor '+this.properties['l']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Inductor.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,14);
@@ -5815,7 +5719,7 @@ schematic = (function() {
 	Diode.prototype.toString = function() {
 	    return '<Diode '+this.properties['area']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Diode.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,16);
@@ -5886,7 +5790,7 @@ schematic = (function() {
 	NFet.prototype.toString = function() {
 	    return '<NFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	NFet.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,16);
@@ -5894,7 +5798,6 @@ schematic = (function() {
 	    this.draw_line(c,-8,16,-8,32);
 	    this.draw_line(c,-8,32,0,32);
 	    this.draw_line(c,0,32,0,48);
-
 	    this.draw_line(c,-24,24,-12,24);
 	    this.draw_line(c,-12,16,-12,32);
 
@@ -5932,7 +5835,7 @@ schematic = (function() {
 	PFet.prototype.toString = function() {
 	    return '<PFet '+this.properties['W/L']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	PFet.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,16);
@@ -5940,9 +5843,7 @@ schematic = (function() {
 	    this.draw_line(c,-8,16,-8,32);
 	    this.draw_line(c,-8,32,0,32);
 	    this.draw_line(c,0,32,0,48);
-
 	    this.draw_line(c,-24,24,-16,24);
-
 	    this.draw_circle(c,-14,24,2,false);
 	    this.draw_line(c,-12,16,-12,32);
 
@@ -5981,7 +5882,7 @@ schematic = (function() {
 	OpAmp.prototype.toString = function() {
 	    return '<OpAmp'+this.properties['A']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	OpAmp.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    // triangle
@@ -6013,7 +5914,6 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	
 	function Source(x,y,rotation,name,type,value) {
 	    Component.call(this,type,x,y,rotation);
 	    this.properties['name'] = name;
@@ -6023,7 +5923,6 @@ schematic = (function() {
 	    this.add_connection(0,48);
 	    this.bounding_box = [-12,0,12,48];
 	    this.update_coords();
-
 	    this.content = document.createElement('div');  // used by edit_properties
 	}
 	Source.prototype = new Component();
@@ -6032,7 +5931,7 @@ schematic = (function() {
 	Source.prototype.toString = function() {
 	    return '<'+this.type+'source '+this.properties['params']+' ('+this.x+','+this.y+')>';
 	}
-    
+
 	Source.prototype.draw = function(c) {
 	    Component.prototype.draw.call(this,c);   // give superclass a shot
 	    this.draw_line(c,0,0,0,12);
@@ -6040,15 +5939,10 @@ schematic = (function() {
 	    this.draw_line(c,0,36,0,48);
 
 	    if (this.type == 'v') {  // voltage source
-		//this.draw_text(c,'+',0,12,1,property_size);
-		//this.draw_text(c,'\u2013',0,36,7,property_size);  // minus sign
 		// draw + and -
 		this.draw_line(c,0,15,0,21);
 		this.draw_line(c,-3,18,3,18);
 		this.draw_line(c,-3,30,3,30);
-		// draw V
-		//this.draw_line(c,-3,20,0,28);
-		//this.draw_line(c,3,20,0,28);
 	    } else if (this.type == 'i') {  // current source
 		// draw arrow: pos to neg
 		this.draw_line(c,0,15,0,32);
@@ -6200,7 +6094,6 @@ schematic = (function() {
 	    } else return false;
 	}
 
-
 	function VSource(x,y,rotation,name,value) {
 	    Source.call(this,x,y,rotation,name,'v',value);
 	    this.type = 'v';
@@ -6303,3 +6196,4 @@ schematic = (function() {
 	}
 	return module;
     }());
+
