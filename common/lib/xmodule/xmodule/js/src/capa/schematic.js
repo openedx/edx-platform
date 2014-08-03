@@ -12,31 +12,30 @@
 // for modified nodal analysis (MNA) stamps see
 // http://www.analog-electronics.eu/analog-electronics/modified-nodal-analysis/modified-nodal-analysis.xhtml
 
-cktsim = (function() {
-    
+var cktsim = (function() {
 	///////////////////////////////////////////////////////////////////////////////
 	//
 	//  Circuit
 	//
 	//////////////////////////////////////////////////////////////////////////////
 
-	// types of "nodes" in the linear system
-	T_VOLTAGE = 0;
-	T_CURRENT = 1;
+    // types of "nodes" in the linear system
+    var T_VOLTAGE = 0;
+    var T_CURRENT = 1;
 
-        v_newt_lim = 0.3;   // Voltage limited Newton great for Mos/diodes
-	v_abstol = 1e-6;	// Absolute voltage error tolerance
-	i_abstol = 1e-12;	// Absolute current error tolerance
-        eps = 1.0e-12;           // A very small number compared to one.
-	dc_max_iters = 1000;	// max iterations before giving pu
-	max_tran_iters = 20;	// max iterations before giving up
-	time_step_increase_factor = 2.0;  // How much can lte let timestep grow.
-	lte_step_decrease_factor = 8;    // Limit lte one-iter timestep shrink.
-	nr_step_decrease_factor = 4;     // Newton failure timestep shink.
-	reltol = 0.0001;		// Relative tol to max observed value
-        lterel = 10;             // LTE/Newton tolerance ratio (> 10!)
-        res_check_abs = Math.sqrt(i_abstol); // Loose Newton residue check
-        res_check_rel = Math.sqrt(reltol); // Loose Newton residue check
+    var v_newt_lim = 0.3; // Voltage limited Newton great for Mos/diodes
+    var v_abstol = 1e-6; // Absolute voltage error tolerance
+    var i_abstol = 1e-12; // Absolute current error tolerance
+    var eps = 1.0e-12; // A very small number compared to one.
+    var dc_max_iters = 1000; // max iterations before giving up
+    var max_tran_iters = 20; // max iterations before giving up
+    var time_step_increase_factor = 2.0; // How much can lte let timestep grow.
+    var lte_step_decrease_factor = 8; // Limit lte one-iter timestep shrink.
+    var nr_step_decrease_factor = 4; // Newton failure timestep shrink.
+    var reltol = 0.0001; // Relative tol to max observed value
+    var lterel = 10; // LTE/Newton tolerance ratio (> 10!)
+    var res_check_abs = Math.sqrt(i_abstol); // Loose Newton residue check
+    var res_check_rel = Math.sqrt(reltol); // Loose Newton residue check
 
 	function Circuit() {
 	    this.node_map = new Array();
@@ -102,7 +101,7 @@ cktsim = (function() {
 		}
 
 		// Check for voltage source loops. 
-		n_vsrc = this.voltage_sources.length;
+        var n_vsrc = this.voltage_sources.length;
 		if (n_vsrc > 0) { // At least one voltage source
 		    var GV = mat_make(n_vsrc, this.N);  // Loop check
 		    for (var i = n_vsrc - 1; i >= 0; --i) {
@@ -201,6 +200,7 @@ cktsim = (function() {
 	    var converged,abssum_old=0, abssum_rhs;
 	    var use_limiting = false;
 	    var down_count = 0;
+        var thresh;
 
 	    // iteratively solve until values convere or iteration limit exceeded
 	    for (var iter = 0; iter < maxiters; iter++) {
@@ -774,6 +774,7 @@ cktsim = (function() {
 	}
 
         Circuit.prototype.opamp = function(np,nn,no,ng,A,name) {
+            var ratio;
 	    // try to convert string value into numeric value, barf if we can't
 	    if ((typeof A) == 'string') {
 		ratio = parse_number(A,undefined);
@@ -939,7 +940,7 @@ cktsim = (function() {
         // variables (rows that can be removed without changing rank(M).
         Circuit.prototype.algebraic = function(M) {
 	    var Nr = M.length
-	    Mc = mat_make(Nr, Nr);
+	    var Mc = mat_make(Nr, Nr);
 	    mat_copy(M,Mc);
 	    var R = mat_rank(Mc);
 
@@ -989,7 +990,7 @@ cktsim = (function() {
 	    var Nc = Mo[0].length;  // Number of columns
 	    var temp,i,j;
 	    // Make a copy to avoid overwriting
-	    M = mat_make(Nr, Nc);
+        var M = mat_make(Nr, Nc);
 	    mat_copy(Mo,M);
 
 	    // Find matrix maximum entry
@@ -1043,7 +1044,7 @@ cktsim = (function() {
         // M should have the extra column!
         // Almost everything is in-lined for speed, sigh.
         function mat_solve_rq(M, rhs) {
-
+            var scale;
 	    var Nr = M.length;  // Number of rows
 	    var Nc = M[0].length;  // Number of columns
 
@@ -1076,7 +1077,7 @@ cktsim = (function() {
 		}
 
 		// Calculate row norm, save if this is first (largest)
-		row_norm = Math.sqrt(maxsumsq);
+        var row_norm = Math.sqrt(maxsumsq);
 		if (row == 0) mat_scale = row_norm;
 
 		// Check for all zero rows
@@ -2042,20 +2043,18 @@ function prepare_schematics() {
 }
 
 schematic = (function() {
-	background_style = 'rgb(220,220,220)';
-	element_style = 'rgb(255,255,255)';
-	thumb_style = 'rgb(128,128,128)';
-	normal_style = 'rgb(0,0,0)';  // default drawing color
-	component_style = 'rgb(64,64,255)';  // color for unselected components
-	selected_style = 'rgb(64,255,64)';  // highlight color for selected components
-	grid_style = "rgb(128,128,128)";
-	annotation_style = 'rgb(255,64,64)';  // color for diagram annotations
+    var background_style = 'rgb(220,220,220)';
+    var element_style = 'rgb(255,255,255)';
+    var thumb_style = 'rgb(128,128,128)';
+    var normal_style = 'rgb(0,0,0)';  // default drawing color
+    var component_style = 'rgb(64,64,255)';  // color for unselected components
+    var selected_style = 'rgb(64,255,64)';  // highlight color for selected components
+    var grid_style = "rgb(128,128,128)";
+    var annotation_style = 'rgb(255,64,64)';  // color for diagram annotations
+    var property_size = 5;  // point size for Component property text
+    var annotation_size = 6;  // point size for diagram annotations
 
-	property_size = 5;  // point size for Component property text
-	annotation_size = 6;  // point size for diagram annotations
-
-	// list of all the defined parts
-	parts_map = {
+    var parts_map = {
 	    'g': [Ground, 'Ground connection'],
 	    'L': [Label, 'Node label'],
 	    'v': [VSource, 'Voltage source'],
@@ -2339,9 +2338,9 @@ schematic = (function() {
 	    this.zoomall();
 	}
 
-	part_w = 42;   // size of a parts bin compartment
-	part_h = 42;
-	status_height = 18;
+	var part_w = 42;   // size of a parts bin compartment
+	var part_h = 42;
+	var status_height = 18;
 
 	Schematic.prototype.add_component = function(new_c) {
 	    this.components.push(new_c);
@@ -2522,11 +2521,11 @@ schematic = (function() {
 	    this.redraw_background();
 	}
 
-	zoom_factor = 1.25;    // scaling is some power of zoom_factor
-	zoom_min = 0.5;
-	zoom_max = 4.0;
-	origin_min = -200;    // in grids
-	origin_max = 200;
+	var zoom_factor = 1.25;    // scaling is some power of zoom_factor
+	var zoom_min = 0.5;
+	var zoom_max = 4.0;
+	var origin_min = -200;    // in grids
+	var origin_max = 200;
 
 	Schematic.prototype.zoomin = function() {
 	    var nscale = this.scale * zoom_factor;
@@ -4076,17 +4075,17 @@ schematic = (function() {
 	    }
 	}
 
-	help_icon = 'data:image/gif;base64,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';
+	var help_icon = 'data:image/gif;base64,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';
 
-	cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
+	var cut_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQu8MhJqz1g5qs7lxv2gRkQfuWomarXEgDRHjJhf3YtyRav0xcfcFgR0nhB5OwTAQA7';
 
-	copy_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQ+8MhJ6wE4Wwqef9gmdV8HiKZJrCz3ecS7TikWfzExvk+M9a0a4MbTkXCgTMeoHPJgG5+yF31SLazsTMTtViIAOw==';
+	var copy_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAAQ+8MhJ6wE4Wwqef9gmdV8HiKZJrCz3ecS7TikWfzExvk+M9a0a4MbTkXCgTMeoHPJgG5+yF31SLazsTMTtViIAOw==';
 
-	paste_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAARL8MhJqwUYWJnxWp3GDcgAgCdQIqLKXmVLhhnyHiqpr7rME8AgocVDEB5IJHD0SyofBFzxGIQGAbvB0ZkcTq1CKK6z5YorwnR0w44AADs=';
+	var paste_icon = 'data:image/gif;base64,R0lGODlhEAAQALMAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAcALAAAAAAQABAAAARL8MhJqwUYWJnxWp3GDcgAgCdQIqLKXmVLhhnyHiqpr7rME8AgocVDEB5IJHD0SyofBFzxGIQGAbvB0ZkcTq1CKK6z5YorwnR0w44AADs=';
 
-	close_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAGtra/f3/62tre/v9+bm787O1pycnHNzc6WlpcXFxd7e3tbW1nt7e7W1te/v74SEhMXFzmNjY+bm5v///87OzgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAVt4DRMZGmSwRQQBUS9MAwRIyQ5Uq7neEFSDtxOF4T8cobIQaE4RAQ5yjHHiCCSD510QtFGvoCFdppDfBu7bYzy+D7WP5ggAgA8Y3FKwi5IAhIweW1vbBGEWy5rilsFi2tGAwSJixAFBCkpJ5ojIQA7';
+	var close_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAGtra/f3/62tre/v9+bm787O1pycnHNzc6WlpcXFxd7e3tbW1nt7e7W1te/v74SEhMXFzmNjY+bm5v///87OzgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAAAAAAALAAAAAAQABAAAAVt4DRMZGmSwRQQBUS9MAwRIyQ5Uq7neEFSDtxOF4T8cobIQaE4RAQ5yjHHiCCSD510QtFGvoCFdppDfBu7bYzy+D7WP5ggAgA8Y3FKwi5IAhIweW1vbBGEWy5rilsFi2tGAwSJixAFBCkpJ5ojIQA7';
 
-	grid_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAP///zAwYT09bpGRqZ6et5iYsKWlvbi40MzM5cXF3czM5OHh5tTU2fDw84uMom49DbWKcfLy8g0NDcDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABQALAAAAAAQABAAAAUtICWOZGmeKDCqIlu68AvMdO2ueHvGuslTN6Bt6MsBd8Zg77hsDW3FpRJFrYpCADs=';
+	var grid_icon = 'data:image/gif;base64,R0lGODlhEAAQAMQAAAAAAP///zAwYT09bpGRqZ6et5iYsKWlvbi40MzM5cXF3czM5OHh5tTU2fDw84uMom49DbWKcfLy8g0NDcDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAABQALAAAAAAQABAAAAUtICWOZGmeKDCqIlu68AvMdO2ueHvGuslTN6Bt6MsBd8Zg77hsDW3FpRJFrYpCADs=';
 
 	///////////////////////////////////////////////////////////////////////////////
 	//
@@ -4491,14 +4490,14 @@ schematic = (function() {
 	}
 
 	function array_max(a) {
-	    max = -Infinity;
+        var max = -Infinity;
 	    for (var i = a.length - 1; i >= 0; --i)
 		if (a[i] > max) max = a[i];
 	    return max;
 	}
 
 	function array_min(a) {
-	    min = Infinity;
+        var min = Infinity;
 	    for (var i = a.length - 1; i >= 0; --i)
 		if (a[i] < min) min = a[i];
 	    return min;
@@ -5025,7 +5024,7 @@ schematic = (function() {
 	    this.sch.draw_arc(c,nx,ny,radius,0,2*Math.PI,false,1,filled);
 	}
 
-	rot_angle = [
+    var rot_angle = [
 		     0.0,		// NORTH (identity)
 		     Math.PI/2,	// EAST (rot270)
 		     Math.PI,	// SOUTH (rot180)
@@ -5034,7 +5033,7 @@ schematic = (function() {
 		     Math.PI/2,	// REAST (int-neg)
 		     Math.PI,	// RSOUTH (negx)
 		     3*Math.PI/2,	// RWEST (int-pos)
-		     ];
+     ];
 
 	Component.prototype.draw_arc = function(c,x,y,radius,start_radians,end_radians) {
 	    c.strokeStyle = this.selected ? selected_style :
@@ -5056,7 +5055,7 @@ schematic = (function() {
 	}
 
 	// result of rotating an alignment [rot*9 + align]
-	aOrient = [
+    var aOrient = [
 		   0, 1, 2, 3, 4, 5, 6, 7, 8,		// NORTH (identity)
 		   2, 5, 8, 1, 4, 7, 0, 3, 6, 		// EAST (rot270)
 		   8, 7, 6, 5, 4, 3, 2, 1, 0,		// SOUTH (rot180)
@@ -5067,13 +5066,13 @@ schematic = (function() {
 		   0, 3, 6, 1, 4, 7, 2, 5, 8		// RWEST (int-pos)
 		   ];
 
-	textAlign = [
+    var textAlign = [
 		     'left', 'center', 'right',
 		     'left', 'center', 'right',
 		     'left', 'center', 'right'
 		     ];
 
-	textBaseline = [
+    var textBaseline = [
 			'top', 'top', 'top',
 			'middle', 'middle', 'middle',
 			'bottom', 'bottom', 'bottom'
@@ -5186,7 +5185,7 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	connection_point_radius = 2;
+    var connection_point_radius = 2;
 
 	function ConnectionPoint(parent,x,y) {
 	    this.parent = parent;
@@ -5287,7 +5286,7 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	near_distance = 2;   // how close to wire counts as "near by"
+	var near_distance = 2;   // how close to wire counts as "near by"
 
 	function Wire(x1,y1,x2,y2) {
 	    // arbitrarily call x1,y1 the origin
@@ -5493,8 +5492,8 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	probe_colors = ['red','green','blue','cyan','magenta','yellow','black','x-axis'];
-	probe_colors_rgb = {
+    var probe_colors = ['red','green','blue','cyan','magenta','yellow','black','x-axis'];
+    var probe_colors_rgb = {
 	    'red': 'rgb(255,64,64)',
 	    'green': 'rgb(64,255,64)',
 	    'blue': 'rgb(64,64,255)',
@@ -5798,7 +5797,7 @@ schematic = (function() {
 	//
 	////////////////////////////////////////////////////////////////////////////////
 
-	diode_types = ['normal','ideal'];
+	var diode_types = ['normal','ideal'];
 
 	function Diode(x,y,rotation,name,area,type) {
 	    Component.call(this,'d',x,y,rotation);
@@ -6064,7 +6063,7 @@ schematic = (function() {
 	}
 
 	// map source function name to labels for each source parameter
-	source_functions = {
+	var source_functions = {
 	    'dc': ['DC value'],
 
 	    'impulse': ['Height',
