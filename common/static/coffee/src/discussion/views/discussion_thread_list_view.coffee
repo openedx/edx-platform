@@ -493,6 +493,7 @@ if Backbone?
     clearSearch: ->
       @$(".forum-nav-search-input").val("")
       @current_search = ""
+      @clearSearchAlerts()
 
     clearFilters: ->
      @$(".forum-nav-filter-main-control").val("all")
