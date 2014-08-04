@@ -104,8 +104,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                         self.mappings[course_id] = store
                         return store
 
-        # return the first store, as the default
-        return self.modulestores[0]
+        # return the default store
+        return self.default_modulestore
 
     def _get_modulestore_by_type(self, modulestore_type):
         """
@@ -496,23 +496,35 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         else:
             raise NotImplementedError(u"Cannot call {} on store {}".format(method, store))
 
+    @property
+    def default_modulestore(self):
+        """
+        Return the default modulestore
+        """
+        thread_local_default_store = getattr(self.thread_cache, 'default_store', None)
+        if thread_local_default_store:
+            # return the thread-local cache, if found
+            return thread_local_default_store
+        else:
+            # else return the default store
+            return self.modulestores[0]
+
     @contextmanager
     def default_store(self, store_type):
         """
         A context manager for temporarily changing the default store in the Mixed modulestore to the given store type
         """
-        previous_store_list = self.modulestores
-        found = False
+        # find the store corresponding to the given type
+        store = next((store for store in self.modulestores if store.get_modulestore_type() == store_type), None)
+        if not store:
+            raise Exception(u"Cannot find store of type {}".format(store_type))
+
+        previous_thread_local_default_store = getattr(self.thread_cache, 'default_store', None)
         try:
-            for i, store in enumerate(self.modulestores):
-                if store.get_modulestore_type() == store_type:
-                    self.modulestores.insert(0, self.modulestores.pop(i))
-                    found = True
-            if not found:
-                raise Exception(u"Cannot find store of type {}".format(store_type))
+            self.thread_cache.default_store = store
             yield
         finally:
-            self.modulestores = previous_store_list
+            self.thread_cache.default_store = previous_thread_local_default_store
 
     @contextmanager
     def branch_setting(self, branch_setting, course_id=None):
