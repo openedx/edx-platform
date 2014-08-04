@@ -10,6 +10,7 @@ Core methods
 
 from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
+from opaque_keys import InvalidKeyError
 
 from . import app_settings
 
@@ -121,6 +122,10 @@ def del_cached_content(location):
     # delete content for the given location, as well as for content with run=None.
     # it's possible that the content could have been cached without knowing the
     # course_key - and so without having the run.
-    cache.delete_many(
-        [unicode(loc).encode("utf-8") for loc in [location, location.replace(run=None)]]
-    )
+    try:
+        cache.delete_many(
+            [unicode(loc).encode("utf-8") for loc in [location, location.replace(run=None)]]
+        )
+    except InvalidKeyError:
+        # although deprecated keys allowed run=None, new keys don't if there is no version.
+        pass
