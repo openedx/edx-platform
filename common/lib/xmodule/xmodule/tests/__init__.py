@@ -213,9 +213,9 @@ class CourseComparisonTest(unittest.TestCase):
         else:
             revision = None
         actual_items = actual_store.get_items(actual_course_key, revision=revision)
-        self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
+        self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
-    def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key):
+    def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
         self.assertEqual(len(expected_items), len(actual_items))
 
         actual_item_map = {
@@ -264,7 +264,6 @@ class CourseComparisonTest(unittest.TestCase):
             # compare children
             self.assertEqual(expected_item.has_children, actual_item.has_children)
             if expected_item.has_children:
-                expect_drafts = getattr(expected_item, 'is_draft', getattr(actual_item, 'is_draft', False))
                 expected_children = [
                     course1_item_child.location.map_into_course(actual_item.location.course_key)
                     for course1_item_child in expected_item.get_children()
@@ -272,10 +271,10 @@ class CourseComparisonTest(unittest.TestCase):
                     if expect_drafts or not getattr(course1_item_child, 'is_draft', False)
                 ]
                 actual_children = [
-                   item_child.location
-                   for item_child in actual_item.get_children()
-                   # get_children was returning drafts for published parents :-(
-                   if expect_drafts or not getattr(item_child, 'is_draft', False)
+                    item_child.location
+                    for item_child in actual_item.get_children()
+                    # get_children was returning drafts for published parents :-(
+                    if expect_drafts or not getattr(item_child, 'is_draft', False)
                 ]
                 try:
                     self.assertEqual(expected_children, actual_children)
@@ -331,34 +330,3 @@ class CourseComparisonTest(unittest.TestCase):
         actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
 
         self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)
-
-    def compute_real_state(self, store, item):
-        """
-        In draft mongo, compute_published_state can return draft when the draft == published, but in split,
-        it'll return public in that case
-        """
-        supposed_state = store.compute_publish_state(item)
-        if supposed_state == PublishState.draft and isinstance(item.runtime.modulestore, DraftModuleStore):
-            # see if the draft differs from the published
-            published = store.get_item(item.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            if item.get_explicitly_set_fields_by_scope() != published.get_explicitly_set_fields_by_scope():
-                # checking content: if published differs from item, return draft
-                return supposed_state
-            if item.get_explicitly_set_fields_by_scope(Scope.settings) != published.get_explicitly_set_fields_by_scope(Scope.settings):
-                # checking settings: if published differs from item, return draft
-                return supposed_state
-            if item.has_children and item.children != published.children:
-                # checking children: if published differs from item, return draft
-                return supposed_state
-            # published == item in all respects, so return public
-            return PublishState.public
-        elif supposed_state == PublishState.public and item.location.category in DIRECT_ONLY_CATEGORIES:
-            if not all([
-                store.has_item(child_loc, revision=ModuleStoreEnum.RevisionOption.draft_only)
-                for child_loc in item.children
-            ]):
-                return PublishState.draft
-            else:
-                return supposed_state
-        else:
-            return supposed_state

@@ -11,8 +11,8 @@ can't represent that virtual state (2nd row in table)
 In the table body, the tuples represent virtual modulestore result. The row headers represent the pre-import
 modulestore state.
 
-Modulestore virtual  \           XML physical (draft, published)
-(draft, published)    \  (-, -) | (x, -) | (x, x) | (x, y) | (-, x)
+Modulestore virtual   |          XML physical (draft, published)
+(draft, published)    |  (-, -) | (x, -) | (x, x) | (x, y) | (-, x)
 ----------------------+--------------------------------------------
              (-, -)   |  (-, -) | (x, -) | (x, x) | (x, y) | (-, x)
              (-, a)   |  (-, a) | (x, a) | (x, x) | (x, y) | (-, x) : deleted from draft before import
@@ -207,11 +207,12 @@ def import_from_xml(
                 continue
 
         with store.bulk_write_operations(dest_course_id):
+            source_course = xml_module_store.get_course(course_key)
             # STEP 1: find and import course module
             course, course_data_path = _import_course_module(
-                xml_module_store, store, runtime, user_id,
-                data_dir, course_key, dest_course_id, do_import_static,
-                verbose
+                store, runtime, user_id,
+                data_dir, course_key, dest_course_id, source_course,
+                do_import_static, verbose
             )
             new_courses.append(course)
 
@@ -221,18 +222,39 @@ def import_from_xml(
             )
 
             # STEP 3: import PUBLISHED items
-            # now loop through all the modules
+            # now loop through all the modules depth first and then orphans
             with store.branch_setting(ModuleStoreEnum.Branch.published_only, dest_course_id):
-                for module in xml_module_store.modules[course_key].itervalues():
-                    if module.scope_ids.block_type == 'course':
-                        # we've already saved the course module up above
-                        continue
+                all_locs = set(xml_module_store.modules[course_key].keys())
+                all_locs.remove(source_course.location)
 
+                def depth_first(subtree):
+                    """
+                    Import top down just so import code can make assumptions about parents always being available
+                    """
+                    if subtree.has_children:
+                        for child in subtree.get_children():
+                            all_locs.remove(child.location)
+                            if verbose:
+                                log.debug('importing module location {loc}'.format(loc=child.location))
+
+                            _import_module_and_update_references(
+                                child, store,
+                                user_id,
+                                course_key,
+                                dest_course_id,
+                                do_import_static=do_import_static,
+                                runtime=course.runtime
+                            )
+                            depth_first(child)
+
+                depth_first(source_course)
+
+                for leftover in all_locs:
                     if verbose:
-                        log.debug('importing module location {loc}'.format(loc=module.location))
+                        log.debug('importing module location {loc}'.format(loc=leftover))
 
                     _import_module_and_update_references(
-                        module, store,
+                        xml_module_store.get_item(leftover), store,
                         user_id,
                         course_key,
                         dest_course_id,
@@ -256,7 +278,7 @@ def import_from_xml(
 
 
 def _import_course_module(
-        xml_module_store, store, runtime, user_id, data_dir, course_key, dest_course_id, do_import_static,
+        store, runtime, user_id, data_dir, course_key, dest_course_id, source_course, do_import_static,
         verbose,
 ):
     if verbose:
@@ -265,70 +287,65 @@ def _import_course_module(
     # Quick scan to get course module as we need some info from there.
     # Also we need to make sure that the course module is committed
     # first into the store
-    for module in xml_module_store.modules[course_key].itervalues():
-        if module.scope_ids.block_type == 'course':
-            course_data_path = path(data_dir) / module.data_dir
+    course_data_path = path(data_dir) / source_course.data_dir
 
-            log.debug(u'======> IMPORTING course {course_key}'.format(
-                course_key=course_key,
-            ))
+    log.debug(u'======> IMPORTING course {course_key}'.format(
+        course_key=course_key,
+    ))
 
-            if not do_import_static:
-                # for old-style xblock where this was actually linked to kvs
-                module.static_asset_path = module.data_dir
-                module.save()
-                log.debug('course static_asset_path={path}'.format(
-                    path=module.static_asset_path
-                ))
+    if not do_import_static:
+        # for old-style xblock where this was actually linked to kvs
+        source_course.static_asset_path = source_course.data_dir
+        source_course.save()
+        log.debug('course static_asset_path={path}'.format(
+            path=source_course.static_asset_path
+        ))
 
-            log.debug('course data_dir={0}'.format(module.data_dir))
+    log.debug('course data_dir={0}'.format(source_course.data_dir))
 
-            course = _import_module_and_update_references(
-                module, store, user_id,
-                course_key,
-                dest_course_id,
-                do_import_static=do_import_static,
-                runtime=runtime,
+    course = _import_module_and_update_references(
+        source_course, store, user_id,
+        course_key,
+        dest_course_id,
+        do_import_static=do_import_static,
+        runtime=runtime,
+    )
+
+    for entry in course.pdf_textbooks:
+        for chapter in entry.get('chapters', []):
+            if StaticContent.is_c4x_path(chapter.get('url', '')):
+                asset_key = StaticContent.get_location_from_path(chapter['url'])
+                chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+
+    # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
+    # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
+    # values then remap it so that the wiki does not point to the old wiki.
+    if course_key != course.id:
+        original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
+            course_key.org,
+            course_key.course,
+            course_key.run
+        )
+        if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
+            course.wiki_slug = u'{0}.{1}.{2}'.format(
+                course.id.org,
+                course.id.course,
+                course.id.run,
             )
 
-            for entry in course.pdf_textbooks:
-                for chapter in entry.get('chapters', []):
-                    if StaticContent.is_c4x_path(chapter.get('url', '')):
-                        asset_key = StaticContent.get_location_from_path(chapter['url'])
-                        chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+    # cdodge: more hacks (what else). Seems like we have a
+    # problem when importing a course (like 6.002) which
+    # does not have any tabs defined in the policy file.
+    # The import goes fine and then displays fine in LMS,
+    # but if someone tries to add a new tab in the CMS, then
+    # the LMS barfs because it expects that -- if there are
+    # *any* tabs -- then there at least needs to be
+    # some predefined ones
+    if course.tabs is None or len(course.tabs) == 0:
+        CourseTabList.initialize_default(course)
 
-            # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
-            # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
-            # values then remap it so that the wiki does not point to the old wiki.
-            if course_key != course.id:
-                original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
-                    course_key.org,
-                    course_key.course,
-                    course_key.run
-                )
-                if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
-                    course.wiki_slug = u'{0}.{1}.{2}'.format(
-                        course.id.org,
-                        course.id.course,
-                        course.id.run,
-                    )
-
-            # cdodge: more hacks (what else). Seems like we have a
-            # problem when importing a course (like 6.002) which
-            # does not have any tabs defined in the policy file.
-            # The import goes fine and then displays fine in LMS,
-            # but if someone tries to add a new tab in the CMS, then
-            # the LMS barfs because it expects that -- if there are
-            # *any* tabs -- then there at least needs to be
-            # some predefined ones
-            if course.tabs is None or len(course.tabs) == 0:
-                CourseTabList.initialize_default(course)
-
-            store.update_item(course, user_id)
-            return course, course_data_path
-
-    # raise an exception if the course wasn't found
-    raise Exception("Course module not found in imported modules")
+    store.update_item(course, user_id)
+    return course, course_data_path
 
 
 def _import_static_content_wrapper(static_content_store, do_import_static, course_data_path, dest_course_id, verbose):
@@ -524,8 +541,8 @@ def _import_course_draft(
                         # attributes (they are normally in the parent object,
                         # aka sequential), so we have to replace the location.name
                         # with the XML filename that is part of the pack
-                        fn, __ = os.path.splitext(filename)
-                        descriptor.location = descriptor.location.replace(name=fn)
+                        filename, __ = os.path.splitext(filename)
+                        descriptor.location = descriptor.location.replace(name=filename)
 
                         index = int(descriptor.xml_attributes['index_in_children_list'])
                         if index in drafts:
@@ -566,7 +583,7 @@ def _import_course_draft(
                             sequential = store.get_item(seq_location, depth=0)
 
                             non_draft_location = module.location.map_into_course(target_course_id)
-                            if non_draft_location not in sequential.children:
+                            if not any(child.block_id == module.location.block_id for child in sequential.children):
                                 sequential.children.insert(index, non_draft_location)
                                 store.update_item(sequential, user_id)
 
