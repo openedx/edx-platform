@@ -23,7 +23,7 @@ from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
 from instructor.access import revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
+from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
 
 from xmodule.modulestore.django import modulestore
 
@@ -40,6 +40,8 @@ from .serializers import GradeSerializer, CourseLeadersSerializer, CourseComplet
 
 from lms.lib.comment_client.user import get_course_social_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
+
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -302,6 +304,27 @@ def _manage_role(course_descriptor, user, role, action):
             queryset = queryset.filter(course_id=course_descriptor.id)
             if len(queryset) == 0:
                 update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+
+
+def _get_aggregate_exclusion_user_ids(course_key):
+    """
+    This helper method will return the list of user ids that are marked in roles
+    that can be excluded from certain aggregate queries. The list of roles to exclude
+    can be defined in a AGGREGATION_EXCLUDE_ROLES settings variable
+    """
+
+    exclude_user_ids = set()
+    exclude_role_list = getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
+
+    for role in exclude_role_list:
+        users = CourseRole(role, course_key).users_with_role()
+        user_ids = set()
+        for user in users:
+            user_ids.add(user.id)
+
+        exclude_user_ids = exclude_user_ids.union(user_ids)
+
+    return exclude_user_ids
 
 
 class CourseContentList(SecureAPIView):
@@ -1515,13 +1538,14 @@ class CoursesLeadersList(SecureListAPIView):
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
+
         queryset = StudentModule.objects.filter(
             course_id__exact=course_key,
             grade__isnull=False,
             max_grade__isnull=False,
             max_grade__gt=0,
             student__is_active=True
-        )
+        ).exclude(student__in=_get_aggregate_exclusion_user_ids(course_key))
 
         if content_id:
             content_descriptor, content_key, existing_content = get_course_child(request, request.user, course_key, content_id)  # pylint: disable=W0612
@@ -1580,7 +1604,10 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        queryset = CourseModuleCompletion.objects.filter(course_id=course_key)
+
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        queryset = CourseModuleCompletion.objects.filter(course_id=course_key)\
+            .exclude(user__in=exclude_users)
 
         if user_id:
             user_completions = queryset.filter(user__id=user_id).count()
@@ -1591,6 +1618,7 @@ class CoursesCompletionsLeadersList(SecureAPIView):
 
         total_completions = queryset.filter(user__is_active=True).count()
         users = CourseModuleCompletion.objects.filter(user__is_active=True)\
+            .exclude(user__in=exclude_users)\
             .aggregate(total=Count('user__id', distinct=True))
 
         if users and users['total'] > 0:
@@ -1636,7 +1664,19 @@ class CoursesSocialMetrics(SecureListAPIView):
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
-            data = get_course_social_stats(course_id)
+            course_key = CourseKey.from_string(course_id)
+
+            # the forum service expects the legacy slash separated string format
+            data = get_course_social_stats(course_key.to_deprecated_string())
+
+            # remove any excluded users from the aggregate
+
+            exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+
+            for user_id in exclude_users:
+                if str(user_id) in data:
+                    del data[str(user_id)]
+
             http_status = status.HTTP_200_OK
         except CommentClientRequestError, e:
             data = {
@@ -1666,7 +1706,9 @@ class CoursesCitiesMetrics(SecureListAPIView):
         course_descriptor, course_key, course_content = get_course(self.request, self.request.user, course_id)  # pylint: disable=W0612
         if not course_descriptor:
             raise Http404
-        queryset = CourseEnrollment.users_enrolled_in(course_key)
+
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        queryset = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
         if city:
             city = city.split(',')[:upper_bound]
             q_list = [Q(profile__city__iexact=item.strip()) for item in city]
