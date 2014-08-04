@@ -141,14 +141,14 @@ describe "DiscussionThreadListView", ->
                             <option value="unanswered">Unanswered</option>
                             <option value="flagged">Flagged</option>
                         </select>
-                    </span>
+                    </label>
                     <label class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
                             <option value="date">by recent activity</option>
                             <option value="comments">by most activity</option>
                             <option value="votes">by most votes</option>
                         </select>
-                    </span>
+                    </label>
                 </div>
             </div>
             <div class="search-alerts"></div>
