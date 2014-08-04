@@ -410,6 +410,11 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
+    # TODO need to fix components that are sending definition_data as strings, instead of as dicts
+    # For now, migrate them into dicts here.
+    if isinstance(data, basestring):
+        data = {'data': data}
+
     created_block = store.create_child(
         request.user.id,
         usage_key,
