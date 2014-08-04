@@ -10,9 +10,9 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation
 from opaque_keys.edx.locator import AssetLocator
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys import InvalidKeyError
 from PIL import Image
 
 
@@ -56,7 +56,7 @@ class StaticContent(object):
         return AssetLocator(
             course_key,
             'asset' if not is_thumbnail else 'thumbnail',
-            AssetLocation.clean_keeping_underscores(path)
+            AssetLocator.clean_keeping_underscores(path)
         ).for_branch(None)
 
     def get_id(self):
@@ -105,16 +105,20 @@ class StaticContent(object):
 
         assert(isinstance(course_key, CourseKey))
         # create a dummy asset location and then strip off the last 2 characters: '/a'
-        return course_key.make_asset_key('asset', 'a').to_deprecated_string()[:-2]
+        return course_key.make_asset_key('asset', 'a').for_branch(None).to_deprecated_string()[:-2]
 
     @staticmethod
     def get_location_from_path(path):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        # TODO OpaqueKeys after opaque keys deprecation is working
-        # return AssetLocation.from_string(path)
-        return AssetLocation.from_deprecated_string(path)
+        try:
+            return AssetKey.from_string(path)
+        except InvalidKeyError:
+            # TODO - NAATODO is there a better way to do this stripping?
+            if path.startswith('/'):
+                # try stripping off the leading slash and try again
+                return AssetKey.from_string(path[1:])
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
