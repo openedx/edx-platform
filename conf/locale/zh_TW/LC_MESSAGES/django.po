@@ -5,6 +5,7 @@
 # 
 # Translators:
 # 陳子琦 <christtabris@gmail.com>, 2014
+# howard_liu <howard55662004@yahoo.com>, 2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
@@ -16,6 +17,7 @@
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2014
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
+# ZhenRC <zhenrcaaron@gmail.com>, 2014
 # 徐琨閔 <qwer20108@gmail.com>, 2014
 # 陳子琦 <christtabris@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -24,18 +26,21 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# howard_liu <howard55662004@yahoo.com>, 2014
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2014
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
+# ZhenRC <zhenrcaaron@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# howard_liu <howard55662004@yahoo.com>, 2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
@@ -81,6 +86,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# howard_liu <howard55662004@yahoo.com>, 2014
 # lin31504 <lin31504@gmail.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2014
@@ -88,9 +94,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-28 10:03-0400\n"
-"PO-Revision-Date: 2014-07-22 14:02+0000\n"
-"Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
+"POT-Creation-Date: 2014-08-04 09:18-0400\n"
+"PO-Revision-Date: 2014-07-31 13:51+0000\n"
+"Last-Translator: howard_liu <howard55662004@yahoo.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -117,14 +123,14 @@ msgstr "討論"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "問題"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr ""
+msgstr "進階"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -269,6 +275,7 @@ msgid ""
 "reset your password before you can log in again. Please click the \"Forgot "
 "Password\" link on this page to reset your password before logging in again."
 msgstr ""
+"您的帳戶密碼應許久未更換，已超過密碼原則設定的期限。在您重新設定密碼前系統將拒絕您登入系統。再次嘗試登入前，請點選\"忘記密碼\"的連結以重新設定您的密碼。"
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
@@ -3708,8 +3715,8 @@ msgid "allowed file types are '%(file_types)s'"
 msgstr "允許的文件類型包含 '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-msgid "maximum upload file size is %(file_size)sK"
-msgstr "上傳文件的最大容量是 %(file_size)s KB"
+msgid "Maximum upload file size is %(file_size)s bytes."
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -3755,7 +3762,7 @@ msgstr ""
 msgid "Gender"
 msgstr "性別"
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "教育水準"
 
@@ -5377,6 +5384,13 @@ msgstr "刪除文章"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: cms/templates/component.html cms/templates/container_xblock_component.html
+#: cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Delete"
 msgstr "刪除"
 
@@ -5408,7 +5422,15 @@ msgstr "...還有更多！"
 msgid "You are deleting an article. Please confirm."
 msgstr "您確定要刪除這篇文章嗎？"
 
-#: lms/templates/wiki/edit.html
+#: lms/templates/wiki/edit.html cms/templates/component.html
+#: cms/templates/container.html cms/templates/container_xblock_component.html
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/mustache/_inline_thread_show.mustache
+#: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "編輯"
 
@@ -5892,6 +5914,10 @@ msgstr ""
 msgid "must have at least two groups"
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/course.py
+msgid "This Group Configuration is already in use and cannot be removed."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "課程成功匯出到Git資源庫"
@@ -5997,23 +6023,23 @@ msgstr ""
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
-msgstr ""
+msgstr "找不到頁面"
 
 #: cms/templates/404.html lms/templates/static_templates/404.html
 msgid "Page not found"
-msgstr ""
+msgstr "找不到頁面"
 
 #: cms/templates/asset_index.html lms/templates/courseware/courseware.html
 #: lms/templates/verify_student/_modal_editname.html
 msgid "close"
-msgstr ""
+msgstr "關閉"
 
 #: cms/templates/container.html cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
-msgstr ""
+msgstr "載入中..."
 
 #. Translators: this is a verb describing the action of viewing more details
 #: cms/templates/container_xblock_component.html
@@ -6027,7 +6053,7 @@ msgstr "檢視"
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
@@ -6036,7 +6062,7 @@ msgstr ""
 #: cms/templates/index.html cms/templates/settings.html
 #: lms/templates/courseware/course_about.html
 msgid "Course Number"
-msgstr ""
+msgstr "課程編號"
 
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/overview.html cms/templates/overview.html
@@ -6067,7 +6093,7 @@ msgstr ""
 
 #: cms/templates/login.html lms/templates/login.html
 msgid "Forgot password?"
-msgstr ""
+msgstr "忘記密碼？"
 
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/login.html lms/templates/provider_login.html
@@ -6593,7 +6619,7 @@ msgstr ""
 
 #: lms/templates/edx_footer.html
 msgid "&copy; 2014 edX, some rights reserved."
-msgstr ""
+msgstr "&copy; 2014 edX, 部分權利保留。"
 
 #: lms/templates/edx_footer.html lms/templates/footer.html
 msgid "Terms of Service and Honor Code"
@@ -6697,7 +6723,7 @@ msgstr "用戶"
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
-msgstr ""
+msgstr "&copy; 2014 {platform_name}, 部分權利保留。"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
@@ -7439,7 +7465,7 @@ msgid "Highest Level of Education Completed"
 msgstr "最高教育程度"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "出生年份"
 
@@ -7912,7 +7938,7 @@ msgstr "總字數："
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Open Response"
-msgstr "打開回復"
+msgstr "打開回覆"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Assessments:"
@@ -8957,6 +8983,7 @@ msgid "Enrolled as: "
 msgstr "登記為："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr ""
 
@@ -9872,49 +9899,29 @@ msgstr ""
 msgid "Percentage Discount"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Active Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Score Distribution"
-msgstr "成績分布"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Loading problem list..."
-msgstr "載入問題列表..."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Gender Distribution"
-msgstr "性別分佈"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "註冊資訊"
 
+#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
+#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr "總參與人數(教師、助教和學生)"
+msgid ""
+"Number of enrollees (instructors, staff members, and students) by track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "總數"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -10188,6 +10195,42 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "重置學生的結束時間"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Active Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Score Distribution"
+msgstr "成績分布"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Loading problem list..."
+msgstr "載入問題列表..."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Gender Distribution"
+msgstr "性別分佈"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -11140,10 +11183,6 @@ msgid "Order No."
 msgstr "訂單編號"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "總數"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
 msgstr "付款方："
 
@@ -11226,7 +11265,7 @@ msgstr "編輯您的姓名"
 #: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
 msgid "The following error occurred while editing your name:"
-msgstr ""
+msgstr "在您註冊時發生了下列錯誤："
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid ""
@@ -12770,21 +12809,28 @@ msgid "This module is disabled at the moment."
 msgstr ""
 
 #: cms/templates/group_configurations.html
-msgid "You can create and edit group configurations."
+msgid "You can create, edit, and delete group configurations."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "A group configuration defines how many groups of students are in an "
-"experiment. When you create a content experiment, you select the group "
+"experiment. When you create an experiment, you select the group "
 "configuration to use."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit an existing configuration, hover over its box and click "
+"To edit a configuration, hover over its box and click "
 "{em_start}Edit{em_end}."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/textbooks.html
@@ -14231,7 +14277,7 @@ msgid ""
 "If you didn't request this, you don't need to do anything; you won't receive"
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the edX web site."
-msgstr "如果您並未發出請求，則您不需要做做任何事，也將不會再收到我們的郵件。請不要直接回復此郵件。如果您需要幫助，請點擊edX網站的説明頁面。"
+msgstr "如果您並未發出請求，則您不需要做任何事，也將不會再收到我們的郵件。請不要直接回覆此郵件，若您需要幫助，請點擊edX網站的説明頁面。"
 
 #: cms/templates/emails/activation_email_subject.txt
 msgid "Your account for edX Studio"

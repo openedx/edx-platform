@@ -41,6 +41,7 @@
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # brk0_0, 2013
+# edgarapmelo <edgarapmelo@gmail.com>, 2014
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -64,7 +65,7 @@
 # anunciato <anunciato@gmail.com>, 2014
 # brk0_0, 2013
 # brunojm <brunojm@gmail.com>, 2013
-# brunojm <brunojm@gmail.com>, 2013
+# brunojm <brunojm@gmail.com>, 2013-2014
 # edgarapmelo <edgarapmelo@gmail.com>, 2014
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # G.Ribas <gabriel.ribas1@hotmail.com>, 2014
@@ -141,7 +142,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-28 10:03-0400\n"
+"POT-Creation-Date: 2014-08-04 09:18-0400\n"
 "PO-Revision-Date: 2014-07-22 14:02+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -172,7 +173,7 @@ msgstr "Discussão"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "Problema"
 
@@ -291,7 +292,7 @@ msgstr "Não há mais vagas"
 
 #: common/djangoapps/student/views.py
 msgid "Student is already enrolled"
-msgstr ""
+msgstr "O estudante já está matriculado"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -456,7 +457,7 @@ msgstr "É obrigatório informar país"
 
 #: common/djangoapps/student/views.py
 msgid "You are missing one or more required fields"
-msgstr ""
+msgstr "Você não está preenchendo um ou mais campos"
 
 #: common/djangoapps/student/views.py
 msgid "Username cannot be more than {0} characters long"
@@ -481,7 +482,7 @@ msgstr "Senha: "
 
 #: common/djangoapps/student/views.py
 msgid "Username and password fields cannot match"
-msgstr ""
+msgstr "O nome de usuário e a senha não conferem"
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
@@ -1018,11 +1019,11 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Cannot connect to the queue"
-msgstr ""
+msgstr "Não é possível conectar à fila"
 
 #: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
 msgid "No formula specified."
-msgstr ""
+msgstr "Sem fórmula especificada."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Couldn't parse formula: {error_msg}"
@@ -1361,7 +1362,7 @@ msgstr "Finalizada"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
-msgstr ""
+msgstr "Correto ou Atrasado"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
@@ -1740,7 +1741,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
-msgstr ""
+msgstr "Passaportes LTI"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -1750,7 +1751,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start Date"
-msgstr ""
+msgstr "Data Anunciada de Início do Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -1761,7 +1762,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Show Calculator"
-msgstr ""
+msgstr "Mostrar Calculadora"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -1776,12 +1777,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
-msgstr ""
+msgstr "Nome de Exibição do Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Course Editor"
-msgstr ""
+msgstr "Editor do Curso"
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -1790,7 +1791,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Show Chat Widget"
-msgstr ""
+msgstr "Mostrar Chat"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3863,7 +3864,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "User {user} created successfully!"
-msgstr ""
+msgstr "Usuário {user} criado com sucesso!"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Cannot find user with email address {email_addr}"
@@ -3875,7 +3876,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted user {username}"
-msgstr ""
+msgstr "Usuário {username} apagado"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
@@ -4076,8 +4077,8 @@ msgid "allowed file types are '%(file_types)s'"
 msgstr "os tipos de arquivo permitidos são  '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-msgid "maximum upload file size is %(file_size)sK"
-msgstr "o tamanho máximo para o envio de um arquivo é de %(file_size)s K"
+msgid "Maximum upload file size is %(file_size)s bytes."
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -4127,7 +4128,7 @@ msgid "Gender"
 msgstr "Sexo"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 #, fuzzy
 msgid "Level of Education"
 msgstr ""
@@ -4199,7 +4200,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon id is None"
-msgstr ""
+msgstr "O id do cupom está vazio"
 
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
@@ -6483,15 +6484,15 @@ msgstr "Carregamento concluído"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Video"
-msgstr ""
+msgstr "Vídeo"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
-msgstr ""
+msgstr "Vazio "
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid ""
@@ -6529,14 +6530,18 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
-msgstr ""
+msgstr "JSON inválido"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "must have name of the configuration"
-msgstr ""
+msgstr "deve ter o nome da configuração"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "must have at least two groups"
+msgstr "deve ter no mínimo dois grupos"
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "This Group Configuration is already in use and cannot be removed."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/export_git.py
@@ -6557,7 +6562,7 @@ msgstr "Não foi possível encontrar o arquivo course.xml no pacote."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Empty"
-msgstr ""
+msgstr "Vazio"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
@@ -6641,7 +6646,7 @@ msgstr ""
 
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
-msgstr ""
+msgstr "Formato incorreto para o campo '{name}'.{detailed_message}"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -7284,7 +7289,7 @@ msgstr "Perguntas frequentes"
 
 #: lms/templates/edx_footer.html
 msgid "edX Logo"
-msgstr ""
+msgstr "Logo edX"
 
 #: lms/templates/edx_footer.html
 msgid ""
@@ -8198,7 +8203,7 @@ msgid "Highest Level of Education Completed"
 msgstr "Nível mais alto de formação completa"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "Ano de nascimento"
 
@@ -9834,6 +9839,7 @@ msgid "Enrolled as: "
 msgstr "Inscrito como:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Verificado"
 
@@ -10240,7 +10246,7 @@ msgstr "Atualizar comentário"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
-msgstr ""
+msgstr "Por: Equipe"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Community TA"
@@ -10838,7 +10844,7 @@ msgstr "Pular"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add Coupon"
-msgstr ""
+msgstr "Adicionar Cupom"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Please enter Coupon detail below"
@@ -10848,60 +10854,36 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Code"
-msgstr ""
+msgstr "Código"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Percentage Discount"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Active Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Score Distribution"
-msgstr "Distribuição de pontuação"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr ""
-"O gráfico abaixo mostra a distribuição da pontuação para cada problema-"
-"padrão em sua classe, especificada pelo nome do URL do problema."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr ""
-"As pontuações são mostradas sem ponderação de peso, então se o seu problema "
-"contém 2 questões, será mostrado com um total de 2 pontos."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Loading problem list..."
-msgstr "Carregando a lista de problemas..."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Gender Distribution"
-msgstr "Distribuição de gênero"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "Informações sobre a inscrição"
 
+#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
+#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr "Número total de inscritos (professores, funcionários e alunos)"
+msgid ""
+"Number of enrollees (instructors, staff members, and students) by track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "Total"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -11123,16 +11105,16 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Edit Coupon"
-msgstr ""
+msgstr "Editar Cupom"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon"
-msgstr ""
+msgstr "Atualizar Cupom"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Information"
-msgstr ""
+msgstr "Atualizar Informações do Cupom"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -11220,6 +11202,46 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "Redefinição da data de entrega para o aluno"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Active Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Score Distribution"
+msgstr "Distribuição de pontuação"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+"O gráfico abaixo mostra a distribuição da pontuação para cada problema-"
+"padrão em sua classe, especificada pelo nome do URL do problema."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+"As pontuações são mostradas sem ponderação de peso, então se o seu problema "
+"contém 2 questões, será mostrado com um total de 2 pontos."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Loading problem list..."
+msgstr "Carregando a lista de problemas..."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Gender Distribution"
+msgstr "Distribuição de gênero"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -12115,7 +12137,7 @@ msgstr "Qtde."
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
@@ -12285,10 +12307,6 @@ msgstr ""
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Order No."
 msgstr "Número do pedido"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "Total"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -14067,21 +14085,28 @@ msgid "This module is disabled at the moment."
 msgstr ""
 
 #: cms/templates/group_configurations.html
-msgid "You can create and edit group configurations."
+msgid "You can create, edit, and delete group configurations."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "A group configuration defines how many groups of students are in an "
-"experiment. When you create a content experiment, you select the group "
+"experiment. When you create an experiment, you select the group "
 "configuration to use."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit an existing configuration, hover over its box and click "
+"To edit a configuration, hover over its box and click "
 "{em_start}Edit{em_end}."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/textbooks.html
