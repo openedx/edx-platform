@@ -9,7 +9,6 @@
  *
  * The view can be constructed with an initialState option which is a JSON structure representing
  * the desired initial state. The parameters are as follows:
- *  - expanded_locators - the locators that should be shown as expanded in addition to the defaults
  *  - locator_to_show - the locator for the xblock which is the one being explicitly shown
  *  - scroll_offset - the scroll offset to use for the locator being shown
  *  - edit_display_name - true if the shown xblock's display name should be in inline edit mode
@@ -30,6 +29,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             initialize: function() {
                 BaseView.prototype.initialize.call(this);
                 this.initialState = this.options.initialState;
+                this.expandedLocators = this.options.expandedLocators;
                 this.template = this.options.template;
                 if (!this.template) {
                     this.template = this.loadTemplate(this.templateName);
@@ -37,7 +37,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.parentInfo = this.options.parentInfo;
                 this.parentView = this.options.parentView;
                 this.renderedChildren = false;
-                this.model.on('sync', this.onXBlockChange, this);
+                this.model.on('sync', this.onSync, this);
             },
 
             render: function() {
@@ -46,6 +46,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.addNameEditor();
                 if (this.shouldRenderChildren() && this.shouldExpandChildren()) {
                     this.renderChildren();
+                }
+                else {
+                    this.renderedChildren = false;
                 }
                 return this;
             },
@@ -132,6 +135,17 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             toggleExpandCollapse: function(event) {
+                // The course outline page tracks expanded locators. The unit location sidebar does not.
+                if (this.expandedLocators) {
+                    var locator = this.model.get('id');
+                    var wasExpanded = this.expandedLocators.contains(locator);
+                    if (wasExpanded) {
+                        this.expandedLocators.remove(locator);
+                    }
+                    else {
+                        this.expandedLocators.add(locator);
+                    }
+                }
                 // Ensure that the children have been rendered before expanding
                 if (this.shouldRenderChildren() && !this.renderedChildren) {
                     this.renderChildren();
@@ -164,6 +178,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     model: xblockInfo,
                     parentInfo: parentInfo,
                     initialState: this.initialState,
+                    expandedLocators: this.expandedLocators,
                     template: this.template,
                     parentView: parentView || this
                 });
@@ -179,6 +194,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     xblockType = translate ? gettext('unit') : 'unit';
                 }
                 return xblockType;
+            },
+
+            onSync: function(event) {
+                if (ViewUtils.hasChangedAttributes(this.model, ['visibility_state', 'child_info', 'display_name'])) {
+                   this.onXBlockChange();
+                }
             },
 
             onXBlockChange: function() {
