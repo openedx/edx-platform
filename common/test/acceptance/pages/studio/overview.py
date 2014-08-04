@@ -246,7 +246,9 @@ class CourseOutlineUnit(CourseOutlineChild):
         Open the container page linked to by this unit link, and return
         an initialized :class:`.ContainerPage` for that unit.
         """
-        return ContainerPage(self.browser, self.locator).visit()
+        unit = ContainerPage(self.browser, self.locator).visit()
+        unit.wait_for_page_loaded()
+        return unit
     
     def is_browser_on_page(self):
         return self.q(css=self.BODY_SELECTOR).present
