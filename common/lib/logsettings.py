@@ -53,8 +53,9 @@ def get_logger_config(log_dir,
                                              logging_env=logging_env,
                                              hostname=hostname)
 
-    handlers = ['console', 'local'] if debug else ['console',
-                                                   'syslogger-remote', 'local']
+    handlers = ['console', 'local']
+    if syslog_addr:
+        handlers.append('syslogger-remote')
 
     logger_config = {
         'version': 1,
