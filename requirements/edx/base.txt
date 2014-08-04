@@ -4,8 +4,6 @@
 #   * @jtauber - to check licensing
 #   * One of @e0d, @jarv, or @feanil - to check system requirements
 
--r custom.txt
-
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
