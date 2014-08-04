@@ -33,6 +33,14 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             org, course, run, user_id, master_branch=master_branch, **kwargs
         )
         self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+
+        # create any other necessary things as a side effect: ensure they populate the draft branch
+        # and rely on auto publish to populate the published branch
+        with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
+            super(SplitMongoModuleStore, self).create_course(
+                org, course, run, user_id, **kwargs
+            )
+
         return item
 
     def get_course(self, course_id, depth=0):

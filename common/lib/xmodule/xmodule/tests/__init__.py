@@ -203,12 +203,12 @@ class CourseComparisonTest(unittest.TestCase):
         self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
         # compare draft
-        if expected_store.get_modulestore_type() == ModuleStoreEnum.Type.split:
+        if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         else:
             revision = None
         expected_items = expected_store.get_items(expected_course_key, revision=revision)
-        if actual_store.get_modulestore_type() == ModuleStoreEnum.Type.split:
+        if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
             revision = ModuleStoreEnum.RevisionOption.draft_only
         else:
             revision = None
@@ -276,10 +276,7 @@ class CourseComparisonTest(unittest.TestCase):
                     # get_children was returning drafts for published parents :-(
                     if expect_drafts or not getattr(item_child, 'is_draft', False)
                 ]
-                try:
-                    self.assertEqual(expected_children, actual_children)
-                except:
-                    pass
+                self.assertEqual(expected_children, actual_children)
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
         """
@@ -319,7 +316,6 @@ class CourseComparisonTest(unittest.TestCase):
         ``actual_course_key`` in ``actual_store`` are identical, allowing for differences related
         to their being from different course keys.
         """
-        return  # FIXME remove
         expected_content, expected_count = expected_store.get_all_content_for_course(expected_course_key)
         actual_content, actual_count = actual_store.get_all_content_for_course(actual_course_key)
 

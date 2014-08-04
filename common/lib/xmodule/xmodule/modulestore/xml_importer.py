@@ -303,48 +303,50 @@ def _import_course_module(
 
     log.debug('course data_dir={0}'.format(source_course.data_dir))
 
-    course = _import_module_and_update_references(
-        source_course, store, user_id,
-        course_key,
-        dest_course_id,
-        do_import_static=do_import_static,
-        runtime=runtime,
-    )
+    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, dest_course_id):
 
-    for entry in course.pdf_textbooks:
-        for chapter in entry.get('chapters', []):
-            if StaticContent.is_c4x_path(chapter.get('url', '')):
-                asset_key = StaticContent.get_location_from_path(chapter['url'])
-                chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
-
-    # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
-    # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
-    # values then remap it so that the wiki does not point to the old wiki.
-    if course_key != course.id:
-        original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
-            course_key.org,
-            course_key.course,
-            course_key.run
+        course = _import_module_and_update_references(
+            source_course, store, user_id,
+            course_key,
+            dest_course_id,
+            do_import_static=do_import_static,
+            runtime=runtime,
         )
-        if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
-            course.wiki_slug = u'{0}.{1}.{2}'.format(
-                course.id.org,
-                course.id.course,
-                course.id.run,
+
+        for entry in course.pdf_textbooks:
+            for chapter in entry.get('chapters', []):
+                if StaticContent.is_c4x_path(chapter.get('url', '')):
+                    asset_key = StaticContent.get_location_from_path(chapter['url'])
+                    chapter['url'] = StaticContent.get_static_path_from_location(asset_key)
+
+        # Original wiki_slugs had value location.course. To make them unique this was changed to 'org.course.name'.
+        # If we are importing into a course with a different course_id and wiki_slug is equal to either of these default
+        # values then remap it so that the wiki does not point to the old wiki.
+        if course_key != course.id:
+            original_unique_wiki_slug = u'{0}.{1}.{2}'.format(
+                course_key.org,
+                course_key.course,
+                course_key.run
             )
+            if course.wiki_slug == original_unique_wiki_slug or course.wiki_slug == course_key.course:
+                course.wiki_slug = u'{0}.{1}.{2}'.format(
+                    course.id.org,
+                    course.id.course,
+                    course.id.run,
+                )
 
-    # cdodge: more hacks (what else). Seems like we have a
-    # problem when importing a course (like 6.002) which
-    # does not have any tabs defined in the policy file.
-    # The import goes fine and then displays fine in LMS,
-    # but if someone tries to add a new tab in the CMS, then
-    # the LMS barfs because it expects that -- if there are
-    # *any* tabs -- then there at least needs to be
-    # some predefined ones
-    if course.tabs is None or len(course.tabs) == 0:
-        CourseTabList.initialize_default(course)
+        # cdodge: more hacks (what else). Seems like we have a
+        # problem when importing a course (like 6.002) which
+        # does not have any tabs defined in the policy file.
+        # The import goes fine and then displays fine in LMS,
+        # but if someone tries to add a new tab in the CMS, then
+        # the LMS barfs because it expects that -- if there are
+        # *any* tabs -- then there at least needs to be
+        # some predefined ones
+        if course.tabs is None or len(course.tabs) == 0:
+            CourseTabList.initialize_default(course)
 
-    store.update_item(course, user_id)
+        store.update_item(course, user_id)
     return course, course_data_path
 
 
