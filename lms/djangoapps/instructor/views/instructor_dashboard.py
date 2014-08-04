@@ -92,7 +92,6 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price:
         sections.append(_section_e_commerce(course_key, access))
 
-
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
@@ -277,6 +276,9 @@ def _section_send_email(course_key, access, course):
         ),
         'email_background_tasks_url': reverse(
             'list_background_email_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
+        ),
+        'email_content_history_url': reverse(
+            'list_email_content', kwargs={'course_id': course_key.to_deprecated_string()}
         ),
     }
     return section_data
