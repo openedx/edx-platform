@@ -7,6 +7,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
 
 from .course_page import CoursePage
 from .container import ContainerPage
@@ -89,6 +90,13 @@ class CourseOutlineItem(object):
         """
         self.edit_name()
         set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
+        self.wait_for_ajax()
+
+    def finalize_name(self):
+        """
+        Presses ENTER, saving the value of the display name for this item.
+        """
+        self.q(css=self._bounded_selector(self.NAME_INPUT_SELECTOR)).results[0].send_keys(Keys.ENTER)
         self.wait_for_ajax()
 
     def in_editable_form(self):
