@@ -162,8 +162,8 @@
 /* Viewer */
 .annotator-viewer .share-viewer-annotator div.share-text-annotator,
 .annotator-viewer .share-viewer-annotator div.share-button,
-.annotator-wrapper div.share-button,
-.annotator-wrapper div.share-text-annotator {
+.annotator-wrapper .annotator-viewer div.share-button,
+.annotator-wrapper .annotator-viewer div.share-text-annotator {
 	border-top: 0;
 	padding: 0;
 	background-size: 2em;

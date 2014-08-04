@@ -161,11 +161,12 @@
             richText: {
                 tinymce:{
                     selector: "li.annotator-item textarea",
-                    plugins: "image codemirror",
+                    plugins: "image link codemirror media",
                     menubar: false,
                     toolbar_items_size: 'small',
                     extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
+                    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | code ",
+                    resize: "both",
                 }
             },
         },
