@@ -470,20 +470,25 @@ class EditNamesTest(CourseOutlineTest):
         """
         Scenario: A section stays in the same expand/collapse state while its name is edited
             Given that I have created a section
-            And the section is expanded
+            And the section is collapsed
             When I click on the name of the section
-            Then the section is expanded
+            Then the section is collapsed
             And given that I have entered a new name
-            Then the section is expanded
+            Then the section is collapsed
+            And given that I press ENTER to finalize the name
+            Then the section is collapsed
         """
         self.course_outline_page.visit()
+        self.course_outline_page.section_at(0).toggle_expand()
         self.assertFalse(self.course_outline_page.section_at(0).in_editable_form())
-        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
         self.course_outline_page.section_at(0).edit_name()
         self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
-        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
         self.course_outline_page.section_at(0).enter_name('Changed')
-        self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
+        self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
+        self.course_outline_page.section_at(0).finalize_name()
+        self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
 class CreateSectionsTest(CourseOutlineTest):
