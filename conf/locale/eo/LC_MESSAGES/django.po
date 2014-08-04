@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-28 10:27-0400\n"
-"PO-Revision-Date: 2014-07-28 14:27:12.585144\n"
+"POT-Creation-Date: 2014-08-04 11:24-0400\n"
+"PO-Revision-Date: 2014-08-04 15:24:08.779156\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +68,7 @@ msgstr "Dïsçüssïön Ⱡ#"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "Prößlém #"
 
@@ -4194,8 +4194,8 @@ msgid "allowed file types are '%(file_types)s'"
 msgstr "ällöwéd fïlé týpés äré '%(file_types)s' Ⱡ'σяєм #"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-msgid "maximum upload file size is %(file_size)sK"
-msgstr "mäxïmüm üplöäd fïlé sïzé ïs %(file_size)sK Ⱡ'σяєм ι#"
+msgid "Maximum upload file size is %(file_size)s bytes."
+msgstr "Mäxïmüm üplöäd fïlé sïzé ïs %(file_size)s ßýtés. Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -4245,7 +4245,7 @@ msgid "Gender"
 msgstr "Géndér Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "Lévél öf Édüçätïön Ⱡ'σ#"
 
@@ -6746,6 +6746,12 @@ msgstr "müst hävé nämé öf thé çönfïgürätïön Ⱡ'σяєм ιρ#"
 msgid "must have at least two groups"
 msgstr "müst hävé ät léäst twö gröüps Ⱡ'σяєм #"
 
+#: cms/djangoapps/contentstore/views/course.py
+msgid "This Group Configuration is already in use and cannot be removed."
+msgstr ""
+"Thïs Gröüp Çönfïgürätïön ïs älréädý ïn üsé änd çännöt ßé rémövéd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Çöürsé süççéssfüllý éxpörtéd tö gït répösïtörý Ⱡ'σяєм ιρѕυм #"
@@ -8460,7 +8466,7 @@ msgid "Highest Level of Education Completed"
 msgstr "Hïghést Lévél öf Édüçätïön Çömplétéd Ⱡ'σяєм ιρ#"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "Ýéär öf Bïrth Ⱡ'#"
 
@@ -10125,6 +10131,7 @@ msgid "Enrolled as: "
 msgstr "Énrölléd äs:  Ⱡ'#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Vérïfïéd #"
 
@@ -11165,63 +11172,31 @@ msgstr "Çödé Ⱡ'σяєм#"
 msgid "Percentage Discount"
 msgstr "Pérçéntägé Dïsçöünt Ⱡ'σя#"
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Active Students"
-msgstr "Àçtïvé Stüdénts Ⱡ'#"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-"Thé çöünt öf stüdénts whö ïntéräçtéd ät léäst önçé ßý öpénïng pägés, pläýïng"
-" vïdéös, pöstïng ïn dïsçüssïöns, süßmïttïng prößléms, ör çömplétïng öthér "
-"äçtïvïtïés. Thé däté rängé ïnçlüdés äll äçtïvïtïés fröm mïdnïght ön thé "
-"stärt däté (ïnçlüsïvé) thöügh mïdnïght ön thé énd däté (éxçlüsïvé). Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Score Distribution"
-msgstr "Sçöré Dïstrïßütïön Ⱡ'σ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr ""
-"Thé çhärt ßélöw dïspläýs thé sçöré dïstrïßütïön för éäçh ständärd prößlém ïn"
-" ýöür çläss, spéçïfïéd ßý thé prößlém's ürl nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr ""
-"Sçörés äré shöwn wïthöüt wéïghtïng äpplïéd, sö ïf ýöür prößlém çöntäïns 2 "
-"qüéstïöns, ït wïll dïspläý äs hävïng ä tötäl öf 2 pöïnts. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Loading problem list..."
-msgstr "Löädïng prößlém lïst... Ⱡ'σяє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Gender Distribution"
-msgstr "Géndér Dïstrïßütïön Ⱡ'σя#"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "Énröllmént Ìnförmätïön Ⱡ'σяє#"
 
+#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
+#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Total number of enrollees (instructors, staff members, and students)"
+msgid ""
+"Number of enrollees (instructors, staff members, and students) by track"
 msgstr ""
-"Tötäl nümßér öf énrölléés (ïnstrüçtörs, stäff mémßérs, änd stüdénts) Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕ#"
+"Nümßér öf énrölléés (ïnstrüçtörs, stäff mémßérs, änd stüdénts) ßý träçk "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr "Àüdït Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr "Hönör Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "Tötäl Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -11548,6 +11523,54 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "Rését düé däté för stüdént Ⱡ'σяєм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Active Students"
+msgstr "Àçtïvé Stüdénts Ⱡ'#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+"Thé çöünt öf stüdénts whö ïntéräçtéd ät léäst önçé ßý öpénïng pägés, pläýïng"
+" vïdéös, pöstïng ïn dïsçüssïöns, süßmïttïng prößléms, ör çömplétïng öthér "
+"äçtïvïtïés. Thé däté rängé ïnçlüdés äll äçtïvïtïés fröm mïdnïght ön thé "
+"stärt däté (ïnçlüsïvé) thöügh mïdnïght ön thé énd däté (éxçlüsïvé). Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Score Distribution"
+msgstr "Sçöré Dïstrïßütïön Ⱡ'σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+"Thé çhärt ßélöw dïspläýs thé sçöré dïstrïßütïön för éäçh ständärd prößlém ïn"
+" ýöür çläss, spéçïfïéd ßý thé prößlém's ürl nämé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+"Sçörés äré shöwn wïthöüt wéïghtïng äpplïéd, sö ïf ýöür prößlém çöntäïns 2 "
+"qüéstïöns, ït wïll dïspläý äs hävïng ä tötäl öf 2 pöïnts. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Loading problem list..."
+msgstr "Löädïng prößlém lïst... Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Gender Distribution"
+msgstr "Géndér Dïstrïßütïön Ⱡ'σя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -12643,10 +12666,6 @@ msgstr ""
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Order No."
 msgstr "Ördér Nö. #"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "Tötäl Ⱡ'σяєм ι#"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -14542,28 +14561,39 @@ msgid "This module is disabled at the moment."
 msgstr "Thïs mödülé ïs dïsäßléd ät thé mömént. Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/group_configurations.html
-msgid "You can create and edit group configurations."
-msgstr "Ýöü çän çréäté änd édït gröüp çönfïgürätïöns. Ⱡ'σяєм ιρѕυм#"
+msgid "You can create, edit, and delete group configurations."
+msgstr ""
+"Ýöü çän çréäté, édït, änd délété gröüp çönfïgürätïöns. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "A group configuration defines how many groups of students are in an "
-"experiment. When you create a content experiment, you select the group "
+"experiment. When you create an experiment, you select the group "
 "configuration to use."
 msgstr ""
 "À gröüp çönfïgürätïön défïnés höw mäný gröüps öf stüdénts äré ïn än "
-"éxpérïmént. Whén ýöü çréäté ä çöntént éxpérïmént, ýöü séléçt thé gröüp "
-"çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+"éxpérïmént. Whén ýöü çréäté än éxpérïmént, ýöü séléçt thé gröüp "
+"çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit an existing configuration, hover over its box and click "
+"To edit a configuration, hover over its box and click "
 "{em_start}Edit{em_end}."
 msgstr ""
 "Çlïçk {em_start}Néw Gröüp Çönfïgürätïön{em_end} tö ädd ä néw çönfïgürätïön. "
-"Tö édït än éxïstïng çönfïgürätïön, hövér övér ïts ßöx änd çlïçk "
-"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+"Tö édït ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk "
+"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
+msgstr ""
+"Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs nöt ïn üsé ïn än "
+"éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk thé "
+"délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
 
 #: cms/templates/group_configurations.html cms/templates/textbooks.html
 msgid "Learn More"

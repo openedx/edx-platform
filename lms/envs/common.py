@@ -619,6 +619,7 @@ LANGUAGES = (
     ('da', u'dansk'),  # Danish
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
     ('el', u'Ελληνικά'),  # Greek
+    ('en-uk', u'English (United Kingdom)'),  # English (United Kingdom)
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
     ('en@pirate', u'Pirate English'),  # Pirate English
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
@@ -665,6 +666,7 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('sq', u'shqip'),  # Albanian
     ('sr', u'Српски'),  # Serbian
     ('ta', u'தமிழ்'),  # Tamil
     ('te', u'తెలుగు'),  # Telugu

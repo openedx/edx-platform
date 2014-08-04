@@ -185,7 +185,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-28 10:03-0400\n"
+"POT-Creation-Date: 2014-08-04 09:18-0400\n"
 "PO-Revision-Date: 2014-07-22 14:02+0000\n"
 "Last-Translator: wuqiong <wuqiong417@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -214,7 +214,7 @@ msgstr "论坛"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "问题"
 
@@ -3818,8 +3818,8 @@ msgid "allowed file types are '%(file_types)s'"
 msgstr "允许的文件类型是'%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-msgid "maximum upload file size is %(file_size)sK"
-msgstr "最大上传文件%(file_size)s KB"
+msgid "Maximum upload file size is %(file_size)s bytes."
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -3867,7 +3867,7 @@ msgid "Gender"
 msgstr "性别"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "教育水平"
 
@@ -6126,6 +6126,10 @@ msgstr ""
 msgid "must have at least two groups"
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/course.py
+msgid "This Group Configuration is already in use and cannot be removed."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "课程成功被导出到Git源"
@@ -7678,7 +7682,7 @@ msgid "Highest Level of Education Completed"
 msgstr "最高教育程度"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "出生年份"
 
@@ -9204,6 +9208,7 @@ msgid "Enrolled as: "
 msgstr "登记为："
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "已验证"
 
@@ -10141,49 +10146,29 @@ msgstr ""
 msgid "Percentage Discount"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Active Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Score Distribution"
-msgstr "成绩分布"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr "下图显示的是您的班级中每个问答的成绩分布，问答由其链接地址指定。"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr "所显示的成绩尚未加权，所以，如果您的问答包含2个问题，系统显示的总分为2分。"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Loading problem list..."
-msgstr "加载问题列表……"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Gender Distribution"
-msgstr "性别分布"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "注册信息"
 
+#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
+#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr "总参与人数(主讲教师、教员及学生)"
+msgid ""
+"Number of enrollees (instructors, staff members, and students) by track"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "总计"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -10460,6 +10445,42 @@ msgstr "重设一个问题的截止日期，将取消学生在指定单元上的
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "重置学生的结束时间"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Active Students"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Score Distribution"
+msgstr "成绩分布"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr "下图显示的是您的班级中每个问答的成绩分布，问答由其链接地址指定。"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr "所显示的成绩尚未加权，所以，如果您的问答包含2个问题，系统显示的总分为2分。"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Loading problem list..."
+msgstr "加载问题列表……"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Gender Distribution"
+msgstr "性别分布"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -11412,10 +11433,6 @@ msgstr "请打印此页作为您自己的纪录,这是你的收据。您也会�
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Order No."
 msgstr "订单号："
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "总计"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -13045,21 +13062,28 @@ msgid "This module is disabled at the moment."
 msgstr ""
 
 #: cms/templates/group_configurations.html
-msgid "You can create and edit group configurations."
+msgid "You can create, edit, and delete group configurations."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "A group configuration defines how many groups of students are in an "
-"experiment. When you create a content experiment, you select the group "
+"experiment. When you create an experiment, you select the group "
 "configuration to use."
 msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit an existing configuration, hover over its box and click "
+"To edit a configuration, hover over its box and click "
 "{em_start}Edit{em_end}."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/textbooks.html
