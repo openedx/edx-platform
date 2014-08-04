@@ -13,6 +13,8 @@ from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
                                  redirect_with_get)
 from microsite_configuration import microsite
 
+from third_party_auth import pipeline, provider
+
 __all__ = ['register', 'login_page', 'howitworks']
 
 
@@ -29,7 +31,29 @@ def register(request):
         # and registration is disabled.
         return redirect_with_get('login', request.GET, False)
 
-    return render_to_response('register.html', {'csrf': csrf_token})
+    context = {
+        'csrf': csrf_token,
+        'pipeline_running': None,
+        'platform_name': microsite.get_value(
+            'platform_name',
+            settings.PLATFORM_NAME
+        ),
+        'email': '',
+        'name': '',
+        'username': '',
+    }
+
+    # If third-party auth is enabled, prepopulate the form with data from the
+    # selected provider.
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+        pipeline_running = pipeline.get(request)
+        current_provider = provider.Registry.get_by_backend_name(pipeline_running.get('backend'))
+        overrides = current_provider.get_register_form_data(pipeline_running.get('kwargs'))
+        overrides['pipeline_running'] = pipeline_running
+        overrides['selected_provider'] = current_provider.NAME
+        context.update(overrides)
+
+    return render_to_response('register.html', context)
 
 
 @ssl_login_shortcut
@@ -59,6 +83,10 @@ def login_page(request):
             'csrf': csrf_token,
             'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
+            # Bool injected into JS to submit form if we're inside a running third-
+            # party auth pipeline; distinct from the actual instance of the running
+            # pipeline, if any.
+            'pipeline_running': 'true' if pipeline.running(request) else 'false',
         }
     )
 

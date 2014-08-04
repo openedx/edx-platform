@@ -95,6 +95,10 @@ FEATURES = {
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
 
+    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
+    # if you enable this; we don't create tables by default.
+    'ENABLE_THIRD_PARTY_AUTH': False,
+
     # Allow creating courses with non-ascii characters in the course id
     'ALLOW_UNICODE_COURSE_ID': False,
 
@@ -637,6 +641,10 @@ for app_name in OPTIONAL_APPS:
         except ImportError:
             continue
     INSTALLED_APPS += (app_name,)
+
+# Stub for third_party_auth options.
+# See common/djangoapps/third_party_auth/settings.py for configuration details.
+THIRD_PARTY_AUTH = {}
 
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default

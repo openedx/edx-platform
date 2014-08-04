@@ -3,6 +3,7 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from third_party_auth import provider, pipeline
 %>
 <%block name="title">${_("Sign In")}</%block>
 <%block name="bodyclass">not-signedin view-signin</%block>
@@ -17,7 +18,7 @@ from django.utils.translation import ugettext as _
     </header>
 
     <article class="content-primary" role="main">
-      <form id="login_form" method="post" action="login_post">
+      <form id="login_form" method="post" action="/login_post">
 
         <fieldset>
           <legend class="sr">${_("Required Information to Sign In to edX Studio")}</legend>
@@ -43,6 +44,28 @@ from django.utils.translation import ugettext as _
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
         <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
       </form>
+
+      % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+
+      <hr />
+
+      <p class="instructions">
+        ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
+        ## Translators: this is the last choice of a number of choices of how to log in to the site.
+        ${_('or, if you have connected one of these providers, log in below.')}
+      </p>
+
+      <div class="form-actions form-third-party-auth">
+
+      % for enabled in provider.Registry.enabled():
+        ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
+        <button type="submit" class="button button-primary" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+      % endfor
+
+      </div>
+
+      % endif
+
     </article>
 
     <aside class="content-supplementary" role="complimentary">
@@ -59,6 +82,22 @@ from django.utils.translation import ugettext as _
 
 <%block name="jsextra">
 <script type="text/javascript">
+function thirdPartySignin(event, url) {
+  event.preventDefault();
+  window.location.href = appendParameter(url, "signin", "return");
+}
+
+function post_form_if_pipeline_running(pipeline_running) {
+   // If the pipeline is running, the user has already authenticated via a
+   // third-party provider. We want to invoke /login_ajax to loop in the
+   // code that does logging and sets cookies on the request. It is most
+   // consistent to do that by using the same mechanism that is used when
+   // the use does first-party sign-in: POSTing the sign-in form.
+   if (pipeline_running) {
+     $('#login_form').submit();
+   }
+}
+
 require(["jquery", "jquery.cookie", "utility"], function($) {
   function postJSON(url, data, callback) {
     $.ajax({type:'POST',

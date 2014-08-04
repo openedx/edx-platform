@@ -2,6 +2,7 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "register" %></%def>
 <%! from django.core.urlresolvers import reverse %>
+<%! from third_party_auth import pipeline, provider %>
 
 <%block name="title">${_("Sign Up")}</%block>
 <%block name="bodyclass">not-signedin view-signup</%block>
@@ -23,29 +24,75 @@
         </div>
 
         <fieldset>
+            % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+
+              % if not pipeline_running:
+
+              <p class="instructions">
+                ${_("Register to start learning today!")}
+              </p>
+
+              <div class="form-actions form-third-party-auth">
+
+              % for enabled in provider.Registry.enabled():
+                ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
+                <button type="submit" class="button button-primary" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+              % endfor
+
+              </div>
+
+              <p class="instructions">
+                ${_('or create your own {platform_name} account by completing all <strong>required*</strong> fields below.').format(platform_name=platform_name)}
+              </p>
+
+              % else:
+
+              <p class="instructions">
+                ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
+                ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
+                ${_("Finish your account registration below to start learning.")}
+              </p>
+
+              % endif
+
+          % else:
+
           <legend class="sr">${_("Required Information to Sign Up for edX Studio")}</legend>
+
+          % endif
 
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("Email Address")}</label>
-              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />
+              <input id="email" type="email" name="email" value="${email}" placeholder="e.g. jane.doe@gmail.com" />
             </li>
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
-              <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
+              <input id="name" type="text" name="name" value="${name}" placeholder="e.g. Jane Doe" />
             </li>
 
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
-              <input id="username" type="text" name="username" placeholder="e.g. janedoe" />
+              <input id="username" type="text" name="username" value="${username}" placeholder="e.g. janedoe" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
+
+            % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
+
+            <li class="is-disabled field optional password" id="field-password" hidden>
+              <label for="password">${_('Password')}</label>
+              <input id="password" type="password" name="password" value="" disabled required aria-required="true" />
+            </li>
+
+            % else:
 
             <li class="field text required" id="field-password">
               <label for="password">${_("Password")}</label>
               <input id="password" type="password" name="password" />
             </li>
+
+            % endif
 
             <li class="field-group">
               <div class="field text" id="field-location">
@@ -101,6 +148,11 @@
 
 <%block name="jsextra">
   <script type="text/javascript">
+function thirdPartySignin(event, url) {
+  event.preventDefault();
+  window.location.href = url;
+}
+
 require(["jquery", "jquery.cookie"], function($) {
   $("form :input").focus(function() {
     $("label[for='" + this.id + "']").addClass("is-focused");
@@ -119,7 +171,8 @@ require(["jquery", "jquery.cookie"], function($) {
       data: submit_data,
       headers: {'X-CSRFToken': $.cookie('csrftoken')},
       success: function(json) {
-        location.href = "/course/";
+        var url = json.redirect_url || "${reverse('course_handler')}";
+        location.href = url + '?signin=initial';
       },
       error: function(jqXHR, textStatus, errorThrown) {
         json = $.parseJSON(jqXHR.responseText);
