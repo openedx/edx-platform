@@ -92,6 +92,13 @@ class TagsMiddlewareTest(TestCase):
 
         self.assertContextSetTo({})
 
+    def test_invalid_course_id(self):
+        self.request = self.request_factory.get('/courses/edX/101/')
+        self.request.user = self.user
+
+        self.process_request()
+        self.assertContextSetTo({})
+
     def test_anonymous_user(self):
         self.request.user = AnonymousUserFactory()
 
