@@ -165,6 +165,18 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             return listType;
         };
 
+        getXBlockType = function(category, parentInfo, translate) {
+            var xblockType = category;
+            if (category === 'chapter') {
+                xblockType = translate ? gettext('section') : 'section';
+            } else if (category === 'sequential') {
+                xblockType = translate ? gettext('subsection') : 'subsection';
+            } else if (category === 'vertical' && (!parentInfo || parentInfo.get('category') === 'sequential')) {
+                xblockType = translate ? gettext('unit') : 'unit';
+            }
+            return xblockType;
+        };
+
         return {
             'VisibilityState': VisibilityState,
             'addXBlock': addXBlock,
@@ -172,6 +184,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils", "js/util
             'updateXBlockField': updateXBlockField,
             'getXBlockVisibilityClass': getXBlockVisibilityClass,
             'getXBlockListTypeClass': getXBlockListTypeClass,
-            'updateXBlockFields': updateXBlockFields
+            'updateXBlockFields': updateXBlockFields,
+            'getXBlockType': getXBlockType
         };
     });

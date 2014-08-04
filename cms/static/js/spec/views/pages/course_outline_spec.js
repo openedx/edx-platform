@@ -20,6 +20,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     published: true,
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
                     edited_by: 'MockUser',
+                    has_explicit_staff_lock: false,
                     child_info: {
                         display_name: 'Section',
                         category: 'chapter',
@@ -38,6 +39,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     published: true,
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
                     edited_by: 'MockUser',
+                    has_explicit_staff_lock: false,
                     child_info: {
                         category: 'sequential',
                         display_name: 'Subsection',
@@ -57,6 +59,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     edited_on: 'Jul 02, 2014 at 20:56 UTC',
                     edited_by: 'MockUser',
                     course_graders: '["Lab", "Howework"]',
+                    has_explicit_staff_lock: false,
                     child_info: {
                         category: 'vertical',
                         display_name: 'Unit',
@@ -359,18 +362,21 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($("due_date")).not.toExist();
                     expect($("grading_format")).not.toExist();
 
+                    // Staff lock controls are always visible
+                    expect($("#staff_lock")).toExist();
+
                     $(".edit-outline-item-modal .action-save").click();
 
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                         "metadata":{
-                            "start":"2015-01-02T00:00:00.000Z",
+                            "start":"2015-01-02T00:00:00.000Z"
                         }
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
 
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, {});
-                    var mockResponseSectionJSON = $.extend(true, {}, 
+                    var mockResponseSectionJSON = $.extend(true, {},
                         createMockSectionJSON('mock-section', 'Mock Section', [
                             createMockSubsectionJSON('mock-subsection', 'Mock Subsection', [{
                                 id: 'mock-unit',
@@ -386,7 +392,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             ])
                         ]),
                         {
-                            release_date: 'Jan 02, 2015 at 00:00 UTC',   
+                            release_date: 'Jan 02, 2015 at 00:00 UTC',
                         }
                     );
                     create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section')
@@ -405,14 +411,15 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     return getItemHeaders('subsection').find('.wrapper-xblock-field');
                 };
 
-                setEditModalValues = function (start_date, due_date, grading_type) {
+                setEditModalValues = function (start_date, due_date, grading_type, is_locked) {
                     $("#start_date").val(start_date);
                     $("#due_date").val(due_date);
                     $("#grading_type").val(grading_type);
-                }
+                    $("#staff_lock").prop('checked', is_locked);
+                };
 
                 // Contains hard-coded dates because dates are presented in different formats.
-                var mockServerValuesJson = $.extend(true, {},
+                mockServerValuesJson = $.extend(true, {},
                     createMockSectionJSON('mock-section', 'Mock Section', [
                         createMockSubsectionJSON('mock-subsection', 'Mock Subsection', [{
                             id: 'mock-unit',
@@ -436,7 +443,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                                 release_date: 'Jul 09, 2014 at 00:00 UTC',
                                 start: "2014-07-09T00:00:00Z",
                                 format: "Lab",
-                                due: "2014-07-10T00:00:00Z"
+                                due: "2014-07-10T00:00:00Z",
+                                has_explicit_staff_lock: true,
+                                staff_only_message: true
                             }]
                         }
                     }
@@ -504,11 +513,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can be edited', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
                     $(".edit-outline-item-modal .action-save").click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
+                        "publish": "republish",
                         "metadata":{
+                            "visible_to_staff_only": true,
                             "start":"2014-07-09T00:00:00.000Z",
                             "due":"2014-07-10T00:00:00.000Z"
                         }
@@ -525,18 +536,20 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
                     expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
                     expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
+                    expect($(".outline-subsection .status-message-copy")).toContainText("Contains staff only content");
 
                     expect($(".outline-item .outline-subsection .status-grading-value")).toContainText("Lab");
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
                     expect($("#start_date").val()).toBe('7/9/2014');
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
+                    expect($("#staff_lock").is(":checked")).toBe(true);
                 });
 
-                it('release date, due date and grading type can be cleared.', function() {
+                it('release date, due date, grading type, and staff lock can be cleared.', function() {
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
-                    setEditModalValues("7/9/2014", "7/10/2014", "Lab");
+                    setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
                     $(".edit-outline-item-modal .action-save").click();
 
                     // This is the response for the change operation.
@@ -547,11 +560,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
                     expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
                     expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
+                    expect($(".outline-subsection .status-message-copy")).toContainText("Contains staff only content");
 
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#start_date").val()).toBe('7/9/2014');
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
+                    expect($("#staff_lock").is(":checked")).toBe(true);
 
                     $(".edit-outline-item-modal .scheduled-date-input .action-clear").click();
                     $(".edit-outline-item-modal .due-date-input .action-clear").click();
@@ -559,6 +574,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($("#due_date").val()).toBe('');
 
                     $("#grading_type").val('notgraded');
+                    $("#staff_lock").prop('checked', false);
 
                     $(".edit-outline-item-modal .action-save").click();
 
@@ -573,6 +589,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($(".outline-subsection .status-release-value")).not.toContainText("Jul 09, 2014 at 00:00 UTC");
                     expect($(".outline-subsection .status-grading-date")).not.toExist();
                     expect($(".outline-subsection .status-grading-value")).not.toExist();
+                    expect($(".outline-subsection .status-message-copy")).not.toContainText("Contains staff only content");
                 });
             });
 

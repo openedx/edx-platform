@@ -12,9 +12,25 @@ class CoursewarePage(CoursePage):
 
     url_path = "courseware/"
     xblock_component_selector = '.vert .xblock'
+    section_selector = '.chapter'
+    subsection_selector = '.chapter ul li'
 
     def is_browser_on_page(self):
         return self.q(css='body.courseware').present
+
+    @property
+    def num_sections(self):
+        """
+        Return the number of sections in the sidebar on the page
+        """
+        return len(self.q(css=self.section_selector))
+
+    @property
+    def num_subsections(self):
+        """
+        Return the number of subsections in the sidebar on the page, including in collapsed sections
+        """
+        return len(self.q(css=self.subsection_selector))
 
     @property
     def num_xblock_components(self):

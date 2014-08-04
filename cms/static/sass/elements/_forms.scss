@@ -59,6 +59,46 @@ textarea.text {
 // forms - additional UI
 form {
 
+  // CASE: cosmetic checkbox input
+  .checkbox-cosmetic {
+
+    .input-checkbox-checked, .input-checkbox-unchecked, .label {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .input-checkbox-checked, .input-checkbox-unchecked {
+      width: $baseline;
+    }
+
+    .input-checkbox {
+      @extend %cont-text-sr;
+
+      // CASE: unchecked
+      ~ label .input-checkbox-checked {
+        display: none;
+      }
+
+      ~ label .input-checkbox-unchecked {
+        display: inline-block;
+      }
+
+      // CASE: checked
+      &:checked {
+
+        ~ label .input-checkbox-checked {
+          display: inline-block;
+        }
+
+        ~ label .input-checkbox-unchecked {
+          display: none;
+        }
+      }
+
+    }
+  }
+
+  // CASE: file input
   input[type=file] {
     @extend %t-copy-sub1;
   }

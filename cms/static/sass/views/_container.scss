@@ -157,6 +157,11 @@
         .release-date {
           @extend %t-strong;
         }
+
+        .release-with {
+          @extend %t-title8;
+          display: block;
+        }
       }
 
       .wrapper-visibility {
@@ -170,6 +175,13 @@
           margin-left: ($baseline/4);
           color: $gray-d1;
         }
+
+        .inherited-from {
+          @extend %t-title8;
+          display: block;
+        }
+
+
       }
 
       .wrapper-pub-actions {

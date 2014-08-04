@@ -146,7 +146,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             editXBlock: function() {
                 var modal = new EditSectionXBlockModal({
                     model: this.model,
-                    onSave: this.refresh.bind(this)
+                    onSave: this.refresh.bind(this),
+                    parentInfo: this.parentInfo
                 });
 
                 modal.show();
