@@ -277,7 +277,11 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
 
                 refreshParent = function (element) {
                     var refresh = element.data('refresh');
-                    if (_.isFunction(refresh)) { refresh(); }
+                    // If drop was into a collapsed parent, the parent will have been
+                    // expanded. Views using this class may need to track the
+                    // collapse/expand state, so send it with the refresh callback.
+                    var collapsed = element.hasClass(this.collapsedClass);
+                    if (_.isFunction(refresh)) { refresh(collapsed); }
 
                 };
                 // If the parent has changed, update the children of the old parent.
