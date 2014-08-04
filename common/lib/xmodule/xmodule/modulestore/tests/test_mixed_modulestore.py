@@ -192,6 +192,10 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         return self.course_locations[string].course_key
 
+    def _initialize_mixed(self):
+        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
+        self.addCleanup(self.store.close_all_connections)
+
     def initdb(self, default):
         """
         Initialize the database and create one test course in it
@@ -203,8 +207,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
-        self.addCleanup(self.store.close_all_connections)
+        self._initialize_mixed()
 
         # convert to CourseKeys
         self.course_locations = {
@@ -1188,6 +1191,48 @@ class TestMixedModuleStore(unittest.TestCase):
             assertProblemNameEquals(problem_new_name)
             # there should be no published problems with the old name
             assertNumProblems(problem_original_name, 0)
+
+    def verify_default_store(self, store_type):
+        # verify default_store property
+        self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
+
+        # verify internal helper method
+        store = self.store._get_modulestore_for_courseid()
+        self.assertEquals(store.get_modulestore_type(), store_type)
+
+        # verify store used for creating a course
+        try:
+            course = self.store.create_course("org", "course{}".format(uuid4().hex[:3]), "run", self.user_id)
+            self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
+        except NotImplementedError:
+            self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    def test_default_store(self, default_ms):
+        """
+        Test the default store context manager
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(default_ms):
+            self.verify_default_store(default_ms)
+
+    def test_nested_default_store(self):
+        """
+        Test the default store context manager, nested within one another
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
+            with self.store.default_store(ModuleStoreEnum.Type.split):
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+                with self.store.default_store(ModuleStoreEnum.Type.xml):
+                    self.verify_default_store(ModuleStoreEnum.Type.xml)
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
 
 
 #=============================================================================================================
