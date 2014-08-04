@@ -11,7 +11,7 @@ from selenium.webdriver.common.keys import Keys
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, click_css, confirm_prompt, set_input_value
+from .utils import set_input_value_and_save, click_css, confirm_prompt
 
 
 class CourseOutlineItem(object):
@@ -82,7 +82,7 @@ class CourseOutlineItem(object):
         """
         Enters new_name as the item's display name.
         """
-        set_input_value(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
+        set_input_value_and_save(self, self._bounded_selector(self.NAME_INPUT_SELECTOR), new_name)
 
     def change_name(self, new_name):
         """

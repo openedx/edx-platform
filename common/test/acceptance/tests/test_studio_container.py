@@ -16,7 +16,7 @@ from ..pages.lms.staff_view import StaffPage
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 
 @attr('shard_1')
