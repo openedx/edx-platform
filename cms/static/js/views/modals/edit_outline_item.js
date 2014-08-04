@@ -1,19 +1,19 @@
 /**
  * The EditSectionXBlockModal is a Backbone view that shows an editor in a modal window.
- * It has nested views: for release date, due date and grading format.
+ * It has nested views: for release date, due date, grading format, and staff lock.
  * It is invoked using the editXBlock method and uses xblock_info as a model,
  * and upon save parent invokes refresh function that fetches updated model and
  * re-renders edited course outline.
  */
 define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_modal',
-    'date', 'js/views/utils/xblock_utils', 'js/utils/date_utils'
+    'date', 'js/views/utils/xblock_utils', 'js/utils/date_utils', 'js/views/utils/view_utils'
 ],
     function(
-        $, Backbone, _, gettext, BaseModal, date, XBlockViewUtils, DateUtils
+        $, Backbone, _, gettext, BaseModal, date, XBlockViewUtils, DateUtils, ViewUtils
     ) {
         'use strict';
         var EditSectionXBlockModal, BaseDateView, ReleaseDateView, DueDateView,
-            GradingView;
+            GradingView, StaffLockView;
 
         EditSectionXBlockModal = BaseModal.extend({
             events : {
@@ -58,13 +58,28 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
 
             save: function(event) {
                 event.preventDefault();
-                var requestData = _.extend({}, this.getRequestData(), {
-                    metadata: this.getMetadata()
-                });
-                XBlockViewUtils.updateXBlockFields(this.model, requestData, {
-                    success: this.options.onSave
-                });
-                this.hide();
+                var self = this;
+
+                var performSave = function() {
+                    var requestData = _.extend({}, self.getRequestData(), {
+                        metadata: self.getMetadata()
+                    });
+                    XBlockViewUtils.updateXBlockFields(self.model, requestData, {
+                        success: self.options.onSave
+                    });
+                    self.hide();
+                };
+
+                if (!this.staffLockView.isLocked() && this.staffLockView.isModelLocked()) {
+                    ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
+                        gettext("If you make this content visible to students, students will be able to see its content after the release date has passed and you have published it. Do you want to proceed?"),
+                        gettext("Make Visible to Students"),
+                        performSave,
+                        function() { }
+                    );
+                } else {
+                    performSave();
+                }
             },
 
             /**
@@ -114,13 +129,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
              */
             initializeComponents: function () {
                 this.components = [];
-                this.components.push(
-                    new ReleaseDateView({
-                        selector: '.scheduled-date-input',
-                        parentView: this,
-                        model: this.model
-                    })
-                );
+                this.staffLockView = new StaffLockView({
+                    selector: '.edit-staff-lock',
+                    parentView: this,
+                    model: this.model
+                });
+                this.components.push(this.staffLockView);
+
+                if (this.model.isChapter() || this.model.isSequential()) {
+                    this.components.push(
+                        new ReleaseDateView({
+                            selector: '.scheduled-date-input',
+                            parentView: this,
+                            model: this.model
+                        })
+                    );
+                }
 
                 if (this.model.isSequential()) {
                     this.components.push(
@@ -237,6 +261,37 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
                 return {
                     graderTypes: JSON.parse(this.model.get('course_graders'))
                 };
+            }
+        });
+
+        StaffLockView = Backbone.View.extend({
+            isModelLocked: function() {
+                return this.model.get('visibility_state') == XBlockViewUtils.VisibilityState.staffOnly;
+            },
+
+            afterRender: function () {
+                this.setElement(this.options.parentView.$(this.options.selector).get(0));
+                this.setLock(this.isModelLocked());
+            },
+
+            setLock: function(value) {
+                this.$('#staff_lock').prop('checked', value);
+            },
+
+            isLocked: function() {
+                return this.$('#staff_lock').is(':checked');
+            },
+
+            hasChanges: function() {
+                return this.isModelLocked() != this.isLocked();
+            },
+
+            getRequestData: function() {
+                return this.hasChanges() ? { publish: 'republish' } : {};
+            },
+
+            getMetadata: function() {
+                return this.hasChanges() ? { visible_to_staff_only: this.isLocked() } : {};
             }
         });
 

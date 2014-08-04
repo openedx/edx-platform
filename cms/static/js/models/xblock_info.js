@@ -157,7 +157,7 @@ function(Backbone, _, str, ModuleUtils) {
          * @return {Boolean}
          */
         isEditableOnCourseOutline: function() {
-            return this.isSequential() || this.isChapter();
+            return this.isSequential() || this.isChapter() || this.isVertical();
         }
     });
     return XBlockInfo;
