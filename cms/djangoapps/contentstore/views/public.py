@@ -13,13 +13,13 @@ from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
                                  redirect_with_get)
 from microsite_configuration import microsite
 
-__all__ = ['signup', 'login_page', 'howitworks']
+__all__ = ['register', 'login_page', 'howitworks']
 
 
 @ensure_csrf_cookie
-def signup(request):
+def register(request):
     """
-    Display the signup form.
+    Display the register form.
     """
     csrf_token = csrf(request)['csrf_token']
     if request.user.is_authenticated():
