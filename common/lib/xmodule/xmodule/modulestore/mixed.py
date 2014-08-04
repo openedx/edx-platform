@@ -508,9 +508,9 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 if store.get_modulestore_type() == store_type:
                     self.modulestores.insert(0, self.modulestores.pop(i))
                     found = True
-                    yield
             if not found:
                 raise Exception(u"Cannot find store of type {}".format(store_type))
+            yield
         finally:
             self.modulestores = previous_store_list
 
