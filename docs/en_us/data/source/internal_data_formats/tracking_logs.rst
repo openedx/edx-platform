@@ -249,7 +249,9 @@ emitted.
 **Type:** string
 
 **Details:** This 32-character value is a key that identifies the user's
-session. Can be undefined.
+session. All browser events and the server :ref:`enrollment<enrollment>` events
+include a value for the session. Other server events do not include a session
+value.
 
 ===================
 ``time`` Field
