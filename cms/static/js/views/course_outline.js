@@ -24,12 +24,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             },
 
             shouldExpandChildren: function() {
-                // Expand the children if this xblock's locator is in the initially expanded state
-                if (this.initialState && _.contains(this.initialState.expanded_locators, this.model.id)) {
-                    return true;
-                }
-                // Only expand the course and its chapters (aka sections) initially
-                return this.model.isCourse() || this.model.isChapter();
+                return this.expandedLocators.contains(this.model.get('id'));
             },
 
             shouldRenderChildren: function() {
@@ -42,20 +37,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     model: xblockInfo,
                     parentInfo: parentInfo,
                     initialState: this.initialState,
+                    expandedLocators: this.expandedLocators,
                     template: this.template,
                     parentView: parentView || this
                 });
-            },
-
-            getExpandedLocators: function() {
-                var expandedLocators = [];
-                this.$('.outline-item.is-collapsible').each(function(index, rawElement) {
-                    var element = $(rawElement);
-                    if (!element.hasClass('is-collapsed')) {
-                        expandedLocators.push(element.data('locator'));
-                    }
-                });
-                return expandedLocators;
             },
 
             /**
@@ -76,11 +61,24 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 };
 
                 view = getViewToRefresh(this);
-                expandedLocators = view.getExpandedLocators();
                 viewState = viewState || {};
-                viewState.expanded_locators = expandedLocators.concat(viewState.expanded_locators || []);
                 view.initialState = viewState;
                 return view.model.fetch({});
+            },
+
+            /**
+             * Updates the collapse/expand state for this outline element, and then calls refresh.
+             * @param isCollapsed true if the element should be collapsed, else false
+             */
+            refreshWithCollapsedState: function(isCollapsed) {
+                var locator =  this.model.get('id');
+                if (isCollapsed) {
+                    this.expandedLocators.remove(locator);
+                }
+                else {
+                    this.expandedLocators.add(locator);
+                }
+                this.refresh();
             },
 
             onChildAdded: function(locator, category, event) {
@@ -113,6 +111,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     sectionInfo.fetch().done(function() {
                         sectionView = self.createChildView(sectionInfo, self.model, self);
                         sectionView.initialState = initialState;
+                        sectionView.expandedLocators = self.expandedLocators;
                         sectionView.render();
                         self.addChildView(sectionView);
                         sectionView.setViewState(initialState);
@@ -136,10 +135,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             },
 
             createNewItemViewState: function(locator, scrollOffset) {
+                this.expandedLocators.add(locator);
                 return {
                     locator_to_show: locator,
                     edit_display_name: true,
-                    expanded_locators: [ locator ],
                     scroll_offset: scrollOffset || 0
                 };
             },
@@ -168,7 +167,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.section-drag-handle',
                         droppableClass: 'ol.list-sections',
                         parentLocationSelector: 'article.outline',
-                        refresh: this.refresh.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-subsection")) {
@@ -177,7 +176,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.subsection-drag-handle',
                         droppableClass: 'ol.list-subsections',
                         parentLocationSelector: 'li.outline-section',
-                        refresh: this.refresh.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-unit")) {
@@ -186,7 +185,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.unit-drag-handle',
                         droppableClass: 'ol.list-units',
                         parentLocationSelector: 'li.outline-subsection',
-                        refresh: this.refresh.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this)
                     });
                 }
             }
