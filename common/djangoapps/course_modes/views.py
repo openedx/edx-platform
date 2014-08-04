@@ -70,6 +70,7 @@ class ChooseModeView(View):
             ]
             context["currency"] = modes["verified"].currency.upper()
             context["min_price"] = modes["verified"].min_price
+            context["verified_name"] = modes["verified"].name
 
         return render_to_response("course_modes/choose.html", context)
 
