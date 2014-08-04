@@ -9,12 +9,12 @@
     background: $yellow;
     border: 1px solid rgb(200,200,200);
     box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
-    padding: 10px;
-    margin-bottom: 30px;
+    padding: ($baseline/2);
+    margin-bottom: ($baseline*1.5);
 
     &:empty {
       display: none;
-      background-color: #FFF;
+      background-color: $white;
     }
 
     h2 {
@@ -42,7 +42,7 @@
 
       h1.user-name {
         overflow: hidden;
-        margin: 0px;
+        margin: 0;
         padding: ($baseline*.75) ($baseline/2);
         color: $base-font-color;
         text-transform: none;
@@ -58,7 +58,7 @@
       > ul {
         @include box-sizing(border-box);
         @include clearfix;
-        margin: 0px;
+        margin: 0;
         border: 1px solid $border-color-2;
         border-top: none;
         border-radius: 0 0 ($baseline/4) ($baseline/4);
@@ -70,7 +70,7 @@
           @include clearfix;
           border-bottom: 1px dotted $border-color-2;
           list-style: none;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*.75);
           padding-bottom: 17px;
 
           &:last-child {
@@ -101,11 +101,9 @@
           }
 
           span.data {
+            @extend %text-truncated;
             color: $base-font-color;
             font-weight: 600;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
 
             .third-party-auth {
               color: inherit;
@@ -176,10 +174,10 @@
 
     .news-carousel {
       @include clearfix;
-      margin: 30px 10px 0;
+      margin: ($baseline*1.5) ($baseline/2) 0;
       border: 1px solid $border-color-2;
       background: $dashboard-profile-color;
-      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
+      box-shadow: inset 0 0 3px 0 rgba(0,0,0, .15);
 
       * {
         font-family: $sans-serif;
@@ -192,7 +190,7 @@
 
       .page-dots {
         float: right;
-        margin: 18px 15px 0 0;
+        margin: 18px ($baseline*.75) 0 0;
 
         li {
           float: left;
@@ -218,7 +216,7 @@
 
       h4 {
         float: left;
-        margin-left: 15px;
+        margin-left: ($baseline*.75);
         font-size: 15px;
         line-height: 48px;
         font-weight: 700;
@@ -241,12 +239,12 @@
       }
 
       section {
-        padding: 0 10px;
+        padding: 0 ($baseline/2);
       }
 
       .news-image {
         height: 180px;
-        margin-bottom: 15px;
+        margin-bottom: ($baseline*.75);
 
         img {
           width: 100%;
@@ -265,9 +263,9 @@
       }
 
       .excerpt {
-        margin-left: 5px;
+        margin-left: ($baseline/4);
         font-size: 13px;
-        padding-bottom: 40px;
+        padding-bottom: ($baseline*2);
       }
     }
   }
@@ -277,40 +275,40 @@
   // course listings
   .my-courses {
     float: left;
-    margin: 0px;
+    margin: 0;
     width: flex-grid(9);
 
     > header {
       border-bottom: 1px solid $border-color-2;
-      margin-bottom: 30px;
+      margin-bottom: ($baseline*1.5);
     }
 
     .empty-dashboard-message {
-      padding: 60px 0px;
+      padding: ($baseline*3) 0;
       text-align: center;
 
       p {
+        margin-bottom: $baseline;
         color: $lighter-base-font-color;
-        font-style: italic;
-        margin-bottom: 20px;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
+        font-style: italic;
       }
 
       a {
-        background: rgb(240,240,240);
         @include background-image($button-bg-image);
-        background-color: $button-bg-color;
-        border: 1px solid $border-color-2;
-        border-radius: 4px;
-        box-shadow: 0 1px 8px 0 rgba(0,0,0, 0.1);
         @include box-sizing(border-box);
-        color: $base-font-color;
-        font-family: $sans-serif;
         display: inline-block;
-        letter-spacing: 1px;
-        margin-left: 5px;
-        padding: 5px 10px;
+        margin-left: ($baseline/4);
+        padding: ($baseline/4) ($baseline/2);
+        border: 1px solid $border-color-2;
+        border-radius: ($baseline/5);
+        background: rgb(240,240,240);
+        background-color: $button-bg-color;
+        box-shadow: 0 1px 8px 0 $shadow-l1;
+        color: $base-font-color;
         text-shadow: 0 1px rgba(255,255,255, 0.6);
+        letter-spacing: 1px;
+        font-family: $sans-serif;
 
         &:hover, &:focus {
           color: $link-color;
@@ -326,9 +324,9 @@
       @extend %ui-no-list;
 
       .course-item {
-        margin-bottom: ($baseline*2.5);
+        margin-bottom: $baseline;
         border-bottom: 4px solid $border-color-l4;
-        padding-bottom: ($baseline*2.5);
+        padding-bottom: $baseline;
 
         &:last-child {
           margin-bottom: 0;
@@ -358,7 +356,7 @@
         max-height: 100%;
         width: 200px;
         height: 120px;
-        margin: 0px;
+        margin: 0 $baseline 0 0;
         border-radius: ($baseline/10);
         border: 1px solid $dashboard-course-cover-border;
         border-bottom: 4px solid $dashboard-course-cover-border;
@@ -372,35 +370,34 @@
 
       .info {
         @include clearfix;
-        padding: 0 10px 0 230px;
 
         > hgroup {
           padding: 0;
           width: 100%;
 
           .university {
-            color: $lighter-base-font-color;
-            font-family: $sans-serif;
-            font-size: 16px;
-            font-weight: 400;
+            display: inline-block;
             margin: 0 0 6px;
+            color: $lighter-base-font-color;
             text-transform: none;
             letter-spacing: 0;
+            font-weight: 400;
+            font-size: 16px;
+            font-family: $sans-serif;
           }
 
           .date-block {
-            position: absolute;
-            top: 0;
-            right: 0;
-            font-family: $sans-serif;
-            font-size: 13px;
-            font-style: italic;
+            display: inline-block;
+            float: right;
             color: $lighter-base-font-color;
+            font-style: italic;
+            font-size: 13px;
+            font-family: $sans-serif;
           }
 
           h3 a, h3 span {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: ($baseline/2);
             font-family: $sans-serif;
             font-size: 34px;
             line-height: 42px;
@@ -447,14 +444,13 @@
         .enter-course {
           @include button(simple, $button-color);
           @include box-sizing(border-box);
+          display: inline-block;
+          margin-top: ($baseline/2);
+          padding: 6px ($baseline*1.5) 7px;
           border-radius: 3px;
-          display: block;
-          float: left;
-          font: normal 15px/1.6rem $sans-serif;
-          letter-spacing: 0;
-          padding: 6px 32px 7px;
           text-align: center;
-          margin-top: 16px;
+          letter-spacing: 0;
+          font: normal 15px/1.6rem $sans-serif;
 
           &.archived {
             @include button(simple, $button-archive-color);
@@ -569,14 +565,11 @@
     // UI: message
     .message {
       @include clearfix;
-      border-radius: 3px;
-      display: none;
       z-index: 10;
-      margin: $baseline 0 ($baseline/2) 0;
+      display: none;
       padding: ($baseline*0.75) $baseline;
+      border-radius: 3px;
       font-family: $sans-serif;
-      background: tint($yellow,70%);
-      border: 1px solid #ccc;
 
       // STATE: shown
       &.is-shown {
@@ -597,9 +590,11 @@
 
       .actions {
         @include clearfix;
-        list-style: none;
-        margin: 0;
+        display: inline-block;
+        margin: 0 0 0 $baseline;
         padding: 0;
+        list-style: none; 
+        vertical-align: middle; 
       }
 
       .message-title,
@@ -612,7 +607,7 @@
       .message-copy,
       .message-copy .copy {
         @extend %t-copy-sub1;
-        margin: 2px 0 0 0;
+        margin: ($baseline/10) 0 0 0;
       }
 
       // CASE: expandable
@@ -662,6 +657,8 @@
 
     // TYPE: upsell
     .message-upsell {
+      background-color: $gray-l5;
+      border-top: 5px solid $gray;
 
       .wrapper-tip {
         @include clearfix();
@@ -731,15 +728,12 @@
 
     // TYPE: status
     .message-status {
-      background: tint($yellow,70%);
-      border-color: #ccc;
 
       .message-copy {
         @extend %t-copy-sub1;
         margin: 0;
 
         .grade-value {
-          font-size: 1.2rem;
           font-weight: bold;
         }
       }
@@ -748,7 +742,7 @@
 
         .action {
           float: left;
-          margin: 0 15px 0 0;
+          margin: 0 ($baseline*75) 0 0;
 
           .btn, .cta {
             display: inline-block;
@@ -799,14 +793,14 @@
       &.exam-register {
 
         .message-copy {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
           width: 55%;
         }
       }
 
       &.exam-schedule {
         .exam-button {
-          margin-top: 5px;
+          margin-top: ($baseline/4);
         }
       }
 
@@ -822,8 +816,8 @@
 
       .button {
         display: inline-block;
-        margin-top: 10px;
-        padding: 9px 18px 10px;
+        margin-top: ($baseline/2);
+        padding: 9px 18px ($baseline/2);
         font-size: 13px;
         font-weight: bold;
         letter-spacing: 0;
@@ -843,7 +837,7 @@
       &.course-status-certrendering {
 
         .cta {
-          margin-top: 2px;
+          margin-top: ($baseline/10);
         }
       }
 
@@ -859,13 +853,13 @@
     }
 
     a.unenroll {
+      display: inline-block;
       float: right;
-      display: block;
-      font-style: italic;
+      margin-top: 26px;
       color: $lighter-base-font-color;
       text-decoration: underline;
+      font-style: italic;
       font-size: .8em;
-      margin-top: 32px;
 
       &:hover, &:focus {
         color: #333;
@@ -874,7 +868,7 @@
 
     a.email-settings {
       @extend a.unenroll;
-      margin-right: 10px;
+      margin-right: $baseline;
     }
   }
 
