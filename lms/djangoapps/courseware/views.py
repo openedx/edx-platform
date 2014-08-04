@@ -549,7 +549,11 @@ def static_tab(request, course_id, tab_slug):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    except InvalidKeyError:
+        raise Http404
+
     course = get_course_with_access(request.user, 'load', course_key)
 
     tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
