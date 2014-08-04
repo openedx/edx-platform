@@ -73,7 +73,7 @@ from contentstore.utils import reverse_usage_url
                 <%
                 course_locator = context_course.location
                 %>
-                <article class="outline outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
+                <article class="outline outline-full outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
                 </article>
             </div>
             <div class="ui-loading">
@@ -90,5 +90,202 @@ from contentstore.utils import reverse_usage_url
         </aside>
     </section>
 </div>
-<footer></footer>
+</%block>
+
+<!-- TODO: remove and refactor this into real modal UI -->
+<%block name="placeholder_modal">
+<!-- <div class="wrapper wrapper-modal-window wrapper-modal-window-bulkpublish-section" aria-describedby="modal-window-description" aria-labelledby="modal-window-title" aria-hidden="" role="dialog">
+    <div class="modal-window-overlay"></div>
+    <div style="top: 5%; left: 30%;" class="modal-window confirm modal-med modal-type-generic">
+        <div class="bulkpublish-section-modal">
+            <div class="modal-header">
+                <h2 class="title modal-window-title">${_("Section Publishing")}</h2>
+            </div>
+
+            <div class="modal-content">
+                <div class="message modal-introduction">
+                    <p>${_("Publish all unpublished changes in this section")}</p>
+                </div>
+
+                <div class="modal-section bulkpublish-included">
+                    <h3 class="modal-section-title">${_("The following will be published:")}</h3>
+                    <div class="modal-section-content">
+                        <div class="outline outline-skosh outline-bulkpublish">
+                            <ol class="list-subsections is-sortable">
+                                <li class="outline-item outline-subsection">
+                                    <h4 class="subsection-title item-title">Subsection Title</h4>
+
+                                    <div class="subsection-content">
+                                        <ol class="list-units is-sortable">
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </li>
+
+                                <li class="outline-item outline-subsection">
+                                    <h4 class="subsection-title item-title">Subsection Title</h4>
+
+                                    <div class="subsection-content">
+                                        <ol class="list-units is-sortable">
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </li>
+
+                                <li class="outline-item outline-subsection">
+                                    <h4 class="subsection-title item-title">Subsection Title</h4>
+
+                                    <div class="subsection-content">
+                                        <ol class="list-units is-sortable">
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished changes</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <li class="outline-item outline-unit is-draggable">
+                                                <h5 class="unit-title item-title">Unit Title</h5>
+                                                <div class="unit-status">
+                                                    <div class="status-message">
+                                                      <p class="status-message-copy">Unpublished</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section bulkpublish-included">
+                    <h3 class="modal-section-title">${_("12 items will not be published:")}</h3>
+                    <div class="modal-section-content">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <h3 class="sr">Actions</h3>
+                <ul>
+                  <li class="action-item">
+                    <a href="#" class="button action-primary action-publish">Publish</a>
+                  </li>
+                  <li class="action-item">
+                    <a href="#" class="button  action-cancel">Cancel</a>
+                  </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> -->
 </%block>
