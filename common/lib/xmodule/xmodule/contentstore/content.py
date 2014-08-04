@@ -103,7 +103,8 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, CourseKey))
-        # create a dummy asset location and then strip off the last character: 'a'
+        # create a dummy asset location and then strip off the last character: 'a',
+        # since the AssetLocator rejects the empty string as a legal value for the block_id.
         return course_key.make_asset_key('asset', 'a').for_branch(None).to_deprecated_string()[:-1]
 
     @staticmethod

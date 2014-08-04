@@ -119,13 +119,19 @@ def get_cached_content(location):
 
 
 def del_cached_content(location):
-    # delete content for the given location, as well as for content with run=None.
-    # it's possible that the content could have been cached without knowing the
-    # course_key - and so without having the run.
+    """
+    delete content for the given location, as well as for content with run=None.
+    it's possible that the content could have been cached without knowing the
+    course_key - and so without having the run.
+    """
+    def location_str(loc):
+        return unicode(loc).encode("utf-8")
+
+    locations = [location_str(location)]
     try:
-        cache.delete_many(
-            [unicode(loc).encode("utf-8") for loc in [location, location.replace(run=None)]]
-        )
+        locations.append(location_str(location.replace(run=None)))
     except InvalidKeyError:
         # although deprecated keys allowed run=None, new keys don't if there is no version.
         pass
+
+    cache.delete_many(locations)

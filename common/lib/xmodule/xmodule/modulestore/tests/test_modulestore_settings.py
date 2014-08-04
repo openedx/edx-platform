@@ -45,7 +45,6 @@ class ModuleStoreSettingsMigration(TestCase):
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
                 "mappings": {},
-                "reference_type": "Location",
                 "stores": {
                     "an_old_mongo_store": {
                         "DOC_STORE_CONFIG": {},
@@ -82,7 +81,6 @@ class ModuleStoreSettingsMigration(TestCase):
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': {},
-                'reference_type': 'Location',
                 'stores': [
                     {
                         'NAME': 'split',
@@ -146,7 +144,7 @@ class ModuleStoreSettingsMigration(TestCase):
         Tests whether the split module store is configured in the given setting.
         """
         stores = self._get_mixed_stores(mixed_setting)
-        split_settings = [store for store in stores if 'DraftVersioningModuleStore' in store['ENGINE']]
+        split_settings = [store for store in stores if store['ENGINE'].endswith('.DraftVersioningModuleStore')]
         if len(split_settings):
             # there should only be one setting for split
             self.assertEquals(len(split_settings), 1)

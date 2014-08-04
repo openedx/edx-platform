@@ -43,7 +43,6 @@ def convert_module_store_setting_if_needed(module_store_setting):
                 "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
                 "OPTIONS": {
                     "mappings": {},
-                    "reference_type": "Location",
                     "stores": []
                 }
             }
@@ -70,12 +69,12 @@ def convert_module_store_setting_if_needed(module_store_setting):
 
     # If Split is not defined but the DraftMongoModuleStore is configured, add Split as a copy of Draft
     mixed_stores = module_store_setting['default']['OPTIONS']['stores']
-    is_split_defined = any(('DraftVersioningModuleStore' in store['ENGINE']) for store in mixed_stores)
+    is_split_defined = any((store['ENGINE'].endswith('.DraftVersioningModuleStore')) for store in mixed_stores)
     if not is_split_defined:
         # find first setting of mongo store
         mongo_store = next(
             (store for store in mixed_stores if (
-                'DraftMongoModuleStore' in store['ENGINE'] or 'DraftModuleStore' in store['ENGINE']
+                store['ENGINE'].endswith('.DraftMongoModuleStore') or store['ENGINE'].endswith('.DraftModuleStore')
             )),
             None
         )

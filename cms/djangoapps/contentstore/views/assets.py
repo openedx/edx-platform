@@ -294,5 +294,5 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
 
 def _add_slash(url):
     if not url.startswith('/'):
-        url = '/' + url  # TODO NAATODO - is there a better way to do this?
+        url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
     return url

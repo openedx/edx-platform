@@ -504,7 +504,6 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {},
-            'reference_type': 'Location',
             'stores': [
                 {
                     'NAME': 'draft',

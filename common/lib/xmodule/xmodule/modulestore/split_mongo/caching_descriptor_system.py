@@ -53,7 +53,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.default_class = default_class
         self.local_modules = {}
 
-    def _load_item(self, block_id, course_entry_override=None):
+    def _load_item(self, block_id, course_entry_override=None, **kwargs):
         if isinstance(block_id, BlockUsageLocator):
             if isinstance(block_id.block_id, LocalId):
                 try:
@@ -77,7 +77,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 raise ItemNotFoundError(block_id)
 
         class_ = self.load_block_type(json_data.get('category'))
-        return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
+        return self.xblock_from_json(class_, block_id, json_data, course_entry_override, **kwargs)
 
     # xblock's runtime does not always pass enough contextual information to figure out
     # which named container (course x branch) or which parent is requesting an item. Because split allows
@@ -90,7 +90,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
-    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None):
+    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None, **kwargs):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
@@ -126,6 +126,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             definition,
             converted_fields,
             json_data.get('_inherited_settings'),
+            **kwargs
         )
         field_data = KvsFieldData(kvs)
 
@@ -151,8 +152,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         edit_info = json_data.get('edit_info', {})
         module.edited_by = edit_info.get('edited_by')
         module.edited_on = edit_info.get('edited_on')
-        module.published_by = None  # TODO
-        module.published_date = None  # TODO
+        module.published_by = None  # TODO - addressed with LMS-11184
+        module.published_date = None  # TODO - addressed with LMS-11184
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
         module.source_version = edit_info.get('source_version', None)

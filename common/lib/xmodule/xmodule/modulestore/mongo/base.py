@@ -37,10 +37,11 @@ from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceVa
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, ReferentialIntegrityError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
 
@@ -354,8 +355,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
-    reference_type = SlashSeparatedCourseKey
-
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
@@ -716,7 +715,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             for item in items
         ]
 
-    def get_courses(self):
+    def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors.
         '''
@@ -751,7 +750,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             raise ItemNotFoundError(location)
         return item
 
-    def get_course(self, course_key, depth=0):
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run, deprecated=True)
+
+    def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
         """
@@ -763,7 +771,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_key, ignore_case=False):
+    def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Returns the course_id of the course if it was found, else None
         Note: we return the course_id instead of a boolean here since the found course may have
@@ -882,7 +890,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if 'children' in kwargs:
             query['definition.children'] = kwargs.pop('children')
 
-        query.update(kwargs)
+        # remove any callable kwargs for qualifiers
+        qualifiers = {key: val for key, val in kwargs.iteritems() if not callable(val)}
+
+        query.update(qualifiers)
         items = self.collection.find(
             query,
             sort=[SORT_REVISION_FAVOR_DRAFT],
@@ -919,10 +930,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         ])
         courses = self.collection.find(course_search_location, fields=('_id'))
         if courses.count() > 0:
-            raise InvalidLocationError(
-                "There are already courses with the given org and course id: {}".format([
-                    course['_id'] for course in courses
-                ]))
+            raise DuplicateCourseError(course_id, courses[0]['_id'])
 
         location = course_id.make_usage_key('course', course_id.run)
         course = self.create_xmodule(
@@ -1253,7 +1261,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         return ModuleStoreEnum.Type.mongo
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Return an array of all of the locations for orphans in the course.
         """
@@ -1274,7 +1282,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         item_locs -= all_reachable
         return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
 
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
