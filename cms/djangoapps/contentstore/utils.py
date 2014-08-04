@@ -102,8 +102,8 @@ def get_lms_link_for_item(location, preview=False):
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_key=location.course_key.to_deprecated_string(),
-        location=location.to_deprecated_string(),
+        course_key=unicode(location.course_key.for_branch(None)),
+        location=unicode(location.for_branch(None)),
     )
 
 
