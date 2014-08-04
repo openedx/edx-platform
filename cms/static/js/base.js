@@ -73,6 +73,11 @@ domReady(function() {
     $('a.show-tender').bind('click', smoothScrollTop);
 
     IframeUtils.iframeBinding();
+
+    // disable ajax caching in IE so that backbone fetches work
+    if ($.browser.msie) {
+        $.ajaxSetup({ cache: false });
+    }
 });
 
 function smoothScrollLink(e) {
