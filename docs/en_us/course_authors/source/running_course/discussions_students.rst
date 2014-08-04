@@ -311,14 +311,18 @@ completely.
 
 * Posts that you have not read yet have a blue callout image.
 
-* Posts with responses or comments that you have not read yet have a white
-  callout image.
+* Posts that you have read, but with responses or comments that you have not
+  read yet, have a white callout image.
  
 * Exchanges that you have read completely have a gray callout image and
   background.
 
  .. image:: ../Images/Discussion_colorcoding.png
   :alt: The list of posts with posts showing differently colored backgrounds and callout images
+
+The total number of contributions in the exchange (the post and its responses
+and comments) appears in each callout image. To see the number of contributions
+that you haven't read yet, move your cursor to hover over the callout image.
 
 These color-coded callout images appear when you sort the list of posts by
 recent activity or by most activity. If you sort the list of posts by most
