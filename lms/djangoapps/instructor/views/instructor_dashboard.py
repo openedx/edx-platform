@@ -92,12 +92,11 @@ def instructor_dashboard_2(request, course_id):
     if course_mode_has_price:
         sections.append(_section_e_commerce(course_key, access))
 
-
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
 
-    enrollment_count = sections[0]['enrollment_count']
+    enrollment_count = sections[0]['enrollment_count']['total']
     disable_buttons = False
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
@@ -160,7 +159,7 @@ def _section_course_info(course_key, access):
         'access': access,
         'course_id': course_key,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.num_enrolled_in(course_key),
+        'enrollment_count': CourseEnrollment.enrollment_counts(course_key),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
@@ -278,6 +277,9 @@ def _section_send_email(course_key, access, course):
         'email_background_tasks_url': reverse(
             'list_background_email_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
         ),
+        'email_content_history_url': reverse(
+            'list_email_content', kwargs={'course_id': course_key.to_deprecated_string()}
+        ),
     }
     return section_data
 
@@ -285,7 +287,7 @@ def _section_send_email(course_key, access, course):
 def _section_analytics(course_key, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'section_key': 'analytics',
+        'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),

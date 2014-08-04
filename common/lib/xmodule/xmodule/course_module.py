@@ -8,8 +8,6 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-from opaque_keys.edx.locations import Location
-from opaque_keys.edx.locator import UsageKey
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -17,7 +15,6 @@ import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
-from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -556,10 +553,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, UsageKey):
-                self.wiki_slug = self.location.course
-            elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.id.offering or self.display_name
+            self.wiki_slug = self.location.course
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),

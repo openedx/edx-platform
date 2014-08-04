@@ -23,7 +23,7 @@ from xblock.plugin import Plugin
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
+from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from opaque_keys.edx.keys import UsageKey
@@ -31,13 +31,11 @@ from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
-from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 from nose.tools import assert_in
 from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
-from xmodule.modulestore.tests.factories import check_mongo_calls
 
 
 log = logging.getLogger(__name__)
@@ -148,7 +146,7 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_greater(len(ids), 12)
 
     def test_mongo_modulestore_type(self):
-        store = MongoModuleStore(
+        store = DraftModuleStore(
             None,
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
@@ -244,11 +242,6 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_not_none(
             self.draft_store._find_one(Location('edX', 'toy', '2012_Fall', 'video', 'Welcome')),
         )
-
-    def test_path_to_location(self):
-        '''Make sure that path_to_location works'''
-        with check_mongo_calls(self.draft_store, 9):
-            check_path_to_location(self.draft_store)
 
     def test_xlinter(self):
         '''
@@ -351,7 +344,7 @@ class TestMongoModuleStore(unittest.TestCase):
         for course_number in self.courses:
             course_locations = self.draft_store.get_courses_for_wiki(course_number)
             assert_equals(len(course_locations), 1)
-            assert_equals(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations[0])
+            assert_equals(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations[0])
 
         course_locations = self.draft_store.get_courses_for_wiki('no_such_wiki')
         assert_equals(len(course_locations), 0)
@@ -369,7 +362,7 @@ class TestMongoModuleStore(unittest.TestCase):
         course_locations = self.draft_store.get_courses_for_wiki('simple')
         assert_equals(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            assert_in(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
+            assert_in(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations)
 
         # configure simple course to use unique wiki_slug.
         simple_course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'))
@@ -378,7 +371,7 @@ class TestMongoModuleStore(unittest.TestCase):
         # it should be retrievable with its new wiki_slug
         course_locations = self.draft_store.get_courses_for_wiki('edX.simple.2012_Fall')
         assert_equals(len(course_locations), 1)
-        assert_in(Location('edX', 'simple', '2012_Fall', 'course', '2012_Fall'), course_locations)
+        assert_in(SlashSeparatedCourseKey('edX', 'simple', '2012_Fall'), course_locations)
 
     @Plugin.register_temp_plugin(ReferenceTestXBlock, 'ref_test')
     def test_reference_converters(self):
@@ -390,13 +383,28 @@ class TestMongoModuleStore(unittest.TestCase):
         def setup_test():
             course = self.draft_store.get_course(course_key)
             # can't use item factory as it depends on django settings
-            p1ele = self.draft_store.create_and_save_xmodule(
-                course.id.make_usage_key('problem', 'p1'), 99, runtime=course.runtime)
-            p2ele = self.draft_store.create_and_save_xmodule(
-                course.id.make_usage_key('problem', 'p2'), 99, runtime=course.runtime)
+            p1ele = self.draft_store.create_item(
+                99,
+                course_key,
+                'problem',
+                block_id='p1',
+                runtime=course.runtime
+            )
+            p2ele = self.draft_store.create_item(
+                99,
+                course_key,
+                'problem',
+                block_id='p2',
+                runtime=course.runtime
+            )
             self.refloc = course.id.make_usage_key('ref_test', 'ref_test')
-            self.draft_store.create_and_save_xmodule(
-                self.refloc, 99, runtime=course.runtime, fields={
+            self.draft_store.create_item(
+                99,
+                self.refloc.course_key,
+                self.refloc.block_type,
+                block_id=self.refloc.block_id,
+                runtime=course.runtime,
+                fields={
                     'reference_link': p1ele.location,
                     'reference_list': [p1ele.location, p2ele.location],
                     'reference_dict': {'p1': p1ele.location, 'p2': p2ele.location},
@@ -493,56 +501,20 @@ class TestMongoModuleStore(unittest.TestCase):
         finally:
             shutil.rmtree(root_dir)
 
-    def test_has_changes_direct_only(self):
-        """
-        Tests that has_changes() returns false when a new xblock in a direct only category is checked
-        """
-        course_location = Location('edx', 'direct', '2012_Fall', 'course', 'test_course')
-        chapter_location = Location('edx', 'direct', '2012_Fall', 'chapter', 'test_chapter')
-
-        # Create dummy direct only xblocks
-        self.draft_store.create_and_save_xmodule(course_location, user_id=self.dummy_user)
-        self.draft_store.create_and_save_xmodule(chapter_location, user_id=self.dummy_user)
-
-        # Check that neither xblock has changes
-        self.assertFalse(self.draft_store.has_changes(course_location))
-        self.assertFalse(self.draft_store.has_changes(chapter_location))
-
-    def test_has_changes(self):
-        """
-        Tests that has_changes() only returns true when changes are present
-        """
-        location = Location('edX', 'changes', '2012_Fall', 'vertical', 'test_vertical')
-
-        # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
-
-        # Not yet published, so changes are present
-        self.assertTrue(self.draft_store.has_changes(location))
-
-        # Publish and verify that there are no unpublished changes
-        self.draft_store.publish(location, self.dummy_user)
-        self.assertFalse(self.draft_store.has_changes(location))
-
-        # Change the component, then check that there now are changes
-        component = self.draft_store.get_item(location)
-        component.display_name = 'Changed Display Name'
-        self.draft_store.update_item(component, self.dummy_user)
-        self.assertTrue(self.draft_store.has_changes(location))
-
-        # Publish and verify again
-        self.draft_store.publish(location, self.dummy_user)
-        self.assertFalse(self.draft_store.has_changes(location))
-
     def test_has_changes_missing_child(self):
         """
         Tests that has_changes() returns False when a published parent points to a child that doesn't exist.
         """
-        location = Location('edX', 'missing', '2012_Fall', 'sequential', 'parent')
+        location = Location('edX', 'toy', '2012_Fall', 'sequential', 'parent')
 
         # Create the parent and point it to a fake child
-        parent = self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
-        parent.children += [Location('edX', 'missing', '2012_Fall', 'vertical', 'does_not_exist')]
+        parent = self.draft_store.create_item(
+            self.dummy_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
+        parent.children += [Location('edX', 'toy', '2012_Fall', 'vertical', 'does_not_exist')]
         self.draft_store.update_item(parent, self.dummy_user)
 
         # Check the parent for changes should return False and not throw an exception
@@ -561,27 +533,39 @@ class TestMongoModuleStore(unittest.TestCase):
         if user_id is None:
             user_id = self.dummy_user
 
-        locations = {
-            'grandparent': Location('edX', 'tree', name, 'chapter', 'grandparent'),
-            'parent_sibling': Location('edX', 'tree', name, 'sequential', 'parent_sibling'),
-            'parent': Location('edX', 'tree', name, 'sequential', 'parent'),
-            'child_sibling': Location('edX', 'tree', name, 'vertical', 'child_sibling'),
-            'child': Location('edX', 'tree', name, 'vertical', 'child'),
-        }
+        org = 'edX'
+        course = 'tree{}'.format(name)
+        run = name
 
-        for key in locations:
-            self.draft_store.create_and_save_xmodule(locations[key], user_id=user_id)
+        if not self.draft_store.has_course(SlashSeparatedCourseKey(org, course, run)):
+            self.draft_store.create_course(org, course, run, user_id)
 
-        grandparent = self.draft_store.get_item(locations['grandparent'])
-        grandparent.children += [locations['parent_sibling'], locations['parent']]
-        self.draft_store.update_item(grandparent, user_id=user_id)
+            locations = {
+                'grandparent': Location(org, course, run, 'chapter', 'grandparent'),
+                'parent_sibling': Location(org, course, run, 'sequential', 'parent_sibling'),
+                'parent': Location(org, course, run, 'sequential', 'parent'),
+                'child_sibling': Location(org, course, run, 'vertical', 'child_sibling'),
+                'child': Location(org, course, run, 'vertical', 'child'),
+            }
 
-        parent = self.draft_store.get_item(locations['parent'])
-        parent.children += [locations['child_sibling'], locations['child']]
-        self.draft_store.update_item(parent, user_id=user_id)
+            for key in locations:
+                self.draft_store.create_item(
+                    user_id,
+                    locations[key].course_key,
+                    locations[key].block_type,
+                    block_id=locations[key].block_id
+                )
 
-        self.draft_store.publish(locations['parent'], user_id)
-        self.draft_store.publish(locations['parent_sibling'], user_id)
+            grandparent = self.draft_store.get_item(locations['grandparent'])
+            grandparent.children += [locations['parent_sibling'], locations['parent']]
+            self.draft_store.update_item(grandparent, user_id=user_id)
+
+            parent = self.draft_store.get_item(locations['parent'])
+            parent.children += [locations['child_sibling'], locations['child']]
+            self.draft_store.update_item(parent, user_id=user_id)
+
+            self.draft_store.publish(locations['parent'], user_id)
+            self.draft_store.publish(locations['parent_sibling'], user_id)
 
         return locations
 
@@ -663,10 +647,12 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Create a new child and attach it to parent
         new_child_location = Location('edX', 'tree', 'has_changes_add_remove_child', 'vertical', 'new_child')
-        self.draft_store.create_and_save_xmodule(new_child_location, user_id=self.dummy_user)
-        parent = self.draft_store.get_item(locations['parent'])
-        parent.children += [new_child_location]
-        self.draft_store.update_item(parent, user_id=self.dummy_user)
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations['parent'],
+            new_child_location.block_type,
+            block_id=new_child_location.block_id
+        )
 
         # Verify that the ancestors now have changes
         self.assertTrue(self.draft_store.has_changes(locations['grandparent']))
@@ -685,13 +671,21 @@ class TestMongoModuleStore(unittest.TestCase):
         """
         Tests that has_changes() returns true after editing the child of a vertical (both not direct only categories).
         """
-        parent_location = Location('edX', 'test', 'non_direct_only_children', 'vertical', 'parent')
-        child_location = Location('edX', 'test', 'non_direct_only_children', 'html', 'child')
+        parent_location = Location('edX', 'toy', '2012_Fall', 'vertical', 'parent')
+        child_location = Location('edX', 'toy', '2012_Fall', 'html', 'child')
 
-        parent = self.draft_store.create_and_save_xmodule(parent_location, user_id=self.dummy_user)
-        child = self.draft_store.create_and_save_xmodule(child_location, user_id=self.dummy_user)
-        parent.children += [child_location]
-        self.draft_store.update_item(parent, user_id=self.dummy_user)
+        parent = self.draft_store.create_item(
+            self.dummy_user,
+            parent_location.course_key,
+            parent_location.block_type,
+            block_id=parent_location.block_id
+        )
+        child = self.draft_store.create_child(
+            self.dummy_user,
+            parent_location,
+            child_location.block_type,
+            block_id=child_location.block_id
+        )
         self.draft_store.publish(parent_location, self.dummy_user)
 
         # Verify that there are no changes
@@ -757,10 +751,15 @@ class TestMongoModuleStore(unittest.TestCase):
         """
         Tests that edited_on and edited_by are set correctly during an update
         """
-        location = Location('edX', 'editInfoTest', '2012_Fall', 'html', 'test_html')
+        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
 
         # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=self.dummy_user)
+        self.draft_store.create_item(
+            self.dummy_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
 
         # Store the current edit time and verify that dummy_user created the component
         component = self.draft_store.get_item(location)
@@ -780,12 +779,17 @@ class TestMongoModuleStore(unittest.TestCase):
         """
         Tests that published_date and published_by are set correctly
         """
-        location = Location('edX', 'publishInfo', '2012_Fall', 'html', 'test_html')
+        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
         create_user = 123
         publish_user = 456
 
         # Create a dummy component to test against
-        self.draft_store.create_and_save_xmodule(location, user_id=create_user)
+        self.draft_store.create_item(
+            create_user,
+            location.course_key,
+            location.block_type,
+            block_id=location.block_id
+        )
 
         # Store the current time, then publish
         old_time = datetime.now(UTC)

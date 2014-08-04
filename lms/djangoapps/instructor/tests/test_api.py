@@ -8,6 +8,7 @@ import json
 import requests
 import datetime
 import ddt
+import random
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -31,6 +32,8 @@ from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
 from microsite_configuration import microsite
+from util.date_utils import get_default_time_display
+from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
@@ -1321,7 +1324,6 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
             self.assertNotIn(rolename, user_roles)
 
 
-
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -1802,7 +1804,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
@@ -1821,7 +1823,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         act.return_value = self.tasks
         url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
@@ -1840,7 +1842,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {
                 'problem_location_str': self.problem_urlname,
@@ -1861,7 +1863,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.get(url, {
                 'problem_location_str': self.problem_urlname,
@@ -1877,6 +1879,104 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.assertDictEqual(exp_task, act_task)
 
         self.assertEqual(actual_tasks, expected_tasks)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.object(instructor_task.api, 'get_instructor_task_history')
+class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test the instructor email content history endpoint.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
+
+    def setup_fake_email_info(self, num_emails):
+        """ Initialize the specified number of fake emails """
+        self.tasks = {}
+        self.emails = {}
+        self.emails_info = {}
+        for email_id in range(num_emails):
+            num_sent = random.randint(1, 15401)
+            self.tasks[email_id] = FakeContentTask(email_id, num_sent, 'expected')
+            self.emails[email_id] = FakeEmail(email_id)
+            self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent)
+
+    def get_matching_mock_email(self, *args, **kwargs):
+        """ Returns the matching mock emails for the given id """
+        email_id = kwargs.get('id', 0)
+        return self.emails[email_id]
+
+    def get_email_content_response(self, num_emails, task_history_request):
+        """ Calls the list_email_content endpoint and returns the repsonse """
+        self.setup_fake_email_info(num_emails)
+        task_history_request.return_value = self.tasks.values()
+        url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+            mock_email_info.side_effect = self.get_matching_mock_email
+            response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+        return response
+
+    def test_content_list_one_email(self, task_history_request):
+        """ Test listing of bulk emails when email list has one email """
+        response = self.get_email_content_response(1, task_history_request)
+        self.assertTrue(task_history_request.called)
+        email_info = json.loads(response.content)['emails']
+
+        # Emails list should have one email
+        self.assertEqual(len(email_info), 1)
+
+        # Email content should be what's expected
+        expected_message = self.emails[0].html_message
+        returned_email_info = email_info[0]
+        received_message = returned_email_info[u'email'][u'html_message']
+        self.assertEqual(expected_message, received_message)
+
+    def test_content_list_no_emails(self, task_history_request):
+        """ Test listing of bulk emails when email list empty """
+        response = self.get_email_content_response(0, task_history_request)
+        self.assertTrue(task_history_request.called)
+        email_info = json.loads(response.content)['emails']
+
+        # Emails list should be empty
+        self.assertEqual(len(email_info), 0)
+
+    def test_content_list_email_content_many(self, task_history_request):
+        """ Test listing of bulk emails sent large amount of emails """
+        response = self.get_email_content_response(50, task_history_request)
+        self.assertTrue(task_history_request.called)
+        expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
+        actual_email_info = json.loads(response.content)['emails']
+
+        self.assertEqual(len(actual_email_info), 50)
+        for exp_email, act_email in zip(expected_email_info, actual_email_info):
+            self.assertDictEqual(exp_email, act_email)
+
+        self.assertEqual(actual_email_info, expected_email_info)
+
+    def test_list_email_content_error(self, task_history_request):
+        """ Test handling of error retrieving email """
+        self.invalid_task = FakeContentTask(0, 0, 'test')
+        self.invalid_task.make_invalid_input()
+        task_history_request.return_value = [self.invalid_task]
+        url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(task_history_request.called)
+        returned_email_info = json.loads(response.content)['emails']
+        self.assertEqual(len(returned_email_info), 1)
+        returned_info = returned_email_info[0]
+        for info in ['created', 'sent_to', 'email', 'number_sent']:
+            self.assertEqual(returned_info[info], None)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

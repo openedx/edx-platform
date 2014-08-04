@@ -512,8 +512,7 @@ def get_module_system_for_user(user, field_data_cache,
             position = None
 
     system.set('position', position)
-
-    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
+    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS') and user.is_authenticated():
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
             make_psychometrics_data_update_handler(course_id, user, descriptor.location)

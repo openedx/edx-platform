@@ -45,11 +45,13 @@ class ImportTestCase(CourseTestCase):
         # Create tar test files -----------------------------------------------
         # OK course:
         good_dir = tempfile.mkdtemp(dir=self.content_dir)
-        os.makedirs(os.path.join(good_dir, "course"))
-        with open(os.path.join(good_dir, "course.xml"), "w+") as f:
+        # test course being deeper down than top of tar file
+        embedded_dir = os.path.join(good_dir, "grandparent", "parent")
+        os.makedirs(os.path.join(embedded_dir, "course"))
+        with open(os.path.join(embedded_dir, "course.xml"), "w+") as f:
             f.write('<course url_name="2013_Spring" org="EDx" course="0.00x"/>')
 
-        with open(os.path.join(good_dir, "course", "2013_Spring.xml"), "w+") as f:
+        with open(os.path.join(embedded_dir, "course", "2013_Spring.xml"), "w+") as f:
             f.write('<course></course>')
 
         self.good_tar = os.path.join(self.content_dir, "good.tar.gz")

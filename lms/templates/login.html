@@ -35,6 +35,8 @@
       }).blur(function() {
         $("label").parent().removeClass("is-focused");
       });
+
+      $("#email").focus();
     });
 
     (function() {
@@ -51,18 +53,22 @@
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
           var u=decodeURI(window.location.search);
-          next=u.split("next=")[1];
+          var next = u.split("next=")[1];
+          if (next != undefined) {
+            // if next is undefined, decodeURI returns "undefined" causing a bad redirect.
+            next = decodeURIComponent(next);
+          }
           if (next && !isExternal(next)) {
-            location.href=next;
+            location.href=appendParameter(next, "signin", "return");
           }  else if(json.redirect_url){
-            location.href=json.redirect_url;
+            location.href=appendParameter(json.redirect_url, "signin", "return");
           } else {
-            location.href="${reverse('dashboard')}";
+            location.href=appendParameter("${reverse('dashboard')}", "signin", "return");
           }
         } else if(json.hasOwnProperty('redirect')) {
           var u=decodeURI(window.location.search);
           if (!isExternal(json.redirect)) { // a paranoid check.  Our server is the one providing json.redirect
-              location.href=json.redirect+u;
+              location.href=appendParameter(json.redirect+u, "signin", "return");
           } // else we just remain on this page, which is fine since this particular path implies a login failure
             // that has been generated via packet tampering (json.redirect has been messed with).
         } else {
@@ -97,7 +103,7 @@
 
     function thirdPartySignin(event, url) {
       event.preventDefault();
-      window.location.href = url;
+      window.location.href = appendParameter(url, "signin", "return");
     }
 
     (function post_form_if_pipeline_running(pipeline_running) {

@@ -774,6 +774,14 @@ input[name="subject"] {
     color: green;
     font-weight: bold;
   }
+  table {
+    tr {
+      height: 21px;
+      td {
+        width: 120px;
+      }
+    }
+  }
 }
 
 .ecommerce-wrapper{

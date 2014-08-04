@@ -20,6 +20,8 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
 from util.json_request import JsonResponse
+from util.date_utils import get_default_time_display
+from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -36,7 +38,6 @@ from courseware.models import StudentModule
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
-from instructor_task.views import get_task_completion_info
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
@@ -47,12 +48,12 @@ from instructor.enrollment import (
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
-import analytics.basic
-import analytics.distributions
-import analytics.csvs
+import instructor_analytics.basic
+import instructor_analytics.distributions
+import instructor_analytics.csvs
 import csv
 
-from submissions import api as sub_api # installed from the edx-submissions repository
+from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
 
@@ -538,7 +539,7 @@ def get_grading_config(request, course_id):
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
-    grading_config_summary = analytics.basic.dump_grading_context(course)
+    grading_config_summary = instructor_analytics.basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -561,14 +562,14 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    available_features = analytics.basic.AVAILABLE_FEATURES
+    available_features = instructor_analytics.basic.AVAILABLE_FEATURES
     query_features = [
         'id', 'username', 'name', 'email', 'language', 'location',
         'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
         'goals',
     ]
 
-    student_data = analytics.basic.enrolled_students_features(course_id, query_features)
+    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -598,8 +599,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
-        return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
+        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
 @ensure_csrf_cookie
@@ -610,9 +611,10 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
     # TODO: the User.objects query and CSV generation here could be
-    # centralized into analytics. Currently analytics has similar functionality
-    # but not quite what's needed.
+    # centralized into instructor_analytics. Currently instructor_analytics
+    # has similar functionality but not quite what's needed.
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(mimetype='text/csv')
@@ -655,7 +657,7 @@ def get_distribution(request, course_id):
     else:
         feature = str(feature)
 
-    available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
+    available_features = instructor_analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
         return HttpResponseBadRequest(strip_tags(
@@ -666,12 +668,12 @@ def get_distribution(request, course_id):
         'course_id': course_id.to_deprecated_string(),
         'queried_feature': feature,
         'available_features': available_features,
-        'feature_display_names': analytics.distributions.DISPLAY_NAMES,
+        'feature_display_names': instructor_analytics.distributions.DISPLAY_NAMES,
     }
 
     p_dist = None
     if not feature is None:
-        p_dist = analytics.distributions.profile_distribution(course_id, feature)
+        p_dist = instructor_analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
             'feature': p_dist.feature,
             'feature_display_name': p_dist.feature_display_name,
@@ -850,45 +852,6 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
-def extract_task_features(task):
-    """
-    Convert task to dict for json rendering.
-    Expects tasks have the following features:
-    * task_type (str, type of task)
-    * task_input (dict, input(s) to the task)
-    * task_id (str, celery id of the task)
-    * requester (str, username who submitted the task)
-    * task_state (str, state of task eg PROGRESS, COMPLETED)
-    * created (datetime, when the task was completed)
-    * task_output (optional)
-    """
-    # Pull out information from the task
-    features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
-    task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
-    # Some information (created, duration, status, task message) require additional formatting
-    task_feature_dict['created'] = task.created.isoformat()
-
-    # Get duration info, if known
-    duration_sec = 'unknown'
-    if hasattr(task, 'task_output') and task.task_output is not None:
-        try:
-            task_output = json.loads(task.task_output)
-        except ValueError:
-            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
-        else:
-            if 'duration_ms' in task_output:
-                duration_sec = int(task_output['duration_ms'] / 1000.0)
-    task_feature_dict['duration_sec'] = duration_sec
-
-    # Get progress status message & success information
-    success, task_message = get_task_completion_info(task)
-    status = _("Complete") if success else _("Incomplete")
-    task_feature_dict['status'] = status
-    task_feature_dict['task_message'] = task_message
-
-    return task_feature_dict
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -903,6 +866,24 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_email_content(requests, course_id):
+    """
+    List the content of bulk emails sent
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    task_type = 'bulk_course_email'
+    # First get tasks list of bulk emails sent
+    emails = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+
+    response_payload = {
+        'emails': map(extract_email_features, emails),
     }
     return JsonResponse(response_payload)
 

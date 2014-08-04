@@ -4,7 +4,6 @@ from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 import django.contrib.auth.views
-
 from microsite_configuration import microsite
 
 # Uncomment the next two lines to enable the admin:
@@ -478,8 +477,12 @@ urlpatterns += (
 
 if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
-        url(r'^debug/run_python', 'debug.views.run_python'),
+        url(r'^debug/run_python$', 'debug.views.run_python'),
     )
+
+urlpatterns += (
+    url(r'^debug/show_parameters$', 'debug.views.show_parameters'),
+)
 
 # Crowdsourced hinting instructor manager.
 if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):

@@ -580,6 +580,7 @@ class JSInput(InputTypeBase):
             Attribute('gradefn', "gradefn"),
             Attribute('get_statefn', None),  # Function to call in iframe
                                              #   to get current state.
+            Attribute('initial_state', None),  # JSON string to be used as initial state
             Attribute('set_statefn', None),  # Function to call iframe to
                                              #   set state
             Attribute('width', "400"),       # iframe width

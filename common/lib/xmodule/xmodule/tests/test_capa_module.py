@@ -258,6 +258,43 @@ class CapaModuleTest(unittest.TestCase):
                                             graceperiod=self.two_day_delta_str)
         self.assertFalse(still_in_grace.answer_available())
 
+    def test_showanswer_correct_or_past_due(self):
+        """
+        With showanswer="correct_or_past_due" should show answer after the answer is correct
+        or after the problem is closed for everyone--e.g. after due date + grace period.
+        """
+
+        # can see because answer is correct, even with due date in the future
+        answer_correct = CapaFactory.create(showanswer='correct_or_past_due',
+                                            max_attempts="1",
+                                            attempts="0",
+                                            due=self.tomorrow_str,
+                                            correct=True)
+        self.assertTrue(answer_correct.answer_available())
+
+        # can see after due date, even when answer isn't correct
+        past_due_date = CapaFactory.create(showanswer='correct_or_past_due',
+                                           max_attempts="1",
+                                           attempts="0",
+                                           due=self.yesterday_str)
+        self.assertTrue(past_due_date.answer_available())
+
+        # can also see after due date when answer _is_ correct
+        past_due_date_correct = CapaFactory.create(showanswer='correct_or_past_due',
+                                                   max_attempts="1",
+                                                   attempts="0",
+                                                   due=self.yesterday_str,
+                                                   correct=True)
+        self.assertTrue(past_due_date_correct.answer_available())
+
+        # Can't see because grace period hasn't expired and answer isn't correct
+        still_in_grace = CapaFactory.create(showanswer='correct_or_past_due',
+                                            max_attempts="1",
+                                            attempts="1",
+                                            due=self.yesterday_str,
+                                            graceperiod=self.two_day_delta_str)
+        self.assertFalse(still_in_grace.answer_available())
+
     def test_showanswer_past_due(self):
         """
         With showanswer="past_due" should only show answer after the problem is closed

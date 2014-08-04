@@ -266,6 +266,9 @@ FEATURES = {
 
 }
 
+# Ignore static asset files on import which match this pattern
+ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
+
 # Used for A/B testing
 DEFAULT_GROUPS = []
 
@@ -315,8 +318,8 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 ################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
-from tempdir import mkdtemp_clean
-MAKO_MODULE_DIR = mkdtemp_clean('mako')
+import tempfile
+MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_lms')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
                           COMMON_ROOT / 'templates',
@@ -616,6 +619,7 @@ LANGUAGES = (
     ('da', u'dansk'),  # Danish
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
     ('el', u'Ελληνικά'),  # Greek
+    ('en-uk', u'English (United Kingdom)'),  # English (United Kingdom)
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
     ('en@pirate', u'Pirate English'),  # Pirate English
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
@@ -662,6 +666,7 @@ LANGUAGES = (
     ('si', u'සිංහල'),  # Sinhala
     ('sk', u'Slovenčina'),  # Slovak
     ('sl', u'Slovenščina'),  # Slovenian
+    ('sq', u'shqip'),  # Albanian
     ('sr', u'Српски'),  # Serbian
     ('ta', u'தமிழ்'),  # Tamil
     ('te', u'తెలుగు'),  # Telugu
@@ -1007,6 +1012,7 @@ PIPELINE_JS = {
             'js/query-params.js',
             'js/src/utility.js',
             'js/src/accessibility_tools.js',
+            'js/src/ie_shim.js',
         ],
         'output_filename': 'js/lms-application.js',
 
@@ -1316,6 +1322,8 @@ INSTALLED_APPS = (
 
     #cities
     'cities'
+    # Course action state
+    'course_action_state'
 )
 
 ######################### MARKETING SITE ###############################

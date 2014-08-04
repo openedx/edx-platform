@@ -14,6 +14,7 @@ define([
         initialize: function() {
             this.emptyTemplate = this.loadTemplate('no-group-configurations');
             this.listenTo(this.collection, 'add', this.addNewItemView);
+            this.listenTo(this.collection, 'remove', this.handleDestory);
         },
 
         render: function() {
@@ -56,7 +57,13 @@ define([
 
         addOne: function(event) {
             if(event && event.preventDefault) { event.preventDefault(); }
-            this.collection.add([{editing: true}]);
+            this.collection.add([{ editing: true }]);
+        },
+
+        handleDestory: function () {
+            if(this.collection.length === 0) {
+                this.$el.html(this.emptyTemplate());
+            }
         }
     });
 

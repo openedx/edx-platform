@@ -31,6 +31,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
     url(r'^list_background_email_tasks$',
         'instructor.views.api.list_background_email_tasks', name="list_background_email_tasks"),
+    url(r'^list_email_content$',
+        'instructor.views.api.list_email_content', name="list_email_content"),
     url(r'^list_forum_members$',
         'instructor.views.api.list_forum_members', name="list_forum_members"),
     url(r'^update_forum_role_membership$',

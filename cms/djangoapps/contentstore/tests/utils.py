@@ -9,10 +9,11 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import PublishState, ModuleStoreEnum, mongo
+from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.xml_importer import import_from_xml
 from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
@@ -94,6 +95,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client = Client()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
+            nonstaff.is_authenticated = True
         return client, nonstaff
 
     def populate_course(self):
@@ -151,11 +153,11 @@ class CourseTestCase(ModuleStoreTestCase):
         self.assertEqual(self.store.compute_publish_state(draft_vertical), PublishState.draft)
 
         # create a Private (draft only) vertical
-        private_vertical = self.store.create_and_save_xmodule(course_id.make_usage_key('vertical', self.PRIVATE_VERTICAL), self.user.id)
+        private_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PRIVATE_VERTICAL)
         self.assertEqual(self.store.compute_publish_state(private_vertical), PublishState.private)
 
         # create a Published (no draft) vertical
-        public_vertical = self.store.create_and_save_xmodule(course_id.make_usage_key('vertical', self.PUBLISHED_VERTICAL), self.user.id)
+        public_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PUBLISHED_VERTICAL)
         public_vertical = self.store.publish(public_vertical.location, self.user.id)
         self.assertEqual(self.store.compute_publish_state(public_vertical), PublishState.public)
 
@@ -262,10 +264,14 @@ class CourseTestCase(ModuleStoreTestCase):
                     self.store.compute_publish_state(course2_item)
                 )
             except AssertionError:
-                # old mongo calls things draft if draft exists even if it's != published; so, do more work
+                c1_state = self.compute_real_state(course1_item)
+                c2_state = self.compute_real_state(course2_item)
                 self.assertEqual(
-                    self.compute_real_state(course1_item),
-                    self.compute_real_state(course2_item)
+                    c1_state,
+                    c2_state,
+                    "Publish states not equal: course item {} in state {} != course item {} in state {}".format(
+                        course1_item.location, c1_state, course2_item.location, c2_state
+                    )
                 )
 
             # compare data
@@ -329,13 +335,17 @@ class CourseTestCase(ModuleStoreTestCase):
             # see if the draft differs from the published
             published = self.store.get_item(item.location, revision=ModuleStoreEnum.RevisionOption.published_only)
             if item.get_explicitly_set_fields_by_scope() != published.get_explicitly_set_fields_by_scope():
+                # checking content: if published differs from item, return draft
                 return supposed_state
             if item.get_explicitly_set_fields_by_scope(Scope.settings) != published.get_explicitly_set_fields_by_scope(Scope.settings):
+                # checking settings: if published differs from item, return draft
                 return supposed_state
             if item.has_children and item.children != published.children:
+                # checking children: if published differs from item, return draft
                 return supposed_state
+            # published == item in all respects, so return public
             return PublishState.public
-        elif supposed_state == PublishState.public and item.location.category in mongo.base.DIRECT_ONLY_CATEGORIES:
+        elif supposed_state == PublishState.public and item.location.category in DIRECT_ONLY_CATEGORIES:
             if not all([
                 self.store.has_item(child_loc, revision=ModuleStoreEnum.RevisionOption.draft_only)
                 for child_loc in item.children

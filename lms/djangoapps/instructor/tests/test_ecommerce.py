@@ -84,7 +84,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
 
         data = {
             'code': 'A2314', 'course_id': self.course.id.to_deprecated_string(),
-            'description': 'asdsasda', 'created_by': self.instructor, 'discount': 111
+            'description': 'asdsasda', 'created_by': self.instructor, 'discount': 99
         }
         response = self.client.post(add_coupon_url, data)
         self.assertTrue("coupon with the coupon code ({code}) already exist".format(code='A2314') in response.content)
@@ -93,6 +93,17 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('<td>ADSADASDSAD</td>' in response.content)
         self.assertTrue('<td>A2314</td>' in response.content)
         self.assertFalse('<td>111</td>' in response.content)
+
+        data = {
+            'code': 'A2345314', 'course_id': self.course.id.to_deprecated_string(),
+            'description': 'asdsasda', 'created_by': self.instructor, 'discount': 199
+        }
+        response = self.client.post(add_coupon_url, data)
+        self.assertTrue("Please Enter the Coupon Discount Value Less than or Equal to 100" in response.content)
+
+        data['discount'] = '25%'
+        response = self.client.post(add_coupon_url, data=data)
+        self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
     def test_delete_coupon(self):
         """
@@ -178,6 +189,15 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         data['coupon_id'] = 1000  # Coupon Not Exist with this ID
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000) in response.content)
+
+        data['coupon_id'] = coupon.id
+        data['discount'] = 123
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue('Please Enter the Coupon Discount Value Less than or Equal to 100' in response.content)
+
+        data['discount'] = '25%'
+        response = self.client.post(update_coupon_url, data=data)
+        self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)

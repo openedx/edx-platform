@@ -14,6 +14,8 @@ In the data package, wiki data is delivered in two SQL files:
 
 * The wiki_articlerevision file stores data about the articles, including data about changes and deletions. The full name of this file is in this format: edX-*organization*-*course*-wiki_articlerevision-*source*-analytics.sql.
 
+.. _wiki_article:
+
 ***********************************
 Fields in the wiki_article file
 ***********************************
@@ -93,6 +95,8 @@ other_read
 other_write
 ----------------------
     Defines whether others have write access to the article. 1 if so, 0 if not.
+
+.. _wiki_articlerevision:
 
 ******************************************************
 Fields in the wiki_articlerevision file 

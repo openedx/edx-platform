@@ -29,6 +29,7 @@ class BokChoyTestSuite(TestSuite):
         self.fasttest = kwargs.get('fasttest', False)
         self.test_spec = kwargs.get('test_spec', None)
         self.verbosity = kwargs.get('verbosity', 2)
+        self.extra_args = kwargs.get('extra_args', '')
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -97,6 +98,7 @@ class BokChoyTestSuite(TestSuite):
             "--with-flaky",
             "--xunit-file={}".format(self.xunit_report),
             "--verbosity={}".format(self.verbosity),
+            self.extra_args,
         ]
 
         cmd = (" ").join(cmd)

@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import random
 import string  # pylint: disable=W0402
+import logging
 
 from django.utils.translation import ugettext as _
 import django.utils
@@ -29,13 +30,17 @@ from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
+    add_instructor,
+    initialize_permissions,
     get_lms_link_for_item,
     add_extra_panel_tab,
     remove_extra_panel_tab,
-    reverse_course_url
+    reverse_course_url,
+    reverse_usage_url,
+    reverse_url,
+    remove_all_instructors,
 )
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
-
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
@@ -48,27 +53,30 @@ from .component import (
     ADVANCED_COMPONENT_POLICY_KEY,
     SPLIT_TEST_COMPONENT_TYPE,
 )
-
-from django_comment_common.models import assign_default_role
-from django_comment_common.utils import seed_permissions_roles
-
-from student.models import CourseEnrollment
-from student.roles import CourseRole, UserBasedRole
+from .tasks import rerun_course
 
 from opaque_keys.edx.keys import CourseKey
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
+from student.roles import (
+    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
+)
 from student import auth
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+from course_action_state.managers import CourseActionStateItemNotFoundError
 
 from microsite_configuration import microsite
+
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
+           'course_notifications_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
            'group_configurations_list_handler', 'group_configurations_detail_handler']
+
+log = logging.getLogger(__name__)
 
 
 class AccessListFallback(Exception):
@@ -88,6 +96,90 @@ def _get_course_module(course_key, user, depth=0):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
+
+
+@login_required
+def course_notifications_handler(request, course_key_string=None, action_state_id=None):
+    """
+    Handle incoming requests for notifications in a RESTful way.
+
+    course_key_string and action_state_id must both be set; else a HttpBadResponseRequest is returned.
+    
+    For each of these operations, the requesting user must have access to the course;
+    else a PermissionDenied error is returned.
+
+    GET
+        json: return json representing information about the notification (action, state, etc)
+    DELETE
+        json: return json repressing success or failure of dismissal/deletion of the notification
+    PUT
+        Raises a NotImplementedError.
+    POST
+        Raises a NotImplementedError.
+    """
+    # ensure that we have a course and an action state
+    if not course_key_string or not action_state_id:
+        return HttpResponseBadRequest()
+
+    response_format = request.REQUEST.get('format', 'html')
+
+    course_key = CourseKey.from_string(course_key_string)
+
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if not has_course_access(request.user, course_key):
+            raise PermissionDenied()
+        if request.method == 'GET':
+            return _course_notifications_json_get(action_state_id)
+        elif request.method == 'DELETE':
+            # we assume any delete requests dismiss actions from the UI
+            return _dismiss_notification(request, action_state_id)
+        elif request.method == 'PUT':
+            raise NotImplementedError()
+        elif request.method == 'POST':
+            raise NotImplementedError()
+        else:
+            return HttpResponseBadRequest()
+    else:
+        return HttpResponseNotFound()
+
+
+def _course_notifications_json_get(course_action_state_id):
+    """
+    Return the action and the action state for the given id
+    """
+    try:
+        action_state = CourseRerunState.objects.find_first(id=course_action_state_id)
+    except CourseActionStateItemNotFoundError:
+        return HttpResponseBadRequest()
+
+    action_state_info = {
+        'action': action_state.action,
+        'state': action_state.state,
+        'should_display': action_state.should_display
+    }
+    return JsonResponse(action_state_info)
+
+
+def _dismiss_notification(request, course_action_state_id):  # pylint: disable=unused-argument
+    """
+    Update the display of the course notification
+    """
+    try:
+        action_state = CourseRerunState.objects.find_first(id=course_action_state_id)
+
+    except CourseActionStateItemNotFoundError:
+        # Can't dismiss a notification that doesn't exist in the first place
+        return HttpResponseBadRequest()
+
+    if action_state.state == CourseRerunUIStateManager.State.FAILED:
+        # We remove all permissions for this course key at this time, since
+        # no further access is required to a course that failed to be created.
+        remove_all_instructors(action_state.course_key)
+
+    # The CourseRerunState is no longer needed by the UI; delete
+    action_state.delete()
+
+    return JsonResponse({'success': True})
 
 
 # pylint: disable=unused-argument
@@ -119,7 +211,7 @@ def course_handler(request, course_key_string=None):
         if request.method == 'GET':
             return JsonResponse(_course_json(request, CourseKey.from_string(course_key_string)))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
-            return create_new_course(request)
+            return _create_or_rerun_course(request)
         elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -167,26 +259,29 @@ def _accessible_courses_list(request):
     """
     List all courses available to the logged in user by iterating through all the courses
     """
-    courses = modulestore().get_courses()
-
-    # filter out courses that we don't have access to
     def course_filter(course):
         """
-        Get courses to which this user has access
+        Filter out unusable and inaccessible courses
         """
         if isinstance(course, ErrorDescriptor):
             return False
 
-        if GlobalStaff().has_user(request.user):
-            return course.location.course != 'templates'
+        # pylint: disable=fixme
+        # TODO remove this condition when templates purged from db
+        if course.location.course == 'templates':
+            return False
 
-        return (has_course_access(request.user, course.id)
-                # pylint: disable=fixme
-                # TODO remove this condition when templates purged from db
-                and course.location.course != 'templates'
-                )
-    courses = filter(course_filter, courses)
-    return courses
+        return has_course_access(request.user, course.id)
+
+    courses = filter(course_filter, modulestore().get_courses())
+    unsucceeded_course_actions = [
+        course for course in
+        CourseRerunState.objects.find_all(
+            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
+        )
+        if has_course_access(request.user, course.course_key)
+    ]
+    return courses, unsucceeded_course_actions
 
 
 def _accessible_courses_list_from_groups(request):
@@ -194,6 +289,7 @@ def _accessible_courses_list_from_groups(request):
     List all courses available to the logged in user by reversing access group names
     """
     courses_list = {}
+    unsucceeded_course_actions = []
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
@@ -205,6 +301,15 @@ def _accessible_courses_list_from_groups(request):
             # If the course_access does not have a course_id, it's an org-based role, so we fall back
             raise AccessListFallback
         if course_key not in courses_list:
+            # check for any course action state for this course
+            unsucceeded_course_actions.extend(
+                CourseRerunState.objects.find_all(
+                    exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
+                    should_display=True,
+                    course_key=course_key,
+                )
+            )
+            # check for the course itself
             try:
                 course = modulestore().get_course(course_key)
             except ItemNotFoundError:
@@ -214,7 +319,7 @@ def _accessible_courses_list_from_groups(request):
                 # ignore deleted or errored courses
                 courses_list[course_key] = course
 
-    return courses_list.values()
+    return courses_list.values(), unsucceeded_course_actions
 
 
 @login_required
@@ -227,14 +332,14 @@ def course_listing(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses = _accessible_courses_list(request)
+        courses, unsucceeded_course_actions = _accessible_courses_list(request)
     else:
         try:
-            courses = _accessible_courses_list_from_groups(request)
+            courses, unsucceeded_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses = _accessible_courses_list(request)
+            courses, unsucceeded_course_actions = _accessible_courses_list(request)
 
     def format_course_for_view(course):
         """
@@ -249,8 +354,17 @@ def course_listing(request):
             course.location.name
         )
 
+    # remove any courses in courses that are also in the unsucceeded_course_actions list
+    unsucceeded_action_course_keys = [uca.course_key for uca in unsucceeded_course_actions]
+    courses = [
+        format_course_for_view(c)
+        for c in courses
+        if not isinstance(c, ErrorDescriptor) and (c.id not in unsucceeded_action_course_keys)
+    ]
+
     return render_to_response('index.html', {
-        'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
+        'courses': courses,
+        'unsucceeded_course_actions': unsucceeded_course_actions,
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -270,6 +384,11 @@ def course_index(request, course_key):
     lms_link = get_lms_link_for_item(course_module.location)
     sections = course_module.get_children()
 
+    try:
+        current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
+    except (ItemNotFoundError, CourseActionStateItemNotFoundError):
+        current_action = None
+
     return render_to_response('overview.html', {
         'context_course': course_module,
         'lms_link': lms_link,
@@ -280,85 +399,42 @@ def course_index(request, course_key):
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'new_unit_category': 'vertical',
-        'category': 'vertical'
+        'category': 'vertical',
+        'rerun_notification_id': current_action.id if current_action else None,
     })
 
 
 @expect_json
-def create_new_course(request):
+def _create_or_rerun_course(request):
     """
-    Create a new course.
-
-    Returns the URL for the course overview page.
+    To be called by requests that create a new destination course (i.e., create_new_course and rerun_course)
+    Returns the destination course_key and overriding fields for the new course.
+    Raises InvalidLocationError and InvalidKeyError
     """
     if not auth.has_access(request.user, CourseCreatorRole()):
         raise PermissionDenied()
 
-    org = request.json.get('org')
-    number = request.json.get('number')
-    display_name = request.json.get('display_name')
-    run = request.json.get('run')
-
-    # allow/disable unicode characters in course_id according to settings
-    if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
-        if _has_non_ascii_characters(org) or _has_non_ascii_characters(number) or _has_non_ascii_characters(run):
-            return JsonResponse(
-                {'error': _('Special characters not allowed in organization, course number, and course run.')},
-                status=400
-            )
-
     try:
+        org = request.json.get('org')
+        number = request.json.get('number')
+        display_name = request.json.get('display_name')
+        run = request.json.get('run')
+
+        # allow/disable unicode characters in course_id according to settings
+        if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
+            if _has_non_ascii_characters(org) or _has_non_ascii_characters(number) or _has_non_ascii_characters(run):
+                return JsonResponse(
+                    {'error': _('Special characters not allowed in organization, course number, and course run.')},
+                    status=400
+                )
+
         course_key = SlashSeparatedCourseKey(org, number, run)
+        fields = {'display_name': display_name} if display_name is not None else {}
 
-        # instantiate the CourseDescriptor and then persist it
-        # note: no system to pass
-        if display_name is None:
-            metadata = {}
+        if 'source_course_key' in request.json:
+            return _rerun_course(request, course_key, fields)
         else:
-            metadata = {'display_name': display_name}
-
-        # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
-        # existing xml courses this cannot be changed in CourseDescriptor.
-        # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
-        # w/ xmodule.course_module.CourseDescriptor.__init__
-        wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
-        definition_data = {'wiki_slug': wiki_slug}
-
-        # Create the course then fetch it from the modulestore
-        # Check if role permissions group for a course named like this already exists
-        # Important because role groups are case insensitive
-        if CourseRole.course_group_already_exists(course_key):
-            raise InvalidLocationError()
-
-        fields = {}
-        fields.update(definition_data)
-        fields.update(metadata)
-
-        # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-        new_course = modulestore().create_course(
-            course_key.org,
-            course_key.course,
-            course_key.run,
-            request.user.id,
-            fields=fields,
-        )
-
-        # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
-        # however, we can assume that b/c this user had authority to create the course, the user can add themselves
-        CourseInstructorRole(new_course.id).add_users(request.user)
-        auth.add_users(request.user, CourseStaffRole(new_course.id), request.user)
-
-        # seed the forums
-        seed_permissions_roles(new_course.id)
-
-        # auto-enroll the course creator in the course so that "View Live" will
-        # work.
-        CourseEnrollment.enroll(request.user, new_course.id)
-        _users_assign_default_role(new_course.id)
-
-        return JsonResponse({
-            'url': reverse_course_url('course_handler', new_course.id)
-        })
+            return _create_new_course(request, course_key, fields)
 
     except InvalidLocationError:
         return JsonResponse({
@@ -380,13 +456,62 @@ def create_new_course(request):
         )
 
 
-def _users_assign_default_role(course_id):
+def _create_new_course(request, course_key, fields):
     """
-    Assign 'Student' role to all previous users (if any) for this course
+    Create a new course.
+    Returns the URL for the course overview page.
     """
-    enrollments = CourseEnrollment.objects.filter(course_id=course_id)
-    for enrollment in enrollments:
-        assign_default_role(course_id, enrollment.user)
+    # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
+    # existing xml courses this cannot be changed in CourseDescriptor.
+    # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
+    # w/ xmodule.course_module.CourseDescriptor.__init__
+    wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+    definition_data = {'wiki_slug': wiki_slug}
+    fields.update(definition_data)
+
+    # Creating the course raises InvalidLocationError if an existing course with this org/name is found
+    new_course = modulestore().create_course(
+        course_key.org,
+        course_key.course,
+        course_key.run,
+        request.user.id,
+        fields=fields,
+    )
+
+    # Make sure user has instructor and staff access to the new course
+    add_instructor(new_course.id, request.user, request.user)
+
+    # Initialize permissions for user in the new course
+    initialize_permissions(new_course.id, request.user)
+
+    return JsonResponse({
+        'url': reverse_course_url('course_handler', new_course.id)
+    })
+
+
+def _rerun_course(request, destination_course_key, fields):
+    """
+    Reruns an existing course.
+    Returns the URL for the course listing page.
+    """
+    source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
+
+    # verify user has access to the original course
+    if not has_course_access(request.user, source_course_key):
+        raise PermissionDenied()
+
+    # Make sure user has instructor and staff access to the destination course
+    # so the user can see the updated status for that course
+    add_instructor(destination_course_key, request.user, request.user)
+
+    # Mark the action as initiated
+    CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user)
+
+    # Rerun the course as a new celery task
+    rerun_course.delay(source_course_key, destination_course_key, request.user.id, fields)
+
+    # Return course listing page
+    return JsonResponse({'url': reverse_url('course_handler')})
 
 
 # pylint: disable=unused-argument
@@ -972,12 +1097,16 @@ def group_configurations_list_handler(request, course_key_string):
 
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+        course_outline_url = reverse_course_url('course_handler', course_key)
         split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+
+        configurations = GroupConfiguration.add_usage_info(course, store)
 
         return render_to_response('group_configurations.html', {
             'context_course': course,
             'group_configuration_url': group_configuration_url,
-            'configurations': [u.to_json() for u in course.user_partitions] if split_test_enabled else None,
+            'course_outline_url': course_outline_url,
+            'configurations': configurations if split_test_enabled else None,
         })
     elif "application/json" in request.META.get('HTTP_ACCEPT'):
         if request.method == 'POST':

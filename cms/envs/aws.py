@@ -152,6 +152,8 @@ TECH_SUPPORT_EMAIL = ENV_TOKENS.get('TECH_SUPPORT_EMAIL', TECH_SUPPORT_EMAIL)
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
+ASSET_IGNORE_REGEX = ENV_TOKENS.get('ASSET_IGNORE_REGEX', ASSET_IGNORE_REGEX)
+
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 
@@ -178,7 +180,6 @@ WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
-                            syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False,
                             service_variant=SERVICE_VARIANT)
 

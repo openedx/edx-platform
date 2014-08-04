@@ -136,7 +136,7 @@ def localize_checklist_text(checklist):
     # Localize checklist items
     for item in checklist.get('items'):
         item['short_description'] = ugettext(item['short_description'])
-        item['long_description'] = ugettext(item['long_description'])
+        item['long_description'] = ugettext(item['long_description']) if item['long_description'] != '' else u''
         item['action_text'] = ugettext(item['action_text']) if item['action_text'] != "" else u""
 
     return checklist

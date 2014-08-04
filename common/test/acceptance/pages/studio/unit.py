@@ -14,6 +14,8 @@ class UnitPage(PageObject):
     Unit page in Studio
     """
 
+    NAME_SELECTOR = '#unit-display-name-input'
+
     def __init__(self, browser, unit_locator):
         super(UnitPage, self).__init__(browser)
         self.unit_locator = unit_locator
@@ -37,6 +39,10 @@ class UnitPage(PageObject):
             self.q(css='body.view-unit').present and
             Promise(_is_finished_loading, 'Finished rendering the xblocks in the unit.').fulfill()
         )
+
+    @property
+    def name(self):
+        return self.q(css=self.NAME_SELECTOR).attrs('value')[0]
 
     @property
     def components(self):
@@ -86,6 +92,7 @@ COMPONENT_BUTTONS = {
     'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
     'save_settings': '.action-save',
 }
+
 
 class Component(PageObject):
     """

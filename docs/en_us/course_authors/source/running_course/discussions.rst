@@ -1,8 +1,8 @@
 .. _Discussions:
 
-############################
-Discussions
-############################
+##################################
+Managing the Course Discussions
+##################################
 
 Discussions, or discussion forums, foster interaction among your students and
 between students and course staff. You can set up different topics to guide
@@ -47,16 +47,19 @@ levels of interaction.
   post as a whole.
  
 The dialog created by a post, its responses, and the comments on those
-repsonses is called a *thread*.
+responses is called a *thread*.
 
 All course staff members and enrolled students can add posts, responses, and
 comments, and view all of the posts, responses, and comments made by other
 course participants. Discussion threads are saved as part of the course
 history.
 
-..note:: 
- The :ref:`Discussions for Students and Staff` section describes features that
- are available to all discussion participants. 
+.. note:: 
+  The :ref:`Discussions for Students and Staff` chapter describes features that
+  are available to all discussion participants, and may be useful to students
+  who are new to online discussion forums. You can share the chapter with your
+  students by, for example, adding a "Never Used a Discussion Forum Before?"
+  post that includes the information you think will be most useful to them.
 
 .. _Organizing_discussions:
 
@@ -66,7 +69,8 @@ Set Up Discussions for Your Course
 
 Discussions in an edX course include both the specific topics that you add to
 course units as discussion components, and broader forums on course-wide areas
-of interest, such as Feedback, Troubleshooting, or Technical Help. You add both types of topics in Studio.
+of interest, such as "Feedback", "Troubleshooting", or "Technical Help". You
+add both types of topics in Studio.
 
 ============================================
 Add Units With a Discussion Component
@@ -76,7 +80,8 @@ Typically, all units are added during the design and creation of your course in
 Studio. To add a component to a unit, follow the instructions in :ref:`Working
 with Discussion Components`.
 
-This type of discussion is subject to the release date of the section that contains it. Students cannot contribute to these discussions until that date.
+This type of discussion is subject to the release date of the section that
+contains it. Students cannot contribute to these discussions until that date.
 
 =====================================
 Create Course-Wide Discussion Topics
@@ -152,7 +157,8 @@ these roles:
   banner. This role is often given to course team members who already have the
   Course Staff role.
 
-.. removed this clause from 1st sentence per JAAkana and MHoeber: , and, if the course is cohorted, see posts from all cohorts
+.. removed this clause from 1st sentence per JAAkana and MHoeber: , and, if the
+.. course is cohorted, see posts from all cohorts
 
 * Discussion community TAs have the same options for working with discussions
   as moderators. Posts made by community TAs are marked as "By: Community TA"
@@ -307,7 +313,8 @@ them available to students as a course handout file or on a defined page in
 your course. These guidelines can define your expectations and optionally
 introduce features of edX discussions.
 
-.. For a template that you can use to develop your own guidelines, see :ref:`Discussion Forum Guidelines`.
+.. For a template that you can use to develop your own guidelines, see
+.. :ref:`Discussion Forum Guidelines`.
 
 ========================================
 Develop a Positive Discussion Culture
@@ -354,7 +361,8 @@ responses, and comments. Messages that include spoilers or solutions, or that
 contain inappropriate or off-topic material, should be edited quickly to remove
 text, images, or links.
 
-#. Log in to the course with your discussion administrator username.
+#. Log in to the site and then select the course on your **Current Courses**
+   dashboard.
 
 #. Click the **Edit** button below the post or response or the pencil icon for
    the comment.
@@ -373,7 +381,8 @@ Discussion moderators, community TAs, and discussion admins can delete the
 content of posts, responses, and comments. Posts that include spam or abusive
 language may need to be deleted, rather than edited.
 
-#. Log in to the course with your discussion administrator username.
+#. Log in to the site and then select the course on your **Current Courses**
+   dashboard.
 
 #. Click the **Delete** button below the post or response or the "X" icon for
    the comment.
@@ -407,7 +416,9 @@ that have been flagged in this way and edit or delete them as needed.
 Block Users
 ===============
 
-For a student who continues to misuse the course discussions, you can unenroll the student from the course. See :ref:`unenroll_student`. If the enrollment period for the course is over, the student cannot re-enroll.
+For a student who continues to misuse the course discussions, you can unenroll
+the student from the course. See :ref:`unenroll_student`. If the enrollment
+period for the course is over, the student cannot re-enroll.
 
 .. _Close_discussions:
 
@@ -506,3 +517,5 @@ reopen:
    .. image:: ../Images/Discussion_blackout_formatted.png
      :alt: Same policy value but with a line feed after each bracket and comma,
          and an indent before each date
+
+.. For examples of email messages that you can send to let students know when the course discussions are closed (or open), see :ref:`Example Messages to Students`.

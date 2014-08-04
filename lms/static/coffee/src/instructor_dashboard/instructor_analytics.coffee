@@ -204,7 +204,7 @@ class GradeDistributionDisplay
 
 
 # Analytics Section
-class Analytics
+class InstructorAnalytics
   constructor: (@$section) ->
     @$section.data 'wrapper', @
 
@@ -239,4 +239,4 @@ class Analytics
 _.defaults window, InstructorDashboard: {}
 _.defaults window.InstructorDashboard, sections: {}
 _.defaults window.InstructorDashboard.sections,
-  Analytics: Analytics
+  InstructorAnalytics: InstructorAnalytics

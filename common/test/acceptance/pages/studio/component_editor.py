@@ -1,6 +1,5 @@
 from bok_choy.page_object import PageObject
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
 from utils import click_css
 from selenium.webdriver.support.ui import Select
 

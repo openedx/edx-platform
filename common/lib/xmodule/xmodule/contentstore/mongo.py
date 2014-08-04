@@ -13,6 +13,7 @@ import os
 import json
 from bson.son import SON
 from opaque_keys.edx.keys import AssetKey
+from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 
 
 class MongoContentStore(ContentStore):
@@ -169,6 +170,26 @@ class MongoContentStore(ContentStore):
         return self._get_all_content_for_course(
             course_key, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
         )
+
+    def remove_redundant_content_for_courses(self):
+        """
+        Finds and removes all redundant files (Mac OS metadata files with filename ".DS_Store"
+        or filename starts with "._") for all courses
+        """
+        assets_to_delete = 0
+        for prefix in ['_id', 'content_son']:
+            query = SON([
+                ('{}.tag'.format(prefix), XASSET_LOCATION_TAG),
+                ('{}.category'.format(prefix), 'asset'),
+                ('{}.name'.format(prefix), {'$regex': ASSET_IGNORE_REGEX}),
+            ])
+            items = self.fs_files.find(query)
+            assets_to_delete = assets_to_delete + items.count()
+            for asset in items:
+                self.fs.delete(asset[prefix])
+
+            self.fs_files.remove(query)
+        return assets_to_delete
 
     def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None):
         '''
