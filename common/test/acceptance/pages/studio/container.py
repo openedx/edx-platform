@@ -55,6 +55,18 @@ class ContainerPage(PageObject):
             Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
+    def wait_for_page_loaded(self):
+        """
+        Waits for document.readyState to be 'complete'
+        """
+        def _is_document_ready():
+            """
+            Check if document loading is completed.
+            """
+            return self.browser.execute_script("return document.readyState") == 'complete'
+
+        EmptyPromise(_is_document_ready, "Finished waiting for document to load.").fulfill()
+
     @property
     def xblocks(self):
         """
