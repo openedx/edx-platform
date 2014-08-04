@@ -46,7 +46,7 @@ three hierarchical levels of interaction.
   clarification or side note made to a specific response, rather than to the
   post as a whole.
  
-The dialog created by a post, its responses, and the comments on those
+The dialogue created by a post, its responses, and the comments on those
 responses is called a *thread*.
 
 All course staff members and enrolled students can add posts, responses, and
@@ -163,8 +163,9 @@ these roles:
 
 * Discussion community TAs have the same options for working with discussions
   as moderators. Posts made by community TAs are marked as "By: Community TA"
-  in the list of posts. Responses and comments made by community TAs have a
-  colored "Community TA" banner. This role is often given to students.
+  in the list of posts on the **Discussion** page. Responses and comments made
+  by community TAs have a colored "Community TA" banner. This role is often
+  given to students.
 
 * Discussion admins have the same options for working with discussions as
   moderators, and their posts, responses, and comments have the same "Staff"
@@ -268,10 +269,10 @@ long threads (with more than 200 responses and comments) can be difficult to
 read, and can therefore result in an unsatisfactory experience in the
 discussion.
 
-* Pin a post. Pinning a post makes it appear at the top of the list of posts.
-  As a result, it is more likely that students will see and respond to pinned
-  posts. You can write your own post and then pin it, or pin a post by any
-  author. Click **Pin Thread**.
+* Pin a post. Pinning a post makes it appear at the top of the list of posts on
+  the **Discussion** page. As a result, it is more likely that students will
+  see and respond to pinned posts. You can write your own post and then pin it,
+  or pin a post by any author. Click **Pin Thread**.
 
     .. image:: ../Images/Pin_Discussion.png
      :alt: Image of the pin icon for discussion posts
@@ -391,8 +392,8 @@ check or tick mark image replaces the question mark image. See :ref:`Answer
 Questions`.
 
 In addition to these visual cues, filters can help you find questions and
-discussions that need review. Above the list of posts, the **Show all** filter
-is selected by default. You can also select:
+discussions that need review. Above the list of posts on the **Discussion**
+page, the **Show all** filter is selected by default. You can also select:
 
 * **Unanswered**, to list only questions that do not yet have any responses
   marked as answers.
