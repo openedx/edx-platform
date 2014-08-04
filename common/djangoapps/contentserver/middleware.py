@@ -6,6 +6,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import AssetLocator
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
@@ -14,8 +15,11 @@ from xmodule.exceptions import NotFoundError
 
 class StaticContentServer(object):
     def process_request(self, request):
-        # look to see if the request is prefixed with 'c4x' tag
-        if request.path.startswith('/' + XASSET_LOCATION_TAG + '/'):
+        # look to see if the request is prefixed with an asset prefix tag
+        if (
+            request.path.startswith('/' + XASSET_LOCATION_TAG + '/') or
+            request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
+        ):
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except (InvalidLocationError, InvalidKeyError):
