@@ -9,7 +9,8 @@ from tempfile import mkdtemp
 import path
 import shutil
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locator import CourseLocator, AssetLocator
+from opaque_keys.edx.keys import AssetKey
 from xmodule.tests import DATA_DIR
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.contentstore.content import StaticContent
@@ -41,13 +42,13 @@ class TestContentstore(unittest.TestCase):
         Restores deprecated values
         """
         if cls.asset_deprecated is not None:
-            setattr(AssetLocation, 'deprecated', cls.asset_deprecated)
+            setattr(AssetLocator, 'deprecated', cls.asset_deprecated)
         else:
-            delattr(AssetLocation, 'deprecated')
+            delattr(AssetLocator, 'deprecated')
         if cls.ssck_deprecated is not None:
-            setattr(SlashSeparatedCourseKey, 'deprecated', cls.ssck_deprecated)
+            setattr(CourseLocator, 'deprecated', cls.ssck_deprecated)
         else:
-            delattr(SlashSeparatedCourseKey, 'deprecated')
+            delattr(CourseLocator, 'deprecated')
         return super(TestContentstore, cls).tearDownClass()
 
     def set_up_assets(self, deprecated):
@@ -59,11 +60,11 @@ class TestContentstore(unittest.TestCase):
         self.contentstore = MongoContentStore(HOST, DB, port=PORT)
         self.addCleanup(self.contentstore._drop_database)  # pylint: disable=protected-access
 
-        setattr(AssetLocation, 'deprecated', deprecated)
-        setattr(SlashSeparatedCourseKey, 'deprecated', deprecated)
+        setattr(AssetLocator, 'deprecated', deprecated)
+        setattr(CourseLocator, 'deprecated', deprecated)
 
-        self.course1_key = SlashSeparatedCourseKey('test', 'asset_test', '2014_07')
-        self.course2_key = SlashSeparatedCourseKey('test', 'asset_test2', '2014_07')
+        self.course1_key = CourseLocator('test', 'asset_test', '2014_07')
+        self.course2_key = CourseLocator('test', 'asset_test2', '2014_07')
 
         self.course1_files = ['contains.sh', 'picture1.jpg', 'picture2.jpg']
         self.course2_files = ['picture1.jpg', 'picture3.jpg', 'door_2.ogg']
@@ -154,13 +155,13 @@ class TestContentstore(unittest.TestCase):
         course1_assets, count = self.contentstore.get_all_content_for_course(self.course1_key)
         self.assertEqual(count, len(self.course1_files), course1_assets)
         for asset in course1_assets:
-            parsed = AssetLocation.from_deprecated_string(asset['filename'])
+            parsed = AssetKey.from_string(asset['filename'])
             self.assertIn(parsed.name, self.course1_files)
 
         course1_assets, __ = self.contentstore.get_all_content_for_course(self.course1_key, 1, 1)
         self.assertEqual(len(course1_assets), 1, course1_assets)
 
-        fake_course = SlashSeparatedCourseKey('test', 'fake', 'non')
+        fake_course = CourseLocator('test', 'fake', 'non')
         course_assets, count = self.contentstore.get_all_content_for_course(fake_course)
         self.assertEqual(count, 0)
         self.assertEqual(course_assets, [])
@@ -183,7 +184,7 @@ class TestContentstore(unittest.TestCase):
         copy_all_course_assets
         """
         self.set_up_assets(deprecated)
-        dest_course = SlashSeparatedCourseKey('test', 'destination', 'copy')
+        dest_course = CourseLocator('test', 'destination', 'copy')
         self.contentstore.copy_all_course_assets(self.course1_key, dest_course)
         for filename in self.course1_files:
             asset_key = self.course1_key.make_asset_key('asset', filename)
