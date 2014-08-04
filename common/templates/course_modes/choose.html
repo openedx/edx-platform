@@ -72,16 +72,21 @@ $(document).ready(function() {
                 <h4 class="title">${verified_name}</h4>
               %endif
 
-
-              %if upgrade:
-                <div class="copy">
-                  <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
-                </div>
+              %if verified_name == "Verified Certificate":
+                %if upgrade:
+                    <div class="copy">
+                    <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %else:
+                    <div class="copy">
+                    <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %endif
               %else:
-                <div class="copy">
-                  <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
-                </div>
-              %endif
+                    <div class="copy">
+                    <p>${verified_description}</p>
+                    </div>
+               %endif
             </div>
 
             <div class="field field-certificate-contribution">
