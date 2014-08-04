@@ -1,8 +1,8 @@
 define([
-    'js/views/baseview', 'jquery', 'js/views/group_configuration_details',
-    'js/views/group_configuration_edit'
+    'js/views/baseview', 'jquery', "gettext", 'js/views/group_configuration_details',
+    'js/views/group_configuration_edit', "js/views/utils/view_utils"
 ], function(
-    BaseView, $, GroupConfigurationDetails, GroupConfigurationEdit
+    BaseView, $, gettext, GroupConfigurationDetails, GroupConfigurationEdit, ViewUtils
 ) {
     'use strict';
     var GroupConfigurationsItem = BaseView.extend({
@@ -32,12 +32,12 @@ define([
         deleteConfiguration: function(event) {
             if(event && event.preventDefault) { event.preventDefault(); }
             var self = this;
-            this.confirmThenRunOperation(
+            ViewUtils.confirmThenRunOperation(
                 gettext('Delete this Group Configuration?'),
                 gettext('Deleting this Group Configuration is permanent and cannot be undone.'),
                 gettext('Delete'),
                 function() {
-                    return self.runOperationShowingMessage(
+                    return ViewUtils.runOperationShowingMessage(
                         gettext('Deleting') + '&hellip;',
                         function () {
                             return self.model.destroy({ wait: true });
