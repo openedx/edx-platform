@@ -20,7 +20,6 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
 from util.json_request import JsonResponse
-from util.date_utils import get_default_time_display
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
@@ -873,7 +872,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def list_email_content(requests, course_id):
+def list_email_content(request, course_id):  # pylint: disable=unused-argument
     """
     List the content of bulk emails sent
     """

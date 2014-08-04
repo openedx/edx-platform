@@ -32,7 +32,6 @@ from student.tests.factories import UserFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
 from microsite_configuration import microsite
-from util.date_utils import get_default_time_display
 from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -1891,6 +1890,9 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        self.tasks = {}
+        self.emails = {}
+        self.emails_info = {}
 
     def tearDown(self):
         """
@@ -1900,16 +1902,13 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def setup_fake_email_info(self, num_emails):
         """ Initialize the specified number of fake emails """
-        self.tasks = {}
-        self.emails = {}
-        self.emails_info = {}
         for email_id in range(num_emails):
             num_sent = random.randint(1, 15401)
             self.tasks[email_id] = FakeContentTask(email_id, num_sent, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
             self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent)
 
-    def get_matching_mock_email(self, *args, **kwargs):
+    def get_matching_mock_email(self, **kwargs):
         """ Returns the matching mock emails for the given id """
         email_id = kwargs.get('id', 0)
         return self.emails[email_id]
@@ -1964,9 +1963,9 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def test_list_email_content_error(self, task_history_request):
         """ Test handling of error retrieving email """
-        self.invalid_task = FakeContentTask(0, 0, 'test')
-        self.invalid_task.make_invalid_input()
-        task_history_request.return_value = [self.invalid_task]
+        invalid_task = FakeContentTask(0, 0, 'test')
+        invalid_task.make_invalid_input()
+        task_history_request.return_value = [invalid_task]
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
