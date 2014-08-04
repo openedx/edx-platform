@@ -44,6 +44,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 this.renderTemplate();
                 this.addButtonActions(this.$el);
                 this.addNameEditor();
+                this.renderedChildren = false;
                 if (this.shouldRenderChildren() && this.shouldExpandChildren()) {
                     this.renderChildren();
                 }
