@@ -125,7 +125,7 @@ def _assets_json(request, course_key):
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
-            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
+            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4]).for_branch(None)
 
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
@@ -241,7 +241,7 @@ def _update_asset(request, course_key, asset_key):
         if content.thumbnail_location is not None:
             # We are ignoring the value of the thumbnail_location-- we only care whether
             # or not a thumbnail has been stored, and we can now easily create the correct path.
-            thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name)
+            thumbnail_location = course_key.make_asset_key('thumbnail', asset_key.name).for_branch(None)
             try:
                 thumbnail_content = contentstore().find(thumbnail_location)
                 contentstore('trashcan').save(thumbnail_content)
@@ -277,7 +277,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
-    asset_url = location.to_deprecated_string()
+    asset_url = _add_slash(location.to_deprecated_string())
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
@@ -285,8 +285,14 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'url': asset_url,
         'external_url': external_url,
         'portable_url': StaticContent.get_static_path_from_location(location),
-        'thumbnail': thumbnail_location.to_deprecated_string() if thumbnail_location is not None else None,
+        'thumbnail': _add_slash(unicode(thumbnail_location)) if thumbnail_location else None,
         'locked': locked,
         # Needed for Backbone delete/update.
         'id': unicode(location)
     }
+
+
+def _add_slash(url):
+    if not url.startswith('/'):
+        url = '/' + url  # TODO NAATODO - is there a better way to do this?
+    return url

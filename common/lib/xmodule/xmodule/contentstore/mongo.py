@@ -94,7 +94,9 @@ class MongoContentStore(ContentStore):
                 fp = self.fs.get(content_id)
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
-                    thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
+                    thumbnail_location = location.course_key.make_asset_key(
+                        'thumbnail', thumbnail_location[4]
+                    ).for_branch(None)
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
@@ -105,7 +107,9 @@ class MongoContentStore(ContentStore):
                 with self.fs.get(content_id) as fp:
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
-                        thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
+                        thumbnail_location = location.course_key.make_asset_key(
+                            'thumbnail', thumbnail_location[4]
+                        ).for_branch(None)
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
@@ -218,7 +222,7 @@ class MongoContentStore(ContentStore):
         # callers are insulated from knowing how our identifiers are stored.
         for asset in assets:
             asset_id = asset.get('content_son', asset['_id'])
-            asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name'])
+            asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name']).for_branch(None)
         return assets, count
 
     def set_attr(self, asset_key, attr, value=True):
@@ -304,7 +308,9 @@ class MongoContentStore(ContentStore):
                 asset_id = asset_key
             else:  # add the run, since it's the last field, we're golden
                 asset_key['run'] = dest_course_key.run
-                asset_id = unicode(dest_course_key.make_asset_key(asset_key['category'], asset_key['name']))
+                asset_id = unicode(
+                    dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
+                )
 
             self.fs.put(
                 source_content.read(),
@@ -340,6 +346,7 @@ class MongoContentStore(ContentStore):
         """
         Returns the database _id and son structured lookup to find the given asset location.
         """
+        location = location.for_branch(None)
         dbkey = SON((field_name, getattr(location, field_name)) for field_name in cls.ordered_key_fields)
         if getattr(location, 'deprecated', False):
             content_id = dbkey
