@@ -69,14 +69,24 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <% } else { %>
             <p class="copy"><%= gettext("Staff and Students") %></p>
         <% } %>
+        <% if (staffLockFrom) { %>
+            <p>
+                <%= interpolate(gettext("Hidden from students by %(section_or_subsection)s"),
+                    { section_or_subsection: staffLockFrom }, true) %>
+            </p>
+        <% } %>
         <p class="action-inline">
-            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= visibleToStaffOnly %>">
-                <% if (visibleToStaffOnly) { %>
+            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
+                <% if (hasExplicitStaffLock) { %>
                     <i class="icon-check"></i>
                 <% } else { %>
                     <i class="icon-check-empty"></i>
                 <% } %>
-                <%= gettext('Hide from students') %>
+                <% if (staffLockFrom) { %>
+                    <%= gettext('Explicitly hide from students') %>
+                <% } else { %>
+                    <%= gettext('Hide from students') %>
+                <% } %>
             </a>
         </p>
     </div>

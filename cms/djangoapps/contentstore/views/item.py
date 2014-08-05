@@ -684,6 +684,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
         if visibility_state == VisibilityState.staff_only:
             xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
+        else:
+            xblock_info["staff_lock_from"] = None
 
     return xblock_info
 
@@ -818,7 +820,8 @@ def _get_staff_lock_from(xblock):
     """
     Returns a string representation of the section or subsection that sets the xblock's release date
     """
-    return _xblock_type_and_display_name(find_staff_lock_source(xblock))
+    source = find_staff_lock_source(xblock)
+    return _xblock_type_and_display_name(source) if source else None
 
 
 def _xblock_type_and_display_name(xblock):
