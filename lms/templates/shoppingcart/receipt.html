@@ -86,16 +86,18 @@
             ${_("Note: items with strikethough like <del>this</del> have been refunded.")}
           </p>
         % endif
-
-        <h2>${_("Billed To:")}</h2>
-        <p>
-          ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br />
-          ${order.bill_to_first} ${order.bill_to_last}<br />
-          ${order.bill_to_street1}<br />
-          ${order.bill_to_street2}<br />
-          ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br />
-          ${order.bill_to_country.upper()}<br />
-        </p>
+        % if order.total_cost > 0:
+            <h2>${_("Billed To:")}</h2>
+            <p>
+              ${order.bill_to_cardtype} ${_("#:")} ${order.bill_to_ccnum}<br />
+              ${order.bill_to_first} ${order.bill_to_last}<br />
+              ${order.bill_to_street1}<br />
+              ${order.bill_to_street2}<br />
+              ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}<br />
+              ${order.bill_to_country.upper()}<br />
+            </p>
+         % endif
+      </article>
     </div>
   </section>
 </div>

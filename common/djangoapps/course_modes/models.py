@@ -143,3 +143,35 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}, prices={}".format(
             self.course_id.to_deprecated_string(), self.mode_slug, self.min_price, self.suggested_prices
         )
+
+
+class CourseModesArchive(models.Model):
+    """
+    Store the past values of course_mode that a course had in the past. We decided on having
+    separate model, because there is a uniqueness contraint on (course_mode, course_id)
+    field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
+    such as course price changes
+    """
+    # the course that this mode is attached to
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    # the reference to this mode that can be used by Enrollments to generate
+    # similar behavior for the same slug across courses
+    mode_slug = models.CharField(max_length=100)
+
+    # The 'pretty' name that can be translated and displayed
+    mode_display_name = models.CharField(max_length=255)
+
+    # minimum price in USD that we would like to charge for this mode of the course
+    min_price = models.IntegerField(default=0)
+
+    # the suggested prices for this mode
+    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+
+    # the currency these prices are in, using lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8)
+
+    # turn this mode off after the given expiration date
+    expiration_date = models.DateField(default=None, null=True, blank=True)
+
+    expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)

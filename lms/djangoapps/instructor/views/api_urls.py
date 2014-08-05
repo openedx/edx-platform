@@ -17,6 +17,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
+    url(r'^get_purchase_transaction(?P<csv>/csv)?$',
+        'instructor.views.api.get_purchase_transaction', name="get_purchase_transaction"),
     url(r'^get_anon_ids$',
         'instructor.views.api.get_anon_ids', name="get_anon_ids"),
     url(r'^get_distribution$',
@@ -55,6 +57,16 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.list_report_downloads', name="list_report_downloads"),
     url(r'calculate_grades_csv$',
         'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
+
+    # Registration Codes..
+    url(r'get_registration_codes$',
+        'instructor.views.api.get_registration_codes', name="get_registration_codes"),
+    url(r'generate_registration_codes$',
+        'instructor.views.api.generate_registration_codes', name="generate_registration_codes"),
+    url(r'active_registration_codes$',
+        'instructor.views.api.active_registration_codes', name="active_registration_codes"),
+    url(r'spent_registration_codes$',
+        'instructor.views.api.spent_registration_codes', name="spent_registration_codes"),
 
     # spoc gradebook
     url(r'^gradebook$',

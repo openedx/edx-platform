@@ -44,6 +44,8 @@ import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, PaidCourseRegistration, Coupon
+from course_modes.models import CourseMode
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
 
@@ -1330,12 +1332,90 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
     def setUp(self):
         self.course = CourseFactory.create()
+        self.course_mode = CourseMode(course_id=self.course.id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=40)
+        self.course_mode.save()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        self.cart = Order.get_cart_for_user(self.instructor)
+        self.coupon_code = 'abcde'
+        self.coupon = Coupon(code=self.coupon_code, description='testing code', course_id=self.course.id,
+                             percentage_discount=10, created_by=self.instructor, is_active=True)
+        self.coupon.save()
 
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
+
+    def test_get_ecommerce_purchase_features_csv(self):
+        """
+        Test that the response from get_purchase_transaction is in csv format.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url + '/csv', {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+    def test_get_ecommerce_purchase_features_with_coupon_info(self):
+        """
+        Test that some minimum of information is formatted
+        correctly in the response to get_purchase_transaction.
+        """
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        # using coupon code
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('students', res_json)
+
+        for res in res_json['students']:
+            self.validate_purchased_transaction_response(res, self.cart, self.instructor, self.coupon_code)
+
+    def test_get_ecommerce_purchases_features_without_coupon_info(self):
+        """
+        Test that some minimum of information is formatted
+        correctly in the response to get_purchase_transaction.
+        """
+        url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        carts, instructors = ([] for i in range(2))
+
+        # purchasing the course by different users
+        for _ in xrange(3):
+            test_instructor = InstructorFactory(course_key=self.course.id)
+            self.client.login(username=test_instructor.username, password='test')
+            cart = Order.get_cart_for_user(test_instructor)
+            carts.append(cart)
+            instructors.append(test_instructor)
+            PaidCourseRegistration.add_to_order(cart, self.course.id)
+            cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('students', res_json)
+        for res, i in zip(res_json['students'], xrange(3)):
+            self.validate_purchased_transaction_response(res, carts[i], instructors[i], 'None')
+
+    def validate_purchased_transaction_response(self, res, cart, user, code):
+        """
+        validate purchased transactions attribute values with the response object
+        """
+        item = cart.orderitem_set.all().select_subclasses()[0]
+
+        self.assertEqual(res['coupon_code'], code)
+        self.assertEqual(res['username'], user.username)
+        self.assertEqual(res['email'], user.email)
+        self.assertEqual(res['list_price'], item.list_price)
+        self.assertEqual(res['unit_cost'], item.unit_cost)
+        self.assertEqual(res['order_id'], cart.id)
+        self.assertEqual(res['orderitem_id'], item.id)
 
     def test_get_students_features(self):
         """
@@ -2221,3 +2301,192 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
             u'header': [u'Unit', u'Extended Due Date'],
             u'title': u'Due date extensions for %s (%s)' % (
             self.user1.profile.name, self.user1.username)})
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(REGISTRATION_CODE_LENGTH=8)
+class TestCourseRegistrationCodes(ModuleStoreTestCase):
+    """
+    Test data dumps for E-commerce Course Registration Codes.
+    """
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+        # Active Registration Codes
+        for i in range(12):
+            course_registration_code = CourseRegistrationCode(
+                code='MyCode0{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                transaction_group_name='Test Group', created_by=self.instructor
+            )
+            course_registration_code.save()
+
+        for i in range(5):
+            order = Order(user=self.instructor, status='purchased')
+            order.save()
+
+        # Spent(used) Registration Codes
+        for i in range(5):
+            i += 1
+            registration_code_redemption = RegistrationCodeRedemption(
+                order_id=i, registration_code_id=i, redeemed_by=self.instructor
+            )
+            registration_code_redemption.save()
+
+    def test_generate_course_registration_codes_csv(self):
+        """
+        Test to generate a response of all the generated course registration codes
+        """
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {'course_registration_code_number': 15.0, 'transaction_group_name': 'Test Group'}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 17)
+
+    @patch.object(instructor.views.api, 'random_code_generator', Mock(side_effect=['first', 'second', 'third', 'fourth']))
+    def test_generate_course_registration_codes_matching_existing_coupon_code(self):
+        """
+        Test the generated course registration code is already in the Coupon Table
+        """
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        coupon = Coupon(code='first', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor)
+        coupon.save()
+        data = {'course_registration_code_number': 3, 'transaction_group_name': 'Test Group'}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
+
+    @patch.object(instructor.views.api, 'random_code_generator', Mock(side_effect=['first', 'first', 'second', 'third']))
+    def test_generate_course_registration_codes_integrity_error(self):
+        """
+       Test for the Integrity error against the generated code
+        """
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {'course_registration_code_number': 2, 'transaction_group_name': 'Test Group'}
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 4)
+
+    def test_spent_course_registration_codes_csv(self):
+        """
+        Test to generate a response of all the spent course registration codes
+        """
+        url = reverse('spent_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {'spent_transaction_group_name': ''}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 7)
+
+        for i in range(9):
+            course_registration_code = CourseRegistrationCode(
+                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                transaction_group_name='Group Alpha', created_by=self.instructor
+            )
+            course_registration_code.save()
+
+        for i in range(9):
+            order = Order(user=self.instructor, status='purchased')
+            order.save()
+
+        # Spent(used) Registration Codes
+        for i in range(9):
+            i += 13
+            registration_code_redemption = RegistrationCodeRedemption(
+                order_id=i, registration_code_id=i, redeemed_by=self.instructor
+            )
+            registration_code_redemption.save()
+
+        data = {'spent_transaction_group_name': 'Group Alpha'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 11)
+
+    def test_active_course_registration_codes_csv(self):
+        """
+        Test to generate a response of all the active course registration codes
+        """
+        url = reverse('active_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {'active_transaction_group_name': ''}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 9)
+
+        for i in range(9):
+            course_registration_code = CourseRegistrationCode(
+                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                transaction_group_name='Group Alpha', created_by=self.instructor
+            )
+            course_registration_code.save()
+
+        data = {'active_transaction_group_name': 'Group Alpha'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 11)
+
+    def test_get_all_course_registration_codes_csv(self):
+        """
+        Test to generate a response of all the course registration codes
+        """
+        url = reverse('get_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {'download_transaction_group_name': ''}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 14)
+
+        for i in range(9):
+            course_registration_code = CourseRegistrationCode(
+                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                transaction_group_name='Group Alpha', created_by=self.instructor
+            )
+            course_registration_code.save()
+
+        data = {'download_transaction_group_name': 'Group Alpha'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertEqual(len(body.split('\n')), 11)
