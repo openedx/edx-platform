@@ -30,6 +30,8 @@ class ChooseModeView(View):
         from the selection page, parses the response, and then sends user
         to the next step in the flow
     """
+    autoreg = False
+
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
         """ Displays the course mode choice page """
@@ -43,7 +45,7 @@ class ChooseModeView(View):
         # Inactive users always need to re-register
         # verified and professional users do not need to register or upgrade
         # registered users who are not trying to upgrade do not need to re-register
-        if is_active and (upgrade is False or enrollment_mode == 'verified' or enrollment_mode == 'professional'):
+        if is_active and (((upgrade is False) and (self.autoreg is False)) or enrollment_mode == 'verified' or enrollment_mode == 'professional'):
             return redirect(reverse('dashboard'))
 
         modes = CourseMode.modes_for_course_dict(course_key)
@@ -75,6 +77,7 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
+            "autoreg": self.autoreg,
         }
         if "verified" in modes:
             context["suggested_prices"] = [

@@ -67,7 +67,7 @@ $(document).ready(function() {
 
     <%include file="/verify_student/_verification_header.html" args="course_name=course_name" />
 
-    %if false:
+    %if not autoreg:
     <!-- /experiment-control -->
     <div class="wrapper-register-choose wrapper-content-main">
       <article class="register-choose content-main">

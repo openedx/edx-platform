@@ -222,6 +222,8 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^change_enrollment_autoreg$',
+            'student.views.change_enrollment_autoreg', name="change_enrollment_autoreg"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course
