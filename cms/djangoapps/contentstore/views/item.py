@@ -31,14 +31,13 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW, STUDENT_VIEW
 
 from xmodule.course_module import DEFAULT_START_DATE
-from contentstore.utils import find_release_date_source
 from django.contrib.auth.models import User
 from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
 from .access import has_course_access
-from contentstore.utils import is_currently_visible_to_students
+from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
     xblock_type_display_name, get_parent_xblock
 from contentstore.views.preview import get_preview_fragment
@@ -643,6 +642,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
+    visibility_state = _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     xblock_info = {
@@ -655,7 +655,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         'studio_url': xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
-        "visibility_state": _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None,
+        "visibility_state": visibility_state,
         "start": xblock.fields['start'].to_json(xblock.start),
         "graded": xblock.graded,
         "due_date": get_default_time_display(xblock.due),
@@ -681,6 +681,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         xblock_info['has_changes'] = is_unit_with_changes
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
+        if visibility_state == VisibilityState.staff_only:
+            xblock_info["explicit_staff_lock"] = xblock.fields['visible_to_staff_only'].is_set_on(xblock)
+            xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
 
     return xblock_info
 
@@ -808,9 +811,22 @@ def _get_release_date_from(xblock):
     """
     Returns a string representation of the section or subsection that sets the xblock's release date
     """
-    source = find_release_date_source(xblock)
+    return _xblock_type_and_display_name(find_release_date_source(xblock))
+
+
+def _get_staff_lock_from(xblock):
+    """
+    Returns a string representation of the section or subsection that sets the xblock's release date
+    """
+    return _xblock_type_and_display_name(find_staff_lock_source(xblock))
+
+
+def _xblock_type_and_display_name(xblock):
+    """
+    Returns a string representation of the xblock's type and display name
+    """
     # Translators: this will be a part of the release date message.
     # For example, 'Released: Jul 02, 2014 at 4:00 UTC with Section "Week 1"'
     return _('{section_or_subsection} "{display_name}"').format(
-        section_or_subsection=xblock_type_display_name(source),
-        display_name=source.display_name_with_default)
+        section_or_subsection=xblock_type_display_name(xblock),
+        display_name=xblock.display_name_with_default)

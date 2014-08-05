@@ -197,6 +197,29 @@ def find_release_date_source(xblock):
         return find_release_date_source(parent)
 
 
+def find_staff_lock_source(xblock):
+    """
+    Finds the ancestor of xblock that set its staff lock
+    """
+
+    # Stop searching at the section level
+    if xblock.category == 'chapter':
+        return xblock
+
+    # Stop searching if this xblock has explicitly set its own staff lock
+    if xblock.fields['visible_to_staff_only'].is_set_on(xblock):
+        return xblock
+
+    parent_location = modulestore().get_parent_location(xblock.location,
+                                                        revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+    # Orphaned xblocks set their own staff lock
+    if not parent_location:
+        return xblock
+
+    parent = modulestore().get_item(parent_location)
+    return find_release_date_source(parent)
+
+
 def add_extra_panel_tab(tab_type, course):
     """
     Used to add the panel tab to a course if it does not exist.
