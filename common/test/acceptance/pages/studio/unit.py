@@ -56,12 +56,14 @@ class UnitPage(PageObject):
         """
         Started editing a draft of this unit.
         """
+        self.wait_for_ajax()
         EmptyPromise(
             lambda: self.q(css='.create-draft').present,
             'Wait for edit draft link to be present'
         ).fulfill()
 
         self.q(css='.create-draft').first.click()
+        self.wait_for_ajax()
 
         EmptyPromise(
             lambda: self.q(css='.editing-draft-alert').present,
@@ -76,6 +78,7 @@ class UnitPage(PageObject):
             visibility (str): private or public
 
         """
+        self.wait_for_ajax()
         self.q(css='select[name="visibility-select"] option[value="{}"]'.format(visibility)).first.click()
         self.wait_for_ajax()
 
