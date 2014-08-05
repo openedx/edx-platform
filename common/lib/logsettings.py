@@ -53,8 +53,9 @@ def get_logger_config(log_dir,
                                              logging_env=logging_env,
                                              hostname=hostname)
 
-    handlers = ['console', 'local'] if debug else ['console',
-                                                   'syslogger-remote', 'local']
+    handlers = ['console', 'local']
+    if syslog_addr:
+        handlers.append('syslogger-remote')
 
     logger_config = {
         'version': 1,
@@ -84,12 +85,6 @@ def get_logger_config(log_dir,
                 'filters': ['require_debug_false'],
                 'class': 'django.utils.log.AdminEmailHandler'
             },
-            'syslogger-remote': {
-                'level': 'INFO',
-                'class': 'logging.handlers.SysLogHandler',
-                'address': syslog_addr,
-                'formatter': 'syslog_format',
-            },
             'newrelic': {
                 'level': 'ERROR',
                 'class': 'lms.lib.newrelic_logging.NewRelicHandler',
@@ -114,6 +109,15 @@ def get_logger_config(log_dir,
             },
         }
     }
+    if syslog_addr:
+        logger_config['handlers'].update({
+            'syslogger-remote': {
+                'level': 'INFO',
+                'class': 'logging.handlers.SysLogHandler',
+                'address': syslog_addr,
+                'formatter': 'syslog_format',
+            },
+        })
 
     if dev_env:
         tracking_file_loc = os.path.join(log_dir, tracking_filename)
