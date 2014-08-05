@@ -11,6 +11,10 @@ Change Log
 
    * - Date
      - Change
+   * - 08/12/14
+     - Updated the :ref:`Discussion Forums Data` chapter to include the
+       ``thread_type`` field for CommentThreads and the ``endorsement`` field
+       for Comments.
    * - 08/01/14
      - Added the :ref:`Package` chapter with information to help data czars
        locate and download data package files.
