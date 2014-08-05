@@ -60,6 +60,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.course_module import CourseDescriptor
 
 from collections import namedtuple
 
@@ -738,37 +739,23 @@ def notify_enrollment_by_email(course, user, request):
         from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
         try:
-            if (not course.enable_default_enrollment_email):
-
-                # Check if the course has already started and set subject & message accordingly
-                if (course.has_started):
-                    subject = get_course_about_section(course, 'post_enrollment_email_subject')
-                    message = get_course_about_section(course, 'post_enrollment_email')
-                else:
-                    subject = get_course_about_section(course, 'pre_enrollment_email_subject')
-                    message = get_course_about_section(course, 'pre_enrollment_email')
-
+            # Check if the course has already started and set subject & message accordingly
+            if course.has_started():
+                subject = get_course_about_section(course, 'post_enrollment_email_subject')
+                message = get_course_about_section(course, 'post_enrollment_email')
             else:
-
-                # If not default, use the default emailing template
-                course_url = reverse('info', args=(course.id.to_deprecated_string(),))
-                context = {
-                    'course':course,
-                    'full_name':user.profile.name,
-                    'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
-                    'course_url':request.build_absolute_uri(course_url),
-                }
-                subject = render_to_string('emails/enroll_email_enrolledsubject.txt', context)
-                message = render_to_string('emails/enroll_email_enrolledmessage.txt', context)
-
-            subject = ''.join(subject.splitlines())
+                subject = get_course_about_section(course, 'pre_enrollment_email_subject')
+                message = get_course_about_section(course, 'pre_enrollment_email')
 
             user.email_user(subject, message, from_address)
+
         except Exception:
             log.error('unable to send course enrollment verification email to user from "{from_address}"'.format(
                         from_address=from_address), exc_info = True)
             return JsonResponse({"is_success": False, "error": _("Could not send enrollment email to the user"),})
+
         return JsonResponse({"is_success": True, "subject": subject, "message": message})
+
     else:
         return JsonResponse({"email_did_fire": False})
 

@@ -14,14 +14,16 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
+from smtplib import SMTPException
 from util.json_request import JsonResponse
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition, Group
+from xmodule.course_module import CourseDescriptor
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
@@ -68,8 +70,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'grading_handler',
            'advanced_settings_handler',
            'textbooks_list_handler', 'textbooks_detail_handler',
-           'group_configurations_list_handler', 'group_configurations_detail_handler']
-
+           'group_configurations_list_handler', 'group_configurations_detail_handler',
+           'send_test_enrollment_email']
 
 class AccessListFallback(Exception):
     """
@@ -468,6 +470,23 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
             )
 
 
+@require_http_methods("POST")
+def send_test_enrollment_email(request):
+    """
+    Handles ajax request for sending test enrollment emails to the instructor
+    """
+    user = request.user
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    subject = request.POST.get('subject')
+    message = request.POST.get('message')
+
+    try:
+        user.email_user(subject, message, from_address)
+    except SMTPException:
+        return HttpResponseBadRequest(_("Error while sending test email."))
+    return HttpResponse()
+
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
@@ -496,6 +515,9 @@ def settings_handler(request, course_key_string):
 
         short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
 
+        default_enroll_email_template_pre = render_to_string('emails/default_pre_enrollment_message.txt', {})
+        default_enroll_email_template_post = render_to_string('emails/default_post_enrollment_message.txt', {})
+
         return render_to_response('settings.html', {
             'context_course': course_module,
             'course_locator': course_key,
@@ -504,7 +526,9 @@ def settings_handler(request, course_key_string):
             'details_url': reverse_course_url('settings_handler', course_key),
             'about_page_editable': about_page_editable,
             'short_description_editable': short_description_editable,
-            'upload_asset_url': upload_asset_url
+            'upload_asset_url': upload_asset_url,
+            'default_pre_template': default_enroll_email_template_pre,
+            'default_post_template': default_enroll_email_template_post,
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
         if request.method == 'GET':

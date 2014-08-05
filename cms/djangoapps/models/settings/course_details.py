@@ -10,12 +10,13 @@ from contentstore.utils import course_image_url
 from models.settings import course_grading
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
+from edxmako.shortcuts import render_to_string
 
 class CourseDetails(object):
     def __init__(self, org, course_id, run):
         # still need these for now b/c the client's screen shows these 3 fields
         self.org = org
-        self.course_id = course_id
+        self.course_id = course_id # This actually holds the course number.
         self.run = run
         self.start_date = None  # 'start'
         self.end_date = None  # 'end'
@@ -24,16 +25,15 @@ class CourseDetails(object):
         self.syllabus = None  # a pdf file asset
         self.short_description = ""
         self.overview = ""  # html to render as the overview
-        self.pre_enrollment_email = ""  # html to render as the pre-enrollment email
-        self.post_enrollment_email = ""  # html to render as the post-enrollment email
-        self.pre_enrollment_email_subject = "" # header of the pre_enrollment_email
-        self.post_enrollment_email_subject = "" # header of the post_enrollment_email
+        self.pre_enrollment_email = render_to_string('emails/default_pre_enrollment_message.txt', {})
+        self.post_enrollment_email = render_to_string('emails/default_post_enrollment_message.txt', {})
+        self.pre_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
+        self.post_enrollment_email_subject = "Thanks for Enrolling in {}".format(self.course_id)
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
         self.enable_enrollment_email = False
-        self.enable_default_enrollment_email = True
 
     @classmethod
     def fetch(cls, course_key):
@@ -50,7 +50,6 @@ class CourseDetails(object):
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
         course_details.enable_enrollment_email = descriptor.enable_enrollment_email
-        course_details.enable_default_enrollment_email = descriptor.enable_default_enrollment_email
 
         temploc = course_key.make_usage_key('about', 'syllabus')
         try:
@@ -140,11 +139,6 @@ class CourseDetails(object):
         # into the model is nasty, convert the JSON Date to a Python date, which is what the
         # setter expects as input.
         date = Date()
-        
-        # Added to allow admins to enable/disable default enrollment emails
-        if 'enable_default_enrollment_email' in jsondict:
-            descriptor.enable_default_enrollment_email = jsondict['enable_default_enrollment_email']
-            dirty = True
 
         # Added to allow admins to enable/disable enrollment emails
         if 'enable_enrollment_email' in jsondict:
