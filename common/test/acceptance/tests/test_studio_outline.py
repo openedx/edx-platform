@@ -375,6 +375,30 @@ class EditingSectionsTest(CourseOutlineTest):
 
         self.assertEqual(u'Problem', progress_page.grading_formats[0])
 
+    def test_unchanged_release_date_is_not_saved(self):
+        """
+        Scenario: Saving a subsection without changing the release date will not override the release date
+            Given that I have created a section with a subsection
+            When I open the settings modal for the subsection
+            And I pressed save
+            And I open the settings modal for the section
+            And I change the release date to 07/20/1969
+            And I press save
+            Then the subsection and the section have the release date 07/20/1969
+        """
+        self.course_outline_page.visit()
+
+        modal = self.course_outline_page.section_at(0).subsection_at(0).edit()
+        modal.save()
+
+        modal = self.course_outline_page.section_at(0).edit()
+        modal.release_date = '7/20/1969'
+        modal.save()
+
+        release_text = 'Released: Jul 20, 1969'
+        self.assertIn(release_text, self.course_outline_page.section_at(0).release_date)
+        self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
+
 
 class EditNamesTest(CourseOutlineTest):
     """
