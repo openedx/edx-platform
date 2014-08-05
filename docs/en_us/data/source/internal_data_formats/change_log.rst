@@ -11,6 +11,10 @@ Change Log
 
    * - Date
      - Change
+   * - 09/02/14
+     - Updated the :ref:`Discussion Forums Data` chapter to include the
+       ``thread_type`` field for CommentThreads and the ``endorsement`` field
+       for Comments.
    * - 08/25/14
      - Removed information on course grading. See `Establishing a Grading
        Policy <http://edx.readthedocs.org/projects/edx-partner-course-
