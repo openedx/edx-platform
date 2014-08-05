@@ -95,8 +95,7 @@ FEATURES = {
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,
 
-    # Turn on third-party auth. Disabled for now because full implementations are not yet available. Remember to syncdb
-    # if you enable this; we don't create tables by default.
+    # Turn off third party authentication by default
     'ENABLE_THIRD_PARTY_AUTH': False,
 
     # Allow creating courses with non-ascii characters in the course id
