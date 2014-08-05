@@ -29,7 +29,6 @@ from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xmodule.html_module import AboutDescriptor
 from xblock.runtime import KvsFieldData
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
@@ -948,22 +947,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if courses.count() > 0:
             raise DuplicateCourseError(course_id, courses[0]['_id'])
 
-        course = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
+        xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
-        # clone a default 'about' overview module as well
-        about_location = course_id.make_usage_key('about', 'overview')
-
-        overview_template = AboutDescriptor.get_template('overview.yaml')
-        self.create_item(
-            user_id,
-            about_location.course_key,
-            about_location.block_type,
-            block_id=about_location.block_id,
-            definition_data=overview_template.get('data'),
-            runtime=course.system
+        # create any other necessary things as a side effect
+        super(MongoModuleStore, self).create_course(
+            org, course, run, user_id, runtime=xblock.runtime, **kwargs
         )
 
-        return course
+        return xblock
 
     def create_xblock(
         self, runtime, course_key, block_type, block_id=None, fields=None,
