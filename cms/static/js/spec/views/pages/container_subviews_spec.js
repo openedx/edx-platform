@@ -394,13 +394,13 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                         create_sinon.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                             publish: 'republish',
-                            metadata: { visible_to_staff_only: isStaffOnly }
+                            metadata: { visible_to_staff_only: isStaffOnly ? true : null }
                         });
                         create_sinon.respondWithJson(requests, {
                             data: null,
                             id: "locator-container",
                             metadata: {
-                                visible_to_staff_only: isStaffOnly
+                                visible_to_staff_only: isStaffOnly ? true : null
                             }
                         });
                         create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
