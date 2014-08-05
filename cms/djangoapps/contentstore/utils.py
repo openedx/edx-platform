@@ -202,13 +202,13 @@ def find_staff_lock_source(xblock):
     Finds the ancestor of xblock that set its staff lock
     """
 
-    # Stop searching at the section level
-    if xblock.category == 'chapter':
-        return xblock
-
     # Stop searching if this xblock has explicitly set its own staff lock
     if xblock.fields['visible_to_staff_only'].is_set_on(xblock):
         return xblock
+
+    # Stop searching at the section level
+    if xblock.category == 'chapter':
+        return None
 
     parent_location = modulestore().get_parent_location(xblock.location,
                                                         revision=ModuleStoreEnum.RevisionOption.draft_preferred)
@@ -217,7 +217,7 @@ def find_staff_lock_source(xblock):
         return xblock
 
     parent = modulestore().get_item(parent_location)
-    return find_release_date_source(parent)
+    return find_staff_lock_source(parent)
 
 
 def add_extra_panel_tab(tab_type, course):
