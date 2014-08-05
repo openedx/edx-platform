@@ -11,6 +11,10 @@ Change Log
 
    * - Date
      - Change
+   * - 09/02/14
+     - Updated the :ref:`Discussion Forums Data` chapter to include the
+       ``thread_type`` field for CommentThreads and the ``endorsement`` field
+       for Comments.
    * - 08/12/14
      - Added the :ref:`ora2` section to the :ref:`Tracking Logs` chapter.
    * - 08/01/14

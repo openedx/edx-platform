@@ -300,6 +300,13 @@ title
 --------------------
   Title of the thread. UTF-8 string.
 
+--------------------
+thread_type
+--------------------
+  Identifies the type of post as a "question" or "discussion".  
+
+  **History**: Added 12 Aug 2014.
+
 ********************
 Comment Fields
 ********************
@@ -326,7 +333,24 @@ historical_abuse_flaggers
 --------------------
 endorsed
 --------------------
-  Boolean value, true if a forum moderator or instructor has marked that this ``Comment`` is a correct answer for whatever question the thread was asking. Exists for Comments that are replies to other Comments, but in that case ``endorsed`` is always false because there's no way to endorse such comments through the UI.
+  Boolean value. True if a forum moderator has marked this response to a
+  ``CommentThread`` with a ``thread_type`` of "discussion" as a valuable
+  contribution, or if a forum moderator or the originator of a
+  ``CommentThread`` with a ``thread_type`` of "question" has marked this
+  response as the correct answer.
+
+  The ``endorsed`` field is present for comments that are made as replies to
+  responses, but in these cases the value is always false: the user interface
+  does not offer a way to endorse comments.
+
+--------------------
+endorsement
+--------------------
+  Contains ``time`` and ``user_id`` fields for the date and time that this
+  response to a post was endorsed and the numeric user ID (from
+  ``auth_user.id``) of the person who endorsed it.
+
+  **History**: Added 12 Aug 2014.
 
 --------------------
 comment_thread_id
