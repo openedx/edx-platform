@@ -60,6 +60,7 @@ class ChooseModeView(View):
             "chosen_price": chosen_price,
             "error": error,
             "upgrade": upgrade,
+            "can_audit": "audit" in modes,
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -69,6 +70,8 @@ class ChooseModeView(View):
             ]
             context["currency"] = modes["verified"].currency.upper()
             context["min_price"] = modes["verified"].min_price
+            context["verified_name"] = modes["verified"].name
+            context["verified_description"] = modes["verified"].description
 
         return render_to_response("course_modes/choose.html", context)
 

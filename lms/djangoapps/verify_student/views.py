@@ -74,7 +74,8 @@ class VerifyView(View):
             # bookkeeping-wise just to start over.
             progress_state = "start"
 
-        verify_mode = CourseMode.mode_for_course(course_id, "verified")
+        modes_dict = CourseMode.modes_for_course_dict(course_id)
+        verify_mode = modes_dict.get('verified', None)
         # if the course doesn't have a verified mode, we want to kick them
         # from the flow
         if not verify_mode:
@@ -102,6 +103,7 @@ class VerifyView(View):
             "chosen_price": chosen_price,
             "min_price": verify_mode.min_price,
             "upgrade": upgrade,
+            "can_audit": "audit" in modes_dict,
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -121,7 +123,9 @@ class VerifiedView(View):
         course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         if CourseEnrollment.enrollment_mode_for_user(request.user, course_id) == ('verified', True):
             return redirect(reverse('dashboard'))
-        verify_mode = CourseMode.mode_for_course(course_id, "verified")
+
+        modes_dict = CourseMode.modes_for_course_dict(course_id)
+        verify_mode = modes_dict.get('verified', None)
 
         if verify_mode is None:
             return redirect(reverse('dashboard'))
@@ -146,6 +150,7 @@ class VerifiedView(View):
             "chosen_price": chosen_price,
             "create_order_url": reverse("verify_student_create_order"),
             "upgrade": upgrade,
+            "can_audit": "audit" in modes_dict,
         }
         return render_to_response('verify_student/verified.html', context)
 

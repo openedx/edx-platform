@@ -66,17 +66,27 @@ $(document).ready(function() {
           <div class="register-choice register-choice-certificate">
             <div class="wrapper-copy">
               <span class="deco-ribbon"></span>
-              <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
-
-              %if upgrade:
-                <div class="copy">
-                  <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
-                </div>
+              %if verified_name == "Verified Certificate":
+                <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
               %else:
-                <div class="copy">
-                  <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
-                </div>
+                <h4 class="title">${verified_name}</h4>
               %endif
+
+              %if verified_name == "Verified Certificate":
+                %if upgrade:
+                    <div class="copy">
+                    <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %else:
+                    <div class="copy">
+                    <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %endif
+              %else:
+                    <div class="copy">
+                    <p>${verified_description}</p>
+                    </div>
+               %endif
             </div>
 
             <div class="field field-certificate-contribution">

@@ -11,7 +11,17 @@ from django.db.models import Q
 
 from xmodule_django.models import CourseKeyField
 
-Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_datetime'])
+Mode = namedtuple('Mode',
+                  [
+                      'slug',
+                      'name',
+                      'min_price',
+                      'suggested_prices',
+                      'currency',
+                      'expiration_datetime',
+                      'description'
+                  ])
+
 
 class CourseMode(models.Model):
     """
@@ -42,7 +52,11 @@ class CourseMode(models.Model):
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
+    # optional description override
+    # WARNING: will not be localized
+    description = models.TextField(null=True, blank=True)
+
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None)
     DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
@@ -66,7 +80,8 @@ class CourseMode(models.Model):
             mode.min_price,
             mode.suggested_prices,
             mode.currency,
-            mode.expiration_datetime
+            mode.expiration_datetime,
+            mode.description
         ) for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
