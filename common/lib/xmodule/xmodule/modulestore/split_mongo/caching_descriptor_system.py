@@ -151,6 +151,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         edit_info = json_data.get('edit_info', {})
         module.edited_by = edit_info.get('edited_by')
         module.edited_on = edit_info.get('edited_on')
+        module.published_by = None  # TODO
+        module.published_date = None  # TODO
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
         module.source_version = edit_info.get('source_version', None)

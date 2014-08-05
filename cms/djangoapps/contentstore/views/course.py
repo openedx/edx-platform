@@ -26,7 +26,8 @@ from xmodule.partitions.partitions import UserPartition, Group
 
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import CourseLocator
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -429,7 +430,7 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        course_key = SlashSeparatedCourseKey(org, number, run)
+        course_key = CourseLocator(org, number, run)
         fields = {'display_name': display_name} if display_name is not None else {}
 
         if 'source_course_key' in request.json:
@@ -461,6 +462,7 @@ def _create_new_course(request, course_key, fields):
     """
     Create a new course.
     Returns the URL for the course overview page.
+    Raises InvalidLocationError if the course already exists
     """
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
@@ -470,14 +472,16 @@ def _create_new_course(request, course_key, fields):
     definition_data = {'wiki_slug': wiki_slug}
     fields.update(definition_data)
 
-    # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-    new_course = modulestore().create_course(
-        course_key.org,
-        course_key.course,
-        course_key.run,
-        request.user.id,
-        fields=fields,
-    )
+    store = modulestore()
+    with store.default_store(settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE', 'mongo')):
+        # Creating the course raises InvalidLocationError if an existing course with this org/name is found
+        new_course = modulestore().create_course(
+            course_key.org,
+            course_key.course,
+            course_key.run,
+            request.user.id,
+            fields=fields,
+        )
 
     # Make sure user has instructor and staff access to the new course
     add_instructor(new_course.id, request.user, request.user)
