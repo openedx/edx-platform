@@ -184,6 +184,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
 
         ReleaseDateView = BaseDateView.extend({
             fieldName: 'start',
+            startingReleaseDate: null,
+
+            afterRender: function () {
+                BaseDateView.prototype.afterRender.call(this);
+                // Store the starting date and time so that we can determine if the user
+                // actually changed it when "Save" is pressed.
+                this.startingReleaseDate = this.getValue();
+            },
 
             getValue: function () {
                 return DateUtils.getDate(this.$('#start_date'), this.$('#start_time'));
@@ -195,8 +203,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
             },
 
             getMetadata: function () {
+                var newReleaseDate = this.getValue();
+                if (JSON.stringify(newReleaseDate) === JSON.stringify(this.startingReleaseDate)) {
+                    return {};
+                }
                 return {
-                    'start': this.getValue()
+                    'start': newReleaseDate
                 };
             }
         });
