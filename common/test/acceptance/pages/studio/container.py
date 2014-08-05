@@ -122,8 +122,7 @@ class ContainerPage(PageObject):
         if not warnings.is_present():
             return False
         warning_text = warnings.first.text[0]
-        return (warning_text == "This unit is visible to students. If you edit the unit, you must re-publish it for students to see your changes."
-            or warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience.")
+        return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."
 
     @property
     def publish_action(self):
