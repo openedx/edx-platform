@@ -280,6 +280,14 @@
             width: 25%;
           }
         }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
       }
 
       // CASE: select input
