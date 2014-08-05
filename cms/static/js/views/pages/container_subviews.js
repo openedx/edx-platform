@@ -174,9 +174,11 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 };
 
                 saveAndPublishStaffLock = function() {
+                    // Setting staff lock to null when disabled will delete the field from this xblock,
+                    // allowing it to use the inherited value instead of using false explicitly.
                     return xblockInfo.save({
                         publish: 'republish',
-                        metadata: {visible_to_staff_only: enableStaffLock}},
+                        metadata: {visible_to_staff_only: enableStaffLock ? true : null}},
                         {patch: true}
                     ).always(function() {
                         xblockInfo.set("publish", null);
