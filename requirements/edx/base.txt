@@ -8,7 +8,7 @@ beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
 bleach==1.4
 html5lib==0.999
-boto==2.13.3
+boto==2.32.1
 celery==3.0.19
 cssselect==0.9.1
 dealer==0.2.3
@@ -45,7 +45,7 @@ GitPython==0.3.2.RC1
 glob2==0.3
 gunicorn==0.17.4
 lazy==1.1
-lxml==3.0.1
+lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
 mongoengine==0.7.10
@@ -72,7 +72,7 @@ pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
 requests-oauthlib==0.4.1
-scipy==0.11.0
+scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
 sorl-thumbnail==11.12
