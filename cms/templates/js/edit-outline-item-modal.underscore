@@ -93,8 +93,8 @@
             <div class="modal-section-content staff-lock">
                 <ul class="list-fields list-input">
                     <li class="field field-checkbox">
+                        <label for="staff_lock" class="label"><%= gettext('Explicitly hide from students') %></label>
                         <input type="checkbox" id="staff_lock" name="staff_lock" />
-                        <label for="staff_lock" class="label"><%= gettext('Hide from students') %></label>
                     </li>
                 </ul>
             </div>

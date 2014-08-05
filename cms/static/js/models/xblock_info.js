@@ -102,7 +102,16 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The same as `due_date` but as an ISO-formatted date string.
              */
-            'due': null
+            'due': null,
+            /**
+             * True iff this xblock is explicitly staff locked, false otherwise.
+             */
+            'explicit_staff_lock': null,
+            /**
+             * The xblock which is determining the staff lock value. For instance, for a unit,
+             * this will either be the parent subsection or the grandparent section.
+             */
+            'staff_lock_from': null
         },
 
         initialize: function () {

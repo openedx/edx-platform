@@ -266,7 +266,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
 
         StaffLockView = Backbone.View.extend({
             isModelLocked: function() {
-                return this.model.get('visibility_state') == XBlockViewUtils.VisibilityState.staffOnly;
+                return this.model.get('explicit_staff_lock');
             },
 
             afterRender: function () {
@@ -291,7 +291,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
             },
 
             getMetadata: function() {
-                return this.hasChanges() ? { visible_to_staff_only: this.isLocked() } : {};
+                // Setting visible_to_staff_only to null when disabled will delete the field from this
+                // xblock, allowing it to inherit the value of its ancestors.
+                return this.hasChanges() ? { visible_to_staff_only: this.isLocked() ? true : null } : {};
             }
         });
 
