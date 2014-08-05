@@ -160,7 +160,7 @@ def use_code(request):
     """
     code = request.POST["code"]
     try:
-        coupon = Coupon.objects.get(code=code)
+        coupon = Coupon.objects.get(code=code, is_active=True)
     except Coupon.DoesNotExist:
         # If not coupon code then we check that code against course registration code
         try:
@@ -192,18 +192,15 @@ def use_coupon_code(coupon, user):
     """
     This method utilize course coupon code
     """
-    if coupon.is_active:
-        try:
-            cart = Order.get_cart_for_user(user)
-            CouponRedemption.add_coupon_redemption(coupon, cart)
-        except CouponAlreadyExistException:
-            return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon.code)))
-        except ItemDoesNotExistAgainstCouponException:
-            return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon.code)))
+    try:
+        cart = Order.get_cart_for_user(user)
+        CouponRedemption.add_coupon_redemption(coupon, cart)
+    except CouponAlreadyExistException:
+        return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon.code)))
+    except ItemDoesNotExistAgainstCouponException:
+        return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon.code)))
 
-        return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
-    else:
-        return HttpResponseBadRequest(_("Coupon '{0}' is inactive.".format(coupon.code)))
+    return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
 
 @login_required

@@ -142,8 +142,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.add_coupon(self.course_key, False)
         self.add_course_to_user_cart()
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
-        self.assertEqual(resp.status_code, 400)
-        self.assertIn("Coupon '{0}' is inactive.".format(self.coupon_code), resp.content)
+        self.assertEqual(resp.status_code, 404)
+        self.assertIn("Discount does not exist against code '{0}'.".format(self.coupon_code), resp.content)
 
     def test_course_does_not_exist_in_cart_against_valid_coupon(self):
         course_key = self.course_key.to_deprecated_string() + 'testing'
