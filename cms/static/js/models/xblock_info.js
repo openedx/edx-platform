@@ -110,6 +110,7 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The xblock which is determining the staff lock value. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
+             * This can be null if the xblock has no inherited staff lock.
              */
             'staff_lock_from': null
         },
