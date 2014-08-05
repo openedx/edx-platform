@@ -1,7 +1,6 @@
 import sys
 import json
 import logging
-import urllib2
 import urlparse
 import requests
 
@@ -48,11 +47,11 @@ class ProctorPanel(object):
         self.user = user
         self.ses = requests.session()
 
-    def _make_request(self, url, data=None, json=True):
-        ret = self.ses.get(urlparse.urljoin(self.proc_url, url),
-                           verify=False, data=data,
-                           auth=(self.proc_user, self.proc_pass),
-                           params={'problem': self.procset_name})
+    def _make_request(self, url, method="GET", data=None, json=True):
+        ret = self.ses.request(
+            method=method, url=urlparse.urljoin(self.proc_url, url),
+            verify=False, data=data, auth=(self.proc_user, self.proc_pass),
+            params={'problem': self.procset_name})
         if json:
             try:
                 data = ret.json()
@@ -65,23 +64,16 @@ class ProctorPanel(object):
         return data
 
     def request(self, json=True):
-        url = 'cmd/request/{0}/{1}'.format(self.user.id,
-                                           urllib2.quote(self.procset_name))
         data = dict(uname=self.user.username, name=self.user.profile.name)
-        return self._make_request(url, data=data, json=json)
+        return self._make_request('cmd/request/%s' % self.user.id,
+                                  method='POST', data=data, json=json)
 
     def status(self, json=True):
-        url = 'cmd/status/{0}/{1}'.format(self.user.id,
-                                           urllib2.quote(self.procset_name))
-        return self._make_request(url, json=json)
+        return self._make_request('cmd/status/%s' % self.user.id, json=json)
 
     def is_released(self):
-        url = 'cmd/status/{0}'.format(self.user.id)
-        log.info('ProctorPanel url={0}'.format(url))
-        retdat = self._make_request(url)
-        log.info('ProctorPanel retdat={0}'.format(retdat))
-        enabled = retdat.get('enabled', False)
-        return enabled
+        retdata = self.status()
+        return retdata.get('enabled', False)
 
 
 class ProctorFields(object):
