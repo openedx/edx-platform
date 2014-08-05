@@ -3,365 +3,394 @@
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
-
 <div class="ecommerce-wrapper">
-  <h3 class="coupon-errors" id="code-error"></h3>
-  <h2>Registration Codes</h2>
-  <p>Enter the transaction group name and number of registration codes that you want to generate. Click to generate a CSV :</p>
-  <p>
-     <form action="${ section_data['generate_registration_code_csv_url'] }" id="course_codes_number" method="post">
-       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-       <input type="text" name="transaction_group_name" placeholder="Transaction Group Name"/>
-       <input type="text" name="course_registration_code_number" placeholder="Number of Registration Codes" maxlength="4"/>
-       <input type="submit" name="generate-registration-codes-csv" value="${_("Generate Registration Codes")}" data-csv="true">
-     </form>
-  </p>
-
-  <p>Click to generate a CSV file of all Course Registrations Codes:</p>
-  <p>
-    <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
-       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-       <input type="text" name="download_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
-       <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
-    </form>
-  </p>
-
-  <p>Click to generate a CSV file of all Active Course Registrations Codes:</p>
-  <p>
-    <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
-       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-       <input type="text" name="active_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
-       <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
-    </form>
-  </p>
-
-  <p>Click to generate a CSV file of all Spent Course Registrations Codes:</p>
-  <p>
-    <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
-       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-       <input type="text" name="spent_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
-       <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
-    </form>
-  </p>
-  <hr>
-  <h2>${_("Course Price")}</h2>
-    <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
+   <h3 class="coupon-errors" id="code-error"></h3>
+   <div id = "accordion">
+      <div class="wrap">
+         <h2>Registration Codes</h2>
+         <div>
+            <p>Enter the transaction group name and number of registration codes that you want to generate. Click to generate a CSV :</p>
+            <p>
+            <form action="${ section_data['generate_registration_code_csv_url'] }" id="course_codes_number" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="transaction_group_name" placeholder="Transaction Group Name"/>
+               <input type="text" name="course_registration_code_number" placeholder="Number of Registration Codes" maxlength="4"/>
+               <input type="submit" name="generate-registration-codes-csv" value="${_("Generate Registration Codes")}" data-csv="true">
+            </form>
+            </p>
+            <p>Click to generate a CSV file of all Course Registrations Codes:</p>
+            <p>
+            <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="download_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
+            </form>
+            </p>
+            <p>Click to generate a CSV file of all Active Course Registrations Codes:</p>
+            <p>
+            <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="active_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
+            </form>
+            </p>
+            <p>Click to generate a CSV file of all Spent Course Registrations Codes:</p>
+            <p>
+            <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="spent_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
+            </form>
+            </p>
+         </div>
+      </div>
+      <!-- end wrap -->
+      <div class="wrap">
+         <h2>${_("Course Price")}</h2>
+         <div>
+            <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
+            %if section_data['access']['finance_admin'] is True:
+            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ Set Price</a>
+            %endif
+            </span>
+         </div>
+      </div>
+      <!-- end wrap -->
       %if section_data['access']['finance_admin'] is True:
-        <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ Set Price</a>
+      <div class="wrap">
+         <h2>${_("Transactions")}</h2>
+         <div>
+            %if section_data['total_amount'] is not None:
+            <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
+            %endif
+            <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
+            <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
+         </div>
+      </div>
+      <!-- end wrap -->
       %endif
-    </span>
-  <hr>
-  %if section_data['access']['finance_admin'] is True:
-    <h2>${_("Transactions")}</h2>
-    %if section_data['total_amount'] is not None:
-         <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
-    %endif
-
-    <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
-
-    <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
-  %endif
-
-  <h2>${_("Coupons List")}</h2>
-
-  <h3 class="coupon-errors" id="coupon-error"></h3>
-  <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
-                                                   class="add blue-button">${_("+ Add Coupon")}</a></span>
+      <div class="wrap">
+         <h2>${_("Coupons List")}</h2>
+         <div>
+            <h3 class="coupon-errors" id="coupon-error"></h3>
+            <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
+               class="add blue-button">${_("+ Add Coupon")}</a></span>
+            <div class="wrapper-content wrapper">
+               <section class="content">
+                  %if len(section_data['coupons']):
+                  <table class="coupons-table">
+                     <thead>
+                        <tr class="coupons-headings">
+                           <th class="c_code">${_("Code")}</th>
+                           <th class="c_dsc">${_("Description")}</th>
+                           <th class="c_course_id">${_("Course_id")}</th>
+                           <th class="c_discount">${_("Discount(%)")}</th>
+                           <th class="c_count">${_("Count")}</th>
+                           <th class="c_action">${_("Actions")}</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        %for coupon in section_data['coupons']:
+                        %if coupon.is_active == False:
+                        <tr class="coupons-items inactive_coupon">
+                           %else:
+                        <tr class="coupons-items">
+                           %endif
+                           <td>${coupon.code}</td>
+                           <td>${coupon.description}</td>
+                           <td>${coupon.course_id.to_deprecated_string()}</td>
+                           <td>${coupon.percentage_discount}</td>
+                           <td>
+                              ${ coupon.couponredemption_set.all().count() }
+                           </td>
+                           <!--<td>${coupon.is_active}</td>-->
+                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a></td>
+                        </tr>
+                        %endfor
+                     </tbody>
+                  </table>
+                  <a id="edit-modal-trigger" href="#edit-coupon-modal" rel="leanModal"></a>
+                  %endif
+               </section>
+            </div>
+         </div>
+      </div>
+      <!-- end wrap -->
+   </div>
 </div>
-<div class="wrapper-content wrapper">
-  <section class="content">
-    %if len(section_data['coupons']):
-    <table class="coupons-table">
-      <thead>
-      <tr class="coupons-headings">
-        <th class="c_code">${_("Code")}</th>
-        <th class="c_dsc">${_("Description")}</th>
-        <th class="c_course_id">${_("Course_id")}</th>
-        <th class="c_discount">${_("Discount(%)")}</th>
-        <th class="c_count">${_("Count")}</th>
-        <th class="c_action">${_("Actions")}</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      %for coupon in section_data['coupons']:
-      %if coupon.is_active == False:
-      <tr class="coupons-items inactive_coupon">
-      %else:
-      <tr class="coupons-items">
-      %endif
-        <td>${coupon.code}</td>
-
-        <td>${coupon.description}</td>
-        <td>${coupon.course_id.to_deprecated_string()}</td>
-        <td>${coupon.percentage_discount}</td>
-        <td>
-           ${ coupon.couponredemption_set.all().count() }
-        </td>
-        <!--<td>${coupon.is_active}</td>-->
-        <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a></td>
-      </tr>
-      %endfor
-      </tbody>
-    </table>
-    <a id="edit-modal-trigger" href="#edit-coupon-modal" rel="leanModal"></a>
-    %endif
-  </section>
-</div>
-
-
 <script>
-  $(function () {
-    $('a[rel*=leanModal]').leanModal();
-    $.each($("a.edit-right"), function () {
-      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-        $(this).removeAttr('href')
-      }
-    });
-    $.each($("a.remove_coupon"), function () {
-      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-        $(this).removeAttr('href')
-      }
-    });
-    $('a.edit-right').click(function (event) {
-      $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
-      $('#edit_coupon_form #coupon_form_error').text();
-      event.preventDefault();
-      event.stopPropagation();
-      var coupon_id = $(this).data('item-id');
-      $('#coupon_id').val(coupon_id);
-      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-        return false;
-      }
-      $.ajax({
-        type: "POST",
-        data: {id: coupon_id},
-        url: "${section_data['ajax_get_coupon_info']}",
-        success: function (data) {
-            $('#coupon-error').val('');
-            $('#coupon-error').attr('style', 'display: none');
-            $('input#edit_coupon_code').val(data.coupon_code);
-            $('input#edit_coupon_discount').val(data.coupon_discount);
-            $('textarea#edit_coupon_description').val(data.coupon_description);
-            $('input#edit_coupon_course_id').val(data.coupon_course_id);
-            $('#edit-modal-trigger').click();
-          },
-        error: function(jqXHR, textStatus, errorThrown) {
-          var data = $.parseJSON(jqXHR.responseText);
-          $('#coupon-error').html(data.message).show();
-        }
-      });
-    });
-    $('a.remove_coupon').click(function (event) {
-      var anchor = $(this);
-      if (anchor.data("disabled")) {
-        return false;
-      }
-      anchor.data("disabled", "disabled");
-      event.preventDefault();
-      if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-        return false;
-      }
-      $.ajax({
-        type: "POST",
-        data: {id: $(this).data('item-id')},
-        url: "${section_data['ajax_remove_coupon_url']}",
-        success: function (data) {
-            anchor.removeData("disabled");
-            location.reload(true);
-          },
-        error: function(jqXHR, textStatus, errorThrown) {
-          var data = $.parseJSON(jqXHR.responseText);
-          $('#coupon-error').html(data.message).show();
-          anchor.removeData("disabled");
-        }
-      });
-    });
-    $('#edit_coupon_form').submit(function () {
-      $("#update_coupon_button").attr('disabled', true);
-      // Get the Code and Discount value and trim it
-      var code = $.trim($('#edit_coupon_code').val());
-      var coupon_discount = $.trim($('#edit_coupon_discount').val());
-
-      // Check if empty of not
-      if (code === '') {
-        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
-        $("#update_coupon_button").removeAttr('disabled');
-        return false;
-      }
-      if (coupon_discount == '0') {
-        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Value Greater than 0')}");
-        $("#update_coupon_button").removeAttr('disabled');
-        return false;
-      }
-      if (parseInt(coupon_discount) > 100) {
-        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
-        $("#update_coupon_button").removeAttr('disabled');
-        return false;
-      }
-      if (!$.isNumeric(coupon_discount)) {
-        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
-        $("#update_coupon_button").removeAttr('disabled');
-        return false;
-      }
-    });
-    $('#course_price_link').click(function () {
-      reset_input_fields();
-    });
-    $('#add_coupon_link').click(function () {
-      reset_input_fields();
-    });
-    $('#set_price_form').submit(function () {
-      $("#set_course_button").attr('disabled', true);
-      // Get the Code and Discount value and trim it
-      var course_price = $.trim($('#mode_price').val());
-      var currency = $.trim($('#course_mode_currency').val());
-
-      // Check if empty of not
-      if (course_price === '') {
-        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-        $('#set_price_form #course_form_error').text("${_('Please Enter the Course Price')}");
-        $("#set_course_button").removeAttr('disabled');
-        return false;
-      }
-      if (!$.isNumeric(course_price)) {
-        $("#set_course_button").removeAttr('disabled');
-        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-        $('#set_price_form #course_form_error').text("${_('Please Enter the Numeric value for Discount')}");
-        return false;
-      }
-      if (currency == '') {
-        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-        $('#set_price_form #course_form_error').text("${_('Please Select the Currency')}");
-        $("#set_course_button").removeAttr('disabled');
-        return false;
-      }
-    });
-    $('#add_coupon_form').submit(function () {
-      $("#add_coupon_button").attr('disabled', true);
-      // Get the Code and Discount value and trim it
-      var code = $.trim($('#coupon_code').val());
-      var coupon_discount = $.trim($('#coupon_discount').val());
-
-      // Check if empty of not
-      if (code === '') {
-        $("#add_coupon_button").removeAttr('disabled');
-        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
-        return false;
-      }
-      if (coupon_discount == '0') {
-        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
-        $("#add_coupon_button").removeAttr('disabled');
-        return false;
-      }
-      if (parseInt(coupon_discount) > 100) {
-        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
-        $("#add_coupon_button").removeAttr('disabled');
-        return false;
-      }
-      if (!$.isNumeric(coupon_discount)) {
-        $("#add_coupon_button").removeAttr('disabled');
-        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Numeric value for Discount')}");
-        return false;
-      }
-    });
-
-    $('#set_price_form').on('ajax:complete', function (event, xhr) {
-      if (xhr.status == 200) {
-        location.reload(true);
-      } else {
-        $("#set_course_button").removeAttr('disabled');
-        $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-        $('#set_price_form #course_form_error').text(xhr.responseText);
-      }
-    });
-
-    $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
-      if (xhr.status == 200) {
-        location.reload(true);
-      } else {
-        $("#add_coupon_button").removeAttr('disabled');
-        $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#add_coupon_form #coupon_form_error').text(xhr.responseText);
-      }
-    });
-
-    $('#edit_coupon_form').on('ajax:complete', function (event, xhr) {
-      if (xhr.status == 200) {
-        location.reload(true);
-      } else {
-        $("#update_coupon_button").removeAttr('disabled');
-        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-        $('#edit_coupon_form #coupon_form_error').text(xhr.responseText);
-      }
-    });
-    // removing close link's default behavior
-    $('.close-modal').click(function (e) {
-      $("#update_coupon_button").removeAttr('disabled');
-      $("#add_coupon_button").removeAttr('disabled');
-      $("#set_course_button").removeAttr('disabled');
-      reset_input_fields();
-      e.preventDefault();
-    });
-
-    var onModalClose = function () {
-      $("#add-coupon-modal").attr("aria-hidden", "true");
-      $(".remove_coupon").focus();
-      $("#edit-coupon-modal").attr("aria-hidden", "true");
-      $(".edit-right").focus();
-      $("#set-course-mode-price-modal").attr("aria-hidden", "true");
-      $("#add_coupon_button").removeAttr('disabled');
-      $("#set_course_button").removeAttr('disabled');
-      $("#update_coupon_button").removeAttr('disabled');
-      reset_input_fields();
-    };
-
-    var cycle_modal_tab = function (from_element_name, to_element_name) {
-      $(from_element_name).on('keydown', function (e) {
-        var keyCode = e.keyCode || e.which;
-        var TAB_KEY = 9;  // 9 corresponds to the tab key
-        if (keyCode === TAB_KEY) {
-          e.preventDefault();
-          $(to_element_name).focus();
-        }
-      });
-    };
-
-    $("#add-coupon-modal .close-modal").click(onModalClose);
-    $("#edit-coupon-modal .close-modal").click(onModalClose);
-    $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
-
-
-    // Hitting the ESC key will exit the modal
-    $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
-      var keyCode = e.keyCode || e.which;
-      // 27 is the ESC key
-      if (keyCode === 27) {
-        e.preventDefault();
-        $("#add-coupon-modal .close-modal").click();
-        $("#set-course-mode-price-modal .close-modal").click();
-        $("#edit-coupon-modal .close-modal").click();
-      }
-    });
-  });
-  var reset_input_fields = function () {
-    $('#coupon-error').val('');
-    $('#coupon-error').attr('style', 'display: none');
-    $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
-    $('#set_price_form #course_form_error').attr('style', 'display: none');
-    $('#add_coupon_form #coupon_form_error').text();
-    $('input#mode_price').val('');
-    $('input#coupon_code').val('');
-    $('input#coupon_discount').val('');
-    $('textarea#coupon_description').val('');
-
-  }
+   $(function () {
+   
+       var icons = {
+           header: "ui-icon-circle-arrow-e",
+           activeHeader: "ui-icon-circle-arrow-s"
+       };
+       var act = 0;
+       $("#accordion").accordion(
+               {
+                   heightStyle: 'content',
+                   activate: function(event, ui) {
+                    var active = jQuery("#accordion").accordion('option', 'active');
+                    $.cookie('saved_index', null);
+                    $.cookie('saved_index', active);
+                   },
+                   animate: 400,
+                   header: "> div.wrap >h2",
+                   icons:icons,
+                   active:isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
+                   collapsible: true
+        });
+   
+     $('a[rel*=leanModal]').leanModal();
+     $.each($("a.edit-right"), function () {
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         $(this).removeAttr('href')
+       }
+     });
+     $.each($("a.remove_coupon"), function () {
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         $(this).removeAttr('href')
+       }
+     });
+     $('a.edit-right').click(function (event) {
+       $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
+       $('#edit_coupon_form #coupon_form_error').text();
+       event.preventDefault();
+       event.stopPropagation();
+       var coupon_id = $(this).data('item-id');
+       $('#coupon_id').val(coupon_id);
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {id: coupon_id},
+         url: "${section_data['ajax_get_coupon_info']}",
+         success: function (data) {
+             $('#coupon-error').val('');
+             $('#coupon-error').attr('style', 'display: none');
+             $('input#edit_coupon_code').val(data.coupon_code);
+             $('input#edit_coupon_discount').val(data.coupon_discount);
+             $('textarea#edit_coupon_description').val(data.coupon_description);
+             $('input#edit_coupon_course_id').val(data.coupon_course_id);
+             $('#edit-modal-trigger').click();
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+           var data = $.parseJSON(jqXHR.responseText);
+           $('#coupon-error').html(data.message).show();
+         }
+       });
+     });
+     $('a.remove_coupon').click(function (event) {
+       var anchor = $(this);
+       if (anchor.data("disabled")) {
+         return false;
+       }
+       anchor.data("disabled", "disabled");
+       event.preventDefault();
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {id: $(this).data('item-id')},
+         url: "${section_data['ajax_remove_coupon_url']}",
+         success: function (data) {
+             anchor.removeData("disabled");
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+           var data = $.parseJSON(jqXHR.responseText);
+           $('#coupon-error').html(data.message).show();
+           anchor.removeData("disabled");
+         }
+       });
+     });
+     $('#edit_coupon_form').submit(function () {
+       $("#update_coupon_button").attr('disabled', true);
+       // Get the Code and Discount value and trim it
+       var code = $.trim($('#edit_coupon_code').val());
+       var coupon_discount = $.trim($('#edit_coupon_discount').val());
+   
+       // Check if empty of not
+       if (code === '') {
+         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
+         $("#update_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (coupon_discount == '0') {
+         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Value Greater than 0')}");
+         $("#update_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (parseInt(coupon_discount) > 100) {
+         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
+         $("#update_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (!$.isNumeric(coupon_discount)) {
+         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
+         $("#update_coupon_button").removeAttr('disabled');
+         return false;
+       }
+     });
+     $('#course_price_link').click(function () {
+       reset_input_fields();
+     });
+     $('#add_coupon_link').click(function () {
+       reset_input_fields();
+     });
+     $('#set_price_form').submit(function () {
+       $("#set_course_button").attr('disabled', true);
+       // Get the Code and Discount value and trim it
+       var course_price = $.trim($('#mode_price').val());
+       var currency = $.trim($('#course_mode_currency').val());
+   
+       // Check if empty of not
+       if (course_price === '') {
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Please Enter the Course Price')}");
+         $("#set_course_button").removeAttr('disabled');
+         return false;
+       }
+       if (!$.isNumeric(course_price)) {
+         $("#set_course_button").removeAttr('disabled');
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         return false;
+       }
+       if (currency == '') {
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Please Select the Currency')}");
+         $("#set_course_button").removeAttr('disabled');
+         return false;
+       }
+     });
+     $('#add_coupon_form').submit(function () {
+       $("#add_coupon_button").attr('disabled', true);
+       // Get the Code and Discount value and trim it
+       var code = $.trim($('#coupon_code').val());
+       var coupon_discount = $.trim($('#coupon_discount').val());
+   
+       // Check if empty of not
+       if (code === '') {
+         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
+         return false;
+       }
+       if (coupon_discount == '0') {
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
+         $("#add_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (parseInt(coupon_discount) > 100) {
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
+         $("#add_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (!$.isNumeric(coupon_discount)) {
+         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         return false;
+       }
+     });
+   
+     $('#set_price_form').on('ajax:complete', function (event, xhr) {
+       if (xhr.status == 200) {
+         location.reload(true);
+       } else {
+         $("#set_course_button").removeAttr('disabled');
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text(xhr.responseText);
+       }
+     });
+   
+     $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
+       if (xhr.status == 200) {
+         location.reload(true);
+       } else {
+         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text(xhr.responseText);
+       }
+     });
+   
+     $('#edit_coupon_form').on('ajax:complete', function (event, xhr) {
+       if (xhr.status == 200) {
+         location.reload(true);
+       } else {
+         $("#update_coupon_button").removeAttr('disabled');
+         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#edit_coupon_form #coupon_form_error').text(xhr.responseText);
+       }
+     });
+     // removing close link's default behavior
+     $('.close-modal').click(function (e) {
+       $("#update_coupon_button").removeAttr('disabled');
+       $("#add_coupon_button").removeAttr('disabled');
+       $("#set_course_button").removeAttr('disabled');
+       reset_input_fields();
+       e.preventDefault();
+     });
+   
+     var onModalClose = function () {
+       $("#add-coupon-modal").attr("aria-hidden", "true");
+       $(".remove_coupon").focus();
+       $("#edit-coupon-modal").attr("aria-hidden", "true");
+       $(".edit-right").focus();
+       $("#set-course-mode-price-modal").attr("aria-hidden", "true");
+       $("#add_coupon_button").removeAttr('disabled');
+       $("#set_course_button").removeAttr('disabled');
+       $("#update_coupon_button").removeAttr('disabled');
+       reset_input_fields();
+     };
+   
+     var cycle_modal_tab = function (from_element_name, to_element_name) {
+       $(from_element_name).on('keydown', function (e) {
+         var keyCode = e.keyCode || e.which;
+         var TAB_KEY = 9;  // 9 corresponds to the tab key
+         if (keyCode === TAB_KEY) {
+           e.preventDefault();
+           $(to_element_name).focus();
+         }
+       });
+     };
+   
+     $("#add-coupon-modal .close-modal").click(onModalClose);
+     $("#edit-coupon-modal .close-modal").click(onModalClose);
+     $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
+   
+   
+     // Hitting the ESC key will exit the modal
+     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
+       var keyCode = e.keyCode || e.which;
+       // 27 is the ESC key
+       if (keyCode === 27) {
+         e.preventDefault();
+         $("#add-coupon-modal .close-modal").click();
+         $("#set-course-mode-price-modal .close-modal").click();
+         $("#edit-coupon-modal .close-modal").click();
+       }
+     });
+   });
+   var reset_input_fields = function () {
+     $('#coupon-error').val('');
+     $('#coupon-error').attr('style', 'display: none');
+     $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
+     $('#set_price_form #course_form_error').attr('style', 'display: none');
+     $('#add_coupon_form #coupon_form_error').text();
+     $('input#mode_price').val('');
+     $('input#coupon_code').val('');
+     $('input#coupon_discount').val('');
+     $('textarea#coupon_description').val('');
+   
+   }
 </script>
