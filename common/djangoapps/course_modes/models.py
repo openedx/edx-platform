@@ -4,6 +4,7 @@ Add and create new modes for running courses on this particular LMS
 import pytz
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 from collections import namedtuple
 from django.utils.translation import ugettext as _
@@ -12,6 +13,7 @@ from django.db.models import Q
 from xmodule_django.models import CourseKeyField
 
 Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_datetime'])
+
 
 class CourseMode(models.Model):
     """
@@ -35,14 +37,17 @@ class CourseMode(models.Model):
     suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
 
     # the currency these prices are in, using lower case ISO currency codes
-    currency = models.CharField(default="usd", max_length=8)
+    payment_currency = 'usd'
+    if settings.PAID_COURSE_REGISTRATION_CURRENCY[0]:
+        payment_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
+    currency = models.CharField(default=payment_currency, max_length=8)
 
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', payment_currency, None)
     DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
