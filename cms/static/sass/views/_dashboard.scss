@@ -561,6 +561,15 @@
 
     .course-item {
       border: none;
+
+      // STATE: hover/focus
+      &:hover {
+        background: inherit;
+
+        .course-title {
+          color: inherit;
+        }
+      }
     }
 
     // course details (replacement for course-link when a course cannot be linked)

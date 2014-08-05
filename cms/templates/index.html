@@ -248,7 +248,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <ul  class="item-actions course-actions">
               % if course_creator_status=='granted':
               <li class="action action-rerun">
-                <a href="${rerun_link}" rel="external" class="button rerun-button">${_("Re-run Course")}</a>
+                <a href="${rerun_link}" class="button rerun-button">${_("Re-run Course")}</a>
               </li>
               % endif
               <li class="action action-view">
