@@ -119,7 +119,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     released: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
                     releaseDateFrom: this.model.get('release_date_from'),
-                    hasExplicitStaffLock: this.model.get('explicit_staff_lock'),
+                    hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
                     staffLockFrom: this.model.get('staff_lock_from')
                 }));
 
@@ -168,7 +168,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = !xblockInfo.get('explicit_staff_lock');
+                enableStaffLock = !xblockInfo.get('has_explicit_staff_lock');
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);

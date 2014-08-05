@@ -106,7 +106,7 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True iff this xblock is explicitly staff locked, false otherwise.
              */
-            'explicit_staff_lock': null,
+            'has_explicit_staff_lock': null,
             /**
              * The xblock which is determining the staff lock value. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
