@@ -656,6 +656,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
         "visibility_state": visibility_state,
+        "explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
         "start": xblock.fields['start'].to_json(xblock.start),
         "graded": xblock.graded,
         "due_date": get_default_time_display(xblock.due),
@@ -682,7 +683,6 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
         if visibility_state == VisibilityState.staff_only:
-            xblock_info["explicit_staff_lock"] = xblock.fields['visible_to_staff_only'].is_set_on(xblock)
             xblock_info["staff_lock_from"] = _get_staff_lock_from(xblock)
 
     return xblock_info
