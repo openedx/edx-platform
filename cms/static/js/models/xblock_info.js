@@ -59,7 +59,7 @@ function(Backbone, _, str, ModuleUtils) {
              */
             "visibility_state": null,
             /**
-             * True iff the release date of the xblock is in the past.
+             * True if the release date of the xblock is in the past.
              */
             'released_to_students': null,
             /**

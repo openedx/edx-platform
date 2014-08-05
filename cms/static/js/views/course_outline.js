@@ -9,8 +9,10 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils",
-        "js/models/xblock_outline_info", "js/views/modals/edit_outline_item", "js/utils/drag_and_drop"],
-    function($, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, EditSectionXBlockModal, ContentDragger) {
+        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+    function(
+        $, _, XBlockOutlineView, ViewUtils, XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+    ) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
             // takes XBlockOutlineInfo as a model
@@ -144,12 +146,23 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             },
 
             editXBlock: function() {
-                var modal = new EditSectionXBlockModal({
-                    model: this.model,
+                var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
                     onSave: this.refresh.bind(this)
                 });
 
-                modal.show();
+                if (modal) {
+                    modal.show();
+                }
+            },
+
+            publishXBlock: function() {
+                var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
+                    onSave: this.refresh.bind(this)
+                });
+
+                if (modal) {
+                    modal.show();
+                }
             },
 
             addButtonActions: function(element) {
@@ -157,6 +170,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 element.find('.configure-button').click(function(event) {
                     event.preventDefault();
                     this.editXBlock();
+                }.bind(this));
+                element.find('.publish-button').click(function(event) {
+                    event.preventDefault();
+                    this.publishXBlock();
                 }.bind(this));
             },
 
