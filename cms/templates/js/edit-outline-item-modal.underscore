@@ -30,7 +30,7 @@
                   <ul class="list-actions">
                       <li class="action-item">
                           <a href="#" data-tooltip="<%= gettext('Clear Release Date/Time') %>" class="clear-date action-button action-clear">
-                              <i class="icon-remove-sign"></i>
+                              <i class="icon-undo"></i>
                               <span class="sr"><%= gettext('Clear Release Date/Time') %></span>
                           </a>
                       </li>
@@ -77,7 +77,7 @@
                   <ul class="list-actions">
                       <li class="action-item">
                           <a href="#" data-tooltip="<%= gettext('Clear Grading Due Date') %>" class="clear-date action-button action-clear">
-                              <i class="icon-remove-sign"></i>
+                              <i class="icon-undo"></i>
                               <span class="sr"><%= gettext('Clear Grading Due Date') %></span>
                           </a>
                       </li>
