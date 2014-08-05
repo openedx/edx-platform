@@ -16,6 +16,8 @@ PYTHON_REQ_FILES = [
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
+    'requirements/edx/github.txt',
+    'requirements/edx/local.txt',
     'requirements/edx/post.txt',
 ]
 
