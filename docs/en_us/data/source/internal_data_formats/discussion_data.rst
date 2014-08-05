@@ -334,9 +334,10 @@ historical_abuse_flaggers
 endorsed
 --------------------
   Boolean value. True if a forum moderator has marked this response to a
-  ``CommentThread`` as a valuable contribution to a discussion, or if a forum
-  moderator or the originator of a question ``CommentThread`` has marked this
-  response as the correct answer to the question that was asked.
+  ``CommentThread`` with a ``thread_type`` of "discussion" as a valuable
+  contribution, or if a forum moderator or the originator of a
+  ``CommentThread`` with a ``thread_type`` of "question" has marked this
+  response as the correct answer.
 
   The ``endorsed`` field is present for comments that are made as replies to
   responses, but in these cases the value is always false: the user interface
