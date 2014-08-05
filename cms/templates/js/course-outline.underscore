@@ -99,7 +99,7 @@ if (xblockInfo.get('graded')) {
                             <i class="icon icon-time"></i>
                             <%= gettext('Scheduled:') %>
                         <% } else { %>
-                            <i class="icon icon-file-alt"></i>
+                            <i class="icon icon-time"></i>
                             <%= gettext('Unscheduled') %>
                         <% } %>
                         <% if (xblockInfo.get('release_date')) { %>
