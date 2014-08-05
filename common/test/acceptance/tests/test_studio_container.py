@@ -692,6 +692,7 @@ class UnitPublishingTest(ContainerBase):
         Goes to the published version, then waits for the browser to load the page.
         """
         unit.view_published_version()
+        self.assertEqual(len(self.browser.window_handles), 2)
         self.courseware.wait_for_page()
 
     def _verify_and_return_staff_page(self):
