@@ -154,7 +154,6 @@ body.discussion {
   }
 
   .blank-slate {
-
     padding: 40px 40px 10px;
 
     section {
@@ -176,7 +175,11 @@ body.discussion {
     position: relative;
     min-height: 500px;
     background-image: url(../images/bg-texture.png);
-    background: $blue-l4;
+    background: $blue-l5;
+
+    &.blank-slate {
+      background: $white;
+    }
 
     a {
       word-wrap: break-word;
