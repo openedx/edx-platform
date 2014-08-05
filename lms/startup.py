@@ -12,6 +12,8 @@ import edxmako
 import logging
 import analytics
 
+from third_party_auth import settings as auth_settings
+
 log = logging.getLogger(__name__)
 
 
@@ -29,8 +31,11 @@ def run():
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
 
+    # Enable the use of third_party_auth, which allows users to sign in to edX
+    # using other identity providers. For configuration details, see
+    # common/djangoapps/third_party_auth/settings.py.
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
+        auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
 
     # Initialize Segment.io analytics module. Flushes first time a message is received and 
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
@@ -125,14 +130,3 @@ def enable_microsites():
         edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)
-
-
-def enable_third_party_auth():
-    """
-    Enable the use of third_party_auth, which allows users to sign in to edX
-    using other identity providers. For configuration details, see
-    common/djangoapps/third_party_auth/settings.py.
-    """
-
-    from third_party_auth import settings as auth_settings
-    auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)

@@ -118,7 +118,7 @@
 
       % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
-        % if not running_pipeline:
+        % if not pipeline_running:
 
         <p class="instructions">
           ${_("Register to start learning today!")}
@@ -178,7 +178,7 @@
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
-          % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:
+          % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline_running:
 
           <li class="is-disabled field optional password" id="field-password" hidden>
             <label for="password">${_('Password')}</label>

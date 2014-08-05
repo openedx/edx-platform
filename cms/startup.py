@@ -8,6 +8,8 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
 
+from third_party_auth import settings as auth_settings
+
 
 def run():
     """
@@ -16,8 +18,11 @@ def run():
     autostartup()
 
     add_mimetypes()
+    # Enable the use of third_party_auth, which allows users to sign in to edX
+    # using other identity providers. For configuration details, see
+    # common/djangoapps/third_party_auth/settings.py.
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
+        auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
 
 
 def add_mimetypes():
@@ -33,12 +38,3 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
 
-def enable_third_party_auth():
-    """
-    Enable the use of third_party_auth, which allows users to sign in to edX
-    using other identity providers. For configuration details, see
-    common/djangoapps/third_party_auth/settings.py.
-    """
-
-    from third_party_auth import settings as auth_settings
-    auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)

@@ -88,7 +88,7 @@ from util.password_policy_validators import (
     validate_password_dictionary
 )
 
-from third_party_auth import pipeline, provider
+from third_party_auth import pipeline, provider, utils
 from xmodule.error_module import ErrorDescriptor
 
 
@@ -367,16 +367,8 @@ def register_user(request, extra_context=None):
 
     context = {
         'course_id': request.GET.get('course_id'),
-        'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
-        'name': '',
-        'running_pipeline': None,
-        'platform_name': microsite.get_value(
-            'platform_name',
-            settings.PLATFORM_NAME
-        ),
         'selected_provider': '',
-        'username': '',
     }
 
     if extra_context is not None:
@@ -385,15 +377,7 @@ def register_user(request, extra_context=None):
     if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
         return render_to_response('register-shib.html', context)
 
-    # If third-party auth is enabled, prepopulate the form with data from the
-    # selected provider.
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
-        running_pipeline = pipeline.get(request)
-        current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
-        overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
-        overrides['running_pipeline'] = running_pipeline
-        overrides['selected_provider'] = current_provider.NAME
-        context.update(overrides)
+    utils.prepopulate_register_form(request, context)
 
     return render_to_response('register.html', context)
 
