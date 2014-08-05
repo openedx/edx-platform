@@ -13,6 +13,9 @@ July, 2014
 
    * - Date
      - Change
+   * - 08/5/14
+     - Updated the :ref:`view_enrollment_count` section to add that enrollment
+       information now includes a breakdown by certification track.
    * - 07/30/14
      - Expanded the :ref:`Discussions for Students and Staff` chapter to
        include information about adding posts, responses, and comments.
