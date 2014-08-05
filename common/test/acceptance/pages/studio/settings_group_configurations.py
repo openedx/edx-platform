@@ -30,6 +30,14 @@ class GroupConfigurationsPage(CoursePage):
         """
         self.q(css=".new-button").first.click()
 
+    @property
+    def no_group_configuration_message_is_present(self):
+        return self.q(css='.wrapper-content .no-group-configurations-content').present
+
+    @property
+    def no_group_configuration_message_text(self):
+        return self.q(css='.wrapper-content .no-group-configurations-content').text[0]
+
 
 class GroupConfiguration(object):
     """
@@ -197,6 +205,34 @@ class GroupConfiguration(object):
         Return delete note for the group configuration.
         """
         return self.find_css('.wrapper-delete-button').first.attrs('data-tooltip')[0]
+
+    @property
+    def details_error_icon_is_present(self):
+        return self.find_css('.wrapper-group-configuration-usages .icon-exclamation-sign').present
+
+    @property
+    def details_warning_icon_is_present(self):
+        return self.find_css('.wrapper-group-configuration-usages .icon-warning-sign').present
+
+    @property
+    def details_message_is_present(self):
+        return self.find_css('.wrapper-group-configuration-usages .group-configuration-validation-message').present
+
+    @property
+    def details_message_text(self):
+        return self.find_css('.wrapper-group-configuration-usages .group-configuration-validation-message').text[0]
+
+    @property
+    def edit_warning_icon_is_present(self):
+        return self.find_css('.wrapper-group-configuration-validation .icon-warning-sign').present
+
+    @property
+    def edit_warning_message_is_present(self):
+        return self.find_css('.wrapper-group-configuration-validation .group-configuration-validation-text').present
+
+    @property
+    def edit_warning_message_text(self):
+        return self.find_css('.wrapper-group-configuration-validation .group-configuration-validation-text').text[0]
 
     def __repr__(self):
         return "<{}:{}>".format(self.__class__.__name__, self.name)

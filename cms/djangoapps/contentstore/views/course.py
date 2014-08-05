@@ -106,7 +106,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     Handle incoming requests for notifications in a RESTful way.
 
     course_key_string and action_state_id must both be set; else a HttpBadResponseRequest is returned.
-    
+
     For each of these operations, the requesting user must have access to the course;
     else a PermissionDenied error is returned.
 
@@ -1123,20 +1123,49 @@ class GroupConfiguration(object):
     @staticmethod
     def get_usage_info(course, store):
         """
-        Get all units names and their urls that have experiments and associated
-        with configurations.
+        Get usage information for all Group Configurations.
+        """
+        split_tests = store.get_items(course.id, qualifiers={'category': 'split_test'})
+        return GroupConfiguration._get_usage_info(store, course, split_tests)
+
+    @staticmethod
+    def add_usage_info(course, store):
+        """
+        Add usage information to group configurations jsons in course.
+
+        Returns json of group configurations updated with usage information.
+        """
+        usage_info = GroupConfiguration.get_usage_info(course, store)
+        configurations = []
+        for partition in course.user_partitions:
+            configuration = partition.to_json()
+            configuration['usage'] = usage_info.get(partition.id, [])
+            configurations.append(configuration)
+        return configurations
+
+    @staticmethod
+    def _get_usage_info(store, course, split_tests):
+        """
+        Returns all units names, their urls and validation messages.
 
         Returns:
         {'user_partition_id':
             [
-                {'label': 'Unit Name / Experiment Name', 'url': 'url_to_unit_1'},
-                {'label': 'Another Unit Name / Another Experiment Name', 'url': 'url_to_unit_1'}
+                {
+                    'label': 'Unit 1 / Experiment 1',
+                    'url': 'url_to_unit_1',
+                    'validation': {'message': 'a validation message', 'type': 'warning'}
+                },
+                {
+                    'label': 'Unit 2 / Experiment 2',
+                    'url': 'url_to_unit_2',
+                    'validation': {'message': 'another validation message', 'type': 'error'}
+                }
             ],
         }
         """
         usage_info = {}
-        descriptors = store.get_items(course.id, qualifiers={'category': 'split_test'})
-        for split_test in descriptors:
+        for split_test in split_tests:
             if split_test.user_partition_id not in usage_info:
                 usage_info[split_test.user_partition_id] = []
 
@@ -1157,24 +1186,28 @@ class GroupConfiguration(object):
             )
             usage_info[split_test.user_partition_id].append({
                 'label': '{} / {}'.format(unit.display_name, split_test.display_name),
-                'url': unit_url
+                'url': unit_url,
+                'validation': split_test.general_validation_message,
             })
         return usage_info
 
     @staticmethod
-    def add_usage_info(course, store):
+    def update_usage_info(store, course, configuration):
         """
-        Add usage information to group configurations json.
+        Update usage information for particular Group Configuration.
 
-        Returns json of group configurations updated with usage information.
+        Returns json of particular group configuration updated with usage information.
         """
-        usage_info = GroupConfiguration.get_usage_info(course, store)
-        configurations = []
-        for partition in course.user_partitions:
-            configuration = partition.to_json()
-            configuration['usage'] = usage_info.get(partition.id, [])
-            configurations.append(configuration)
-        return configurations
+        # Get all Experiments that use particular Group Configuration in course.
+        split_tests = store.get_items(
+            course.id,
+            category='split_test',
+            content={'user_partition_id': configuration.id}
+        )
+        configuration_json = configuration.to_json()
+        usage_information = GroupConfiguration._get_usage_info(store, course, split_tests)
+        configuration_json['usage'] = usage_information.get(configuration.id, [])
+        return configuration_json
 
 
 @require_http_methods(("GET", "POST"))
@@ -1262,7 +1295,8 @@ def group_configurations_detail_handler(request, course_key_string, group_config
         else:
             course.user_partitions.append(new_configuration)
         store.update_item(course, request.user.id)
-        return JsonResponse(new_configuration.to_json(), status=201)
+        configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
+        return JsonResponse(configuration, status=201)
     elif request.method == "DELETE":
         if not configuration:
             return JsonResponse(status=404)

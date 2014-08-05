@@ -301,6 +301,33 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             )
         )
 
+    def create_group_configuration_experiment(self, groups, associate_experiment):
+        """
+        Creates a Group Configuration containing a list of groups.
+        Optionally creates a Content Experiment and associates it with previous Group Configuration.
+        """
+        # Create a new group configurations
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, "Name", "Description.", groups).to_json(),
+                ],
+            },
+        })
+
+        if associate_experiment:
+            # Assign newly created group configuration to experiment
+            vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+            self.course_fixture.create_xblock(
+                vertical.locator,
+                XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+            )
+
+        # Go to the Group Configuration Page
+        self.page.visit()
+        config = self.page.group_configurations[0]
+        return config
+
     def test_no_group_configurations_added(self):
         """
         Scenario: Ensure that message telling me to create a new group configuration is
@@ -311,11 +338,10 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And "Create new Group Configuration" button is available
         """
         self.page.visit()
-        css = ".wrapper-content .no-group-configurations-content"
-        self.assertTrue(self.page.q(css=css).present)
+        self.assertTrue(self.page.no_group_configuration_message_is_present)
         self.assertIn(
             "You haven't created any group configurations yet.",
-            self.page.q(css=css).text[0]
+            self.page.no_group_configuration_message_text
         )
 
     def test_group_configurations_have_correct_data(self):
@@ -783,4 +809,116 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertEqual(
             group_configuration_link_name,
             self.page.group_configurations[1].name
+        )
+
+    def test_details_error_validation_message(self):
+        """
+        Scenario: When a Content Experiment uses a Group Configuration, ensure
+        that an error validation message appears if necessary.
+
+        Given I have a course with a Group Configuration containing two Groups
+        And a Content Experiment is assigned to that Group Configuration
+        When I go to the Group Configuration Page
+        Then I do not see a error icon and message in the Group Configuration details view.
+        When I add a Group
+        Then I see an error icon and message in the Group Configuration details view
+        """
+
+        # Create group configuration and associated experiment
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+
+        # Display details view
+        config.toggle()
+        # Check that error icon and message are not present
+        self.assertFalse(config.details_error_icon_is_present)
+        self.assertFalse(config.details_message_is_present)
+
+        # Add a group
+        config.toggle()
+        config.edit()
+        config.add_group()
+        config.save()
+
+        # Display details view
+        config.toggle()
+        # Check that error icon and message are present
+        self.assertTrue(config.details_error_icon_is_present)
+        self.assertTrue(config.details_message_is_present)
+        self.assertIn(
+            "This content experiment has issues that affect content visibility.",
+            config.details_message_text
+        )
+
+    def test_details_warning_validation_message(self):
+        """
+        Scenario: When a Content Experiment uses a Group Configuration, ensure
+        that a warning validation message appears if necessary.
+
+        Given I have a course with a Group Configuration containing three Groups
+        And a Content Experiment is assigned to that Group Configuration
+        When I go to the Group Configuration Page
+        Then I do not see a warning icon and message in the Group Configuration details view.
+        When I remove a Group
+        Then I see a warning icon and message in the Group Configuration details view
+        """
+
+        # Create group configuration and associated experiment
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+
+        # Display details view
+        config.toggle()
+        # Check that warning icon and message are not present
+        self.assertFalse(config.details_warning_icon_is_present)
+        self.assertFalse(config.details_message_is_present)
+
+        # Remove a group
+        config.toggle()
+        config.edit()
+        config.groups[2].remove()
+        config.save()
+
+        # Display details view
+        config.toggle()
+        # Check that warning icon and message are present
+        self.assertTrue(config.details_warning_icon_is_present)
+        self.assertTrue(config.details_message_is_present)
+        self.assertIn(
+            "This content experiment has issues that affect content visibility.",
+            config.details_message_text
+        )
+
+    def test_edit_warning_message_empty_usage(self):
+        """
+        Scenario: When a Group Configuration is not used, ensure that there are no warning icon and message.
+
+        Given I have a course with a Group Configuration containing two Groups
+        When I edit the Group Configuration
+        Then I do not see a warning icon and message
+        """
+
+        # Create a group configuration with no associated experiment and display edit view
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], False)
+        config.edit()
+        # Check that warning icon and message are not present
+        self.assertFalse(config.edit_warning_icon_is_present)
+        self.assertFalse(config.edit_warning_message_is_present)
+
+    def test_edit_warning_message_non_empty_usage(self):
+        """
+        Scenario: When a Group Configuration is used, ensure that there are a warning icon and message.
+
+        Given I have a course with a Group Configuration containing two Groups
+        When I edit the Group Configuration
+        Then I see a warning icon and message
+        """
+
+        # Create a group configuration with an associated experiment and display edit view
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+        config.edit()
+        # Check that warning icon and message are present
+        self.assertTrue(config.edit_warning_icon_is_present)
+        self.assertTrue(config.edit_warning_message_is_present)
+        self.assertIn(
+            "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.",
+            config.edit_warning_message_text
         )

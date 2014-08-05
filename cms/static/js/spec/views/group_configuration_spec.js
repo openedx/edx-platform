@@ -33,7 +33,12 @@ define([
         usageText: '.group-configuration-usage-text',
         usageTextAnchor: '.group-configuration-usage-text > a',
         usageUnit: '.group-configuration-usage-unit',
-        usageUnitAnchor: '.group-configuration-usage-unit > a',
+        usageUnitAnchor: '.group-configuration-usage-unit a',
+        usageUnitMessage: '.group-configuration-validation-message',
+        usageUnitWarningIcon: '.group-configuration-usage-unit i.icon-warning-sign',
+        usageUnitErrorIcon: '.group-configuration-usage-unit i.icon-exclamation-sign',
+        warningMessage: '.group-configuration-validation-text',
+        warningIcon: '.wrapper-group-configuration-validation > i',
         note: '.wrapper-delete-button'
     };
 
@@ -162,12 +167,10 @@ define([
         it('should show non-empty usage appropriately', function() {
             var usageUnitAnchors;
 
-            this.model.set('usage',
-                [
-                    {'label': 'label1', 'url': 'url1'},
-                    {'label': 'label2', 'url': 'url2'}
-                ]
-            );
+            this.model.set('usage', [
+                {'label': 'label1', 'url': 'url1'},
+                {'label': 'label2', 'url': 'url2'}
+            ]);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
 
@@ -204,6 +207,55 @@ define([
             expect(this.view.$(SELECTORS.usageUnit)).not.toExist();
             expect(this.view.$(SELECTORS.usageCount))
                 .toContainText('Used in 2 units');
+        });
+
+        it('should show validation warning icon and message appropriately', function() {
+            this.model.set('usage', [
+                {
+                    'label': 'label1',
+                    'url': 'url1',
+                    'validation': {
+                        'message': "Warning message",
+                        'type': 'warning'
+                    }
+                }
+            ]);
+            this.model.set('showGroups', false);
+            this.view.$('.show-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).toContainText('Warning message');
+            expect(this.view.$(SELECTORS.usageUnitWarningIcon)).toExist();
+        });
+
+        it('should show validation error icon and message appropriately', function() {
+            this.model.set('usage', [
+                {
+                    'label': 'label1',
+                    'url': 'url1',
+                    'validation': {
+                        'message': "Error message",
+                        'type': 'error'
+                    }
+                }
+            ]);
+            this.model.set('showGroups', false);
+            this.view.$('.show-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).toContainText('Error message');
+            expect(this.view.$(SELECTORS.usageUnitErrorIcon)).toExist();
+        });
+
+        it('should hide validation icons and messages appropriately', function() {
+            this.model.set('usage', [
+                {'label': 'label1', 'url': 'url1'},
+                {'label': 'label2', 'url': 'url2'}
+            ]);
+            this.model.set('showGroups', true);
+            this.view.$('.hide-groups').click();
+
+            expect(this.view.$(SELECTORS.usageUnitMessage)).not.toExist();
+            expect(this.view.$(SELECTORS.usageUnitWarningIcon)).not.toExist();
+            expect(this.view.$(SELECTORS.usageUnitErrorIcon)).not.toExist();
         });
     });
 
@@ -417,6 +469,24 @@ define([
                 'data-tooltip', 'Cannot delete when in use by an experiment'
             );
             expect(this.view.$('.delete')).toHaveClass('is-disabled');
+        });
+
+        it('contains warning message if it is in use', function () {
+            this.model.set('usage', [ {'label': 'label1', 'url': 'url1'} ]);
+            this.view.render();
+            expect(this.view.$(SELECTORS.warningMessage)).toContainText(
+                'This configuration is currently used in content ' +
+                'experiments. If you make changes to the groups, you may ' +
+                'need to edit those experiments.'
+            );
+            expect(this.view.$(SELECTORS.warningIcon)).toExist();
+        });
+
+        it('does not contain warning message if it is not in use', function () {
+            this.model.set('usage', []);
+            this.view.render();
+            expect(this.view.$(SELECTORS.warningMessage)).not.toExist();
+            expect(this.view.$(SELECTORS.warningIcon)).not.toExist();
         });
     });
 

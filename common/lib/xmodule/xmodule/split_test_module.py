@@ -607,3 +607,19 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[unicode(group.id)] = dest_usage_key
+
+    @property
+    def general_validation_message(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        validation_messages = self.validation_messages()
+        if validation_messages:
+            has_error = any(message.message_type == ValidationMessageType.error for message in validation_messages)
+            return {
+                'message': _(u"This content experiment has issues that affect content visibility."),
+                'type': ValidationMessageType.error if has_error else ValidationMessageType.warning,
+            }
+        return None
