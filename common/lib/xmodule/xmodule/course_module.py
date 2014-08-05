@@ -934,7 +934,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     @property
     def id(self):
         """Return the course_id for this course"""
-        return self.location.course_key
+        return self.location.course_key.version_agnostic()
 
     @property
     def start_date_text(self):
