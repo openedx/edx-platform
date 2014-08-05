@@ -200,7 +200,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def course_id(self):
-        return self.location.course_key
+        return self.location.course_key.version_agnostic()
 
     @property
     def category(self):
@@ -208,7 +208,7 @@ class XModuleMixin(XBlockMixin):
 
     @property
     def location(self):
-        return self.scope_ids.usage_id
+        return self.scope_ids.usage_id.version_agnostic()
 
     @location.setter
     def location(self, value):

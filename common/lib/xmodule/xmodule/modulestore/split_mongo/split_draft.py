@@ -55,7 +55,11 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         Returns all the courses on the Draft branch (which is a superset of the courses on the Published branch).
         """
-        return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+        branch_setting = self.get_branch_setting()
+        if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+        elif branch_setting == ModuleStoreEnum.Branch.published_only:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.published)
 
     def _auto_publish_no_children(self, location, category, user_id):
         """

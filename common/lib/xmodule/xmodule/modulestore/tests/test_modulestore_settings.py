@@ -79,13 +79,13 @@ class ModuleStoreSettingsMigration(TestCase):
 
     def _get_mixed_stores(self, mixed_setting):
         """
-        Helper for accessing stores in a configuration setting for the Mixed modulestore
+        Helper for accessing stores in a configuration setting for the Mixed modulestore.
         """
         return mixed_setting["default"]["OPTIONS"]["stores"]
 
     def assertStoreValuesEqual(self, store_setting1, store_setting2):
         """
-        Tests whether the fields in the given store_settings are equal
+        Tests whether the fields in the given store_settings are equal.
         """
         store_fields = ["OPTIONS", "DOC_STORE_CONFIG"]
         for field in store_fields:
@@ -108,17 +108,27 @@ class ModuleStoreSettingsMigration(TestCase):
 
         return new_mixed_setting, new_stores[0]
 
+    def isSplitAdded(self, setting):
+        """
+        Tests whether the split module store is configured in the given setting.
+        """
+        return any(
+            ('DraftVersioningModuleStore' in store['ENGINE']) for store in setting['default']['OPTIONS']['stores']
+        )
+
     def test_convert_into_mixed(self):
         old_setting = self.OLD_CONFIG
-        _, new_default_store_setting = self.assertMigrated(old_setting)
+        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         self.assertEqual(new_default_store_setting["ENGINE"], old_setting["default"]["ENGINE"])
+        self.assertFalse(self.isSplitAdded(new_mixed_setting))
 
     def test_convert_from_old_mongo_to_draft_store(self):
         old_setting = self.OLD_CONFIG_WITH_DIRECT_MONGO
-        _, new_default_store_setting = self.assertMigrated(old_setting)
+        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         self.assertEqual(new_default_store_setting["ENGINE"], "xmodule.modulestore.mongo.draft.DraftModuleStore")
+        self.assertTrue(self.isSplitAdded(new_mixed_setting))
 
     def test_convert_from_dict_to_list(self):
         old_mixed_setting = self.OLD_MIXED_CONFIG_WITH_DICT
@@ -128,6 +138,7 @@ class ModuleStoreSettingsMigration(TestCase):
         # compare each store configured in mixed
         old_stores = self._get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
         new_stores = self._get_mixed_stores(new_mixed_setting)
-        self.assertEqual(len(new_stores), len(old_stores))
+        self.assertEqual(len(new_stores), len(old_stores) + 1)  # we do a +1 here since we added split
         for new_store_setting in self._get_mixed_stores(new_mixed_setting):
             self.assertStoreValuesEqual(new_store_setting, old_stores[new_store_setting['NAME']])
+        self.assertTrue(self.isSplitAdded(new_mixed_setting))
