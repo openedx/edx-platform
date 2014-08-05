@@ -266,7 +266,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
 
         StaffLockView = Backbone.View.extend({
             isModelLocked: function() {
-                return this.model.get('explicit_staff_lock');
+                return this.model.get('has_explicit_staff_lock');
             },
 
             afterRender: function () {
