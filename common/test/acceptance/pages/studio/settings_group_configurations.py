@@ -56,6 +56,13 @@ class GroupConfiguration(object):
         """
         self.find_css('a.group-toggle').first.click()
 
+    @property
+    def is_expanded(self):
+        """
+        Group configuration usage information is expanded.
+        """
+        return self.find_css('a.group-toggle.hide-groups').present
+
     def add_group(self):
         """
         Add new group.
