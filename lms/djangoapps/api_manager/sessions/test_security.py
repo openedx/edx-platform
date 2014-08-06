@@ -38,8 +38,8 @@ class SessionApiSecurityTest(TestCase):
         # Create the test client
         self.client = Client()
         cache.clear()
-        self.session_url = '/api/sessions'
-        self.user_url = '/api/users'
+        self.session_url = '/api/server/sessions'
+        self.user_url = '/api/server/users'
 
     @override_settings(MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED=10)
     def test_login_ratelimited_success(self):

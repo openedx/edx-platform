@@ -59,7 +59,12 @@ class UsersApiTests(TestCase):
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
         self.test_city = str(uuid.uuid4())
-        self.org_base_uri = '/api/organizations/'
+        self.courses_base_uri = '/api/server/courses'
+        self.groups_base_uri = '/api/server/groups'
+        self.org_base_uri = '/api/server/organizations/'
+        self.workgroups_base_uri = '/api/server/workgroups/'
+        self.users_base_uri = '/api/server/users'
+        self.sessions_base_uri = '/api/server/sessions'
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_bogus_content_id = 'i4x://foo/bar/baz/Chapter1'
 
@@ -144,7 +149,7 @@ class UsersApiTests(TestCase):
 
     def _create_test_user(self):
         """Helper method to create a new test user"""
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -153,7 +158,7 @@ class UsersApiTests(TestCase):
         return user_id
 
     def test_user_list_get(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         users = []
         # create a 25 new users
         for i in xrange(1, 26):
@@ -218,7 +223,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 0)
 
     def test_user_list_get_with_org_filter(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         users = []
         # create a 7 new users
         for i in xrange(1, 8):
@@ -256,7 +261,7 @@ class UsersApiTests(TestCase):
         self.assertGreaterEqual(len(response.data['results']), 4)
 
     def test_user_list_post(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -273,7 +278,7 @@ class UsersApiTests(TestCase):
         self.assertIsNotNone(response.data['created'])
 
     def test_user_list_post_inactive(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password,
@@ -283,7 +288,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['is_active'], False)
 
     def test_user_list_post_duplicate(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -294,7 +299,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['field_conflict'], 'username or email')
 
     def test_user_detail_get(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -313,12 +318,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data['resources']), 2)
 
     def test_user_detail_get_undefined(self):
-        test_uri = '/api/users/123456789'
+        test_uri = '{}/123456789'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_detail_post(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email,
                 'username': local_username, 'password': self.test_password,
@@ -327,7 +332,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 201)
         test_uri = test_uri + '/' + str(response.data['id'])
         auth_data = {'username': local_username, 'password': self.test_password}
-        self.do_post('/api/sessions', auth_data)
+        self.do_post(self.sessions_base_uri, auth_data)
         self.assertEqual(response.status_code, 201)
         data = {'is_active': False, 'is_staff': True}
         response = self.do_post(test_uri, data)
@@ -350,7 +355,7 @@ class UsersApiTests(TestCase):
         Must return bad request against username, Already exist!
         """
         lst_username = []
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         for i in xrange(2):
             local_username = self.test_username + str(i)
             lst_username.append(local_username)
@@ -377,7 +382,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['message'], message)
 
     def test_user_detail_post_invalid_password(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email,
                 'username': local_username, 'password': self.test_password,
@@ -394,7 +399,7 @@ class UsersApiTests(TestCase):
         Create a user, then add the user profile
         Must be added
         """
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
@@ -422,7 +427,7 @@ class UsersApiTests(TestCase):
         Profile Must be added with year_of_birth will be none
         and avatar_url None
         """
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
@@ -436,17 +441,17 @@ class UsersApiTests(TestCase):
         self.is_user_profile_created_updated(response, data)
 
     def test_user_detail_post_invalid_user(self):
-        test_uri = '/api/users/123124124'
+        test_uri = '{}/123124124'.format(self.users_base_uri)
         data = {'is_active': False}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_list_post(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -465,11 +470,11 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['user_id'], str(user_id))
 
     def test_user_groups_list_post_duplicate(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -484,22 +489,22 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 409)
 
     def test_user_groups_list_post_invalid_user(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users/897698769/groups'
+        test_uri = '{}/897698769/groups'.format(self.users_base_uri)
         data = {'group_id': group_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_list_get(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         group_name = 'Alpha Group'
         data = {'name': group_name, 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -517,7 +522,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['groups'][0]['name'], str(group_name))
 
     def test_user_groups_list_get_with_query_params(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password,
@@ -528,7 +533,7 @@ class UsersApiTests(TestCase):
         test_uri = '{}/{}'.format(test_uri, str(user_id))
         fail_user_id_group_uri = '{}/{}/groups'.format(test_uri, '22')
 
-        group_url = '/api/groups'
+        group_url = self.groups_base_uri
         group_name = 'Alpha Group'
         data = {'name': group_name, 'type': 'Engineer'}
         response = self.do_post(group_url, data)
@@ -564,16 +569,16 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data['groups']), 0)
 
     def test_user_groups_list_get_invalid_user(self):
-        test_uri = '/api/users/123124/groups'
+        test_uri = '{}/123124/groups'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_detail_get(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -592,11 +597,11 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['user_id'], user_id)
 
     def test_user_groups_detail_delete(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -616,27 +621,27 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_detail_get_invalid_user(self):
-        test_uri = '/api/users/123124/groups/12321'
+        test_uri = '{}/123124/groups/12321'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_groups_detail_get_undefined(self):
-        test_uri = '/api/groups'
+        test_uri = self.groups_base_uri
         data = {'name': 'Alpha Group', 'type': 'test'}
         response = self.do_post(test_uri, data)
         group_id = response.data['id']
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
-        test_uri = '/api/users/' + str(user_id) + '/groups/' + str(group_id)
+        test_uri = '{}/{}/groups/{}'.format(self.users_base_uri, user_id, group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_post(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -653,7 +658,7 @@ class UsersApiTests(TestCase):
 
     def test_user_courses_list_post_undefined_user(self):
         course = CourseFactory.create()
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         user_id = '234234'
         test_uri = '{}/{}/courses'.format(test_uri, str(user_id))
         data = {'course_id': unicode(course.id)}
@@ -661,7 +666,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_post_undefined_course(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -676,7 +681,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_list_get(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -707,7 +712,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(datetime.strftime(response.data[1]['end'], '%Y-%m-%d %H:%M:%S'), datetime.strftime(self.course.end, '%Y-%m-%d %H:%M:%S'))
 
     def test_user_courses_list_get_undefined_user(self):
-        test_uri = '/api/users/2134234/courses'
+        test_uri = '{}/2134234/courses'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -763,7 +768,7 @@ class UsersApiTests(TestCase):
             display_name="Vertical 3"
         )
 
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -808,7 +813,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['position_tree']['vertical']['id'], unicode(vertical3.scope_ids.usage_id))
 
     def test_user_courses_detail_post_invalid_course(self):
-        test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, self.user.id, self.test_bogus_course_id)
         response = self.do_post(test_uri, data={})
         self.assertEqual(response.status_code, 404)
 
@@ -823,7 +828,7 @@ class UsersApiTests(TestCase):
         )
         user_id = 2342334
         course_id = 'asd/fa/9sd8fasdf'
-        test_uri = '/api/users/{}/courses/{}'.format(str(user_id), course_id)
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, user_id, course_id)
         position_data = {
             'position': {
                 'parent_content_id': course_id,
@@ -843,7 +848,7 @@ class UsersApiTests(TestCase):
             data=test_data,
             display_name="Chapter 1"
         )
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -865,7 +870,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
 
     def test_user_courses_detail_post_position_invalid_course(self):
-        test_uri = '/api/users/{}/courses'.format(self.user.id)
+        test_uri = '{}/{}/courses'.format(self.users_base_uri, self.user.id)
         data = {'course_id': unicode(self.course.id)}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + unicode(self.course.id)
@@ -888,7 +893,7 @@ class UsersApiTests(TestCase):
             data=test_data,
             display_name="Overview"
         )
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -919,30 +924,30 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter1.scope_ids.usage_id))
 
     def test_user_courses_detail_get_invalid_course(self):
-        test_uri = '/api/users/{}/courses/{}'.format(self.user.id, self.test_bogus_course_id)
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, self.user.id, self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_get_undefined_user(self):
-        test_uri = '/api/users/2134234/courses/a8df7/asv/d98'
+        test_uri = '{}/2134234/courses/a8df7/asv/d98'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_get_undefined_enrollment(self):
         course = CourseFactory.create()
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
-        test_uri = '/api/users/' + str(user_id) + '/courses/' + str(course.id)
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, user_id, course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_courses_detail_delete(self):
         course = CourseFactory.create()
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
                 self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
@@ -972,31 +977,28 @@ class UsersApiTests(TestCase):
     def test_user_courses_detail_delete_undefined_user(self):
         course = CourseFactory.create()
         user_id = '2134234'
-        test_uri = '/api/users/{}/courses/{}'.format(
-            str(user_id), str(course.id))
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, user_id, course.id)
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
     def test_user_courses_detail_delete_undefined_course(self):
-        test_uri = '/api/users/{}/courses/{}'.format(str(self.user.id), self.test_bogus_course_id)
+        test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, self.user.id, self.test_bogus_course_id)
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
     def test_user_course_grades_course_not_found(self):
-        test_uri = '/api/users/{}/courses/{}/grades'.format(
-            self.user.id, 'slashes:some+unknown+course')
+        test_uri = '{}/{}/courses/slashes:some+unknown+course/grades'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_course_grades_user_not_found(self):
         course = CourseFactory.create()
-        test_uri = '/api/users/{}/courses/{}/grades'.format(
-            '9999999', course.id)
+        test_uri = '{}/99999999/courses/{}/grades'.format(self.users_base_uri, course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_preferences_user_list_get_not_found(self):
-        test_uri = '/api/users/{}/preferences'.format('999999')
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -1004,20 +1006,20 @@ class UsersApiTests(TestCase):
         # By default newly created users will have one initial preference settings:
         # 'pref-lang' = 'en'
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data['pref-lang'], 'en')
 
     def test_user_preferences_list_post_user_not_found(self):
-        test_uri = '/api/users/{}/preferences'.format('999999')
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 404)
 
     def test_user_preferences_list_post_bad_request(self):
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_post(test_uri, {})
         self.assertEqual(response.status_code, 400)
         # also test with a non-simple key/value set of strings
@@ -1032,7 +1034,7 @@ class UsersApiTests(TestCase):
 
     def test_user_preferences_list_post(self):
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 201)
         response = self.do_get(test_uri)
@@ -1043,7 +1045,7 @@ class UsersApiTests(TestCase):
 
     def test_user_preferences_list_update(self):
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 201)
         response = self.do_post(test_uri, {"foo": "updated"})
@@ -1056,7 +1058,7 @@ class UsersApiTests(TestCase):
 
     def test_user_preferences_detail_get(self):
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/{}'.format(test_uri, 'foo')
@@ -1065,13 +1067,13 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['foo'], 'bar')
 
     def test_user_preferences_detail_get_invalid_user(self):
-        test_uri = '/api/users/12345/preferences/foo'
+        test_uri = '{}/12345/preferences/foo'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_preferences_detail_delete(self):
         user_id = self._create_test_user()
-        test_uri = '/api/users/{}/preferences'.format(user_id)
+        test_uri = '{}/{}/preferences'.format(self.users_base_uri, user_id)
         response = self.do_post(test_uri, {"foo": "bar"})
         self.assertEqual(response.status_code, 201)
         test_uri = '{}/{}'.format(test_uri, 'foo')
@@ -1083,7 +1085,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_user_preferences_detail_delete_invalid_user(self):
-        test_uri = '/api/users/12345/preferences/foo'
+        test_uri = '{}/12345/preferences/foo'.format(self.users_base_uri)
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -1144,8 +1146,7 @@ class UsersApiTests(TestCase):
             module_type='mentoring'
         )
 
-        test_uri = '/api/users/{}/courses/{}/grades'.format(
-            user_id, unicode(course.id))
+        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1201,23 +1202,23 @@ class UsersApiTests(TestCase):
             response = self.do_post(self.org_base_uri, data)
             self.assertEqual(response.status_code, 201)
 
-        test_uri = '/api/users/{}/organizations/'.format(user_id)
+        test_uri = '{}/{}/organizations/'.format(self.users_base_uri, user_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 6)
         self.assertEqual(len(response.data['results']), 6)
         self.assertEqual(response.data['num_pages'], 1)
 
         # test with anonymous user id
-        test_uri = '/api/users/{}/organizations/'.format(anonymous_id)
+        test_uri = '{}/{}/organizations/'.format(self.users_base_uri, anonymous_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 6)
 
         # test with invalid user
-        response = self.do_get('/api/users/4356340/organizations/')
+        response = self.do_get('{}/4356340/organizations/'.format(self.users_base_uri))
         self.assertEqual(response.status_code, 404)
 
     def test_user_workgroups_list(self):
-        test_workgroups_uri = '/api/workgroups/'
+        test_workgroups_uri = self.workgroups_base_uri
         user_id = self.user.id
         # create anonymous user
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
@@ -1238,7 +1239,7 @@ class UsersApiTests(TestCase):
             self.assertEqual(response.status_code, 201)
 
         # test with anonymous user id
-        test_uri = '/api/users/{}/workgroups/?page_size=10'.format(anonymous_id)
+        test_uri = '{}/{}/workgroups/?page_size=10'.format(self.users_base_uri, anonymous_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 11)
         self.assertEqual(len(response.data['results']), 10)
@@ -1246,7 +1247,7 @@ class UsersApiTests(TestCase):
 
         # test with course_id filter and integer user id
         course_id = {'course_id': unicode(self.course.id)}
-        response = self.do_get('/api/users/{}/workgroups/?{}'.format(user_id, urlencode(course_id)))
+        response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, user_id, urlencode(course_id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 7)
         self.assertEqual(len(response.data['results']), 7)
@@ -1254,12 +1255,12 @@ class UsersApiTests(TestCase):
         self.assertIsNotNone(response.data['results'][0]['project'])
 
         # test with invalid user
-        response = self.do_get('/api/users/4356340/workgroups/')
+        response = self.do_get('{}/4356340/workgroups/'.format(self.users_base_uri))
         self.assertEqual(response.status_code, 404)
 
         # test with valid user but has no workgroup
         another_user_id = self._create_test_user()
-        response = self.do_get('/api/users/{}/workgroups/'.format(another_user_id))
+        response = self.do_get('{}/{}/workgroups/'.format(self.users_base_uri, another_user_id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(len(response.data['results']), 0)
@@ -1267,7 +1268,7 @@ class UsersApiTests(TestCase):
     def test_user_completions_list(self):
         user_id = self.user.id
         another_user_id = UserFactory().id
-        completion_uri = '/api/courses/{}/completions/'.format(unicode(self.course.id))
+        completion_uri = '{}/{}/completions/'.format(self.courses_base_uri, unicode(self.course.id))
 
         for i in xrange(1, 26):
             if i > 12:
@@ -1286,7 +1287,7 @@ class UsersApiTests(TestCase):
             self.assertEqual(response.status_code, 201)
 
         # Get course module completion by user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/?page_size=6'.format(user_id, unicode(self.course.id))
+        completion_list_uri = '{}/{}/courses/{}/completions/?page_size=6'.format(self.users_base_uri, user_id, unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 12)
@@ -1296,14 +1297,15 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['num_pages'], 2)
 
         # Get course module completion by other user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format(another_user_id, unicode(self.course.id))
+        completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, another_user_id, unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 13)
 
         # Get course module completion by other user and course module id (content_id)
         content_id = {'content_id': unicode(local_content.scope_ids.usage_id)}
-        completion_list_uri = '/api/users/{}/courses/{}/completions/?{}'.format(
+        completion_list_uri = '{}/{}/courses/{}/completions/?{}'.format(
+            self.users_base_uri,
             course_user_id,
             unicode(self.course.id),
             urlencode(content_id)
@@ -1313,12 +1315,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['count'], 1)
 
         # Get course module completion by bogus user
-        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', unicode(self.course.id))
+        completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, '34323422', unicode(self.course.id))
         response = self.do_get(completion_list_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_user_count_by_city(self):
-        test_uri = '/api/users'
+        test_uri = self.users_base_uri
 
         # create a 25 new users
         for i in xrange(1, 26):
@@ -1344,26 +1346,26 @@ class UsersApiTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.is_user_profile_created_updated(response, data)
 
-        response = self.do_get('/api/users/metrics/cities/')
+        response = self.do_get('{}/metrics/cities/'.format(self.users_base_uri))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 4)
         self.assertEqual(response.data['results'][0]['city'], 'San Francisco')
         self.assertEqual(response.data['results'][0]['count'], 9)
 
         # filter counts by city
-        response = self.do_get('/api/users/metrics/cities/?city=new york city')
+        response = self.do_get('{}/metrics/cities/?city=new york city'.format(self.users_base_uri))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['city'], 'New York City')
         self.assertEqual(response.data['results'][0]['count'], 6)
 
     def test_users_social_metrics_get_service_unavailable(self):
-        test_uri = '/api/users/{}/courses/{}/metrics/social/'.format(self.user.id, self.course.id)
+        test_uri = '{}/{}/courses/{}/metrics/social/'.format(self.users_base_uri, self.user.id, self.course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 500)
 
     def test_users_social_metrics_get_invalid_user(self):
-        test_uri = '/api/users/{}/courses/{}/metrics/social/'.format(12345, self.course.id)
+        test_uri = '{}/12345/courses/{}/metrics/social/'.format(self.users_base_uri, self.course.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -1381,7 +1383,7 @@ class UsersApiTests(TestCase):
             end=datetime(2015, 1, 16, 14, 30)
         )
         allow_access(course3, self.user, 'staff')
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
@@ -1406,19 +1408,19 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['count'], 0)
 
     def test_users_roles_list_get_invalid_user(self):
-        test_uri = '/api/users/23423/roles/'
+        test_uri = '{}/23423/roles/'.format(self.users_base_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_list_get_invalid_course(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         course_id = {'course_id': '{}'.format(unicode(self.test_bogus_course_id))}
         test_uri = '{}?{}'.format(test_uri, urlencode(course_id))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_list_post(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
@@ -1436,19 +1438,19 @@ class UsersApiTests(TestCase):
         self.assertTrue(has_role)
 
     def test_users_roles_list_post_invalid_user(self):
-        test_uri = '/api/users/2131/roles/'
+        test_uri = '{}/2131/roles/'.format(self.users_base_uri)
         data = {'course_id': unicode(self.course.id), 'role': 'instructor'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_list_post_invalid_course(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = {'course_id': self.test_bogus_course_id, 'role': 'instructor'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_users_roles_list_post_invalid_role(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = {'course_id': unicode(self.course.id), 'role': 'invalid_role'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 400)
@@ -1472,7 +1474,7 @@ class UsersApiTests(TestCase):
             name=FORUM_ROLE_MODERATOR,
             course_id=course3.id)
 
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
@@ -1503,13 +1505,13 @@ class UsersApiTests(TestCase):
             self.assertEqual(role['role'], 'staff')
 
     def test_users_roles_list_put_invalid_user(self):
-        test_uri = '/api/users/2131/roles/'
+        test_uri = '{}/2131/roles/'.format(self.users_base_uri)
         data = [{'course_id': unicode(self.course.id), 'role': 'instructor'}]
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_list_put_invalid_course(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = {'course_id': unicode(self.course.id), 'role': 'instructor'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -1524,13 +1526,13 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['results'][0]['course_id'], unicode(self.course.id))
 
     def test_users_roles_list_put_invalid_roles(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = []
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_users_roles_courses_detail_delete(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = {'course_id': unicode(self.course.id), 'role': 'instructor'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -1554,19 +1556,19 @@ class UsersApiTests(TestCase):
             pass
 
     def test_users_roles_courses_detail_delete_invalid_course(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         delete_uri = '{}instructor/courses/{}'.format(test_uri, self.test_bogus_course_id)
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_courses_detail_delete_invalid_user(self):
-        test_uri = '/api/users/124134/roles/'
+        test_uri = '{}/124134/roles/'.format(self.users_base_uri)
         delete_uri = '{}instructor/courses/{}'.format(test_uri, unicode(self.course.id))
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_users_roles_courses_detail_delete_invalid_role(self):
-        test_uri = '/api/users/{}/roles/'.format(self.user.id)
+        test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         delete_uri = '{}invalid_role/courses/{}'.format(test_uri, unicode(self.course.id))
         response = self.do_delete(delete_uri)
         self.assertEqual(response.status_code, 404)

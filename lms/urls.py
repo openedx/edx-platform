@@ -59,7 +59,6 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('user_api.urls')),
 
     url(r'^lang_pref/', include('lang_pref.urls')),
 
@@ -73,11 +72,20 @@ urlpatterns = ('',  # nopep8
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
-# OPEN EDX API
+# OPEN EDX SERVER API
 if settings.FEATURES["API"]:
     urlpatterns += (
-        url(r'^api/', include('api_manager.urls')),
+        url(r'^api/server/', include('api_manager.urls')),
     )
+
+# OPEN EDX USER API
+# mattdrayer: Please note that the user_api declaration must follow
+# the server api declaration.  When declared ahead of the server api
+# the user_api will oddly begin to return server-oriented user URIs
+# At this time I'm not sure why this seems to be a one-way scenario.
+urlpatterns += (
+    url(r'^user_api/', include('user_api.urls')),
+)
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (

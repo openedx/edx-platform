@@ -33,13 +33,11 @@ def course_id_from_url(url):
     if not url:
         return None
 
+    COURSE_REGEX = re.compile(r'^.*?/courses/(?P<course_id>[a-zA-Z0-9_+\/:]+)')
     match = COURSE_REGEX.match(url)
-
     if match is None:
         return None
-
     course_id = match.group('course_id')
-
     if course_id is None:
         return None
 
