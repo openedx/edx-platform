@@ -35,9 +35,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
 
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
-        self.test_organizations_uri = '/api/organizations/'
-        self.test_users_uri = '/api/users'
-        self.base_groups_uri = '/api/groups'
+        self.base_organizations_uri = '/api/server/organizations/'
+        self.base_users_uri = '/api/server/users'
+        self.base_groups_uri = '/api/server/groups'
         self.test_organization_name = str(uuid.uuid4())
         self.test_organization_display_name = 'Test Org'
         self.test_organization_contact_name = 'John Org'
@@ -97,7 +97,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
                 'first_name': 'John{}'.format(i),
                 'last_name': 'Doe{}'.format(i)
             }
-            response = self.do_post(self.test_users_uri, data)
+            response = self.do_post(self.base_users_uri, data)
             self.assertEqual(response.status_code, 201)
             users.append(response.data['id'])
 
@@ -109,12 +109,12 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_phone': self.test_organization_contact_phone,
             'users': users
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertGreater(response.data['id'], 0)
         confirm_uri = '{}{}{}/'.format(
             self.test_server_prefix,
-            self.test_organizations_uri,
+            self.base_organizations_uri,
             str(response.data['id'])
         )
         self.assertEqual(response.data['url'], confirm_uri)
@@ -137,9 +137,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         confirm_uri = self.test_server_prefix + test_uri
@@ -156,15 +156,15 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(response.data['modified'])
 
     def test_organizations_detail_get_undefined(self):
-        test_uri = '/api/organizations/123456789/'
+        test_uri = '{}/123456789/'.format(self.base_organizations_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
     def test_organizations_detail_delete(self):
         data = {'name': self.test_organization_name}
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         response = self.do_delete(test_uri)
@@ -180,7 +180,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': 'testatme.com',
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 400)
 
     def test_organizations_list_post_with_groups(self):
@@ -200,7 +200,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'display_name': self.test_organization_display_name,
             'groups': groups
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(len(response.data['groups']), len(groups))
 
@@ -212,9 +212,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
@@ -231,9 +231,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
         data = {"id": 123456}
         response = self.do_post(users_uri, data)
@@ -247,9 +247,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
@@ -271,9 +271,9 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             'contact_email': self.test_organization_contact_email,
             'contact_phone': self.test_organization_contact_phone
         }
-        response = self.do_post(self.test_organizations_uri, data)
+        response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_organizations_uri, str(response.data['id']))
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
         users_uri = '{}users/'.format(test_uri)
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)

@@ -34,10 +34,10 @@ class SubmissionsApiTests(TestCase):
 
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
-        self.test_users_uri = '/api/users/'
-        self.test_workgroups_uri = '/api/workgroups/'
-        self.test_projects_uri = '/api/projects/'
-        self.test_submissions_uri = '/api/submissions/'
+        self.test_users_uri = '/api/server/users/'
+        self.test_workgroups_uri = '/api/server/workgroups/'
+        self.test_projects_uri = '/api/server/projects/'
+        self.test_submissions_uri = '/api/server/submissions/'
 
         self.test_course_id = 'edx/demo/course'
         self.test_bogus_course_id = 'foo/bar/baz'
@@ -182,7 +182,7 @@ class SubmissionsApiTests(TestCase):
         self.assertIsNotNone(response.data['modified'])
 
     def test_submissions_detail_get_undefined(self):
-        test_uri = '/api/submissions/123456789/'
+        test_uri = '{}123456789/'.format(self.test_submissions_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
