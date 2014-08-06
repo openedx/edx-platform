@@ -538,6 +538,18 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course_id,
             descriptor.location,
         )
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        """
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
 
         # Send a signal out to any listeners who are waiting for score change
         # events.
