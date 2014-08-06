@@ -84,7 +84,7 @@
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
                            <th class="c_course_id">${_("Course_id")}</th>
-                           <th class="c_discount">${_("Discount(%)")}</th>
+                           <th class="c_discount">${_("Discount (%)")}</th>
                            <th class="c_count">${_("Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
                         </tr>
@@ -120,7 +120,7 @@
 </div>
 <script>
    $(function () {
-   
+
        var icons = {
            header: "ui-icon-circle-arrow-e",
            activeHeader: "ui-icon-circle-arrow-s"
@@ -140,7 +140,7 @@
                    active:isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
                    collapsible: true
         });
-   
+
      $('a[rel*=leanModal]').leanModal();
      $.each($("a.edit-right"), function () {
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
@@ -211,7 +211,7 @@
        // Get the Code and Discount value and trim it
        var code = $.trim($('#edit_coupon_code').val());
        var coupon_discount = $.trim($('#edit_coupon_discount').val());
-   
+
        // Check if empty of not
        if (code === '') {
          $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
@@ -249,7 +249,7 @@
        // Get the Code and Discount value and trim it
        var course_price = $.trim($('#mode_price').val());
        var currency = $.trim($('#course_mode_currency').val());
-   
+
        // Check if empty of not
        if (course_price === '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
@@ -275,7 +275,7 @@
        // Get the Code and Discount value and trim it
        var code = $.trim($('#coupon_code').val());
        var coupon_discount = $.trim($('#coupon_discount').val());
-   
+
        // Check if empty of not
        if (code === '') {
          $("#add_coupon_button").removeAttr('disabled');
@@ -302,7 +302,7 @@
          return false;
        }
      });
-   
+
      $('#set_price_form').on('ajax:complete', function (event, xhr) {
        if (xhr.status == 200) {
          location.reload(true);
@@ -312,7 +312,7 @@
          $('#set_price_form #course_form_error').text(xhr.responseText);
        }
      });
-   
+
      $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
        if (xhr.status == 200) {
          location.reload(true);
@@ -322,7 +322,7 @@
          $('#add_coupon_form #coupon_form_error').text(xhr.responseText);
        }
      });
-   
+
      $('#edit_coupon_form').on('ajax:complete', function (event, xhr) {
        if (xhr.status == 200) {
          location.reload(true);
@@ -340,7 +340,7 @@
        reset_input_fields();
        e.preventDefault();
      });
-   
+
      var onModalClose = function () {
        $("#add-coupon-modal").attr("aria-hidden", "true");
        $(".remove_coupon").focus();
@@ -352,7 +352,7 @@
        $("#update_coupon_button").removeAttr('disabled');
        reset_input_fields();
      };
-   
+
      var cycle_modal_tab = function (from_element_name, to_element_name) {
        $(from_element_name).on('keydown', function (e) {
          var keyCode = e.keyCode || e.which;
@@ -363,12 +363,12 @@
          }
        });
      };
-   
+
      $("#add-coupon-modal .close-modal").click(onModalClose);
      $("#edit-coupon-modal .close-modal").click(onModalClose);
      $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
-   
-   
+
+
      // Hitting the ESC key will exit the modal
      $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
        var keyCode = e.keyCode || e.which;
@@ -391,6 +391,6 @@
      $('input#coupon_code').val('');
      $('input#coupon_discount').val('');
      $('textarea#coupon_description').val('');
-   
+
    }
 </script>
