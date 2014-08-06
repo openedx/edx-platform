@@ -383,6 +383,14 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
         self.assertGreater(len(response.data['children']), 0)
 
+    def test_course_content_detail_get_with_extra_fields(self):
+        test_uri = self.base_course_content_uri + '/' + self.test_course_content_id
+        response = self.do_get('{}?include_fields=course_edit_method,edited_by'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertIsNotNone(response.data['course_edit_method'])
+        self.assertIsNotNone(response.data['edited_by'])
+
     def test_course_content_detail_get_course(self):
         test_uri = self.base_course_content_uri + '/' + self.test_course_id
         response = self.do_get(test_uri)
