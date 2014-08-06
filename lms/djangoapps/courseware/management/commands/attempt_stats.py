@@ -11,28 +11,12 @@
 #
 import csv
 import json
-from optparse import make_option
 
-from django.conf import settings
-from django.dispatch import Signal
-from django.core.cache import get_cache
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, make_option
 
 from student import roles
-from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
 from courseware.module_tree_reset import ProctorModuleInfo
 from courseware.models import StudentModule, StudentModuleHistory
-
-
-CACHE = get_cache('mongo_metadata_inheritance')
-for store_name in settings.MODULESTORE:
-    store = modulestore(store_name)
-    store.metadata_inheritance_cache_subsystem = CACHE
-    store.request_cache = RequestCache.get_request_cache()
-    modulestore_update_signal = Signal(
-        providing_args=['modulestore', 'course_id', 'location'])
-    store.modulestore_update_signal = modulestore_update_signal
 
 
 class Stats(object):

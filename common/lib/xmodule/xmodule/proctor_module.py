@@ -205,7 +205,8 @@ class ProctorModule(ProctorFields, XModule):
             # Proctor Student Admin URLs (STAFF ONLY)
             if dispatch == 'reset':
                 username = data.get("username")
-                return self.reset(username)
+                wipe_history = data.get("wipe_history") == "on"
+                return self.reset(username, wipe_history=wipe_history)
             #if dispatch == 'status':
                 #return self.status()
             # if dispatch == 'grades':
@@ -226,10 +227,11 @@ class ProctorModule(ProctorFields, XModule):
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'
 
-    def reset(self, username):
+    def reset(self, username, wipe_history=False):
         try:
             pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
-            pminfo.get_assignments_attempted_and_failed(username, do_reset=True)
+            pminfo.get_assignments_attempted_and_failed(
+                username, reset=True, wipe_randomize_history=wipe_history)
             return self.status(username)
         except Exception as exc:
             return json.dumps({"error": str(exc)})

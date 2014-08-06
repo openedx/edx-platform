@@ -4,15 +4,30 @@ import datetime
 from collections import OrderedDict
 
 import pytz
+from django.db import transaction
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.dispatch import Signal
+from django.core.cache import get_cache
 
 from xmodule.modulestore import Location
 from courseware.models import StudentModule
+from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 from instructor.offline_gradecalc import student_grades
 
 
 log = logging.getLogger("mitx.module_tree_reset")
+
+
+CACHE = get_cache('mongo_metadata_inheritance')
+for store_name in settings.MODULESTORE:
+    store = modulestore(store_name)
+    store.metadata_inheritance_cache_subsystem = CACHE
+    store.request_cache = RequestCache.get_request_cache()
+    modulestore_update_signal = Signal(
+        providing_args=['modulestore', 'course_id', 'location'])
+    store.modulestore_update_signal = modulestore_update_signal
 
 
 class TreeNode(object):
@@ -67,7 +82,7 @@ class TreeNodeSet(list):
             elif tn.module.category in ['problem', 'problemset']:
                 self.pset.append(tn)
 
-    def reset_randomization(self):
+    def reset_randomization(self, wipe_history=False):
         """
         Go through all <problem> and <randomize> modules in tree and reset
         their StudentModule state to empty.
@@ -75,14 +90,13 @@ class TreeNodeSet(list):
         msg = ("Resetting all <problem> and <randomize> in tree of parent "
                "module %s\n" % self.parent_module)
         for module in self.rset + self.pset:
-            old_state = json.loads(module.smstate.state if module.smstate is
-                                   not None else '{}')
-            msg += "    Resetting %s, old state=%s\n" % (module, old_state)
-            new_state = {}
-            if 'history' in old_state:
-                new_state['history'] = old_state['history']
             if module.smstate is not None:
-                module.smstate.state = json.dumps(new_state)
+                old_state = json.loads(module.smstate.state or '{}')
+                state = {}
+                msg += "    Resetting %s, old state=%s\n" % (module, state)
+                if not wipe_history and 'history' in old_state:
+                    state['history'] = old_state['history']
+                module.smstate.state = json.dumps(state)
                 module.smstate.grade = None
                 module.smstate.save()
         return msg
@@ -99,6 +113,12 @@ class DummyRequest(object):
 
     def is_secure(self):
         return False
+
+
+class StateInfo(object):
+    def __init__(self):
+        self.state = '{}'
+        return
 
 
 class ProctorModuleInfo(object):
@@ -163,8 +183,7 @@ class ProctorModuleInfo(object):
             gradeset = student_grades(student, request, self.course,
                                       keep_raw_scores=False, use_offline=False)
         except Exception:
-            # log.exception("Failed to get grades for %s" % student)
-            print("Failed to get grades for %s" % student)
+            log.exception("Failed to get grades for %s" % student)
             gradeset = []
 
         self.gradeset = gradeset
@@ -182,17 +201,12 @@ class ProctorModuleInfo(object):
 
         # for debugging; flushes db cache
         if debug:
-            from django.db import transaction
             try:
                 transaction.commit()
             except Exception:
-                print "db cache flushed"
+                log.debug("db cache flushed")
 
-        class StateInfo(object):
-            def __init__(self):
-                self.state = '{}'
-                return
-        # assume <proctor><problemset><randomized/></problemset></prcotor>
+        # assume <proctor><problemset><randomized/></problemset></proctor>
         # structure
         for rpmod in self.rpmods:
             try:
@@ -218,7 +232,7 @@ class ProctorModuleInfo(object):
             # module state
             try:
                 sm.choice = json.loads(sm.state)['choice']
-            except Exception:
+            except KeyError:
                 sm.choice = None
             if sm.choice is not None:
                 try:
@@ -292,7 +306,7 @@ class ProctorModuleInfo(object):
         ret['id'] = student.id
         ret['name'] = student.profile.name
         # ret['username'] = student.username
-        ret['email'] = '%s@mit.edu' % student.username
+        ret['email'] = student.email
 
         for stat in status['assignments']:
             if stat['attempted']:
@@ -313,18 +327,20 @@ class ProctorModuleInfo(object):
                            earned=assignment['earned'],
                            possible=assignment['possible'])
 
-    def get_assignments_attempted_and_failed(self, student, do_reset=False):
+    def get_assignments_attempted_and_failed(self, student, reset=False,
+                                             wipe_randomize_history=False):
         student = self._get_student_obj(student)
         status = self.get_student_status(student)
         failed = [self._get_od_for_assignment(student, a)
-                  for a in status['assignments'] if a['attempted'] and
+                  for a in status['assignments']
+                  if a['earned'] is None or a['possible'] is None or
                   a['earned'] != a['possible']]
         for f in failed:
             log.info(
                 "Student %s Assignment %s attempted '%s' but failed "
                 "(%s/%s)" % (student, f['assignment'], f['problem'],
                              f['earned'], f['possible']))
-            if do_reset:
+            if reset:
                 try:
                     log.info('resetting %s for student %s' %
                              (f['assignment'], f['username']))
@@ -336,7 +352,8 @@ class ProctorModuleInfo(object):
                                                 assi_url.url())
                     tnset = TreeNodeSet(self.course.id, pmod, self.ms,
                                         student)
-                    msg = tnset.reset_randomization()
+                    msg = tnset.reset_randomization(
+                        wipe_history=wipe_randomize_history)
                     log.debug(str(msg))
                 except Exception:
                     log.exception("Failed to do reset of %s for %s" %

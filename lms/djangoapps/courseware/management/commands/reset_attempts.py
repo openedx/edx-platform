@@ -1,25 +1,10 @@
 #!/usr/bin/python
 import csv
 
-from request_cache.middleware import RequestCache
-from xmodule.modulestore.django import modulestore
 from courseware.module_tree_reset import ProctorModuleInfo
 
-from django.conf import settings
-from django.dispatch import Signal
-from django.core.cache import get_cache
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError, make_option
-
-
-CACHE = get_cache('mongo_metadata_inheritance')
-for store_name in settings.MODULESTORE:
-    store = modulestore(store_name)
-    store.metadata_inheritance_cache_subsystem = CACHE
-    store.request_cache = RequestCache.get_request_cache()
-    modulestore_update_signal = Signal(
-        providing_args=['modulestore', 'course_id', 'location'])
-    store.modulestore_update_signal = modulestore_update_signal
 
 
 class Command(BaseCommand):
@@ -39,6 +24,11 @@ arguments."""
                     action='store',
                     default=None,
                     help='Save stats to csv file'),
+        make_option('--wipe-randomize-history',
+                    dest='wipe_history',
+                    action='store_true',
+                    default=False,
+                    help="Reset randomization xmodule's history tracking"),
     )
 
     def handle(self, *args, **options):
@@ -47,13 +37,15 @@ arguments."""
         course_id = args[0]
         dry_run = options['dry_run']
         csv_file = options['csv_output_filename']
+        wipe_history = options['wipe_history']
         pminfo = ProctorModuleInfo(course_id)
         students = User.objects.filter(
             courseenrollment__course_id=pminfo.course.id).order_by('username')
         failed = []
         for student in students:
             failed += pminfo.get_assignments_attempted_and_failed(
-                student, do_reset=not dry_run)
+                student, reset=not dry_run,
+                wipe_randomize_history=wipe_history)
         if csv_file:
             self.write_to_csv(csv_file, failed)
 

@@ -17,6 +17,7 @@
     <form id="proctor_${element_id}_reset_form">
       <label for="proctor_${element_id}_student_username">${_("User:")}</label>
       <input name="username" id="proctor_${element_id}_student_username" type="text" placeholder=""/>
+      <input name="wipe_history" id="proctor_${element_id}_wipe_history" type="checkbox"/> Wipe randomize history?
       <input name="location" type="hidden" id="proctor_${element_id}_reset_location" value="${location}"/>
       <div class="submit">
           <button id="proctor_${element_id}_submit" name="submit" type="submit">${_("Reset Attempts")}</button>
