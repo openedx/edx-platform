@@ -111,18 +111,10 @@ def expand_checklist_action_url(course_module, checklist):
     expanded_checklist = copy.deepcopy(checklist)
 
     urlconf_map = {
-<<<<<<< HEAD
         "ManageUsers": "course_team_handler",
         "CourseOutline": "course_handler",
         "SettingsDetails": "settings_handler",
         "SettingsGrading": "grading_handler",
-=======
-        "ManageUsers": "course_team",
-        "CourseOutline": "course",
-        "SettingsDetails": "settings/details",
-        "SettingsGrading": "settings/grading",
-        "Syllabus": "syllabuses",
->>>>>>> staging
     }
     for item in expanded_checklist.get('items'):
         action_url = item.get('action_url')
