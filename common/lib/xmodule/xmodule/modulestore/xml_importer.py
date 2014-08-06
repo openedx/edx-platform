@@ -233,7 +233,12 @@ def import_from_xml(
                     """
                     if subtree.has_children:
                         for child in subtree.get_children():
-                            all_locs.remove(child.location)
+                            try:
+                                all_locs.remove(child.location)
+                            except KeyError:
+                                # ContentStoreTest.test_image_import has non-tree children
+                                # so, make this more robust
+                                pass
                             if verbose:
                                 log.debug('importing module location {loc}'.format(loc=child.location))
 
