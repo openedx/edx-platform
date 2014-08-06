@@ -1619,10 +1619,11 @@ class RerunCourseTest(ContentStoreTestCase):
         """
         course_listing_html = self.client.get_html('/course/')
         self.assertNotIn(course_key.run, course_listing_html.content)
-        # TODO Verify the course is in the unsucceeded listing once LMS-11011 is implemented.
+
+        # TODO Uncomment this once LMS-11011 is implemented.
+        # self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
 
     def test_rerun_course_success(self):
-
         source_course = CourseFactory.create()
         destination_course_key = self.post_rerun_request(source_course.id)
 

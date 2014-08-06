@@ -42,7 +42,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         return "duplicate course"
 
     # catch all exceptions so we can update the state and properly cleanup the course.
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc: # pylint: disable=broad-except
         # update state: Failed
         CourseRerunState.objects.failed(course_key=destination_course_key, exception=exc)
 
