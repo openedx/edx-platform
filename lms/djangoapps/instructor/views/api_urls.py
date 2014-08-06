@@ -19,6 +19,12 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_students_features', name="get_students_features"),
     url(r'^get_purchase_transaction(?P<csv>/csv)?$',
         'instructor.views.api.get_purchase_transaction', name="get_purchase_transaction"),
+    url(r'^get_user_invoice_preference$',
+        'instructor.views.api.get_user_invoice_preference', name="get_user_invoice_preference"),
+    url(r'^get_sale_records(?P<csv>/csv)?$',
+        'instructor.views.api.get_sale_records', name="get_sale_records"),
+    url(r'^sale_validation_url$',
+        'instructor.views.api.sale_validation', name="sale_validation"),
     url(r'^get_anon_ids$',
         'instructor.views.api.get_anon_ids', name="get_anon_ids"),
     url(r'^get_distribution$',
@@ -67,6 +73,10 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.active_registration_codes', name="active_registration_codes"),
     url(r'spent_registration_codes$',
         'instructor.views.api.spent_registration_codes', name="spent_registration_codes"),
+
+    # Coupon Codes..
+    url(r'get_coupon_codes',
+        'instructor.views.api.get_coupon_codes', name="get_coupon_codes"),
 
     # spoc gradebook
     url(r'^gradebook$',

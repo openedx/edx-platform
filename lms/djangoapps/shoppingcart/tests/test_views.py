@@ -96,8 +96,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         """
         add dummy registration code into models
         """
-        course_reg_code = CourseRegistrationCode(code=self.reg_code, course_id=course_key,
-                                                 transaction_group_name='A', created_by=self.user)
+        course_reg_code = CourseRegistrationCode(code=self.reg_code, course_id=course_key, created_by=self.user)
         course_reg_code.save()
 
     def add_course_to_user_cart(self):

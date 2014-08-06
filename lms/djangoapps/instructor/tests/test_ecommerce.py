@@ -175,8 +175,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
-            transaction_group_name='Test Group', created_by=self.instructor
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
         )
         course_registration.save()
 
@@ -254,7 +253,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         response = self.client.post(self.url)
         self.assertTrue('<td>AS452</td>' in response.content)
         data = {
-            'coupon_id': coupon.id, 'code': 'update_code', 'discount': '12',
+            'coupon_id': coupon.id, 'code': 'AS452', 'discount': '10', 'description': 'updated_description',  # pylint: disable=E1101
             'course_id': coupon.course_id.to_deprecated_string()
         }
         # URL for update_coupon
@@ -263,43 +262,12 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('coupon with the coupon id ({coupon_id}) updated Successfully'.format(coupon_id=coupon.id)in response.content)
 
         response = self.client.post(self.url)
-        self.assertTrue('<td>update_code</td>' in response.content)
-        self.assertTrue('<td>12</td>' in response.content)
+        self.assertTrue('<td>updated_description</td>' in response.content)
 
         data['coupon_id'] = 1000  # Coupon Not Exist with this ID
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon with the coupon id ({coupon_id}) DoesNotExist'.format(coupon_id=1000) in response.content)
 
-        data['coupon_id'] = coupon.id
-        data['discount'] = 123
-        response = self.client.post(update_coupon_url, data=data)
-        self.assertTrue('Please Enter the Coupon Discount Value Less than or Equal to 100' in response.content)
-
-        data['discount'] = '25%'
-        response = self.client.post(update_coupon_url, data=data)
-        self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
-
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon id not found' in response.content)
-
-        coupon1 = Coupon(
-            code='11111', description='coupon', course_id=self.course.id.to_deprecated_string(),
-            percentage_discount=20, created_by=self.instructor
-        )
-        coupon1.save()
-        data = {'coupon_id': coupon.id, 'code': '11111', 'discount': '12'}  # pylint: disable=E1101
-        response = self.client.post(update_coupon_url, data=data)
-        self.assertTrue('coupon with the coupon id ({coupon_id}) already exist'.format(coupon_id=coupon.id) in response.content)  # pylint: disable=E1101
-
-        course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
-            transaction_group_name='Test Group', created_by=self.instructor
-        )
-        course_registration.save()
-
-        data = {'coupon_id': coupon.id, 'code': 'Vs23Ws4j',  # pylint: disable=E1101
-                'discount': '6', 'course_id': coupon.course_id.to_deprecated_string()}  # pylint: disable=E1101
-        response = self.client.post(update_coupon_url, data=data)
-        self.assertTrue("The code ({code}) that you have tried to define is already in use as a registration code".
-                        format(code=data['code']) in response.content)
