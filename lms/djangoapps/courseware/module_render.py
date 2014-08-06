@@ -38,6 +38,7 @@ from courseware.masquerade import (
     setup_masquerade
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from courseware.models import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
@@ -460,6 +461,25 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             user_location=user_location,
             request_token=request_token,
             course=course
+        )
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the edx_solutions_api_integration djangoapp
+        """
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
+
+        # Send a signal out to any listeners who are waiting for score change
+        # events.
+        SCORE_CHANGED.send(
+            sender=None,
+            points_possible=event['max_value'],
+            points_earned=event['value'],
+            user_id=user_id,
+            course_id=unicode(course_id),
+            usage_id=unicode(descriptor.location)
         )
 
     def publish(block, event_type, event):
