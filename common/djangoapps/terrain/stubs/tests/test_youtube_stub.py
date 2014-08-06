@@ -74,16 +74,3 @@ class StubYouTubeServiceTest(unittest.TestCase):
 
         # ensure that server config dict is empty after successful reset
         self.assertEqual(self.server.config, {})
-
-
-    def test_iframe_response_is_up_to_date(self):
-        """
-        Check if IFRAME_API_RESPONSE is up-to-date.
-
-        This should prevent issues with IFRAME_API_RESPONSE hard-coding, 
-        when hard-coded version is different from actual.
-        """
-        self.assertEqual(
-            IFRAME_API_RESPONSE,
-            requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
-        )
