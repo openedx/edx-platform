@@ -67,6 +67,11 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
+        # cdodge: rendering the html module counts as "progress"
+        # unfortunately, we can't look at settings.FEATURES to make this switchable on/off since settings is a Django concept
+        # and not in scope in common/lib
+        self.system.publish(self, 'progress', {})
+
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data

@@ -360,6 +360,8 @@ def get_module_system_for_user(user, field_data_cache,
         tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
         """
         user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
 
         CourseModuleCompletion.objects.get_or_create(
             user_id=user_id,
