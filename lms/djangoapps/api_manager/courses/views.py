@@ -104,6 +104,11 @@ def _serialize_content(request, content_key, content_descriptor):
 
     data['start'] = getattr(content_descriptor, 'start', None)
     data['end'] = getattr(content_descriptor, 'end', None)
+    include_fields = request.QUERY_PARAMS.get('include_fields', None)
+    if include_fields:
+        include_fields = include_fields.split(',')
+        for field in include_fields:
+            data[field] = getattr(content_descriptor, field, None)
     return data
 
 
