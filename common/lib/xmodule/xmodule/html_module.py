@@ -78,6 +78,12 @@ class HtmlBlock(object):
     def get_html(self):
         """ Returns html required for rendering XModule. """
 
+        # cdodge: rendering the html module counts as "progress"
+        # unfortunately, we can't look at settings.FEATURES to make this switchable on/off
+        # since settings is a Django concept
+        # and not in scope in common/lib
+        self.system.publish(self, 'progress', {})
+
         # When we switch this to an XBlock, we can merge this with student_view,
         # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
