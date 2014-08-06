@@ -8,32 +8,32 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Deleting field 'UserProfile.city'
+        db.delete_column('auth_userprofile', 'city')
+
+        # Adding field 'UserProfile.city_id'
+        db.add_column('auth_userprofile', 'city_id',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['cities.City'], null=True, blank=True),
+                      keep_default=False)
+
         # Adding field 'UserProfile.cedula'
         db.add_column('auth_userprofile', 'cedula',
-                      self.gf('django.db.models.fields.CharField')(max_length=132, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True),
                       keep_default=False)
 
 
-        # Renaming column for 'UserProfile.city' to match new field type.
-        db.rename_column('auth_userprofile', 'city', 'city_id')
-        # Changing field 'UserProfile.city'
-        db.alter_column('auth_userprofile', 'city_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cities.City'], null=True))
-        # Adding index on 'UserProfile', fields ['city']
-        db.create_index('auth_userprofile', ['city_id'])
-
-
     def backwards(self, orm):
-        # Removing index on 'UserProfile', fields ['city']
-        db.delete_index('auth_userprofile', ['city_id'])
+        # Adding field 'UserProfile.city'
+        db.add_column('auth_userprofile', 'city',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Deleting field 'UserProfile.city_id'
+        db.delete_column('auth_userprofile', 'city_id_id')
 
         # Deleting field 'UserProfile.cedula'
         db.delete_column('auth_userprofile', 'cedula')
 
-
-        # Renaming column for 'UserProfile.city' to match new field type.
-        db.rename_column('auth_userprofile', 'city_id', 'city')
-        # Changing field 'UserProfile.city'
-        db.alter_column('auth_userprofile', 'city', self.gf('django.db.models.fields.TextField')(null=True))
 
     models = {
         'auth.group': {
@@ -155,8 +155,8 @@ class Migration(SchemaMigration):
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
             'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'cedula': ('django.db.models.fields.CharField', [], {'max_length': '132', 'null': 'True', 'blank': 'True'}),
-            'city': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['cities.City']", 'null': 'True', 'blank': 'True'}),
+            'cedula': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
+            'city_id': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['cities.City']", 'null': 'True', 'blank': 'True'}),
             'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
             'gender': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '6', 'null': 'True', 'blank': 'True'}),
@@ -170,6 +170,12 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '255', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"}),
             'year_of_birth': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'})
+        },
+        'student.usersignupsource': {
+            'Meta': {'object_name': 'UserSignupSource'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'site': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'student.userstanding': {
             'Meta': {'object_name': 'UserStanding'},
