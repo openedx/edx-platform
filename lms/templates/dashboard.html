@@ -198,7 +198,7 @@
   % if duplicate_provider:
     <section class="dashboard-banner third-party-auth">
       ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
-      ${_('The selected {provider_name} account is already linked to another {platform_name} account. Please {link_start}log out{link_end}, then log in with your {provider_name} account.').format(link_end='</a>', link_start='<a href="%s">' % logout_url, provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
+      <p>${_('The {provider_name} account you selected is already linked to another {platform_name} account.').format(provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
     </section>
   % endif
 
@@ -226,22 +226,23 @@
         % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         <li class="controls--account">
           <span class="title">
-            <div class="icon icon-gears"></div>
             ## Translators: this section lists all the third-party authentication providers (for example, Google and LinkedIn) the user can link with or unlink from their edX account.
-            ${_("Account Links")}
+            ${_("Connected Accounts")}
           </span>
 
           <span class="data">
             <span class="third-party-auth">
 
             % for state in provider_user_states:
-            <div>
+            <div class="auth-provider">
 
-              % if state.has_account:
-              <span class="icon icon-link pull-left"></span>
-              % else:
-              <span class="icon icon-unlink pull-left"></span>
-              % endif
+              <div class="status">
+                % if state.has_account:
+                <i class="icon icon-link"></i> <span class="copy">${_('Linked')}</span>
+                % else:
+                <i class="icon icon-unlink"></i><span class="copy">${_('Not Linked')}</span>
+                % endif
+              </div>
 
               <span class="provider">${state.provider.NAME}</span>
               <span class="control">
@@ -252,17 +253,19 @@
                   method="post"
                   name="${state.get_unlink_form_name()}">
                   <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
-                </form>
-                <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
-                  ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                  ${_("unlink")}
-                </a>
-              % else:
-                <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD)}">
-                  ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
-                  ${_("link")}
-                </a>
+
+                  <a href="#" onclick="document.${state.get_unlink_form_name()}.submit()">
+                    ## Translators: clicking on this removes the link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                    ${_("Unlink")}
+                  </a>
+                % else:
+                  <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD)}">
+                    ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
+                    ${_("Link")}
+                  </a>
               % endif
+              </form>
+
               </span>
             </div>
             % endfor

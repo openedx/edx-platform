@@ -110,17 +110,40 @@
             .third-party-auth {
               color: inherit;
               font-weight: inherit;
+            }
 
-              .control {
-                float: right;
-              }
+            .auth-provider {
+              width: flex-grid(12);
+              display: block;
+              margin-top: ($baseline/4);
 
-              .icon {
-                margin-top: 4px;
+              .status {
+                width: flex-grid(1);
+                display: inline-block;
+                color: $gray-l2;
+
+                .icon-link {
+                  color: $base-font-color;
+                }
+
+                .copy {
+                  @extend %text-sr;
+                }
               }
 
               .provider {
-                display: inline;
+                width: flex-grid(9);
+                display: inline-block;
+              }
+
+              .control {
+                width: flex-grid(2);
+                display: inline-block;
+                text-align: right;
+
+                a:link, a:visited {
+                  @extend %t-copy-sub2;
+                }
               }
             }
           }
