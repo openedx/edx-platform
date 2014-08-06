@@ -1327,7 +1327,7 @@ INSTALLED_APPS = (
     'monitoring',
 
     #cities
-    'cities'
+    'cities',
     # Course action state
     'course_action_state'
 )
