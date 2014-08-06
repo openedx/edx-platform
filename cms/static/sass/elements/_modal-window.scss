@@ -54,7 +54,7 @@
 
     // sections within a modal
     .modal-section {
-      margin-bottom: ($baseline/2);
+      margin-bottom: ($baseline*0.75);
 
       &:last-child {
         margin-bottom: 0;
@@ -245,12 +245,6 @@
         margin-right: ($baseline/2);
         margin-bottom: ($baseline/4);
 
-
-        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
-          display: block;
-        }
-
         label {
           @extend %t-copy-sub1;
           @include transition(color $tmg-f3 ease-in-out 0s);
@@ -288,6 +282,27 @@
         .due-time {
           width: ($baseline*7);
         }
+
+        .tip {
+          @extend %t-copy-sub1;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l2;
+        }
+
+        .tip-warning {
+          color: $gray-d2;
+        }
+      }
+
+      // CASE: type-based input
+      .field-text {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
       }
 
       // CASE: select input
@@ -305,13 +320,50 @@
         .input {
           width: 100%;
         }
+
+        // CASE: checkbox input
+        .field-checkbox {
+
+          .label, label {
+            margin-bottom: 0;
+          }
+        }
       }
     }
 
+
+
+    // UI: grading section
     .edit-settings-grading {
 
       .grading-type {
         margin-bottom: $baseline;
+      }
+    }
+
+    // UI: staff lock section
+    .edit-staff-lock {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: none;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: block;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
       }
     }
   }
