@@ -61,11 +61,12 @@ explicitly enroll students.
 When you enroll people in a course you have these options:
 
 * **Auto Enroll**. When you choose this option, the people who you enroll do
-  not need to complete an explicit course enrollment step. Of the list of
-  email addresses that you supply, those that correspond to a registered user
-  account are immediately enrolled in the course, and your course displays on the dashboards on log in. Email addresses on the list
-  that do not match a registered user account are enrolled as soon as that
-  account is registered and activated.
+  not need to complete an explicit course enrollment step. Of the list of email
+  addresses that you supply, those that correspond to a registered user account
+  are immediately enrolled in the course, and your course displays on the
+  **Current Courses** dashboard for those users on log in. Email addresses on
+  the list that do not match a registered user account are enrolled as soon as
+  that account is registered and activated.
 
   If you do not select **Auto Enroll**, the people who you enroll must also actively locate your course and enroll themselves in it. These students see the course on their dashboards after they have done so.
 
@@ -165,6 +166,6 @@ To unenroll students, you supply the email addresses of enrolled students.
 .. note:: The **Auto Enroll** option has no effect when you click **Unenroll**.
 
 5. Click **Unenroll**. The course is no longer listed on the students'
-   dashboards, and the students can no longer contribute to discussions or the
-   wiki or access the courseware.
+   **Current Courses** dashboards, and the students can no longer contribute to
+   discussions or the wiki or access the courseware.
 

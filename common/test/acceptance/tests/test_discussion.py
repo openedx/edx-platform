@@ -3,6 +3,7 @@ Tests for discussion pages
 """
 
 from uuid import uuid4
+from nose.plugins.attrib import attr
 
 from .helpers import UniqueCourseTest
 from ..pages.lms.auto_auth import AutoAuthPage
@@ -122,6 +123,7 @@ class DiscussionResponsePaginationTestMixin(object):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
+@attr('shard_1')
 class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -141,6 +143,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.thread_page.visit()
 
 
+@attr('shard_1')
 class DiscussionCommentDeletionTest(UniqueCourseTest):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
@@ -184,6 +187,7 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
         page.delete_comment("comment_other_author")
 
 
+@attr('shard_1')
 class DiscussionCommentEditTest(UniqueCourseTest):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -273,6 +277,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
         self.assertTrue(page.is_add_comment_visible("response1"))
 
 
+@attr('shard_1')
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -297,7 +302,8 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        CoursewarePage(self.browser, self.course_id).visit()
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
 
     def setup_thread_page(self, thread_id):
@@ -313,7 +319,23 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.discussion_page.expand_discussion()
         self.assertEqual(self.discussion_page.get_num_displayed_threads(), 0)
 
+    def check_anonymous_to_peers(self, is_staff):
+        thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))
+        self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
 
+    def test_anonymous_to_peers_threads_as_staff(self):
+        AutoAuthPage(self.browser, course_id=self.course_id, roles="Administrator").visit()
+        self.courseware_page.visit()
+        self.check_anonymous_to_peers(True)
+
+    def test_anonymous_to_peers_threads_as_peer(self):
+        self.check_anonymous_to_peers(False)
+
+
+@attr('shard_1')
 class DiscussionUserProfileTest(UniqueCourseTest):
     """
     Tests for user profile page in discussion tab.
@@ -416,6 +438,8 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     def test_151_threads(self):
         self.check_pages(151)
 
+
+@attr('shard_1')
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -489,6 +513,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         ).wait_for_page()
 
 
+@attr('shard_1')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
     """
     Tests for the discussion page displaying a single thread.

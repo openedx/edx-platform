@@ -1,14 +1,14 @@
 import sys
 import logging
-from xmodule.mako_module import MakoDescriptorSystem
+from xblock.runtime import KvsFieldData
+from xblock.fields import ScopeIds
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator
+from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import KvsFieldData
+from xmodule.modulestore.split_mongo import encode_key_for_mongo
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
-from xblock.fields import ScopeIds
-from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
             course_entry['structure'].get('blocks', {}).get(
-                LocMapperStore.encode_key_for_mongo(course_entry['structure'].get('root'))
+                encode_key_for_mongo(course_entry['structure'].get('root'))
             )
         )
         self.default_class = default_class
@@ -68,7 +68,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # deeper than initial descendant fetch or doesn't exist
             course_info = course_entry_override or self.course_entry
             course_key = CourseLocator(
-                course_info.get('org'), course_info.get('offering'), course_info.get('branch'),
+                course_info.get('org'), course_info.get('course'), course_info.get('run'), course_info.get('branch'),
                 course_info['structure']['_id']
             )
             self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
@@ -97,7 +97,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry['branch'] = course_entry_override['branch']
             self.course_entry['org'] = course_entry_override['org']
-            self.course_entry['offering'] = course_entry_override['offering']
+            self.course_entry['course'] = course_entry_override['course']
+            self.course_entry['run'] = course_entry_override['run']
         # most likely a lazy loader or the id directly
         definition = json_data.get('definition', {})
         definition_id = self.modulestore.definition_locator(definition)
@@ -110,7 +111,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             CourseLocator(
                 version_guid=course_entry_override['structure']['_id'],
                 org=course_entry_override.get('org'),
-                offering=course_entry_override.get('offering'),
+                course=course_entry_override.get('course'),
+                run=course_entry_override.get('run'),
                 branch=course_entry_override.get('branch'),
             ),
             block_type=json_data.get('category'),
@@ -151,6 +153,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.edited_on = edit_info.get('edited_on')
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
+        module.source_version = edit_info.get('source_version', None)
         module.definition_locator = definition_id
         # decache any pending field settings
         module.save()

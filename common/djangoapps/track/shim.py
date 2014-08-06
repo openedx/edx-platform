@@ -18,9 +18,9 @@ class LegacyFieldMappingProcessor(object):
             for field in CONTEXT_FIELDS_TO_INCLUDE:
                 if field in context:
                     event[field] = context[field]
-                    del context[field]
                 else:
                     event[field] = ''
+            remove_shim_context(event)
 
         if 'event_type' in event.get('context', {}):
             event['event_type'] = event['context']['event_type']
@@ -40,3 +40,11 @@ class LegacyFieldMappingProcessor(object):
 
         event['event_source'] = 'server'
         event['page'] = None
+
+
+def remove_shim_context(event):
+    if 'context' in event:
+        context = event['context']
+        for field in CONTEXT_FIELDS_TO_INCLUDE:
+            if field in context:
+                del context[field]

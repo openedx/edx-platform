@@ -15,7 +15,7 @@ from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
 from cache_toolbox.core import del_cached_content
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from opaque_keys.edx.keys import UsageKey
@@ -79,10 +79,6 @@ class Basetranscripts(CourseTestCase):
             1.25: item.youtube_id_1_25,
             1.5: item.youtube_id_1_5
         }
-
-    def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
 
 
 class TestUploadtranscripts(Basetranscripts):

@@ -345,6 +345,7 @@ def get_codemirror_value(index=0, find_prefix="$"):
 def attach_file(filename, sub_path):
     path = os.path.join(TEST_ROOT, sub_path, filename)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
+    assert_true(os.path.exists(path))
     world.browser.attach_file('file', os.path.abspath(path))
 
 

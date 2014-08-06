@@ -10,8 +10,9 @@ Overview
 *******************
 
 This chapter describes how you set up your course to be displayed in the course
-summary page and in a student's dashboard. The information you configure for
-your course is important for prospective and current students to understand.
+summary page and in a student's **Current Courses** dashboard. The information
+you configure for your course is important for prospective and current students
+to understand.
 
 See:
 
@@ -56,9 +57,9 @@ The Student Dashboard
 
 
 If a student registers for your course, the course is then listed on the
-dashboard, with the course image.  From the dashboard, a student can open a
-course that has started. If the course has not started, the student can see the
-start date, as explained in this chapter.
+**Current Courses** dashboard, with the course image.  From the dashboard, a
+student can open a course that has started. If the course has not started, the
+student can see the start date, as explained in this chapter.
 
 .. image:: ../Images/dashboard.png
  :alt: An image of the dashboard
@@ -70,6 +71,7 @@ start date, as explained in this chapter.
 ***********************************
 Set Important Dates for Your Course
 ***********************************
+
 You must set dates and times for enrollment and for the course.
 
 In Studio, from the **Settings** menu, select **Schedule and Details**.  
@@ -95,8 +97,8 @@ The Course Start Date
  you intend it to.  You must change the course start date to the date you want
  students to begin using the course.
 
-Students see the course start date on their dashboards and on the course summary
-page.
+Students see the course start date on their **Current Courses** dashboards and
+on the course summary page.
 
 The following example shows the course start date on the course summary page:
 
@@ -107,8 +109,8 @@ The following example shows the course start date on the course summary page:
  your edX Program Manager, to ensure the date is accurate on the course
  summary page.
 
-In the dashboard, if the course has not yet started, students see the start date
-as in the following example:
+In the dashboard, if the course has not yet started, students see the start
+date as in the following example:
 
 .. image:: ../Images/dashboard-course-to-start.png
  :alt: An image of a course that has not started in the student dashboard, with
@@ -137,32 +139,29 @@ could advertise the start date as **Spring, 2014**.
 To set an advertised start date:
 
 #. From the **Settings** menu, select **Advanced Settings**.
-#. Find the policy key **advertised_start**. The default value is **null**.
-#. Enter the date you want as an advertised start date.  You can use any string,
-   enclosed in double quotation marks. If you format the string as a date (for
-   example, as 02/01/2014), the value is parsed and presented to students as a
-   date.
+#. Find the **Course Advertised Start Date** policy key. The default value is
+   **null**.
+#. Enter the value you want to display as the advertised start date. You can
+   use any string, enclosed in double quotation marks. If you format the string
+   as a date (for example, as 02/01/2014), the value is parsed and presented to
+   students as a date.
 
   .. image:: ../Images/advertised_start.png
-   :alt: Image of the advertised start date policy key
+   :alt: Image of the advertised start date policy key with a value of "anytime, self-paced"
 
 4. Click **Save Changes** at the bottom of the page.
 
-The start date shown on the student's dashboard is now the value of the
-advertised_start policy key:
+  The start date shown on the dashboard is now the value of the **Course
+  Advertised Start Date** policy key:
 
-.. image:: ../Images/dashboard-course_adver_start.png
- :alt: An image of a course listing in the student dashboard, with the
+  .. image:: ../Images/dashboard-course_adver_start.png
+   :alt: An image of a course listing in the student dashboard, with the
      advertised start date circled.
 
 If you do not change the default course start date (01/01/2030), and the
-**advertised_start** policy value is ``null``, then the student dashboard does
-not list a start date for the course.  Students just see that the course has not
-yet started:
-
-.. image:: ../Images/dashboard-course_not_started.png
- :alt: Image of a course listing in the student dashboard, with no start date
-
+**Course Advertised Start Date** policy value is ``null``, then the student
+dashboard does not list a start date for the course. Students just see that
+the course has not yet started.
 
 .. _The Course End Date:
 
@@ -184,7 +183,8 @@ the course end date.
  summary page.
 
 After grades and certificates are finalized, students see the course end date
-on their personal dashboards, as shown in the following examples.
+on their personal **Current Courses** dashboards, as shown in the following
+examples.
 
 * If grades and certificates are not yet finalized, students can see the course
   end date and a message:

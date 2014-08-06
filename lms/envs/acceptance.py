@@ -27,10 +27,17 @@ import string
 def seed():
     return os.getppid()
 
-# Suppress error message "Cannot determine primary key of logged in user"
-# from track.middleware that gets triggered when using an auto_auth workflow
-# This is an ERROR level warning so we need to set the threshold at CRITICAL
-logging.getLogger('track.middleware').setLevel(logging.CRITICAL)
+# Silence noisy logs
+LOG_OVERRIDES = [
+    ('track.middleware', logging.CRITICAL),
+    ('codejail.safe_exec', logging.ERROR),
+    ('edx.courseware', logging.ERROR),
+    ('audit', logging.ERROR),
+    ('instructor_task.api_helper', logging.ERROR),
+]
+
+for log_name, log_level in LOG_OVERRIDES:
+    logging.getLogger(log_name).setLevel(log_level)
 
 update_module_store_settings(
     MODULESTORE,
@@ -58,6 +65,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "test_edx.db",
         'TEST_NAME': TEST_ROOT / "db" / "test_edx.db",
+        'OPTIONS': {
+            'timeout': 30,
+        },
     }
 }
 
@@ -76,12 +86,6 @@ EVENT_TRACKING_BACKENDS.update({
     }
 })
 
-
-# Enable asset pipeline
-# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
-# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
-PIPELINE = True
-STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 
 BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
@@ -129,8 +133,7 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
-FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
-FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
+FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)

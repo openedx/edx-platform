@@ -13,6 +13,7 @@ from .models import (
 )
 import logging
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from django.db import DatabaseError
 from django.contrib.auth.models import User
@@ -61,7 +62,7 @@ class FieldDataCache(object):
         self.descriptors = descriptors
         self.select_for_update = select_for_update
 
-        assert isinstance(course_id, SlashSeparatedCourseKey)
+        assert isinstance(course_id, CourseKey)
         self.course_id = course_id
         self.user = user
 
@@ -238,7 +239,7 @@ class FieldDataCache(object):
         if key.scope == Scope.user_state:
             # When we start allowing block_scope_ids to be either Locations or Locators,
             # this assertion will fail. Fix the code here when that happens!
-            assert(isinstance(key.block_scope_id, Location))
+            assert(isinstance(key.block_scope_id, UsageKey))
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
                 student=User.objects.get(id=key.user_id),

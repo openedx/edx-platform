@@ -9,16 +9,17 @@ from pytz import UTC
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django_comment_common.models import assign_default_role
+from django_comment_common.utils import seed_permissions_roles
 
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mixed import store_bulk_write_operations_on_course
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.store_utilities import delete_course
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from student.roles import CourseInstructorRole, CourseStaffRole
+from student.models import CourseEnrollment
+from student import auth
 
 
 log = logging.getLogger(__name__)
@@ -29,27 +30,57 @@ NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def delete_course_and_groups(course_id, commit=False):
+def add_instructor(course_key, requesting_user, new_instructor):
     """
-    This deletes the courseware associated with a course_id as well as cleaning update_item
+    Adds given user as instructor and staff to the given course,
+    after verifying that the requesting_user has permission to do so.
+    """
+    # can't use auth.add_users here b/c it requires user to already have Instructor perms in this course
+    CourseInstructorRole(course_key).add_users(new_instructor)
+    auth.add_users(requesting_user, CourseStaffRole(course_key), new_instructor)
+
+
+def initialize_permissions(course_key, user_who_created_course):
+    """
+    Initializes a new course by enrolling the course creator as a student,
+    and initializing Forum by seeding its permissions and assigning default roles.
+    """
+    # seed the forums
+    seed_permissions_roles(course_key)
+
+    # auto-enroll the course creator in the course so that "View Live" will work.
+    CourseEnrollment.enroll(user_who_created_course, course_key)
+
+    # set default forum roles (assign 'Student' role)
+    assign_default_role(course_key, user_who_created_course)
+
+
+def remove_all_instructors(course_key):
+    """
+    Removes all instructor and staff users from the given course.
+    """
+    staff_role = CourseStaffRole(course_key)
+    staff_role.remove_users(*staff_role.users_with_role())
+    instructor_role = CourseInstructorRole(course_key)
+    instructor_role.remove_users(*instructor_role.users_with_role())
+
+
+def delete_course_and_groups(course_key, user_id):
+    """
+    This deletes the courseware associated with a course_key as well as cleaning update_item
     the various user table stuff (groups, permissions, etc.)
     """
     module_store = modulestore()
-    content_store = contentstore()
 
-    with store_bulk_write_operations_on_course(module_store, course_id):
-        if delete_course(module_store, content_store, course_id, commit):
+    with module_store.bulk_write_operations(course_key):
+        module_store.delete_course(course_key, user_id)
 
-            print 'removing User permissions from course....'
-            # in the django layer, we need to remove all the user permissions groups associated with this course
-            if commit:
-                try:
-                    staff_role = CourseStaffRole(course_id)
-                    staff_role.remove_users(*staff_role.users_with_role())
-                    instructor_role = CourseInstructorRole(course_id)
-                    instructor_role.remove_users(*instructor_role.users_with_role())
-                except Exception as err:
-                    log.error("Error in deleting course groups for {0}: {1}".format(course_id, err))
+        print 'removing User permissions from course....'
+        # in the django layer, we need to remove all the user permissions groups associated with this course
+        try:
+            remove_all_instructors(course_key)
+        except Exception as err:
+            log.error("Error in deleting course groups for {0}: {1}".format(course_key, err))
 
 
 def get_lms_link_for_item(location, preview=False):
@@ -59,7 +90,7 @@ def get_lms_link_for_item(location, preview=False):
     :param location: the location to jump to
     :param preview: True if the preview version of LMS should be returned. Default value is false.
     """
-    assert(isinstance(location, Location))
+    assert(isinstance(location, UsageKey))
 
     if settings.LMS_BASE is None:
         return None
@@ -69,19 +100,19 @@ def get_lms_link_for_item(location, preview=False):
     else:
         lms_base = settings.LMS_BASE
 
-    return u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+    return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
-        course_id=location.course_key.to_deprecated_string(),
+        course_key=location.course_key.to_deprecated_string(),
         location=location.to_deprecated_string(),
     )
 
 
-def get_lms_link_for_about_page(course_id):
+def get_lms_link_for_about_page(course_key):
     """
     Returns the url to the course about page from the location tuple.
     """
 
-    assert(isinstance(course_id, SlashSeparatedCourseKey))
+    assert(isinstance(course_key, CourseKey))
 
     if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
@@ -106,9 +137,9 @@ def get_lms_link_for_about_page(course_id):
     else:
         return None
 
-    return u"//{about_base_url}/courses/{course_id}/about".format(
+    return u"//{about_base_url}/courses/{course_key}/about".format(
         about_base_url=about_base,
-        course_id=course_id.to_deprecated_string()
+        course_key=course_key.to_deprecated_string()
     )
 
 
@@ -142,6 +173,10 @@ def is_xblock_visible_to_students(xblock):
         published = modulestore().get_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
     # If there's no published version then the xblock is clearly not visible
     except ItemNotFoundError:
+        return False
+
+    # If visible_to_staff_only is True, this xblock is not visible to students regardless of start date.
+    if published.visible_to_staff_only:
         return False
 
     # Check start date

@@ -72,8 +72,19 @@ DEBUG_TOOLBAR_CONFIG = {
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 ###############################################################################
-# Lastly, see if the developer has any local overrides.
+# See if the developer has any local overrides.
 try:
     from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
+
+#####################################################################
+# Lastly, run any migrations, if needed.
+MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
+
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+
+PLATFORM_NAME = 'MOOC UPEx'
+SITE_NAME = 'upex.edu.ec'
+

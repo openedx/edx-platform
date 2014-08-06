@@ -7,6 +7,7 @@ import logging
 import re
 import uuid
 import time
+import json
 from collections import defaultdict
 from pytz import UTC
 
@@ -31,6 +32,9 @@ from django.utils.translation import ugettext as _, get_language
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST, require_GET
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from django.template.response import TemplateResponse
 
 from ratelimitbackend.exceptions import RateLimitException
@@ -43,7 +47,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory
+    create_comments_service_user, PasswordHistory, UserSignupSource
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -89,9 +93,6 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
-
-from student.validators import validate_cedula
-from cities.models import City
 
 
 log = logging.getLogger("edx.student")
@@ -665,13 +666,16 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
+# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
+# seems Probably Incorrect
 def _parse_course_id_from_string(input_str):
     """
     Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
     @param input_str:
     @return: the course_id if found, None if not
     """
-    m_obj = re.match(r'^/courses/(?P<course_id>[^/]+/[^/]+/[^/]+)', input_str)
+    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
     if m_obj:
         return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
     return None
@@ -709,7 +713,7 @@ def accounts_login(request):
     if redirect_to:
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id)
+            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
 
     context = {
         'pipeline_running': 'false',
@@ -1025,7 +1029,22 @@ class AccountValidationError(Exception):
         super(AccountValidationError, self).__init__(message)
         self.field = field
 
-def _do_create_account(post_vars):
+
+@receiver(post_save, sender=User)
+def user_signup_handler(sender, **kwargs):  # pylint: disable=W0613
+    """
+    handler that saves the user Signup Source
+    when the user is created
+    """
+    if 'created' in kwargs and kwargs['created']:
+        site = microsite.get_value('SITE_NAME')
+        if site:
+            user_signup_source = UserSignupSource(user=kwargs['instance'], site=site)
+            user_signup_source.save()
+            log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
+
+
+def _do_create_account(post_vars, extended_profile=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -1093,6 +1112,10 @@ def _do_create_account(post_vars):
 
     profile.cedula = post_vars['cedula']
         
+    # add any extended profile information in the denormalized 'meta' field in the profile
+    if extended_profile:
+        profile.meta = json.dumps(extended_profile)
+
     try:
         profile.year_of_birth = int(post_vars['year_of_birth'])
     except (ValueError, KeyError):
@@ -1119,7 +1142,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     js = {'success': False}  # pylint: disable-msg=invalid-name
 
     post_vars = post_override if post_override else request.POST
-    extra_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+
+    # allow for microsites to define their own set of required/optional/hidden fields
+    extra_fields = microsite.get_value(
+        'REGISTRATION_EXTRA_FIELDS',
+        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+    )
 
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
         post_vars = dict(post_vars.items())
@@ -1192,7 +1220,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         else:
             min_length = 2
 
-        if len(post_vars[field_name]) < min_length:
+        if field_name not in post_vars or len(post_vars[field_name]) < min_length:
             error_str = {
                 'username': _('Username must be minimum of two characters long'),
                 'email': _('A properly formatted e-mail is required'),
@@ -1208,7 +1236,12 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
                 'city': _('A city is required'),
                 'country': _('A country is required')
             }
-            js['value'] = error_str[field_name]
+
+            if field_name in error_str:
+                js['value'] = error_str[field_name]
+            else:
+                js['value'] = _('You are missing one or more required fields')
+
             js['field'] = field_name
             return JsonResponse(js, status=400)
     
@@ -1250,7 +1283,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         return JsonResponse(js, status=400)
 
     # enforce password complexity as an optional feature
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
+    # but not if we're doing ext auth b/c those pws never get used and are auto-generated so might not pass validation
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False) and not DoExternalAuth:
         try:
             password = post_vars['password']
 
@@ -1262,10 +1296,30 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             js['field'] = 'password'
             return JsonResponse(js, status=400)
 
+    # allow microsites to define 'extended profile fields' which are
+    # captured on user signup (for example via an overriden registration.html)
+    # and then stored in the UserProfile
+    extended_profile_fields = microsite.get_value('extended_profile_fields', [])
+    extended_profile = None
+
+    for field in extended_profile_fields:
+        if field in post_vars:
+            if not extended_profile:
+                extended_profile = {}
+            extended_profile[field] = post_vars[field]
+
+    # Make sure that password and username fields do not match
+    username = post_vars['username']
+    password = post_vars['password']
+    if username == password:
+        js['value'] = _("Username and password fields cannot match")
+        js['field'] = 'username'
+        return JsonResponse(js, status=400)
+
     # Ok, looks like everything is legit.  Create the account.
     try:
         with transaction.commit_on_success():
-            ret = _do_create_account(post_vars)
+            ret = _do_create_account(post_vars, extended_profile)
     except AccountValidationError as e:
         return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
 

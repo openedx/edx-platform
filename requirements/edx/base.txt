@@ -131,15 +131,16 @@ flaky==0.2.0
 #sentry
 raven==3.5.2
 
-#suds WS
-git+https://github.com/ovnicraft/suds.git
+# Used for Segment.io analytics
+analytics-python==0.4.4
+
 git+https://github.com/mfogel/django-settings-context-processor.git
 
 # django-cas version 2.0.3 with patch to be compatible with django 1.4
 git+https://github.com/mitocw/django-cas.git
 
 # edX packages
-edx-submissions==0.0.2
+edx-submissions==0.0.3
 
 #suds WS
 git+https://github.com/ovnicraft/suds.git

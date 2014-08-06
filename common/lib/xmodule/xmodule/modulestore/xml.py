@@ -13,21 +13,21 @@ from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
+from contextlib import contextmanager
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.modulestore.xml_exporter import DEFAULT_CONTENT_FIELDS
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, ModuleStoreReadBase
 from xmodule.tabs import CourseTabList
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdGenerator
 
-from . import ModuleStoreReadBase, Location, ModuleStoreEnum
 
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata, inheriting_field_data
@@ -129,9 +129,9 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # put it in the error tracker--content folks need to see it.
 
                     if tag in need_uniq_names:
-                        error_tracker("PROBLEM: no name of any kind specified for {tag}.  Student "
-                                      "state will not be properly tracked for this module.  Problem xml:"
-                                      " '{xml}...'".format(tag=tag, xml=xml[:100]))
+                        error_tracker(u"PROBLEM: no name of any kind specified for {tag}.  Student "
+                                      u"state will not be properly tracked for this module.  Problem xml:"
+                                      u" '{xml}...'".format(tag=tag, xml=xml[:100]))
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
@@ -144,8 +144,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     # doesn't store state, don't complain about things that are
                     # hashed.
                     if tag in need_uniq_names:
-                        msg = ("Non-unique url_name in xml.  This may break state tracking for content."
-                               "  url_name={0}.  Content={1}".format(url_name, xml[:100]))
+                        msg = (u"Non-unique url_name in xml.  This may break state tracking for content."
+                               u"  url_name={0}.  Content={1}".format(url_name, xml[:100]))
                         error_tracker("PROBLEM: " + msg)
                         log.warning(msg)
                         # Just set name to fallback_name--if there are multiple things with the same fallback name,
@@ -409,9 +409,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
-
-        # The XML Module Store is a read-only store and only handles published content
-        self.branch_setting_func = lambda: ModuleStoreEnum.RevisionOption.published_only
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -720,7 +717,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
-    def get_items(self, course_id, settings=None, content=None, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, revision=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -745,6 +742,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                 you can search dates by providing either a datetime for == (probably
                 useless) or a tuple (">"|"<" datetime) for after or before, etc.
         """
+        if revision == ModuleStoreEnum.RevisionOption.draft_only:
+            return []
+
         items = []
 
         category = kwargs.pop('category', None)
@@ -813,7 +813,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         :return: list of course locations
         """
         courses = self.get_courses()
-        return [course.location for course in courses if (course.wiki_slug == wiki_slug)]
+        return [course.location.course_key for course in courses if (course.wiki_slug == wiki_slug)]
 
     def heartbeat(self):
         """
@@ -824,3 +824,11 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return {ModuleStoreEnum.Type.xml: True}
 
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
+        """
+        A context manager for temporarily setting the branch value for the store to the given branch_setting.
+        """
+        if branch_setting != ModuleStoreEnum.Branch.published_only:
+            raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
+        yield

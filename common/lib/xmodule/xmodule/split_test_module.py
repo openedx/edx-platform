@@ -559,7 +559,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                 changed = True
 
         if changed:
-            # request does not have a user attribute, so pass None for user.
+            # TODO user.id - to be fixed by Publishing team
             self.system.modulestore.update_item(self, None)
         return Response()
 
@@ -569,16 +569,18 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
 
         This appends the new vertical to the end of children, and updates group_id_to_child.
         A mutable modulestore is needed to call this method (will need to update after mixed
-        modulestore work, currently relies on mongo's create_and_save_xmodule method).
+        modulestore work, currently relies on mongo's create_item method).
         """
-        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_and_save_xmodule'), \
+        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'create_item'), \
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
         metadata = {'display_name': group.name}
-        modulestore.create_and_save_xmodule(
-            dest_usage_key,
+        modulestore.create_item(
             user_id,
+            self.location.course_key,
+            dest_usage_key.block_type,
+            block_id=dest_usage_key.block_id,
             definition_data=None,
             metadata=metadata,
             runtime=self.system,

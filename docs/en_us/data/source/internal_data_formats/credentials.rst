@@ -31,14 +31,17 @@ files before making them available to a partner institution. As a result, when
 you receive a data package (or other files) from the edX Analytics team, you
 must decrypt the files that it contains before you use them.
 
-The cryptograhpic processes of encrypting and decrypting data files require that you create a pair of keys: the public key in the pair is used to encrypt data, and the corresponding private key is used to decrypt any files that have been encrypted with the public key. 
+The cryptographic processes of encrypting and decrypting data files require
+that you create a pair of keys: the public key in the pair is used to encrypt
+data, and the corresponding private key is used to decrypt any files that have
+been encrypted with the public key.
 
 To create the keys needed for this encryption and decryption process, you use
 GNU Privacy Guard (GnuPG or GPG). Essentially, you install a cryptographic
 application on your local computer and supply your email address and a secret
 passphrase (a password). 
 
-.. note:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
+.. important:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
 
 The result is the public key that you send to edX to use in encrypting data
 files for your institution, and the private key which you keep secret and use
@@ -64,10 +67,10 @@ Create Keys: Windows
    a. When you are prompted to specify the type of key pair you want, click
       **Create personal OpenPGP key pair**.
 
-   b.  When you are prompted for your email address, be sure to enter your
-       official university or institution email address. EdX cannot use public
-       keys that are based on personal or other non-official email addresses to
-       encrypt data.
+   b.  When you are prompted for your email address, be sure to enter *your
+       official university or institution email address*. EdX cannot use
+       public keys that are based on personal or other non-official email
+       addresses to encrypt data.
 
    c. When you are prompted for a passphrase, enter a strong passphrase. Be
       sure to remember your passphrase: you will use it to decrypt your data
@@ -97,9 +100,9 @@ Create Keys: Macintosh
    When installation is complete, GPG Keychain Access opens a web page with
    `First Steps`_ and a dialog box.
 
-#. Enter your name and email address. Be sure to enter your official university
-   or institution email address. EdX cannot use public keys that are based on
-   personal or other non-official email addresses to encrypt data.
+#. Enter your name and email address. Be sure to enter *your official
+   university or institution email address*. EdX cannot use public keys that
+   are based on personal or other non-official email addresses to encrypt data.
 
 #. Click **Generate key**. A dialog box opens to prompt you for a passphrase.
 
@@ -180,8 +183,10 @@ contains your email address, your Access Key, and your Secret Key.
  .. image:: ../Images/AWS_Credentials.png
   :alt: A csv file, open in Notepad, with the Access Key value and the Secret Key value underlined
 
+.. _Access Amazon S3:
+
 ****************************************************************
-Access Amazon S3 and Download Data Packages
+Access Amazon S3
 ****************************************************************
 
 To connect to Amazon S3, you must have your decrypted credentials. You may want
@@ -193,29 +198,17 @@ Browser. Alternatively, you can use the `AWS Command Line Interface`_.
 #. Select and install a third-party tool or interface to manage your S3
    account.
 
-#. Open your decrypted credentials.csv file. This file contains your AWS Access
-   Key and your AWS Secret Key.
+#. Open your decrypted ``credentials.csv`` file. This file contains your AWS
+   Access Key and your AWS Secret Key.
 
 #. Open the third-party tool. In most tools, you set up information about the
    S3 account and then supply your Access Key and your Secret Key to connect to
    that account. For more information, refer to the documentation for the tool
    that you selected.
 
-#. Access Amazon S3 and navigate to the edX **course-data** bucket. For each
-   period that a data package is prepared for your organization, two files are
-   available.
-
-   Event tracking data is in a file named {date}-{organization}-tracking.tar.
-   Database data files are in a file named {organization}-{date}.zip.
-
-#. Download the files. These files can be very large, sometimes several
-   gigabytes in size.
-
-#. Extract the files from the compressed .tar and the .zip files. All of the
-   files that you extract are .gpg files.
-
-#. Use your private key to decrypt the .gpg files. See `Decrypt an Encrypted
-   File`_.
+   Data package files are in the edX **course-data** and
+   **edx-course-data** buckets. For information about the files that you
+   download from Amazon S3, see :ref:`Package`.
 
 .. _AWS Command Line Interface: http://aws.amazon.com/cli/
 

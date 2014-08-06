@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=E1101
+# pylint: disable=protected-access
 """
 Tests for import_from_xml using the mongo modulestore.
 """
@@ -7,22 +8,17 @@ Tests for import_from_xml using the mongo modulestore.
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
-from path import path
 import copy
 
-from django.contrib.auth.models import User
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.contentstore.django import _CONTENTSTORE
-
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
-from pymongo import MongoClient
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -35,29 +31,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
-
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the use so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-
-        # Save the data that we've just changed to the db.
-        self.user.save()
-
+        password = super(ContentStoreImportTest, self).setUp()
+        
         self.client = Client()
-        self.client.login(username=uname, password=password)
-
-    def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
-        _CONTENTSTORE.clear()
+        self.client.login(username=self.user.username, password=password)
 
     def load_test_import_course(self):
         '''
@@ -68,7 +45,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store = modulestore()
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['test_import_course'],
             static_content_store=content_store,
@@ -88,7 +65,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         module_store, __, course = self.load_test_import_course()
         __, course_items = import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data',
             ['test_import_course_2'],
             target_course_id=course.id,
@@ -104,7 +81,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         course_id = SlashSeparatedCourseKey(u'Юникода', u'unicode_course', u'échantillon')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['2014_Uni'],
             target_course_id=course_id
@@ -150,7 +127,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore()
-        import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
+        import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
         course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -161,7 +138,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        _, courses = import_from_xml(module_store, '**replace_user**', 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        _, courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -175,12 +152,27 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         print "course tabs = {0}".format(course.tabs)
         self.assertEqual(course.tabs[2]['name'], 'Syllabus')
 
+    def test_import_performance_mongo(self):
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+
+        # we try to refresh the inheritance tree for each update_item in the import
+        with check_exact_number_of_calls(store, store.refresh_cached_metadata_inheritance_tree, 46):
+
+            # the post-publish step loads each item in the subtree, which calls _get_cached_metadata_inheritance_tree
+            with check_exact_number_of_calls(store, store._get_cached_metadata_inheritance_tree, 22):
+
+                # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
+                # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
+                #       Locally, without memcache, the number of calls is actually 2 (once more during the publish step)
+                with check_number_of_calls(store, store._compute_metadata_inheritance_tree, 2):
+                    self.load_test_import_course()
+
     def test_rewrite_reference_list(self):
         module_store = modulestore()
         target_course_id = SlashSeparatedCourseKey('testX', 'conditional_copy', 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['conditional'],
             target_course_id=target_course_id
@@ -210,7 +202,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         target_course_id = SlashSeparatedCourseKey('testX', 'peergrading_copy', 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
             ['open_ended'],
             target_course_id=target_course_id
@@ -224,24 +216,45 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             peergrading_module.link_to_location
         )
 
-    def test_rewrite_reference_value_dict(self):
+    def test_rewrite_reference_value_dict_published(self):
+        """
+        Test rewriting references in ReferenceValueDict, specifically with published content.
+        """
+        self._verify_split_test_import(
+            'split_test_copy',
+            'split_test_module',
+            'split1',
+            {"0": 'sample_0', "2": 'sample_2'},
+        )
+
+    def test_rewrite_reference_value_dict_draft(self):
+        """
+        Test rewriting references in ReferenceValueDict, specifically with draft content.
+        """
+        self._verify_split_test_import(
+            'split_test_copy_with_draft',
+            'split_test_module_draft',
+            'fb34c21fe64941999eaead421a8711b8',
+            {"0": '9f0941d021414798836ef140fb5f6841', "1": '0faf29473cf1497baa33fcc828b179cd'},
+        )
+
+    def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):
         module_store = modulestore()
-        target_course_id = SlashSeparatedCourseKey('testX', 'split_test_copy', 'copy_run')
+        target_course_id = SlashSeparatedCourseKey('testX', target_course_name, 'copy_run')
         import_from_xml(
             module_store,
-            '**replace_user**',
+            self.user.id,
             'common/test/data/',
-            ['split_test_module'],
+            [source_course_name],
             target_course_id=target_course_id
         )
         split_test_module = module_store.get_item(
-            target_course_id.make_usage_key('split_test', 'split1')
+            target_course_id.make_usage_key('split_test', split_test_name)
         )
         self.assertIsNotNone(split_test_module)
-        self.assertEqual(
-            {
-                "0": target_course_id.make_usage_key('vertical', 'sample_0'),
-                "2": target_course_id.make_usage_key('vertical', 'sample_2'),
-            },
-            split_test_module.group_id_to_child,
-        )
+
+        remapped_verticals = {
+            key: target_course_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+        }
+
+        self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

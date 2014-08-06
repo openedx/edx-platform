@@ -131,6 +131,7 @@ class CapaFields(object):
             {"display_name": _("Attempted"), "value": "attempted"},
             {"display_name": _("Closed"), "value": "closed"},
             {"display_name": _("Finished"), "value": "finished"},
+            {"display_name": _("Correct or Past Due"), "value": "correct_or_past_due"},
             {"display_name": _("Past Due"), "value": "past_due"},
             {"display_name": _("Never"), "value": "never"}]
     )
@@ -712,6 +713,8 @@ class CapaMixin(CapaFields):
         elif self.showanswer == 'finished':
             return self.closed() or self.is_correct()
 
+        elif self.showanswer == 'correct_or_past_due':
+            return self.is_correct() or self.is_past_due()
         elif self.showanswer == 'past_due':
             return self.is_past_due()
         elif self.showanswer == 'always':
@@ -1186,9 +1189,8 @@ class CapaMixin(CapaFields):
 
             answer_response = None
             for response, responder in self.lcp.responders.iteritems():
-                for other_input_id in self.lcp.responder_answers[response]:
-                    if other_input_id == input_id:
-                        answer_response = responder
+                if input_id in responder.answer_ids:
+                    answer_response = responder
 
             if answer_response is None:
                 log.warning('Answer responder could not be found for input_id %s.', input_id)

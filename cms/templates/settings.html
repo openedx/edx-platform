@@ -215,8 +215,14 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
-                  <textarea id="course-overview"></textarea>
-                  <span class="tip tip-stacked"></span>
+                  <textarea class="tinymce" id="course-overview"></textarea>
+                  <%def name='overview_text()'><%
+                    a_link_start = '<a class="link-courseURL" rel="external" href="'
+                    a_link_end = '">' + _("your course summary page") + '</a>'
+                    a_link = a_link_start + lms_link_for_about_page + a_link_end
+                    text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
+                    %>${text}</%def>
+                  <span class="tip tip-stacked">${overview_text()}</span>
                 </li>
                 % endif
 

@@ -46,6 +46,10 @@ class LmsBlockMixin(XBlockMixin):
     ispublic = Boolean(
         display_name=_("Course Is Public"),
         help=_("Enter true or false. If true, the course is open to the public. If false, the course is open only to admins."),
+        scope=Scope.settings
+    )
+    visible_to_staff_only = Boolean(
+        help=_("If true, can be seen only by course staff, regardless of start date."),
+        default=False,
         scope=Scope.settings,
-        deprecated=True
     )

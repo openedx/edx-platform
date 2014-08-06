@@ -1,0 +1,93 @@
+<combinedopenended markdown="[prompt]&#10;    &lt;h3&gt;Censorship in the Libraries&lt;/h3&gt;&#10;&#10;    &lt;p&gt;'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author&#10;    &lt;/p&gt;&#10;&#10;    &lt;p&gt;&#10;    Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.&#10;    &lt;/p&gt;&#10;[prompt]&#10;[rubric]&#10;+ Ideas&#10;- Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.&#10;- Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.&#10;- Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.&#10;- Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.&#10;+ Content&#10;- Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.&#10;- Includes little information and few or no details.  Explores only one or two facets of the topic.&#10;- Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.&#10;- Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.&#10;+ Organization&#10;- Ideas organized illogically, transitions weak, and response difficult to follow.&#10;- Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.&#10;- Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.&#10;+ Style&#10;- Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.&#10;- Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).&#10;- Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.&#10;+ Voice&#10;- Demonstrates language and tone that may be inappropriate to task and reader.&#10;- Demonstrates an attempt to adjust language and tone to task and reader.&#10;- Demonstrates effective adjustment of language and tone to task and reader.&#10;[rubric]&#10;[tasks]&#10;(Self)&#10;[tasks]&#10;&#10;">
+  <prompt>
+    <h3>Censorship in the Libraries</h3>
+    <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+    </p>
+    <p>
+    Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+    </p>
+  </prompt>
+  <rubric>
+    <rubric>
+      <category>
+        <description>
+Ideas
+</description>
+        <option>
+Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+</option>
+        <option>
+Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
+</option>
+        <option>
+Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+</option>
+        <option>
+Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+</option>
+      </category>
+      <category>
+        <description>
+Content
+</description>
+        <option>
+Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+</option>
+        <option>
+Includes little information and few or no details.  Explores only one or two facets of the topic.
+</option>
+        <option>
+Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+</option>
+        <option>
+Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
+</option>
+      </category>
+      <category>
+        <description>
+Organization
+</description>
+        <option>
+Ideas organized illogically, transitions weak, and response difficult to follow.
+</option>
+        <option>
+Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+</option>
+        <option>
+Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+</option>
+      </category>
+      <category>
+        <description>
+Style
+</description>
+        <option>
+Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+</option>
+        <option>
+Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+</option>
+        <option>
+Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+</option>
+      </category>
+      <category>
+        <description>
+Voice
+</description>
+        <option>
+Demonstrates language and tone that may be inappropriate to task and reader.
+</option>
+        <option>
+Demonstrates an attempt to adjust language and tone to task and reader.
+</option>
+        <option>
+Demonstrates effective adjustment of language and tone to task and reader.
+</option>
+      </category>
+    </rubric>
+  </rubric>
+  <task>
+    <selfassessment/>
+  </task>
+</combinedopenended>

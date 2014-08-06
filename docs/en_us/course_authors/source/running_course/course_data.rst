@@ -50,8 +50,9 @@ Studio, or derived from data that you define in Studio.
   Studio, this field is labeled **Course Name**. 
 
   This name can be changed in Studio (not recommended if your course is live):
-  select **Settings** > **Advanced Settings** and scroll down to the policy key
-  labeled **display_name**. This setting changes the **Course Display Name** in the LMS only. 
+  From the **Settings** menu select **Advanced Settings**. The value for the
+  **Course Display Name** policy key defines the course name that appears in the
+  LMS only.
 
   The illustration that follows shows the information collected by Studio for
   a new course side-by-side with the same information in the **Basic Course

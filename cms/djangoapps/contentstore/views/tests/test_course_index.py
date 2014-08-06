@@ -4,11 +4,15 @@ Unit tests for getting the list of courses and the course outline.
 import json
 import lxml
 
-from cms.urls import COURSE_KEY_PATTERN
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from contentstore.utils import reverse_course_url, add_instructor
+from contentstore.views.access import has_course_access
+from course_action_state.models import CourseRerunState
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locator import Locator
+from opaque_keys.edx.locator import CourseLocator
+from student.tests.factories import UserFactory
+from course_action_state.managers import CourseRerunUIStateManager
+from django.conf import settings
 
 
 class TestCourseIndex(CourseTestCase):
@@ -39,7 +43,7 @@ class TestCourseIndex(CourseTestCase):
         for link in course_link_eles:
             self.assertRegexpMatches(
                 link.get("href"),
-                'course/{}'.format(COURSE_KEY_PATTERN)
+                'course/{}'.format(settings.COURSE_KEY_PATTERN)
             )
             # now test that url
             outline_response = authed_client.get(link.get("href"), {}, HTTP_ACCEPT='text/html')
@@ -96,7 +100,7 @@ class TestCourseIndex(CourseTestCase):
 
         # First spot check some values in the root response
         self.assertEqual(json_response['category'], 'course')
-        self.assertEqual(json_response['id'], 'location:MITx+999+Robot_Super_Course+course+Robot_Super_Course')
+        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
         self.assertTrue(json_response['is_container'])
         self.assertFalse(json_response['is_draft'])
@@ -106,7 +110,7 @@ class TestCourseIndex(CourseTestCase):
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
-        self.assertEqual(first_child_response['id'], 'location:MITx+999+Robot_Super_Course+chapter+Week_1')
+        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
         self.assertTrue(first_child_response['is_container'])
         self.assertFalse(first_child_response['is_draft'])
@@ -114,6 +118,63 @@ class TestCourseIndex(CourseTestCase):
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
+
+    def test_notifications_handler_get(self):
+        state = CourseRerunUIStateManager.State.FAILED
+        action = CourseRerunUIStateManager.ACTION
+        should_display = True
+
+        # try when no notification exists
+        notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': 1,
+        })
+
+        resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
+
+        # verify that we get an empty dict out
+        self.assertEquals(resp.status_code, 400)
+
+        # create a test notification
+        rerun_state = CourseRerunState.objects.update_state(course_key=self.course.id, new_state=state, allow_not_found=True)
+        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=UserFactory(), should_display=should_display)
+
+        # try to get information on this notification
+        notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': rerun_state.id,
+        })
+        resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
+
+        json_response = json.loads(resp.content)
+
+        self.assertEquals(json_response['state'], state)
+        self.assertEquals(json_response['action'], action)
+        self.assertEquals(json_response['should_display'], should_display)
+
+    def test_notifications_handler_dismiss(self):
+        state = CourseRerunUIStateManager.State.FAILED
+        should_display = True
+        rerun_course_key = CourseLocator(org='testx', course='test_course', run='test_run')
+
+        # add an instructor to this course
+        user2 = UserFactory()
+        add_instructor(rerun_course_key, self.user, user2)
+
+        # create a test notification
+        rerun_state = CourseRerunState.objects.update_state(course_key=rerun_course_key, new_state=state, allow_not_found=True)
+        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=user2, should_display=should_display)
+
+        # try to get information on this notification
+        notification_dismiss_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': rerun_state.id,
+        })
+        resp = self.client.delete(notification_dismiss_url)
+        self.assertEquals(resp.status_code, 200)
+
+        with self.assertRaises(CourseRerunState.DoesNotExist):
+            # delete nofications that are dismissed
+            CourseRerunState.objects.get(id=rerun_state.id)
+
+        self.assertFalse(has_course_access(user2, rerun_course_key))
 
     def assert_correct_json_response(self, json_response):
         """

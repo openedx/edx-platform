@@ -6,29 +6,26 @@ import ddt
 
 from mock import patch
 from pytz import UTC
-from unittest import skipUnless
 from webob import Response
 
-from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_usage_url, reverse_course_url
+from contentstore.utils import reverse_usage_url
+from contentstore.views.preview import StudioUserService
 
 from contentstore.views.component import (
-    component_handler, get_component_templates,
-    SPLIT_TEST_COMPONENT_TYPE
+    component_handler, get_component_templates
 )
 
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import PublishState
-from xmodule.modulestore.django import modulestore
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
 
@@ -40,7 +37,6 @@ class ItemTest(CourseTestCase):
 
         self.course_key = self.course.id
         self.usage_key = self.course.location
-        self.store = modulestore()
 
     def get_item_from_modulestore(self, usage_key, verify_is_draft=False):
         """
@@ -160,7 +156,7 @@ class GetItem(ItemTest):
             html,
             # The instance of the wrapper class will have an auto-generated ID. Allow any
             # characters after wrapper.
-            (r'"/container/location:MITx\+999\+Robot_Super_Course\+wrapper\+\w+" class="action-button">\s*'
+            (r'"/container/i4x://MITx/999/wrapper/\w+" class="action-button">\s*'
              '<span class="action-button-text">View</span>')
         )
 
@@ -250,6 +246,17 @@ class TestCreateItem(ItemTest):
         obj = self.get_item_from_modulestore(usage_key)
         self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=UTC))
 
+    def test_static_tabs_initialization(self):
+        """
+        Test that static tab display names are not being initialized as None.
+        """
+        # Add a new static tab with no explicit name
+        resp = self.create_xblock(category='static_tab')
+        usage_key = self.response_usage_key(resp)
+
+        # Check that its name is not None
+        new_tab = self.get_item_from_modulestore(usage_key)
+        self.assertEquals(new_tab.display_name, 'Empty') 
 
 class TestDuplicateItem(ItemTest):
     """
@@ -778,7 +785,6 @@ class TestEditItem(ItemTest):
         self.verify_publish_state(html_usage_key, PublishState.draft)
 
 
-@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class TestEditSplitModule(ItemTest):
     """
     Tests around editing instances of the split_test module.
@@ -979,6 +985,12 @@ class TestEditSplitModule(ItemTest):
         group_id_to_child = split_test.group_id_to_child
         self.assertEqual(2, len(group_id_to_child))
 
+        # Test environment and Studio use different module systems
+        # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
+        # CachingDescriptorSystem doesn't have user service, that's needed for
+        # SplitTestModule. So, in this line of code we add this service manually.
+        split_test.runtime._services['user'] = StudioUserService(self.request)  # pylint: disable=protected-access
+
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)
         split_test = self._assert_children(3)
@@ -990,34 +1002,6 @@ class TestEditSplitModule(ItemTest):
         split_test.add_missing_groups(self.request)
         split_test = self._assert_children(3)
         self.assertEqual(group_id_to_child, split_test.group_id_to_child)
-
-    def test_view_index_ok(self):
-        """
-        Basic check that the groups configuration page responds correctly.
-        """
-        if SPLIT_TEST_COMPONENT_TYPE not in self.course.advanced_modules:
-            self.course.advanced_modules.append(SPLIT_TEST_COMPONENT_TYPE)
-            self.store.update_item(self.course, self.user.id)
-
-        url = reverse_course_url('group_configurations_list_handler', self.course.id)
-        resp = self.client.get(url)
-        self.assertContains(resp, self.course.display_name)
-        self.assertContains(resp, 'First Partition')
-        self.assertContains(resp, 'alpha')
-        self.assertContains(resp, 'Second Partition')
-        self.assertContains(resp, 'Group 1')
-
-    def test_view_index_disabled(self):
-        """
-        Check that group configuration page is not displayed when turned off.
-        """
-        if SPLIT_TEST_COMPONENT_TYPE in self.course.advanced_modules:
-            self.course.advanced_modules.remove(SPLIT_TEST_COMPONENT_TYPE)
-            self.store.update_item(self.course, self.user.id)
-
-        url = reverse_course_url('group_configurations_list_handler', self.course.id)
-        resp = self.client.get(url)
-        self.assertContains(resp, "module is disabled")
 
 
 @ddt.ddt
@@ -1129,6 +1113,15 @@ class TestComponentTemplates(CourseTestCase):
         only_template = advanced_templates[0]
         self.assertNotEqual(only_template.get('category'), 'video')
         self.assertNotEqual(only_template.get('category'), 'openassessment')
+
+    def test_advanced_components_without_display_name(self):
+        """
+        Test that advanced components without display names display their category instead.
+        """
+        self.course.advanced_modules.append('graphical_slider_tool')
+        self.templates = get_component_templates(self.course)
+        template = self.get_templates_of_type('advanced')[0]
+        self.assertEqual(template.get('display_name'), 'graphical_slider_tool')
 
     def test_advanced_problems(self):
         """

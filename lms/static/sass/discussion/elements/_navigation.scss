@@ -1,6 +1,8 @@
 .forum-nav {
   @include box-sizing(border-box);
   float: left;
+  position: relative;
+  width: 31%;
   border: 1px solid #aaa;
   border-radius: 3px;
 }
@@ -27,6 +29,7 @@
   }
 
   .icon {
+    @include font-size(14);
     margin-right: ($baseline/4);
   }
 }
@@ -64,7 +67,6 @@
 // Browse menu
 // -----------
 .forum-nav-browse-menu-wrapper {
-  overflow-y: scroll;
   border-bottom: 1px solid $gray-l3;
   background: $gray-l5;
 }
@@ -85,6 +87,27 @@
 
 .forum-nav-browse-filter-input {
   width: 100%;
+}
+
+.forum-nav-browse-menu {
+  @include font-size(14);
+  overflow-y: scroll;
+  list-style: none;
+}
+
+.forum-nav-browse-submenu {
+  padding-left: $baseline;
+  list-style: none;
+}
+
+.forum-nav-browse-title {
+  display: block;
+  border-bottom: 1px solid $gray-l3;
+  padding: ($baseline/2) ($baseline/2);
+
+  &:hover, &:focus {
+    background: $forum-color-active-thread;
+  }
 }
 
 .forum-nav-browse-title .icon {
@@ -127,14 +150,25 @@
 // -----------
 .forum-nav-thread-list {
   overflow-y: scroll;
+  list-style: none;
 }
 
 .forum-nav-thread {
   border-bottom: 1px solid $gray-l3;
+  background-color: $gray-l5;
+
+  &.is-unread {
+    background-color: $white;
+  }
 }
 
 .forum-nav-thread-link {
-  @include clearfix();
+  display: block;
+  padding: ($baseline/4) ($baseline/2);
+
+  &.is-active, &:hover, &:focus {
+    background-color: $forum-color-active-thread;
+  }
 }
 
 %forum-nav-thread-wrapper {
@@ -162,8 +196,10 @@
   @extend %t-weight4;
   @include font-size(9);
   display: inline;
+  margin-top: ($baseline/4);
   border: 1px solid;
   border-radius: 3px;
+  padding: 1px 6px;
   text-transform: uppercase;
   white-space: nowrap;
 
@@ -265,13 +301,25 @@
   }
 }
 
+.forum-nav-load-more {
+  border-bottom: 1px solid $gray-l3;
+  background-color: $gray-l5;
+}
+
 %forum-nav-load-more-content {
+  display: block;
+  padding: $baseline 0;
   text-align: center;
 }
 
 .forum-nav-load-more-link {
   @extend %forum-nav-load-more-content;
   color: $link-color;
+
+  &:hover, &:focus {
+    color: $link-color;
+    background-color: $forum-color-active-thread;
+  }
 }
 
 .forum-nav-loading {

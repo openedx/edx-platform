@@ -47,6 +47,8 @@ from functools import total_ordering
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 
+from ratelimitbackend import admin
+
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -275,6 +277,15 @@ class UserProfile(models.Model):
         self.save()
 
 
+class UserSignupSource(models.Model):
+    """
+    This table contains information about users registering
+    via Micro-Sites
+    """
+    user = models.ForeignKey(User, db_index=True)
+    site = models.CharField(max_length=255, db_index=True)
+
+
 def unique_id_for_user(user, save=True):
     """
     Return a unique id for a user, suitable for inserting into
@@ -332,6 +343,7 @@ class PendingEmailChange(models.Model):
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
 
 
 class PasswordHistory(models.Model):
@@ -698,6 +710,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
+
         if activation_changed:
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
@@ -711,7 +724,7 @@ class CourseEnrollment(models.Model):
 
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
-
+                
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
                 dog_stats_api.increment(
@@ -720,6 +733,10 @@ class CourseEnrollment(models.Model):
                           u"offering:{}".format(self.course_id.offering),
                           u"mode:{}".format(self.mode)]
                 )
+        if mode_changed:
+            # the user's default mode is "honor" and disabled for a course
+            # mode change events will only be emitted when the user's mode changes from this
+            self.emit_event(EVENT_NAME_ENROLLMENT_MODE_CHANGED)
 
     def emit_event(self, event_name):
         """
@@ -728,7 +745,7 @@ class CourseEnrollment(models.Model):
 
         try:
             context = contexts.course_context_from_course_id(self.course_id)
-            assert(isinstance(self.course_id, SlashSeparatedCourseKey))
+            assert(isinstance(self.course_id, CourseKey))
             data = {
                 'user_id': self.user.id,
                 'course_id': self.course_id.to_deprecated_string(),
@@ -737,6 +754,16 @@ class CourseEnrollment(models.Model):
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
+
+                if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                    analytics.track(self.user_id, event_name, {
+                        'category': 'conversion',
+                        'label': self.course_id.to_deprecated_string(),
+                        'org': self.course_id.org,
+                        'course': self.course_id.course,
+                        'run': self.course_id.run,
+                        'mode': self.mode,
+                    })
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
@@ -761,6 +788,8 @@ class CourseEnrollment(models.Model):
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
+
+        Also emits relevant events for analytics purposes.
         """
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
@@ -874,7 +903,7 @@ class CourseEnrollment(models.Model):
 
         `course_id_partial` (CourseKey) is missing the run component
         """
-        assert isinstance(course_id_partial, SlashSeparatedCourseKey)
+        assert isinstance(course_id_partial, CourseKey)
         assert not course_id_partial.run  # None or empty string
         course_key = SlashSeparatedCourseKey(course_id_partial.org, course_id_partial.course, '')
         querystring = unicode(course_key.to_deprecated_string())
@@ -1034,6 +1063,12 @@ class CourseAccessRole(models.Model):
         """
         return self._key < other._key
 
+    def __unicode__(self):
+        return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
+
+
+class CourseAccessRoleAdmin(admin.ModelAdmin):
+    raw_id_fields = ("user",)
 
 #### Helper methods for use from python manage.py shell and other classes.
 

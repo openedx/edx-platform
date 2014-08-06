@@ -2,6 +2,7 @@ from xblock.fields import Scope
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
 
+
 class CourseMetadata(object):
     '''
     For CRUD operations on metadata fields which do not have specific editors
@@ -23,9 +24,11 @@ class CourseMetadata(object):
                      'graded',
                      'hide_from_toc',
                      'pdf_textbooks',
+                     'user_partitions',
                      'name',  # from xblock
                      'tags',  # from xblock
                      'video_speed_optimizations',
+                     'visible_to_staff_only'
     ]
 
     @classmethod
@@ -53,7 +56,7 @@ class CourseMetadata(object):
         return result
 
     @classmethod
-    def update_from_json(cls, descriptor, jsondict, filter_tabs=True, user=None):
+    def update_from_json(cls, descriptor, jsondict, user, filter_tabs=True):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
@@ -84,6 +87,6 @@ class CourseMetadata(object):
             setattr(descriptor, key, value)
 
         if len(key_values) > 0:
-            modulestore().update_item(descriptor, user.id if user else None)
+            modulestore().update_item(descriptor, user.id)
 
         return cls.fetch(descriptor)

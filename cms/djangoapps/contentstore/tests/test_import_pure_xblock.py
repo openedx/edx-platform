@@ -28,9 +28,6 @@ class StubXBlock(XBlock):
 
 class XBlockImportTest(ModuleStoreTestCase):
 
-    def setUp(self):
-        self.store = modulestore()
-
     @XBlock.register_temp_plugin(StubXBlock)
     def test_import_public(self):
         self._assert_import(
@@ -62,7 +59,7 @@ class XBlockImportTest(ModuleStoreTestCase):
 
         """
         _, courses = import_from_xml(
-            self.store, '**replace_user**', 'common/test/data', [course_dir]
+            self.store, self.user.id, 'common/test/data', [course_dir]
         )
 
         xblock_location = courses[0].id.make_usage_key('stubxblock', 'xblock_test')

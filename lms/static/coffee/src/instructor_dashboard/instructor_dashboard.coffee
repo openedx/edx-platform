@@ -168,8 +168,8 @@ setup_instructor_dashboard_sections = (idash_content) ->
     constructor: window.InstructorDashboard.sections.Email
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#send_email"
   ,
-    constructor: window.InstructorDashboard.sections.Analytics
-    $element: idash_content.find ".#{CSS_IDASH_SECTION}#analytics"
+    constructor: window.InstructorDashboard.sections.InstructorAnalytics
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#instructor_analytics"
   ,
     constructor: window.InstructorDashboard.sections.Metrics
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#metrics"

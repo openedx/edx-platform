@@ -11,6 +11,8 @@ plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, argum
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
+create_email_content_table = -> window.InstructorDashboard.util.create_email_content_table.apply this, arguments
+create_email_message_views = -> window.InstructorDashboard.util.create_email_message_views.apply this, arguments
 
 class SendEmail
   constructor: (@$container) ->
@@ -21,9 +23,14 @@ class SendEmail
     @$btn_send = @$container.find("input[name='send']'")
     @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
+    @$content_request_response_error = @$container.find(".content-request-response-error")
     @$history_request_response_error = @$container.find(".history-request-response-error")
     @$btn_task_history_email = @$container.find("input[name='task-history-email']'")
+    @$btn_task_history_email_content = @$container.find("input[name='task-history-email-content']'")
     @$table_task_history_email = @$container.find(".task-history-email-table")
+    @$table_email_content_history = @$container.find(".content-history-email-table")
+    @$email_content_table_inner = @$container.find(".content-history-table-inner")
+    @$email_messages_wrapper = @$container.find(".email-messages-wrapper")
 
     # attach click handlers
 
@@ -83,9 +90,25 @@ class SendEmail
           else
             @$history_request_response_error.text gettext("There is no email history for this course.")
             # Enable the msg-warning css display
-            $(".msg-warning").css({"display":"block"})
+            @$history_request_response_error.css({"display":"block"})
         error: std_ajax_err =>
           @$history_request_response_error.text gettext("There was an error obtaining email task history for this course.")
+
+    # List content history for emails sent
+    @$btn_task_history_email_content.click =>
+      url = @$btn_task_history_email_content.data 'endpoint'
+      $.ajax
+        dataType: 'json'
+        url : url
+        success: (data) =>
+          if data.emails.length
+            create_email_content_table @$table_email_content_history, @$email_content_table_inner, data.emails
+            create_email_message_views @$email_messages_wrapper, data.emails
+          else
+            @$content_request_response_error.text gettext("There is no email history for this course.")
+            @$content_request_response_error.css({"display":"block"})
+        error: std_ajax_err =>
+          @$content_request_response_error.text gettext("There was an error obtaining email content history for this course.")
 
   fail_with_error: (msg) ->
     console.warn msg

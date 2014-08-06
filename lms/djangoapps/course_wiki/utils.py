@@ -27,20 +27,25 @@ def user_is_article_course_staff(user, article):
     if wiki_slug is None:
         return False
 
+    modstore = modulestore.django.modulestore()
+    return _has_wiki_staff_access(user, wiki_slug, modstore)
+
+
+def _has_wiki_staff_access(user, wiki_slug, modstore):
+    """Returns whether the user has staff access to the wiki represented by wiki_slug"""
+    course_keys = modstore.get_courses_for_wiki(wiki_slug)
+
     # The wiki expects article slugs to contain at least one non-digit so if
     # the course number is just a number the course wiki root slug is set to
     # be '<course_number>_'. This means slug '202_' can belong to either
     # course numbered '202_' or '202' and so we need to consider both.
+    if wiki_slug.endswith('_') and slug_is_numerical(wiki_slug[:-1]):
+        course_keys.extend(modstore.get_courses_for_wiki(wiki_slug[:-1]))
 
-    courses = modulestore.django.modulestore().get_courses_for_wiki(wiki_slug)
-    if any(courseware.access.has_access(user, 'staff', course, course.course_key) for course in courses):
-        return True
-
-    if (wiki_slug.endswith('_') and slug_is_numerical(wiki_slug[:-1])):
-        courses = modulestore.django.modulestore().get_courses_for_wiki(wiki_slug[:-1])
-        if any(courseware.access.has_access(user, 'staff', course, course.course_key) for course in courses):
+    for course_key in course_keys:
+        course = modstore.get_course(course_key)
+        if courseware.access.has_access(user, 'staff', course, course_key):
             return True
-
     return False
 
 

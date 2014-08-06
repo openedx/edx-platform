@@ -23,7 +23,7 @@ import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import PublishState, ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, DuplicateItemError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import PREVIEW_VIEWS, STUDIO_VIEW
@@ -60,6 +60,15 @@ def hash_resource(resource):
     md5 = hashlib.md5()
     md5.update(repr(resource))
     return md5.hexdigest()
+
+
+def usage_key_with_run(usage_key_string):
+    """
+    Converts usage_key_string to a UsageKey, adding a course run if necessary
+    """
+    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
+    return usage_key
 
 
 # pylint: disable=unused-argument
@@ -100,7 +109,8 @@ def xblock_handler(request, usage_key_string):
               The locator (unicode representation of a UsageKey) for the created xblock (minus children) is returned.
     """
     if usage_key_string:
-        usage_key = UsageKey.from_string(usage_key_string)
+        usage_key = usage_key_with_run(usage_key_string)
+
         if not has_course_access(request.user, usage_key.course_key):
             raise PermissionDenied()
 
@@ -134,14 +144,14 @@ def xblock_handler(request, usage_key_string):
             )
     elif request.method in ('PUT', 'POST'):
         if 'duplicate_source_locator' in request.json:
-            parent_usage_key = UsageKey.from_string(request.json['parent_locator'])
-            duplicate_source_usage_key = UsageKey.from_string(request.json['duplicate_source_locator'])
+            parent_usage_key = usage_key_with_run(request.json['parent_locator'])
+            duplicate_source_usage_key = usage_key_with_run(request.json['duplicate_source_locator'])
 
             dest_usage_key = _duplicate_item(
                 parent_usage_key,
                 duplicate_source_usage_key,
-                request.json.get('display_name'),
                 request.user,
+                request.json.get('display_name'),
             )
 
             return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
@@ -166,7 +176,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    usage_key = UsageKey.from_string(usage_key_string)
+    usage_key = usage_key_with_run(usage_key_string)
     if not has_course_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
@@ -193,8 +203,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            # change not authored by requestor but by xblocks.
-            store.update_item(xblock, None)
+            store.update_item(xblock, request.user.id)
         elif view_name in (unit_views + container_views):
             is_container_view = (view_name in container_views)
 
@@ -275,7 +284,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # New module at this location, for pages that are not pre-created.
             # Used for course info handouts.
-            existing_item = store.create_and_save_xmodule(usage_key, user.id)
+            existing_item = store.create_item(user.id, usage_key.course_key, usage_key.block_type, usage_key.block_id)
         else:
             raise
     except InvalidLocationError:
@@ -293,7 +302,6 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
                 pass
         elif publish == 'create_draft':
             try:
-                # This recursively clones the item subtree and marks the copies as draft
                 store.convert_to_draft(existing_item.location, user.id)
             except DuplicateItemError:
                 pass
@@ -306,11 +314,10 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
         data = old_content['data'] if 'data' in old_content else None
 
     if children is not None:
-        children_usage_keys = [
-            UsageKey.from_string(child)
-            for child
-            in children
-        ]
+        children_usage_keys = []
+        for child in children:
+            child_usage_key = usage_key_with_run(child)
+            children_usage_keys.append(child_usage_key)
         existing_item.children = children_usage_keys
 
     # also commit any metadata which might have been passed along
@@ -376,7 +383,7 @@ def _save_item(user, usage_key, data=None, children=None, metadata=None, nullout
 @expect_json
 def _create_item(request):
     """View for create items."""
-    usage_key = UsageKey.from_string(request.json['parent_locator'])
+    usage_key = usage_key_with_run(request.json['parent_locator'])
     category = request.json['category']
 
     display_name = request.json.get('display_name')
@@ -403,9 +410,11 @@ def _create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    created_block = store.create_and_save_xmodule(
-        dest_usage_key,
+    created_block = store.create_child(
         request.user.id,
+        usage_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=data,
         metadata=metadata,
         runtime=parent.runtime,
@@ -415,6 +424,7 @@ def _create_item(request):
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
     if category == 'static_tab':
+        display_name = display_name or _("Empty") # Prevent name being None
         course = store.get_course(dest_usage_key.course_key)
         course.tabs.append(
             StaticTab(
@@ -424,15 +434,10 @@ def _create_item(request):
         )
         store.update_item(course, request.user.id)
 
-    # TODO replace w/ nicer accessor
-    if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        parent.children.append(created_block.location)
-        store.update_item(parent, request.user.id)
-
     return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=None, user=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -452,9 +457,11 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
         else:
             duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
-    dest_module = store.create_and_save_xmodule(
-        dest_usage_key,
+    dest_module = store.create_item(
         user.id,
+        dest_usage_key.course_key,
+        dest_usage_key.block_type,
+        block_id=dest_usage_key.block_id,
         definition_data=source_item.get_explicitly_set_fields_by_scope(Scope.content),
         metadata=duplicate_metadata,
         runtime=source_item.runtime,
@@ -467,7 +474,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
         for child in source_item.children:
             dupe = _duplicate_item(dest_module.location, child, user=user)
             dest_module.children.append(dupe)
-        store.update_item(dest_module, user.id if user else None)
+        store.update_item(dest_module, user.id)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = store.get_item(parent_usage_key)
@@ -478,7 +485,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, display_name=N
             parent.children.insert(source_index + 1, dest_module.location)
         else:
             parent.children.append(dest_module.location)
-        store.update_item(parent, user.id if user else None)
+        store.update_item(parent, user.id)
 
     return dest_module.location
 
@@ -516,7 +523,7 @@ def orphan_handler(request, course_key_string):
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
         if has_course_access(request.user, course_usage_key):
-            return JsonResponse(modulestore().get_orphans(course_usage_key))
+            return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
@@ -524,11 +531,9 @@ def orphan_handler(request, course_key_string):
             store = modulestore()
             items = store.get_orphans(course_usage_key)
             for itemloc in items:
-                # get_orphans returns the deprecated string format w/o revision
-                usage_key = course_usage_key.make_usage_key_from_deprecated_string(itemloc)
                 # need to delete all versions
-                store.delete_item(usage_key, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
-            return JsonResponse({'deleted': items})
+                store.delete_item(itemloc, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
+            return JsonResponse({'deleted': [unicode(item) for item in items]})
         else:
             raise PermissionDenied()
 
@@ -544,7 +549,7 @@ def _get_module_info(usage_key, user, rewrite_static_links=True):
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
-            module = store.create_and_save_xmodule(usage_key, user.id)
+            module = store.create_item(user.id, usage_key.course_key, usage_key.block_type, block_id=usage_key.block_id)
         else:
             raise
 

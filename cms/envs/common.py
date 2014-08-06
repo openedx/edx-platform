@@ -30,10 +30,11 @@ import sys
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES, WIKI_ENABLED, MODULESTORE,
+    update_module_store_settings, ASSET_IGNORE_REGEX
 )
 from path import path
-from lms.envs.modulestore_settings import *
+from warnings import simplefilter
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from dealer.git import git
@@ -129,8 +130,8 @@ GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
-from tempdir import mkdtemp_clean
-MAKO_MODULE_DIR = mkdtemp_clean('mako')
+import tempfile
+MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_cms')
 MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
@@ -168,6 +169,12 @@ AUTHENTICATION_BACKENDS = (
 
 LMS_BASE = None
 
+# These are standard regexes for pulling out info like course_ids, usage_ids, etc.
+# They are used so that URLs with deprecated-format strings still work.
+from lms.envs.common import (
+    COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
+)
+
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
     'url': 'http://localhost:8888',
@@ -176,6 +183,10 @@ XQUEUE_INTERFACE = {
     'basic_auth': None,
 }
 
+################################# Deprecation warnings #####################
+
+# Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
+simplefilter('ignore')
 
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
@@ -535,8 +546,12 @@ INSTALLED_APPS = (
 
     # Monitoring signals
     'monitoring',
+
     # Cities UPEx
     'cities',
+
+    # Course action state
+    'course_action_state'
 )
 
 
@@ -606,6 +621,7 @@ OPTIONAL_APPS = (
     'submissions',
     'openassessment',
     'openassessment.assessment',
+    'openassessment.fileupload',
     'openassessment.workflow',
     'openassessment.xblock'
 )
@@ -630,3 +646,7 @@ ADVANCED_SECURITY_CONFIG = {}
 
 DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70
+
+### External auth usage -- prefixes for ENROLLMENT_DOMAIN
+SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+OPENID_DOMAIN_PREFIX = 'openid:'

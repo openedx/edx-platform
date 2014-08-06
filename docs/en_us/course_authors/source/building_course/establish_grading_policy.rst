@@ -69,6 +69,15 @@ You use the grade range control to change these settings:
 After you make any changes to the grade range, you must click **Save Changes**
 at the bottom of the page.
 
+.. _Grade Ranges and Certificates:
+
+==============================
+Grade Ranges and Certificates
+==============================
+
+If you plan for your course to offer certificates, note that a student will
+qualify for a certificate by earning any grade over the F, or Fail, threshold.
+This is true regardless of how many grade levels you add in the grade range.
 
 .. _Set the Grace Period:
 

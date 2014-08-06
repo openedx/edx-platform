@@ -37,20 +37,23 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
-        // Editor tinymce
+        //tinymce
         this.editor = new tinymce.Editor('course-overview', {
-            language: "es",
-            plugins: ["table"],
-            menu: {
-                file: {title: 'File', items: 'save'},
-                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
-                insert: {title: 'Insert', items: '|'}, 
-                view: {title: 'View', items: 'visualaid'}, 
-                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
-                table: {title: 'Table'}, 
-                tools: {title: 'Tools', items: 'inserttable'} 
+            plugins: [
+                "link image",
+                "codemirror",
+                "table",
+                "paste textcolor"
+            ],
+            theme: "modern",
+            skin: 'studio-tmce4',
+            schema: "html5",
+            codemirror: {
+                path: "" + baseUrl + "/js/vendor"
             },
-            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+            toolbar2: "print preview media | forecolor backcolor code",
+            image_advtab: true,
         }, tinymce.EditorManager);
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
@@ -64,14 +67,16 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
-        this.editor.render();
-        //this code can be moved out to funct
-        this.editor.on('change', function(e){
+        // tinymce
+        var cachethis = this;
+        this.editor.on('change', function(e) {
             var newVal = tinymce.activeEditor.getContent();
-            if (cachethis.model.get('overview') != newVal){
+            if (cachethis.model.get('overview') != newVal) {
                 cachethis.setAndValidate('overview', newVal);
             }
         });
+        this.editor.render();
+
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
 //        this.codeMirrorize(null, $('#course-overview')[0]);
 
@@ -229,8 +234,11 @@ var DetailsView = ValidatingView.extend({
         if (!this.codeMirrors[thisTarget.id]) {
             var cachethis = this;
             var field = this.selectorToField[thisTarget.id];
+
+            this.editor.setContent(this.model.attributes.overview);
+
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
-                mode: "text/html", lineNumbers: true, lineWrapping: true});
+                mode: "text/html", lineNumbers: true, lineWrapping: true, style: "display: none;"});
             this.codeMirrors[thisTarget.id].on('change', function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();

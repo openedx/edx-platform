@@ -56,7 +56,7 @@
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         var url = json.redirect_url || "${reverse('dashboard')}";
-        location.href = url;
+        location.href = appendParameter(url, "signin", "initial");
       });
 
       $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
@@ -166,6 +166,17 @@
           <li class="field required text" id="field-email">
             <label for="email">${_('E-mail')}</label>
             <input class="" id="email" type="email" name="email" value="${email}" placeholder="${_('example: username@domain.com')}" required aria-required="true" />
+          </li>
+
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+          </li>
+          <li class="field required text" id="field-username">
+            <label for="username">${_('Public Username')}</label>
+            <input id="username" type="text" name="username" value="${username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
           % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:

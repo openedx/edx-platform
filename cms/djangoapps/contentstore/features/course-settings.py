@@ -141,7 +141,7 @@ def click_upload_button(_step):
 
 @step('I upload a new course image$')
 def upload_new_course_image(_step):
-    upload_file('image.jpg')
+    upload_file('image.jpg', sub_path="uploads")
 
 
 @step('I should see the new course image$')

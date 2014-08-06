@@ -95,7 +95,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                 <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
                   <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
-                  <span class="tip">${_("The public display name for your course.")}</span>
+                  <span class="tip">${_("The public display name for your course. This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
                 <li class="field text required" id="field-organization">
@@ -295,7 +295,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
         <ol class="list-actions">
           <li class="action-item">
-            
+
             <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with edX Studio")}</a>
           </li>
           <li class="action-item">

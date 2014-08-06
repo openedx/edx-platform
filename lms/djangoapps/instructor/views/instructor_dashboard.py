@@ -26,6 +26,10 @@ from courseware.courses import get_course_by_id, get_cms_course_link, get_course
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
+from shoppingcart.models import Coupon, PaidCourseRegistration
+from course_modes.models import CourseMode
+from student.roles import CourseFinanceAdminRole
+
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
@@ -49,6 +53,7 @@ def instructor_dashboard_2(request, course_id):
     access = {
         'admin': request.user.is_staff,
         'instructor': has_access(request.user, 'instructor', course),
+        'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
         'staff': has_access(request.user, 'staff', course),
         'forum_admin': has_forum_access(
             request.user, course_key, FORUM_ROLE_ADMINISTRATOR
@@ -66,6 +71,12 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_key, access),
     ]
 
+    #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
+    course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
+    course_mode_has_price = False
+    if course_honor_mode and course_honor_mode.min_price > 0:
+        course_mode_has_price = True
+
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
 
@@ -77,11 +88,15 @@ def instructor_dashboard_2(request, course_id):
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
         sections.append(_section_metrics(course_key, access))
 
+     # Gate access to Ecommerce tab
+    if course_mode_has_price:
+        sections.append(_section_e_commerce(course_key, access))
+
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
 
-    enrollment_count = sections[0]['enrollment_count']
+    enrollment_count = sections[0]['enrollment_count']['total']
     disable_buttons = False
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
@@ -111,6 +126,29 @@ section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
 
+def _section_e_commerce(course_key, access):
+    """ Provide data for the corresponding dashboard section """
+    coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
+    total_amount = None
+    if access['finance_admin']:
+        total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
+
+    section_data = {
+        'section_key': 'e-commerce',
+        'section_display_name': _('E-Commerce'),
+        'access': access,
+        'course_id': course_key.to_deprecated_string(),
+        'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'coupons': coupons,
+        'total_amount': total_amount,
+    }
+    return section_data
+
+
 def _section_course_info(course_key, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_key, depth=None)
@@ -121,7 +159,7 @@ def _section_course_info(course_key, access):
         'access': access,
         'course_id': course_key,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.num_enrolled_in(course_key),
+        'enrollment_count': CourseEnrollment.enrollment_counts(course_key),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
@@ -239,6 +277,9 @@ def _section_send_email(course_key, access, course):
         'email_background_tasks_url': reverse(
             'list_background_email_tasks', kwargs={'course_id': course_key.to_deprecated_string()}
         ),
+        'email_content_history_url': reverse(
+            'list_email_content', kwargs={'course_id': course_key.to_deprecated_string()}
+        ),
     }
     return section_data
 
@@ -246,7 +287,7 @@ def _section_send_email(course_key, access, course):
 def _section_analytics(course_key, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'section_key': 'analytics',
+        'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
         'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_key.to_deprecated_string()}),

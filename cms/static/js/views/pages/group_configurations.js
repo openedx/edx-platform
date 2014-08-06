@@ -2,23 +2,30 @@ define([
     'jquery', 'underscore', 'gettext', 'js/views/baseview',
     'js/views/group_configurations_list'
 ],
-function ($, _, gettext, BaseView, ConfigurationsListView) {
+function ($, _, gettext, BaseView, GroupConfigurationsList) {
     'use strict';
     var GroupConfigurationsPage = BaseView.extend({
         initialize: function() {
             BaseView.prototype.initialize.call(this);
-            this.listView = new ConfigurationsListView({
+            this.listView = new GroupConfigurationsList({
                 collection: this.collection
             });
         },
 
         render: function() {
             this.hideLoadingIndicator();
-            this.$el.append(this.listView.render().el);
-            this.addGlobalActions();
+            this.$('.content-primary').append(this.listView.render().el);
+            this.addButtonActions();
+            this.addWindowActions();
         },
 
-        addGlobalActions: function () {
+        addButtonActions: function () {
+            this.$('.nav-actions .new-button').click(function (event) {
+                this.listView.addOne(event);
+            }.bind(this));
+        },
+
+        addWindowActions: function () {
             $(window).on('beforeunload', this.onBeforeUnload.bind(this));
         },
 
@@ -29,8 +36,7 @@ function ($, _, gettext, BaseView, ConfigurationsListView) {
 
             if(dirty) {
                 return gettext(
-                    'You have unsaved changes. Do you really want to ' +
-                    'leave this page?'
+                    'You have unsaved changes. Do you really want to leave this page?'
                 );
             }
         }

@@ -13,6 +13,23 @@ July, 2014
 
    * - Date
      - Change
+   * - 07/30/14
+     - Expanded the :ref:`Discussions for Students and Staff` chapter to
+       include information about adding posts, responses, and comments.
+   * - 07/23/14
+     - Added the section :ref:`Grade Ranges and Certificates` to the
+       :ref:`Establish a Grading Policy` chapter.
+   * - 07/22/14
+     - Added :ref:`Example Messages to Students` to the :ref:`Launch` chapter.
+   * - 07/15/14
+     - Added the :ref:`Discussions for Students and Staff` chapter.
+   * - 07/11/14
+     - Added :ref:`Track Student Activity` to the :ref:`Student Data`
+       chapter.
+   * - 07/10/14
+     - Updated the :ref:`Discussions` chapter to add an
+       :ref:`Overview_discussions` section and to reflect changes to the
+       Discussion list and to the Advanced Settings page in Studio.
    * - 07/01/14
      - Updated :ref:`The Course End Date` to specify when students can earn and
        access certificates.

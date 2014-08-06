@@ -37,56 +37,41 @@
       </ol>
       </nav>
 
-      <div class="colophon-about">
-        <img src="${static.url('images/header-logo.png')}" alt="${_('{platform_name} Logo').format(platform_name=platform_name())}" />
-
-        <p>${_("{platform_name} is a non-profit created by founding partners {Harvard} and {MIT} whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. {platform_name}'s free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.").format(platform_name="EdX", Harvard="Harvard", MIT="MIT")}</p>
+      <div class="wrapper-logo">
+        <p>
+          <a href="/">
+            ## this is just a placeholder logo
+            ## feel free to change this logo to your own
+            <img alt="organiztion logo placeholder" src="/static/images/logo-placeholder.png">
+          </a>
+        </p>
       </div>
+
+      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved").format(platform_name=settings.PLATFORM_NAME)}</p>
+        <nav class="nav-legal">
+          <ul>
+            <li class="nav-legal-01">
+              <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
+            </li>
+            <li class="nav-legal-02">
+              <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+            </li>
+          </ul>
+        </nav>
     </div>
 
-    <div class="references">
-      <nav class="nav-social">
-        <ul>
-          <li class="nav-social-01">
-            <a href="http://www.meetup.com/edX-Global-Community/" rel="external">
-              <img src="${static.url('images/social/ico-social-meetup.png')}" alt="edX on Meetup" />
-            </a>
-          </li>
-          <li class="nav-social-02">
-            <a href="http://www.facebook.com/EdxOnline" rel="external">
-              <img src="${static.url('images/social/ico-social-facebook.png')}" alt="edX on Facebook" />
-            </a>
-          </li>
-          <li class="nav-social-03">
-            <a href="https://twitter.com/edXOnline" rel="external">
-              <img src="${static.url('images/social/ico-social-twitter.png')}" alt="edX on Twitter" />
-            </a>
-          </li>
-          <li class="nav-social-04">
-            <a href="https://plus.google.com/108235383044095082735/posts" rel="external">
-              <img src="${static.url('images/social/ico-social-google.png')}" alt="edX on Google+" />
-            </a>
-          </li>
-          <li class="nav-social-05">
-            <a href="http://youtube.com/user/edxonline" rel="external">
-              <img src="${static.url('images/social/ico-social-youtube.png')}" alt="edX on YouTube" />
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved.").format(platform_name=settings.PLATFORM_NAME)}</p>
-
-      <nav class="nav-legal">
-        <ul>
-          <li class="nav-legal-01">
-            <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
-          </li>
-          <li class="nav-legal-02">
-            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-          </li>
-        </ul>
-      </nav>
+    ## please leave this link and use one of the logos provided
+    <div class="powered-by">
+      <p>
+        <a href="http://openedx.org/">
+          ## standard powered-by logo
+          <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png" alt="Powered by Open edX" width="150" height="50" />
+          ## greyscale logo for dark background
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-light.png" alt="Powered by Open edX" width="150" height="50" />
+          ## greyscale logo for light background
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png" alt="Powered by Open edX" width="150" height="50" />
+        </a>
+      </p>
     </div>
   </footer>
 </div>

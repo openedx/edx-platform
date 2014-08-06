@@ -436,7 +436,6 @@ body.discussion {
   }
 
   section.user-profile {
-    @extend .sidebar;
     display: table-cell;
     border-right: 1px solid #ddd;
     border-radius: 3px 0 0 3px;

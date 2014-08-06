@@ -210,17 +210,15 @@ def import_handler(request, course_key_string):
                             status=415
                         )
 
-                    logging.debug('found course.xml at {0}'.format(dirpath))
+                    dirpath = os.path.relpath(dirpath, data_root)
 
-                    if dirpath != course_dir:
-                        for fname in os.listdir(dirpath):
-                            shutil.move(dirpath / fname, course_dir)
+                    logging.debug('found course.xml at {0}'.format(dirpath))
 
                     _module_store, course_items = import_from_xml(
                         modulestore(),
                         request.user.id,
                         settings.GITHUB_REPO_ROOT,
-                        [course_subdir],
+                        [dirpath],
                         load_error_modules=False,
                         static_content_store=contentstore(),
                         target_course_id=course_key,
@@ -324,11 +322,11 @@ def export_handler(request, course_key_string):
         try:
             export_to_xml(modulestore(), contentstore(), course_module.id, root_dir, name)
 
-            logging.debug('tar file being generated at {0}'.format(export_file.name))
+            logging.debug(u'tar file being generated at {0}'.format(export_file.name))
             with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
                 tar_file.add(root_dir / name, arcname=name)
         except SerializationError as exc:
-            log.exception('There was an error exporting course %s', course_module.id)
+            log.exception(u'There was an error exporting course %s', course_module.id)
             unit = None
             failed_item = None
             parent = None
@@ -369,7 +367,7 @@ def export_handler(request, course_key_string):
 
         wrapper = FileWrapper(export_file)
         response = HttpResponse(wrapper, content_type='application/x-tgz')
-        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
+        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name.encode('utf-8'))
         response['Content-Length'] = os.path.getsize(export_file.name)
         return response
 

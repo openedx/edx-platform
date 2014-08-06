@@ -5,9 +5,8 @@ import urllib
 from lettuce import world
 from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.contentstore.django import _CONTENTSTORE
 
 
 @world.absorb
@@ -72,6 +71,6 @@ def clear_courses():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-    store.collection.drop()
-    contentstore().fs_files.drop()
+    modulestore()._drop_database()  # pylint: disable=protected-access
+    _CONTENTSTORE.clear()
+    clear_existing_modulestores()

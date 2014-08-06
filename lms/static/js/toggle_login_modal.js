@@ -17,7 +17,7 @@
         closeButton: null,
         position: 'fixed'
       }
-      
+
       if ($("#lean_overlay").length == 0) {
         var overlay = $("<div id='lean_overlay'></div>");
         $("body").append(overlay);
@@ -52,6 +52,11 @@
             close_modal(modal_id, e);
           });
 
+          // To enable closing of email modal when copy button hit
+          $(o.copyEmailButton).click(function(e) {
+            close_modal(modal_id, e);
+          });
+
           var modal_height = $(modal_id).outerHeight();
           var modal_width = $(modal_id).outerWidth();
 
@@ -59,17 +64,28 @@
           $('#lean_overlay').fadeTo(200,o.overlay);
 
           $('iframe', modal_id).attr('src', $('iframe', modal_id).data('src'));
-          $(modal_id).css({
-            'display' : 'block',
-            'position' : o.position,
-            'opacity' : 0,
-            'z-index': 11000,
-            'left' : 50 + '%',
-            'margin-left' : -(modal_width/2) + "px",
-            'top' : o.top + "px"
-          })
+          if ($(modal_id).hasClass("email-modal")){
+            $(modal_id).css({
+              'width' : 80 + '%',
+              'height' : 80 + '%',
+              'position' : o.position,
+              'opacity' : 0,
+              'z-index' : 11000,
+              'left' : 10 + '%',
+              'top' : 10 + '%'
+            })
+          } else {
+            $(modal_id).css({
+              'position' : o.position,
+              'opacity' : 0,
+              'z-index': 11000,
+              'left' : 50 + '%',
+              'margin-left' : -(modal_width/2) + "px",
+              'top' : o.top + "px"
+            })
+        }
 
-          $(modal_id).fadeTo(200,1);
+          $(modal_id).show().fadeTo(200,1);
           $(modal_id).find(".notice").hide().html("");
           var notice = $(this).data('notice')
           if(notice !== undefined) {

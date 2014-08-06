@@ -39,7 +39,7 @@ ANALYTICS_API_KEY = ""
 
 ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
 ANALYTICS_DATA_TOKEN = ""
-FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = True
+FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
 
 
 ################################ DEBUG TOOLBAR ################################
@@ -82,11 +82,15 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 #####################################################################
-# Lastly, see if the developer has any local overrides.
+# See if the developer has any local overrides.
 try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+#####################################################################
+# Lastly, run any migrations, if needed.
+MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html

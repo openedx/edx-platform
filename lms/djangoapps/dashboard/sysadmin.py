@@ -38,10 +38,8 @@ from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
-from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -591,9 +589,7 @@ class Courses(SysadminDashboardView):
 
             elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
-                content_store = contentstore()
-                commit = True
-                delete_course(self.def_ms, content_store, course.id, commit)
+                self.def_ms.delete_course(course.id, request.user.id)
                 # don't delete user permission groups, though
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
