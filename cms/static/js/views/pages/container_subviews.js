@@ -38,13 +38,12 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             shouldRefresh: function(model) {
-                return ViewUtils.hasChangedAttributes(model, ['currently_visible_to_students', 'has_changes']);
+                return ViewUtils.hasChangedAttributes(model, ['currently_visible_to_students']);
             },
 
             render: function() {
                 this.$el.html(this.template({
-                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students'),
-                    hasChanges: this.model.get('has_changes')
+                    currentlyVisibleToStudents: this.model.get('currently_visible_to_students')
                 }));
                 return this;
             }
