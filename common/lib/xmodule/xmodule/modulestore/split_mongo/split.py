@@ -953,8 +953,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if source_index is None:
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
         return self.create_course(
-            dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields,
-            versions_dict=source_index['versions'], search_targets=source_index['search_targets'], **kwargs
+            dest_course_id.org, dest_course_id.course, dest_course_id.run,
+            user_id,
+            fields=fields,
+            versions_dict=source_index['versions'],
+            search_targets=source_index['search_targets'],
+            skip_auto_publish=True,
+            **kwargs
         )
 
     def create_course(

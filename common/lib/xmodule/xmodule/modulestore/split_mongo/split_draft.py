@@ -15,7 +15,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     A subclass of Split that supports a dual-branch fall-back versioning framework
         with a Draft branch that falls back to a Published branch.
     """
-    def create_course(self, org, course, run, user_id, **kwargs):
+    def create_course(self, org, course, run, user_id, skip_auto_publish=False, **kwargs):
         """
         Creates and returns the course.
 
@@ -32,14 +32,18 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         item = super(DraftVersioningModuleStore, self).create_course(
             org, course, run, user_id, master_branch=master_branch, **kwargs
         )
-        self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+        if master_branch == ModuleStoreEnum.BranchName.draft and not skip_auto_publish:
+            # any other value is hopefully only cloning or doing something which doesn't want this value add
+            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
 
-        # create any other necessary things as a side effect: ensure they populate the draft branch
-        # and rely on auto publish to populate the published branch
-        with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
-            super(SplitMongoModuleStore, self).create_course(
-                org, course, run, user_id, **kwargs
-            )
+            # create any other necessary things as a side effect: ensure they populate the draft branch
+            # and rely on auto publish to populate the published branch: split's create course doesn't
+            # call super b/c it needs the auto publish above to have happened before any of the create_items
+            # in this
+            with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
+                super(SplitMongoModuleStore, self).create_course(
+                    org, course, run, user_id, **kwargs
+                )
 
         return item
 
@@ -84,15 +88,20 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     def create_item(
         self, user_id, course_key, block_type, block_id=None,
         definition_locator=None, fields=None,
-        force=False, continue_version=False, **kwargs
+        force=False, continue_version=False, skip_auto_publish=False, **kwargs
     ):
+        """
+        Adds skip_auto_publish to behavior or parent. Skip_auto_publish basically just calls the super
+        and skips all of this wrapper's functionality.
+        """
         course_key = self._map_revision_to_branch(course_key)
         item = super(DraftVersioningModuleStore, self).create_item(
             user_id, course_key, block_type, block_id=block_id,
             definition_locator=definition_locator, fields=fields,
             force=force, continue_version=continue_version, **kwargs
         )
-        self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+        if not skip_auto_publish:
+            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
         return item
 
     def create_child(
