@@ -58,7 +58,6 @@ urlpatterns = ('',  # nopep8
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('user_api.urls')),
 
     url(r'^lang_pref/', include('lang_pref.urls')),
 
@@ -72,10 +71,11 @@ urlpatterns = ('',  # nopep8
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 )
 
-# OPEN EDX API
+# OPEN EDX APIs
 if settings.FEATURES["API"]:
     urlpatterns += (
-        url(r'^api/', include('api_manager.urls')),
+        url(r'^api/server/', include('api_manager.urls')),
+        url(r'^user_api/', include('user_api.urls')),
     )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
