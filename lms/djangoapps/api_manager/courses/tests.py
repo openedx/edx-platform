@@ -136,6 +136,14 @@ class CoursesApiTests(TestCase):
             display_name=u"test unit",
         )
 
+        self.dash_unit = ItemFactory.create(
+            parent_location=self.sub_section.location,
+            category="vertical-with-dash",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test unit 2",
+        )
+
+
         self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(USER_COUNT)]
 
         for user in self.users:
@@ -390,6 +398,16 @@ class CoursesApiTests(TestCase):
         self.assertGreater(len(response.data), 0)
         self.assertIsNotNone(response.data['course_edit_method'])
         self.assertIsNotNone(response.data['edited_by'])
+
+    def test_course_content_detail_get_dashed_id(self):
+        test_content_id = unicode(self.dash_unit.scope_ids.usage_id)
+        test_uri = self.base_course_content_uri + '/' + test_content_id
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(len(response.data), 0)
+        self.assertEqual(response.data['id'], test_content_id)
+        confirm_uri = self.test_server_prefix + test_uri
+        self.assertEqual(response.data['uri'], confirm_uri)
 
     def test_course_content_detail_get_course(self):
         test_uri = self.base_course_content_uri + '/' + self.test_course_id
