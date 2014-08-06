@@ -60,12 +60,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
         var cancelRerunCourse = function (e) {
             e.preventDefault();
             // Clear out existing fields and errors
-            _.each(
-                ['.rerun-course-name', '.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
-                function (field) {
-                    $(field).val('');
-                }
-            );
+            $('.rerun-course-run').val('');
             $('#course_rerun_error').html('');
             $('wrapper-error').removeClass('is-shown').addClass('is-hidden');
             $('.rerun-course-save').off('click');
@@ -94,11 +89,12 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
         domReady(function () {
             var $cancelButton = $('.rerun-course-cancel');
-            var $courseName = $('.rerun-course-name');
-            $courseName.focus().select();
-            $('.rerun-course-save').on('click', saveRerunCourse)
-            $cancelButton.bind('click', cancelRerunCourse)
-            CancelOnEscape($cancelButton)
+            var $courseRun = $('.rerun-course-run');
+            $courseRun.focus().select();
+            $('.rerun-course-save').on('click', saveRerunCourse);
+            $cancelButton.bind('click', cancelRerunCourse);
+            CancelOnEscape($cancelButton);
+            $('.cancel-button').bind('click', cancelRerunCourse);
 
             // Check that a course (org, number, run) doesn't use any special characters
             var validateCourseItemEncoding = function (item) {
@@ -150,7 +146,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                             return;
                         }
                         var error = validateCourseItemEncoding($ele.val());
-                        setNewCourseFieldInErr($ele.parent('li'), error);
+                        setNewCourseFieldInErr($ele.parent(), error);
                         validateTotalCourseItemsLength();
                     });
                 }
@@ -158,7 +154,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             var $name = $('.rerun-course-name');
             $name.on('keyup', function () {
                 var error = validateRequiredField($name.val());
-                setNewCourseFieldInErr($name.parent('li'), error);
+                setNewCourseFieldInErr($name.parent(), error);
                 validateTotalCourseItemsLength();
             });
         });

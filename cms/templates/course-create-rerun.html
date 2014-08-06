@@ -47,7 +47,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
         <h3 class="sr">Page Actions</h3>
         <ul>
           <li class="nav-item">
-            <a href="" rel="external" class="button cancel-button">${_("Cancel")}</a>
+            <a href="" class="button cancel-button">${_("Cancel")}</a>
           </li>
         </ul>
       </nav>
@@ -90,7 +90,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                   <ol class="list-input">
                     <li class="field text required" id="field-course-name">
                       <label for="rerun-course-name">${_("Course Name")}</label>
-                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
+                      <input class="rerun-course-name" id="rerun-course-name" type="text" name="rerun-course-name" aria-required="true" value="${display_name}" placeholder="${_('e.g. Introduction to Computer Science')}" />
                       <span class="tip">
                         ${_("The public display name for the new course. (This name is often the same as the original course name.)")}
                       </span>
@@ -98,7 +98,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                     </li>
                     <li class="field text required" id="field-organization">
                       <label for="rerun-course-org">${_("Organization")}</label>
-                      <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                      <input class="rerun-course-org" id="rerun-course-org" type="text" name="rerun-course-org" aria-required="true" value="${source_course_key.org}" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
                       <span class="tip">
                         ${_("The name of the organization sponsoring the new course. (This name is often the same as the original organization name.)")}
                         <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
@@ -109,7 +109,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                     <li class="row">
                       <div class="column field text required" id="field-course-number">
                         <label for="rerun-course-number">${_("Course Number")}</label>
-                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
+                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course}" placeholder="${_('e.g. CS101')}" />
                         <span class="tip">
                           ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
                           <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>

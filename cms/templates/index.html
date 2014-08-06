@@ -132,6 +132,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       % endif
 
       <!-- STATE: processing courses -->
+      %if len(unsucceeded_course_actions) > 0:
       <div class="courses courses-processing">
           <h3 class="title">Courses Being Processed</h3>
 
@@ -222,6 +223,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             %endfor
           </ul>
       </div>
+      %endif
 
       %if len(courses) > 0:
       <div class="courses">
