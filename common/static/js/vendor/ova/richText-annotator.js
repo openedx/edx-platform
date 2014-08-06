@@ -23,27 +23,28 @@ var _ref,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 Annotator.Plugin.RichText = (function(_super) {
+
     __extends(RichText, _super);
     
     
-    // default tinymce configuration
+    //Default tinymce configuration
     RichText.prototype.options = {
         tinymce:{
             selector: "li.annotator-item textarea",
             skin: 'studio-tmce4',
             formats: {
                 code: {
-                    inline: 'code',
+                    inline: 'code'
                 }
             },
             codemirror: {
-                path: "/static/js/vendor",
+                path: "/static/js/vendor"
             },
-            plugins: "image link codemirror",
+            plugins: "image link codemirror media",
             menubar: false,
             toolbar_items_size: 'small',
             extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image rubric | code ",
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | code ",
             resize: "both",
         }
     };
