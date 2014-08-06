@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
-from courseware.courses import get_course_about_section
+from courseware.courses import get_course_about_section, course_image_url
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -76,5 +76,13 @@ class CourseAboutDetail(generics.RetrieveAPIView):
         # There are other fields, but they don't seem to be in use.
         # see courses.py:get_course_about_section
         return Response(
-            {"overview": get_course_about_section(course, "overview").strip()}
-        )
+            {
+                "overview": get_course_about_section(course, "overview").strip(),
+                "course-number": course.id.to_deprecated_string(),
+                "status": "new" if course.is_newish else None,
+                "title": get_course_about_section(course, 'title'),
+                "course_image_url": course_image_url(course),
+                "short_description": get_course_about_section(course, 'short_description'),
+                "university": get_course_about_section(course, 'university'),
+                "start-date": course.start_date_text,
+            }
