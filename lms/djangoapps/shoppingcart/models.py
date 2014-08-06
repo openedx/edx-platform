@@ -317,6 +317,20 @@ class OrderItem(models.Model):
         return ''
 
 
+class Invoice(models.Model):
+    """
+         This table capture all the information needed to support "invoicing"
+         which is when a user wants to purchase Registration Codes,
+         but will not do so via a Credit Card transaction.
+    """
+    total_amount = models.FloatField()
+    purchaser_name = models.CharField(max_length=255, db_index=True)
+    purchaser_contact = models.CharField(max_length=255)
+    purchaser_email = models.CharField(max_length=255)
+    tax_id = models.CharField(max_length=64, null=True)
+    reference = models.CharField(max_length=255, null=True)
+
+
 class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
@@ -327,6 +341,7 @@ class CourseRegistrationCode(models.Model):
     transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    invoice = models.ForeignKey(Invoice, null=True)
 
     @classmethod
     @transaction.commit_on_success
