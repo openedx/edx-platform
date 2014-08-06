@@ -474,14 +474,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(location.course_key, 'convert_to_draft')
         return store.convert_to_draft(location, user_id)
 
-    def has_changes(self, usage_key):
+    def has_changes(self, xblock):
         """
         Checks if the given block has unpublished changes
-        :param usage_key: the block to check
+        :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
-        store = self._verify_modulestore_support(usage_key.course_key, 'has_changes')
-        return store.has_changes(usage_key)
+        store = self._verify_modulestore_support(xblock.location.course_key, 'has_changes')
+        return store.has_changes(xblock)
 
     def _verify_modulestore_support(self, course_key, method):
         """

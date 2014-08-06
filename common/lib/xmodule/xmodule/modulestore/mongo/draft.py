@@ -599,25 +599,19 @@ class DraftModuleStore(MongoModuleStore):
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
         self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
-    def has_changes(self, location):
+    def has_changes(self, xblock):
         """
         Check if the xblock or its children have been changed since the last publish.
-        :param location: location to check
+        :param xblock: xblock to check
         :return: True if the draft and published versions differ
         """
 
-        try:
-            item = self.get_item(location)
-        # defensively check that the parent's child actually exists
-        except ItemNotFoundError:
-            return False
-
         # don't check children if this block has changes (is not public)
-        if self.compute_publish_state(item) != PublishState.public:
+        if self.compute_publish_state(xblock) != PublishState.public:
             return True
         # if this block doesn't have changes, then check its children
-        elif item.has_children:
-            return any([self.has_changes(child) for child in item.children])
+        elif xblock.has_children:
+            return any([self.has_changes(child) for child in xblock.get_children()])
         # otherwise there are no changes
         else:
             return False
@@ -799,13 +793,11 @@ class DraftModuleStore(MongoModuleStore):
         """
         if getattr(xblock, 'is_draft', False):
             published_xblock_location = as_published(xblock.location)
-            published_item = self.collection.find_one(
-                {'_id': published_xblock_location.to_deprecated_son()}
-            )
-            if published_item is None:
+            try:
+                xblock.runtime.lookup_item(published_xblock_location)
+            except ItemNotFoundError:
                 return PublishState.private
-            else:
-                return PublishState.draft
+            return PublishState.draft
         else:
             return PublishState.public
 

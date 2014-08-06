@@ -194,16 +194,16 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         location = self._map_revision_to_branch(location, revision=revision)
         return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
 
-    def has_changes(self, usage_key):
+    def has_changes(self, xblock):
         """
         Checks if the given block has unpublished changes
-        :param usage_key: the block to check
+        :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
         # TODO for better performance: lookup the courses and get the block entry, don't create the instances
-        draft = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.draft))
+        draft = self.get_item(xblock.location.for_branch(ModuleStoreEnum.BranchName.draft))
         try:
-            published = self.get_item(usage_key.for_branch(ModuleStoreEnum.BranchName.published))
+            published = self.get_item(xblock.location.for_branch(ModuleStoreEnum.BranchName.published))
         except ItemNotFoundError:
             return True
 
