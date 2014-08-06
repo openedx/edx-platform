@@ -30,8 +30,8 @@ class UserPasswordResetTest(TestCase):
         """
         setup the api urls
         """
-        self.session_url = '/api/sessions'
-        self.user_url = '/api/users'
+        self.session_url = '/api/server/sessions'
+        self.user_url = '/api/server/users'
         cache.clear()
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS': 5})

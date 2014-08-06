@@ -33,8 +33,8 @@ class SessionsApiTests(TestCase):
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
-        self.base_users_uri = '/api/users'
-        self.base_sessions_uri = '/api/sessions'
+        self.base_users_uri = '/api/server/users'
+        self.base_sessions_uri = '/api/server/sessions'
 
         self.client = SecureClient()
         cache.clear()
