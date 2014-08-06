@@ -11,7 +11,7 @@ from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import modulestore
 
 from xblock.core import XBlock
@@ -97,7 +97,7 @@ def subsection_handler(request, usage_key_string):
         can_view_live = False
         subsection_units = item.get_children()
         for unit in subsection_units:
-            has_published = modulestore().has_item(unit.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+            has_published = modulestore().compute_publish_state(unit) != PublishState.private
             if has_published:
                 can_view_live = True
                 break

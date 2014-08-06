@@ -374,8 +374,8 @@ class TestMixedModuleStore(unittest.TestCase):
         )
 
         # Check that neither xblock has changes
-        self.assertFalse(self.store.has_changes(test_course.location))
-        self.assertFalse(self.store.has_changes(chapter.location))
+        self.assertFalse(self.store.has_changes(test_course))
+        self.assertFalse(self.store.has_changes(chapter))
 
     @ddt.data('draft', 'split')
     def test_has_changes(self, default_ms):
@@ -395,22 +395,22 @@ class TestMixedModuleStore(unittest.TestCase):
         )
 
         # Not yet published, so changes are present
-        self.assertTrue(self.store.has_changes(xblock.location))
+        self.assertTrue(self.store.has_changes(xblock))
 
         # Publish and verify that there are no unpublished changes
-        self.store.publish(xblock.location, self.user_id)
-        self.assertFalse(self.store.has_changes(xblock.location))
+        newXBlock = self.store.publish(xblock.location, self.user_id)
+        self.assertFalse(self.store.has_changes(newXBlock))
 
         # Change the component, then check that there now are changes
         component = self.store.get_item(xblock.location)
         component.display_name = 'Changed Display Name'
 
         component = self.store.update_item(component, self.user_id)
-        self.assertTrue(self.store.has_changes(component.location))
+        self.assertTrue(self.store.has_changes(component))
 
         # Publish and verify again
-        self.store.publish(component.location, self.user_id)
-        self.assertFalse(self.store.has_changes(component.location))
+        component = self.store.publish(component.location, self.user_id)
+        self.assertFalse(self.store.has_changes(component))
 
     @ddt.data(('draft', 7, 2), ('split', 13, 4))
     @ddt.unpack
@@ -994,7 +994,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # Draft WITH changes
         item.display_name = 'new name'
         item = self.store.update_item(item, self.user_id)
-        self.assertTrue(self.store.has_changes(item.location))
+        self.assertTrue(self.store.has_changes(item))
         self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
 
     @ddt.data('draft', 'split')

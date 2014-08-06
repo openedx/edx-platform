@@ -541,14 +541,14 @@ class TestEditItem(ItemTest):
         Verifies the item with given location has a published version and no draft (unpublished changes).
         """
         self.assertTrue(self._is_location_published(location))
-        self.assertFalse(modulestore().has_changes(location))
+        self.assertFalse(modulestore().has_changes(modulestore().get_item(location)))
 
     def _verify_published_with_draft(self, location):
         """
         Verifies the item with given location has a published version and also a draft version (unpublished changes).
         """
         self.assertTrue(self._is_location_published(location))
-        self.assertTrue(modulestore().has_changes(location))
+        self.assertTrue(modulestore().has_changes(modulestore().get_item(location)))
 
     def test_make_public(self):
         """ Test making a private problem public (publishing it). """

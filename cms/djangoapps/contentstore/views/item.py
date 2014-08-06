@@ -24,7 +24,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
@@ -380,7 +380,7 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
     # new item should be republished. This is used by staff locking to ensure that changing the draft
     # value of the staff lock will also update the published version.
     if publish == 'republish':
-        published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+        published = modulestore().compute_publish_state(xblock) != PublishState.private
         if published:
             publish = 'make_public'
 
@@ -624,7 +624,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         return None
 
     is_xblock_unit = is_unit(xblock, parent_xblock)
-    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock.location)
+    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock)
 
     if graders is None:
         graders = CourseGradingModel.fetch(xblock.location.course_key).graders
@@ -643,7 +643,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
-    published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
+    published = modulestore().compute_publish_state(xblock) != PublishState.private
 
     xblock_info = {
         "id": unicode(xblock.location),
