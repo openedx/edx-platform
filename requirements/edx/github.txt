@@ -24,7 +24,7 @@
 -e git+https://github.com/edx/django-waffle.git@823a102e48#egg=django-waffle
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
 -e git+https://github.com/edx/edx-analytics-api-client.git@0.1.0#egg=analytics-client
--e git+https://github.com/edx/bok-choy.git@821d3b0ac742c204a93d802a8732be024a0bce22#egg=bok_choy
+-e git+https://github.com/edx/bok-choy.git@feb61863967134a378a7c912576cb31a94ba02bf#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@9965a53c269666a30bb4e2b3f6037c138aef2a55#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2014-07-28T12.09#egg=edx-ora2

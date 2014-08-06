@@ -27,11 +27,11 @@ class VideoTimesTest(VideoBaseTest):
         # go to video
         self.navigate_to_video()
 
-        self.assertEqual(self.video.position(), '0:10')
+        self.assertEqual(self.video.position, '0:10')
 
         self.video.click_player_button('play')
 
-        self.assertGreaterEqual(int(self.video.position().split(':')[1]), 10)
+        self.assertGreaterEqual(int(self.video.position.split(':')[1]), 10)
 
     def test_video_end_time_with_default_start_time(self):
         """
@@ -53,7 +53,7 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position(), '0:02')
+        self.assertEqual(self.video.position, '0:02')
 
     def test_video_end_time_wo_default_start_time(self):
         """
@@ -78,7 +78,7 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position(), '1:00')
+        self.assertEqual(self.video.position, '1:00')
 
     def test_video_start_time_and_end_time(self):
         """
@@ -96,14 +96,14 @@ class VideoTimesTest(VideoBaseTest):
         # go to video
         self.navigate_to_video()
 
-        self.assertEqual(self.video.position(), '0:10')
+        self.assertEqual(self.video.position, '0:10')
 
         self.video.click_player_button('play')
 
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position(), '0:12')
+        self.assertEqual(self.video.position, '0:12')
 
     @skip("Intermittently fails 03 June 2014")
     def test_video_end_time_and_finish_time(self):
@@ -135,14 +135,14 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position(), '1:42')
+        self.assertEqual(self.video.position, '1:42')
 
         self.video.click_player_button('play')
 
         # wait until video stop playing
         self.video.wait_for_state('finished')
 
-        self.assertIn(self.video.position(), ['1:54', '1:55'])
+        self.assertIn(self.video.position, ['1:54', '1:55'])
 
     def test_video_end_time_with_seek(self):
         """
@@ -167,7 +167,7 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position(), '0:32')
+        self.assertEqual(self.video.position, '0:32')
 
     def test_video_finish_time_with_seek(self):
         """
@@ -198,4 +198,4 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('finished')
 
-        self.assertIn(self.video.position(), ['1:54', '1:55'])
+        self.assertIn(self.video.position, ['1:54', '1:55'])
