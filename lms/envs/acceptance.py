@@ -57,7 +57,7 @@ CONTENTSTORE = {
     }
 }
 
-# Set this up so that rake lms[acceptance] and running the
+# Set this up so that 'paver lms --settings=acceptance' and running the
 # harvest command both use the same (test) database
 # which they can flush without messing up your dev db
 DATABASES = {

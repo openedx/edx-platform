@@ -37,7 +37,7 @@ class DjangoEventHandler(FileSystemEventHandler):
                 break
 
 if __name__ == "__main__":
-    event_handler = DjangoEventHandler(Popen(['rake', 'lms']))
+    event_handler = DjangoEventHandler(Popen(['paver', 'lms']))
     observer = Observer()
     for dir in WATCH_DIRS:
         observer.schedule(event_handler, dir, recursive=True)
