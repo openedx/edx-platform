@@ -1669,10 +1669,17 @@ class CoursesSocialMetrics(SecureListAPIView):
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
-            course_key = CourseKey.from_string(course_id)
+            # be robust to the try of course_id we get from caller
+            try:
+                # assume new style
+                course_key = CourseKey.from_string(course_id)
+                slash_course_id = course_key.to_deprecated_string()
+            except:
+                # assume course_id passed in is legacy format
+                slash_course_id = course_id
 
             # the forum service expects the legacy slash separated string format
-            data = get_course_social_stats(course_key.to_deprecated_string())
+            data = get_course_social_stats(slash_course_id)
 
             # remove any excluded users from the aggregate
 
