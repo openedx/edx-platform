@@ -255,7 +255,6 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             PublishState.public - published exists and is the same as draft
             PublishState.private - no published version exists
         """
-        # TODO figure out what to say if xblock is not from the HEAD of its branch
         def get_head(branch):
             course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
             return self._get_block_from_structure(course_structure, xblock.location.block_id)

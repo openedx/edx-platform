@@ -247,7 +247,7 @@ class CourseOutlineUnit(CourseOutlineChild):
         an initialized :class:`.ContainerPage` for that unit.
         """
         return ContainerPage(self.browser, self.locator).visit()
-    
+
     def is_browser_on_page(self):
         return self.q(css=self.BODY_SELECTOR).present
 
@@ -356,13 +356,13 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Return the :class:`.CourseOutlineSection` with the title `title`.
         """
         return self.child(title)
-    
+
     def section_at(self, index):
         """
         Returns the :class:`.CourseOutlineSection` at the specified index.
         """
         return self.child_at(index)
-        
+
     def click_section_name(self, parent_css=''):
         """
         Find and click on first section name in course outline
@@ -495,7 +495,7 @@ class CourseOutlineModal(object):
         self.click(input_selector)
         if getattr(self, property_name):
             current_month, current_year = map(int, getattr(self, property_name).split('/')[1:])
-        else: # Use default timepicker values, which are current month and year.
+        else:  # Use default timepicker values, which are current month and year.
             current_month, current_year = datetime.datetime.today().month, datetime.datetime.today().year
         date_diff = 12 * (year - current_year) + month - current_month
         selector = "a.ui-datepicker-{}".format('next' if date_diff > 0 else 'prev')

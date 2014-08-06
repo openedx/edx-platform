@@ -875,7 +875,7 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         self.assertEqual(self.user_id, block.edited_by)
         self.assertGreater(datetime.datetime.now(UTC), block.edited_on)
-        
+
     @ddt.data('draft')
     def test_create_item_populates_subtree_edited_info(self, default_ms):
         self.initdb(default_ms)
