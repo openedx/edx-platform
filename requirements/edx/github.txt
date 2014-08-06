@@ -27,7 +27,7 @@
 -e git+https://github.com/edx/bok-choy.git@9162c0bfb8e0eb1e2fa8e6df8dec12d181322a90#egg=bok_choy
 -e git+https://github.com/edx-solutions/django-splash.git@9965a53c269666a30bb4e2b3f6037c138aef2a55#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
--e git+https://github.com/edx/edx-ora2.git@hotfix-2014-08-05#egg=edx-ora2
+-e git+https://github.com/edx/edx-ora2.git@hotfix-2014-08-06#egg=edx-ora2
 -e git+https://github.com/edx/opaque-keys.git@454bd984d9539550c6290020e92ee2d6094038d0#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@f5303e82dff368c7595884d9325aeea1d802da25#egg=i18n-tools
