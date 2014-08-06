@@ -442,18 +442,34 @@ $outline-indent-width: $baseline;
 // UI: section
 %outline-simple-section {
   margin-bottom: $baseline;
+  padding: ($baseline/2);
 }
 
 // UI: subsection
 %outline-simple-subsection {
   margin-bottom: ($baseline/2);
+  padding: ($baseline/2);
 }
 
+%outline-simple-unit {
+  padding: ($baseline/4) ($baseline/2);
+}
+
+
 %outline-simple-item {
+  border: 1px solid $gray-l4;
 
   // CASE: last-child in UI
   &:last-child {
     margin-bottom: 0;
+  }
+
+  .item-title a {
+      color: $color-heading-base;
+
+    &:hover {
+      color: $blue;
+    }
   }
 }
 
@@ -483,23 +499,6 @@ $outline-indent-width: $baseline;
     .status-release {
       @include transition(opacity $tmg-f2 ease-in-out 0s);
       opacity: 0.65;
-    }
-
-    // status - grading
-    .status-grading {
-      @include transition(opacity $tmg-f2 ease-in-out 0s);
-      opacity: 0.65;
-    }
-
-    .status-grading-value {
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .status-grading-date {
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: ($baseline/4);
     }
 
     // status - message
@@ -572,6 +571,25 @@ $outline-indent-width: $baseline;
         opacity: 1.0;
       }
     }
+
+    // status - grading
+    .status-grading {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: 0.65;
+    }
+
+    .status-grading-value {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+
+
   }
 
   // outline: units
@@ -608,7 +626,6 @@ $outline-indent-width: $baseline;
 
   // outline: sections
   .outline-section {
-    @extend %ui-window;
     @extend %outline-simple-item;
     @extend %outline-simple-section;
 
@@ -684,6 +701,7 @@ $outline-indent-width: $baseline;
   // outline: units
   .outline-unit {
     @extend %outline-simple-item;
+    @extend %outline-simple-unit;
     margin-bottom: ($baseline/4);
 
     // header - title
