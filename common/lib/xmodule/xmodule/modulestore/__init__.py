@@ -604,7 +604,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             about_location.block_type,
             block_id=about_location.block_id,
             definition_data=overview_template.get('data'),
-            runtime=runtime
+            runtime=runtime,
+            continue_version=True,
         )
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):

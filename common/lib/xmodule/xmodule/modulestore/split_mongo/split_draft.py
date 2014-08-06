@@ -42,7 +42,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             # in this
             with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
                 super(SplitMongoModuleStore, self).create_course(
-                    org, course, run, user_id, **kwargs
+                    org, course, run, user_id, runtime=item.runtime, **kwargs
                 )
 
         return item
