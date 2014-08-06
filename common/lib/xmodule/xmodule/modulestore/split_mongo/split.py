@@ -63,7 +63,7 @@ from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree,
-    LocalId, Locator
+    LocalId,
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
@@ -77,7 +77,6 @@ from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.split_mongo import encode_key_for_mongo, decode_key_from_mongo
-import types
 from _collections import defaultdict
 
 
@@ -111,7 +110,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     """
 
     SCHEMA_VERSION = 1
-    reference_type = Locator
     # a list of field names to store in course index search_targets. Note, this will
     # only record one value per key. If branches disagree, the last one set wins.
     # It won't recompute the value on operations such as update_course_index (e.g., to revert to a prev
@@ -377,6 +375,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if not isinstance(course_list[0], ErrorDescriptor):
                 result.append(course_list[0])
         return result
+
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run)
 
     def get_course(self, course_id, depth=0):
         '''
@@ -821,10 +828,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         the new version_guid from the locator in the returned object!
         """
         # split handles all the fields in one dict not separated by scope
-        fields = kwargs.get('fields', {})
-        fields.update(kwargs.pop('metadata', {}) or {})
-        fields.update(kwargs.pop('definition_data', {}) or {})
-        kwargs['fields'] = fields
+        fields = fields or {}
+        fields.update(kwargs.pop('metadata', {}))
+        fields.update(kwargs.pop('definition_data', {}))
 
         # find course_index entry if applicable and structures entry
         index_entry = self._get_index_if_valid(course_key, force, continue_version)
@@ -955,6 +961,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
         source_index = self.get_course_index_info(source_course_id)
+        if source_index is None:
+            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
         return self.create_course(
             dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields,
             versions_dict=source_index['versions'], search_targets=source_index['search_targets']

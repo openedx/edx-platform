@@ -5,7 +5,7 @@ Adds user's tags to tracking event context.
 
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from track.contexts import COURSE_REGEX
 from user_api.models import UserCourseTag
@@ -24,7 +24,7 @@ class UserTagsEventContextMiddleware(object):
         if match:
             course_id = match.group('course_id')
             try:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+                course_key = CourseKey.from_string(course_id)
             except InvalidKeyError:
                 course_id = None
                 course_key = None

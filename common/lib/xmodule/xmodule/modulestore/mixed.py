@@ -15,7 +15,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
-from .exceptions import ItemNotFoundError
+from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .split_migrator import SplitMigrator
 
@@ -100,7 +100,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 return mapping
             else:
                 for store in self.modulestores:
-                    if isinstance(course_id, store.reference_type) and store.has_course(course_id):
+                    if store.has_course(course_id):
                         self.mappings[course_id] = store
                         return store
 
@@ -177,26 +177,26 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses in this modulestore.
         '''
-        courses = {}  # a dictionary of course keys to course objects
-
-        # first populate with the ones in mappings as the mapping override discovery
-        for course_id, store in self.mappings.iteritems():
-            course = store.get_course(course_id)
-            # check if the course is not None - possible if the mappings file is outdated
-            # TODO - log an error if the course is None, but move it to an initialization method to keep it less noisy
-            if course is not None:
-                courses[course_id] = course
-
+        courses = []
         for store in self.modulestores:
+            courses.extend(store.get_courses())
+        return courses
 
-            # filter out ones which were fetched from earlier stores but locations may not be ==
-            for course in store.get_courses():
-                course_id = self._clean_course_id_for_mapping(course.id)
-                if course_id not in courses:
-                    # course is indeed unique. save it in result
-                    courses[course_id] = course
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
 
-        return courses.values()
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        # If there is a mapping that match this org/course/run, use that
+        for course_id, store in self.mappings.iteritems():
+            candidate_key = store.make_course_key(org, course, run)
+            if candidate_key == course_id:
+                return candidate_key
+
+        # Otherwise, return the key created by the default store
+        return self.default_modulestore.make_course_key(org, course, run)
 
     def get_course(self, course_key, depth=0):
         """
@@ -285,8 +285,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Returns: a CourseDescriptor
         """
+        # first make sure an existing course doesn't already exist in the mapping
+        course_key = self.make_course_key(org, course, run)
+        if course_key in self.mappings:
+            raise DuplicateCourseError(course_key, course_key)
+
+        # create the course
         store = self._verify_modulestore_support(None, 'create_course')
-        return store.create_course(org, course, run, user_id, **kwargs)
+        course = store.create_course(org, course, run, user_id, **kwargs)
+
+        # add new course to the mapping
+        self.mappings[course_key] = store
+
+        return course
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """

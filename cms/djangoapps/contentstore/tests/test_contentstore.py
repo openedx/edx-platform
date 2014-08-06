@@ -1115,8 +1115,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
-        self.assert_course_creation_failed(
-            r"(?s)Unable to create course 'Robot Super Course'.*: Invalid characters in u'University of California, Berkeley'")
+        self.assert_course_creation_failed(r"(?s)Unable to create course 'Robot Super Course'.*")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
@@ -1572,7 +1571,7 @@ class RerunCourseTest(ContentStoreTestCase):
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
         }
-        self.destination_course_key = _get_course_id(self.destination_course_data)
+        self.destination_course_key = _get_course_id(self.destination_course_data, key_class=CourseLocator)
 
     def post_rerun_request(self, source_course_key, response_code=200):
         """Create and send an ajax post for the rerun request"""
@@ -1590,10 +1589,6 @@ class RerunCourseTest(ContentStoreTestCase):
         if response_code == 200:
             self.assertNotIn('ErrMsg', parse_json(response))
 
-    def create_course_listing_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the course listing section"""
-        return '<a class="course-link" href="/course/{}"'.format(course_key)
-
     def create_unsucceeded_course_action_html(self, course_key):
         """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
         # TODO LMS-11011 Update this once the Rerun UI is implemented.
@@ -1605,7 +1600,7 @@ class RerunCourseTest(ContentStoreTestCase):
         and NOT in the unsucceeded course action section of the html.
         """
         course_listing_html = self.client.get_html('/course/')
-        self.assertIn(self.create_course_listing_html(course_key), course_listing_html.content)
+        self.assertIn(course_key.run, course_listing_html.content)
         self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
 
     def assertInUnsucceededCourseActions(self, course_key):
@@ -1614,12 +1609,12 @@ class RerunCourseTest(ContentStoreTestCase):
         and NOT in the accessible course listing section of the html.
         """
         course_listing_html = self.client.get_html('/course/')
-        self.assertNotIn(self.create_course_listing_html(course_key), course_listing_html.content)
+        self.assertNotIn(course_key.run, course_listing_html.content)
         # TODO Uncomment this once LMS-11011 is implemented.
         # self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
 
     def test_rerun_course_success(self):
-        source_course = CourseFactory.create()
+        source_course = self.store.create_course('testOrg', 'testCourse', 'testRun', self.user.id)
         self.post_rerun_request(source_course.id)
 
         # Verify that the course rerun action is marked succeeded
@@ -1635,7 +1630,7 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def test_rerun_course_fail(self):
         existent_course_key = CourseFactory.create().id
-        non_existent_course_key = CourseLocator("org", "non_existent_course", "run")
+        non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
         self.post_rerun_request(non_existent_course_key)
 
         # Verify that the course rerun action is marked failed
@@ -1705,6 +1700,6 @@ def _course_factory_create_course():
     return CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
 
-def _get_course_id(course_data):
+def _get_course_id(course_data, key_class=SlashSeparatedCourseKey):
     """Returns the course ID (org/number/run)."""
-    return SlashSeparatedCourseKey(course_data['org'], course_data['number'], course_data['run'])
+    return key_class(course_data['org'], course_data['number'], course_data['run'])

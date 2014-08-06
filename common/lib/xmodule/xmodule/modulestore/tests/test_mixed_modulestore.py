@@ -219,12 +219,9 @@ class TestMixedModuleStore(unittest.TestCase):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        if default == 'split':
-            self.fake_location = CourseLocator(
-                'foo', 'bar', 'slowly', branch=ModuleStoreEnum.BranchName.draft
-            ).make_usage_key('vertical', 'baz')
-        else:
-            self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+
+        self.fake_location = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'fake')
+
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
@@ -515,7 +512,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with check_mongo_calls(mongo_store, max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
-    @ddt.data(('draft', 3, 0), ('split', 6, 0))
+    @ddt.data(('draft', 2, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)

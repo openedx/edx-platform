@@ -53,9 +53,15 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
     def get_courses(self):
         """
-        Returns all the courses on the Draft branch (which is a superset of the courses on the Published branch).
+        Returns all the courses on the Draft or Published branch depending on the branch setting.
         """
-        return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+        branch_setting = self.get_branch_setting()
+        if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+        elif branch_setting == ModuleStoreEnum.Branch.published_only:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.published)
+        else:
+            raise InsufficientSpecificationError()
 
     def _auto_publish_no_children(self, location, category, user_id):
         """
@@ -287,3 +293,14 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         # This is a no-op in Split since a draft version of the data always remains
         pass
+
+    def _load_items(self, *args, **kwargs):
+        """
+        Override this internal method to remove version and branch information in the locations, for now.
+        """
+        items = super(DraftVersioningModuleStore, self)._load_items(*args, **kwargs)
+        # TODO - do this as a separate story
+        # for item in items:
+        #     item.location = item.location.version_agnostic().for_branch(None)
+        return items
+
