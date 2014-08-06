@@ -10,7 +10,6 @@ from contentstore.views.access import has_course_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
-from contentstore.views.item import create_xblock_info
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locator import CourseLocator

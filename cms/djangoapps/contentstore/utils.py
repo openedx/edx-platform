@@ -149,6 +149,7 @@ def course_image_url(course):
     path = loc.to_deprecated_string()
     return path
 
+
 # pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """

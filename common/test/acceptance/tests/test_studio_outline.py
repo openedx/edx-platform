@@ -55,7 +55,7 @@ class WarningMessagesTest(CourseOutlineTest):
     """
     Feature: Warning messages on sections, subsections, and units
     """
-    
+
     __test__ = True
 
     STAFF_ONLY_WARNING = 'Contains staff only content'
