@@ -415,7 +415,7 @@ class UnitPublishingTest(ContainerBase):
                                           XBlockFixtureDesc('problem', '<problem></problem>', data=self.html_content)
                                       )
                                   )
-            ),
+                              ),
             XBlockFixtureDesc('chapter', 'Section With Locked Unit').add_children(
                 XBlockFixtureDesc('sequential', 'Subsection With Locked Unit',
                                   metadata={'start': past_start_date.isoformat()}).add_children(

@@ -379,7 +379,7 @@ def course_index(request, course_key):
         current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
     except (ItemNotFoundError, CourseActionStateItemNotFoundError):
         current_action = None
-   
+
     return render_to_response('course_outline.html', {
         'context_course': course_module,
         'lms_link': lms_link,
