@@ -64,9 +64,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
                     var requestData = _.extend({}, self.getRequestData(), {
                         metadata: self.getMetadata()
                     });
-                    XBlockViewUtils.updateXBlockFields(self.model, requestData, {
-                        success: self.options.onSave
-                    });
+                    // Only update if something changed to prevent items from erroneously entering draft state
+                    if (!_.isEqual(requestData, { metadata: {} })) {
+                        XBlockViewUtils.updateXBlockFields(self.model, requestData, {
+                            success: self.options.onSave
+                        });
+                    }
                     self.hide();
                 };
 
