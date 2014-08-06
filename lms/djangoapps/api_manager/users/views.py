@@ -42,6 +42,8 @@ from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
 
+from opaque_keys.edx.keys import CourseKey
+
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -1071,7 +1073,17 @@ class UsersSocialMetrics(SecureListAPIView):
             return Response({}, status.HTTP_404_NOT_FOUND)
 
         comment_user = CommentUser.from_django_user(user)
-        comment_user.course_id = course_id
+
+        # be robust to the try of course_id we get from caller
+        try:
+            # assume new style
+            course_key = CourseKey.from_string(course_id)
+            slash_course_id = course_key.to_deprecated_string()
+        except:
+            # assume course_id passed in is legacy format
+            slash_course_id = course_id
+
+        comment_user.course_id = slash_course_id
 
         try:
             data = (comment_user.social_stats())[user_id]

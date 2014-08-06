@@ -39,7 +39,13 @@ class SecureClient(Client):
         kwargs.update({'SERVER_PORT': 443, 'wsgi.url_scheme': 'https'})
         super(SecureClient, self).__init__(*args, **kwargs)
 
+def _fake_get_get_course_social_stats(course_id):
+    return {
+        '1': {'foo':'bar'},
+        '2': {'one': 'two'}
+    }
 
+@mock.patch("lms.lib.comment_client.user.get_course_social_stats", _fake_get_get_course_social_stats)
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 class CoursesApiTests(TestCase):
@@ -1509,13 +1515,6 @@ class CoursesApiTests(TestCase):
         response = self.do_get(completion_uri)
         self.assertEqual(response.status_code, 404)
 
-    def _fake_get_get_course_social_stats(course_id):
-        return {
-            '1': {'foo':'bar'},
-            '2': {'one': 'two'}
-        }
-
-    @mock.patch("lms.lib.comment_client.user.get_course_social_stats", _fake_get_get_course_social_stats)
     def test_social_metrics(self):
         test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
