@@ -15,6 +15,7 @@ from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
+from ..pages.studio.container import ContainerPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ..pages.studio.utils import add_advanced_component
 from ..pages.xblock.utils import wait_for_xblock_initialization
@@ -661,7 +662,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         usage = config.usages[0]
         config.click_unit_anchor()
 
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = ContainerPage(self.browser, vertical.locator)
         # Waiting for the page load and verify that we've landed on the unit page
         EmptyPromise(
             lambda: unit.is_browser_on_page(), "loaded page {!r}".format(unit),
@@ -766,9 +767,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 1})
         )
 
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = ContainerPage(self.browser, vertical.locator)
         unit.visit()
-        experiment = unit.components[0]
+        experiment = unit.xblocks[0]
 
         group_configuration_link_name = experiment.group_configuration_link_name
 
