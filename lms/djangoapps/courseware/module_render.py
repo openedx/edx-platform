@@ -485,7 +485,53 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         if not user_id:
             return
 
-        CourseModuleCompletion.objects.get_or_create(
+        set_score(
+            user_id,
+            descriptor.location,
+            grade,
+            max_grade,
+        )
+
+        # Bin score into range and increment stats
+        score_bucket = get_score_bucket(grade, max_grade)
+
+        tags = [
+            u"org:{}".format(course_id.org),
+            u"course:{}".format(course_id),
+            u"score_bucket:{0}".format(score_bucket)
+        ]
+
+        if grade_bucket_type is not None:
+            tags.append('type:%s' % grade_bucket_type)
+
+        dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
+
+        # Cycle through the milestone fulfillment scenarios to see if any are now applicable
+        # thanks to the updated grading information that was just submitted
+        _fulfill_content_milestones(
+            user,
+            course_id,
+            descriptor.location,
+        )
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        """
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
+
+        # Send a signal out to any listeners who are waiting for score change
+        # events.
+        SCORE_CHANGED.send(
+            sender=None,
+            points_possible=event['max_value'],
+            points_earned=event['value'],
             user_id=user_id,
             course_id=course_id,
             content_id=unicode(descriptor.location)
