@@ -47,7 +47,11 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
     def setUp(self):
         super(WorkgroupsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
-        self.test_workgroups_uri = '/api/workgroups/'
+        self.test_workgroups_uri = '/api/server/workgroups/'
+        self.test_submissions_uri = '/api/server/submissions/'
+        self.test_peer_reviews_uri = '/api/server/peer_reviews/'
+        self.test_workgroup_reviews_uri = '/api/server/workgroup_reviews/'
+        self.test_courses_uri = '/api/server/courses'
         self.test_bogus_course_id = 'foo/bar/baz'
         self.test_bogus_course_content_id = "i4x://foo/bar/baz"
         self.test_group_id = '1'
@@ -383,7 +387,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             'question': 'Test question?',
             'answer': 'Test answer!'
         }
-        response = self.do_post('/api/peer_reviews/', pr_data)
+        response = self.do_post(self.test_peer_reviews_uri, pr_data)
         self.assertEqual(response.status_code, 201)
         pr_id = response.data['id']
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
@@ -407,7 +411,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             'question': 'Test question?',
             'answer': 'Test answer!'
         }
-        response = self.do_post('/api/workgroup_reviews/', wr_data)
+        response = self.do_post(self.test_workgroup_reviews_uri, wr_data)
         self.assertEqual(response.status_code, 201)
         wr_id = response.data['id']
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
@@ -432,7 +436,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             'document_url': 'https://s3.amazonaws.com/bucketname/filename.pdf',
             'document_mime_type': 'application/pdf'
         }
-        response = self.do_post('/api/submissions/', data)
+        response = self.do_post(self.test_submissions_uri, data)
         self.assertEqual(response.status_code, 201)
         submission_id = response.data['id']
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
@@ -469,7 +473,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Confirm the grades for the users
-        course_grades_uri = '/api/courses/{}/grades'.format(self.test_course_id)
+        course_grades_uri = '{}/{}/grades'.format(self.test_courses_uri, self.test_course_id)
         response = self.do_get(course_grades_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['grades']), 0)
@@ -615,7 +619,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_workgroups_detail_get_undefined(self):
-        test_uri = '/api/workgroups/123456789/'
+        test_uri = '{}123456789/'.format(self.test_workgroups_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 

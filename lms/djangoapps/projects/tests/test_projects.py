@@ -34,8 +34,8 @@ class ProjectsApiTests(TestCase):
 
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
-        self.test_projects_uri = '/api/projects/'
-        self.test_organizations_uri = '/api/organizations/'
+        self.test_projects_uri = '/api/server/projects/'
+        self.test_organizations_uri = '/api/server/organizations/'
         self.test_project_name = str(uuid.uuid4())
 
         self.test_course_id = 'edx/demo/course'
@@ -155,7 +155,7 @@ class ProjectsApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_projects_detail_get_undefined(self):
-        test_uri = '/api/projects/123456789/'
+        test_uri = '{}/123456789/'.format(self.test_projects_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 

@@ -20,7 +20,7 @@ class PermissionsTests(TestCase):
         self.username = self.username[3:-1]  # username is a 32-character field
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'
-        self.test_uri = '/api/users'
+        self.test_uri = '/api/server/users'
         self.data = {'email': self.test_email, 'username': self.test_username, 'password': self.test_password}
         self.headers = {
             'Content-Type': 'application/json',

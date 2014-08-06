@@ -37,7 +37,7 @@ class SessionApiRateLimitingProtectionTest(TestCase):
         # Create the test client
         self.client = Client()
         cache.clear()
-        self.session_url = '/api/sessions'
+        self.session_url = '/api/server/sessions'
 
     def test_login_ratelimiting_protection(self):
         """ Try (and fail) login user 30 times on invalid password """

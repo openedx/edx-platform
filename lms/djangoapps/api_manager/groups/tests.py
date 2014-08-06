@@ -42,8 +42,9 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.test_group_name = str(uuid.uuid4())
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
-        self.base_users_uri = '/api/users'
-        self.base_groups_uri = '/api/groups'
+        self.base_users_uri = '/api/server/users'
+        self.base_groups_uri = '/api/server/groups'
+        self.base_workgroups_uri = '/api/server/workgroups/'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
@@ -965,7 +966,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(response.status_code, 201)
         group_id = response.data['id']
-        test_workgroups_uri = '/api/workgroups/'
+        test_workgroups_uri = self.base_workgroups_uri
         for i in xrange(1, 12):
             project_id = self.test_project.id
             data = {
@@ -981,7 +982,7 @@ class GroupsApiTests(ModuleStoreTestCase):
             self.assertEqual(response.status_code, 201)
 
         # test to get list of workgroups
-        test_uri = '/api/groups/{}/workgroups/?page_size=10'.format(group_id)
+        test_uri = '{}/{}/workgroups/?page_size=10'.format(self.base_groups_uri, group_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 11)
         self.assertEqual(len(response.data['results']), 10)
@@ -989,12 +990,13 @@ class GroupsApiTests(ModuleStoreTestCase):
 
         # test with course_id filter
         course_id = {'course_id': unicode(self.course.id)}
-        response = self.do_get('/api/groups/{}/workgroups/?{}'.format(group_id, urlencode(course_id)))
+        groups_uri = '{}/{}/workgroups/?{}'.format(self.base_groups_uri, group_id, urlencode(course_id))
+        response = self.do_get(groups_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 11)
         self.assertIsNotNone(response.data['results'][0]['name'])
         self.assertIsNotNone(response.data['results'][0]['project'])
 
         # test with invalid group id
-        response = self.do_get('/api/groups/4356340/workgroups/')
+        response = self.do_get('{}/4356340/workgroups/'.format(self.base_groups_uri))
         self.assertEqual(response.status_code, 404)

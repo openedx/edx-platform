@@ -51,12 +51,9 @@ def course_id_from_url(url):
         key_generator = CourseKey.from_string
 
     match = COURSE_REGEX.match(url)
-
     if match is None:
         return None
-
     course_id = match.group('course_id')
-
     if course_id is None:
         return None
 
