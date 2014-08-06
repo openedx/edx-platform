@@ -537,4 +537,155 @@
       bottom: -($baseline/2);
     }
   }
+
+  // outline: edit item settings
+  .edit-outline-item-modal {
+
+    .list-fields {
+
+      .field {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: ($baseline/2);
+        margin-bottom: ($baseline/4);
+
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
+
+        label {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
+          font-weight: 600;
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: short length
+          &.short {
+            width: 25%;
+          }
+        }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          margin-right: ($baseline/2);
+        }
+
+        .input {
+          width: 100%;
+        }
+      }
+    }
+
+    .edit-settings-grading {
+
+      .grading-type {
+        margin-bottom: $baseline;
+      }
+    }
+  }
+
+  // outline: bulk publishing items
+  .bulkpublish-section-modal,
+  .bulkpublish-subsection-modal,
+  .bulkpublish-unit-modal {
+
+    .modal-introduction {
+      color: $gray-d2;
+    }
+
+    .bulkpublish-included .outline-bulkpublish {
+      max-height: ($baseline*20);
+      overflow-y: scroll;
+    }
+
+    .outline-section,
+    .outline-subsection {
+      border: none;
+      padding: 0;
+    }
+
+    .outline-subsection {
+      margin-bottom: $baseline;
+      padding-right: ($baseline/4);
+    }
+
+    .outline-subsection .subsection-title {
+      @extend %t-title8;
+      margin-bottom: ($baseline/4);
+      font-weight: 600;
+      color: $gray-l2;
+      text-transform: uppercase;
+    }
+
+    .outline-unit .unit-title, .outline-unit .unit-status {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .outline-unit .unit-title {
+      @extend %t-title7;
+      color: $color-heading-base;
+    }
+
+    .outline-unit .unit-status {
+      @extend %t-copy-sub2;
+      text-align: right;
+    }
+
+    // CASE: items included in bulk publish
+    .bulkpublish-included {
+
+    }
+  }
+
+  .bulkpublish-unit-modal {
+
+    .modal-introduction {
+      margin-bottom: 0;
+    }
+  }
+
+  // outline: publishing units
+  .bulkpublish-unit-modal {
+
+    .modal-introduction {
+      margin-bottom: 0;
+    }
+  }
 }
