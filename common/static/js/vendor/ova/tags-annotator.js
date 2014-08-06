@@ -902,6 +902,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         this.updateViewer = __bind(this.updateViewer, this);
         this.colorize = __bind(this.colorize, this);
         this.updateField = __bind(this.updateField, this);
+        this.externalCall = __bind(this.externalCall, this);
 
         this.options = options;
         _ref = HighlightTags.__super__.constructor.apply(this, arguments);
@@ -950,6 +951,7 @@ Annotator.Plugin.HighlightTags = (function(_super) {
         this.annotator.subscribe('annotationUpdated', this.colorize);
         this.annotator.subscribe('flaggedAnnotation', this.updateViewer);
         this.annotator.subscribe('annotationCreated', this.colorize);
+        this.annotator.subscribe('externalCallToHighlightTags', this.externalCall);
 
     };
     
@@ -1054,6 +1056,8 @@ Annotator.Plugin.HighlightTags = (function(_super) {
                 $(annotations[annNum]).css("background","");
             }
         }
+        
+        this.annotator.publish('colorizeCompleted');
     }
     
     HighlightTags.prototype.updateField = function(field, annotation){
@@ -1128,6 +1132,13 @@ Annotator.Plugin.HighlightTags = (function(_super) {
             $(field).remove();
         }
         this.annotator.publish("finishedDrawingTags");
+    }
+    
+    //The following will call the colorize function during an external call and then return
+    //an event signaling completion.
+    HighlightTags.prototype.externalCall = function(){
+        this.colorize();
+        this.annotator.publish('finishedExternalCallToHighlightTags');
     }
     
     return HighlightTags;
