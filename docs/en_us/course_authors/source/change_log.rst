@@ -2,6 +2,20 @@
 Change Log
 ############
 
+**************
+August, 2014
+**************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 08/07/14
+     - Added information about reviewing and duplicating the contents of
+       previously-sent mssages to the :ref:`Bulk Email` section.
+
 
 ***********
 July, 2014
