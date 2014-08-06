@@ -102,7 +102,3 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
-
-    updateModelDetails: =>
-      @renderVote()
-      @renderFlagged()

@@ -47,16 +47,6 @@ if Backbone?
         enable: -> @$(".action-delete").closest("li").show()
         disable: -> @$(".action-delete").closest("li").hide()
 
-      can_endorse:
-        enable: ->
-          @$(".action-endorse").show()
-        disable: ->
-          @$(".action-endorse").css("cursor", "default")
-          if not @model.get('endorsed')
-            @$(".action-endorse").hide()
-          else
-            @$(".action-endorse").show()
-
       can_openclose:
         enable: -> @$(".action-openclose").closest("li").show()
         disable: -> @$(".action-openclose").closest("li").hide()
