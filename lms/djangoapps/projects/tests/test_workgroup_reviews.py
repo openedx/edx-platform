@@ -38,10 +38,10 @@ class WorkgroupReviewsApiTests(ModuleStoreTestCase):
     def setUp(self):
         super(WorkgroupReviewsApiTests, self).setUp()
         self.test_server_prefix = 'https://testserver'
-        self.test_users_uri = '/api/users/'
-        self.test_workgroups_uri = '/api/workgroups/'
-        self.test_projects_uri = '/api/projects/'
-        self.test_workgroup_reviews_uri = '/api/workgroup_reviews/'
+        self.test_users_uri = '/api/server/users/'
+        self.test_workgroups_uri = '/api/server/workgroups/'
+        self.test_projects_uri = '/api/server/projects/'
+        self.test_workgroup_reviews_uri = '/api/server/workgroup_reviews/'
 
         self.course = CourseFactory.create()
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
@@ -174,7 +174,7 @@ class WorkgroupReviewsApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(response.data['modified'])
 
     def test_workgroup_reviews_detail_get_undefined(self):
-        test_uri = '/api/workgroup_reviews/123456789/'
+        test_uri = '{}123456789/'.format(self.test_workgroup_reviews_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 

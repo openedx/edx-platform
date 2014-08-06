@@ -27,16 +27,16 @@ urlpatterns = patterns(
     url(r'^courses/*', include('api_manager.courses.urls')),
 )
 
-router = SimpleRouter()
-router.register(r'organizations', OrganizationsViewSet)
+server_api_router = SimpleRouter()
+server_api_router.register(r'organizations', OrganizationsViewSet)
 
 # Project-related ViewSets
-router.register(r'projects', project_views.ProjectsViewSet)
-router.register(r'workgroups', project_views.WorkgroupsViewSet)
-router.register(r'submissions', project_views.WorkgroupSubmissionsViewSet)
-router.register(r'workgroup_reviews', project_views.WorkgroupReviewsViewSet)
-router.register(r'submission_reviews', project_views.WorkgroupSubmissionReviewsViewSet)
-router.register(r'peer_reviews', project_views.WorkgroupPeerReviewsViewSet)
-router.register(r'groups', project_views.GroupViewSet)
-router.register(r'users', project_views.UserViewSet)
-urlpatterns += router.urls
+server_api_router.register(r'projects', project_views.ProjectsViewSet)
+server_api_router.register(r'workgroups', project_views.WorkgroupsViewSet)
+server_api_router.register(r'submissions', project_views.WorkgroupSubmissionsViewSet)
+server_api_router.register(r'workgroup_reviews', project_views.WorkgroupReviewsViewSet)
+server_api_router.register(r'submission_reviews', project_views.WorkgroupSubmissionReviewsViewSet)
+server_api_router.register(r'peer_reviews', project_views.WorkgroupPeerReviewsViewSet)
+server_api_router.register(r'groups', project_views.GroupViewSet)
+server_api_router.register(r'users', project_views.UserViewSet)
+urlpatterns += server_api_router.urls

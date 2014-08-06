@@ -26,7 +26,7 @@ class SystemApiTests(TestCase):
     """ Test suite for base API views """
 
     def setUp(self):
-        self.test_server_prefix = "https://testserver/api/"
+        self.test_server_prefix = "https://testserver/api/server/"
         self.test_username = str(uuid.uuid4())
         self.test_password = str(uuid.uuid4())
         self.test_email = str(uuid.uuid4()) + '@test.org'

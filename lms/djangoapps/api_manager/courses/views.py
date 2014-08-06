@@ -83,7 +83,7 @@ def _serialize_content(request, content_key, content_descriptor):
     protocol = 'http'
     if request.is_secure():
         protocol = protocol + 's'
-    content_uri = '{}://{}/api/courses/{}'.format(
+    content_uri = '{}://{}/api/server/courses/{}'.format(
         protocol,
         request.get_host(),
         unicode(content_key)
@@ -466,7 +466,7 @@ class CourseContentDetail(SecureAPIView):
             protocol = 'http'
             if request.is_secure():
                 protocol = protocol + 's'
-            response_data['uri'] = '{}://{}/api/courses/{}'.format(
+            response_data['uri'] = '{}://{}/api/server/courses/{}'.format(
                 protocol,
                 request.get_host(),
                 unicode(course_key)
