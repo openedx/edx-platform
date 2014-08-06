@@ -26,6 +26,8 @@
 
 .. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
 
+.. _Data Delivered in Data Packages: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/package.html
+
 .. _edX Developer's Guide: http://edx.readthedocs.org/projects/userdocs/en/latest/
 
 .. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html

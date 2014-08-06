@@ -31,6 +31,7 @@ email message when we have updated the edX Course Staff Release Notes.
 
    read_me
    preface
+   08-07-2014
    07-30-2014
    07-23-2014
    07-21-2014
