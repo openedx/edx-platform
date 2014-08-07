@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from student.models import UserProfile %>
 
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "home" %></%def>
@@ -116,6 +117,18 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                   <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
                   <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field-group" id="field-course-education">
+                  <div class="field select required" id="field-education-level">
+                    <label for="new-course-education">${_("Highest Level of Education Required")}</label>
+                    <select id="new-course-education" name="new-course-education" value="">
+                      <option value="">--</option>
+                      %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                      <option value="${code}">${ed_level}</option>
+                      %endfor
+                    </select>
+                  </div>
                 </li>
               </ol>
 

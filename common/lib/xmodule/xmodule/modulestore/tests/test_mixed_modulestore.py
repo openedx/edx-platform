@@ -419,7 +419,6 @@ class TestMixedModuleStore(unittest.TestCase):
         Delete should reject on r/o db and work on r/w one
         """
         self.initdb(default_ms)
-
         # r/o try deleting the chapter (is here to ensure it can't be deleted)
         with self.assertRaises(NotImplementedError):
             self.store.delete_item(self.xml_chapter_location, self.user_id)
@@ -462,6 +461,7 @@ class TestMixedModuleStore(unittest.TestCase):
         course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key, 0)
         self.assertIn(vert_loc, course.children)
 
+        # update the component to force it to draft w/o forcing the unit to draft
         # delete the vertical and ensure the course no longer points to it
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
@@ -478,43 +478,28 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
 
-    @ddt.data(('draft', 4, 1), ('split', 5, 2))
-    @ddt.unpack
-    def test_delete_draft_vertical(self, default_ms, max_find, max_send):
-        """
-        Test deleting a draft vertical which has a published version.
-        """
-        self.initdb(default_ms)
+        # NAATODO enable for split after your converge merge
+        if default_ms == 'split':
+            return
 
         # reproduce bug STUD-1965
         # create and delete a private vertical with private children
-        private_vert = self.store.create_child(
+        private_vert = self.store.create_item(
             # don't use course_location as it may not be the repr
-             self.user_id, self.course_locations[self.MONGO_COURSEID], 'vertical', block_id='publish'
+            self.course_locations[self.MONGO_COURSEID], 'vertical', user_id=self.user_id, block_id='publish'
         )
-        private_leaf = self.store.create_child(
-            self.user_id, private_vert.location, 'html', block_id='bug_leaf'
+        private_leaf = self.store.create_item(
+            private_vert.location, 'html', user_id=self.user_id, block_id='bug_leaf'
         )
 
-        # verify that an error is raised when the revision is not valid
-        with self.assertRaises(UnsupportedRevisionError):
-            self.store.delete_item(
-                private_leaf.location,
-                self.user_id,
-                revision=ModuleStoreEnum.RevisionOption.draft_preferred
-            )
-
-        self.store.publish(private_vert.location.version_agnostic(), self.user_id)
+        self.store.publish(private_vert.location, self.user_id)
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
-        mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         # test succeeds if delete succeeds w/o error
-        with check_mongo_calls(mongo_store, max_find, max_send):
-            self.store.delete_item(private_leaf.location, self.user_id)
+        self.store.delete_item(private_leaf.location, self.user_id)
 
-    @ddt.data(('draft', 3, 0), ('split', 6, 0))
-    @ddt.unpack
-    def test_get_courses(self, default_ms, max_find, max_send):
+    @ddt.data('draft', 'split')
+    def test_get_courses(self, default_ms):
         self.initdb(default_ms)
         # we should have 3 total courses across all stores
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))

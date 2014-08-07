@@ -6,7 +6,9 @@ from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed
 from student.models import CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, CourseAccessRoleAdmin
 from ratelimitbackend import admin
 
-admin.site.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name', 'gender', 'allow_certificate')
+admin.site.register(UserProfile, UserProfileAdmin)
 
 admin.site.register(UserTestGroup)
 

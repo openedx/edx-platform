@@ -5,7 +5,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
             // One final check for empty values
             var errors = _.reduce(
-                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run', '#new-course-education'],
                 function (acc, ele) {
                     var $ele = $(ele);
                     var error = validateRequiredField($ele.val());
@@ -24,19 +24,22 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             var org = $newCourseForm.find('.new-course-org').val();
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
+            var level_of_education = $newCourseForm.find('#new-course-education').val()
 
             analytics.track('Created a Course', {
                 'org': org,
                 'number': number,
                 'display_name': display_name,
-                'run': run
+                'run': run,
+                'level_of_education': level_of_education
             });
 
             $.postJSON('/course/', {
                     'org': org,
                     'number': number,
                     'display_name': display_name,
-                    'run': run
+                    'run': run,
+                    'level_of_education': level_of_education
                 },
                 function (data) {
                     if (data.url !== undefined) {
@@ -56,7 +59,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             $('.wrapper-create-course').removeClass('is-shown');
             // Clear out existing fields and errors
             _.each(
-                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run', '#new-course-education'],
                 function (field) {
                     $(field).val('');
                 }
@@ -163,6 +166,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
 
         domReady(function () {
+            $('#new-course-education option[value="none"]').attr("selected",true);
             $('.new-course-button').bind('click', addNewCourse);
         });
     });

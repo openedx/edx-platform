@@ -39,7 +39,7 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = "Your Platform Name Here"
+PLATFORM_NAME = "UPEx en Instituto de Altos Estudios Nacionales"
 CC_MERCHANT_NAME = PLATFORM_NAME
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
@@ -195,13 +195,13 @@ FEATURES = {
     'MULTIPLE_ENROLLMENT_ROLES': False,
 
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False,
+    'ENABLE_SHOPPING_CART': True,
 
     # Toggle storing detailed billing information
     'STORE_BILLING_INFO': False,
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
-    'ENABLE_PAID_COURSE_REGISTRATION': False,
+    'ENABLE_PAID_COURSE_REGISTRATION': True,
 
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
@@ -565,10 +565,16 @@ CMS_BASE = 'localhost:8001'
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "example.com"
+SITE_NAME = "upex.edu.ec"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
+#ALLOWED_HOSTS = [
+#    'beta.cms.iaen.edu.ec',
+#    'beta.evex.iaen.edu.ec',
+#    'upex.iaen.edu.ec',
+#    'cms.iaen.edu.ec'
+#    ]
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -596,8 +602,8 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
@@ -744,11 +750,11 @@ PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource': {
-        'SHARED_SECRET': '',
-        'MERCHANT_ID': '',
-        'SERIAL_NUMBER': '',
+        'SHARED_SECRET': 'keysecret',
+        'MERCHANT_ID': 'cybersource_csiu_id',
+        'SERIAL_NUMBER': '0123456789012345678901',
         'ORDERPAGE_VERSION': '7',
-        'PURCHASE_ENDPOINT': '',
+        'PURCHASE_ENDPOINT': '/shoppingcart/payment_fake',
     }
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
@@ -1322,6 +1328,8 @@ INSTALLED_APPS = (
     # Monitoring functionality
     'monitoring',
 
+    #cities
+    'cities',
     # Course action state
     'course_action_state'
 )
@@ -1388,6 +1396,19 @@ REGISTRATION_EXTRA_FIELDS = {
 ########################## CERTIFICATE NAME ########################
 CERT_NAME_SHORT = "Certificate"
 CERT_NAME_LONG = "Certificate of Achievement"
+# Years allowed range
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70
+
+########################## WS CONFIG ###########################
+
+WS_CONFIG = {
+    'ws_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'ws_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'method_permission': "validarPermisoPeticion",
+    'method_query_title': "consultaTitulo",
+    'identity': '1803550274'
+    }
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
@@ -1674,3 +1695,18 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""
+
+#####################IAEN CONF##################################
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70
+
+########################## WS CONFIG ###########################
+
+WS_CONFIG = {
+    'ws_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'ws_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'method_permission': "validarPermisoPeticion",
+    'method_query_title': "consultaTitulo",
+    'identity': '0103893954'
+    }
+

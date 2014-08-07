@@ -7,9 +7,8 @@ define([
         defaults: function() {
             return {
                 name: '',
-                version: null,
-                order: null
-             };
+                version: null
+            };
         },
 
         isEmpty: function() {
@@ -18,7 +17,6 @@ define([
 
         toJSON: function() {
             return {
-                id: this.get('id'),
                 name: this.get('name'),
                 version: this.get('version')
              };

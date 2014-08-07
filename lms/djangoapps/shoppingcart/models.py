@@ -523,7 +523,10 @@ class PaidCourseRegistration(OrderItem):
 
         ### Validations done, now proceed
         ### handle default arguments for mode_slug, cost, currency
-        course_mode = CourseMode.mode_for_course(course_id, mode_slug)
+        ## Se corrigio la llamada a CourseMode, para que lea la forma
+        ## de pago que esta ligada a este curso
+        course_list = CourseMode.modes_for_course(course_id)
+        course_mode = course_list and course_list[0] or []
         if not course_mode:
             # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
             course_mode = CourseMode.DEFAULT_MODE

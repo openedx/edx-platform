@@ -44,8 +44,8 @@ function(BaseView, _, gettext, str) {
             this.model.set('editing', true);
         },
 
-        showGroups: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+        showGroups: function(e) {
+            if(e && e.preventDefault) { e.preventDefault(); }
             this.model.set('showGroups', true);
         },
 

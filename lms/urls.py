@@ -505,6 +505,12 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         url(r'', include('third_party_auth.urls')),
     )
 
+# Extra ajax calls
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler')
+)
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
@@ -518,4 +524,10 @@ handler500 = 'static_template_view.views.render_500'
 urlpatterns += (
     url(r'404', handler404),
     url(r'500', handler500),
+)
+
+# Extra ajax calls
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+    url(r'^user_lookup/$', 'student.views.student_handler', name='student_handler')
 )

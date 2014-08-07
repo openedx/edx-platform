@@ -42,10 +42,11 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             model: model
         });
         editor.render();
-      },
+       },
       reset: true
     });
 });
+
   </script>
 </%block>
 
@@ -214,7 +215,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
-                  <textarea class="tinymce text-editor" id="course-overview"></textarea>
+                  <textarea class="tinymce" id="course-overview"></textarea>
                   <%def name='overview_text()'><%
                     a_link_start = '<a class="link-courseURL" rel="external" href="'
                     a_link_end = '">' + _("your course summary page") + '</a>'

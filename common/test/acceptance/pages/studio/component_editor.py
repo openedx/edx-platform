@@ -58,12 +58,12 @@ class ComponentEditorView(PageObject):
         Sets the text field with given label (display name) to the specified value, and presses Save.
         """
         elem = self.get_setting_element(label)
-
-        # Clear the current value, set the new one, then
-        # Tab to move to the next field (so change event is triggered).
-        elem.clear()
-        elem.send_keys(value)
-        elem.send_keys(Keys.TAB)
+        # Click in the field, delete the value there.
+        action = ActionChains(self.browser).click(elem)
+        for _x in range(0, len(elem.get_attribute('value'))):
+            action = action.send_keys(Keys.BACKSPACE)
+        # Send the new text, then Tab to move to the next field (so change event is triggered).
+        action.send_keys(value).send_keys(Keys.TAB).perform()
         self.save()
 
     def set_select_value_and_save(self, label, value):

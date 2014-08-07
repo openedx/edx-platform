@@ -108,6 +108,19 @@ class GroupConfiguration(object):
         self.find_css('.actions .delete').first.click()
         confirm_prompt(self.page)
 
+    def get_text(self, css):
+        """
+        Return text for the defined by css locator.
+        """
+        return self.find_css(css).first.text[0]
+
+    def edit(self):
+        """
+        Open editing view for the group configuration.
+        """
+        css = '.action-edit .edit'
+        self.find_css(css).first.click()
+
     def save(self):
         """
         Save group configuration.
@@ -144,14 +157,6 @@ class GroupConfiguration(object):
         Return validation message.
         """
         return self.get_text('.message-status.error')
-
-    @property
-    def usages(self):
-        """
-        Return list of usages.
-        """
-        css = '.group-configuration-usage-unit'
-        return self.find_css(css).text
 
     @property
     def name(self):
@@ -219,7 +224,7 @@ class Group(object):
     @property
     def name(self):
         """
-        Return the name of the group .
+        Return group name.
         """
         css = '.group-name'
         return self.find_css(css).first.text[0]

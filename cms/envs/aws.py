@@ -9,6 +9,7 @@ This is the default template for our main set of AWS servers.
 import json
 
 from .common import *
+from .iaen_settings import *
 
 from logsettings import get_logger_config
 import os
@@ -39,7 +40,8 @@ TEMPLATE_DEBUG = False
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = ''#'storages.backends.s3boto.S3BotoStorage'
+MEDIA_ROOT = '/edx/var/edxapp/uploads'
 
 ###################################### CELERY  ################################
 
@@ -183,7 +185,7 @@ LOGGING = get_logger_config(LOG_DIR,
                             service_variant=SERVICE_VARIANT)
 
 #theming start:
-PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'MOOC UPEx')
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
@@ -289,3 +291,7 @@ ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
 
 ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get('ADVANCED_COMPONENT_TYPES', ADVANCED_COMPONENT_TYPES)
 ADVANCED_PROBLEM_TYPES = ENV_TOKENS.get('ADVANCED_PROBLEM_TYPES', ADVANCED_PROBLEM_TYPES)
+
+import newrelic.agent
+newrelic.agent.initialize('/var/tmp/newrelic-cms.ini')
+

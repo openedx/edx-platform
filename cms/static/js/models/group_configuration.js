@@ -11,16 +11,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 name: '',
                 description: '',
                 version: null,
-                groups: new GroupCollection([
-                    {
-                        name: gettext('Group A'),
-                        order: 0
-                    },
-                    {
-                        name: gettext('Group B'),
-                        order: 1
-                    }
-                ]),
+                groups: new GroupCollection([]),
                 showGroups: false,
                 editing: false,
                 usage: []
