@@ -667,7 +667,10 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     :param csv_type:
     """
     # csv headers
-    query_features = ['code', 'course_id', 'transaction_group_name', 'created_by', 'redeemed_by']
+    query_features = [
+        'code', 'course_id', 'transaction_group_name', 'created_by',
+        'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
+    ]
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
     header, data_rows = instructor_analytics.csvs.format_dictlist(registration_codes, query_features)
