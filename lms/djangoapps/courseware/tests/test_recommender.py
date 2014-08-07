@@ -1,5 +1,6 @@
 """
-This test file will run through some XBlock test scenarios regarding the recommender system
+This test file will run through some XBlock test scenarios regarding the
+recommender system
 """
 import json
 import tempfile
@@ -29,41 +30,61 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         self.course = CourseFactory.create(
-            display_name='Recommender_Test_Course')
-        self.chapter = ItemFactory.create(parent=self.course,
-                                          display_name='Overview')
-        self.section = ItemFactory.create(parent=self.chapter,
-                                          display_name='Welcome')
-        self.unit = ItemFactory.create(parent=self.section,
-                                       display_name='New Unit')
-        self.xblock = ItemFactory.create(parent=self.unit,
-                                         category='recommender',
-                                         display_name='recommender')
-        self.xblock2 = ItemFactory.create(parent=self.unit,
-                                          category='recommender',
-                                          display_name='recommender_second')
+            display_name='Recommender_Test_Course'
+        )
+        self.chapter = ItemFactory.create(
+            parent=self.course, display_name='Overview'
+        )
+        self.section = ItemFactory.create(
+            parent=self.chapter, display_name='Welcome'
+        )
+        self.unit = ItemFactory.create(
+            parent=self.section, display_name='New Unit'
+        )
+        self.xblock = ItemFactory.create(
+            parent=self.unit,
+            category='recommender',
+            display_name='recommender'
+        )
+        self.xblock2 = ItemFactory.create(
+            parent=self.unit,
+            category='recommender',
+            display_name='recommender_second'
+        )
 
         self.xblock_names = ['recommender', 'recommender_second']
 
         self.test_recommendations = [
             {
                 "title": "Covalent bonding and periodic trends",
-                "url": "https://courses.edx.org/courses/MITx/3.091X/" +
-                "2013_Fall/courseware/SP13_Week_4/" +
-                "SP13_Periodic_Trends_and_Bonding/",
-                "description": "http://people.csail.mit.edu/swli/edx/" +
-                "recommendation/img/videopage1.png",
-                "descriptionText": "short description for Covalent bonding " +
-                "and periodic trends"
+                "url": (
+                    "https://courses.edx.org/courses/MITx/3.091X/" +
+                    "2013_Fall/courseware/SP13_Week_4/" +
+                    "SP13_Periodic_Trends_and_Bonding/"
+                ),
+                "description": (
+                    "http://people.csail.mit.edu/swli/edx/" +
+                    "recommendation/img/videopage1.png"
+                ),
+                "descriptionText": (
+                    "short description for Covalent bonding " +
+                    "and periodic trends"
+                )
             },
             {
                 "title": "Polar covalent bonds and electronegativity",
-                "url": "https://courses.edx.org/courses/MITx/3.091X/" +
-                "2013_Fall/courseware/SP13_Week_4/SP13_Covalent_Bonding/",
-                "description": "http://people.csail.mit.edu/swli/edx/" +
-                "recommendation/img/videopage2.png",
-                "descriptionText": "short description for Polar covalent " +
-                "bonds and electronegativity"
+                "url": (
+                    "https://courses.edx.org/courses/MITx/3.091X/" +
+                    "2013_Fall/courseware/SP13_Week_4/SP13_Covalent_Bonding/"
+                ),
+                "description": (
+                    "http://people.csail.mit.edu/swli/edx/" +
+                    "recommendation/img/videopage2.png"
+                ),
+                "descriptionText": (
+                    "short description for Polar covalent " +
+                    "bonds and electronegativity"
+                )
             }
         ]
 
@@ -112,7 +133,8 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def check_for_get_xblock_page_code(self, code):
         """
-        Check the response.status_code for getting the page where the XBlock attached
+        Check the response.status_code for getting the page where the XBlock
+        attached
         """
         url = reverse(
             'courseware_section',
@@ -125,8 +147,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, code)
 
-    def check_ajax_event_result(self, data, handler,
-                                expected_result, xblock_name='recommender'):
+    def check_ajax_event_result(
+        self, data, handler, expected_result, xblock_name='recommender'
+    ):
         """
         Call a ajax event and check whether the result is the same as expected
         """
@@ -153,17 +176,20 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'bucketName': 'bucket name',
             'uploadedFileDir': '/'
         }
-        self.client.post(self.get_handler_url('set_s3_info', xblock_name),
-                         json.dumps(data), '')
+        url = self.get_handler_url('set_s3_info', xblock_name)
+        self.client.post(url, json.dumps(data), '')
 
     def upload_file(self, test_cases, xblock_name):
         """
-        Create a temp file and upload it by calling the corresponding ajax event
+        Create a temp file and upload it by calling the corresponding ajax
+        event
         """
         for test_case in test_cases:
-            temp = tempfile.NamedTemporaryFile(prefix='upload_',
-                                               suffix=test_case['suffixes'],
-                                               delete=False)
+            temp = tempfile.NamedTemporaryFile(
+                prefix='upload_',
+                suffix=test_case['suffixes'],
+                delete=False
+            )
             temp.seek(0)
             temp.write(test_case['magic_number'].decode('hex'))
             temp.flush()
@@ -179,14 +205,17 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.logout()
         self.enroll_staff(self.staff_user)
         # Add resources, assume correct here, tested in test_add_resource
-        for resource, xblock_name in itertools.product(self.test_recommendations,
-                                                       self.xblock_names):
+        for resource, xblock_name in itertools.product(
+            self.test_recommendations, self.xblock_names
+        ):
             self.add_resource(resource, xblock_name)
 
-    def call_event_by_id(self, handler, resource_id, times,
-                         xblock_name='recommender'):
+    def call_event_by_id(
+        self, handler, resource_id, times, xblock_name='recommender'
+    ):
         """
-        Call a ajax event (vote, delete, endorse) on a resource by its id several times
+        Call a ajax event (vote, delete, endorse) on a resource by its id
+        several times
         """
         url = self.get_handler_url(handler, xblock_name)
         for _ in range(0, times):
@@ -261,8 +290,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=100, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=100, times=1
+        )
         self.check_result(resp['error'], 'bad id')
 
     def test_endorse_resource_once(self):
@@ -271,8 +301,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=1, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=1, times=1
+        )
         self.check_result(resp['status'], 'endorsement')
 
     def test_endorse_resource_twice(self):
@@ -282,8 +313,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.set_up_resources()
         self.call_event_by_id('endorse_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=1, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=1, times=1
+        )
         self.check_result(resp['status'], 'undo endorsement')
 
     def test_endorse_resource_thrice(self):
@@ -293,8 +325,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.set_up_resources()
         self.call_event_by_id('endorse_resource', resource_id=1, times=2)
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=1, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=1, times=1
+        )
         self.check_result(resp['status'], 'endorsement')
 
     def test_endorse_different_resources(self):
@@ -304,8 +337,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.set_up_resources()
         self.call_event_by_id('endorse_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=0, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=0, times=1
+        )
         self.check_result(resp['status'], 'endorsement')
 
     def test_endorse_resources_in_different_xblocks(self):
@@ -315,9 +349,12 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.set_up_resources()
         self.call_event_by_id('endorse_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('endorse_resource', resource_id=1,
-                                     times=1,
-                                     xblock_name=self.xblock_names[1])
+        resp = self.call_event_by_id(
+            'endorse_resource',
+            resource_id=1,
+            times=1,
+            xblock_name=self.xblock_names[1]
+        )
         self.check_result(resp['status'], 'endorsement')
 
     def test_endorse_resource_by_student(self):
@@ -328,8 +365,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.logout()
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         # Test
-        resp = self.call_event_by_id('endorse_resource',
-                                     resource_id=1, times=1)
+        resp = self.call_event_by_id(
+            'endorse_resource', resource_id=1, times=1
+        )
         self.check_result(resp['error'], 'Endorse resource without permission')
 
     def test_delete_resource_non_existing(self):
@@ -338,8 +376,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        resp = self.call_event_by_id('delete_resource',
-                                     resource_id=100, times=1)
+        resp = self.call_event_by_id(
+            'delete_resource', resource_id=100, times=1
+        )
         self.check_result(resp['error'], 'bad id')
 
     def test_delete_resource_once(self):
@@ -378,9 +417,12 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.set_up_resources()
         self.call_event_by_id('delete_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('delete_resource', resource_id=1,
-                                     times=1,
-                                     xblock_name=self.xblock_names[1])
+        resp = self.call_event_by_id(
+            'delete_resource',
+            resource_id=1,
+            times=1,
+            xblock_name=self.xblock_names[1]
+        )
         self.check_result(resp['Success'], True)
 
     def test_delete_resource_by_student(self):
@@ -410,8 +452,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        for handler, r_id, votes in zip(['handle_upvote', 'handle_downvote'],
-                                        [0, 1], [1, -1]):
+        for handler, r_id, votes in zip(
+            ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -423,8 +466,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
             self.call_event_by_id(handler, resource_id=r_id, times=1)
         # Test
-        for handler, r_id, votes in zip(['handle_upvote', 'handle_downvote'],
-                                        [0, 1], [0, 0]):
+        for handler, r_id, votes in zip(
+            ['handle_upvote', 'handle_downvote'], [0, 1], [0, 0]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -436,8 +480,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
             self.call_event_by_id(handler, resource_id=r_id, times=2)
         # Test
-        for handler, r_id, votes in zip(['handle_upvote', 'handle_downvote'],
-                                        [0, 1], [1, -1]):
+        for handler, r_id, votes in zip(
+            ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -449,8 +494,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
             self.call_event_by_id(handler, resource_id=r_id, times=1)
         # Test
-        for handler, r_id, votes in zip(['handle_downvote', 'handle_upvote'],
-                                        [0, 1], [-1, 1]):
+        for handler, r_id, votes in zip(
+            ['handle_downvote', 'handle_upvote'], [0, 1], [-1, 1]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -460,12 +506,16 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        for handler, r_id, votes in zip(['handle_upvote',
-                                         'handle_upvote',
-                                         'handle_downvote',
-                                         'handle_downvote'],
-                                        [0, 1, 0, 1],
-                                        [1, 1, -1, -1]):
+        for handler, r_id, votes in zip(
+            [
+                'handle_upvote',
+                'handle_upvote',
+                'handle_downvote',
+                'handle_downvote'
+            ],
+            [0, 1, 0, 1],
+            [1, 1, -1, -1]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -477,11 +527,15 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
             self.call_event_by_id(handler, resource_id=r_id, times=1)
         # Test
-        for handler, r_id, votes in zip(['handle_upvote', 'handle_downvote'],
-                                        [0, 1], [1, -1]):
-            resp = self.call_event_by_id(handler, resource_id=r_id,
-                                         times=1,
-                                         xblock_name=self.xblock_names[1])
+        for handler, r_id, votes in zip(
+            ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
+        ):
+            resp = self.call_event_by_id(
+                handler,
+                resource_id=r_id,
+                times=1,
+                xblock_name=self.xblock_names[1]
+            )
             self.check_result(resp['newVotes'], votes)
 
     def test_vote_resource_by_different_users(self):
@@ -494,8 +548,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.logout()
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         # Test
-        for handler, r_id, votes in zip(['handle_upvote', 'handle_downvote'],
-                                        [0, 1], [2, -2]):
+        for handler, r_id, votes in zip(
+            ['handle_upvote', 'handle_downvote'], [0, 1], [2, -2]
+        ):
             resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
             self.check_result(resp['newVotes'], votes)
 
@@ -505,8 +560,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        resp = self.call_event_by_data('edit_resource',
-                                       self.generate_edit_resource(100))
+        resp = self.call_event_by_data(
+            'edit_resource', self.generate_edit_resource(100)
+        )
         self.check_result(resp['error'], 'bad id')
 
     def test_edit_redundant_resource(self):
@@ -528,8 +584,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         self.set_up_resources()
         # Test
-        resp = self.call_event_by_data('edit_resource',
-                                       self.generate_edit_resource(0))
+        resp = self.call_event_by_data(
+            'edit_resource', self.generate_edit_resource(0)
+        )
         self.check_result(resp['Success'], True)
 
     def test_edit_resources_in_different_xblocks(self):
@@ -663,9 +720,11 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             if index == 1:
                 self.logout()
                 self.enroll_staff(self.staff_user)
-            self.check_ajax_event_result(test_cases[index]['data'],
-                                         'set_s3_info',
-                                         test_cases[index]['expected_result'])
+            self.check_ajax_event_result(
+                test_cases[index]['data'],
+                'set_s3_info',
+                test_cases[index]['expected_result']
+            )
 
     def test_upload_screenshot_s3_not_set(self):
         """
