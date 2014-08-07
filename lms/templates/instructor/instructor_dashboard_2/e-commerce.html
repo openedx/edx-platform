@@ -3,21 +3,16 @@
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
+<%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
    <h3 class="coupon-errors" id="code-error"></h3>
    <div id = "accordion">
       <div class="wrap">
          <h2>Registration Codes</h2>
          <div>
-            <p>Enter the transaction group name and number of registration codes that you want to generate. Click to generate a CSV :</p>
-            <p>
-            <form action="${ section_data['generate_registration_code_csv_url'] }" id="course_codes_number" method="post">
-               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="transaction_group_name" placeholder="Transaction Group Name"/>
-               <input type="text" name="course_registration_code_number" placeholder="Number of Registration Codes" maxlength="4"/>
-               <input type="submit" name="generate-registration-codes-csv" value="${_("Generate Registration Codes")}" data-csv="true">
-            </form>
-            </p>
+            <span class="code_tip">Click to add information About Registration Code Generation
+            <a id="registration_code_generation_link" href="#registration_code_generation_modal" rel="leanModal" class="add blue-button">Registration Code Generation</a>
+            </span>
             <p>Click to generate a CSV file of all Course Registrations Codes:</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
@@ -244,6 +239,10 @@
      $('#add_coupon_link').click(function () {
        reset_input_fields();
      });
+      $('#registration_code_generation_link').click(function () {
+        reset_input_fields();
+        $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
+     });
      $('#set_price_form').submit(function () {
        $("#set_course_button").attr('disabled', true);
        // Get the Code and Discount value and trim it
@@ -337,6 +336,7 @@
        $("#update_coupon_button").removeAttr('disabled');
        $("#add_coupon_button").removeAttr('disabled');
        $("#set_course_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
        reset_input_fields();
        e.preventDefault();
      });
@@ -347,9 +347,11 @@
        $("#edit-coupon-modal").attr("aria-hidden", "true");
        $(".edit-right").focus();
        $("#set-course-mode-price-modal").attr("aria-hidden", "true");
+       $("#registration_code_generation_modal").attr("aria-hidden", "true");
        $("#add_coupon_button").removeAttr('disabled');
        $("#set_course_button").removeAttr('disabled');
        $("#update_coupon_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
        reset_input_fields();
      };
 
@@ -366,11 +368,12 @@
 
      $("#add-coupon-modal .close-modal").click(onModalClose);
      $("#edit-coupon-modal .close-modal").click(onModalClose);
+     $('#registration_code_generation_modal .close-modal').click(onModalClose);
      $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
 
 
      // Hitting the ESC key will exit the modal
-     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal").on("keydown", function (e) {
+     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal").on("keydown", function (e) {
        var keyCode = e.keyCode || e.which;
        // 27 is the ESC key
        if (keyCode === 27) {
@@ -378,6 +381,7 @@
          $("#add-coupon-modal .close-modal").click();
          $("#set-course-mode-price-modal .close-modal").click();
          $("#edit-coupon-modal .close-modal").click();
+         $('#registration_code_generation_modal .close-modal').click();
        }
      });
    });
@@ -386,11 +390,20 @@
      $('#coupon-error').attr('style', 'display: none');
      $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
      $('#set_price_form #course_form_error').attr('style', 'display: none');
+     $('#generate_codes #registration_code_form_error').attr('style', 'display: none');
      $('#add_coupon_form #coupon_form_error').text();
      $('input#mode_price').val('');
      $('input#coupon_code').val('');
      $('input#coupon_discount').val('');
      $('textarea#coupon_description').val('');
-
+     $('input[name="company_name"]').val('');
+     $('input[name="total-registration-codes"]').val('');
+     $('input[name="purchaser_contact"]').val('');
+     $('input[name="sale_price"]').val('');
+     $('input[name="purchaser_name"]').val('');
+     $('input[name="purchaser_email"]').val('');
+     $('input[name="tax"]').val('');
+     $('input[name="invoice"]').attr('checked', 'checked');
+     $('input[name="reference"]').val('');
    }
 </script>
