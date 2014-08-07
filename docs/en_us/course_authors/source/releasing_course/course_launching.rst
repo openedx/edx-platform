@@ -92,7 +92,7 @@ participants directly from the Instructor Dashboard. Messages can use HTML
 styling, and can include links to videos, social media pages for the course,
 and other material. All course contributors who are assigned the course staff
 or instructor role can use this feature to communicate with course
-participants before, during, and after the course run.
+participants before, during, and after the course run. For templates that you can use when preparing your own messages, see :ref:`Example Messages to Students`.
 
 .. note:: The bulk email feature is currently in limited release, and is enabled for new courses only. A gradual rollout of this feature is planned for 2014.
 
@@ -146,12 +146,13 @@ To send an email message to course participants:
 
 #. Enter the text for the message. Message text is required. 
    
-   Messages can use HTML styling, including text formatting and links. The email
-   message editor offers the same formatting options as the HTML component
-   editor in Studio. See :ref:`Working with HTML Components`.
+   Messages can use HTML styling, including text formatting and links. The
+   email message editor offers the same formatting options as the HTML
+   component editor in Studio. See :ref:`Working with HTML Components`.
 
-#. Click **Send Email**. You can perform other tasks on the Instructor Dashboard
-   or navigate to other pages while you wait for your message to be sent.
+#. Click **Send Email**. You can perform other tasks on the Instructor
+   Dashboard or navigate to other pages while you wait for your message to be
+   sent.
 
 After you send a message, a bulk email task is queued for processing.
 Multiple courses use the same queue to complete these tasks, so it can take
@@ -165,9 +166,9 @@ course participants to no more than one per week.
 Message Workflow States
 ======================================================
 
-When you click **Send Email** for a message, the server begins to process a bulk
-email task. The server assigns a series of different workflow states to the
-task.
+When you click **Send Email** for a message, the server begins to process a
+bulk email task. The server assigns a series of different workflow states to
+the task.
   
 .. image:: ../Images/Bulk_email_states.png
        :alt: Flowchart of the possible states of a bulk email task 
@@ -183,9 +184,9 @@ The workflow states for a bulk email task are:
   be in this state even if some or all of its emailing subtasks failed.
 * Failure: An error occurred and task processing did not complete successfully.
 
-While the bulk email task is in progress, you can find out how far it has gotten
-in the workflow by checking the **Pending Instructor Tasks** section on the
-**Email** page.
+While the bulk email task is in progress, you can find out how far it has
+gotten in the workflow by checking the **Pending Instructor Tasks** section on
+the **Email** page.
 
 .. image:: ../Images/Bulk_email_pending.png
        :alt: Information about an email message, including who submitted it and when, in tabular format
@@ -193,23 +194,58 @@ in the workflow by checking the **Pending Instructor Tasks** section on the
 When the bulk email task is complete, you can find its final state by checking
 the Email Task History report. See :ref:`Email Task History Report`.
 
+.. _Review Sent Messages:
+
+********************************
+Review Sent Messages
+********************************
+
+You can review a list of all of the messages that have been sent for the
+course. For any listed message, you can review the subject, date and time sent,
+selected recipients, and the message text.
+
+#. View the live version of your course.
+
+#. Click **Instructor** then click **Email**. 
+
+#. In the **Email Task History** section of the page, click **Sent Email
+   History**. The list of sent messages displays.
+
+   .. image:: ../Images/Bulk_email_list.png
+    :alt: A tabular list of sent messages, with columns for subject, time sent, and number sent
+
+4. To review additional information for a message, click its subject. The
+   message opens in a dialog box.
+ 
+   .. image:: ../Images/Bulk_email_sent.png
+    :alt: A dialog box with the subject, time sent, sent to, and message for an email message, and an option to Copy Email to Editor
+
+5. Optionally, use the message as the basis for a new message: click **Copy
+   Email to Editor**. The dialog box closes and you can edit the text, links,
+   and formatting that were duplicated into the **Subject** and **Message**
+   fields.
+
+   When you create a message by copying a previously-sent message, be sure to
+   review and test it thoroughly before you send it to all course participants.
+
 .. _Email Task History Report:
 
 ********************************
 Email Task History Report
 ********************************
 
-You can produce a report of all of the completed bulk email tasks for your
-course. For each message sent, the report includes the username of the
-requester, the date and time it was submitted, the duration and state of the
-entire task, the task status, and the task progress.
+The Email Task History report can help you keep track of who sent messages,
+when, and to how many people. For each message sent, the report includes the
+username of the requester, the date and time it was submitted, the duration and
+state of the entire task, the task status, and the task progress.
 
 You can use this history to investigate questions relating to bulk email
 messages that have been sent, such as:
 
 * How frequently students are sent course-related email messages.
 * Whether a message was sent successfully.
-* The number of people who were sent course-related messages over time.
+* The change in the number of people who were sent course-related messages over
+  time.
 
 
 To produce the Email Task History report:

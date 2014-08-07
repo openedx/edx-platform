@@ -403,6 +403,163 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
 
 
+class StaffLockTest(CourseOutlineTest):
+    """
+    Feature: Sections, subsections, and units can be locked and unlocked from the course outline.
+    """
+
+    __test__ = True
+
+    def populate_course_fixture(self, course_fixture):
+        """ Create a course with two sections, four subsections, and eight units """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', '1').add_children(
+                XBlockFixtureDesc('sequential', '1.1').add_children(
+                    XBlockFixtureDesc('vertical', '1.1.1'),
+                    XBlockFixtureDesc('vertical', '1.1.2')
+                ),
+                XBlockFixtureDesc('sequential', '1.2').add_children(
+                    XBlockFixtureDesc('vertical', '1.2.1'),
+                    XBlockFixtureDesc('vertical', '1.2.2')
+                )
+            ),
+            XBlockFixtureDesc('chapter', '2').add_children(
+                XBlockFixtureDesc('sequential', '2.1').add_children(
+                    XBlockFixtureDesc('vertical', '2.1.1'),
+                    XBlockFixtureDesc('vertical', '2.1.2')
+                ),
+                XBlockFixtureDesc('sequential', '2.2').add_children(
+                    XBlockFixtureDesc('vertical', '2.2.1'),
+                    XBlockFixtureDesc('vertical', '2.2.2')
+                )
+            )
+        )
+
+    def _expand_all_subsections(self):
+        """
+        Expands all the subsections in this course.
+        """
+        for section in self.course_outline_page.sections():
+            for subsection in section.subsections():
+                subsection.toggle_expand()
+
+    def _set_staff_lock(self, item, is_locked):
+        """
+        Sets the explicit staff lock of item to is_locked.
+        """
+        modal = item.edit()
+        modal.is_explicitly_locked = is_locked
+        modal.save()
+
+    def test_units_can_be_locked(self):
+        """
+        Scenario: Units can be locked and unlocked from the course outline page
+            Given I have a course with a unit
+            When I click on the configuration icon
+            And I enable explicit staff locking
+            And I click save
+            Then the unit shows a staff lock warning
+            And when I click on the configuration icon
+            And I disable explicit staff locking
+            And I click save
+            Then the unit does not show a staff lock warning
+        """
+        self.course_outline_page.visit()
+        self._expand_all_subsections()
+        unit = self.course_outline_page.section('1').subsection('1.1').unit('1.1.1')
+        self.assertFalse(unit.has_staff_lock_warning)
+        self._set_staff_lock(unit, True)
+        self.assertTrue(unit.has_staff_lock_warning)
+        self._set_staff_lock(unit, False)
+        self.assertFalse(unit.has_staff_lock_warning)
+
+    def test_subsections_can_be_locked(self):
+        """
+        Scenario: Subsections can be locked and unlocked from the course outline page
+            Given I have a course with a subsection
+            When I click on the subsection's configuration icon
+            And I enable explicit staff locking
+            And I click save
+            Then the subsection shows a staff lock warning
+            And when I click on the subsection's configuration icon
+            And I disable explicit staff locking
+            And I click save
+            Then the the subsection does not show a staff lock warning
+        """
+        self.course_outline_page.visit()
+        subsection = self.course_outline_page.section('1').subsection('1.1')
+        self.assertFalse(subsection.has_staff_lock_warning)
+        self._set_staff_lock(subsection, True)
+        self.assertTrue(subsection.has_staff_lock_warning)
+        self._set_staff_lock(subsection, False)
+        self.assertFalse(subsection.has_staff_lock_warning)
+
+    def test_sections_can_be_locked(self):
+        """
+        Scenario: Sections can be locked and unlocked from the course outline page
+            Given I have a course with a section
+            When I click on the section's configuration icon
+            And I enable explicit staff locking
+            And I click save
+            Then the section shows a staff lock warning
+            And when I click on the section's configuration icon
+            And I disable explicit staff locking
+            And I click save
+            Then the section does not show a staff lock warning
+        """
+        self.course_outline_page.visit()
+        section = self.course_outline_page.section('1')
+        self.assertFalse(section.has_staff_lock_warning)
+        self._set_staff_lock(section, True)
+        self.assertTrue(section.has_staff_lock_warning)
+        self._set_staff_lock(section, False)
+        self.assertFalse(section.has_staff_lock_warning)
+
+    def test_explicit_staff_lock_remains_after_unlocking_section(self):
+        """
+        Scenario: An explicitly locked unit is still locked after removing an inherited lock from a section
+            Given I have a course with sections, subsections, and units
+            And I have enabled explicit staff lock on a section and one of its units
+            When I click on the section's configuration icon
+            And I disable explicit staff locking
+            And I click save
+            Then the unit still shows a staff lock warning
+        """
+        self.course_outline_page.visit()
+        self._expand_all_subsections()
+        section = self.course_outline_page.section('1')
+        unit = section.subsection('1.1').unit('1.1.1')
+        self._set_staff_lock(unit, True)
+        self._set_staff_lock(section, True)
+        self.assertTrue(section.has_staff_lock_warning)
+        self.assertTrue(unit.has_staff_lock_warning)
+        self._set_staff_lock(section, False)
+        self.assertFalse(section.has_staff_lock_warning)
+        self.assertTrue(unit.has_staff_lock_warning)
+
+    def test_explicit_staff_lock_remains_after_unlocking_subsection(self):
+        """
+        Scenario: An explicitly locked unit is still locked after removing an inherited lock from a subsection
+            Given I have a course with sections, subsections, and units
+            And I have enabled explicit staff lock on a subsection and one of its units
+            When I click on the subsection's configuration icon
+            And I disable explicit staff locking
+            And I click save
+            Then the unit still shows a staff lock warning
+        """
+        self.course_outline_page.visit()
+        self._expand_all_subsections()
+        subsection = self.course_outline_page.section('1').subsection('1.1')
+        unit = subsection.unit('1.1.1')
+        self._set_staff_lock(subsection, True)
+        self._set_staff_lock(unit, True)
+        self.assertTrue(subsection.has_staff_lock_warning)
+        self.assertTrue(unit.has_staff_lock_warning)
+        self._set_staff_lock(subsection, False)
+        self.assertFalse(subsection.has_staff_lock_warning)
+        self.assertTrue(unit.has_staff_lock_warning)
+
+
 @attr('shard_2')
 class EditNamesTest(CourseOutlineTest):
     """

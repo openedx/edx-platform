@@ -124,14 +124,19 @@ enrolled in it. When you view an enrollment count, note that:
   students and course team staff. It is not a historical count of everyone who
   has ever enrolled in the course.
 
+The total number of current enrollees is shown as the sum of the number of
+people who selected each of the certification tracks (verified, audit, or
+honor) that are available for your course.
+
 To view the enrollment count for a course:
 
 #. View the live version of your course.
 
 #. Click **Instructor**, then click **Course Info** if necessary. 
 
-  The **Enrollment Information** section of the page that opens shows the total
-  number of people who are currently enrolled.
+  The **Enrollment Information** section of the page that opens shows the
+  number of people who are currently enrolled in your course and in each of the
+  certification tracks.
 
 You can also view or download a list of the people who are enrolled in the
 course. See :ref:`Student Data`.
