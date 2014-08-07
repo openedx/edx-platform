@@ -1740,7 +1740,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         xblock_class = self.mixologist.mix(xblock_class)
 
         for field_name, value in fields.iteritems():
-            if value:
+            if value is not None:
                 if isinstance(xblock_class.fields[field_name], Reference):
                     fields[field_name] = value.block_id
                 elif isinstance(xblock_class.fields[field_name], ReferenceList):

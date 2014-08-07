@@ -361,7 +361,7 @@ def course_listing(request):
             _get_rerun_link_for_item(course.id),
             course.display_org_with_default,
             course.display_number_with_default,
-            course.location.name
+            course.location.run
         )
 
     def format_unsucceeded_course_for_view(uca):
