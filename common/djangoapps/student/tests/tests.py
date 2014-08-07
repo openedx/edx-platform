@@ -54,7 +54,7 @@ class CourseEndingTest(TestCase):
     def test_cert_info(self):
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url)
+        course = Mock(end_of_course_survey_url=survey_url, certificates_show_before_end=False)
 
         self.assertEqual(_cert_info(user, course, None),
                          {'status': 'processing',
@@ -122,6 +122,22 @@ class CourseEndingTest(TestCase):
 
         # Test a course that doesn't have a survey specified
         course2 = Mock(end_of_course_survey_url=None)
+        cert_status = {'status': 'notpassing', 'grade': '67',
+                       'download_url': download_url, 'mode': 'honor'}
+        self.assertEqual(_cert_info(user, course2, cert_status),
+                         {'status': 'notpassing',
+                          'show_disabled_download_button': False,
+                          'show_download_url': False,
+                          'show_survey_button': False,
+                          'grade': '67',
+                          'mode': 'honor'
+                          })
+
+        # test when the status is true, we get the correct results out
+        course2.certificates_show_before_end = True
+        cert_status = {'status': 'unavailable'}
+        self.assertIsNone(_cert_info(user, course2, cert_status))
+
         cert_status = {'status': 'notpassing', 'grade': '67',
                        'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course2, cert_status),

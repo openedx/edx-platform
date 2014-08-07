@@ -285,6 +285,9 @@ def _cert_info(user, course, cert_status):
     if cert_status is None:
         return default_info
 
+    if cert_status['status'] == 'unavailable' and course.certificates_show_before_end:
+        return None
+
     status = template_state.get(cert_status['status'], default_status)
 
     d = {'status': status,
