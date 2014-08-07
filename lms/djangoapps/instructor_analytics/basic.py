@@ -3,7 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-from shoppingcart.models import PaidCourseRegistration, CouponRedemption
+from shoppingcart.models import PaidCourseRegistration, CouponRedemption, Invoice
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
@@ -121,6 +121,12 @@ def course_registration_features(features, registration_codes, csv_type):
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
         course_registration_dict['redeemed_by'] = None
+        if registration_code.invoice:
+            sale_invoice = Invoice.objects.get(id=registration_code.invoice_id)
+            course_registration_dict['invoice_id'] = sale_invoice.id
+            course_registration_dict['purchaser'] = sale_invoice.purchaser_name
+            course_registration_dict['total_price'] = sale_invoice.total_amount
+            course_registration_dict['reference'] = sale_invoice.reference
 
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
