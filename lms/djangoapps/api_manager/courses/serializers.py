@@ -26,7 +26,14 @@ class CourseLeadersSerializer(serializers.Serializer):
     username = serializers.CharField(source='student__username')
     title = serializers.CharField(source='student__profile__title')
     avatar_url = serializers.CharField(source='student__profile__avatar_url')
-    points_scored = serializers.IntegerField()
+    points_scored = serializers.SerializerMethodField('get_points_scored')
+
+    def get_points_scored(self, obj):
+        """
+        formats points_scored to two decimal points
+        """
+        points_scored = obj['points_scored'] or 0
+        return round(points_scored, 2)
 
 
 class CourseCompletionsLeadersSerializer(serializers.Serializer):
