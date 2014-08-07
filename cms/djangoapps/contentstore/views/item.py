@@ -642,7 +642,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
-    visibility_state = _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
+    visibility_state = _compute_visibility_state(xblock, child_info, is_unit_with_changes, course_outline) if not xblock.category == 'course' else None
     published = modulestore().has_item(xblock.location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     xblock_info = {
@@ -716,11 +716,11 @@ class VisibilityState(object):
     staff_only = 'staff_only'
 
 
-def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
+def _compute_visibility_state(xblock, child_info, is_unit_with_changes, course_outline=False):
     """
     Returns the current publish state for the specified xblock and its children
     """
-    if xblock.visible_to_staff_only:
+    if xblock.visible_to_staff_only if not course_outline else xblock.fields['visible_to_staff_only'].is_set_on(xblock):
         return VisibilityState.staff_only
     elif is_unit_with_changes:
         # Note that a unit that has never been published will fall into this category,
