@@ -49,9 +49,11 @@ def get_request_for_user(user):
 
     request = RequestFactory()
     request.user = user
+    request.COOKIES = {}
     request.META = {}
     request.is_secure = lambda: True
     request.get_host = lambda: "edx.org"
+    request.method = 'GET'
     return request
 
 

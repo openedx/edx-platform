@@ -4,8 +4,9 @@ Test cases for tabs.
 from mock import MagicMock, Mock, patch
 
 from courseware.courses import get_course_by_id
-from courseware.views import get_static_tab_contents
+from courseware.views import get_static_tab_contents, static_tab
 
+from django.http import Http404
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
@@ -42,6 +43,11 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+
+    def test_invalid_course_key(self):
+        request = get_request_for_user(UserFactory.create())
+        with self.assertRaises(Http404):
+            static_tab(request, 'edX/toy', 'new_tab')
 
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
     def test_get_static_tab_contents(self):
