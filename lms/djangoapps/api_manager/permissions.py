@@ -93,8 +93,7 @@ class IdsInFilterBackend(filters.BaseFilterBackend):
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
         ids = request.QUERY_PARAMS.get('ids')
         if ids:
-            if ',' in ids:
-                ids = ids.split(",")[:upper_bound]
+            ids = ids.split(",")[:upper_bound]
             return queryset.filter(id__in=ids)
         return queryset
 
