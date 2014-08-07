@@ -31,10 +31,10 @@ def get_course(request, user, course_id, depth=0):
             pass
     if course_descriptor:
         field_data_cache = FieldDataCache([course_descriptor], course_key, user)
-        course_content = module_render.get_module(
+        course_content = module_render.get_module_for_descriptor(
             user,
             request,
-            course_descriptor.location,
+            course_descriptor,
             field_data_cache,
             course_key)
     return course_descriptor, course_key, course_content
@@ -61,10 +61,10 @@ def get_course_child(request, user, course_key, content_id):
             pass
         if content_descriptor:
             field_data_cache = FieldDataCache([content_descriptor], course_key, user)
-            content = module_render.get_module(
+            content = module_render.get_module_for_descriptor(
                 user,
                 request,
-                content_key,
+                content_descriptor,
                 field_data_cache,
                 course_key)
     return content_descriptor, content_key, content
