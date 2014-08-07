@@ -59,7 +59,6 @@ def strip_key(func):
 
         # return the "decorated" value
         return strip_key_field_decorator(retval)
-
     return inner
 
 

@@ -298,14 +298,3 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         # This is a no-op in Split since a draft version of the data always remains
         pass
-
-    def _load_items(self, *args, **kwargs):
-        """
-        Override this internal method to remove version and branch information in the locations, for now.
-        """
-        items = super(DraftVersioningModuleStore, self)._load_items(*args, **kwargs)
-        # TODO - do this as a separate story
-        # for item in items:
-        #     item.location = item.location.version_agnostic().for_branch(None)
-        return items
-
