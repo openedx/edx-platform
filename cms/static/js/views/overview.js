@@ -1,6 +1,6 @@
-define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "js/utils/drag_and_drop",
-    "js/utils/cancel_on_escape", "js/utils/get_date", "js/utils/module"],
-    function (domReady, $, ui, _, gettext, NotificationView, ContentDragger, CancelOnEscape,
+define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification",
+    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module"],
+    function (domReady, $, ui, _, gettext, NotificationView, CancelOnEscape,
               DateUtils, ModuleUtils) {
 
         var modalSelector = '.edit-section-publish-settings';
@@ -31,15 +31,15 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var toggleSubmodules = function(e) {
             e.preventDefault();
-            $(this).toggleClass('expand').toggleClass('collapse');
+            $(this).toggleClass('expand collapse');
             $(this).closest('.is-collapsible, .window').toggleClass('collapsed');
         };
 
 
         var closeModalNew = function (e) {
-             if (e) {
+            if (e) {
                 e.preventDefault();
-            };
+            }
             $('body').removeClass('modal-window-is-shown');
             $('.edit-section-publish-settings').removeClass('is-shown');
         };
@@ -61,7 +61,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
         var saveSetSectionScheduleDate = function (e) {
             e.preventDefault();
 
-            var datetime = DateUtils(
+            var datetime = DateUtils.getDate(
                 $('.edit-section-publish-settings .start-date'),
                 $('.edit-section-publish-settings .start-time')
             );
@@ -230,27 +230,6 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             $('.new-courseware-section-button').bind('click', addNewSection);
             $('.new-subsection-item').bind('click', addNewSubsection);
 
-            // Section
-            ContentDragger.makeDraggable(
-                '.courseware-section',
-                '.section-drag-handle',
-                '.courseware-overview',
-                'article.courseware-overview'
-            );
-            // Subsection
-            ContentDragger.makeDraggable(
-                '.id-holder',
-                '.subsection-drag-handle',
-                '.subsection-list > ol',
-                '.courseware-section'
-            );
-            // Unit
-            ContentDragger.makeDraggable(
-                '.unit',
-                '.unit-drag-handle',
-                'ol.sortable-unit-list',
-                'li.courseware-subsection, article.subsection-body'
-            );
         });
 
         return {

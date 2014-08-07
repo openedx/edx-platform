@@ -102,10 +102,11 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
         """
+        user_id = self.user.id
         def descend(parent, stack):
             xblock_type = stack.pop(0)
             for _ in range(2):
-                child = ItemFactory.create(category=xblock_type, parent_location=parent.location)
+                child = ItemFactory.create(category=xblock_type, parent_location=parent.location, user_id=user_id)
                 if stack:
                     descend(child, stack)
 
@@ -308,7 +309,7 @@ class CourseTestCase(ModuleStoreTestCase):
         # assert is here to make sure that the course being tested actually has verticals (units) to check.
         self.assertGreater(len(items), 0, "Course has no verticals (units) to check")
         for descriptor in items:
-            resp = self.client.get_html(get_url('unit_handler', descriptor.location))
+            resp = self.client.get_html(get_url('container_handler', descriptor.location))
             self.assertEqual(resp.status_code, 200)
 
     def assertAssetsEqual(self, asset_son, course1_id, course2_id):

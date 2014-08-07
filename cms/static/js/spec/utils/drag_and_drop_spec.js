@@ -1,10 +1,32 @@
-define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery"],
-    function (ContentDragger, Notification, create_sinon, $) {
+define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_helpers/create_sinon", "jquery", "underscore"],
+    function (ContentDragger, Notification, create_sinon, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {
                 setFixtures(readFixtures('mock/mock-outline.underscore'));
-                ContentDragger.makeDraggable('.unit', '.unit-drag-handle', 'ol.sortable-unit-list', 'li.courseware-subsection, article.subsection-body');
-                ContentDragger.makeDraggable('.courseware-subsection', '.subsection-drag-handle', '.sortable-subsection-list', 'section');
+                _.each(
+                    $('.unit'),
+                    function (element) {
+                        ContentDragger.makeDraggable(element, {
+                            type: '.unit',
+                            handleClass: '.unit-drag-handle',
+                            droppableClass: 'ol.sortable-unit-list',
+                            parentLocationSelector: 'li.courseware-subsection',
+                            refresh: jasmine.createSpy('Spy on Unit')
+                        });
+                    }
+                );
+                _.each(
+                    $('.courseware-subsection'),
+                    function (element) {
+                        ContentDragger.makeDraggable(element, {
+                            type: '.courseware-subsection',
+                            handleClass: '.subsection-drag-handle',
+                            droppableClass: '.sortable-subsection-list',
+                            parentLocationSelector: 'section',
+                            refresh: jasmine.createSpy('Spy on Subsection')
+                        });
+                    }
+                );
             });
 
             describe("findDestination", function () {
@@ -115,7 +137,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 });
                 it("can drag into a collapsed list", function () {
                     var $ele, destination;
-                    $('#subsection-2').addClass('collapsed');
+                    $('#subsection-2').addClass('is-collapsed');
                     $ele = $('#unit-2');
                     $ele.offset({
                         top: $('#subsection-2').offset().top + 3,
@@ -142,17 +164,17 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     });
                 });
                 it("collapses expanded elements", function () {
-                    expect($('#subsection-1')).not.toHaveClass('collapsed');
+                    expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                     ContentDragger.onDragStart({
                         element: $('#subsection-1')
                     }, null, null);
-                    expect($('#subsection-1')).toHaveClass('collapsed');
+                    expect($('#subsection-1')).toHaveClass('is-collapsed');
                     expect($('#subsection-1')).toHaveClass('expand-on-drop');
                 });
             });
             describe("onDragMove", function () {
                 beforeEach(function () {
-                    this.scrollSpy = spyOn(window, 'scrollBy').andCallThrough();
+                    this.redirectSpy = spyOn(window, 'scrollBy').andCallThrough();
                 });
                 it("adds the correct CSS class to the drop destination", function () {
                     var $ele, dragX, dragY;
@@ -199,7 +221,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, '', {
                         clientY: 2
                     });
-                    expect(this.scrollSpy).toHaveBeenCalledWith(0, -10);
+                    expect(this.redirectSpy).toHaveBeenCalledWith(0, -10);
                 });
                 it("scrolls down if necessary", function () {
                     ContentDragger.onDragMove({
@@ -207,7 +229,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, '', {
                         clientY: window.innerHeight - 5
                     });
-                    expect(this.scrollSpy).toHaveBeenCalledWith(0, 10);
+                    expect(this.redirectSpy).toHaveBeenCalledWith(0, 10);
                 });
             });
             describe("onDragEnd", function () {
@@ -219,7 +241,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 });
                 it("calls handleReorder on a successful drag", function () {
                     ContentDragger.dragState.dropDestination = $('#unit-2');
-                    ContentDragger.dragState.attachMethod = "before";
+                    ContentDragger.dragState.attachMethod = "after";
                     ContentDragger.dragState.parentList = $('#subsection-1');
                     $('#unit-1').offset({
                         top: $('#unit-1').offset().top + 10,
@@ -246,16 +268,16 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     expect(['0px', 'auto']).toContain($('#unit-1').css('left'));
                 });
                 it("expands an element if it was collapsed on drag start", function () {
-                    $('#subsection-1').addClass('collapsed');
+                    $('#subsection-1').addClass('is-collapsed');
                     $('#subsection-1').addClass('expand-on-drop');
                     ContentDragger.onDragEnd({
                         element: $('#subsection-1')
                     }, null, null);
-                    expect($('#subsection-1')).not.toHaveClass('collapsed');
+                    expect($('#subsection-1')).not.toHaveClass('is-collapsed');
                     expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
                 });
                 it("expands a collapsed element when something is dropped in it", function () {
-                    $('#subsection-2').addClass('collapsed');
+                    $('#subsection-2').addClass('is-collapsed');
                     ContentDragger.dragState.dropDestination = $('#list-2');
                     ContentDragger.dragState.attachMethod = "prepend";
                     ContentDragger.dragState.parentList = $('#subsection-2');
@@ -264,7 +286,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     }, null, {
                         clientX: $('#unit-1').offset().left
                     });
-                    expect($('#subsection-2')).not.toHaveClass('collapsed');
+                    expect($('#subsection-2')).not.toHaveClass('is-collapsed');
                 });
             });
             describe("AJAX", function () {
@@ -276,7 +298,7 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                 afterEach(function () {
                     this.clock.restore();
                 });
-                it("should send an update on reorder", function () {
+                it("should send an update on reorder from one parent to another", function () {
                     var requests, savingOptions;
                     requests = create_sinon["requests"](this);
                     ContentDragger.dragState.dropDestination = $('#unit-4');
@@ -306,6 +328,35 @@ define(["js/utils/drag_and_drop", "js/views/feedback_notification", "js/spec_hel
                     expect(this.savingSpies.hide).toHaveBeenCalled();
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
+                    // source
+                    expect($('#subsection-1').data('refresh')).toHaveBeenCalled();
+                    // target
+                    expect($('#subsection-2').data('refresh')).toHaveBeenCalled();
+                });
+                it("should send an update on reorder within the same parent", function () {
+                    var requests = create_sinon["requests"](this);
+                    ContentDragger.dragState.dropDestination = $('#unit-2');
+                    ContentDragger.dragState.attachMethod = "after";
+                    ContentDragger.dragState.parentList = $('#subsection-1');
+                    $('#unit-1').offset({
+                        top: $('#unit-1').offset().top + 10,
+                        left: $('#unit-1').offset().left
+                    });
+                    ContentDragger.onDragEnd({
+                        element: $('#unit-1')
+                    }, null, {
+                        clientX: $('#unit-1').offset().left
+                    });
+                    expect(requests.length).toEqual(1);
+                    expect($('#unit-1')).toHaveClass('was-dropped');
+                    expect(requests[0].requestBody).toEqual(
+                        '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
+                    );
+                    requests[0].respond(200);
+                    this.clock.tick(1001);
+                    expect($('#unit-1')).not.toHaveClass('was-dropped');
+                    // parent
+                    expect($('#subsection-1').data('refresh')).toHaveBeenCalled();
                 });
             });
         });

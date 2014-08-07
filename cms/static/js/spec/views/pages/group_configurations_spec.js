@@ -52,8 +52,8 @@ define([
                 var view = initializePage();
                 expect(view.$('.ui-loading')).toBeVisible();
                 view.render();
-                expect(view.$(itemClassName)).toExist()
-                expect(view.$('.ui-loading')).toBeHidden();
+                expect(view.$(itemClassName)).toExist();
+                expect(view.$('.ui-loading')).toHaveClass('is-hidden');
             });
         });
 

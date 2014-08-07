@@ -15,21 +15,8 @@
     margin-right: flex-gutter();
 
     .add-pages {
-      @extend %ui-well;
+      @extend %no-content;
       margin: ($baseline*1.5) 0;
-      background-color: $gray-l4;
-      padding: ($baseline*2);
-      text-align: center;
-      color: $gray;
-
-      .new-button {
-        @include font-size(14);
-        margin-left: $baseline;
-
-        [class^="icon-"] {
-          margin-right: ($baseline/2);
-        }
-      }
     }
 
     .notice-incontext {

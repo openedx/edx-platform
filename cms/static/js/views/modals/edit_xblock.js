@@ -3,9 +3,9 @@
  * It is invoked using the edit method which is passed an existing rendered xblock,
  * and upon save an optional refresh function can be invoked to update the display.
  */
-define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
+define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/views/utils/view_utils",
     "js/models/xblock_info", "js/views/xblock_editor"],
-    function($, _, gettext, BaseModal, XBlockInfo, XBlockEditorView) {
+    function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
         var EditXBlockModal = BaseModal.extend({
             events : {
                 "click .action-save": "save",
@@ -14,7 +14,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'edit-xblock',
-                addSaveButton: true
+                addSaveButton: true,
+                viewSpecificClasses: 'modal-editor confirm'
             }),
 
             initialize: function() {
@@ -147,10 +148,19 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             save: function(event) {
+                var self = this,
+                    editorView = this.editorView,
+                    xblockInfo = this.xblockInfo,
+                    data = editorView.getXModuleData();
                 event.preventDefault();
-                this.editorView.save({
-                    success: _.bind(this.onSave, this)
-                });
+                if (data) {
+                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+                        function() {
+                            return xblockInfo.save(data);
+                        }).done(function() {
+                            self.onSave();
+                        });
+                }
             },
 
             onSave: function() {
@@ -177,7 +187,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 if (xblockWrapperElement.length > 0) {
                     xblockElement = xblockWrapperElement.find('.xblock');
                     displayName = xblockWrapperElement.find('.xblock-header .header-details .xblock-display-name').text().trim();
-                    // If not found, try looking for the old unit page style rendering
+                    // If not found, try looking for the old unit page style rendering.
+                    // Only used now by static pages.
                     if (!displayName) {
                         displayName = this.xblockElement.find('.component-header').text().trim();
                     }

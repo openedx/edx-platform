@@ -1,7 +1,10 @@
 """
 Utility methods useful for Studio page tests.
 """
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from bok_choy.promise import EmptyPromise
+
 from ...tests.helpers import disable_animations
 
 
@@ -24,13 +27,13 @@ def click_css(page, css, source_index=0, require_notification=True):
     # Click on the element in the browser
     page.q(css=css).filter(lambda el: _is_visible(el)).nth(source_index).click()
 
+    if require_notification:
+        wait_for_notification(page)
+
     # Some buttons trigger ajax posts
     # (e.g. .add-missing-groups-button as configured in split_test_author_view.js)
     # so after you click anything wait for the ajax call to finish
     page.wait_for_ajax()
-
-    if require_notification:
-        wait_for_notification(page)
 
 
 def wait_for_notification(page):
@@ -59,7 +62,7 @@ def press_the_notification_button(page, name):
     page.wait_for_ajax()
 
 
-def add_discussion(page, menu_index):
+def add_discussion(page, menu_index=0):
     """
     Add a new instance of the discussion category.
 
@@ -122,3 +125,24 @@ def confirm_prompt(page, cancel=False):
     confirmation_button_css = '.prompt .action-' + ('secondary' if cancel else 'primary')
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     click_css(page, confirmation_button_css, require_notification=(not cancel))
+
+
+def set_input_value(page, css, value):
+    """
+    Sets the text field with the given label (display name) to the specified value.
+    """
+    input_element = page.q(css=css).results[0]
+    # Click in the input to give it the focus
+    input_element.click()
+    # Select all, then input the value
+    input_element.send_keys(Keys.CONTROL + 'a')
+    input_element.send_keys(value)
+    # Return the input_element for chaining
+    return input_element
+
+
+def set_input_value_and_save(page, css, value):
+    """
+    Sets the text field with given label (display name) to the specified value, and presses Save.
+    """
+    set_input_value(page, css, value).send_keys(Keys.ENTER)

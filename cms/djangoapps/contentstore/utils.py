@@ -150,23 +150,11 @@ def course_image_url(course):
     return path
 
 
-def compute_publish_state(xblock):
+# pylint: disable=invalid-name
+def is_currently_visible_to_students(xblock):
     """
-    Returns whether this xblock is draft, public, or private.
-
-    Returns:
-        PublishState.draft - content is in the process of being edited, but still has a previous
-            version deployed to LMS
-        PublishState.public - content is locked and deployed to LMS
-        PublishState.private - content is editable and not deployed to LMS
-    """
-
-    return modulestore().compute_publish_state(xblock)
-
-
-def is_xblock_visible_to_students(xblock):
-    """
-    Returns true if there is a published version of the xblock that has been released.
+    Returns true if there is a published version of the xblock that is currently visible to students.
+    This means that it has a release date in the past, and the xblock has not been set to staff only.
     """
 
     try:
@@ -185,6 +173,28 @@ def is_xblock_visible_to_students(xblock):
 
     # No start date, so it's always visible
     return True
+
+
+def find_release_date_source(xblock):
+    """
+    Finds the ancestor of xblock that set its release date.
+    """
+
+    # Stop searching at the section level
+    if xblock.category == 'chapter':
+        return xblock
+
+    parent_location = modulestore().get_parent_location(xblock.location,
+                                                        revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+    # Orphaned xblocks set their own release date
+    if not parent_location:
+        return xblock
+
+    parent = modulestore().get_item(parent_location)
+    if parent.start != xblock.start:
+        return xblock
+    else:
+        return find_release_date_source(parent)
 
 
 def add_extra_panel_tab(tab_type, course):

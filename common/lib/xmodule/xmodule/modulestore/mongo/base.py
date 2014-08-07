@@ -297,6 +297,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                         value[key] = self._convert_reference_to_key(subvalue)
         return jsonfields
 
+    def lookup_item(self, location):
+        """
+        Returns the JSON payload of the xblock at location.
+        """
+
+        try:
+            json = self.module_data[location]
+        except KeyError:
+            json = self.modulestore._find_one(location)
+            self.module_data[location] = json
+
+        return json
+
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
 def location_to_query(location, wildcard=True, tag='i4x'):

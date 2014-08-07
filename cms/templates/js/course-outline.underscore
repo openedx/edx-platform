@@ -1,0 +1,167 @@
+<%
+var category = xblockInfo.get('category');
+var releasedToStudents = xblockInfo.get('released_to_students');
+var visibilityState = xblockInfo.get('visibility_state');
+var published = xblockInfo.get('published');
+
+var statusMessage = null;
+var statusType = null;
+if (visibilityState === 'staff_only') {
+    statusType = 'staff-only';
+    statusMessage = gettext('Contains staff only content');
+} else if (visibilityState === 'needs_attention') {
+    if (category === 'vertical') {
+        statusType = 'warning';
+        if (published && releasedToStudents) {
+            statusMessage = gettext('Unpublished changes to live content');
+        } else if (!published) {
+            statusMessage = gettext('Unpublished units will not be released');
+        } else {
+            statusMessage = gettext('Unpublished changes to content that will release in the future');
+        }
+    }
+}
+
+var statusIconClass = '';
+if (statusType === 'warning') {
+    statusIconClass = 'icon-file-alt';
+} else if (statusType === 'error') {
+    statusIconClass = 'icon-warning-sign';
+} else if (statusType === 'staff-only') {
+    statusIconClass = 'icon-lock';
+}
+
+var gradingType = gettext('Not Graded');
+if (xblockInfo.get('graded')) {
+    gradingType = xblockInfo.get('format')
+}
+%>
+<% if (parentInfo) { %>
+<li class="outline-item outline-<%= xblockType %> <%= visibilityClass %> is-draggable <%= includesChildren ? 'is-collapsible' : '' %> <%= isCollapsed ? 'is-collapsed' : '' %>"
+    data-parent="<%= parentInfo.get('id') %>" data-locator="<%= xblockInfo.get('id') %>">
+
+    <span class="draggable-drop-indicator draggable-drop-indicator-before"><i class="icon-caret-right"></i></span>
+
+    <div class="<%= xblockType %>-header">
+        <% if (includesChildren) { %>
+            <h3 class="<%= xblockType %>-header-details expand-collapse <%= isCollapsed ? 'expand' : 'collapse' %> ui-toggle-expansion"
+                title="<%= interpolate(gettext('Collapse/Expand this %(xblock_type)s'), { xblock_type: xblockTypeDisplayName }, true) %>">
+                <i class="icon-caret-down icon"></i>
+        <% } else { %>
+            <h3 class="<%= xblockType %>-header-details">
+        <% } %>
+                <% if (xblockInfo.isVertical()) { %>
+                    <span class="unit-title item-title">
+                        <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                    </span>
+                <% } else { %>
+                    <span class="wrapper-<%= xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%= gettext("Display Name") %>">
+                        <span class="<%= xblockType %>-title item-title xblock-field-value incontext-editor-value"><%= xblockInfo.get('display_name') %></span>
+                    </span>
+                <% } %>
+            </h3>
+
+        <div class="<%= xblockType %>-header-actions">
+            <ul class="actions-list">
+                <% if (xblockInfo.isEditableOnCourseOutline()) { %>
+                    <li class="action-item action-configure">
+                        <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
+                            <i class="icon-gear"></i>
+                            <span class="sr action-button-text"><%= gettext('Configure') %></span>
+                        </a>
+                    </li>
+                <% } %>
+                <li class="action-item action-delete">
+                    <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
+                        <i class="icon icon-trash"></i>
+                        <span class="sr action-button-text"><%= gettext('Delete') %></span>
+                    </a>
+                </li>
+                <li class="action-item action-drag">
+                    <span data-tooltip="<%= gettext('Drag to reorder') %>"
+                          class="drag-handle <%= xblockType %>-drag-handle action">
+                        <span class="sr"><%= gettext('Drag to reorder') %></span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="<%= xblockType %>-status">
+        <% if (!xblockInfo.isVertical()) { %>
+            <div class="status-release">
+                <p>
+                    <span class="sr status-release-label"><%= gettext('Release Status:') %></span>
+                    <span class="status-release-value">
+                        <% if (xblockInfo.get('released_to_students')) { %>
+                            <i class="icon icon-check-sign"></i>
+                            <%= gettext('Released:') %>
+                        <% } else if (xblockInfo.get('release_date')) { %>
+                            <i class="icon icon-time"></i>
+                            <%= gettext('Scheduled:') %>
+                        <% } else { %>
+                            <i class="icon icon-time"></i>
+                            <%= gettext('Unscheduled') %>
+                        <% } %>
+                        <% if (xblockInfo.get('release_date')) { %>
+                            <%= xblockInfo.get('release_date') %>
+                        <% } %>
+                    </span>
+                </p>
+            </div>
+            <% if (xblockInfo.get('due_date') || xblockInfo.get('graded')) { %>
+                <div class="status-grading">
+                    <p>
+                        <span class="sr status-grading-label"> <%= gettext('Graded as:') %> </span>
+                        <i class="icon icon-ok"></i>
+                        <span class="status-grading-value"> <%= gradingType %> </span>
+                        <% if (xblockInfo.get('due_date')) { %>
+                            <span class="status-grading-date"> <%= gettext('Due:') %> <%= xblockInfo.get('due_date') %> </span>
+                        <% } %>
+                    </p>
+                </div>
+            <% } %>
+        <% } %>
+
+        <% if (statusMessage) { %>
+        <div class="status-message">
+            <i class="icon <%= statusIconClass %>"></i>
+            <p class="status-message-copy"><%- statusMessage %></p>
+        </div>
+        <% } %>
+    </div>
+<% } %>
+
+    <% if (!parentInfo && xblockInfo.get('child_info') && xblockInfo.get('child_info').children.length === 0) { %>
+        <div class="no-content add-section">
+            <p><%= gettext("You haven't added any content to this course yet.") %>
+                <a href="#" class="button button-new" data-category="<%= childCategory %>"
+                   data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                   title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
+                    <i class="icon-plus"></i><%= addChildLabel %>
+                </a>
+            </p>
+        </div>
+    <% } else if (category !== 'vertical') { %>
+        <div class="outline-content <%= xblockType %>-content">
+            <ol class="<%= typeListClass %> is-sortable">
+                <li class="ui-splint ui-splint-indicator">
+                    <span class="draggable-drop-indicator draggable-drop-indicator-initial"><i class="icon-caret-right"></i></span>
+                </li>
+            </ol>
+
+            <% if (childType) { %>
+                <div class="add-<%= childType %> add-item">
+                    <a href="#" class="button button-new" data-category="<%= childCategory %>"
+                       data-parent="<%= xblockInfo.get('id') %>" data-default-name="<%= defaultNewChildName %>"
+                       title="<%= interpolate(gettext('Click to add a new %(xblock_type)s'), { xblock_type: defaultNewChildName }, true) %>" >
+                        <i class="icon icon-plus"></i><%= addChildLabel %>
+                    </a>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
+<% if (parentInfo) { %>
+    <span class="draggable-drop-indicator draggable-drop-indicator-after"><i class="icon-caret-right"></i></span>
+</li>
+<% } %>

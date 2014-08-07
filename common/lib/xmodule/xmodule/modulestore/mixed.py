@@ -469,19 +469,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Create a copy of the source and mark its revision as draft.
         Note: This method is to support the Mongo Modulestore and may be deprecated.
 
-        :param source: the location of the source (its revision must be None)
+        :param location: the location of the source (its revision must be None)
         """
         store = self._verify_modulestore_support(location.course_key, 'convert_to_draft')
         return store.convert_to_draft(location, user_id)
 
-    def has_changes(self, usage_key):
+    def has_changes(self, xblock):
         """
         Checks if the given block has unpublished changes
-        :param usage_key: the block to check
+        :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
-        store = self._verify_modulestore_support(usage_key.course_key, 'has_changes')
-        return store.has_changes(usage_key)
+        store = self._verify_modulestore_support(xblock.location.course_key, 'has_changes')
+        return store.has_changes(xblock)
 
     def _verify_modulestore_support(self, course_key, method):
         """

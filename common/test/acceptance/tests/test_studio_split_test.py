@@ -13,14 +13,14 @@ from bok_choy.promise import Promise, EmptyPromise
 
 from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.overview import CourseOutlinePage
+from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
+from ..pages.studio.container import ContainerPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ..pages.studio.utils import add_advanced_component
-from ..pages.studio.unit import UnitPage
 from ..pages.xblock.utils import wait_for_xblock_initialization
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from .base_studio_test import StudioCourseTest
 
 from test_studio_container import ContainerBase
 
@@ -45,7 +45,7 @@ class SplitTestMixin(object):
         def check_xblock_names(expected_groups, actual_blocks):
             self.assertEqual(len(expected_groups), len(actual_blocks))
             for idx, expected in enumerate(expected_groups):
-                self.assertEqual('Expand or Collapse\n{}'.format(expected), actual_blocks[idx].name)
+                self.assertEqual(expected, actual_blocks[idx].name)
 
         check_xblock_names(active_groups, container.active_xblocks)
         check_xblock_names(inactive_groups, container.inactive_xblocks)
@@ -57,7 +57,7 @@ class SplitTestMixin(object):
 
     def verify_add_missing_groups_button_not_present(self, container):
         """
-        Checks that the "add missing gorups" button/link is not present.
+        Checks that the "add missing groups" button/link is not present.
         """
         def missing_groups_button_not_present():
             button_present = container.missing_groups_button_present()
@@ -86,7 +86,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
         })
 
     def populate_course_fixture(self, course_fixture):
-        """ Populates the course """
         course_fixture.add_advanced_settings(
             {u"advanced_modules": {"value": ["split_test"]}}
         )
@@ -99,15 +98,25 @@ class SplitTest(ContainerBase, SplitTestMixin):
             )
         )
 
+    def verify_add_missing_groups_button_not_present(self, container):
+        """
+        Checks that the "add missing groups" button/link is not present.
+        """
+        def missing_groups_button_not_present():
+            button_present = container.missing_groups_button_present()
+            return (not button_present, not button_present)
+
+        Promise(missing_groups_button_not_present, "Add missing groups button should not be showing.").fulfill()
+
     def create_poorly_configured_split_instance(self):
         """
         Creates a split test instance with a missing group and an inactive group.
 
         Returns the container page.
         """
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
@@ -119,16 +128,16 @@ class SplitTest(ContainerBase, SplitTestMixin):
                 ],
             },
         })
-        return self.go_to_container_page()
+        return self.go_to_nested_container_page()
 
     def test_create_and_select_group_configuration(self):
         """
         Tests creating a split test instance on the unit page, and then
         assigning the group configuration.
         """
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration alpha,beta')
@@ -136,14 +145,14 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
         # Switch to the other group configuration. Must navigate again to the container page so
         # that there is only a single "editor" on the page.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration 0,1,2')
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
 
         # Reload the page to make sure the groups were persisted.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
 
     @skip("This fails periodically where it fails to trigger the add missing groups action.Dis")
@@ -161,7 +170,7 @@ class SplitTest(ContainerBase, SplitTestMixin):
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
         # Reload the page to make sure the groups were persisted.
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
     @skip("Disabling as this fails intermittently. STUD-2003")
@@ -440,9 +449,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        unit = self.go_to_unit_page(make_draft=True)
+        unit = self.go_to_unit_page()
         add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'New Group Configuration Name')
@@ -459,7 +468,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        container = self.go_to_container_page()
+        container = self.go_to_nested_container_page()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         self.assertEqual(
@@ -644,7 +653,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             vertical.locator,
             XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
         )
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = CourseOutlineUnit(self.browser, vertical.locator)
 
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
@@ -653,7 +662,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         usage = config.usages[0]
         config.click_unit_anchor()
 
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = ContainerPage(self.browser, vertical.locator)
         # Waiting for the page load and verify that we've landed on the unit page
         EmptyPromise(
             lambda: unit.is_browser_on_page(), "loaded page {!r}".format(unit),
@@ -758,9 +767,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 1})
         )
 
-        unit = UnitPage(self.browser, vertical.locator)
+        unit = ContainerPage(self.browser, vertical.locator)
         unit.visit()
-        experiment = unit.components[0]
+        experiment = unit.xblocks[0]
 
         group_configuration_link_name = experiment.group_configuration_link_name
 

@@ -80,7 +80,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         raise NotImplementedError
 
     @abstractmethod
-    def has_changes(self, usage_key):
+    def has_changes(self, xblock):
         raise NotImplementedError
 
     @abstractmethod

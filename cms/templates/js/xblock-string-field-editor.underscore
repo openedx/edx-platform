@@ -1,0 +1,16 @@
+<div class="incontext-editor-action-wrapper">
+    <a href="" class="action-edit action-inline xblock-field-value-edit incontext-editor-open-action" title="<%= gettext('Edit the name') %>">
+        <i class="icon-pencil"></i><span class="sr"> <%= gettext("Edit") %></span>
+    </a>
+</div>
+
+<div class="xblock-string-field-editor incontext-editor-form">
+  <form>
+    <% var formLabel = gettext("Edit %(display_name)s (required)"); %>
+    <label><span class="sr"><%= interpolate(formLabel, {display_name: fieldDisplayName}, true) %></span>
+      <input type="text" value="<%= value %>" class="xblock-field-input incontext-editor-input" data-metadata-name="<%= fieldName %>" title="<%= gettext('Edit the name') %>">
+    </label>
+    <button class="sr action action-primary" name="submit" type="submit"><%= gettext("Save") %></button>
+    <button class="sr action action-secondary" name="cancel" type="button"><%= gettext("Cancel") %></button>
+  </form>
+</div>

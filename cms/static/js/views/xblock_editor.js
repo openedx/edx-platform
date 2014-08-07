@@ -2,9 +2,9 @@
  * XBlockEditorView displays the authoring view of an xblock, and allows the user to switch between
  * the available modes.
  */
-define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/xblock",
-        "js/views/metadata", "js/collections/metadata", "jquery.inputnumber"],
-    function ($, _, gettext, NotificationView, XBlockView, MetadataView, MetadataCollection) {
+define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata", "js/collections/metadata",
+        "jquery.inputnumber"],
+    function ($, _, gettext, XBlockView, MetadataView, MetadataCollection) {
 
         var XBlockEditorView = XBlockView.extend({
             // takes XBlockInfo as a model
@@ -86,26 +86,6 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
 
             getMetadataEditor: function() {
                 return this.metadataEditor;
-            },
-
-            save: function(options) {
-                var xblockInfo = this.model,
-                    data,
-                    saving;
-                data = this.getXModuleData();
-                if (data) {
-                    saving = new NotificationView.Mini({
-                        title: gettext('Saving&hellip;')
-                    });
-                    saving.show();
-                    return xblockInfo.save(data).done(function() {
-                        var success = options.success;
-                        saving.hide();
-                        if (success) {
-                            success();
-                        }
-                    });
-                }
             },
 
             /**

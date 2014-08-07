@@ -6,6 +6,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
             validDropClass: "valid-drop",
             expandOnDropClass: "expand-on-drop",
+            collapsedClass: "is-collapsed",
 
             /*
              * Determine information about where to drop the currently dragged
@@ -14,7 +15,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
              */
             findDestination: function (ele, yChange) {
                 var eleY = ele.offset().top;
-                var eleYEnd = eleY + ele.height();
+                var eleYEnd = eleY + ele.outerHeight();
                 var containers = $(ele.data('droppable-class'));
 
                 for (var i = 0; i < containers.length; i++) {
@@ -28,7 +29,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // element is on top of its parent list -- don't check the
                     // position of the container
                     var parentList = container.parents(ele.data('parent-location-selector')).first();
-                    if (parentList.hasClass('collapsed')) {
+                    if (parentList.hasClass(this.collapsedClass)) {
                         var parentListTop =  parentList.offset().top;
                         // To make it easier to drop subsections into collapsed sections (which have
                         // a lot of visual padding around them), allow a fudge factor around the
@@ -36,7 +37,7 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                         var collapseFudge = 10;
                         if (Math.abs(eleY - parentListTop) < collapseFudge ||
                             (eleY > parentListTop &&
-                             eleYEnd - collapseFudge <= parentListTop + parentList.height())
+                             eleYEnd - collapseFudge <= parentListTop + parentList.outerHeight())
                             ) {
                             return {
                                 ele: container,
@@ -65,12 +66,12 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                             for (var j = 0; j < siblings.length; j++) {
                                 var $sibling = $(siblings[j]);
                                 var siblingY = $sibling.offset().top;
-                                var siblingHeight = $sibling.height();
+                                var siblingHeight = $sibling.outerHeight();
                                 var siblingYEnd = siblingY + siblingHeight;
 
                                 // Facilitate dropping into the beginning or end of a list
                                 // (coming from opposite direction) via a "fudge factor". Math.min is for Jasmine test.
-                                var fudge = Math.min(Math.ceil(siblingHeight / 2), 20);
+                                var fudge = Math.min(Math.ceil(siblingHeight / 2), 35);
 
                                 // Dragging to top or bottom of a list with only one element is tricky
                                 // because the element being dragged may be the same size as the sibling.
@@ -158,12 +159,16 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     // The direction the drag is moving in (negative means up, positive down).
                     dragDirection: 0
                 };
-                if (!ele.hasClass('collapsed')) {
-                    ele.addClass('collapsed');
+                if (!ele.hasClass(this.collapsedClass)) {
+                    ele.addClass(this.collapsedClass);
                     ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
+
+                // We should remove this class name before start dragging to
+                // avoid performance issues.
+                ele.removeClass('was-dragging');
             },
 
             onDragMove: function (draggie, event, pointer) {
@@ -251,44 +256,57 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             pointerInBounds: function (pointer, ele) {
-                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.width();
+                return pointer.clientX >= ele.offset().left && pointer.clientX < ele.offset().left + ele.outerWidth();
             },
 
             expandElement: function (ele) {
-                ele.removeClass('collapsed');
+                ele.removeClass(this.collapsedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
 
             /*
              * Find all parent-child changes and save them.
              */
-            handleReorder: function (ele) {
-                var parentSelector = ele.data('parent-location-selector');
-                var childrenSelector = ele.data('child-selector');
-                var newParentEle = ele.parents(parentSelector).first();
-                var newParentLocator = newParentEle.data('locator');
-                var oldParentLocator = ele.data('parent');
+            handleReorder: function (element) {
+                var parentSelector = element.data('parent-location-selector'),
+                    childrenSelector = element.data('child-selector'),
+                    newParentEle = element.parents(parentSelector).first(),
+                    newParentLocator = newParentEle.data('locator'),
+                    oldParentLocator = element.data('parent'),
+                    oldParentEle, saving, refreshParent;
+
+                refreshParent = function (element) {
+                    var refresh = element.data('refresh');
+                    // If drop was into a collapsed parent, the parent will have been
+                    // expanded. Views using this class may need to track the
+                    // collapse/expand state, so send it with the refresh callback.
+                    var collapsed = element.hasClass(this.collapsedClass);
+                    if (_.isFunction(refresh)) { refresh(collapsed); }
+
+                };
                 // If the parent has changed, update the children of the old parent.
                 if (newParentLocator !== oldParentLocator) {
                     // Find the old parent element.
-                    var oldParentEle = $(parentSelector).filter(function () {
+                    oldParentEle = $(parentSelector).filter(function () {
                         return $(this).data('locator') === oldParentLocator;
                     });
                     this.saveItem(oldParentEle, childrenSelector, function () {
-                        ele.data('parent', newParentLocator);
+                        element.data('parent', newParentLocator);
+                        refreshParent(oldParentEle);
                     });
                 }
-                var saving = new NotificationView.Mini({
+                saving = new NotificationView.Mini({
                     title: gettext('Saving&hellip;')
                 });
                 saving.show();
-                ele.addClass('was-dropped');
+                element.addClass('was-dropped');
                 // Timeout interval has to match what is in the CSS.
                 setTimeout(function () {
-                    ele.removeClass('was-dropped');
+                    element.removeClass('was-dropped');
                 }, 1000);
                 this.saveItem(newParentEle, childrenSelector, function () {
                     saving.hide();
+                    refreshParent(newParentEle);
                 });
             },
 
@@ -318,27 +336,43 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             /*
-             * Make `type` draggable using `handleClass`, able to be dropped
-             * into `droppableClass`, and with parent type
-             * `parentLocationSelector`.
+             * Make DOM element with class `type` draggable using `handleClass`, able to be dropped
+             * into `droppableClass`, and with parent type `parentLocationSelector`.
+             * @param {DOM element, jQuery element} element
+             * @param {Object} options The list of options. Possible options:
+             *   `type` - class name of the element.
+             *   `handleClass` - specifies on what element the drag interaction starts.
+             *   `droppableClass` - specifies on what elements draggable element can be dropped.
+             *   `parentLocationSelector` - class name of a parent element with data-locator.
+             *   `refresh` - method that will be called after dragging to refresh
+             *      views of the target and source xblocks.
              */
-            makeDraggable: function (type, handleClass, droppableClass, parentLocationSelector) {
-                _.each(
-                    $(type),
-                    function (ele) {
-                        // Remember data necessary to reconstruct the parent-child relationships
-                        $(ele).data('droppable-class', droppableClass);
-                        $(ele).data('parent-location-selector', parentLocationSelector);
-                        $(ele).data('child-selector', type);
-                        var draggable = new Draggabilly(ele, {
-                            handle: handleClass,
-                            containment: '.wrapper-dnd'
-                        });
-                        draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
-                        draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
-                        draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
-                    }
-                );
+            makeDraggable: function (element, options) {
+                var draggable;
+                options = _.defaults({
+                    type: null,
+                    handleClass: null,
+                    droppableClass: null,
+                    parentLocationSelector: null,
+                    refresh: null
+                }, options);
+
+                if ($(element).data('droppable-class') !== options.droppableClass) {
+                    $(element).data({
+                      'droppable-class': options.droppableClass,
+                      'parent-location-selector': options.parentLocationSelector,
+                      'child-selector': options.type,
+                      'refresh': options.refresh
+                    });
+
+                    draggable = new Draggabilly(element, {
+                        handle: options.handleClass,
+                        containment: '.wrapper-dnd'
+                    });
+                    draggable.on('dragStart', _.bind(contentDragger.onDragStart, contentDragger));
+                    draggable.on('dragMove', _.bind(contentDragger.onDragMove, contentDragger));
+                    draggable.on('dragEnd', _.bind(contentDragger.onDragEnd, contentDragger));
+                }
             }
         };
 

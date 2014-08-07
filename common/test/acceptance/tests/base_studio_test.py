@@ -1,6 +1,7 @@
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..fixtures.course import CourseFixture
-from acceptance.tests.helpers import UniqueCourseTest
+from .helpers import UniqueCourseTest
+
 
 
 class StudioCourseTest(UniqueCourseTest):
@@ -13,7 +14,6 @@ class StudioCourseTest(UniqueCourseTest):
         Install a course with no content using a fixture.
         """
         super(StudioCourseTest, self).setUp()
-
         self.course_fixture = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],

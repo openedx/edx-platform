@@ -1,18 +1,22 @@
-import logging
+"""
+Helper methods for Studio views.
+"""
 
+from __future__ import absolute_import
+
+import urllib
+
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
 from edxmako.shortcuts import render_to_string, render_to_response
+from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url, reverse_usage_url
 
 __all__ = ['edge', 'event', 'landing']
 
-EDITING_TEMPLATES = [
-    "basic-modal", "modal-button", "edit-xblock-modal", "editor-mode-button", "upload-dialog", "image-modal",
-    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
-    "add-xblock-component-menu-problem"
-]
 
 # points to the temporary course landing page with log in and sign up
 def landing(request, org, course, coursename):
@@ -51,58 +55,99 @@ def get_parent_xblock(xblock):
     return modulestore().get_item(parent_location)
 
 
-def is_unit(xblock):
+def is_unit(xblock, parent_xblock=None):
     """
     Returns true if the specified xblock is a vertical that is treated as a unit.
     A unit is a vertical that is a direct child of a sequential (aka a subsection).
     """
     if xblock.category == 'vertical':
-        parent_xblock = get_parent_xblock(xblock)
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
         parent_category = parent_xblock.category if parent_xblock else None
         return parent_category == 'sequential'
     return False
 
 
-def xblock_has_own_studio_page(xblock):
+def xblock_has_own_studio_page(xblock, parent_xblock=None):
     """
     Returns true if the specified xblock has an associated Studio page. Most xblocks do
     not have their own page but are instead shown on the page of their parent. There
     are a few exceptions:
       1. Courses
       2. Verticals that are either:
-        - themselves treated as units (in which case they are shown on a unit page)
-        - a direct child of a unit (in which case they are shown on a container page)
-      3. XBlocks with children, except for:
-        - sequentials (aka subsections)
-        - chapters (aka sections)
+        - themselves treated as units
+        - a direct child of a unit
+      3. XBlocks that support children
     """
     category = xblock.category
 
-    if is_unit(xblock):
+    if is_unit(xblock, parent_xblock):
         return True
     elif category == 'vertical':
-        parent_xblock = get_parent_xblock(xblock)
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
         return is_unit(parent_xblock) if parent_xblock else False
-    elif category in ('sequential', 'chapter'):
-        return False
 
     # All other xblocks with children have their own page
     return xblock.has_children
 
 
-def xblock_studio_url(xblock):
+def xblock_studio_url(xblock, parent_xblock=None):
     """
     Returns the Studio editing URL for the specified xblock.
     """
-    if not xblock_has_own_studio_page(xblock):
+    if not xblock_has_own_studio_page(xblock, parent_xblock):
         return None
     category = xblock.category
-    parent_xblock = get_parent_xblock(xblock)
-    parent_category = parent_xblock.category if parent_xblock else None
     if category == 'course':
         return reverse_course_url('course_handler', xblock.location.course_key)
-    elif category == 'vertical' and parent_category == 'sequential':
-        # only show the unit page for verticals directly beneath a subsection
-        return reverse_usage_url('unit_handler', xblock.location)
+    elif category in ('chapter', 'sequential'):
+        return u'{url}?show={usage_key}'.format(
+            url=reverse_course_url('course_handler', xblock.location.course_key),
+            usage_key=urllib.quote(unicode(xblock.location))
+        )
     else:
         return reverse_usage_url('container_handler', xblock.location)
+
+
+def xblock_type_display_name(xblock, default_display_name=None):
+    """
+    Returns the display name for the specified type of xblock. Note that an instance can be passed in
+    for context dependent names, e.g. a vertical beneath a sequential is a Unit.
+
+    :param xblock: An xblock instance or the type of xblock.
+    :param default_display_name: The default value to return if no display name can be found.
+    :return:
+    """
+
+    if hasattr(xblock, 'category'):
+        category = xblock.category
+        if category == 'vertical' and not is_unit(xblock):
+            return _('Vertical')
+    else:
+        category = xblock
+    if category == 'chapter':
+        return _('Section')
+    elif category == 'sequential':
+        return _('Subsection')
+    elif category == 'vertical':
+        return _('Unit')
+    component_class = XBlock.load_class(category, select=settings.XBLOCK_SELECT_FUNCTION)
+    if hasattr(component_class, 'display_name') and component_class.display_name.default:
+        return _(component_class.display_name.default)
+    else:
+        return default_display_name
+
+
+def xblock_primary_child_category(xblock):
+    """
+    Returns the primary child category for the specified xblock, or None if there is not a primary category.
+    """
+    category = xblock.category
+    if category == 'course':
+        return 'chapter'
+    elif category == 'chapter':
+        return 'sequential'
+    elif category == 'sequential':
+        return 'vertical'
+    return None

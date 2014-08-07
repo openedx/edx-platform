@@ -49,7 +49,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
                     'vertical', 'Vert1',
                     split=False
                 )
-                self._create_item('html', 'Html2', "<p>Hellow</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)
+                self._create_item('html', 'Html2', "<p>Hello</p>", {'display_name': 'Hollow Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion2',
                     "discussion discussion_category=\"Lecture 2\" discussion_id=\"b08bfd89b2aa40fa81f2c650a9332846\" discussion_target=\"Lecture 2\"/>\n",

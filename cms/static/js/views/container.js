@@ -20,6 +20,12 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                 reorderableContainer.sortable({
                     handle: '.drag-handle',
 
+                    start: function (event, ui) {
+                        // Necessary because of an open bug in JQuery sortable.
+                        // http://bugs.jqueryui.com/ticket/4990
+                        reorderableContainer.sortable('refreshPositions');
+                    },
+
                     stop: function (event, ui) {
                         var saving, hideSaving, removeFromParent;
 
@@ -82,7 +88,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
             },
 
             updateChildren: function (targetParent, successCallback) {
-                var children, childLocators;
+                var children, childLocators, xblockInfo=this.model;
 
                 // Find descendants with class "studio-xblock-wrapper" whose parent === targetParent.
                 // This is necessary to filter our grandchildren, great-grandchildren, etc.
@@ -110,6 +116,8 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         if (successCallback) {
                             successCallback();
                         }
+                        // Update publish and last modified information from the server.
+                        xblockInfo.fetch();
                     }
                 });
             },
