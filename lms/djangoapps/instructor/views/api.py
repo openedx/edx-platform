@@ -38,7 +38,7 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption
+from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -636,7 +636,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, group_name):
+def save_registration_codes(request, course_id, generated_codes_list, company_name, invoice):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -646,17 +646,17 @@ def save_registration_codes(request, course_id, generated_codes_list, group_name
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
 
     course_registration = CourseRegistrationCode(
         code=code, course_id=course_id.to_deprecated_string(),
-        transaction_group_name=group_name, created_by=request.user
+        transaction_group_name=company_name, created_by=request.user, invoice=invoice
     )
     try:
         course_registration.save()
         generated_codes_list.append(course_registration)
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -719,14 +719,25 @@ def generate_registration_codes(request, course_id):
 
     # covert the course registration code number into integer
     try:
-        course_code_number = int(request.POST['course_registration_code_number'])
+        course_code_number = int(request.POST['total-registration-codes'])
     except ValueError:
-        course_code_number = int(float(request.POST['course_registration_code_number']))
+        course_code_number = int(float(request.POST['total-registration-codes']))
 
-    group_name = request.POST['transaction_group_name']
+    company_name = request.POST['company_name']
 
+    sale_price = request.POST['sale_price']
+    purchaser_contact = request.POST['purchaser_contact']
+    purchaser_name = request.POST['purchaser_name']
+    purchaser_email = request.POST['purchaser_email']
+    company_tax_id = request.POST['tax']
+    reference = request.POST['reference']
+    
+    sale_invoice = Invoice.objects.create(
+        total_amount=sale_price, purchaser_name=purchaser_name, purchaser_contact=purchaser_contact,
+        purchaser_email=purchaser_email, tax_id=company_tax_id, reference=reference
+    )
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, group_name)
+        save_registration_codes(request, course_id, course_registration_codes, company_name, sale_invoice)
 
     return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
 

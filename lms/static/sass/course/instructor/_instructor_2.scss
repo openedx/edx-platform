@@ -957,7 +957,7 @@ input[name="subject"] {
   }
 
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal{
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
       background: #fff;
     }
@@ -970,6 +970,10 @@ input[name="subject"] {
       @extend .button-reset;
     }
     input[type="submit"]#add_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    input[name="generate-registration-codes-csv"]{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -1014,6 +1018,33 @@ input[name="subject"] {
         margin-bottom: 0px !important;
       }
     }
+    form#generate_codes ol.list-input{
+      li{
+        width: 278px;
+        float: left;
+        label.required:after {
+          content: "*";
+          margin-left: 5px;
+        }
+      }
+      li:nth-child(even) {
+        margin-left: 30px !important;
+      }
+      li:nth-child(7) {
+        width: 100%;
+        margin-left: 0px !important;
+      }
+      li:nth-child(8){
+        margin-left: 0 !important;
+        input[type='checkbox'] {
+          width: auto;
+          height: auto;
+        }
+      }
+      li:last-child{
+        margin-left: 30px !important;
+      }
+    }
     li#set-course-mode-modal-field-price{
       width: 100%;
       label.required:after {
@@ -1027,7 +1058,7 @@ input[name="subject"] {
         width: 100%;
       }
     }
-    #coupon-content, #course-content {
+    #coupon-content, #course-content, #registration-content {
       padding: 20px;
       header {
         margin: 0;
@@ -1164,6 +1195,22 @@ input[name="subject"] {
     background: #f8f4ec;
     color: #3c3c3c;
     line-height: 30px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+      float: right;
+    }
+  }
+  span.code_tip {
+    background: none repeat scroll 0 0 #F8F4EC;
+    border-bottom: 1px solid #DDDDDD;
+    border-top: 1px solid #DDDDDD;
+    color: #3C3C3C;
+    display: block;
+    line-height: 30px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 1px;
     .add{
       @include button(simple, $blue);
       @extend .button-reset;
