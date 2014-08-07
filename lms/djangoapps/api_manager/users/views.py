@@ -42,7 +42,10 @@ from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
 
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.locations import Location
+from xmodule.modulestore import InvalidLocationError
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -88,12 +91,41 @@ def _save_content_position(request, user, course_key, position):
         parent_descriptor, parent_key, parent_content = get_course(request, user, parent_content_id)  # pylint: disable=W0612
     else:
         parent_descriptor, parent_key, parent_content = get_course_child(request, user, course_key, parent_content_id)  # pylint: disable=W0612
-    child_descriptor, child_key, child_content = get_course_child(request, user, course_key, child_content_id)  # pylint: disable=W0612
-    if not child_descriptor:
+
+    if not parent_descriptor:
         return None
-    save_child_position(parent_content, child_content.location.name)
-    saved_content = get_current_child(parent_content)
-    return unicode(saved_content.scope_ids.usage_id)
+
+    # no need to fetch the actual child descriptor (avoid round trip to Mongo database), we just need
+    # the id
+    child_key = None
+    try:
+        child_key = UsageKey.from_string(child_content_id)
+    except InvalidKeyError:
+        try:
+            child_key = Location.from_deprecated_string(child_content_id)
+        except (InvalidLocationError, InvalidKeyError):
+            pass
+    if not child_key:
+        return None
+
+    # call an optimized version
+    _save_child_position(parent_content, child_key)
+
+    return child_content_id
+
+
+def _save_child_position(parent_descriptor, target_child_location):
+    """
+    Faster version than what is in the LMS since we don't need to load/traverse children descriptors,
+    we just compare id's from the array of children
+    """
+    for position, child_location in enumerate(parent_descriptor.children, start=1):
+        if child_location == target_child_location:
+            # Only save if position changed
+            if position != parent_descriptor.position:
+                parent_descriptor.position = position
+    # Save this new position to the underlying KeyValueStore
+    parent_descriptor.save()
 
 
 def _manage_role(course_descriptor, user, role, action):
