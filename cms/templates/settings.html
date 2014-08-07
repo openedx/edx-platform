@@ -225,53 +225,6 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 </li>
                 % endif
 
-                <li class="field text" id="field-enable-enrollment-email">
-                  <label for="course-email">${_("Course Enrollment Email")}</label>
-                  <input type="checkbox" id="enable-enrollment-email"/>
-                  <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
-                </li>
-
-                <li class="field text" id="field-enable-default-enrollment-email">
-                  <input type="checkbox" id="enable-default-enrollment-email"/>
-                  <label for="enable-enrollment-email">${_("Use default enrollment emails")}</label>
-                </li>
-
-                <li class="field text" id="field-pre-enrollment-email-subject">
-                  <label for="pre-enrollment-email-subject">${_("Subject of the Email sent to students who enroll before the course starts")}</label>
-                  <textarea class = 'text' id="pre-enrollment-email-subject"></textarea>
-                </li>
-
-                <li class="field text" id="field-pre-enrollment-email">
-                  <label for="pre-enrollment-email">${_("Email sent to students who enroll before the course starts")}</label>
-                  <textarea class="tinymce text-editor" id="pre-enrollment-email"></textarea>
-                  <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course before its start date")}</span>
-                  <ul class="list-actions">
-                    <li class="action-item">
-                      <a title="${_('Send me a copy of this via email')}"
-                          href="" class="action action-primary">
-                          ${_("Send me a test email")}</a>
-                    </li>
-                  </ul>
-                </li>
-                <li class="field text" id="field-post-enrollment-email-subject">
-                  <label for="post-enrollment-email-subject">${_("Subject of the Email sent to students who enroll after the course starts")}</label>
-                  <textarea class = 'text' id="post-enrollment-email-subject"></textarea>
-                </li>
-
-                <li class="field text" id="field-post-enrollment-email">
-                  <label for="post-enrollment-email">${_("Email sent to students who enroll after the course starts")}</label>
-                  <textarea class="tinymce text-editor" id="post-enrollment-email"></textarea>
-                  <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course after its start date")}</span>
-                  <ul class="list-actions">
-                    <li class="action-item">
-                      <a title="${_('Send me a copy of this via email')}"
-                          href="" class="action action-primary">
-                          ${_("Send me a test email")}</a>
-                    </li>
-                  </ul>
-                </li>
-
-
                 <li class="field image" id="field-course-image">
                   <label>${_("Course Image")}</label>
                   <div class="current current-course-image">
@@ -321,6 +274,65 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 % endif
               </ol>
             </section>
+
+        <hr class="divide" />
+        <section class="group-settings enrollment-email">
+          <header>
+            <h2 class="title-2">${_("Course Enrollment Email")}</h2>
+            <span class="tip">${_("Settings for emails that students receive upon course enrollment")}</span>
+          </header>
+          <section class="group-settings">
+            <p><strong>By default, this feature is disabled.</strong> You can either use the default email content or create your own.<br />
+              Students enrolling right on the start date will receive the post-course-start email.<br />
+            </p>
+            <input type="checkbox" id="enable-enrollment-email"/><!-- IMPORTANT -->
+            <label for="enable-enrollment-email">${_("Enable enrollment emails")}</label>
+          </section>
+          <section class="group-settings" id="enrollment-email-settings"><!-- IMPORTANT -->
+            <section class="group-settings" id="custom-enrollment-email-settings"><!-- IMPORTANT -->
+              <section class="group-settings">
+                <p>
+                  ${_("Message for students who enroll {strong_start}before the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
+                  <a class="send-test-email" id='test_email_pre' title="${_('Send me a copy of this via email')}" href="#">${_("Send me a test email")}</a>
+                  <a class="fill-default-email" id='fill_default_email_pre' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
+                </p>
+                <ol class="list-input">
+                  <li class="field text">
+                    <p>
+                      <label for="pre-enrollment-email-subject">${_("Subject of the Email")}</label>
+                      <input type="text" class='text subject' id="pre-enrollment-email-subject"/>
+                    </p>
+                    <p>
+                      <label for="pre-enrollment-email">${_("Body of the Email")}</label>
+                      <textarea class="tinymce text-editor" id="pre-enrollment-email"></textarea>
+                      <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course before its start date.")}</span>
+                    </p>
+                  </li>
+                </ol>
+              </section>
+              <section class="group-settings">
+                <p>
+                  ${_("Message for students who enroll {strong_start}on or after the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
+                  <a class="send-test-email" id='test_email_post' title="${_('Send me a copy of this via email')}" href="#">${_("Send me a test email")}</a>
+                  <a class="fill-default-email" id='fill_default_email_post' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
+                </p>
+                <ol class="list-input">
+                  <li class="field text">
+                    <p>
+                      <label for="post-enrollment-email-subject">${_("Subject of the Email")}</label>
+                      <input type="text" class='text subject' id="post-enrollment-email-subject"/>
+                    </p>
+                    <p>
+                      <label for="post-enrollment-email">${_("Body of the Email")}</label>
+                      <textarea class="tinymce text-editor" id="post-enrollment-email"></textarea>
+                      <span class="tip tip-stacked">${_("This email will be sent to any student who enrolls in the course after its start date.")}</span>
+                    </p>
+                  </li>
+                </ol>
+              </section>
+            </section>
+          </section>
+        </section>
 
           % if about_page_editable:
             <hr class="divide" />
@@ -372,5 +384,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
      </div>
     </aside>
   </section>
+  <div id="default_pre_enrollment_email_template" style="display:none;">${default_pre_template}</div>
+  <div id="default_post_enrollment_email_template" style="display:none;">${default_post_template}</div>
 </div>
 </%block>

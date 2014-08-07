@@ -119,6 +119,17 @@
       font-weight: 400;
     }
 
+    .send-test-email {
+      @extend %ui-btn-flat-outline;
+      float: right;
+    }
+
+    .fill-default-email {
+      @extend %ui-btn-flat-outline;
+      float: right;
+      margin-right: 10px;
+    }
+
     .new-button {
       // @extend %t-action3; - bad buttons won't render this properly
       @include font-size(14);
@@ -132,6 +143,11 @@
 
       .field {
         margin: 0 0 ($baseline*2) 0;
+
+        &.text .subject {
+          height: 40px;
+          resize: none;
+        }
 
         &:last-child {
           margin-bottom: 0;
