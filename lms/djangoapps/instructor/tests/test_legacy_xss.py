@@ -9,6 +9,7 @@ from markupsafe import escape
 
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -48,6 +49,8 @@ class TestXss(ModuleStoreTestCase):
         )
         req.user = self._instructor
         req.session = {}
+
+        mako_middleware_process_request(req)
         resp = legacy.instructor_dashboard(req, self._course.id.to_deprecated_string())
         respUnicode = resp.content.decode(settings.DEFAULT_CHARSET)
         self.assertNotIn(self._evil_student.profile.name, respUnicode)

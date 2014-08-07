@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 import student.views
 from branding.views import index
+from edxmako.tests import mako_middleware_process_request
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -45,6 +46,8 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         """
         request = self.factory.get('/')
         request.user = AnonymousUser()
+
+        mako_middleware_process_request(request)
         student.views.index(request)
 
     @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
