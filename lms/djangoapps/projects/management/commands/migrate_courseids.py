@@ -1,6 +1,8 @@
 """
 One-time data migration script -- shoulen't need to run it again
 """
+import logging
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.test import RequestFactory
@@ -9,6 +11,7 @@ from api_manager.courseware_access import get_course, get_course_child
 from opaque_keys import InvalidKeyError
 from project.models import Project, WorkgroupReview, WorkgroupSubmissionReview
 
+log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     """
@@ -27,6 +30,10 @@ class Command(BaseCommand):
             try:
                 project.content_id = course_key.make_usage_key_from_deprecated_string(project.content_id)
             except InvalidKeyError:
+                log.warning(
+                    'Unable to convert content_id "{}"'.format(project.content_id),
+                    exc_info=True
+                )
                 pass  # If the key conversion fails it was either a new-style key or junk data
             project.save()
 
@@ -37,6 +44,10 @@ class Command(BaseCommand):
             try:
                 wr.content_id = course_key.make_usage_key_from_deprecated_string(wr.content_id)
             except InvalidKeyError:
+                log.warning(
+                    'Unable to convert content_id "{}"'.format(wr.content_id),
+                    exc_info=True
+                )
                 pass  # If the key conversion fails it was either a new-style key or junk data
             wr.save()
 
@@ -47,5 +58,9 @@ class Command(BaseCommand):
             try:
                 wsr.content_id = course_key.make_usage_key_from_deprecated_string(wsr.content_id)
             except InvalidKeyError:
+                log.warning(
+                    'Unable to convert content_id "{}"'.format(wsr.content_id),
+                    exc_info=True
+                )
                 pass  # If the key conversion fails it was either a new-style key or junk data
             wsr.save()
