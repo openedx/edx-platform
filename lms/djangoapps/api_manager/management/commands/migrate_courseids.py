@@ -1,6 +1,8 @@
 """
 One-time data migration script -- shoulen't need to run it again
 """
+import logging
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.test import RequestFactory
@@ -8,6 +10,8 @@ from django.test import RequestFactory
 from api_manager import models as api_models
 from api_manager.courseware_access import get_course, get_course_child
 from opaque_keys import InvalidKeyError
+
+log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -35,6 +39,10 @@ class Command(BaseCommand):
             try:
                 ccg.content_id = course_key.make_usage_key_from_deprecated_string(ccg.content_id)
             except InvalidKeyError:
+                log.warning(
+                    'Unable to convert content_id "{}"'.format(ccg.content_id),
+                    exc_info=True
+                )
                 pass  # If the key conversion fails it was either a new-style key or junk data
             ccg.save()
 
@@ -46,5 +54,9 @@ class Command(BaseCommand):
             try:
                 cmc.content_id = course_key.make_usage_key_from_deprecated_string(cmc.content_id)
             except InvalidKeyError:
+                log.warning(
+                    'Unable to convert content_id "{}"'.format(cmc.content_id),
+                    exc_info=True
+                )
                 pass  # If the key conversion fails it was either a new-style key or junk data
             cmc.save()
