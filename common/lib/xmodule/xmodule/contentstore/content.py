@@ -1,4 +1,5 @@
 import re
+import uuid
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 
@@ -103,9 +104,10 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, CourseKey))
-        # create a dummy asset location and then strip off the last character: 'a',
-        # since the AssetLocator rejects the empty string as a legal value for the block_id.
-        return course_key.make_asset_key('asset', 'a').for_branch(None).to_deprecated_string()[:-1]
+        placeholder_id = uuid.uuid4().hex
+        # create a dummy asset location with a fake but unique name. strip off the name, and return it
+        url_path = unicode(course_key.make_asset_key('asset', placeholder_id).for_branch(None))
+        return url_path.replace(placeholder_id, '')
 
     @staticmethod
     def get_location_from_path(path):
