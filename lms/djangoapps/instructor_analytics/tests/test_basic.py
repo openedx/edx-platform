@@ -6,7 +6,7 @@ from django.test import TestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice
 
 from instructor_analytics.basic import enrolled_students_features, course_registration_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 
@@ -45,11 +45,19 @@ class TestAnalyticsBasic(TestCase):
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
 
     def test_course_registration_features(self):
-        query_features = ['code', 'course_id', 'transaction_group_name', 'created_by', 'redeemed_by']
+        query_features = [
+            'code', 'course_id', 'transaction_group_name', 'created_by',
+            'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
+        ]
+        #create invoice
+        sale_invoice = Invoice.objects.create(
+            total_amount=1234.32, purchaser_name='Test', purchaser_contact='Testw',
+            purchaser_email='test@test.com', tax_id='2Fwe23S', reference="Not Aplicable"
+        )
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course_key.to_deprecated_string(),
-                transaction_group_name='TestName', created_by=self.users[0]
+                transaction_group_name='TestName', created_by=self.users[0], invoice=sale_invoice
             )
             course_code.save()
 
@@ -73,4 +81,8 @@ class TestAnalyticsBasic(TestCase):
             self.assertIn(
                 course_registration['transaction_group_name'],
                 [registration_code.transaction_group_name for registration_code in registration_codes]
+            )
+            self.assertIn(
+                course_registration['invoice_id'],
+                [registration_code.invoice_id for registration_code in registration_codes]
             )
