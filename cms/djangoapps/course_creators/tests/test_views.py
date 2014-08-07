@@ -70,6 +70,7 @@ class CourseCreatorView(TestCase):
     def test_user_requested_access(self):
         add_user_with_status_unrequested(self.user)
         self.assertEqual('unrequested', get_course_creator_status(self.user))
+
         user_requested_access(self.user)
         self.assertEqual('pending', get_course_creator_status(self.user))
 

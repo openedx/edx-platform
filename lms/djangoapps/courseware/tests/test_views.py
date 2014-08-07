@@ -20,6 +20,7 @@ from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
 from edxmako.middleware import MakoMiddleware
+from edxmako.tests import mako_middleware_process_request
 
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
@@ -413,6 +414,8 @@ class TestProgressDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the progress page """
+
+        mako_middleware_process_request(self.request)
         return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
 
 

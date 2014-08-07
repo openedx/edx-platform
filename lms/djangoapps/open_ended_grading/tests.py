@@ -3,6 +3,7 @@ Tests for open ended grading interfaces
 
 ./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
+from django.test import RequestFactory
 
 import json
 import logging
@@ -29,6 +30,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from edxmako.shortcuts import render_to_string
+from edxmako.tests import mako_middleware_process_request
 from student.models import unique_id_for_user
 
 from open_ended_grading import staff_grading_service, views, utils
@@ -471,7 +473,12 @@ class TestPanel(ModuleStoreTestCase):
         Ensure that the problem list from the grading controller server can be rendered properly locally
         @return:
         """
-        request = Mock(user=self.user)
+        request = RequestFactory().get(
+            reverse("open_ended_problems", kwargs={'course_id': self.course_key})
+        )
+        request.user = self.user
+
+        mako_middleware_process_request(request)
         response = views.student_problem_list(request, self.course.id.to_deprecated_string())
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
