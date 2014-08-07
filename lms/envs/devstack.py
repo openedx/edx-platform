@@ -88,6 +88,15 @@ DEBUG_TOOLBAR_CONFIG = {
 def should_show_debug_toolbar(_):
     return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
 
+INSTALLED_APPS += (
+    # Mongo perf stats
+    'debug_toolbar_mongo',
+    )
+
+
+DEBUG_TOOLBAR_PANELS += (
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
+)
 
 ########################### PIPELINE #################################
 

@@ -594,7 +594,7 @@ class CoursesDetail(SecureAPIView):
         depth_int = int(depth)
         # get_course_by_id raises an Http404 if the requested course is invalid
         # Rather than catching it, we just let it bubble up
-        course_descriptor, course_key, course_content = get_course(request, request.user, course_id)  # pylint: disable=W0612
+        course_descriptor, course_key, course_content = get_course(request, request.user, course_id, depth=depth_int)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if depth_int > 0:
