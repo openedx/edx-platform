@@ -2506,21 +2506,21 @@ Annotator.Plugin.Store = (function(_super) {
   Store.prototype._onError = function(xhr) {
     var action, message;
     action = xhr._action;
-    message = Annotator._t("Sorry we could not ") + action + Annotator._t(" this annotation");
+    message = Annotator._t("Sorry, our server seems to be down. We could not ") + action + Annotator._t(" this annotation");
     if (xhr._action === 'search') {
-      message = Annotator._t("Sorry we could not search the store for annotations");
+      message = Annotator._t("Sorry, the Annotations service is down. Contact your instructor and try again later.");
     } else if (xhr._action === 'read' && !xhr._id) {
-      message = Annotator._t("Sorry we could not ") + action + Annotator._t(" the annotations from the store");
+      message = Annotator._t("Sorry, our server seems to be down. We could not ") + action + Annotator._t(" the annotation(s).");
     }
     switch (xhr.status) {
       case 401:
-        message = Annotator._t("Sorry you are not allowed to ") + action + Annotator._t(" this annotation");
+        message = Annotator._t("Sorry, you are not allowed to ") + action + Annotator._t(" this annotation");
         break;
       case 404:
-        message = Annotator._t("Sorry we could not connect to the annotations store");
+        message = Annotator._t("Sorry, we could not connect to the annotations database.");
         break;
       case 500:
-        message = Annotator._t("Sorry something went wrong with the annotation store");
+        message = Annotator._t("Sorry, our server is down. Contact your instructor and try again later.");
     }
     Annotator.showNotification(message, Annotator.Notification.ERROR);
     return console.error(Annotator._t("API request failed:") + (" '" + xhr.status + "'"));
