@@ -1,0 +1,83 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
+<section id="registration_code_generation_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Generate Registration Code Modal')}">
+  <div class="inner-wrapper">
+    <button class="close-modal">
+      <i class="icon-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+    </button>
+
+    <div id="registration-content">
+      <header>
+        <h2>${_("Generate Registration Codes")}</h2>
+      </header>
+
+      <div class="instructions">
+        <p>
+          ${_("Please enter the detail below")}</p>
+      </div>
+
+      <form id="generate_codes" action="${section_data['generate_registration_code_csv_url']}" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        <div id="registration_code_form_error" class="modal-form-error"></div>
+        <fieldset class="group group-form group-form-requiredinformation">
+          <legend class="is-hidden">${_("Required Information")}</legend>
+
+          <ol class="list-input">
+            <li class="field required text" id="generate-registration-modal-field-company-name">
+              <label for="company" class="required">${_("Company Name")}</label>
+              <input class="" id="company" type="text" name="company_name" aria-required="true"/>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-total-price">
+              <label for="total-sale-price" class="required text">${_("Total Sale Price")}</label>
+              <input class="field required" id="total-sale-price" type="text" name="sale_price"
+                     aria-required="true"/>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-total-codes">
+              <label for="total" class="required text">${_("Total Registration Codes")}</label>
+              <input class="field required" id="total" type="text" name="total-registration-codes"
+                     aria-required="true"/>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-purchaser-contact">
+              <label for="purchaser_contact_info" class="required text">${_("purchaser Contact")}</label>
+              <input class="field required" id="purchaser_contact_info" type="text" name="purchaser_contact"
+                     aria-required="true"/>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-purchaser-name">
+              <label for="purchaser-name-info"  class="required text">${_("Purchaser Name")}</label>
+              <input class="field required" id="purchaser-name-info" type="text" name="purchaser_name"
+                     aria-required="true"/>
+            </li>
+            <li class="field" id="generate-registration-modal-field-tax-id">
+              <label for="tax-info">${_("Company Tax id")}</label>
+              <input class="field" id="tax-info" type="text" name="tax"
+                     aria-required="true"/>
+            </li>
+            <li class="field required text" id="generate-registration-modal-field-purchaser-email">
+              <label for="purchaser-email-info"  class="required text">${_("Purchaser Email")}</label>
+              <input class="field required" id="purchaser-email-info" type="email" value="" placeholder="${_('example: username@domain.com')}"
+                     name="purchaser_email" aria-required="true"/>
+            </li>
+            <li class="field" id="generate-registration-modal-field-invoice-copy">
+              <label for="invoice-copy" >${_("Send me a copy of the invoice")}</label>
+              <input class="field" id="invoice-copy" checked type="checkbox" name="invoice"
+                     aria-required="true"/>
+            </li>
+            <li class="field" id="generate-registration-modal-field-references">
+              <label for="reference-info">${_("References")}</label>
+              <input class="field" id="reference-info" type="text" name="reference"
+                     aria-required="true"/>
+            </li>
+          </ol>
+        </fieldset>
+        <div class="submit">
+          <input name="generate-registration-codes-csv" type="submit" value="${_('Generate Registration Codes')}" data-csv="true"/>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
