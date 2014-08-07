@@ -1562,8 +1562,10 @@ class CoursesLeadersList(SecureListAPIView):
             user_points = StudentModule.objects.filter(course_id__exact=course_key,
                                                        student__id=user_id).aggregate(points=Sum('grade'))
             user_points = user_points['points'] or 0
+            user_points = round(user_points, 2)
             users_above = queryset.values('student__id').annotate(points=Sum('grade')).\
-                filter(points__gt=user_points).count()
+                filter(points__gt=user_points).exclude(student__id=user_id).count()  # excluding user to overcome
+                #  float comparison bug
             data['position'] = users_above + 1
             data['points'] = user_points
 
