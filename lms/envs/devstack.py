@@ -60,6 +60,16 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda _: True,
 }
 
+INSTALLED_APPS += (
+    # Mongo perf stats
+    'debug_toolbar_mongo',
+    )
+
+
+DEBUG_TOOLBAR_PANELS += (
+   'debug_toolbar_mongo.panel.MongoDebugPanel',
+   )
+
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
