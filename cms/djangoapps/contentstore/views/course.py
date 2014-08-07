@@ -554,7 +554,10 @@ def _rerun_course(request, org, number, run, fields):
     rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, fields)
 
     # Return course listing page
-    return JsonResponse({'url': reverse_url('course_handler')})
+    return JsonResponse({
+        'url': reverse_url('course_handler'),
+        'destination_course_key': unicode(destination_course_key)
+    })
 
 
 # pylint: disable=unused-argument

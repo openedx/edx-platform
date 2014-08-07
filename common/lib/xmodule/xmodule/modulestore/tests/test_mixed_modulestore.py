@@ -1,6 +1,7 @@
 import pymongo
 from uuid import uuid4
 import ddt
+import itertools
 from importlib import import_module
 from collections import namedtuple
 import unittest
@@ -8,7 +9,6 @@ import datetime
 from pytz import UTC
 
 from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
@@ -21,6 +21,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import DuplicateCourseError
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -247,6 +248,23 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.store.get_modulestore_type(
             SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
+
+    @ddt.data(*itertools.product(
+        (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
+        (True, False)
+    ))
+    @ddt.unpack
+    def test_duplicate_course_error(self, default_ms, reset_mixed_mappings):
+        """
+        Make sure we get back the store type we expect for given mappings
+        """
+        self._initialize_mixed()
+        with self.store.default_store(default_ms):
+            self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+            if reset_mixed_mappings:
+                self.store.mappings = {}
+            with self.assertRaises(DuplicateCourseError):
+                self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
 
     # split has one lookup for the course and then one for the course items
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
