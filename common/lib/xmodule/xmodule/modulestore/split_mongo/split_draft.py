@@ -39,8 +39,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             # create any other necessary things as a side effect: ensure they populate the draft branch
             # and rely on auto publish to populate the published branch: split's create course doesn't
             # call super b/c it needs the auto publish above to have happened before any of the create_items
-            # in this
+            # in this. The explicit use of SplitMongoModuleStore is intentional
             with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, item.id):
+                # pylint: disable=bad-super-call
                 super(SplitMongoModuleStore, self).create_course(
                     org, course, run, user_id, runtime=item.runtime, **kwargs
                 )
@@ -160,10 +161,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             return key.for_branch(ModuleStoreEnum.BranchName.published)
         elif revision == ModuleStoreEnum.RevisionOption.draft_only:
             return key.for_branch(ModuleStoreEnum.BranchName.draft)
-        elif key.branch is not None:
-            return key
-        elif revision == None:
-            if self.get_branch_setting(key) == ModuleStoreEnum.Branch.draft_preferred:
+        elif revision is None:
+            if key.branch is not None:
+                return key
+            elif self.get_branch_setting(key) == ModuleStoreEnum.Branch.draft_preferred:
                 return key.for_branch(ModuleStoreEnum.BranchName.draft)
             else:
                 return key.for_branch(ModuleStoreEnum.BranchName.published)
