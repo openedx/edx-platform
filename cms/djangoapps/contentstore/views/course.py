@@ -478,6 +478,7 @@ def send_test_enrollment_email(request):
     user = request.user
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     subject = request.POST.get('subject')
+    subject = ''.join(subject.splitlines())
     message = request.POST.get('message')
 
     try:
