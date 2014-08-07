@@ -23,7 +23,7 @@ class Project(TimeStampedModel):
 
     class Meta:
         """ Meta class for defining additional model characteristics """
-        unique_together = ("course_id", "content_id")
+        unique_together = ("course_id", "content_id", "organization")
 
 
 class Workgroup(TimeStampedModel):

@@ -48,6 +48,7 @@ class GradeSerializer(serializers.Serializer):
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     workgroups = serializers.PrimaryKeyRelatedField(many=True, required=False)
+    organization = serializers.PrimaryKeyRelatedField(required=False)
 
     class Meta:
         """ Meta class for defining additional serializer characteristics """
