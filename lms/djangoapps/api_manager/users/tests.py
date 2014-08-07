@@ -1472,6 +1472,12 @@ class UsersApiTests(ModuleStoreTestCase):
             name=FORUM_ROLE_MODERATOR,
             course_id=course3.id)
 
+        course4 = CourseFactory.create(
+            display_name="COURSE4 NO MODERATOR",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16, 14, 30)
+        )
+
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1480,8 +1486,9 @@ class UsersApiTests(ModuleStoreTestCase):
         data = [
             {'course_id': unicode(self.course.id), 'role': 'instructor'},
             {'course_id': unicode(course2.id), 'role': 'instructor'},
-            {'course_id': unicode(course3.id), 'role': 'instructor'}
+            {'course_id': unicode(course3.id), 'role': 'instructor'},
         ]
+
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 200)
         response = self.do_get(test_uri)
@@ -1501,6 +1508,20 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['count'], 2)
         for role in response.data['results']:
             self.assertEqual(role['role'], 'staff')
+
+        # Add a role that does not have a corresponding moderator role configured
+        allow_access(course4, self.user, 'staff')
+        # Now modify the existing no-moderator role using the API, which tries to set the moderator role
+        # Also change one of the existing moderator roles, but call it using the deprecated string version
+        data = [
+            {'course_id': course4.id.to_deprecated_string(), 'role': 'instructor'},
+            {'course_id': course2.id.to_deprecated_string(), 'role': 'instructor'},
+        ]
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
 
     def test_users_roles_list_put_invalid_user(self):
         test_uri = '{}/2131/roles/'.format(self.users_base_uri)
@@ -1526,6 +1547,9 @@ class UsersApiTests(ModuleStoreTestCase):
     def test_users_roles_list_put_invalid_roles(self):
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         data = []
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 400)
+        data = [{'course_id': unicode(self.course.id), 'role': 'invalid-role'}]
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
