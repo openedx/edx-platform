@@ -19,11 +19,12 @@ from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
-from django_comment_common.models import FORUM_ROLE_MODERATOR
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment, PasswordHistory, UserProfile
 from student.roles import CourseAccessRole, CourseInstructorRole, CourseObserverRole, CourseStaffRole, UserBasedRole
 from user_api.models import UserPreference
@@ -142,7 +143,16 @@ def _manage_role(course_descriptor, user, role, action):
             new_role = CourseAccessRole(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
             new_role.save()
         if role in forum_moderator_roles:
-            update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
+            try:
+                dep_string = course_descriptor.id.to_deprecated_string()
+                ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
+                update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'allow')
+            except Role.DoesNotExist:
+                try:
+                    update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
+                except Role.DoesNotExist:
+                    pass
+
     elif action is 'revoke':
         revoke_access(course_descriptor, user, role)
         if role in forum_moderator_roles:
@@ -155,7 +165,15 @@ def _manage_role(course_descriptor, user, role, action):
             queryset = user_instructor_courses | user_staff_courses
             queryset = queryset.filter(course_id=course_descriptor.id)
             if len(queryset) == 0:
-                update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+                try:
+                    dep_string = course_descriptor.id.to_deprecated_string()
+                    ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
+                    update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'revoke')
+                except Role.DoesNotExist:
+                    try:
+                        update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+                    except Role.DoesNotExist:
+                        pass
 
 
 class UsersList(SecureListAPIView):
