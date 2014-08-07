@@ -599,6 +599,7 @@ COURSES_WITH_UNSAFE_CODE = []
 DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
+SESSION_COOKIE_SECURE = False
 
 # CMS base
 CMS_BASE = 'localhost:8001'
