@@ -5,7 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-LMS: Instructors can request and see content of previous bulk emails sent in the instructor dashboard. 
+LMS: Instructors can request and see content of previous bulk emails sent in the instructor dashboard.
+
+Studio: New course outline and unit/container pages with revised publishing model. STUD-1790 (part 1)
 
 Studio: Backbone version of the course outline page. STUD-1726.
 
