@@ -222,7 +222,7 @@ class MongoContentStore(ContentStore):
         # callers are insulated from knowing how our identifiers are stored.
         for asset in assets:
             asset_id = asset.get('content_son', asset['_id'])
-            asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name']).for_branch(None)
+            asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name'])
         return assets, count
 
     def set_attr(self, asset_key, attr, value=True):
@@ -346,7 +346,6 @@ class MongoContentStore(ContentStore):
         """
         Returns the database _id and son structured lookup to find the given asset location.
         """
-        location = location.for_branch(None)
         dbkey = SON((field_name, getattr(location, field_name)) for field_name in cls.ordered_key_fields)
         if getattr(location, 'deprecated', False):
             content_id = dbkey
