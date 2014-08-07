@@ -790,31 +790,25 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
 
         position_data = {
-            'position': {
-                'parent_content_id': unicode(course.id),
-                'child_content_id': str(chapter3.location)
-            }
+            'positions': [
+                {
+                    'parent_content_id': unicode(course.id),
+                    'child_content_id': str(chapter3.location)
+                },
+                {
+                    'parent_content_id': unicode(chapter3.scope_ids.usage_id),
+                    'child_content_id': str(sequential2.location)
+                },
+                {
+                    'parent_content_id': unicode(sequential2.scope_ids.usage_id),
+                    'child_content_id': str(vertical3.location)
+                }
+            ]
         }
         response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(chapter3.scope_ids.usage_id))
-
-        position_data = {
-            'position': {
-                'parent_content_id': unicode(chapter3.scope_ids.usage_id),
-                'child_content_id': str(sequential2.location)
-            }
-        }
-        response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(sequential2.scope_ids.usage_id))
-
-        position_data = {
-            'position': {
-                'parent_content_id': unicode(sequential2.scope_ids.usage_id),
-                'child_content_id': str(vertical3.location)
-            }
-        }
-        response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(vertical3.scope_ids.usage_id))
+        self.assertEqual(response.data['positions'][0], unicode(chapter3.scope_ids.usage_id))
+        self.assertEqual(response.data['positions'][1], unicode(sequential2.scope_ids.usage_id))
+        self.assertEqual(response.data['positions'][2], unicode(vertical3.scope_ids.usage_id))
 
         response = self.do_get(response.data['uri'])
         self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter3.scope_ids.usage_id))
@@ -839,11 +833,13 @@ class UsersApiTests(ModuleStoreTestCase):
         course_id = 'asd/fa/9sd8fasdf'
         test_uri = '{}/{}/courses/{}'.format(self.users_base_uri, user_id, course_id)
         position_data = {
-            'position': {
-                'parent_content_id': course_id,
-                'child_content_id': str(chapter1.location)
+            'positions': [
+                {
+                    'parent_content_id': course_id,
+                    'child_content_id': str(chapter1.location)
 
-            }
+                }
+            ]
         }
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.status_code, 404)
@@ -869,14 +865,16 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = test_uri + '/' + str(course.id)
         self.assertEqual(response.status_code, 201)
         position_data = {
-            'position': {
-                'parent_content_id': str(course.location),
-                'child_content_id': str(chapter1.location)
+            'positions': [
+                {
+                    'parent_content_id': str(course.location),
+                    'child_content_id': str(chapter1.location)
 
-            }
+                }
+            ]
         }
         response = self.do_post(test_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
+        self.assertEqual(response.data['positions'][0], unicode(chapter1.scope_ids.usage_id))
 
     def test_user_courses_detail_post_position_invalid_course(self):
         test_uri = '{}/{}/courses'.format(self.users_base_uri, self.user.id)
@@ -885,10 +883,12 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = test_uri + '/' + unicode(self.course.id)
         self.assertEqual(response.status_code, 201)
         position_data = {
-            'position': {
-                'parent_content_id': self.test_bogus_course_id,
-                'child_content_id': self.test_bogus_content_id
-            }
+            'positions': [
+                {
+                    'parent_content_id': self.test_bogus_course_id,
+                    'child_content_id': self.test_bogus_content_id
+                }
+            ]
         }
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.status_code, 400)
@@ -920,14 +920,16 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['course_id'], unicode(course.id))
         self.assertEqual(response.data['user_id'], user_id)
         position_data = {
-            'position': {
-                'parent_content_id': unicode(course.id),
-                'child_content_id': unicode(chapter1.scope_ids.usage_id)
+            'positions': [
+                {
+                    'parent_content_id': unicode(course.id),
+                    'child_content_id': unicode(chapter1.scope_ids.usage_id)
 
-            }
+                }
+            ]
         }
         response = self.do_post(confirm_uri, data=position_data)
-        self.assertEqual(response.data['position'], unicode(chapter1.scope_ids.usage_id))
+        self.assertEqual(response.data['positions'][0], unicode(chapter1.scope_ids.usage_id))
         response = self.do_get(confirm_uri)
         self.assertGreater(response.data['position'], 0) # Position in the GET response is an integer!
         self.assertEqual(response.data['position_tree']['chapter']['id'], unicode(chapter1.scope_ids.usage_id))
