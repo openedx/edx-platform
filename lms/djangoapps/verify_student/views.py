@@ -102,7 +102,7 @@ class VerifyView(View):
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
             "min_price": verify_mode.min_price,
-            "upgrade": upgrade,
+            "upgrade": upgrade == u'True',
             "can_audit": "audit" in modes_dict,
         }
 
@@ -149,7 +149,7 @@ class VerifiedView(View):
             "currency": verify_mode.currency.upper(),
             "chosen_price": chosen_price,
             "create_order_url": reverse("verify_student_create_order"),
-            "upgrade": upgrade,
+            "upgrade": upgrade == u'True',
             "can_audit": "audit" in modes_dict,
         }
         return render_to_response('verify_student/verified.html', context)
@@ -302,7 +302,7 @@ def show_requirements(request, course_id):
         "course_org": course.display_org_with_default,
         "course_num": course.display_number_with_default,
         "is_not_active": not request.user.is_active,
-        "upgrade": upgrade,
+        "upgrade": upgrade == u'True',
     }
     return render_to_response("verify_student/show_requirements.html", context)
 
