@@ -808,17 +808,19 @@ class UsersCoursesDetail(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
-        if request.DATA['position']:
-            content_position = _save_content_position(
-                request,
-                user,
-                course_key,
-                request.DATA['position']
-            )
-            if not content_position:
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-            response_data['position'] = content_position
 
+        if request.DATA['positions']:
+            response_data['positions'] = []
+            for position in request.DATA['positions']:
+                content_position = _save_content_position(
+                    request,
+                    user,
+                    course_key,
+                    position
+                )
+                if not content_position:
+                    return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+                response_data['positions'].append(content_position)
         return Response(response_data, status=status.HTTP_200_OK)
 
     def get(self, request, user_id, course_id):
