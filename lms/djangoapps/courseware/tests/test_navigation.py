@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.tests.factories import GlobalStaffFactory
 
@@ -70,14 +70,14 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.staff_user = GlobalStaffFactory()
 
     def assertTabActive(self, tabname, response):
-        ''' Check if the progress tab is active in the tab set ''' 
+        ''' Check if the progress tab is active in the tab set '''
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 return
         raise AssertionError("assertTabActive failed: "+tabname+" not active")
 
     def assertTabInactive(self, tabname, response):
-        ''' Check if the progress tab is active in the tab set ''' 
+        ''' Check if the progress tab is active in the tab set '''
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 raise AssertionError("assertTabInactive failed: "+tabname+" active")
@@ -85,7 +85,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_chrome_settings(self):
         '''
-        Test settings for disabling and modifying navigation chrome in the courseware: 
+        Test settings for disabling and modifying navigation chrome in the courseware:
         - Accordion enabled, or disabled
         - Navigation tabs enabled, disabled, or redirected
         '''
@@ -108,7 +108,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             }))
             self.assertEquals('open_close_accordion' in response.content, accordion)
             self.assertEquals('course-tabs' in response.content, tabs)
-        
+
         self.assertTabInactive('progress', response)
         self.assertTabActive('courseware', response)
 
@@ -179,13 +179,14 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(reverse('courseware',
                                kwargs={'course_id': self.course.id.to_deprecated_string()}))
 
-        self.assertRedirects(resp, reverse(
+        redirect_url = reverse(
             'courseware_chapter',
             kwargs={
                 'course_id': self.course.id.to_deprecated_string(),
                 'chapter': 'Overview'
             }
-        ))
+        )
+        self.assertRedirects(resp, redirect_url)
 
     def test_accordion_state(self):
         """
@@ -197,22 +198,31 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll(self.test_course, True)
 
         # Now we directly navigate to a section in a chapter other than 'Overview'.
-        check_for_get_code(self, 200, reverse(
+        url = reverse(
             'courseware_section',
             kwargs={
                 'course_id': self.course.id.to_deprecated_string(),
                 'chapter': 'factory_chapter',
                 'section': 'factory_section'
             }
-        ))
+        )
+        self.assert_request_status_code(200, url)
 
         # And now hitting the courseware tab should redirect to 'factory_chapter'
-        resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.course.id.to_deprecated_string()}))
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        resp = self.client.get(url)
 
-        self.assertRedirects(resp, reverse('courseware_chapter',
-                                           kwargs={'course_id': self.course.id.to_deprecated_string(),
-                                                   'chapter': 'factory_chapter'}))
+        redirect_url = reverse(
+            'courseware_chapter',
+            kwargs={
+                'course_id': self.course.id.to_deprecated_string(),
+                'chapter': 'factory_chapter',
+            }
+        )
+        self.assertRedirects(resp, redirect_url)
 
     def test_incomplete_course(self):
         email = self.staff_user.email
@@ -222,46 +232,38 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         test_course_id = self.test_course.id.to_deprecated_string()
 
-        check_for_get_code(
-            self, 200,
-            reverse(
-                'courseware',
-                kwargs={'course_id': test_course_id}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': test_course_id}
         )
+        self.assert_request_status_code(200, url)
 
         section = ItemFactory.create(
             parent_location=self.test_course.location,
             display_name='New Section'
         )
-        check_for_get_code(
-            self, 200,
-            reverse(
-                'courseware',
-                kwargs={'course_id': test_course_id}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': test_course_id}
         )
+        self.assert_request_status_code(200, url)
 
         subsection = ItemFactory.create(
             parent_location=section.location,
             display_name='New Subsection'
         )
-        check_for_get_code(
-            self, 200,
-            reverse(
-                'courseware',
-                kwargs={'course_id': test_course_id}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': test_course_id}
         )
+        self.assert_request_status_code(200, url)
 
         ItemFactory.create(
             parent_location=subsection.location,
             display_name='New Unit'
         )
-        check_for_get_code(
-            self, 302,
-            reverse(
-                'courseware',
-                kwargs={'course_id': test_course_id}
-            )
+        url = reverse(
+            'courseware',
+            kwargs={'course_id': test_course_id}
         )
+        self.assert_request_status_code(302, url)
