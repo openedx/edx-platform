@@ -700,7 +700,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return usage_key in self.modules[usage_key.course_key]
 
-    def get_item(self, usage_key, depth=0):
+    def get_item(self, usage_key, depth=0, **kwargs):
         """
         Returns an XBlock instance for the item for this UsageKey.
 
@@ -775,7 +775,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return CourseLocator(org, course, run, deprecated=True)
 
-    def get_courses(self, depth=0):
+    def get_courses(self, depth=0, **kwargs):
         """
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.
@@ -789,7 +789,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return dict((k, self.errored_courses[k].errors) for k in self.errored_courses)
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
@@ -815,7 +815,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return ModuleStoreEnum.Type.xml
 
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug

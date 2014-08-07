@@ -715,7 +715,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             for item in items
         ]
 
-    def get_courses(self):
+    def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors.
         '''
@@ -759,7 +759,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         return CourseLocator(org, course, run, deprecated=True)
 
-    def get_course(self, course_key, depth=0):
+    def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
         """
@@ -771,7 +771,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_key, ignore_case=False):
+    def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Returns the course_id of the course if it was found, else None
         Note: we return the course_id instead of a boolean here since the found course may have
@@ -890,7 +890,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if 'children' in kwargs:
             query['definition.children'] = kwargs.pop('children')
 
-        query.update(kwargs)
+        # remove any callable kwargs for qualifiers
+        qualifiers = {key: val for key, val in kwargs.iteritems() if not callable(val)}
+
+        query.update(qualifiers)
         items = self.collection.find(
             query,
             sort=[SORT_REVISION_FAVOR_DRAFT],
@@ -1258,7 +1261,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         return ModuleStoreEnum.Type.mongo
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Return an array of all of the locations for orphans in the course.
         """
@@ -1279,7 +1282,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         item_locs -= all_reachable
         return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
 
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
