@@ -113,6 +113,7 @@ class CoursePagesTest(StudioCourseTest):
             page.visit()
 
 
+@attr('shard_1')
 class DiscussionPreviewTest(StudioCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio
