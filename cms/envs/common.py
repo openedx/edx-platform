@@ -248,6 +248,7 @@ XBLOCK_SELECT_FUNCTION = prefer_xmodules
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
 TEMPLATE_DEBUG = False
+SESSION_COOKIE_SECURE = False
 
 # Site info
 SITE_ID = 1
