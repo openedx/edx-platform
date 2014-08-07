@@ -747,6 +747,7 @@ def notify_enrollment_by_email(course, user, request):
                 subject = get_course_about_section(course, 'pre_enrollment_email_subject')
                 message = get_course_about_section(course, 'pre_enrollment_email')
 
+            subject = ''.join(subject.splitlines())
             user.email_user(subject, message, from_address)
 
         except Exception:
