@@ -33,4 +33,4 @@
 -e git+https://github.com/edx/i18n-tools.git@f5303e82dff368c7595884d9325aeea1d802da25#egg=i18n-tools
 
 # Third Party XBlocks
--e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
+-e git+https://github.com/mitodl/edx-sga@86b860c255149acf0abbf1894f023714f346c3e8#egg=edx-sga
