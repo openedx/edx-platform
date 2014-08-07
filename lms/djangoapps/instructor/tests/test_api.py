@@ -44,7 +44,10 @@ import instructor.views.api
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, PaidCourseRegistration, Coupon
+from shoppingcart.models import (
+    CourseRegistrationCode, RegistrationCodeRedemption, Order,
+    PaidCourseRegistration, Coupon, Invoice
+)
 from course_modes.models import CourseMode
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
@@ -2317,6 +2320,12 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
+        #create invoice
+        self.sale_invoice = Invoice.objects.create(
+            total_amount=1234.32, purchaser_name='Test', purchaser_contact='Testw',
+            purchaser_email='test@test.com', tax_id='2Fwe23S', reference="Not Aplicable"
+        )
+
         # Active Registration Codes
         for i in range(12):
             course_registration_code = CourseRegistrationCode(
@@ -2350,7 +2359,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 17)
 
     @patch.object(instructor.views.api, 'random_code_generator', Mock(side_effect=['first', 'second', 'third', 'fourth']))
@@ -2369,7 +2381,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
 
     @patch.object(instructor.views.api, 'random_code_generator', Mock(side_effect=['first', 'first', 'second', 'third']))
@@ -2386,7 +2401,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 4)
 
     def test_spent_course_registration_codes_csv(self):
@@ -2401,7 +2419,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 7)
 
         for i in range(9):
@@ -2428,7 +2449,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_active_course_registration_codes_csv(self):
@@ -2443,7 +2467,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 9)
 
         for i in range(9):
@@ -2458,7 +2485,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_get_all_course_registration_codes_csv(self):
@@ -2473,7 +2503,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 14)
 
         for i in range(9):
@@ -2488,5 +2521,31 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith('"code","course_id","transaction_group_name","created_by","redeemed_by"'))
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
         self.assertEqual(len(body.split('\n')), 11)
+
+    def test_get_codes_with_sale_invoice(self):
+        """
+        Test to generate a response of all the course registration codes
+        """
+        for i in range(5):
+            course_registration_code = CourseRegistrationCode(
+                code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                transaction_group_name='Group Invoice', created_by=self.instructor, invoice=self.sale_invoice
+            )
+            course_registration_code.save()
+
+        url = reverse('get_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+        data = {'download_transaction_group_name': 'Group Invoice'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith(
+            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
+            '"invoice_id","purchaser","total_price","reference"')
+        )
