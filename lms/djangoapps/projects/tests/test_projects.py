@@ -99,7 +99,7 @@ class ProjectsApiTests(TestCase):
         }
         response = self.do_post(self.test_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
-        test_org_id = response.data['url']
+        test_org_id = response.data['id']
 
         test_course_content_id = "i4x://blahblah1234"
         data = {
@@ -123,6 +123,19 @@ class ProjectsApiTests(TestCase):
         self.assertIsNotNone(response.data['workgroups'])
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
+
+    def test_projects_list_post_without_org(self):
+        test_course_content_id = "i4x://blahblah1234"
+        data = {
+            'name': self.test_project_name,
+            'course_id': self.test_course_id,
+            'content_id': test_course_content_id,
+            'organization': None
+        }
+        response = self.do_post(self.test_projects_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        self.assertEqual(response.data['organization'], None)
 
     def test_projects_detail_get(self):
         test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
