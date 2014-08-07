@@ -47,6 +47,8 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore import InvalidLocationError
 
+from xmodule.modulestore.django import modulestore
+
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -719,6 +721,27 @@ class UsersCoursesList(SecureAPIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
+def _get_current_position_loc(parent_module):
+    """
+    An optimized lookup for the current position. The LMS version can cause unnecessary round trips to
+    the Mongo database
+    """
+    if not hasattr(parent_module, 'position'):
+        return None
+
+    if not parent_module.children:
+        return None
+
+    index = 0
+    if parent_module.position:
+        index = parent_module.position - 1   # position is 1 indexed
+
+    if 0 <= index < len(parent_module.children):
+        return parent_module.children[index]
+
+    return parent_module.children[0]
+
+
 class UsersCoursesDetail(SecureAPIView):
     """
     ### The UsersCoursesDetail view allows clients to interact with a specific User-Course relationship (aka, enrollment)
@@ -782,7 +805,7 @@ class UsersCoursesDetail(SecureAPIView):
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
-            course_descriptor, course_key, course_content = get_course(request, user, course_id, depth=2)
+            course_descriptor, course_key, course_content = get_course(request, user, course_id)
         except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not CourseEnrollment.is_enrolled(user, course_key):
@@ -794,7 +817,7 @@ class UsersCoursesDetail(SecureAPIView):
             course_key,
             user,
             course_descriptor,
-            depth=2)
+            depth=0)
         course_module = module_render.get_module_for_descriptor(
             user,
             request,
@@ -805,17 +828,15 @@ class UsersCoursesDetail(SecureAPIView):
         response_data['position_tree'] = {}
         parent_module = course_module
         while parent_module is not None:
-            current_child_descriptor = get_current_child(parent_module)
-            if current_child_descriptor:
-                response_data['position_tree'][current_child_descriptor.category] = {}
-                response_data['position_tree'][current_child_descriptor.category]['id'] = unicode(current_child_descriptor.scope_ids.usage_id)
-                parent_module = module_render.get_module(
-                    user,
-                    request,
-                    current_child_descriptor.scope_ids.usage_id,
-                    field_data_cache,
-                    course_key
-                )
+
+            current_child_loc = _get_current_position_loc(parent_module)
+
+            if  current_child_loc:
+                response_data['position_tree'][current_child_loc.category] = {}
+                response_data['position_tree'][current_child_loc.category]['id'] = unicode(current_child_loc)
+
+                _,_,parent_module = get_course_child(request, user, course_key, unicode(current_child_loc))
+
             else:
                 parent_module = None
         return Response(response_data, status=status.HTTP_200_OK)
