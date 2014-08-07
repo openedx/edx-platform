@@ -190,7 +190,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get('{}?ids={}&page=5'.format(test_uri, '2,3,7,11,6,21,34'))
         self.assertEqual(response.status_code, 404)
         # fetch user data by single id
-        response = self.do_get('{}?ids={}'.format(test_uri, '3'))
+        response = self.do_get('{}?ids={}'.format(test_uri, '23'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(len(response.data['results'][0]['organizations']), total_orgs)
