@@ -100,16 +100,19 @@ def _filter_unstarted_categories(category_map):
         for child in unfiltered_map["children"]:
             if child in unfiltered_map["entries"]:
                 if unfiltered_map["entries"][child]["start_date"] <= now:
-                    filtered_map["children"].append(child)
+                    if child not in filtered_map["children"]:
+                        filtered_map["children"].append(child)
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
                         if key != "start_date":
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
-            else:
+
+            if child in unfiltered_map["subcategories"]:
                 if unfiltered_map["subcategories"][child]["start_date"] < now:
-                    filtered_map["children"].append(child)
+                    if child not in filtered_map["children"]:
+                        filtered_map["children"].append(child)
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
                     filtered_queue.append(filtered_map["subcategories"][child])
