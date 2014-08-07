@@ -58,31 +58,16 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
 
             save: function(event) {
                 event.preventDefault();
-                var self = this;
-
-                var performSave = function() {
-                    var requestData = _.extend({}, self.getRequestData(), {
-                        metadata: self.getMetadata()
+                var requestData = _.extend({}, this.getRequestData(), {
+                    metadata: this.getMetadata()
+                });
+                // Only update if something changed to prevent items from erroneously entering draft state
+                if (!_.isEqual(requestData, { metadata: {} })) {
+                    XBlockViewUtils.updateXBlockFields(this.model, requestData, {
+                        success: this.options.onSave
                     });
-                    // Only update if something changed to prevent items from erroneously entering draft state
-                    if (!_.isEqual(requestData, { metadata: {} })) {
-                        XBlockViewUtils.updateXBlockFields(self.model, requestData, {
-                            success: self.options.onSave
-                        });
-                    }
-                    self.hide();
-                };
-
-                if (!this.staffLockView.isLocked() && this.staffLockView.isModelLocked()) {
-                    ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
-                        gettext("If you make this content visible to students, students will be able to see its content after the release date has passed and you have published it. Do you want to proceed?"),
-                        gettext("Make Visible to Students"),
-                        performSave,
-                        function() { }
-                    );
-                } else {
-                    performSave();
                 }
+                this.hide();
             },
 
             /**

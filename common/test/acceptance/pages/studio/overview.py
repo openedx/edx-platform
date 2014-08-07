@@ -571,7 +571,7 @@ class CourseOutlineModal(object):
         Checks the explicit staff lock box if value is true, otherwise unchecks the box.
         """
         if value != self.is_explicitly_locked:
-            self.find_css('#staff_lock').click()
+            self.find_css('label[for="staff_lock"]').click()
         EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
 
     def get_selected_option_text(self, element):

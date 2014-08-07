@@ -9,7 +9,7 @@ from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from ..pages.studio.utils import add_discussion, confirm_prompt
+from ..pages.studio.utils import add_discussion
 from ..pages.lms.courseware import CoursewarePage
 from ..fixtures.course import XBlockFixtureDesc
 
@@ -454,14 +454,11 @@ class StaffLockTest(CourseOutlineTest):
 
     def _set_staff_lock(self, item, is_locked):
         """
-        Sets the explicit staff lock of item to is_locked, confirming prompts where necessary.
+        Sets the explicit staff lock of item to is_locked.
         """
         modal = item.edit()
-        was_locked = modal.is_explicitly_locked
         modal.is_explicitly_locked = is_locked
         modal.save()
-        if was_locked and not is_locked:
-            confirm_prompt(self.course_outline_page)
 
     def test_units_can_be_locked(self):
         """
