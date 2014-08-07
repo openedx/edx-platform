@@ -96,6 +96,9 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.staff_user = GlobalStaffFactory()
 
+    def tearDown(self):
+        self.check_for_get_xblock_page_code(200)
+
     def get_handler_url(self, handler, xblock_name='recommender'):
         """
         Get url for the specified xblock handler
@@ -183,10 +186,6 @@ class TestRecommenderCreateFromEmpty(TestRecommender):
     """
     Check whether we can add resources to an empty database correctly
     """
-    def setUp(self):
-        # call the setUp function from the superclass
-        super(TestRecommenderCreateFromEmpty, self).setUp()
-
     def test_add_resource(self):
         """
         Verify the addition of new resource is handled correctly
@@ -610,10 +609,6 @@ class TestRecommenderUserIdentity(TestRecommender):
     """
     Check whether we can identify users correctly
     """
-    def setUp(self):
-        # call the setUp function from the superclass
-        super(TestRecommenderUserIdentity, self).setUp()
-
     def test_student_is_not_staff(self):
         """
         Verify student is not a staff
