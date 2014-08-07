@@ -14,20 +14,8 @@ August, 2014
      - Change
    * - 08/07/14
      - Added information about reviewing and duplicating the contents of
-       previously-sent mssages to the :ref:`Bulk Email` section.
-
-
-**************
-August, 2014
-**************
-
-.. list-table::
-   :widths: 10 70
-   :header-rows: 1
-
-   * - Date
-     - Change
-   * - 08/5/14
+       previously-sent messages to the :ref:`Bulk Email` section.
+   * - 
      - Updated the :ref:`view_enrollment_count` section to include the
        breakdown by certification track in the enrollment section.
 
