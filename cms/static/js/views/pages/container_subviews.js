@@ -194,7 +194,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                         _.bind(saveAndPublishStaffLock, self));
                 } else {
                     ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),
-                        gettext("If you make this unit visible to students, students will be able to see its content after the release date has passed and you have published the unit. Do you want to proceed?"),
+                        gettext("If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?"),
                         gettext("Make Visible to Students"),
                         function() {
                             ViewUtils.runOperationShowingMessage(gettext('Making Visible to Students&hellip;'),
