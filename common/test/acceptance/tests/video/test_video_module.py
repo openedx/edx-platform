@@ -499,7 +499,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
     def _verify_caption_text(self, text):
         self.video._wait_for(
-            lambda: (text in self.video.captions_text()),
+            lambda: (text in self.video.captions_text),
             u'Captions contain "{}" text'.format(text),
             timeout=5
         )
