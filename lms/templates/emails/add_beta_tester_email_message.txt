@@ -9,8 +9,8 @@ ${_("You have been invited to be a beta tester for {course_name} at {site_name} 
 	)}
 
 % if auto_enroll:
-${_("To start accessing course materials, please visit {course_url}").format(
-		course_url=course_url
+${_("To start accessing course materials, please visit https://{site_name}/dashboard").format(
+		site_name=site_name
 	)}
 % elif course_about_url is not None:
 ${_("Visit {course_about_url} to join the course and begin the beta test.").format(course_about_url=course_about_url)}

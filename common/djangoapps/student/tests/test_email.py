@@ -88,19 +88,9 @@ class EnrollmentEmailTests(TestCase):
     def test_custom_enrollment_email_sent(self):
         """ Test sending of enrollment emails when enable_default_enrollment_email setting is disabled. """
         self.course.enable_enrollment_email = True
-        self.course.enable_default_enrollment_email = False
         email_result = self.send_enrollment_email()
         self.assertNotIn('email_did_fire', email_result)
         self.assertIn('is_success', email_result)
-
-    def test_default_enrollment_email_sent(self):
-        """ Test sending of enrollment emails when enable_default_enrollment_email setting is enabled. """
-        self.course.enable_enrollment_email = True
-        self.course.enable_default_enrollment_email = True
-        email_result = self.send_enrollment_email()
-        self.assertNotIn('email_did_fire', email_result)
-        self.assertIn('is_success', email_result)
-
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
