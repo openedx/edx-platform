@@ -58,31 +58,31 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             {
                 "title": "Covalent bonding and periodic trends",
                 "url": (
-                    "https://courses.edx.org/courses/MITx/3.091X/" +
-                    "2013_Fall/courseware/SP13_Week_4/" +
+                    "https://courses.edx.org/courses/MITx/3.091X/"
+                    "2013_Fall/courseware/SP13_Week_4/"
                     "SP13_Periodic_Trends_and_Bonding/"
                 ),
                 "description": (
-                    "http://people.csail.mit.edu/swli/edx/" +
+                    "http://people.csail.mit.edu/swli/edx/"
                     "recommendation/img/videopage1.png"
                 ),
                 "descriptionText": (
-                    "short description for Covalent bonding " +
+                    "short description for Covalent bonding "
                     "and periodic trends"
                 )
             },
             {
                 "title": "Polar covalent bonds and electronegativity",
                 "url": (
-                    "https://courses.edx.org/courses/MITx/3.091X/" +
+                    "https://courses.edx.org/courses/MITx/3.091X/"
                     "2013_Fall/courseware/SP13_Week_4/SP13_Covalent_Bonding/"
                 ),
                 "description": (
-                    "http://people.csail.mit.edu/swli/edx/" +
+                    "http://people.csail.mit.edu/swli/edx/"
                     "recommendation/img/videopage2.png"
                 ),
                 "descriptionText": (
-                    "short description for Polar covalent " +
+                    "short description for Polar covalent "
                     "bonds and electronegativity"
                 )
             }
@@ -147,57 +147,6 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, code)
 
-    def check_ajax_event_result(
-        self, data, handler, expected_result, xblock_name='recommender'
-    ):
-        """
-        Call a ajax event and check whether the result is the same as expected
-        """
-        url = self.get_handler_url(handler, xblock_name)
-        resp = self.client.post(url, json.dumps(data), '')
-        result = json.loads(resp.content)
-        self.assertDictEqual(result, expected_result)
-        self.check_for_get_xblock_page_code(200)
-
-    def check_result(self, result, expected_result):
-        """
-        Check whether the result is the same as expected
-        """
-        self.assertEqual(result, expected_result)
-        self.check_for_get_xblock_page_code(200)
-
-    def set_fake_s3_info(self, xblock_name):
-        """
-        Set fake s3 information
-        """
-        data = {
-            'aws_access_key': 'access key',
-            'aws_secret_key': 'secret key',
-            'bucketName': 'bucket name',
-            'uploadedFileDir': '/'
-        }
-        url = self.get_handler_url('set_s3_info', xblock_name)
-        self.client.post(url, json.dumps(data), '')
-
-    def upload_file(self, test_cases, xblock_name):
-        """
-        Create a temp file and upload it by calling the corresponding ajax
-        event
-        """
-        for test_case in test_cases:
-            temp = tempfile.NamedTemporaryFile(
-                prefix='upload_',
-                suffix=test_case['suffixes'],
-                delete=False
-            )
-            temp.seek(0)
-            temp.write(test_case['magic_number'].decode('hex'))
-            temp.flush()
-            url = self.get_handler_url('upload_screenshot', xblock_name)
-            response = self.client.post(url, {'file': open(temp.name, 'r')})
-            self.assertEqual(response.content, test_case['response'])
-            self.check_for_get_xblock_page_code(200)
-
     def set_up_resources(self):
         """
         Set up resources and enroll staff
@@ -210,7 +159,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ):
             self.add_resource(resource, xblock_name)
 
-    def call_event_by_id(
+    def initialize_database_by_id(
         self, handler, resource_id, times, xblock_name='recommender'
     ):
         """
@@ -219,25 +168,24 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         url = self.get_handler_url(handler, xblock_name)
         for _ in range(0, times):
-            resp = self.client.post(url, json.dumps({'id': resource_id}), '')
-        return json.loads(resp.content)
+            self.client.post(url, json.dumps({'id': resource_id}), '')
 
-    def generate_edit_resource(self, resource_id):
-        """
-        Generate the resource for edit
-        """
-        data = {"id": resource_id}
-        edited_recommendations = {key: value + " edited" for key, value in self.test_recommendations[0].iteritems()}
-        data.update(edited_recommendations)
-        return data
-
-    def call_event_by_data(self, handler, data, xblock_name='recommender'):
+    def call_event(self, handler, data, xblock_name='recommender'):
         """
         Call a ajax event (edit, flag) on a resource by providing data
         """
         url = self.get_handler_url(handler, xblock_name)
         resp = self.client.post(url, json.dumps(data), '')
         return json.loads(resp.content)
+
+
+class TestRecommenderCreateFromEmpty(TestRecommender):
+    """
+    Check whether we can add resources to an empty database correctly
+    """
+    def setUp(self):
+        # call the setUp function from the superclass
+        super(TestRecommenderCreateFromEmpty, self).setUp()
 
     def test_add_resource(self):
         """
@@ -261,11 +209,29 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.assertDictEqual(result, expected_result)
                 self.check_for_get_xblock_page_code(200)
 
+
+class TestRecommenderCRUDWithResources(TestRecommender):
+    """
+    Check whether we can add/edit/delete resources correctly
+    """
+    def setUp(self):
+        # call the setUp function from the superclass
+        super(TestRecommenderCRUDWithResources, self).setUp()
+        self.set_up_resources()
+
+    def generate_edit_resource(self, resource_id):
+        """
+        Generate the resource for edit
+        """
+        data = {"id": resource_id}
+        edited_recommendations = {key: value + " edited" for key, value in self.test_recommendations[0].iteritems()}
+        data.update(edited_recommendations)
+        return data
+
     def test_add_redundant_resource(self):
         """
         Verify the addition of a redundant resource (url) is rejected
         """
-        self.set_up_resources()
         # Test
         for suffix in ['', '#IAmSuffix', '%23IAmSuffix']:
             resource = deepcopy(self.test_recommendations[0])
@@ -284,227 +250,252 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.assertDictEqual(result, expected_result)
             self.check_for_get_xblock_page_code(200)
 
-    def test_endorse_resource_non_existing(self):
-        """
-        Endorse a non-existing resource
-        """
-        self.set_up_resources()
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=100, times=1
-        )
-        self.check_result(resp['error'], 'bad id')
-
-    def test_endorse_resource_once(self):
-        """
-        Endorse a resource
-        """
-        self.set_up_resources()
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=1, times=1
-        )
-        self.check_result(resp['status'], 'endorsement')
-
-    def test_endorse_resource_twice(self):
-        """
-        Endorse and then un-endorse a resource
-        """
-        self.set_up_resources()
-        self.call_event_by_id('endorse_resource', resource_id=1, times=1)
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=1, times=1
-        )
-        self.check_result(resp['status'], 'undo endorsement')
-
-    def test_endorse_resource_thrice(self):
-        """
-        Endorse and then un-endorse a resource
-        """
-        self.set_up_resources()
-        self.call_event_by_id('endorse_resource', resource_id=1, times=2)
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=1, times=1
-        )
-        self.check_result(resp['status'], 'endorsement')
-
-    def test_endorse_different_resources(self):
-        """
-        Endorse two different resources
-        """
-        self.set_up_resources()
-        self.call_event_by_id('endorse_resource', resource_id=1, times=1)
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=0, times=1
-        )
-        self.check_result(resp['status'], 'endorsement')
-
-    def test_endorse_resources_in_different_xblocks(self):
-        """
-        Endorse two resources in two different xblocks
-        """
-        self.set_up_resources()
-        self.call_event_by_id('endorse_resource', resource_id=1, times=1)
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource',
-            resource_id=1,
-            times=1,
-            xblock_name=self.xblock_names[1]
-        )
-        self.check_result(resp['status'], 'endorsement')
-
-    def test_endorse_resource_by_student(self):
-        """
-        Endorse resource by student
-        """
-        self.set_up_resources()
-        self.logout()
-        self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
-        # Test
-        resp = self.call_event_by_id(
-            'endorse_resource', resource_id=1, times=1
-        )
-        self.check_result(resp['error'], 'Endorse resource without permission')
-
     def test_delete_resource_non_existing(self):
         """
         Delete a non-existing resource
         """
-        self.set_up_resources()
         # Test
-        resp = self.call_event_by_id(
-            'delete_resource', resource_id=100, times=1
-        )
-        self.check_result(resp['error'], 'bad id')
+        resp = self.call_event('delete_resource', {'id': 100})
+        self.assertEqual(resp['error'], 'bad id')
 
     def test_delete_resource_once(self):
         """
         Delete a resource
         """
-        self.set_up_resources()
         # Test
-        resp = self.call_event_by_id('delete_resource', resource_id=1, times=1)
-        self.check_result(resp['Success'], True)
+        resp = self.call_event('delete_resource', {'id': 1})
+        self.assertEqual(resp['Success'], True)
 
     def test_delete_resource_twice(self):
         """
         Delete a resource twice
         """
-        self.set_up_resources()
-        self.call_event_by_id('delete_resource', resource_id=1, times=1)
+        self.initialize_database_by_id('delete_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('delete_resource', resource_id=1, times=1)
-        self.check_result(resp['error'], 'bad id')
+        resp = self.call_event('delete_resource', {'id': 1})
+        self.assertEqual(resp['error'], 'bad id')
 
     def test_delete_different_resources(self):
         """
         Delete two different resources
         """
-        self.set_up_resources()
-        self.call_event_by_id('delete_resource', resource_id=1, times=1)
+        self.initialize_database_by_id('delete_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id('delete_resource', resource_id=0, times=1)
-        self.check_result(resp['Success'], True)
+        resp = self.call_event('delete_resource', {'id': 0})
+        self.assertEqual(resp['Success'], True)
 
     def test_delete_resources_in_different_xblocks(self):
         """
         Delete two resources in two different xblocks
         """
-        self.set_up_resources()
-        self.call_event_by_id('delete_resource', resource_id=1, times=1)
+        self.initialize_database_by_id('delete_resource', resource_id=1, times=1)
         # Test
-        resp = self.call_event_by_id(
+        resp = self.call_event(
             'delete_resource',
-            resource_id=1,
-            times=1,
+            {'id': 1},
             xblock_name=self.xblock_names[1]
         )
-        self.check_result(resp['Success'], True)
+        self.assertEqual(resp['Success'], True)
 
     def test_delete_resource_by_student(self):
         """
         Delete resource by student
         """
-        self.set_up_resources()
         self.logout()
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         # Test
-        resp = self.call_event_by_id('delete_resource', resource_id=1, times=1)
-        self.check_result(resp['error'], 'Delete resource without permission')
+        resp = self.call_event('delete_resource', {'id': 1})
+        self.assertEqual(resp['error'], 'Delete resource without permission')
+
+    def test_edit_resource_non_existing(self):
+        """
+        Edit a non-existing resource
+        """
+        # Test
+        resp = self.call_event(
+            'edit_resource', self.generate_edit_resource(100)
+        )
+        self.assertEqual(resp['error'], 'bad id')
+
+    def test_edit_redundant_resource(self):
+        """
+        Check whether changing the url to the one of 'another' resource is
+        rejected
+        """
+        # Test
+        for suffix in ['', '#IAmSuffix', '%23IAmSuffix']:
+            data = self.generate_edit_resource(0)
+            data['url'] = self.test_recommendations[1]['url'] + suffix
+            resp = self.call_event('edit_resource', data)
+            self.assertEqual(resp['error'], 'existing url')
+            self.assertEqual(resp['dup_id'], 1)
+
+    def test_edit_resource(self):
+        """
+        Check whether changing the content of resource is successful
+        """
+        # Test
+        resp = self.call_event(
+            'edit_resource', self.generate_edit_resource(0)
+        )
+        self.assertEqual(resp['Success'], True)
+
+    def test_edit_resources_in_different_xblocks(self):
+        """
+        Check whether changing the content of resource is successful in two
+        different xblocks
+        """
+        data = self.generate_edit_resource(0)
+        for xblock_name in self.xblock_names:
+            resp = self.call_event('edit_resource', data, xblock_name)
+            self.assertEqual(resp['Success'], True)
+            self.check_for_get_xblock_page_code(200)
+
+
+class TestRecommenderEvaluationWithResources(TestRecommender):
+    """
+    Check whether we can evaluate a resource by voting/endorsing/flagging
+    correctly
+    """
+    def setUp(self):
+        # call the setUp function from the superclass
+        super(TestRecommenderEvaluationWithResources, self).setUp()
+        self.set_up_resources()
+
+    def test_endorse_resource_non_existing(self):
+        """
+        Endorse a non-existing resource
+        """
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 100})
+        self.assertEqual(resp['error'], 'bad id')
+
+    def test_endorse_resource_once(self):
+        """
+        Endorse a resource
+        """
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 1})
+        self.assertEqual(resp['status'], 'endorsement')
+
+    def test_endorse_resource_twice(self):
+        """
+        Endorse and then un-endorse a resource
+        """
+        self.initialize_database_by_id('endorse_resource', resource_id=1, times=1)
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 1})
+        self.assertEqual(resp['status'], 'undo endorsement')
+
+    def test_endorse_resource_thrice(self):
+        """
+        Endorse and then un-endorse a resource
+        """
+        self.initialize_database_by_id('endorse_resource', resource_id=1, times=2)
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 1})
+        self.assertEqual(resp['status'], 'endorsement')
+
+    def test_endorse_different_resources(self):
+        """
+        Endorse two different resources
+        """
+        self.initialize_database_by_id('endorse_resource', resource_id=1, times=1)
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 0})
+        self.assertEqual(resp['status'], 'endorsement')
+
+    def test_endorse_resources_in_different_xblocks(self):
+        """
+        Endorse two resources in two different xblocks
+        """
+        self.initialize_database_by_id('endorse_resource', resource_id=1, times=1)
+        # Test
+        resp = self.call_event(
+            'endorse_resource',
+            {'id': 1},
+            xblock_name=self.xblock_names[1]
+        )
+        self.assertEqual(resp['status'], 'endorsement')
+
+    def test_endorse_resource_by_student(self):
+        """
+        Endorse resource by student
+        """
+        self.logout()
+        self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
+        # Test
+        resp = self.call_event('endorse_resource', {'id': 1})
+        self.assertEqual(resp['error'], 'Endorse resource without permission')
 
     def test_vote_resource_non_existing(self):
         """
         Vote a non-existing resource
         """
-        self.set_up_resources()
         # Test
         for handler in ['handle_upvote', 'handle_downvote']:
-            resp = self.call_event_by_id(handler, resource_id=100, times=1)
-            self.check_result(resp['error'], 'bad id')
+            resp = self.call_event(handler, {'id': 100})
+            self.assertEqual(resp['error'], 'bad id')
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_resource_once(self):
         """
         Vote a resource
         """
-        self.set_up_resources()
         # Test
         for handler, r_id, votes in zip(
             ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_resource_twice(self):
         """
         Vote a resource twice
         """
-        self.set_up_resources()
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
-            self.call_event_by_id(handler, resource_id=r_id, times=1)
+            self.initialize_database_by_id(handler, resource_id=r_id, times=1)
         # Test
         for handler, r_id, votes in zip(
             ['handle_upvote', 'handle_downvote'], [0, 1], [0, 0]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_resource_thrice(self):
         """
         Vote a resource thrice
         """
-        self.set_up_resources()
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
-            self.call_event_by_id(handler, resource_id=r_id, times=2)
+            self.initialize_database_by_id(handler, resource_id=r_id, times=2)
         # Test
         for handler, r_id, votes in zip(
             ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_switch_vote_resource(self):
         """
         Switch the vote of a resource
         """
-        self.set_up_resources()
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
-            self.call_event_by_id(handler, resource_id=r_id, times=1)
+            self.initialize_database_by_id(handler, resource_id=r_id, times=1)
         # Test
         for handler, r_id, votes in zip(
             ['handle_downvote', 'handle_upvote'], [0, 1], [-1, 1]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_different_resources(self):
         """
         Vote two different resources
         """
-        self.set_up_resources()
         # Test
         for handler, r_id, votes in zip(
             [
@@ -516,158 +507,117 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
             [0, 1, 0, 1],
             [1, 1, -1, -1]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_resources_in_different_xblocks(self):
         """
         Vote two resources in two different xblocks
         """
-        self.set_up_resources()
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
-            self.call_event_by_id(handler, resource_id=r_id, times=1)
+            self.initialize_database_by_id(handler, resource_id=r_id, times=1)
         # Test
         for handler, r_id, votes in zip(
             ['handle_upvote', 'handle_downvote'], [0, 1], [1, -1]
         ):
-            resp = self.call_event_by_id(
+            resp = self.call_event(
                 handler,
-                resource_id=r_id,
-                times=1,
+                {'id': r_id},
                 xblock_name=self.xblock_names[1]
             )
-            self.check_result(resp['newVotes'], votes)
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_vote_resource_by_different_users(self):
         """
         Vote resource by two different users
         """
-        self.set_up_resources()
         for handler, r_id in zip(['handle_upvote', 'handle_downvote'], [0, 1]):
-            self.call_event_by_id(handler, resource_id=r_id, times=1)
+            self.initialize_database_by_id(handler, resource_id=r_id, times=1)
         self.logout()
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         # Test
         for handler, r_id, votes in zip(
             ['handle_upvote', 'handle_downvote'], [0, 1], [2, -2]
         ):
-            resp = self.call_event_by_id(handler, resource_id=r_id, times=1)
-            self.check_result(resp['newVotes'], votes)
-
-    def test_edit_resource_non_existing(self):
-        """
-        Edit a non-existing resource
-        """
-        self.set_up_resources()
-        # Test
-        resp = self.call_event_by_data(
-            'edit_resource', self.generate_edit_resource(100)
-        )
-        self.check_result(resp['error'], 'bad id')
-
-    def test_edit_redundant_resource(self):
-        """
-        Check whether changing the url to the one of 'another' resource is rejected
-        """
-        self.set_up_resources()
-        # Test
-        for suffix in ['', '#IAmSuffix', '%23IAmSuffix']:
-            data = self.generate_edit_resource(0)
-            data['url'] = self.test_recommendations[1]['url'] + suffix
-            resp = self.call_event_by_data('edit_resource', data)
-            self.check_result(resp['error'], 'existing url')
-            self.check_result(resp['dup_id'], 1)
-
-    def test_edit_resource(self):
-        """
-        Check whether changing the content of resource is successful
-        """
-        self.set_up_resources()
-        # Test
-        resp = self.call_event_by_data(
-            'edit_resource', self.generate_edit_resource(0)
-        )
-        self.check_result(resp['Success'], True)
-
-    def test_edit_resources_in_different_xblocks(self):
-        """
-        Check whether changing the content of resource is successful in two different xblocks
-        """
-        self.set_up_resources()
-        data = self.generate_edit_resource(0)
-        for xblock_name in self.xblock_names:
-            resp = self.call_event_by_data('edit_resource', data, xblock_name)
-            self.check_result(resp['Success'], True)
+            resp = self.call_event(handler, {'id': r_id})
+            self.assertEqual(resp['newVotes'], votes)
+            self.check_for_get_xblock_page_code(200)
 
     def test_flag_resource_wo_reason(self):
         """
         Flag a resource as problematic, without providing the reason
         """
-        self.set_up_resources()
         data = {'id': 0, 'isProblematic': True, 'reason': ''}
         # Test
-        resp = self.call_event_by_data('flag_resource', data)
-        self.check_result(resp['Success'], True)
-        self.check_result(resp['reason'], '')
+        resp = self.call_event('flag_resource', data)
+        self.assertEqual(resp['Success'], True)
+        self.assertEqual(resp['reason'], '')
 
     def test_flag_resource_w_reason(self):
         """
         Flag a resource as problematic, with providing the reason
         """
-        self.set_up_resources()
         data = {'id': 0, 'isProblematic': True, 'reason': 'reason 0'}
         # Test
-        resp = self.call_event_by_data('flag_resource', data)
-        self.check_result(resp['Success'], True)
-        self.check_result(resp['reason'], 'reason 0')
+        resp = self.call_event('flag_resource', data)
+        self.assertEqual(resp['Success'], True)
+        self.assertEqual(resp['reason'], 'reason 0')
 
     def test_flag_resource_change_reason(self):
         """
         Flag a resource as problematic twice, with different reasons
         """
-        self.set_up_resources()
         data = {'id': 0, 'isProblematic': True, 'reason': 'reason 0'}
-        resp = self.call_event_by_data('flag_resource', data)
+        resp = self.call_event('flag_resource', data)
         # Test
         data = {'id': 0, 'isProblematic': True, 'reason': 'reason 1'}
-        resp = self.call_event_by_data('flag_resource', data)
-        self.check_result(resp['Success'], True)
-        self.check_result(resp['oldReason'], 'reason 0')
-        self.check_result(resp['reason'], 'reason 1')
+        resp = self.call_event('flag_resource', data)
+        self.assertEqual(resp['Success'], True)
+        self.assertEqual(resp['oldReason'], 'reason 0')
+        self.assertEqual(resp['reason'], 'reason 1')
 
     def test_flag_resources_in_different_xblocks(self):
         """
         Flag resources as problematic in two different xblocks
         """
-        self.set_up_resources()
         data = {'id': 0, 'isProblematic': True, 'reason': 'reason 0'}
         # Test
         for xblock_name in self.xblock_names:
-            resp = self.call_event_by_data('flag_resource', data, xblock_name)
-            self.check_result(resp['Success'], True)
-            self.check_result(resp['reason'], 'reason 0')
+            resp = self.call_event('flag_resource', data, xblock_name)
+            self.assertEqual(resp['Success'], True)
+            self.assertEqual(resp['reason'], 'reason 0')
+            self.check_for_get_xblock_page_code(200)
 
     def test_flag_resources_by_different_users(self):
         """
         Different users can't see the flag result of each other
         """
-        self.set_up_resources()
         data = {'id': 0, 'isProblematic': True, 'reason': 'reason 0'}
-        self.call_event_by_data('flag_resource', data)
+        self.call_event('flag_resource', data)
         self.logout()
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         # Test
-        resp = self.call_event_by_data('flag_resource', data)
+        resp = self.call_event('flag_resource', data)
         # The second user won't see the reason provided by the first user
         self.assertNotIn('oldReason', resp)
-        self.check_result(resp['Success'], True)
-        self.check_result(resp['reason'], 'reason 0')
+        self.assertEqual(resp['Success'], True)
+        self.assertEqual(resp['reason'], 'reason 0')
 
-    def test_student_is_user_staff(self):
+
+class TestRecommenderUserIdentity(TestRecommender):
+    """
+    Check whether we can identify users correctly
+    """
+    def setUp(self):
+        # call the setUp function from the superclass
+        super(TestRecommenderUserIdentity, self).setUp()
+
+    def test_student_is_not_staff(self):
         """
         Verify student is not a staff
         """
-        # Check only one block since this handler only retrieves user-scope variable
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
         url = self.get_handler_url('is_user_staff')
         result = json.loads(self.client.post(url, {}, '').content)
@@ -677,54 +627,60 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verify staff is a staff
         """
-        # Check only one block since this handler only retrieves user-scope variable
         self.enroll_staff(self.staff_user)
         url = self.get_handler_url('is_user_staff')
         result = json.loads(self.client.post(url, {}, '').content)
         self.assertTrue(result['is_user_staff'])
 
+
+class TestRecommenderFileUploading(TestRecommender):
+    """
+    Check whether we can handle file uploading correctly
+    """
+    def setUp(self):
+        # call the setUp function from the superclass
+        super(TestRecommenderFileUploading, self).setUp()
+
+        # Fake S3 information
+        self.s3_info = {
+            'aws_access_key': 'access key',
+            'aws_secret_key': 'secret key',
+            'bucketName': 'bucket name',
+            'uploadedFileDir': '/'
+        }
+
+    def upload_file(self, test_cases, xblock_name):
+        """
+        Create a temp file and upload it by calling the corresponding ajax
+        event
+        """
+        for test_case in test_cases:
+            temp = tempfile.NamedTemporaryFile(
+                prefix='upload_',
+                suffix=test_case['suffixes'],
+                delete=False
+            )
+            temp.seek(0)
+            temp.write(test_case['magic_number'].decode('hex'))
+            temp.flush()
+            url = self.get_handler_url('upload_screenshot', xblock_name)
+            response = self.client.post(url, {'file': open(temp.name, 'r')})
+            self.assertEqual(response.content, test_case['response'])
+            self.check_for_get_xblock_page_code(200)
+
     def test_set_s3_info(self):
         """
         Verify the s3 information setting
         """
-        # Check only one block since we can't tell whether the two blocks affect each
-        # other from the return in this handler (will be checked in test_upload_screenshot)
         self.enroll_student(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
-        test_cases = [
-            {
-                'expected_result': {
-                    'Success': False,
-                    'error': 'Set S3 information without permission'
-                },
-                'data': {
-                    'aws_access_key': 'access key',
-                    'aws_secret_key': 'secret key',
-                    'bucketName': 'bucket name',
-                    'uploadedFileDir': '/'
-                }
-            },  # Students have no right to set s3 information
-            {
-                'expected_result': {'Success': True},
-                'data': {
-                    'aws_access_key': 'access key',
-                    'aws_secret_key': 'secret key',
-                    'bucketName': 'bucket name',
-                    'uploadedFileDir': '/'
-                }
-            }  # Staff has the right to set s3 information
-        ]
-        for key, value in test_cases[1]['data'].iteritems():
-            test_cases[1]['expected_result'][key] = value
+        result = self.call_event('set_s3_info', self.s3_info)
+        self.assertEqual(result['Success'], False)
+        self.check_for_get_xblock_page_code(200)
 
-        for index in range(0, len(test_cases)):
-            if index == 1:
-                self.logout()
-                self.enroll_staff(self.staff_user)
-            self.check_ajax_event_result(
-                test_cases[index]['data'],
-                'set_s3_info',
-                test_cases[index]['expected_result']
-            )
+        self.logout()
+        self.enroll_staff(self.staff_user)
+        result = self.call_event('set_s3_info', self.s3_info)
+        self.assertEqual(result['Success'], True)
 
     def test_upload_screenshot_s3_not_set(self):
         """
@@ -786,7 +742,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ]
         # Set fake s3 information for the first block
         # Assume correct, test in test_set_s3_info
-        self.set_fake_s3_info(xblock_name)
+        self.client.post(self.get_handler_url('set_s3_info', xblock_name), json.dumps(self.s3_info), '')
         # Upload file with wrong extension name or magic number
         self.upload_file(test_cases, xblock_name)
 
@@ -798,7 +754,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.enroll_staff(self.staff_user)
         # Set fake s3 information for the first xblock
         # Assume correct, test in test_set_s3_info
-        self.set_fake_s3_info(self.xblock_names[0])
+        self.client.post(self.get_handler_url('set_s3_info', self.xblock_names[0]), json.dumps(self.s3_info), '')
         # Test on the second xblock
         xblock_name = self.xblock_names[1]
         test_cases = [
@@ -811,7 +767,7 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.upload_file(test_cases, xblock_name)
         # Set fake s3 information for the second xblock
         # Assume correct, test in test_set_s3_info
-        self.set_fake_s3_info(xblock_name)
+        self.client.post(self.get_handler_url('set_s3_info', xblock_name), json.dumps(self.s3_info), '')
         test_cases = [
             {
                 'suffixes': '.csv',
@@ -823,15 +779,15 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_upload_screenshot_correct_file_type(self):
         """
-        Verify the file type checking in the file uploading method is successful.
-        We don't check whether the file is uploaded successfully to S3 or not.
-        Thus, we still get 'IMPROPER_S3_SETUP' error here.
+        Verify the file type checking in the file uploading method is
+        successful. We don't check whether the file is uploaded successfully
+        to S3 or not. Thus, we still get 'IMPROPER_S3_SETUP' error here.
         """
         self.enroll_staff(self.staff_user)
         xblock_name = self.xblock_names[0]
         # Set fake s3 information for the first xblock
         # Assume correct, test in test_set_s3_info
-        self.set_fake_s3_info(xblock_name)
+        self.client.post(self.get_handler_url('set_s3_info', xblock_name), json.dumps(self.s3_info), '')
         # Upload file with correct extension name and magic number
         # It fails because we set fake s3 information here
         test_cases = [
