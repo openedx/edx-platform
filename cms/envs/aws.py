@@ -40,7 +40,8 @@ TEMPLATE_DEBUG = False
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = ''#'storages.backends.s3boto.S3BotoStorage'
+MEDIA_ROOT = '/edx/var/edxapp/uploads'
 
 ###################################### CELERY  ################################
 
@@ -285,3 +286,6 @@ X_FRAME_OPTIONS = ENV_TOKENS.get('X_FRAME_OPTIONS', X_FRAME_OPTIONS)
 
 ##### ADVANCED_SECURITY_CONFIG #####
 ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
+
+import newrelic.agent
+newrelic.agent.initialize('/var/tmp/newrelic-cms.ini')
