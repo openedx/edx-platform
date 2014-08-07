@@ -7,7 +7,6 @@ Acceptance tests for Video.
 import json
 from unittest import skipIf, skip
 import requests
-from box.test.flaky import flaky
 from ..helpers import UniqueCourseTest, is_youtube_available
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.tab_nav import TabNavPage
@@ -40,7 +39,6 @@ class YouTubeConfigError(Exception):
     pass
 
 
-@flaky
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """

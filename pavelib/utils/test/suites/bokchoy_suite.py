@@ -95,7 +95,6 @@ class BokChoyTestSuite(TestSuite):
             "nosetests",
             test_spec,
             "--with-xunit",
-            "--with-flaky",
             "--xunit-file={}".format(self.xunit_report),
             "--verbosity={}".format(self.verbosity),
             self.extra_args,
