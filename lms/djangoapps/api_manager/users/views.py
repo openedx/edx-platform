@@ -38,7 +38,7 @@ from api_manager.courseware_access import get_course, get_course_child, get_cour
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
-from api_manager.utils import generate_base_uri
+from api_manager.utils import generate_base_uri, dict_has_items, extract_data_params
 from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
 
@@ -571,6 +571,7 @@ class UsersGroupsList(SecureAPIView):
         * type: Set filtering parameter
         * course: Set filtering parameter to groups associated to a course or courses
         - URI: ```/api/users/{user_id}/groups/?type=series,seriesX&course=slashes%3AMITx%2B999%2BTEST_COURSE```
+        * xblock_id: filters group data and returns those groups where xblock_id matches given xblock_id
     - POST: Append a Group entity to the set of related Group entities for the specified User
         * group_id: __required__, The identifier for the Group being added
     - POST Example:
@@ -619,6 +620,7 @@ class UsersGroupsList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         group_type = request.QUERY_PARAMS.get('type', None)
         course = request.QUERY_PARAMS.get('course', None)
+        data_params = extract_data_params(request)
         response_data = {}
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
@@ -629,6 +631,8 @@ class UsersGroupsList(SecureAPIView):
         if course:
             course = course.split(',')
             groups = groups.filter(coursegrouprelationship__course_id__in=course)
+        if data_params:
+            groups = [group for group in groups if dict_has_items(group.groupprofile.data, data_params)]
         response_data['groups'] = []
         for group in groups:
             group_profile = GroupProfile.objects.get(group_id=group.id)
