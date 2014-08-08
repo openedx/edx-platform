@@ -2,6 +2,7 @@
 
 import socket
 import struct
+import json
 
 
 def address_exists_in_network(ip_address, net_n_bits):
@@ -59,3 +60,30 @@ def is_int(value):
         return False
 
 
+def dict_has_items(obj, items):
+    """
+    examine a `obj` for given `items`. if all `items` are found in `obj`
+    return True otherwise false. where `obj` is a dictionary and `items`
+    is list of dictionaries
+    """
+    has_items = False
+    if isinstance(obj, basestring):
+        obj = json.loads(obj)
+    for item in items:
+        for lookup_key, lookup_val in item.iteritems():
+            if lookup_key in obj and obj[lookup_key] == lookup_val:
+                has_items = True
+            else:
+                return False
+    return has_items
+
+
+def extract_data_params(request):
+    """
+    extracts all query params which starts with data__
+    """
+    data_params = []
+    for key, val in request.QUERY_PARAMS.iteritems():
+        if key.startswith('data__'):
+            data_params.append({key[6:]: val})
+    return data_params
