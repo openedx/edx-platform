@@ -47,7 +47,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-    def get_item(self, usage_key, depth=0, revision=None):
+    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
 
@@ -155,7 +155,7 @@ class DraftModuleStore(MongoModuleStore):
         course_query = self._course_key_to_son(course_key)
         self.collection.remove(course_query, multi=True)
 
-    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         Only called if cloning within this store or if env doesn't set up mixed.
         * copy the courseware
@@ -331,11 +331,6 @@ class DraftModuleStore(MongoModuleStore):
                         returns only Published items
                     if the branch setting is ModuleStoreEnum.Branch.draft_preferred,
                         returns either Draft or Published, preferring Draft items.
-            kwargs (key=value): what to look for within the course.
-                Common qualifiers are ``category`` or any field name. if the target field is a list,
-                then it searches for the given value in the list not list equivalence.
-                Substring matching pass a regex object.
-                ``name`` is another commonly provided key (Location based stores)
         """
         def base_get_items(key_revision):
             return super(DraftModuleStore, self).get_items(course_key, key_revision=key_revision, **kwargs)
@@ -439,7 +434,7 @@ class DraftModuleStore(MongoModuleStore):
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
 
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False, **kwargs):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
@@ -616,7 +611,7 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
-    def publish(self, location, user_id):
+    def publish(self, location, user_id, **kwargs):
         """
         Publish the subtree rooted at location to the live course and remove the drafts.
         Such publishing may cause the deletion of previously published but subsequently deleted
@@ -690,7 +685,7 @@ class DraftModuleStore(MongoModuleStore):
             self.collection.remove({'_id': {'$in': to_be_deleted}})
         return self.get_item(as_published(location))
 
-    def unpublish(self, location, user_id):
+    def unpublish(self, location, user_id, **kwargs):
         """
         Turn the published version into a draft, removing the published version.
 

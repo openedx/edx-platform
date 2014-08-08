@@ -17,7 +17,7 @@ from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
-from xmodule.modulestore.exceptions import InvalidLocationError
+from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
 from xmodule.modulestore import ModuleStoreEnum
 
@@ -174,8 +174,9 @@ def import_from_xml(
             if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
                 try:
                     store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
-                except InvalidLocationError:
+                except DuplicateCourseError:
                     # course w/ same org and course exists
+                    # The Mongo modulestore checks *with* the run in has_course, but not in create_course.
                     log.debug(
                         "Skipping import of course with id, {0},"
                         "since it collides with an existing one".format(dest_course_id)

@@ -895,18 +895,18 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(matches), 6)
         matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, category='chapter')
+        matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
         self.assertEqual(len(matches), 3)
-        matches = modulestore().get_items(locator, category='garbage')
+        matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
-            category='chapter',
+            qualifiers={'category': 'chapter'},
             settings={'display_name': re.compile(r'Hera')},
         )
         self.assertEqual(len(matches), 2)
 
-        matches = modulestore().get_items(locator, children='chapter2')
+        matches = modulestore().get_items(locator, qualifiers={'children': 'chapter2'})
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].location.block_id, 'head12345')
 
@@ -1324,7 +1324,7 @@ class TestItemCrud(SplitModuleTest):
         reusable_location = course.id.version_agnostic().for_branch(BRANCH_NAME_DRAFT)
 
         # delete a leaf
-        problems = modulestore().get_items(reusable_location, category='problem')
+        problems = modulestore().get_items(reusable_location, qualifiers={'category': 'problem'})
         locn_to_del = problems[0].location
         new_course_loc = modulestore().delete_item(locn_to_del, self.user_id)
         deleted = locn_to_del.version_agnostic()
@@ -1336,7 +1336,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
 
         # delete a subtree
-        nodes = modulestore().get_items(reusable_location, category='chapter')
+        nodes = modulestore().get_items(reusable_location, qualifiers={'category': 'chapter'})
         new_course_loc = modulestore().delete_item(nodes[0].location, self.user_id)
         # check subtree
 

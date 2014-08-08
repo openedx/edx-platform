@@ -14,7 +14,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
+from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls, CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.exceptions import NotFoundError

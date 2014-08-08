@@ -463,7 +463,7 @@ def jump_to_id(request, course_id, module_id):
     passed in. This assumes that id is unique within the course_id namespace
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    items = modulestore().get_items(course_key, name=module_id)
+    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
 
     if len(items) == 0:
         raise Http404(
@@ -937,7 +937,7 @@ def get_course_lti_endpoints(request, course_id):
 
     anonymous_user = AnonymousUser()
     anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
-    lti_descriptors = modulestore().get_items(course.id, category='lti')
+    lti_descriptors = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
 
     lti_noauth_modules = [
         get_module_for_descriptor(

@@ -116,7 +116,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_item(self, usage_key, depth=0):
+    def get_item(self, usage_key, depth=0, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at location.
 
@@ -150,7 +150,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None, **kwargs):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -228,7 +228,17 @@ class ModuleStoreRead(object):
             return criteria == target
 
     @abstractmethod
-    def get_courses(self):
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        pass
+
+    @abstractmethod
+    def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
         in this modulestore.
@@ -236,7 +246,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_course(self, course_id, depth=0):
+    def get_course(self, course_id, depth=0, **kwargs):
         '''
         Look for a specific course by its id (:class:`CourseKey`).
         Returns the course descriptor, or None if not found.
@@ -244,7 +254,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def has_course(self, course_id, ignore_case=False):
+    def has_course(self, course_id, ignore_case=False, **kwargs):
         '''
         Look for a specific course id.  Returns whether it exists.
         Args:
@@ -256,13 +266,14 @@ class ModuleStoreRead(object):
 
     @abstractmethod
     def get_parent_location(self, location, **kwargs):
-        '''Find the location that is the parent of this location in this
+        '''
+        Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
         '''
         pass
 
     @abstractmethod
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Get all of the xblocks in the given course which have no parents and are not of types which are
         usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
@@ -287,7 +298,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
@@ -325,7 +336,7 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
@@ -413,7 +424,7 @@ class ModuleStoreWrite(ModuleStoreRead):
         pass
 
     @abstractmethod
-    def delete_course(self, course_key, user_id):
+    def delete_course(self, course_key, user_id, **kwargs):
         """
         Deletes the course. It may be a soft or hard delete. It may or may not remove the xblock definitions
         depending on the persistence layer and how tightly bound the xblocks are to the course.
@@ -480,19 +491,19 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         return {}
 
-    def get_course(self, course_id, depth=0):
+    def get_course(self, course_id, depth=0, **kwargs):
         """
         See ModuleStoreRead.get_course
 
         Default impl--linear search through course list
         """
         assert(isinstance(course_id, CourseKey))
-        for course in self.get_courses():
+        for course in self.get_courses(**kwargs):
             if course.id == course_id:
                 return course
         return None
 
-    def has_course(self, course_id, ignore_case=False):
+    def has_course(self, course_id, ignore_case=False, **kwargs):
         """
         Returns the course_id of the course if it was found, else None
         Args:
@@ -577,7 +588,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
-    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         This base method just copies the assets. The lower level impls must do the actual cloning of
         content.
@@ -587,7 +598,7 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
         return dest_course_id
 
-    def delete_course(self, course_key, user_id):
+    def delete_course(self, course_key, user_id, **kwargs):
         """
         This base method just deletes the assets. The lower level impls must do the actual deleting of
         content.

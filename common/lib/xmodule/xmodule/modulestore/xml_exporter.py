@@ -106,7 +106,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     # and index here since the XML modulestore cannot load draft modules
     draft_verticals = modulestore.get_items(
         course_key,
-        category='vertical',
+        qualifiers={'category': 'vertical'},
         revision=ModuleStoreEnum.RevisionOption.draft_only
     )
     if len(draft_verticals) > 0:
@@ -144,7 +144,7 @@ def _export_field_content(xblock_item, item_dir):
 
 
 def export_extra_content(export_fs, modulestore, course_key, category_type, dirname, file_suffix=''):
-    items = modulestore.get_items(course_key, category=category_type)
+    items = modulestore.get_items(course_key, qualifiers={'category': category_type})
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)

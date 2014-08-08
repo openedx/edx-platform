@@ -190,7 +190,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         items = self.store.get_items(
             course_id,
-            category='vertical',
+            qualifiers={'category': 'vertical'},
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.check_verticals(items)

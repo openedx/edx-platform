@@ -277,7 +277,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
-    asset_url = location.to_deprecated_string()
+    asset_url = _add_slash(location.to_deprecated_string())
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
@@ -285,8 +285,14 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'url': asset_url,
         'external_url': external_url,
         'portable_url': StaticContent.get_static_path_from_location(location),
-        'thumbnail': thumbnail_location.to_deprecated_string() if thumbnail_location is not None else None,
+        'thumbnail': _add_slash(unicode(thumbnail_location)) if thumbnail_location else None,
         'locked': locked,
         # Needed for Backbone delete/update.
         'id': unicode(location)
     }
+
+
+def _add_slash(url):
+    if not url.startswith('/'):
+        url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
+    return url

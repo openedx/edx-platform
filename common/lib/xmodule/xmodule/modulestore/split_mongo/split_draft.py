@@ -48,16 +48,22 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         item = super(DraftVersioningModuleStore, self).create_course(
             org, course, run, user_id, master_branch=master_branch, **kwargs
         )
-        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
         return item
 
-    def get_courses(self):
+    def get_courses(self, **kwargs):
         """
-        Returns all the courses on the Draft branch (which is a superset of the courses on the Published branch).
+        Returns all the courses on the Draft or Published branch depending on the branch setting.
         """
-        return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft)
+        branch_setting = self.get_branch_setting()
+        if branch_setting == ModuleStoreEnum.Branch.draft_preferred:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.draft, **kwargs)
+        elif branch_setting == ModuleStoreEnum.Branch.published_only:
+            return super(DraftVersioningModuleStore, self).get_courses(ModuleStoreEnum.BranchName.published, **kwargs)
+        else:
+            raise InsufficientSpecificationError()
 
-    def _auto_publish_no_children(self, location, category, user_id):
+    def _auto_publish_no_children(self, location, category, user_id, **kwargs):
         """
         Publishes item if the category is DIRECT_ONLY. This assumes another method has checked that
         location points to the head of the branch and ignores the version. If you call this in any
@@ -66,16 +72,17 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         if location.branch == ModuleStoreEnum.BranchName.draft and category in DIRECT_ONLY_CATEGORIES:
             # version_agnostic b/c of above assumption in docstring
-            self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL)
+            self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         item = super(DraftVersioningModuleStore, self).update_item(
             descriptor,
             user_id,
             allow_not_found=allow_not_found,
-            force=force
+            force=force,
+            **kwargs
         )
-        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
         return item
 
     def create_item(
@@ -88,7 +95,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             definition_locator=definition_locator, fields=fields,
             force=force, continue_version=continue_version, **kwargs
         )
-        self._auto_publish_no_children(item.location, item.location.category, user_id)
+        self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
         return item
 
     def create_child(
@@ -99,7 +106,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             user_id, parent_usage_key, block_type, block_id=block_id,
             fields=fields, continue_version=continue_version, **kwargs
         )
-        self._auto_publish_no_children(parent_usage_key, item.location.category, user_id)
+        self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
         return item
 
     def delete_item(self, location, user_id, revision=None, **kwargs):
@@ -134,8 +141,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         for branch in branches_to_delete:
             branched_location = location.for_branch(branch)
             parent_loc = self.get_parent_location(branched_location)
-            SplitMongoModuleStore.delete_item(self, branched_location, user_id, **kwargs)
-            self._auto_publish_no_children(parent_loc, parent_loc.category, user_id)
+            SplitMongoModuleStore.delete_item(self, branched_location, user_id)
+            self._auto_publish_no_children(parent_loc, parent_loc.category, user_id, **kwargs)
 
     def _map_revision_to_branch(self, key, revision=None):
         """
@@ -157,25 +164,20 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         usage_key = self._map_revision_to_branch(usage_key, revision=revision)
         return super(DraftVersioningModuleStore, self).has_item(usage_key)
 
-    def get_item(self, usage_key, depth=0, revision=None):
+    def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns the item identified by usage_key and revision.
         """
         usage_key = self._map_revision_to_branch(usage_key, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth)
+        return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth, **kwargs)
 
-    def get_items(self, course_locator, settings=None, content=None, revision=None, **kwargs):
+    def get_items(self, course_locator, revision=None, **kwargs):
         """
         Returns a list of XModuleDescriptor instances for the matching items within the course with
         the given course_locator.
         """
         course_locator = self._map_revision_to_branch(course_locator, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_items(
-            course_locator,
-            settings=settings,
-            content=content,
-            **kwargs
-        )
+        return super(DraftVersioningModuleStore, self).get_items(course_locator, **kwargs)
 
     def get_parent_location(self, location, revision=None, **kwargs):
         '''
@@ -200,14 +202,18 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
-        # TODO for better performance: lookup the courses and get the block entry, don't create the instances
-        draft = self.get_item(xblock.location.for_branch(ModuleStoreEnum.BranchName.draft))
-        try:
-            published = self.get_item(xblock.location.for_branch(ModuleStoreEnum.BranchName.published))
-        except ItemNotFoundError:
+        def get_block(branch_name):
+            course_structure = self._lookup_course(xblock.location.for_branch(branch_name))['structure']
+            return self._get_block_from_structure(course_structure, xblock.location.block_id)
+
+        draft_block = get_block(ModuleStoreEnum.BranchName.draft)
+        published_block = get_block(ModuleStoreEnum.BranchName.published)
+        if not published_block:
             return True
 
-        return draft.update_version != published.source_version
+        # check if the draft has changed since the published was created
+        return self._get_version(draft_block) != self._get_version(published_block)
+
 
     def publish(self, location, user_id, blacklist=None, **kwargs):
         """
@@ -224,15 +230,15 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             [location],
             blacklist=blacklist
         )
-        return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published))
+        return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)
 
-    def unpublish(self, location, user_id):
+    def unpublish(self, location, user_id, **kwargs):
         """
         Deletes the published version of the item.
         Returns the newly unpublished item.
         """
         self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
-        return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft))
+        return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)
 
     def revert_to_published(self, location, user_id):
         """
@@ -255,24 +261,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             PublishState.public - published exists and is the same as draft
             PublishState.private - no published version exists
         """
-        def get_head(branch):
-            course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
-            return self._get_block_from_structure(course_structure, xblock.location.block_id)
-
-        def get_version(block):
-            """
-            Return the version of the given database representation of a block.
-            """
-            #TODO: make this method a more generic helper
-            return block['edit_info'].get('source_version', block['edit_info']['update_version'])
-
-        draft_head = get_head(ModuleStoreEnum.BranchName.draft)
-        published_head = get_head(ModuleStoreEnum.BranchName.published)
+        draft_head = self._get_head(xblock, ModuleStoreEnum.BranchName.draft)
+        published_head = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
 
         if not published_head:
             # published version does not exist
             return PublishState.private
-        elif get_version(draft_head) == get_version(published_head):
+        elif self._get_version(draft_head) == self._get_version(published_head):
             # published and draft versions are equal
             return PublishState.public
         else:
@@ -287,3 +282,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         # This is a no-op in Split since a draft version of the data always remains
         pass
+
+    def _get_head(self, xblock, branch):
+        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
+        return self._get_block_from_structure(course_structure, xblock.location.block_id)
+
+    def _get_version(self, block):
+        """
+        Return the version of the given database representation of a block.
+        """
+        return block['edit_info'].get('source_version', block['edit_info']['update_version'])
