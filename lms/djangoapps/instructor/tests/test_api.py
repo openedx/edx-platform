@@ -2389,10 +2389,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         data = {
             'total-registration-codes': 15.0, 'company_name': 'Test Group', 'sale_price': 122.45,
             'purchaser_contact': 'Test123', 'purchaser_name': 'Test', 'purchaser_email': 'test@123.com',
-            'tax': '123A23F', 'reference': '', 'invoice': ''
+            'tax': '123A23F', 'reference': '', 'invoice': '23F2Test'
         }
 
-        response = self.client.post(url, data)
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
@@ -2416,7 +2416,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             'tax': '123A23F', 'reference': '', 'invoice': ''
         }
 
-        response = self.client.post(url, data)
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
@@ -2438,7 +2438,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             'tax': '123A23F', 'reference': '', 'invoice': ''
         }
 
-        response = self.client.post(url, data)
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
