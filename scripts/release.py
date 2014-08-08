@@ -149,8 +149,56 @@ def create_github_creds():
             headers=headers, data=json.dumps(payload),
         )
     if not response.ok:
-        raise requests.exceptions.RequestException(response.json()["message"])
+        message = response.json()["message"]
+        if message != "Validation Failed":
+            raise requests.exceptions.RequestException(message)
+        else:
+            # A token called "edx-release" already exists on Github.
+            # Delete it, and try again.
+            token_id = get_github_auth_id(username, password, "edx-release")
+            if token_id:
+                delete_github_auth_token(username, password, token_id)
+            response = requests.post(
+                "https://api.github.com/authorizations",
+                auth=(username, password),
+                headers=headers, data=json.dumps(payload),
+            )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
+
     return (username, response.json()["token"])
+
+
+def get_github_auth_id(username, password, note):
+    """
+    Return the ID associated with the Github auth token with the given note.
+    If no such auth token exists, return None.
+    """
+    response = requests.get(
+        "https://api.github.com/authorizations",
+        auth=(username, password),
+        headers={"User-Agent": "edx-release"},
+    )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
+
+    for auth_token in response.json():
+        if auth_token["note"] == "edx-release":
+            return auth_token["id"]
+    return None
+
+
+def delete_github_auth_token(username, password, token_id):
+    response = requests.delete(
+        "https://api.github.com/authorizations/{id}".format(id=token_id),
+        auth=(username, password),
+        headers={"User-Agent": "edx-release"},
+    )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
 
 
 def ensure_github_creds(attempts=3):
