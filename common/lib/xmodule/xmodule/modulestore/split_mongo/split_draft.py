@@ -297,4 +297,3 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Return the version of the given database representation of a block.
         """
         return block['edit_info'].get('source_version', block['edit_info']['update_version'])
-

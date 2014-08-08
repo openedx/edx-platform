@@ -176,6 +176,7 @@ def import_from_xml(
                     store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
                 except DuplicateCourseError:
                     # course w/ same org and course exists
+                    # The Mongo modulestore checks *with* the run in has_course, but not in create_course.
                     log.debug(
                         "Skipping import of course with id, {0},"
                         "since it collides with an existing one".format(dest_course_id)

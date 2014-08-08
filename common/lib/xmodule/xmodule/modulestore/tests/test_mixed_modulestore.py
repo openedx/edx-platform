@@ -544,6 +544,13 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
 
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            draft_courses = self.store.get_courses(remove_branch=True)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            published_courses = self.store.get_courses(remove_branch=True)
+        self.assertEquals([c.id for c in draft_courses], [c.id for c in published_courses])
+
+
     def test_xml_get_courses(self):
         """
         Test that the xml modulestore only loaded the courses from the maps.
@@ -1229,7 +1236,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.store.default_store(default_ms):
             self.verify_default_store(default_ms)
 
-    def test_nested_default_store(self):
+    def test_default_store_nested(self):
         """
         Test the default store context manager, nested within one another
         """
@@ -1245,6 +1252,17 @@ class TestMixedModuleStore(unittest.TestCase):
                 self.verify_default_store(ModuleStoreEnum.Type.split)
             self.verify_default_store(ModuleStoreEnum.Type.mongo)
 
+    def test_default_store_fake(self):
+        """
+        Test the default store context manager, asking for a fake store
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        fake_store = "fake"
+        with self.assertRaisesRegexp(Exception, "Cannot find store of type {}".format(fake_store)):
+            with self.store.default_store(fake_store):
+                pass  # pragma: no cover
 
 #=============================================================================================================
 # General utils for not using django settings
