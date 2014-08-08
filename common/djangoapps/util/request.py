@@ -2,7 +2,9 @@
 import re
 
 from django.conf import settings
+
 from microsite_configuration import microsite
+from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -41,4 +43,7 @@ def course_id_from_url(url):
     if course_id is None:
         return None
 
-    return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        return SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    except InvalidKeyError:
+        return None
