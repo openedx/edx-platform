@@ -152,6 +152,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         edit_info = json_data.get('edit_info', {})
         module.edited_by = edit_info.get('edited_by')
         module.edited_on = edit_info.get('edited_on')
+        module.subtree_edited_by = None  # TODO - addressed with LMS-11183
+        module.subtree_edited_on = None  # TODO - addressed with LMS-11183
         module.published_by = None  # TODO - addressed with LMS-11184
         module.published_date = None  # TODO - addressed with LMS-11184
         module.previous_version = edit_info.get('previous_version')

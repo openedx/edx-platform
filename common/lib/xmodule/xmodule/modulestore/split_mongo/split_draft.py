@@ -217,7 +217,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             return True
 
         # check if the draft has changed since the published was created
-        return draft_block['edit_info']['update_version'] != published_block['edit_info']['source_version']
+        return self._get_version(draft_block) != self._get_version(published_block)
 
 
     def publish(self, location, user_id, blacklist=None, **kwargs):
@@ -266,24 +266,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             PublishState.public - published exists and is the same as draft
             PublishState.private - no published version exists
         """
-        def get_head(branch):
-            course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
-            return self._get_block_from_structure(course_structure, xblock.location.block_id)
-
-        def get_version(block):
-            """
-            Return the version of the given database representation of a block.
-            """
-            #TODO: make this method a more generic helper
-            return block['edit_info'].get('source_version', block['edit_info']['update_version'])
-
-        draft_head = get_head(ModuleStoreEnum.BranchName.draft)
-        published_head = get_head(ModuleStoreEnum.BranchName.published)
+        draft_head = self._get_head(xblock, ModuleStoreEnum.BranchName.draft)
+        published_head = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
 
         if not published_head:
             # published version does not exist
             return PublishState.private
-        elif get_version(draft_head) == get_version(published_head):
+        elif self._get_version(draft_head) == self._get_version(published_head):
             # published and draft versions are equal
             return PublishState.public
         else:
@@ -298,3 +287,14 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         # This is a no-op in Split since a draft version of the data always remains
         pass
+
+    def _get_head(self, xblock, branch):
+        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
+        return self._get_block_from_structure(course_structure, xblock.location.block_id)
+
+    def _get_version(self, block):
+        """
+        Return the version of the given database representation of a block.
+        """
+        return block['edit_info'].get('source_version', block['edit_info']['update_version'])
+
