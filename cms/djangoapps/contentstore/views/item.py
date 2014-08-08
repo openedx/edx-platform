@@ -23,6 +23,7 @@ from xblock.fields import Scope
 from xblock.fragment import Fragment
 
 import xmodule
+from xmodule.annotator_mixin import html_to_text
 from xmodule.tabs import StaticTab, CourseTabList
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.django import modulestore
@@ -309,6 +310,9 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
         # Returning the same sort of result that we do for other save operations. In the future,
         # we may want to return the full XBlockInfo.
         return JsonResponse({'id': unicode(xblock.location)})
+
+    if metadata and 'display_name' in metadata:
+        metadata["display_name"] = html_to_text(metadata["display_name"])
 
     old_metadata = own_metadata(xblock)
     old_content = xblock.get_explicitly_set_fields_by_scope(Scope.content)
