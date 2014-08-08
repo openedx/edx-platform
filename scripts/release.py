@@ -4,19 +4,26 @@ a release-master multitool
 """
 from __future__ import print_function, unicode_literals
 import sys
-from path import path
-from git import Repo, Commit
-from git.refs.symbolic import SymbolicReference
 import argparse
 from datetime import date, timedelta
-from dateutil.parser import parse as parse_datestring
 import re
 import collections
 import functools
 import textwrap
-import requests
 import json
 import getpass
+
+try:
+    from path import path
+    from git import Repo, Commit
+    from git.refs.symbolic import SymbolicReference
+    from dateutil.parser import parse as parse_datestring
+    import requests
+except ImportError:
+    print("Error: missing dependencies! Please run this command to install them:")
+    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1")
+    sys.exit(1)
+
 try:
     from pygments.console import colorize
 except ImportError:
