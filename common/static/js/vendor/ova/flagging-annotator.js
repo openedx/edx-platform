@@ -76,8 +76,9 @@ Annotator.Plugin.Flagging = (function(_super) {
      */
     Flagging.prototype.updateField = function(field, annotation) {
         
-        // figure out whether annotation is of image or not
-        var user_email = annotation.media === "image" ? 
+        // figure out whether annotation is of type image or if ova is not defined (meaning it
+        // it doesn't have a type yet, but it is still an image).
+        var user_email = (annotation.media === "image" || typeof ova === 'undefined') ? 
                             osda.options.optionsAnnotator.permissions.user.id:
                             ova.options.optionsAnnotator.permissions.user.id;
         
