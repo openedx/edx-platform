@@ -21,6 +21,12 @@ from uuid import uuid4
 # import settings from LMS for consistent behavior with CMS
 from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME)
 
+# mongo connection settings
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+
+THIS_UUID = uuid4().hex[:5]
+
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
@@ -79,15 +85,18 @@ update_module_store_settings(
     },
     doc_store_settings={
         'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+        'host': MONGO_HOST,
+        'port': MONGO_PORT_NUM,
+        'collection': 'test_modulestore{0}'.format(THIS_UUID),
     },
 )
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'test_xcontent',
+        'port': MONGO_PORT_NUM,
         'collection': 'dont_trip',
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'

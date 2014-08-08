@@ -15,6 +15,7 @@ from xmodule.exceptions import InvalidVersionError
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
@@ -26,6 +27,7 @@ if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 @ddt.ddt
@@ -34,8 +36,8 @@ class TestMixedModuleStore(unittest.TestCase):
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
     """
-    HOST = 'localhost'
-    PORT = 27017
+    HOST = MONGO_HOST
+    PORT = MONGO_PORT_NUM
     DB = 'test_mongo_%s' % uuid4().hex[:5]
     COLLECTION = 'modulestore'
     FS_ROOT = DATA_DIR
@@ -54,6 +56,7 @@ class TestMixedModuleStore(unittest.TestCase):
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
+        'port': PORT,
         'db': DB,
         'collection': COLLECTION,
     }
