@@ -91,7 +91,7 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         AssertEqual replacement for CourseLocator
         """
-        if loc1.version_agnostic() != loc2.version_agnostic():
+        if loc1.for_branch(None) != loc2.for_branch(None):
             self.fail(self._formatMessage(msg, u"{} != {}".format(unicode(loc1), unicode(loc2))))
 
     def setUp(self):
@@ -125,13 +125,13 @@ class TestMixedModuleStore(unittest.TestCase):
         # create course
         self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
         if isinstance(self.course.id, CourseLocator):
-            self.course_locations[self.MONGO_COURSEID] = self.course.location.version_agnostic()
+            self.course_locations[self.MONGO_COURSEID] = self.course.location
         else:
             self.assertEqual(self.course.id, course_key)
 
         # create chapter
         chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
-        self.writable_chapter_location = chapter.location.version_agnostic()
+        self.writable_chapter_location = chapter.location
 
     def _create_block_hierarchy(self):
         """
@@ -176,13 +176,13 @@ class TestMixedModuleStore(unittest.TestCase):
 
         def create_sub_tree(parent, block_info):
             block = self.store.create_child(
-                self.user_id, parent.location.version_agnostic(),
+                self.user_id, parent.location,
                 block_info.category, block_id=block_info.display_name,
                 fields={'display_name': block_info.display_name},
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
-            setattr(self, block_info.field_name, block.location.version_agnostic())
+            setattr(self, block_info.field_name, block.location)
 
         for tree in trees:
             create_sub_tree(self.course, tree)
@@ -386,7 +386,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # Create dummy direct only xblocks
         chapter = self.store.create_item(
             self.user_id,
-            test_course.id.version_agnostic(),
+            test_course.id,
             'chapter',
             block_id='vertical_container'
         )
@@ -407,7 +407,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # Create a dummy component to test against
         xblock = self.store.create_item(
             self.user_id,
-            test_course.id.version_agnostic(),
+            test_course.id,
             'vertical',
             block_id='test_vertical'
         )
@@ -522,7 +522,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
 
-        self.store.publish(private_vert.location.version_agnostic(), self.user_id)
+        self.store.publish(private_vert.location, self.user_id)
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
@@ -538,11 +538,7 @@ class TestMixedModuleStore(unittest.TestCase):
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
             courses = self.store.get_courses()
-        course_ids = [
-            course.location.version_agnostic()
-            if hasattr(course.location, 'version_agnostic') else course.location
-            for course in courses
-        ]
+        course_ids = [course.location for course in courses]
         self.assertEqual(len(courses), 3, "Not 3 courses: {}".format(course_ids))
         self.assertIn(self.course_locations[self.MONGO_COURSEID], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
@@ -622,7 +618,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
 
         # publish the course
-        self.course = self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)
 
         # make drafts of verticals
         self.store.convert_to_draft(self.vertical_x1a, self.user_id)
@@ -648,7 +644,7 @@ class TestMixedModuleStore(unittest.TestCase):
         ])
 
         # publish the course again
-        self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
@@ -888,7 +884,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         block = self.store.create_item(
             self.user_id,
-            self.course.location.version_agnostic().course_key,
+            self.course.location.course_key,
             'problem'
         )
         self.assertEqual(self.user_id, block.edited_by)
@@ -899,7 +895,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         block = self.store.create_item(
             self.user_id,
-            self.course.location.version_agnostic().course_key,
+            self.course.location.course_key,
             'problem'
         )
         self.assertEqual(self.user_id, block.subtree_edited_by)
@@ -944,7 +940,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
 
         # publish
-        self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.store.publish(self.course.location, self.user_id)
         published_xblock = self.store.get_item(
             self.vertical_x1a,
             revision=ModuleStoreEnum.RevisionOption.published_only
@@ -980,7 +976,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # start off as Private
         item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')
-        item_location = item.location.version_agnostic()
+        item_location = item.location
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
             self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
@@ -1030,13 +1026,13 @@ class TestMixedModuleStore(unittest.TestCase):
         test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
         self.assertEqual(self.store.compute_publish_state(test_course), PublishState.public)
 
-        test_course_key = test_course.id.version_agnostic()
+        test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
         chapter = self.store.create_item(self.user_id, test_course_key, 'chapter', 'Overview')
         self.assertEqual(self.store.compute_publish_state(chapter), PublishState.public)
 
-        chapter_location = chapter.location.version_agnostic()
+        chapter_location = chapter.location
 
         # test create_child of direct-only category to make sure we are autopublishing
         sequential = self.store.create_child(self.user_id, chapter_location, 'sequential', 'Sequence')

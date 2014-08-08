@@ -8,11 +8,11 @@ In this way, courses can be served up both - say - XMLModuleStore or MongoModule
 import logging
 from contextlib import contextmanager
 import itertools
+import functools
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import Locator
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
@@ -25,40 +25,63 @@ log = logging.getLogger(__name__)
 
 
 def strip_key(func):
+    """
+    A decorator for stripping version and branch information from return values that are, or contain, locations.
+    Additionally, the decorated function is called with an optional 'field_decorator' parameter that can be used
+    to strip any location(-containing) fields, which are not directly returned by the function.
+
+    The behavior can be controlled by passing 'remove_version' and 'remove_branch' booleans to the decorated
+    function's kwargs.
+    """
+    @functools.wraps(func)
     def inner(*args, **kwargs):
+        """
+        Supported kwargs:
+            remove_version - If True, calls 'version_agnostic' on all return values, including those in lists and dicts.
+            remove_branch - If True, calls 'for_branch(None)' on all return values, including those in lists and dicts.
+            Note: The 'field_decorator' parameter passed to the decorated function is a function that honors the
+            values of these kwargs.
+        """
 
         # remove version and branch, by default
         rem_vers = kwargs.pop('remove_version', True)
         rem_branch = kwargs.pop('remove_branch', False)
 
+        # helper function for stripping individual values
         def strip_key_func(val):
+            """
+            Strips the version and branch information according to the settings of rem_vers and rem_branch.
+            Recursively calls this function if the given value has a 'location' attribute.
+            """
             retval = val
-            if isinstance(retval, Locator):
-                if rem_vers:
-                    retval = retval.version_agnostic()
-                if rem_branch:
-                    retval = retval.for_branch(None)
+            if rem_vers and hasattr(retval, 'version_agnostic'):
+                retval = retval.version_agnostic()
+            if rem_branch and hasattr(retval, 'for_branch'):
+                retval = retval.for_branch(None)
+            if hasattr(retval, 'location'):
+                retval.location = strip_key_func(retval.location)
             return retval
 
-        # decorator for field values
-        def strip_key_field_decorator(field_value):
+        # function for stripping both, collection of, and individual, values
+        def strip_key_collection(field_value):
+            """
+            Calls strip_key_func for each element in the given value.
+            """
             if rem_vers or rem_branch:
                 if isinstance(field_value, list):
                     field_value = [strip_key_func(fv) for fv in field_value]
                 elif isinstance(field_value, dict):
                     for key, val in field_value.iteritems():
                         field_value[key] = strip_key_func(val)
-                elif hasattr(field_value, 'location'):
-                    field_value.location = strip_key_func(field_value.location)
                 else:
                     field_value = strip_key_func(field_value)
             return field_value
 
-        # call the function
-        retval = func(field_decorator=strip_key_field_decorator, *args, **kwargs)
+        # call the decorated function
+        retval = func(field_decorator=strip_key_collection, *args, **kwargs)
 
-        # return the "decorated" value
-        return strip_key_field_decorator(retval)
+        # strip the return value
+        return strip_key_collection(retval)
 
     return inner
 
@@ -219,10 +242,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses in this modulestore.
         '''
-        courses = []
+        courses = {}
         for store in self.modulestores:
-            courses.extend(store.get_courses(**kwargs))
-        return courses
+            # filter out ones which were fetched from earlier stores but locations may not be ==
+            for course in store.get_courses(**kwargs):
+                course_id = self._clean_course_id_for_mapping(course.id)
+                if course_id not in courses:
+                    # course is indeed unique. save it in result
+                    courses[course_id] = course
+        return courses.values()
 
     def make_course_key(self, org, course, run):
         """
