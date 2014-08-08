@@ -13,6 +13,7 @@ class TestBulkWriteMixin(unittest.TestCase):
     def setUp(self):
         super(TestBulkWriteMixin, self).setUp()
         self.bulk = BulkWriteMixin()
+        self.bulk.SCHEMA_VERSION = 1
         self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
         self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoConnection)
 
@@ -165,6 +166,12 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
             self.conn.mock_calls
         )
 
+    def test_version_structure_creates_new_version(self):
+        self.assertNotEquals(
+            self.bulk.version_structure(self.course_key, self.structure, 'user_id')['_id'],
+            self.structure['_id']
+        )
+
 class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, TestBulkWriteMixinPreviousTransaction):
     """
     Test that operations on with a closed transaction aren't affected by a previously executed transaction
@@ -257,7 +264,19 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         self.assertEquals(self.conn.get_course_index.call_count, 1)
         self.assertEquals(self.index_entry, result)
 
+    def test_version_structure_creates_new_version_before_read(self):
+        self.assertNotEquals(
+            self.bulk.version_structure(self.course_key, self.structure, 'user_id')['_id'],
+            self.structure['_id']
+        )
 
+    def test_version_structure_creates_new_version_after_read(self):
+        self.conn.get_structure.return_value = copy.deepcopy(self.structure)
+        self.bulk.get_structure(self.course_key, self.structure['_id'])
+        self.assertNotEquals(
+            self.bulk.version_structure(self.course_key, self.structure, 'user_id')['_id'],
+            self.structure['_id']
+        )
 
 class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):
     """
