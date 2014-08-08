@@ -7,7 +7,6 @@ import re
 import unittest
 import uuid
 from importlib import import_module
-from mock import MagicMock, Mock, call
 from path import path
 
 from xmodule.course_module import CourseDescriptor
@@ -21,8 +20,7 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator, VersionTre
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, BulkWriteMixin
-from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
+from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
@@ -1734,101 +1732,6 @@ class TestSchema(SplitModuleTest):
                 0,
                 "{0.name} has records with wrong schema_version".format(collection)
             )
-
-
-class TestBulkWriteMixin(unittest.TestCase):
-    def setUp(self):
-        self.bulk = BulkWriteMixin()
-        self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
-        self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoConnection)
-
-        self.course_key = Mock(name='course_key', spec=CourseLocator)
-        self.course_key_b = Mock(name='course_key_b', spec=CourseLocator)
-        self.version_guid = Mock(name='version_guid')
-        self.structure = MagicMock(name='structure')
-        self.index_entry = MagicMock(name='index_entry')
-
-    def assertConnCalls(self, *calls):
-        self.assertEqual(list(calls), self.conn.mock_calls)
-
-    def assertCacheNotCleared(self):
-        self.assertFalse(self.clear_cache.called)
-
-    def test_no_bulk_read_structure(self):
-        # Reading a structure when no bulk operation is active should just call
-        # through to the db_connection
-        result = self.bulk.get_structure(self.course_key, self.version_guid)
-        self.assertConnCalls(call.get_structure(self.course_key.as_object_id.return_value))
-        self.assertEqual(result, self.conn.get_structure.return_value)
-        self.assertCacheNotCleared()
-
-    def test_no_bulk_write_structure(self):
-        # Writing a structure when no bulk operation is active should just
-        # call through to the db_connection. It should also clear the
-        # system cache
-        self.bulk.update_structure(self.course_key, self.structure)
-        self.assertConnCalls(call.upsert_structure(self.structure))
-        self.clear_cache.assert_called_once_with(self.structure['_id'])
-
-    def test_no_bulk_read_index(self):
-        # Reading a course index when no bulk operation is active should just call
-        # through to the db_connection
-        result = self.bulk.get_course_index(self.course_key, ignore_case=True)
-        self.assertConnCalls(call.get_course_index(self.course_key, True))
-        self.assertEqual(result, self.conn.get_course_index.return_value)
-        self.assertCacheNotCleared()
-
-    def test_no_bulk_write_index(self):
-        # Writing a course index when no bulk operation is active should just call
-        # through to the db_connection
-        self.bulk.insert_course_index(self.course_key, self.index_entry)
-        self.assertConnCalls(call.insert_course_index(self.index_entry))
-        self.assertCacheNotCleared()
-
-    def test_read_structure_without_write_from_db(self):
-        # Reading a structure before it's been written (while in bulk operation mode)
-        # returns the structure from the database
-        self.bulk._begin_bulk_write_operation(self.course_key)
-        result = self.bulk.get_structure(self.course_key, self.version_guid)
-        self.assertEquals(self.conn.get_structure.call_count, 1)
-        self.assertEqual(result, self.conn.get_structure.return_value)
-        self.assertCacheNotCleared()
-
-    def test_read_structure_without_write_only_reads_once(self):
-        # Reading the same structure multiple times shouldn't hit the database
-        # more than once
-        self.test_read_structure_without_write_from_db()
-        result = self.bulk.get_structure(self.course_key, self.version_guid)
-        self.assertEquals(self.conn.get_structure.call_count, 1)
-        self.assertEqual(result, self.conn.get_structure.return_value)
-        self.assertCacheNotCleared()
-
-    def test_read_structure_after_write_no_db(self):
-        # Reading a structure that's already been written shouldn't hit the db at all
-        self.bulk._begin_bulk_write_operation(self.course_key)
-        self.bulk.update_structure(self.course_key, self.structure)
-        result = self.bulk.get_structure(self.course_key, self.version_guid)
-        self.assertEquals(self.conn.get_structure.call_count, 0)
-        self.assertEqual(result, self.structure)
-
-    def test_read_structure_after_write_after_read(self):
-        # Reading a structure that's been updated after being pulled from the db should
-        # still get the updated value
-        self.test_read_structure_without_write_only_reads_once()
-        self.conn.get_structure.reset_mock()
-        self.bulk.update_structure(self.course_key, self.structure)
-        result = self.bulk.get_structure(self.course_key, self.version_guid)
-        self.assertEquals(self.conn.get_structure.call_count, 0)
-        self.assertEqual(result, self.structure)
-
-    # read index after close
-    # read structure after close
-    # write index on close
-    # write structure on close
-    # close with new index
-    # close with existing index
-    # read index after update
-    # read index without update
 
 
 #===========================================

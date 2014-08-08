@@ -114,7 +114,8 @@ class BulkWriteRecord(object):
         self._structures = {}
 
     def set_structure(self, branch, structure):
-        self.index['versions'][branch] = structure['_id']
+        if self.index is not None:
+            self.index['versions'][branch] = structure['_id']
         self._structures[branch] = structure
         self.dirty_branches.add(branch)
 
@@ -170,7 +171,7 @@ class BulkWriteMixin(object):
                         key.run.lower() == course_key.run.lower()
                     ):
                         return record
-                # If nothing matches case-insesitively, fall through to creating a new record with the passed in case
+                # If nothing matches case-insensitively, fall through to creating a new record with the passed in case
             return self._active_bulk_writes.records[course_key.replace(branch=None, version_guid=None)]
         else:
             # If nothing org/course/run aren't set, use a bulk record that is identified just by the version_guid
@@ -198,7 +199,9 @@ class BulkWriteMixin(object):
         if bulk_write_record.active_count > 1:
             return
 
-        bulk_write_record.initial_index = bulk_write_record.index = self.db_connection.get_course_index(course_key)
+        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
+        # Ensure that any edits to the index don't pollute the initial_index
+        bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
 
     def _end_bulk_write_operation(self, course_key):
         """
@@ -224,12 +227,13 @@ class BulkWriteMixin(object):
                 except DuplicateKeyError:
                     pass  # The structure already exists, so we don't have to write it out again
 
-            if bulk_write_record.index is not None and bulk_write_record.index != bulk_write_record.initial_index:
-                if bulk_write_record.initial_index is None:
-                    self.db_connection.insert_course_index(bulk_write_record.index)
-                else:
-                    self.db_connection.update_course_index(bulk_write_record.index, from_index=bulk_write_record.initial_index)
-            self._clear_bulk_write_record(course_key)
+        if bulk_write_record.index is not None and bulk_write_record.index != bulk_write_record.initial_index:
+            if bulk_write_record.initial_index is None:
+                self.db_connection.insert_course_index(bulk_write_record.index)
+            else:
+                self.db_connection.update_course_index(bulk_write_record.index, from_index=bulk_write_record.initial_index)
+
+        self._clear_bulk_write_record(course_key)
 
     def _is_in_bulk_write_operation(self, course_key, ignore_case=False):
         """
@@ -318,7 +322,7 @@ class BulkWriteMixin(object):
         return new_structure
 
 
-class SplitMongoModuleStore(ModuleStoreWriteBase, BulkWriteMixin):
+class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
