@@ -5,16 +5,17 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
-from django.views.decorators.http import require_POST
-
+import StringIO
 import json
 import logging
 import re
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError
+from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -26,6 +27,8 @@ import random
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
+from microsite_configuration import microsite
+
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
@@ -36,9 +39,9 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption
+from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -635,7 +638,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, group_name):
+def save_registration_codes(request, course_id, generated_codes_list, company_name, invoice):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -645,17 +648,17 @@ def save_registration_codes(request, course_id, generated_codes_list, group_name
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
 
     course_registration = CourseRegistrationCode(
         code=code, course_id=course_id.to_deprecated_string(),
-        transaction_group_name=group_name, created_by=request.user
+        transaction_group_name=company_name, created_by=request.user, invoice=invoice
     )
     try:
         course_registration.save()
         generated_codes_list.append(course_registration)
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -718,17 +721,69 @@ def generate_registration_codes(request, course_id):
 
     # covert the course registration code number into integer
     try:
-        course_code_number = int(request.POST['course_registration_code_number'])
+        course_code_number = int(request.POST['total-registration-codes'])
     except ValueError:
-        course_code_number = int(float(request.POST['course_registration_code_number']))
+        course_code_number = int(float(request.POST['total-registration-codes']))
 
-    group_name = request.POST['transaction_group_name']
+    company_name = request.POST['company_name']
 
+    sale_price = request.POST['sale_price']
+    purchaser_contact = request.POST['purchaser_contact']
+    purchaser_name = request.POST['purchaser_name']
+    purchaser_email = request.POST['purchaser_email']
+    company_tax_id = request.POST['tax']
+    reference = request.POST['reference']
+    recipient_list = [purchaser_email]
+    if request.POST.get('invoice', False):
+        recipient_list.append(request.user.email)
+
+    sale_invoice = Invoice.objects.create(
+        total_amount=sale_price, purchaser_name=purchaser_name, purchaser_contact=purchaser_contact,
+        purchaser_email=purchaser_email, tax_id=company_tax_id, reference=reference
+    )
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, group_name)
+        save_registration_codes(request, course_id, course_registration_codes, company_name, sale_invoice)
 
+    site_name = microsite.get_value('SITE_NAME', 'localhost')
+    course = get_course_by_id(course_id, depth=None)
+    course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
+    course_price = course_honor_mode.min_price
+    quantity = course_code_number
+    discount_price = (float(quantity * course_price) - float(sale_price))
+    course_url = '{base_url}{course_about}'.format(
+        base_url=request.META['HTTP_HOST'],
+        course_about=reverse('about_course', kwargs={'course_id': course_id.to_deprecated_string()})
+    )
+    context = {
+        'invoice': sale_invoice,
+        'company_name': company_name,
+        'site_name': site_name,
+        'course': course,
+        'course_price': course_price,
+        'discount_price': discount_price,
+        'sale_price': sale_price,
+        'quantity': quantity,
+        'registration_codes': course_registration_codes,
+        'course_url': course_url,
+    }
+    # composes registration codes invoice email
+    subject = 'Invoice for {course_name}'.format(course_name=course.display_name)
+    message = render_to_string('emails/registration_codes_sale_invoice.txt', context)
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+    #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
+    csv_file = StringIO.StringIO()
+    csv_writer = csv.writer(csv_file)
+    for registration_code in course_registration_codes:
+        csv_writer.writerow([registration_code.code])
+    email = EmailMessage()
+    email.subject = subject
+    email.body = message
+    email.from_email = from_address
+    email.to = recipient_list
+    email.attach('{file_name}.csv'.format(file_name=subject), csv_file.getvalue(), 'text/csv')
+    email.send()
     return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
-
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
