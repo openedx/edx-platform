@@ -18,7 +18,13 @@ from path import path
 from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
+# mongo connection settings
+MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
+MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
+
 os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
+
+THIS_UUID = uuid4().hex[:5]
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
@@ -120,16 +126,19 @@ update_module_store_settings(
         'data_dir': COMMON_TEST_DATA_ROOT,
     },
     doc_store_settings={
+        'host': MONGO_HOST,
+        'port': MONGO_PORT_NUM,
         'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(uuid4().hex[:5]),
+        'collection': 'test_modulestore{0}'.format(THIS_UUID),
     },
 )
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'xcontent',
+        'port': MONGO_PORT_NUM,
     }
 }
 
@@ -350,4 +359,13 @@ VERIFY_STUDENT["SOFTWARE_SECURE"] = {
 
 VIDEO_CDN_URL = {
     'CN': 'http://api.xuetangx.com/edx/video?s3_url='
+}
+
+######### dashboard git log settings #########
+MONGODB_LOG = {
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
+    'user': '',
+    'password': '',
+    'db': 'xlog',
 }

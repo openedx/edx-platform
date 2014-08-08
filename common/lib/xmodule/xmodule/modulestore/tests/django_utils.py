@@ -1,13 +1,13 @@
 """
 Modulestore configuration for test cases.
 """
-
 from uuid import uuid4
 from django.test import TestCase
 from django.contrib.auth.models import User
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 def mixed_store_config(data_dir, mappings):
@@ -60,7 +60,8 @@ def draft_mongo_store_config(data_dir):
             'NAME': 'draft',
             'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'DOC_STORE_CONFIG': {
-                'host': 'localhost',
+                'host': MONGO_HOST,
+                'port': MONGO_PORT_NUM,
                 'db': 'test_xmodule',
                 'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
@@ -194,6 +195,8 @@ class ModuleStoreTestCase(TestCase):
         if hasattr(module_store, '_drop_database'):
             module_store._drop_database()  # pylint: disable=protected-access
         _CONTENTSTORE.clear()
+        if hasattr(module_store, 'close_connections'):
+            module_store.close_connections()
 
     @classmethod
     def setUpClass(cls):
