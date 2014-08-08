@@ -126,7 +126,6 @@ rednose==0.3
 selenium==2.39.0
 splinter==0.5.4
 testtools==0.9.34
-flaky==0.2.0
 
 # Used for Segment.io analytics
 analytics-python==0.4.4
