@@ -486,7 +486,7 @@ class SplitModuleTest(unittest.TestCase):
                         parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
-                        course.runtime, spec['category'], spec['fields'], block_id, parent_xblock=parent
+                        course.runtime, course.id, spec['category'], block_id, spec['fields'], parent_xblock=parent
                     )
                     new_ele_dict[spec['id']] = child
                 course = split_store.persist_xblock_dag(course, revision['user_id'])

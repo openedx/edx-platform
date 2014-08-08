@@ -91,7 +91,7 @@ class CourseDetails(object):
             try:
                 about_item = store.get_item(temploc)
             except ItemNotFoundError:
-                about_item = store.create_xmodule(temploc, runtime=course.runtime)
+                about_item = store.create_xblock(course.runtime, course.id, 'about', about_key)
             about_item.data = data
             store.update_item(about_item, user.id)
 

@@ -41,6 +41,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
 
@@ -477,6 +478,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return course_key.replace(run=self._course_run_cache[cache_key])
 
+    def for_branch_setting(self, location):
+        """
+        Returns the Location that is for the current branch setting.
+        """
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return location.replace(revision=MongoRevisionKey.published)
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
+            return location.replace(revision=MongoRevisionKey.draft)
+        return location.replace(revision=MongoRevisionKey.published)
+
     def _compute_metadata_inheritance_tree(self, course_id):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
@@ -751,6 +762,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             raise ItemNotFoundError(location)
         return item
 
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run, deprecated=True)
+
     def get_course(self, course_key, depth=0):
         """
         Get the course with the given courseid (org/course/run)
@@ -924,19 +944,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     course['_id'] for course in courses
                 ]))
 
-        location = course_id.make_usage_key('course', course_id.run)
-        course = self.create_xmodule(
-            location,
-            fields=fields,
-            **kwargs
-        )
-        self.update_item(course, user_id, allow_not_found=True)
+        course = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
         # clone a default 'about' overview module as well
-        about_location = location.replace(
-            category='about',
-            name='overview'
-        )
+        about_location = course_id.make_usage_key('about', 'overview')
         overview_template = AboutDescriptor.get_template('overview.yaml')
         self.create_item(
             user_id,
@@ -949,24 +960,25 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return course
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
+    def create_xblock(
+        self, runtime, course_key, block_type, block_id=None, fields=None,
+        metadata=None, definition_data=None, **kwargs
+    ):
         """
-        Create the new xmodule but don't save it. Returns the new module.
+        Create the new xblock but don't save it. Returns the new module.
 
-        :param location: a Location--must have a category
-        :param definition_data: can be empty. The initial definition_data for the kvs
-        :param metadata: can be empty, the initial metadata for the kvs
         :param runtime: if you already have an xblock from the course, the xblock.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        location = location.replace(run=self.fill_in_run(location.course_key).run)
-        # differs from split mongo in that I believe most of this logic should be above the persistence
-        # layer but added it here to enable quick conversion. I'll need to reconcile these.
         if metadata is None:
             metadata = {}
 
         if definition_data is None:
             definition_data = {}
+
+        # @Cale, should this use LocalId like we do in split?
+        if block_id is None:
+            block_id = uuid4().hex  # really need to make this more readable: e.g., u'{}{}'.format(block_type, uuid4().hex[:4]
 
         if runtime is None:
             services = {}
@@ -976,7 +988,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             runtime = CachingDescriptorSystem(
                 modulestore=self,
                 module_data={},
-                course_key=location.course_key,
+                course_key=course_key,
                 default_class=self.default_class,
                 resources_fs=None,
                 error_tracker=self.error_tracker,
@@ -986,14 +998,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 select=self.xblock_select,
                 services=services,
             )
-        xblock_class = runtime.load_block_type(location.category)
-        dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
+        xblock_class = runtime.load_block_type(block_type)
+        location = course_key.make_usage_key(block_type, block_id)
+        dbmodel = self._create_new_field_data(block_type, location, definition_data, metadata)
         xmodule = runtime.construct_xblock_from_class(
             xblock_class,
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both.
-            ScopeIds(None, location.category, location, location),
+            ScopeIds(None, block_type, location, location),
             dbmodel,
         )
         if fields is not None:
@@ -1017,11 +1030,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             block_id: a unique identifier for the new item. If not supplied,
                 a new identifier will be generated
         """
+        if block_type == 'course':
+            block_id = course_key.run
+
         if block_id is None:
             block_id = uuid4().hex
 
-        location = course_key.make_usage_key(block_type, block_id)
-        xblock = self.create_xmodule(location, **kwargs)
+        runtime = kwargs.pop('runtime', None)
+        xblock = self.create_xblock(runtime, course_key, block_type, block_id, **kwargs)
         xblock = self.update_item(xblock, user_id, allow_not_found=True)
 
         return xblock
@@ -1087,7 +1103,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             self._update_ancestors(parent, update)
 
     def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False,
-                    is_publish_root=True):
+                    is_publish_root=True, **kwargs):
         """
         Update the persisted version of xblock to reflect its current values.
 

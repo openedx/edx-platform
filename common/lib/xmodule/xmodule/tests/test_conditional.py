@@ -96,7 +96,7 @@ class ConditionalFactory(object):
         cond_descriptor = ConditionalDescriptor(
             descriptor_system,
             field_data,
-            ScopeIds(None, None, cond_location, cond_location)
+            ScopeIds(None, cond_location.block_type, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
         system.get_module = lambda desc: desc
@@ -262,7 +262,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         """
         dummy_system = Mock()
         dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
-        dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
+        dummy_scope_ids = ScopeIds(None, 'conditional', dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
             'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll'},
@@ -281,7 +281,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
     def test_conditional_module_parse_sources(self):
         dummy_system = Mock()
         dummy_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
-        dummy_scope_ids = ScopeIds(None, None, dummy_location, dummy_location)
+        dummy_scope_ids = ScopeIds(None, 'conditional', dummy_location, dummy_location)
         dummy_field_data = DictFieldData({
             'data': '<conditional/>',
             'xml_attributes': {'sources': 'i4x://HarvardX/ER22x/poll_question/T15_poll;i4x://HarvardX/ER22x/poll_question/T16_poll'},

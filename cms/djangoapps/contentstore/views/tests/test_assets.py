@@ -55,7 +55,8 @@ class BasicAssetsTestCase(AssetsTestCase):
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),
-            verbose=True
+            verbose=True,
+            create_new_course_if_not_present=True
         )
         course = course_items[0]
         url = reverse_course_url('assets_handler', course.id)
@@ -199,7 +200,8 @@ class LockAssetTestCase(AssetsTestCase):
             'common/test/data/',
             ['toy'],
             static_content_store=contentstore(),
-            verbose=True
+            verbose=True,
+            create_new_course_if_not_present=True
         )
         course = course_items[0]
         verify_asset_locked_state(False)

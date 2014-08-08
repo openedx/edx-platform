@@ -127,7 +127,7 @@ class CapaFactory(object):
             descriptor,
             system,
             DictFieldData(field_data),
-            ScopeIds(None, None, location, location),
+            ScopeIds(None, location.block_type, location, location),
         )
 
         if correct:

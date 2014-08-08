@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 
 from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.locator import CourseLocator
 
 
 class LMSLinksTestCase(TestCase):
@@ -249,16 +250,15 @@ class XBlockVisibilityTestCase(TestCase):
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
-        location = Location('edX', 'visibility', '2012_Fall', 'vertical', name)
+        course_key = CourseLocator('edX', 'visibility', '2012_Fall')
 
-        vertical = modulestore().create_xmodule(location)
-        vertical.start = start_date
-        if visible_to_staff_only:
-            vertical.visible_to_staff_only = visible_to_staff_only
-        modulestore().update_item(vertical, self.dummy_user, allow_not_found=True)
+        vertical = modulestore().create_item(
+            self.dummy_user, course_key, 'vertical', name, 
+            fields={'start': start_date, 'visible_to_staff_only': visible_to_staff_only}
+        )
 
         if publish:
-            modulestore().publish(location, self.dummy_user)
+            modulestore().publish(vertical.location, self.dummy_user)
 
         return vertical
 

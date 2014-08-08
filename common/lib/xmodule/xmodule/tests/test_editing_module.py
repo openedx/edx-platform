@@ -47,7 +47,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = system.construct_xblock_from_class(
             TabsEditingDescriptor,
-            scope_ids=ScopeIds(None, None, None, Location('org', 'course', 'run', 'category', 'name', 'revision')),
+            scope_ids=ScopeIds(None, 'category', None, Location('org', 'course', 'run', 'category', 'name', 'revision')),
             field_data=DictFieldData({}),
         )
 

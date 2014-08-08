@@ -43,7 +43,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         import_from_xml(modulestore(), self.user.id, 'common/test/data/', ['toy'],
-                static_content_store=self.contentstore, verbose=True)
+                static_content_store=self.contentstore, verbose=True, create_new_course_if_not_present=True)
 
         # A locked asset
         self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')

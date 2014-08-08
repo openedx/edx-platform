@@ -55,20 +55,10 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
-        location = Location(org, number, run, 'course', name)
-
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             # Write the data to the mongo datastore
-            new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
-
-            # The rest of kwargs become attributes on the course:
-            for k, v in kwargs.iteritems():
-                setattr(new_course, k, v)
-
-            # Save the attributes we just set
-            new_course.save()
-            # Update the data in the mongo datastore
-            store.update_item(new_course, user_id)
+            fields = kwargs.update(kwargs.get('metadata', {}))
+            new_course = store.create_course(org, number, run, user_id, fields=fields)
             return new_course
 
 

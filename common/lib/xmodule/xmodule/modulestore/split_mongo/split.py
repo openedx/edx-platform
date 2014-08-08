@@ -79,6 +79,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.split_mongo import encode_key_for_mongo, decode_key_from_mongo
 import types
 from _collections import defaultdict
+from types import NoneType
 
 
 log = logging.getLogger(__name__)
@@ -377,6 +378,15 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if not isinstance(course_list[0], ErrorDescriptor):
                 result.append(course_list[0])
         return result
+
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run)
 
     def get_course(self, course_id, depth=0):
         '''
@@ -1090,7 +1100,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         course = self.get_course(locator)
         return self.update_item(course, user_id)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Save the descriptor's fields. it doesn't descend the course dag to save the children.
         Return the new descriptor (updated location).
@@ -1105,6 +1115,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         The implementation tries to detect which, if any changes, actually need to be saved and thus won't version
         the definition, structure, nor course if they didn't change.
         """
+        if allow_not_found and isinstance(descriptor.location.block_id, (LocalId, NoneType)):
+            return self.persist_xblock_dag(descriptor, user_id, force)
+
         original_structure = self._lookup_course(descriptor.location)['structure']
         index_entry = self._get_index_if_valid(descriptor.location, force)
 
@@ -1166,7 +1179,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             # nothing changed, just return the one sent in
             return descriptor
 
-    def create_xblock(self, runtime, category, fields=None, block_id=None, definition_id=None, parent_xblock=None):
+    def create_xblock(
+            self, runtime, course_key, block_type, block_id=None, fields=None,
+            definition_id=None, parent_xblock=None, **kwargs
+    ):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of json_data. It does not persist it and can create one which
@@ -1175,13 +1191,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         parent_xblock is used to compute inherited metadata as well as to append the new xblock.
 
         json_data:
-        - 'category': the xmodule category
+        - 'block_type': the xmodule block_type
         - 'fields': a dict of locally set fields (not inherited) in json format not pythonic typed format!
         - 'definition': the object id of the existing definition
         """
-        xblock_class = runtime.load_block_type(category)
+        xblock_class = runtime.load_block_type(block_type)
         json_data = {
-            'category': category,
+            'category': block_type,
             'fields': fields or {},
         }
         if definition_id is not None:

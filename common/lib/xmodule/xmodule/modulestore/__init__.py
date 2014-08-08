@@ -228,6 +228,16 @@ class ModuleStoreRead(object):
             return criteria == target
 
     @abstractmethod
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        pass
+
+    @abstractmethod
     def get_courses(self):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses
@@ -325,7 +335,7 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.

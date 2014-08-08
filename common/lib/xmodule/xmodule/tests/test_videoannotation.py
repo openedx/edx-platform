@@ -31,7 +31,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             Mock(),
             get_test_system(),
             DictFieldData({'data': self.sample_xml, 'sourceUrl': self.sample_sourceurl}),
-            ScopeIds(None, None, None, None)
+            ScopeIds(None, 'videoannotation', None, None)
         )
 
     def test_extract_instructions(self):

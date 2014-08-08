@@ -54,6 +54,10 @@ class ImportTestCase(CourseTestCase):
         with open(os.path.join(embedded_dir, "course", "2013_Spring.xml"), "w+") as f:
             f.write('<course></course>')
 
+        os.makedirs(os.path.join(embedded_dir, "policies"))
+        with open(os.path.join(embedded_dir, "policies", "2013_Spring.json"), "w+") as f:
+            f.write('{"course/2013_Spring": {"display_name": "Neuvo Course"}}')
+
         self.good_tar = os.path.join(self.content_dir, "good.tar.gz")
         with tarfile.open(self.good_tar, "w:gz") as gtar:
             gtar.add(good_dir)

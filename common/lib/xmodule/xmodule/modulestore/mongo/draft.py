@@ -12,9 +12,7 @@ import logging
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import PublishState, ModuleStoreEnum
-from xmodule.modulestore.exceptions import (
-    ItemNotFoundError, DuplicateItemError, InvalidBranchSetting, DuplicateCourseError
-)
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError, DuplicateCourseError
 from xmodule.modulestore.mongo.base import (
     MongoModuleStore, MongoRevisionKey, as_draft, as_published,
     SORT_REVISION_FAVOR_DRAFT
@@ -292,7 +290,7 @@ class DraftModuleStore(MongoModuleStore):
                 else ModuleStoreEnum.RevisionOption.draft_preferred
         return super(DraftModuleStore, self).get_parent_location(location, revision, **kwargs)
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
+    def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module with a draft locator if
         the category allows drafts. If the category does not allow drafts, just creates a published module.
@@ -303,13 +301,11 @@ class DraftModuleStore(MongoModuleStore):
         :param runtime: if you already have an xmodule from the course, the xmodule.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
-
-        if location.category not in DIRECT_ONLY_CATEGORIES:
-            location = as_draft(location)
-        return wrap_draft(
-            super(DraftModuleStore, self).create_xmodule(location, definition_data, metadata, runtime, fields)
+        new_block = super(DraftModuleStore, self).create_xblock(
+            runtime, course_key, block_type, block_id, fields, **kwargs
         )
+        new_block.location = self.for_branch_setting(new_block.location)
+        return wrap_draft(new_block)
 
     def get_items(self, course_key, revision=None, **kwargs):
         """
@@ -400,7 +396,7 @@ class DraftModuleStore(MongoModuleStore):
             DuplicateItemError: if the source or any of its descendants already has a draft copy. Only
                 useful for unpublish b/c we don't want unpublish to overwrite any existing drafts.
         """
-        # verify input conditions
+        # verify input conditions: can only convert to draft branch; so, verify that's the setting
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         _verify_revision_is_published(location)
 
@@ -439,19 +435,19 @@ class DraftModuleStore(MongoModuleStore):
         # convert the subtree using the original item as the root
         self._breadth_first(convert_item, [location])
 
-    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False):
+    def update_item(self, xblock, user_id, allow_not_found=False, force=False, isPublish=False, **kwargs):
         """
         See superclass doc.
         In addition to the superclass's behavior, this method converts the unit to draft if it's not
         direct-only and not already draft.
+        If revision is published_only, updates only the published version
         """
-        self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
+        draft_loc = self.for_branch_setting(xblock.location)
 
-        # if the xblock is direct-only, update the PUBLISHED version
-        if xblock.location.category in DIRECT_ONLY_CATEGORIES:
+        # if the revision is published, defer to base
+        if draft_loc.revision == MongoRevisionKey.published:
             return super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
 
-        draft_loc = as_draft(xblock.location)
         if not super(DraftModuleStore, self).has_item(draft_loc):
             try:
                 # ignore any descendants which are already draft

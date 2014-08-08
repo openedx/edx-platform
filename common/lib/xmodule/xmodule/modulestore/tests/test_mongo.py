@@ -111,7 +111,8 @@ class TestMongoModuleStore(unittest.TestCase):
             999,
             DATA_DIR,
             cls.courses,
-            static_content_store=content_store
+            static_content_store=content_store,
+            create_new_course_if_not_present=True
         )
 
         # also test a course with no importing of static content
@@ -122,7 +123,8 @@ class TestMongoModuleStore(unittest.TestCase):
             ['test_import_course'],
             static_content_store=content_store,
             do_import_static=False,
-            verbose=True
+            verbose=True,
+            create_new_course_if_not_present=True
         )
 
         return content_store, draft_store

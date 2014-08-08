@@ -34,7 +34,8 @@ class ExportAllCourses(ModuleStoreTestCase):
             ['dot-underscore'],
             static_content_store=self.content_store,
             do_import_static=True,
-            verbose=True
+            verbose=True,
+            create_new_course_if_not_present=True
         )
 
         course = self.module_store.get_course(SlashSeparatedCourseKey('edX', 'dot-underscore', '2014_Fall'))

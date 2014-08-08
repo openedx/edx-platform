@@ -23,7 +23,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.tests import CourseComparisonTest
 
-from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
+from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.mongo.base import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -128,6 +128,7 @@ class VersioningModulestoreBuilder(object):
         """
         # pylint: disable=unreachable
         raise SkipTest("DraftVersioningModuleStore doesn't yet support the same interface as the rest of the modulestores")
+
         doc_store_config = dict(
             db='modulestore{}'.format(random.randint(0, 10000)),
             collection='split_module',
@@ -136,7 +137,7 @@ class VersioningModulestoreBuilder(object):
         # Set up a temp directory for storing filesystem content created during import
         fs_root = mkdtemp()
 
-        modulestore = SplitMongoModuleStore(
+        modulestore = DraftVersioningModuleStore(
             contentstore,
             doc_store_config,
             fs_root,
@@ -235,7 +236,10 @@ MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
-COURSE_DATA_NAMES = ('toy', 'manual-testing-complete')
+COURSE_DATA_NAMES = (
+    'toy',
+    'manual-testing-complete',
+)
 
 
 @ddt.ddt
@@ -259,8 +263,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
     ))
     @ddt.unpack
     def test_round_trip(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
-        source_course_key = SlashSeparatedCourseKey('source', 'course', 'key')
-        dest_course_key = SlashSeparatedCourseKey('dest', 'course', 'key')
 
         # Construct the contentstore for storing the first import
         with source_content_builder.build() as source_content:
@@ -270,6 +272,9 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                 with dest_content_builder.build() as dest_content:
                     # Construct the modulestore for storing the second import (using the second contentstore)
                     with dest_builder.build(dest_content) as dest_store:
+                        source_course_key = source_store.make_course_key('src_org', 'src_course', 'src_key')
+                        dest_course_key = dest_store.make_course_key('dest_org', 'dest_course', 'dest_key')
+
                         import_from_xml(
                             source_store,
                             'test_user',
@@ -297,23 +302,34 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
                             create_new_course_if_not_present=True,
                         )
 
-                        self.exclude_field(source_course_key.make_usage_key('course', 'key'), 'wiki_slug')
+                        self.exclude_field(source_store.get_course(source_course_key).location, 'wiki_slug')
+                        self.exclude_field(dest_store.get_course(dest_course_key).location, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')
                         self.ignore_asset_key('content_son')
                         self.ignore_asset_key('thumbnail_location')
 
-                        self.assertCoursesEqual(
-                            source_store,
-                            source_course_key,
-                            dest_store,
-                            dest_course_key,
-                        )
+                        for setting in (ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only):
+                            print "Testing branch={!r}".format(setting)
+                            with source_store.branch_setting(setting):
+                                with dest_store.branch_setting(setting):
+                                    source_store_type = source_store.get_modulestore_type(source_course_key)
+                                    dest_store_type = dest_store.get_modulestore_type(dest_course_key)
 
-                        self.assertAssetsEqual(
-                            source_content,
-                            source_course_key,
-                            dest_content,
-                            dest_course_key,
-                        )
+                                    self.assertCoursesEqual(
+                                        source_store,
+                                        source_course_key,
+                                        dest_store,
+                                        dest_course_key,
+                                        # Only assert that the published state is consistent when importing between
+                                        # stores of the same type.
+                                        assert_published_state=source_store_type == dest_store_type,
+                                    )
+
+                                    self.assertAssetsEqual(
+                                        source_content,
+                                        source_course_key,
+                                        dest_content,
+                                        dest_course_key,
+                                    )

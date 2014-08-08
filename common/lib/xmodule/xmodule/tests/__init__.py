@@ -12,6 +12,7 @@ import os
 import pprint
 import unittest
 
+from contextlib import contextmanager
 from mock import Mock
 from path import path
 
@@ -156,7 +157,41 @@ class LogicTest(unittest.TestCase):
         return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
-class CourseComparisonTest(unittest.TestCase):
+class BulkAssertionManager(object):
+    """
+    This provides a facility for making a large number of assertions, and seeing all of
+    the failures at once, rather than only seeing single failures.
+    """
+    def __init__(self, test_case):
+        self._equal_expected = []
+        self._equal_actual = []
+        self._test_case = test_case
+
+    def assertEqual(self, expected, actual, description):
+        if expected != actual:
+            self._equal_expected.append((description, expected))
+            self._equal_actual.append((description, actual))
+
+    def run_assertions(self):
+        self._test_case.assertEqual(self._equal_expected, self._equal_actual)
+
+
+class BulkAssertionTest(unittest.TestCase):
+    """
+    This context manager provides a BulkAssertionManager to assert with,
+    and then calls `run_assertions` at the end of the block to validate all
+    of the assertions.
+    """
+    @contextmanager
+    def bulk_assertions(self):
+        try:
+            manager = BulkAssertionManager(self)
+            yield manager
+        finally:
+            manager.run_assertions()
+
+
+class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
     """
@@ -184,7 +219,7 @@ class CourseComparisonTest(unittest.TestCase):
         """
         self.ignored_asset_keys.add(key_name)
 
-    def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
+    def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key, assert_published_state=True):
         """
         Assert that the courses identified by ``expected_course_key`` in ``expected_store`` and
         ``actual_course_key`` in ``actual_store`` are identical (ignore differences related
@@ -193,70 +228,110 @@ class CourseComparisonTest(unittest.TestCase):
         Any field value mentioned in ``self.field_exclusions`` by the key (usage_id, field_name)
         will be ignored for the purpose of equality checking.
         """
+        self.maxDiff = None
+
+        expected_root = expected_store.get_course(expected_course_key)
+        actual_root = actual_store.get_course(actual_course_key)
+
         expected_items = expected_store.get_items(expected_course_key)
         actual_items = actual_store.get_items(actual_course_key)
         self.assertGreater(len(expected_items), 0)
-        self.assertEqual(len(expected_items), len(actual_items))
 
-        actual_item_map = {item.location: item for item in actual_items}
-
-        for expected_item in expected_items:
-            actual_item_location = expected_item.location.map_into_course(actual_course_key)
-            if expected_item.location.category == 'course':
-                actual_item_location = actual_item_location.replace(name=actual_item_location.run)
-            actual_item = actual_item_map.get(actual_item_location)
-
-            # compare published state
-            exp_pub_state = expected_store.compute_publish_state(expected_item)
-            act_pub_state = actual_store.compute_publish_state(actual_item)
-            self.assertEqual(
-                exp_pub_state,
-                act_pub_state,
-                'Published states for usages {} and {} differ: {!r} != {!r}'.format(
-                    expected_item.location,
-                    actual_item.location,
-                    exp_pub_state,
-                    act_pub_state
-                )
+        with self.bulk_assertions() as manager:
+            # The usage_keys in the courses should match up, with the following exceptions/translations:
+            #    1) The course roots block_ids may be different
+            #    2) All other blocks should have matching block_type/block_id pairs
+            manager.assertEqual(
+                set(
+                    (item.location.block_type, item.location.block_id)
+                    for item in expected_items
+                    if item.location != expected_root.location
+                ),
+                set(
+                    (item.location.block_type, item.location.block_id)
+                    for item in actual_items
+                    if item.location != actual_root.location
+                ),
+                "stored items differ"
             )
 
-            # compare fields
-            self.assertEqual(expected_item.fields, actual_item.fields)
+            actual_item_map = {item.location.map_into_course(actual_course_key): item for item in actual_items}
 
-            for field_name in expected_item.fields:
-                if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
-                    continue
+            for expected_item in expected_items:
+                actual_item_location = expected_item.location.map_into_course(actual_course_key)
+                if expected_item.location.category == 'course':
+                    actual_item_location = actual_item_location.replace(name=actual_item_location.run)
+                actual_item = actual_item_map.get(actual_item_location)
 
-                if (None, field_name) in self.field_exclusions:
-                    continue
+                if assert_published_state:
+                    # compare published state
+                    exp_pub_state = expected_store.compute_publish_state(expected_item)
+                    act_pub_state = actual_store.compute_publish_state(actual_item)
+                    manager.assertEqual(
+                        exp_pub_state,
+                        act_pub_state,
+                        u'Published states for usages {} and {} differ: {!r} != {!r}'.format(
+                            expected_item.location,
+                            actual_item.location,
+                            exp_pub_state,
+                            act_pub_state
+                        )
+                    )
 
-                # Children are handled specially
-                if field_name == 'children':
-                    continue
+                # compare fields
+                manager.assertEqual(expected_item.fields, actual_item.fields, u'Fields for {} and {} differ'.format(
+                    expected_item.location,
+                    actual_item.location
+                ))
 
-                exp_value = getattr(expected_item, field_name)
-                actual_value = getattr(actual_item, field_name)
-                self.assertEqual(
-                    exp_value,
-                    actual_value,
-                    "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
-                        field_name,
-                        expected_item.scope_ids.usage_id,
-                        actual_item.scope_ids.usage_id,
+                for field_name in expected_item.fields:
+                    if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
+                        continue
+
+                    if (None, field_name) in self.field_exclusions:
+                        continue
+
+                    # Children are handled specially
+                    if field_name == 'children':
+                        continue
+
+                    exp_value = getattr(expected_item, field_name)
+                    actual_value = getattr(actual_item, field_name)
+                    manager.assertEqual(
                         exp_value,
                         actual_value,
+                        u"Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
+                            field_name,
+                            expected_item.scope_ids.usage_id,
+                            actual_item.scope_ids.usage_id,
+                            exp_value,
+                            actual_value,
+                        )
+                    )
+
+                # compare children
+                manager.assertEqual(
+                    expected_item.has_children,
+                    actual_item.has_children,
+                    u'has_children for {} and {} differ'.format(
+                        expected_item.location,
+                        actual_item.location
                     )
                 )
-
-            # compare children
-            self.assertEqual(expected_item.has_children, actual_item.has_children)
-            if expected_item.has_children:
-                expected_children = []
-                for course1_item_child in expected_item.children:
-                    expected_children.append(
-                        course1_item_child.map_into_course(actual_course_key)
+                if expected_item.has_children:
+                    expected_children = []
+                    for course1_item_child in expected_item.children:
+                        expected_children.append(
+                            course1_item_child.map_into_course(actual_course_key)
+                        )
+                    manager.assertEqual(
+                        expected_children,
+                        actual_item.children,
+                        u'children for {} and {} differ'.format(
+                            expected_item.location,
+                            actual_item.location
+                        )
                     )
-                self.assertEqual(expected_children, actual_item.children)
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
         """

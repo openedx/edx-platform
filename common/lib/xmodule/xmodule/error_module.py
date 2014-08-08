@@ -108,7 +108,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             cls,
             # The error module doesn't use scoped data, and thus doesn't need
             # real scope keys
-            ScopeIds('error', None, location, location),
+            ScopeIds(None, 'error', location, location),
             field_data,
         )
 

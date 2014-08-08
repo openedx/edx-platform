@@ -35,7 +35,7 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
             Mock(),
             get_test_system(),
             DictFieldData({'data': self.sample_xml}),
-            ScopeIds(None, None, None, None)
+            ScopeIds(None, 'textannotation', None, None)
         )
 
     def test_extract_instructions(self):

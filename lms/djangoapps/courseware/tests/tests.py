@@ -143,7 +143,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.setup_user()
 
         # Import the toy course
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_new_course_if_not_present=True)
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_toy_textbooks_loads(self, mock_get):

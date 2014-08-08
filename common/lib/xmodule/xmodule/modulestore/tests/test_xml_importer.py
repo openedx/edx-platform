@@ -148,6 +148,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
             999,
             self.xblock.location.course_key,
             target_location_namespace,
+            revision=ModuleStoreEnum.RevisionOption.published_only,
             do_import_static=False
         )
 
@@ -185,6 +186,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
             999,
             self.xblock.location.course_key,
             target_location_namespace.course_key,
+            revision=ModuleStoreEnum.RevisionOption.published_only,
             do_import_static=False
         )
 
@@ -217,6 +219,7 @@ class RemapNamespaceTest(ModuleStoreNoSettings):
             999,
             self.xblock.location.course_key,
             target_location_namespace.course_key,
+            revision=ModuleStoreEnum.RevisionOption.published_only,
             do_import_static=False
         )
 

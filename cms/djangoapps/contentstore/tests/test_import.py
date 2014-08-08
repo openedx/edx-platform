@@ -32,7 +32,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     """
     def setUp(self):
         password = super(ContentStoreImportTest, self).setUp()
-        
+
         self.client = Client()
         self.client.login(username=self.user.username, password=password)
 
@@ -51,6 +51,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             static_content_store=content_store,
             do_import_static=False,
             verbose=True,
+            create_new_course_if_not_present=True,
         )
         course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
         course = module_store.get_course(course_id)
@@ -84,7 +85,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.user.id,
             'common/test/data/',
             ['2014_Uni'],
-            target_course_id=course_id
+            target_course_id=course_id,
+            create_new_course_if_not_present=True
         )
 
         course = module_store.get_course(course_id)
@@ -127,7 +129,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore()
-        import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
+        import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True, create_new_course_if_not_present=True)
 
         course = module_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
 
@@ -138,7 +140,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        _, courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True)
+        _, courses = import_from_xml(module_store, self.user.id, 'common/test/data/', ['toy'], do_import_static=False, verbose=True, create_new_course_if_not_present=True)
         course_key = courses[0].id
 
         handouts = module_store.get_item(course_key.make_usage_key('course_info', 'handouts'))
@@ -175,7 +177,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.user.id,
             'common/test/data/',
             ['conditional'],
-            target_course_id=target_course_id
+            target_course_id=target_course_id,
+            create_new_course_if_not_present=True
         )
         conditional_module = module_store.get_item(
             target_course_id.make_usage_key('conditional', 'condone')
@@ -205,7 +208,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.user.id,
             'common/test/data/',
             ['open_ended'],
-            target_course_id=target_course_id
+            target_course_id=target_course_id,
+            create_new_course_if_not_present=True
         )
         peergrading_module = module_store.get_item(
             target_course_id.make_usage_key('peergrading', 'PeerGradingLinked')
@@ -246,7 +250,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             self.user.id,
             'common/test/data/',
             [source_course_name],
-            target_course_id=target_course_id
+            target_course_id=target_course_id,
+            create_new_course_if_not_present=True
         )
         split_test_module = module_store.get_item(
             target_course_id.make_usage_key('split_test', split_test_name)
