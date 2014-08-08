@@ -5,16 +5,17 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
-from django.views.decorators.http import require_POST
-
+import StringIO
 import json
 import logging
 import re
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError
+from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -26,6 +27,8 @@ import random
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
+from microsite_configuration import microsite
+
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
@@ -36,9 +39,9 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice
+from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -733,7 +736,10 @@ def generate_registration_codes(request, course_id):
     purchaser_email = request.POST['purchaser_email']
     company_tax_id = request.POST['tax']
     reference = request.POST['reference']
-    
+    recipient_list = [purchaser_email]
+    if request.POST.get('invoice', False):
+        recipient_list.append(request.user.email)
+
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price, purchaser_name=purchaser_name, purchaser_contact=purchaser_contact,
         purchaser_email=purchaser_email, tax_id=company_tax_id, reference=reference
@@ -741,8 +747,46 @@ def generate_registration_codes(request, course_id):
     for _ in range(course_code_number):  # pylint: disable=W0621
         save_registration_codes(request, course_id, course_registration_codes, company_name, sale_invoice)
 
-    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+    site_name = microsite.get_value('SITE_NAME', 'localhost')
+    course = get_course_by_id(course_id, depth=None)
+    course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
+    course_price = course_honor_mode.min_price
+    quantity = course_code_number
+    discount_price = (float(quantity * course_price) - float(sale_price))
+    course_url = '{base_url}{course_about}'.format(
+        base_url=request.META['HTTP_HOST'],
+        course_about=reverse('about_course', kwargs={'course_id': course_id.to_deprecated_string()})
+    )
+    context = {
+        'invoice': sale_invoice,
+        'company_name': company_name,
+        'site_name': site_name,
+        'course': course,
+        'course_price': course_price,
+        'discount_price': discount_price,
+        'sale_price': sale_price,
+        'quantity': quantity,
+        'registration_codes': course_registration_codes,
+        'course_url': course_url,
+    }
+    # composes registration codes invoice email
+    subject = 'Invoice for {course_name}'.format(course_name=course.display_name)
+    message = render_to_string('emails/registration_codes_sale_invoice.txt', context)
+    from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
+    #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
+    csv_file = StringIO.StringIO()
+    csv_writer = csv.writer(csv_file)
+    for registration_code in course_registration_codes:
+        csv_writer.writerow([registration_code.code])
+    email = EmailMessage()
+    email.subject = subject
+    email.body = message
+    email.from_email = from_address
+    email.to = recipient_list
+    email.attach('{file_name}.csv'.format(file_name=subject), csv_file.getvalue(), 'text/csv')
+    email.send()
+    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
