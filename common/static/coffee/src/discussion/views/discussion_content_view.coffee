@@ -8,30 +8,6 @@ if Backbone?
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
     attrRenderer:
-      closed: (closed) ->
-        return if not @$(".action-openclose").length
-        return if not @$(".post-status-closed").length
-        if closed
-          @$(".post-status-closed").show()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Close"), gettext("Open")))
-          @$(".discussion-reply-new").hide()
-        else
-          @$(".post-status-closed").hide()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Open"), gettext("Close")))
-          @$(".discussion-reply-new").show()
-
-      voted: (voted) ->
-
-      votes_point: (votes_point) ->
-
-      comments_count: (comments_count) ->
-
-      subscribed: (subscribed) ->
-        if subscribed
-          @$(".dogear").addClass("is-followed").attr("aria-checked", "true")
-        else
-          @$(".dogear").removeClass("is-followed").attr("aria-checked", "false")
-
       ability: (ability) ->
         for action, selector of @abilityRenderer
           if not ability[action]
@@ -48,8 +24,8 @@ if Backbone?
         disable: -> @$(".action-delete").closest("li").hide()
 
       can_openclose:
-        enable: -> @$(".action-openclose").closest("li").show()
-        disable: -> @$(".action-openclose").closest("li").hide()
+        enable: -> @$(".action-close").closest("li").show()
+        disable: -> @$(".action-close").closest("li").hide()
 
     renderPartialAttrs: ->
       for attr, value of @model.changedAttributes()
@@ -78,113 +54,147 @@ if Backbone?
     initialize: ->
       @model.bind('change', @renderPartialAttrs, @)
 
+  class @DiscussionContentShowView extends DiscussionContentView
+    events:
+      "click .action-follow": "toggleFollow"
+      "click .action-answer": "toggleEndorse"
+      "click .action-endorse": "toggleEndorse"
+      "click .action-vote": "toggleVote"
+      "click .action-pin": "togglePin"
+      "click .action-edit": "edit"
+      "click .action-delete": "_delete"
+      "click .action-report": "toggleReport"
+      "click .action-close": "toggleClose"
 
-    toggleFollowing: (event) =>
+    updateButtonState: (selector, checked) =>
+      $button = @$(selector)
+      $button.toggleClass("is-checked", checked)
+      $button.attr("aria-checked", checked)
+
+    attrRenderer:
+      subscribed: (subscribed) ->
+        @updateButtonState(".action-follow", subscribed)
+
+      endorsed: (endorsed) ->
+        selector = if @model.get("thread").get("thread_type") == "question" then ".action-answer" else ".action-endorse"
+        @updateButtonState(selector, endorsed)
+        $button = @$(selector)
+        $button.toggleClass("is-clickable", @model.canBeEndorsed())
+        $button.toggleClass("is-checked", endorsed)
+        if endorsed || @model.canBeEndorsed()
+          $button.removeAttr("hidden")
+        else
+          $button.attr("hidden", "hidden")
+
+      votes: (votes) ->
+        selector = ".action-vote"
+        @updateButtonState(selector, window.user.voted(@model))
+        button = @$el.find(selector)
+        numVotes = votes.up_count
+        button.find(".js-sr-vote-count").html(
+          interpolate(gettext("currently %(numVotes)s votes"), {numVotes: numVotes}, true)
+        )
+        button.find(".js-visual-vote-count").html("" + numVotes)
+
+      pinned: (pinned) ->
+        @updateButtonState(".action-pin", pinned)
+
+      abuse_flaggers: (abuse_flaggers) ->
+        flagged = (
+          window.user.id in abuse_flaggers or
+          (DiscussionUtil.isFlagModerator and abuse_flaggers.length > 0)
+        )
+        @updateButtonState(".action-report", flagged)
+
+      closed: (closed) ->
+        @updateButtonState(".action-close", closed)
+        @$(".post-status-closed").toggle(closed)
+
+    toggleFollow: (event) =>
       event.preventDefault()
-      $elem = $(event.target)
-      url = null
-      if not @model.get('subscribed')
+      if not @model.get("subscribed")
         @model.follow()
         url = @model.urlFor("follow")
       else
         @model.unfollow()
         url = @model.urlFor("unfollow")
       DiscussionUtil.safeAjax
-        $elem: $elem
         url: url
         type: "POST"
 
-    toggleFlagAbuse: (event) =>
+    toggleEndorse: (event) =>
       event.preventDefault()
-      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
-        @unFlagAbuse()
-      else
-        @flagAbuse()
-
-    flagAbuse: =>
-      url = @model.urlFor("flagAbuse")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-flag-abuse")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            ###
-            note, we have to clone the array in order to trigger a change event
-            ###
-            temp_array = _.clone(@model.get('abuse_flaggers'));
-            temp_array.push(window.user.id)
-            @model.set('abuse_flaggers', temp_array)
-
-    unFlagAbuse: =>
-      url = @model.urlFor("unFlagAbuse")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-flag-abuse")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            temp_array = _.clone(@model.get('abuse_flaggers'));
-            temp_array.pop(window.user.id)
-            # if you're an admin, clear this
-            if DiscussionUtil.isFlagModerator
-                temp_array = []
-
-            @model.set('abuse_flaggers', temp_array)
-
-    renderVote: =>
-      button = @$el.find(".vote-btn")
-      voted = window.user.voted(@model)
-      voteNum = @model.get("votes")["up_count"]
-      button.toggleClass("is-cast", voted)
-      button.attr("aria-pressed", voted)
-      button.attr("data-tooltip", if voted then gettext("remove vote") else gettext("vote"))
-      buttonTextFmt =
-        if voted
-          ngettext(
-            "vote (click to remove your vote)",
-            "votes (click to remove your vote)",
-            voteNum
-          )
-        else
-          ngettext(
-            "vote (click to vote)",
-            "votes (click to vote)",
-            voteNum
-          )
-      buttonTextFmt = "%(voteNum)s%(startSrSpan)s " + buttonTextFmt + "%(endSrSpan)s"
-      buttonText = interpolate(
-        buttonTextFmt,
-        {voteNum: voteNum, startSrSpan: "<span class='sr'>", endSrSpan: "</span>"},
-        true
+      if not @model.canBeEndorsed()
+        return
+      url = @model.urlFor('endorse')
+      newEndorsed = not @model.get('endorsed')
+      endorsement = {
+        "username": window.user.get("username"),
+        "time": new Date().toISOString()
+      }
+      @model.set(
+        "endorsed": newEndorsed
+        "endorsement": if newEndorsed then endorsement else null
       )
-      button.html("<span class='plus-icon'/>" + buttonText)
+      @trigger "comment:endorse", newEndorsed
+      DiscussionUtil.safeAjax
+        url: url
+        data:
+          endorsed: newEndorsed
+        type: "POST"
 
     toggleVote: (event) =>
       event.preventDefault()
       if window.user.voted(@model)
-        @unvote()
+        window.user.unvote(@model)
+        url = @model.urlFor("unvote")
       else
-        @vote()
-
-    vote: =>
-      window.user.vote(@model)
-      url = @model.urlFor("upvote")
+        window.user.vote(@model)
+        url = @model.urlFor("upvote")
       DiscussionUtil.safeAjax
-        $elem: @$el.find(".vote-btn")
         url: url
         type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
 
-    unvote: =>
-      window.user.unvote(@model)
-      url = @model.urlFor("unvote")
+    togglePin: (event) =>
+      event.preventDefault()
+      newPinned = not @model.get("pinned")
+      if newPinned
+        url = @model.urlFor("pinThread")
+      else
+        url = @model.urlFor("unPinThread")
+      @model.set("pinned", newPinned)
       DiscussionUtil.safeAjax
-        $elem: @$el.find(".vote-btn")
         url: url
         type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
+        error: =>
+          if newPinned
+            msg = gettext("We had some trouble pinning this thread. Please try again.")
+          else
+            msg = gettext("We had some trouble unpinning this thread. Please try again.")
+          DiscussionUtil.discussionAlert(gettext("Sorry"), msg)
+          @model.set("pinned", not newPinned)
+
+    toggleReport: (event) =>
+      event.preventDefault()
+      newFlaggers = _.clone(@model.get("abuse_flaggers"))
+      if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
+        url = @model.urlFor("unFlagAbuse")
+        newFlaggers.pop(window.user.id)
+      else
+        url = @model.urlFor("flagAbuse")
+        newFlaggers.push(window.user.id)
+      @model.set("abuse_flaggers", newFlaggers)
+      DiscussionUtil.safeAjax
+        url: url
+        type: "POST"
+
+    toggleClose: (event) =>
+      event.preventDefault()
+      url = @model.urlFor("close")
+      newClosed = not @model.get("closed")
+      @model.set("closed", newClosed)
+      DiscussionUtil.safeAjax
+        url: url
+        data:
+          closed: newClosed
+        type: "POST"

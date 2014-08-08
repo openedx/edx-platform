@@ -89,8 +89,8 @@
     color: $gray-l2 ;
   }
 
-  // STATE: enabled action
-  &.is-enabled {
+  // STATE: checked action
+  &.is-checked {
     box-shadow: 0 2px $shadow inset;
 
     .action-icon, .action-label {
@@ -159,11 +159,56 @@
     display: inline-block;
     text-transform: uppercase;
   }
+
+  // CASE: checked
+  &.is-checked {
+    // CASE: pin action
+    &.action-pin {
+      .action-icon, .action-label {
+        color: $pink;
+      }
+    }
+
+    // CASE: report action
+    &.action-report {
+      .action-icon, .action-label {
+        color: $pink;
+      }
+    }
+  }
 }
 
 // CASE: comment action
 .comment-actions-list .action-button.action-more {
   height: ($baseline*1.5);
+}
+
+.action-button, .action-list-item {
+  .action-label {
+    .label-checked, .label-checked-focused {
+      display: none;
+    }
+  }
+
+  &.is-checked {
+    .label-unchecked {
+      display: none;
+    }
+
+    .label-checked {
+      display: inline;
+    }
+
+    &:hover, &:focus {
+      .label-checked {
+        display: none;
+      }
+
+      .label-checked-focused {
+        display: inline;
+      }
+    }
+  }
 }
 
 // ====================

@@ -79,25 +79,27 @@
           <ul class="post-actions-dropdown is-expanded">
             <li class="actions-item">
               <a href="#" class="action-list-item action-report" role="checkbox" aria-checked="false">
+                <span class="sr">${_("Report abuse")}</span>
                 <span class="action-icon"><i class="icon icon-flag"></i></span>
-                <span class="action-label">${_("Report")}</span>
+                <span class="action-label" aria-hidden="true">
+                  <span class="label-unchecked">${_("Report")}</span>
+                  <span class="label-checked">${_("Reported")}</span>
+                  <span class="label-checked-focused">${_("Unreport")}</span>
+                </span>
               </a>
             </li>
             % if course and has_permission(user, 'openclose_thread', course.id):
             <li class="actions-item">
-              <a class="action-list-item action-pin" href="javascript:void(0)" role="button" aria-pressed="false">
+              <a class="action-list-item action-pin" href="javascript:void(0)" role="checkbox" aria-checked="false">
+                <span class="sr">${_("Pin")}</span>
                 <span class="action-icon"><i class="icon icon-pushpin"></i></span>
-                <span class="action-label">${_("Pin")}</span>
+                <span class="action-label" aria-hidden="true">
+                  <span class="label-unchecked">${_("Pin")}</span>
+                  <span class="label-checked">${_("Pinned")}</span>
+                  <span class="label-checked-focused">${_("Unpin")}</span>
+                </span>
               </a>
             </li>
-            %else:
-            ${"<% if (pinned) { %>"}
-            <li class="actions-item">
-              <div class="action-list-item action-pin discussion-pin notpinned">
-                <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pinned")}</span>
-              </div>
-            </li>
-            ${"<% }  %>"}
             % endif
             <li class="actions-item" style="display: none">
               <a class="action-list-item action-edit" href="javascript:void(0)">
@@ -112,23 +114,43 @@
               </a>
             </li>
             <li class="actions-item" style="display: none">
-              <a class="action-list-item action-openclose" href="javascript:void(0)">
+              <a class="action-list-item action-close" href="javascript:void(0)">
+                <span class="sr">${_("Close")}</span>
                 <span class="action-icon"><i class="icon icon-lock"></i></span>
-                <span class="action-label">${_("Close")}</span>
+                <span class="action-label" aria-hidden="true">
+                  <span class="label-unchecked">${_("Close")}</span>
+                  <span class="label-checked">${_("Closed")}</span>
+                  <span class="label-checked-focused">${_("Open")}</span>
+                </span>
               </a>
             </li>
           </ul>
         </li>
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-vote vote-btn" role="button" aria-pressed="false">
-            <span class="action-icon"><i class="icon icon-plus"></i></span>
-            <span class="action-label">${_("Vote")}</span>
-            <!-- DiscussionContentView.renderVote still populates this --></a>
+          <a href="#" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
+            ## Vote counts are populated by JS
+            <span class="sr">${_("Vote")}</span>
+            <span class="sr js-sr-vote-count"></span>
+            <span class="action-icon" aria-hidden="true">
+              <i class="icon icon-plus"></i>
+              <span class="js-visual-vote-count"></span>
+            </span>
+            <span class="action-label" aria-hidden="true">
+              <span class="label-unchecked">${_("Vote")}</span>
+              <span class="label-checked">${_("Voted")}</span>
+              <span class="label-checked-focused">${_("Unvote")}</span>
+            </span>
+          </a>
         </li>
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-follow is-enabled" role="checkbox" aria-checked="false">
+          <a href="#" class="action-button action-follow" role="checkbox" aria-checked="false">
+            <span class="sr">${_("Follow")}</span>
             <span class="action-icon"><i class="icon icon-star"></i></span>
-            <span class="action-label">${_("Following")}</span>
+            <span class="action-label" aria-hidden="true">
+              <span class="label-unchecked">${_("Follow")}</span>
+              <span class="label-checked">${_("Following")}</span>
+              <span class="label-checked-focused">${_("Unfollow")}</span>
+            </span>
           </a>
         </li>
       </ul>
@@ -231,9 +253,6 @@
                 <span class="action-label">${_("Report")}</span>
               </a>
             </li>
-            <li class="actions-item">
-              <!-- pinned with persmissions wrapper conditional-->
-            </li>
             <li class="actions-item" style="display: none">
               <a class="action-list-item action-edit" href="javascript:void(0)">
                 <span class="action-icon"><i class="icon icon-pencil"></i></span>
@@ -249,17 +268,46 @@
           </ul>
         </li>
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-vote is-enabled" role="button" aria-pressed="false">
-            <span class="action-icon"><i class="icon icon-plus"></i></span>
-            <span class="action-label">${_("Vote")}</span>
+          <a href="#" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
+            ## Vote counts are populated by JS
+            <span class="sr">${_("Vote")}</span>
+            <span class="sr js-sr-vote-count"></span>
+            <span class="action-icon" aria-hidden="true">
+              <i class="icon icon-plus"></i>
+              <span class="js-visual-vote-count"></span>
+            </span>
+            <span class="action-label" aria-hidden="true">
+              <span class="label-unchecked">${_("Vote")}</span>
+              <span class="label-checked">${_("Voted")}</span>
+              <span class="label-checked-focused">${_("Unvote")}</span>
+            </span>
           </a>
         </li>
+        ${"<% if (thread.get('thread_type') == 'question') { %>"}
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-endorse" role="button" aria-pressed="false">
+          <a href="#" class="action-button action-answer" role="checkbox" aria-checked="false">
+            <span class="sr">${_("Mark as Answer")}</span>
             <span class="action-icon"><i class="icon icon-ok"></i></span>
-            <span class="action-label">${_("Endorse")}</span>
+            <span class="action-label">
+              <span class="label-unchecked">${_("Mark as Answer")}</span>
+              <span class="label-checked">${_("Marked as Answer")}</span>
+              <span class="label-checked-focused">${_("Unmark as Answer")}</span>
+            </span>
           </a>
         </li>
+        ${"<% } else { %>"}
+        <li class="actions-item action-primary is-visible">
+          <a href="#" class="action-button action-endorse" role="checkbox" aria-checked="false">
+            <span class="sr">${_("Endorse")}</span>
+            <span class="action-icon"><i class="icon icon-ok"></i></span>
+            <span class="action-label">
+              <span class="label-unchecked">${_("Endorse")}</span>
+              <span class="label-checked">${_("Endorsed")}</span>
+              <span class="label-checked-focused">${_("Unendorse")}</span>
+            </span>
+          </a>
+        </li>
+        ${"<% } %>"}
       </ul>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
 </script>

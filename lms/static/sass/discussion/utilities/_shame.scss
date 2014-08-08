@@ -144,3 +144,12 @@ li[class*=forum-nav-thread-label-] {
     line-height: 14px;
   }
 }
+
+// -----------
+// Thread view
+// -----------
+
+// Override global span
+.action-label span, .action-icon span {
+  color: inherit;
+}
