@@ -148,7 +148,10 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # segment.io for LMS--need to explicitly turn it on for production.
+    # Optimizely for the LMS--need to explicitly turn on for production.
+    'OPTIMIZELY_LMS': False,
+
+    # Segment.io for LMS--need to explicitly turn on for production.
     'SEGMENT_IO_LMS': False,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
