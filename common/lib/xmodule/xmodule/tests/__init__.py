@@ -219,19 +219,22 @@ class CourseComparisonTest(unittest.TestCase):
         self.assertEqual(len(expected_items), len(actual_items))
 
         actual_item_map = {
-            actual_course_key.make_usage_key(item.category, item.location.block_id): item
+            item.location.block_id: item
             for item in actual_items
         }
 
         for expected_item in expected_items:
             actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
+            # split and old mongo use different names for the course root but we don't know which
+            # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
             if expected_item.location.category == 'course':
                 actual_item_location = actual_item_location.replace(name=actual_item_location.run)
-            actual_item = actual_item_map.get(actual_item_location)
+            actual_item = actual_item_map.get(actual_item_location.block_id)
+            # must be split
             if actual_item is None and expected_item.location.category == 'course':
                 actual_item_location = actual_item_location.replace(name='course')
-                actual_item = actual_item_map.get(actual_item_location)
-            assert actual_item is not None
+                actual_item = actual_item_map.get(actual_item_location.block_id)
+            self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(actual_item_location, actual_item_map))
 
             # compare fields
             self.assertEqual(expected_item.fields, actual_item.fields)
@@ -264,14 +267,15 @@ class CourseComparisonTest(unittest.TestCase):
             # compare children
             self.assertEqual(expected_item.has_children, actual_item.has_children)
             if expected_item.has_children:
+                actual_course_key = actual_item.location.course_key.version_agnostic()
                 expected_children = [
-                    course1_item_child.location.map_into_course(actual_item.location.course_key)
+                    course1_item_child.location.map_into_course(actual_course_key)
                     for course1_item_child in expected_item.get_children()
                     # get_children was returning drafts for published parents :-(
                     if expect_drafts or not getattr(course1_item_child, 'is_draft', False)
                 ]
                 actual_children = [
-                    item_child.location
+                    item_child.location.version_agnostic()
                     for item_child in actual_item.get_children()
                     # get_children was returning drafts for published parents :-(
                     if expect_drafts or not getattr(item_child, 'is_draft', False)

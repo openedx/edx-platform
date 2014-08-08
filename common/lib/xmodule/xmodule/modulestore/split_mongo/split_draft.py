@@ -48,9 +48,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
         return item
 
-    def get_course(self, course_id, depth=0):
+    def get_course(self, course_id, depth=0, **kwargs):
         course_id = self._map_revision_to_branch(course_id)
-        return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth)
+        return super(DraftVersioningModuleStore, self).get_course(course_id, depth=depth, **kwargs)
 
     def get_courses(self, **kwargs):
         """
@@ -92,8 +92,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         force=False, continue_version=False, skip_auto_publish=False, **kwargs
     ):
         """
-        Adds skip_auto_publish to behavior or parent. Skip_auto_publish basically just calls the super
-        and skips all of this wrapper's functionality.
+        See :py:meth `ModuleStoreDraftAndPublished.create_item`
         """
         course_key = self._map_revision_to_branch(course_key)
         item = super(DraftVersioningModuleStore, self).create_item(
@@ -210,9 +209,9 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         location = self._map_revision_to_branch(location, revision=revision)
         return SplitMongoModuleStore.get_parent_location(self, location, **kwargs)
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
-        return super(DraftVersioningModuleStore, self).get_orphans(course_key)
+        return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
     def has_changes(self, xblock):
         """
@@ -271,16 +270,25 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         raise NotImplementedError()
 
     def get_course_history_info(self, course_locator):
+        """
+        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_history_info`
+        """
         course_locator = self._map_revision_to_branch(course_locator)
         return super(DraftVersioningModuleStore, self).get_course_history_info(course_locator)
 
     def get_course_successors(self, course_locator, version_history_depth=1):
+        """
+        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_course_successors`
+        """
         course_locator = self._map_revision_to_branch(course_locator)
         return super(DraftVersioningModuleStore, self).get_course_successors(
             course_locator, version_history_depth=version_history_depth
         )
 
     def get_block_generations(self, block_locator):
+        """
+        See :py:meth `xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.get_block_generations`
+        """
         block_locator = self._map_revision_to_branch(block_locator)
         return super(DraftVersioningModuleStore, self).get_block_generations(block_locator)
 
@@ -325,25 +333,25 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         return block['edit_info'].get('source_version', block['edit_info']['update_version'])
 
-    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
         Split-based modulestores need to import published blocks to both branches
         """
         # hardcode course root block id
         if block_type == 'course':
-            block_id = 'course'
+            block_id = self.DEFAULT_ROOT_BLOCK_ID
         new_usage_key = course_key.make_usage_key(block_type, block_id)
 
-        if self.get_branch_setting(course_key) == ModuleStoreEnum.Branch.published_only:
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
             # if importing a direct only, override existing draft
             if block_type in DIRECT_ONLY_CATEGORIES:
                 draft_course = course_key.for_branch(ModuleStoreEnum.BranchName.draft)
                 with self.branch_setting(ModuleStoreEnum.Branch.draft_preferred, draft_course):
                     draft = self.import_xblock(user_id, draft_course, block_type, block_id, fields, runtime)
                     self._auto_publish_no_children(draft.location, block_type, user_id)
-                return self.get_item(new_usage_key)
+                return self.get_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published))
             # if new to published
-            elif not self.has_item(new_usage_key):
+            elif not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.published)):
                 # check whether it's new to draft
                 if not self.has_item(new_usage_key.for_branch(ModuleStoreEnum.BranchName.draft)):
                     # add to draft too

@@ -163,12 +163,12 @@ class TemplateTests(unittest.TestCase):
         guid_locator = test_course.location.course_agnostic()
         # verify it can be retrieved by id
         self.assertIsInstance(self.split_store.get_course(id_locator), CourseDescriptor)
-        # and by guid -- reenable when split_draft supports getting specific versions
+        # and by guid -- TODO reenable when split_draft supports getting specific versions
 #         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
         self.split_store.delete_course(id_locator, 'testbot')
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, self.split_store.get_course, id_locator)
-        # but can by guid
+        # but can by guid -- same TODO as above
 #         self.assertIsInstance(self.split_store.get_item(guid_locator), CourseDescriptor)
 
     def test_block_generations(self):

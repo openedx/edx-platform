@@ -603,7 +603,8 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             about_location.course_key,
             about_location.block_type,
             block_id=about_location.block_id,
-            definition_data=overview_template.get('data'),
+            definition_data={'data': overview_template.get('data')},
+            metadata=overview_template.get('metadata'),
             runtime=runtime,
             continue_version=True,
         )

@@ -974,7 +974,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # @Cale, should this use LocalId like we do in split?
         if block_id is None:
-            block_id = uuid4().hex  # really need to make this more readable: e.g., u'{}{}'.format(block_type, uuid4().hex[:4]
+            if block_type == 'course':
+                block_id = course_key.run
+            else:
+                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
         if runtime is None:
             services = {}
@@ -1027,7 +1030,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 a new identifier will be generated
         """
         if block_id is None:
-            block_id = uuid4().hex
+            if block_type == 'course':
+                block_id = course_key.run
+            else:
+                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
         runtime = kwargs.pop('runtime', None)
         xblock = self.create_xblock(runtime, course_key, block_type, block_id, **kwargs)
@@ -1058,7 +1064,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return xblock
 
-    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
         Simple implementation of overwriting any existing xblock
         """

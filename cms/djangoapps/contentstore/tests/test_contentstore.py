@@ -1400,30 +1400,30 @@ class ContentStoreTest(ContentStoreTestCase):
 
         # crate a new module and add it as a child to a vertical
         parent = verticals[0]
-        new_module = self.store.create_child(
+        new_block = self.store.create_child(
             self.user.id, parent.location, 'html', 'new_component'
         )
 
         # flush the cache
-        new_module = self.store.get_item(new_module.location)
+        new_block = self.store.get_item(new_block.location)
 
         # check for grace period definition which should be defined at the course level
-        self.assertEqual(parent.graceperiod, new_module.graceperiod)
-        self.assertEqual(parent.start, new_module.start)
-        self.assertEqual(course.start, new_module.start)
+        self.assertEqual(parent.graceperiod, new_block.graceperiod)
+        self.assertEqual(parent.start, new_block.start)
+        self.assertEqual(course.start, new_block.start)
 
-        self.assertEqual(course.xqa_key, new_module.xqa_key)
+        self.assertEqual(course.xqa_key, new_block.xqa_key)
 
         #
         # now let's define an override at the leaf node level
         #
-        new_module.graceperiod = timedelta(1)
-        self.store.update_item(new_module, self.user.id)
+        new_block.graceperiod = timedelta(1)
+        self.store.update_item(new_block, self.user.id)
 
         # flush the cache and refetch
-        new_module = self.store.get_item(new_module.location)
+        new_block = self.store.get_item(new_block.location)
 
-        self.assertEqual(timedelta(1), new_module.graceperiod)
+        self.assertEqual(timedelta(1), new_block.graceperiod)
 
     def test_default_metadata_inheritance(self):
         course = CourseFactory.create()

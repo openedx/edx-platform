@@ -453,8 +453,10 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return modulestore.create_child(user_id, parent_usage_key, block_type, block_id=block_id, fields=fields, **kwargs)
 
     @strip_key
-    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
+        See :py:meth `ModuleStoreDraftAndPublished.import_xblock`
+
         Defer to the course's modulestore if it supports this method
         """
         store = self._verify_modulestore_support(course_key, 'import_xblock')
@@ -511,6 +513,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     def create_xblock(self, runtime, course_key, block_type, block_id=None, fields=None, **kwargs):
         """
         Create the new xmodule but don't save it. Returns the new module.
+
+        Args:
+            runtime: :py:class `xblock.runtime` from another xblock in the same course. Providing this
+                significantly speeds up processing (inheritance and subsequent persistence)
+            course_key: :py:class `opaque_keys.CourseKey`
+            block_type: :py:class `string`: the string identifying the xblock type
+            block_id: the string uniquely identifying the block within the given course
+            fields: :py:class `dict` field_name, value pairs for initializing the xblock fields. Values
+                should be the pythonic types not the json serialized ones.
         """
         store = self._verify_modulestore_support(course_key, 'create_xblock')
         return store.create_xblock(runtime, course_key, block_type, block_id, fields or {}, **kwargs)

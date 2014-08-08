@@ -166,7 +166,7 @@ def import_from_xml(
             served directly by nginx, instead of going through django.
 
         create_new_course_if_not_present: If True, then a new course is created if it doesn't already exist.
-            Otherwise, it throws an InvalidLocationError for the course.
+            Otherwise, it throws an InvalidLocationError if the course does not exist.
 
         default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
     """
@@ -236,14 +236,15 @@ def import_from_xml(
                             try:
                                 all_locs.remove(child.location)
                             except KeyError:
-                                # ContentStoreTest.test_image_import has non-tree children
-                                # so, make this more robust
+                                # tolerate same child occurring under 2 parents such as in
+                                # ContentStoreTest.test_image_import
                                 pass
                             if verbose:
                                 log.debug('importing module location {loc}'.format(loc=child.location))
 
                             _import_module_and_update_references(
-                                child, store,
+                                child,
+                                store,
                                 user_id,
                                 course_key,
                                 dest_course_id,

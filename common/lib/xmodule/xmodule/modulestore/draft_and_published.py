@@ -104,7 +104,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         raise NotImplementedError
 
     @abstractmethod
-    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None):
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
         """
         Import the given xblock into the current branch setting: import completely overwrites any
         existing block of the same id.

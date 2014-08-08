@@ -18,7 +18,6 @@ import random
 from contextlib import contextmanager, nested
 from shutil import rmtree
 from tempfile import mkdtemp
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.tests import CourseComparisonTest
 

@@ -534,7 +534,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return [
             BlockUsageLocator(
                 course_key=course_key, block_type=blocks[block_id]['category'], block_id=block_id
-            ).version_agnostic()
+            )
             for block_id in items
         ]
 
@@ -818,7 +818,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # split handles all the fields in one dict not separated by scope
         fields = fields or {}
         fields.update(kwargs.pop('metadata', {}) or {})
-        fields.update(kwargs.pop('definition_data', {}) or {})
+        definition_data = kwargs.pop('definition_data', {})
+        if definition_data:
+            if not isinstance(definition_data, dict):
+                definition_data = {'data': definition_data}  # backward compatibility to mongo's hack
+            fields.update(definition_data)
 
         # find course_index entry if applicable and structures entry
         index_entry = self._get_index_if_valid(course_key, force, continue_version)
@@ -962,10 +966,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             **kwargs
         )
 
+    DEFAULT_ROOT_BLOCK_ID = 'course'
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
         versions_dict=None, search_targets=None, root_category='course',
-        root_block_id='course', **kwargs
+        root_block_id=None, **kwargs
     ):
         """
         Create a new entry in the active courses index which points to an existing or new structure. Returns
@@ -1043,7 +1048,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             self.db_connection.insert_definition(definition_entry)
 
             draft_structure = self._new_structure(
-                user_id, root_block_id, root_category, block_fields, definition_id
+                user_id,
+                root_block_id or SplitMongoModuleStore.DEFAULT_ROOT_BLOCK_ID,
+                root_category,
+                block_fields,
+                definition_id
             )
             new_id = draft_structure['_id']
 
@@ -1168,7 +1177,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             is_updated = self._compare_settings(settings, original_entry['fields'])
 
         # check children
-        if partitioned_fields[Scope.children]:
+        if partitioned_fields.get(Scope.children, {}):  # purposely not 'is not None'
             serialized_children = [child.block_id for child in partitioned_fields[Scope.children]['children']]
             is_updated = is_updated or original_entry['fields'].get('children', []) != serialized_children
             if is_updated:
