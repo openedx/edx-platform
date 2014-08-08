@@ -202,9 +202,6 @@ class ModuleStoreRead(object):
                 return True, field
 
         for key, criteria in qualifiers.iteritems():
-            if callable(criteria):
-                # skip over any optional fields that are functions
-                continue
             is_set, value = _is_set_on(key)
             if not is_set:
                 return False

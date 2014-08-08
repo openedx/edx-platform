@@ -326,7 +326,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         course_locn = self.course_locations[self.XML_COURSEID1]
         # NOTE: use get_course if you just want the course. get_items is expensive
-        modules = self.store.get_items(course_locn.course_key, category='course')
+        modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'course'})
         self.assertEqual(len(modules), 1)
         self.assertEqual(modules[0].location, course_locn)
 
@@ -334,7 +334,7 @@ class TestMixedModuleStore(unittest.TestCase):
         course_locn = self.course_locations[self.MONGO_COURSEID]
         with check_mongo_calls(mongo_store, max_find, max_send):
             # NOTE: use get_course if you just want the course. get_items is expensive
-            modules = self.store.get_items(course_locn.course_key, category='problem')
+            modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'problem'})
         self.assertEqual(len(modules), 6)
 
         # verify that an error is raised when the revision is not valid

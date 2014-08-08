@@ -717,7 +717,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         except KeyError:
             raise ItemNotFoundError(usage_key)
 
-    def get_items(self, course_id, settings=None, content=None, revision=None, **kwargs):
+    def get_items(self, course_id, settings=None, content=None, revision=None, qualifiers=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -729,10 +729,10 @@ class XMLModuleStore(ModuleStoreReadBase):
         Args:
             course_id (CourseKey): the course identifier
             settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
+                and rules as qualifiers below
             content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
-            kwargs (key=value): what to look for within the course.
+                rules as qualifiers below.
+            qualifiers (dict): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
@@ -747,8 +747,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         items = []
 
-        category = kwargs.pop('category', None)
-        name = kwargs.pop('name', None)
+        qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
+        category = qualifiers.pop('category', None)
+        name = qualifiers.pop('name', None)
 
         def _block_matches_all(mod_loc, module):
             if category and mod_loc.category != category:
@@ -757,7 +758,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                 return False
             return all(
                 self._block_matches(module, fields or {})
-                for fields in [settings, content, kwargs]
+                for fields in [settings, content, qualifiers]
             )
 
         for mod_loc, module in self.modules[course_id].iteritems():

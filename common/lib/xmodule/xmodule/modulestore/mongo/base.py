@@ -846,7 +846,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
-    def get_items(self, course_id, settings=None, content=None, key_revision=MongoRevisionKey.published, **kwargs):
+    def get_items(
+            self,
+            course_id,
+            settings=None,
+            content=None,
+            key_revision=MongoRevisionKey.published,
+            qualifiers=None,
+            **kwargs
+    ):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -861,15 +869,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Args:
             course_id (CourseKey): the course identifier
             settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
+                and rules as qualifiers below
             content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
+                rules as qualifiers below.
             key_revision (str): the revision of the items you're looking for.
                 MongoRevisionKey.draft - only returns drafts
                 MongoRevisionKey.published (equates to None) - only returns published
                 If you want one of each matching xblock but preferring draft to published, call this same method
                 on the draft modulestore with ModuleStoreEnum.RevisionOption.draft_preferred.
-            kwargs (key=value): what to look for within the course.
+            qualifiers (dict): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
@@ -877,21 +885,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 This modulestore does not allow searching dates by comparison or edited_by, previous_version,
                 update_version info.
         """
+        qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
         query = self._course_key_to_son(course_id)
         query['_id.revision'] = key_revision
         for field in ['category', 'name']:
-            if field in kwargs:
-                query['_id.' + field] = kwargs.pop(field)
+            if field in qualifiers:
+                query['_id.' + field] = qualifiers.pop(field)
 
         for key, value in (settings or {}).iteritems():
             query['metadata.' + key] = value
         for key, value in (content or {}).iteritems():
             query['definition.data.' + key] = value
-        if 'children' in kwargs:
-            query['definition.children'] = kwargs.pop('children')
-
-        # remove any callable kwargs for qualifiers
-        qualifiers = {key: val for key, val in kwargs.iteritems() if not callable(val)}
+        if 'children' in qualifiers:
+            query['definition.children'] = qualifiers.pop('children')
 
         query.update(qualifiers)
         items = self.collection.find(

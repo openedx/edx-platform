@@ -331,11 +331,6 @@ class DraftModuleStore(MongoModuleStore):
                         returns only Published items
                     if the branch setting is ModuleStoreEnum.Branch.draft_preferred,
                         returns either Draft or Published, preferring Draft items.
-            kwargs (key=value): what to look for within the course.
-                Common qualifiers are ``category`` or any field name. if the target field is a list,
-                then it searches for the given value in the list not list equivalence.
-                Substring matching pass a regex object.
-                ``name`` is another commonly provided key (Location based stores)
         """
         def base_get_items(key_revision):
             return super(DraftModuleStore, self).get_items(course_key, key_revision=key_revision, **kwargs)

@@ -151,7 +151,7 @@ class TestMigration(SplitWMongoCourseBoostrapper):
 
         # grab the detached items to compare they should be in both published and draft
         for category in ['conditional', 'about', 'course_info', 'static_tab']:
-            for conditional in presplit.get_items(self.old_course_key, category=category):
+            for conditional in presplit.get_items(self.old_course_key, qualifiers={'category': category}):
                 locator = new_course_key.make_usage_key(category, conditional.location.block_id)
                 self.compare_dags(presplit, conditional, self.split_mongo.get_item(locator), published)
 

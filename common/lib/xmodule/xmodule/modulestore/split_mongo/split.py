@@ -451,7 +451,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             log.debug("Found more than one item for '{}'".format(usage_key))
         return items[0]
 
-    def get_items(self, course_locator, settings=None, content=None, **kwargs):
+    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -462,10 +462,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Args:
             course_locator (CourseLocator): the course identifier
             settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
+                and rules as qualifiers below
             content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
-            kwargs (key=value): what to look for within the course.
+                rules as qualifiers below.
+            qualifiers (dict): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 For substring matching pass a regex object.
@@ -474,6 +474,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         course = self._lookup_course(course_locator)
         items = []
+        qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
 
         def _block_matches_all(block_json):
             """
@@ -481,7 +482,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             """
             # do the checks which don't require loading any additional data
             if (
-                self._block_matches(block_json, kwargs) and
+                self._block_matches(block_json, qualifiers) and
                 self._block_matches(block_json.get('fields', {}), settings)
             ):
                 if content:
@@ -492,17 +493,17 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         if settings is None:
             settings = {}
-        if 'name' in kwargs:
+        if 'name' in qualifiers:
             # odd case where we don't search just confirm
-            block_id = kwargs.pop('name')
+            block_id = qualifiers.pop('name')
             block = course['structure']['blocks'].get(block_id)
             if _block_matches_all(block):
                 return self._load_items(course, [block_id], lazy=True, **kwargs)
             else:
                 return []
         # don't expect caller to know that children are in fields
-        if 'children' in kwargs:
-            settings['children'] = kwargs.pop('children')
+        if 'children' in qualifiers:
+            settings['children'] = qualifiers.pop('children')
         for block_id, value in course['structure']['blocks'].iteritems():
             if _block_matches_all(value):
                 items.append(block_id)

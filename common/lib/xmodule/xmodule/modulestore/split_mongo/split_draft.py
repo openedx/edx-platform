@@ -171,18 +171,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         usage_key = self._map_revision_to_branch(usage_key, revision=revision)
         return super(DraftVersioningModuleStore, self).get_item(usage_key, depth=depth, **kwargs)
 
-    def get_items(self, course_locator, settings=None, content=None, revision=None, **kwargs):
+    def get_items(self, course_locator, revision=None, **kwargs):
         """
         Returns a list of XModuleDescriptor instances for the matching items within the course with
         the given course_locator.
         """
         course_locator = self._map_revision_to_branch(course_locator, revision=revision)
-        return super(DraftVersioningModuleStore, self).get_items(
-            course_locator,
-            settings=settings,
-            content=content,
-            **kwargs
-        )
+        return super(DraftVersioningModuleStore, self).get_items(course_locator, **kwargs)
 
     def get_parent_location(self, location, revision=None, **kwargs):
         '''

@@ -26,7 +26,8 @@ log = logging.getLogger(__name__)
 
 def strip_key(func):
     """
-    A decorator for stripping version and branch information from return values that are, or contain, locations.
+    A decorator for stripping version and branch information from return values that are, or contain, UsageKeys or
+    CourseKeys.
     Additionally, the decorated function is called with an optional 'field_decorator' parameter that can be used
     to strip any location(-containing) fields, which are not directly returned by the function.
 
@@ -222,14 +223,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     and rules as kwargs below
                 content (dict): fields to look for which have content scope. Follows same syntax and
                     rules as kwargs below.
-            additional kwargs (key=value): what to look for within the course.
-                Common qualifiers are ``category`` or any field name. if the target field is a list,
-                then it searches for the given value in the list not list equivalence.
-                Substring matching pass a regex object.
-                For some modulestores, ``name`` is another commonly provided key (Location based stores)
-                For some modulestores,
-                you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
-                useless) or a function accepting one arg to do inequality
+                qualifiers (dict): what to look for within the course.
+                    Common qualifiers are ``category`` or any field name. if the target field is a list,
+                    then it searches for the given value in the list not list equivalence.
+                    Substring matching pass a regex object.
+                    For some modulestores, ``name`` is another commonly provided key (Location based stores)
+                    For some modulestores,
+                    you can search by ``edited_by``, ``edited_on`` providing either a datetime for == (probably
+                    useless) or a function accepting one arg to do inequality
         """
         if not isinstance(course_key, CourseKey):
             raise Exception("Must pass in a course_key when calling get_items()")

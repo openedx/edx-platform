@@ -95,7 +95,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         store.update_item(course, self.user.id)
 
         # just pick one vertical
-        descriptor = store.get_items(course.id, category='vertical',)
+        descriptor = store.get_items(course.id, qualifiers={'category': 'vertical'})
         resp = self.client.get_html(get_url('container_handler', descriptor[0].location))
         self.assertEqual(resp.status_code, 200)
 
@@ -128,7 +128,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         """Verifies the editing HTML in all the verticals in the given test course"""
         _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
 
-        items = self.store.get_items(course_items[0].id, category='vertical')
+        items = self.store.get_items(course_items[0].id, qualifiers={'category': 'vertical'})
         self._check_verticals(items)
 
     def test_edit_unit_toy(self):
@@ -290,7 +290,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
 
-        items = self.store.get_items(course_key, category='poll_question')
+        items = self.store.get_items(course_key, qualifiers={'category': 'poll_question'})
         found = len(items) > 0
 
         self.assertTrue(found)
@@ -644,7 +644,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         filesystem = OSFS(root_dir / 'test_export')
         self.assertTrue(filesystem.exists(dirname))
 
-        items = store.get_items(course_id, category=category_name)
+        items = store.get_items(course_id, qualifiers={'category': category_name})
 
         for item in items:
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
@@ -743,7 +743,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -769,7 +769,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['word_cloud'])
         course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
 
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -796,7 +796,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -917,8 +917,10 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         items = self.store.get_items(
             course_id,
-            category='sequential',
-            name='vertical_sequential'
+            qualifiers={
+                'category': 'sequential',
+                'name': 'vertical_sequential',
+            }
         )
         self.assertEqual(len(items), 1)
 
@@ -1401,7 +1403,7 @@ class ContentStoreTest(ContentStoreTestCase):
         _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
 
         course = course_items[0]
-        verticals = self.store.get_items(course.id, category='vertical')
+        verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:

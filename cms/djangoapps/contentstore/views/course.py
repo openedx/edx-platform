@@ -1135,7 +1135,7 @@ class GroupConfiguration(object):
         }
         """
         usage_info = {}
-        descriptors = store.get_items(course.id, category='split_test')
+        descriptors = store.get_items(course.id, qualifiers={'category': 'split_test'})
         for split_test in descriptors:
             if split_test.user_partition_id not in usage_info:
                 usage_info[split_test.user_partition_id] = []
