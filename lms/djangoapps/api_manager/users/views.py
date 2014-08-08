@@ -569,6 +569,8 @@ class UsersGroupsList(SecureAPIView):
     - URI: ```/api/users/{user_id}/groups/```
     - GET: Returns a JSON representation (array) of the set of related Group entities
         * type: Set filtering parameter
+        * course: Set filtering parameter to groups associated to a course or courses
+        - URI: ```/api/users/{user_id}/groups/?type=series,seriesX&course=slashes%3AMITx%2B999%2BTEST_COURSE```
     - POST: Append a Group entity to the set of related Group entities for the specified User
         * group_id: __required__, The identifier for the Group being added
     - POST Example:
@@ -616,12 +618,17 @@ class UsersGroupsList(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         group_type = request.QUERY_PARAMS.get('type', None)
+        course = request.QUERY_PARAMS.get('course', None)
         response_data = {}
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         groups = existing_user.groups.all()
         if group_type:
-            groups = groups.filter(groupprofile__group_type=group_type)
+            group_type = group_type.split(',')
+            groups = groups.filter(groupprofile__group_type__in=group_type)
+        if course:
+            course = course.split(',')
+            groups = groups.filter(coursegrouprelationship__course_id__in=course)
         response_data['groups'] = []
         for group in groups:
             group_profile = GroupProfile.objects.get(group_id=group.id)
