@@ -9,6 +9,7 @@ from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.tests.test_split_modulestore import SplitModuleTest
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 # pylint: disable=W0613
 def render_to_template_mock(*args):
@@ -21,7 +22,8 @@ class TestDraftVersioningModuleStore(unittest.TestCase):
         self.module_store = DraftVersioningModuleStore(
             contentstore=None,
             doc_store_config={
-                'host': 'localhost',
+                'host': MONGO_HOST,
+                'port': MONGO_PORT_NUM,
                 'db': 'test_xmodule',
                 'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
             },

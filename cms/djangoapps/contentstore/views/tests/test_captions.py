@@ -96,7 +96,7 @@ class Basetranscripts(CourseTestCase):
         }
 
     def tearDown(self):
-        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'])
+        modulestore()._drop_database()
         _CONTENTSTORE.clear()
 
 

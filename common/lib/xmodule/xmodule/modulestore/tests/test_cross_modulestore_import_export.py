@@ -11,7 +11,6 @@ and then for each combination of modulestores, performing the sequence:
     4) Compare all modules in the source and destination modulestores to make sure that they line up
 
 """
-
 import ddt
 import itertools
 import random
@@ -30,9 +29,12 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+
 
 COMMON_DOCSTORE_CONFIG = {
-    'host': 'localhost'
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
 }
 
 
