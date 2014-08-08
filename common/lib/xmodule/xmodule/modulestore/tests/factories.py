@@ -214,23 +214,24 @@ class ItemFactory(XModuleFactory):
 
 
 @contextmanager
-def check_exact_number_of_calls(object_with_method, method, num_calls, method_name=None):
+def check_exact_number_of_calls(object_with_method, method_name, num_calls):
     """
     Instruments the given method on the given object to verify the number of calls to the
     method is exactly equal to 'num_calls'.
     """
-    with check_number_of_calls(object_with_method, method, num_calls, num_calls, method_name):
+    with check_number_of_calls(object_with_method, method_name, num_calls, num_calls):
         yield
 
 
 @contextmanager
-def check_number_of_calls(object_with_method, method, maximum_calls, minimum_calls=1, method_name=None):
+def check_number_of_calls(object_with_method, method_name, maximum_calls, minimum_calls=1):
     """
     Instruments the given method on the given object to verify the number of calls to the method is
     less than or equal to the expected maximum_calls and greater than or equal to the expected minimum_calls.
     """
+    method = getattr(object_with_method, method_name)
     method_wrap = Mock(wraps=method)
-    wrap_patch = patch.object(object_with_method, method_name or method.__name__, method_wrap)
+    wrap_patch = patch.object(object_with_method, method_name, method_wrap)
 
     try:
         wrap_patch.start()
@@ -240,10 +241,26 @@ def check_number_of_calls(object_with_method, method, maximum_calls, minimum_cal
         wrap_patch.stop()
 
         # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-        assert_greater_equal(method_wrap.call_count, minimum_calls)
+        assert_greater_equal(
+            method_wrap.call_count,
+            minimum_calls,
+            "Expected at least {} calls, {} were made. Calls: {}".format(
+                minimum_calls,
+                method_wrap.call_count,
+                method_wrap.call_args_list
+            )
+        )
 
         # now verify the number of actual calls is less than (or equal to) the expected maximum
-        assert_less_equal(method_wrap.call_count, maximum_calls)
+        assert_less_equal(
+            method_wrap.call_count,
+            maximum_calls,
+            "Expected at most {} calls, {} were made. Calls: {}".format(
+                maximum_calls,
+                method_wrap.call_count,
+                method_wrap.call_args_list
+            )
+        )
 
 
 @contextmanager
@@ -259,11 +276,11 @@ def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
         the given int value.
     """
     if mongo_store.get_modulestore_type() == ModuleStoreEnum.Type.mongo:
-        with check_exact_number_of_calls(mongo_store.collection, mongo_store.collection.find, num_finds):
+        with check_exact_number_of_calls(mongo_store.collection, 'find', num_finds):
             if num_sends is not None:
                 with check_exact_number_of_calls(
                     mongo_store.database.connection,
-                    mongo_store.database.connection._send_message,  # pylint: disable=protected-access
+                    '_send_message',
                     num_sends,
                 ):
                     yield
@@ -289,7 +306,7 @@ def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
                 connection = mongo_store.db_connection.database.connection
                 with check_exact_number_of_calls(
                     connection,
-                    connection._send_message,  # pylint: disable=protected-access
+                    '_send_message',  # pylint: disable=protected-access
                     num_sends,
                 ):
                     yield
