@@ -59,8 +59,6 @@ class ChooseModeView(View):
                 )
             )
 
-
-
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(course_key, None)
 
@@ -135,11 +133,6 @@ class ChooseModeView(View):
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_key] = amount_value
             request.session["donation_for_course"] = donation_for_course
-            if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
-                return redirect(
-                    reverse('verify_student_verified',
-                            kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
-                )
 
             return redirect(
                 reverse('verify_student_show_requirements',
