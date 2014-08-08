@@ -678,6 +678,33 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return set(config.get("cohorted_discussions", []))
 
     @property
+    def inline_discussions_cohorting_default(self):
+        """
+        This allow to change the default behavior of inline discussions cohorting. By setting this to
+        False, all inline discussions are non-cohorted.
+
+        """
+        config = self.cohort_config
+        if config is None:
+            return True
+
+        return bool(config.get("inline_discussions_cohorting_default", True))
+
+    @property
+    def cohorted_inline_discussions(self):
+        """
+        When inline_discussions_cohorting_default is False, this is used to set a discussion cohorted.
+        Return the set of inline discussions that are explicitly cohorted. It may be the empty set.
+        By adding an inline discussion id in this setting, it becomes cohorted.
+
+        """
+        config = self.cohort_config
+        if config is None:
+            return set()
+
+        return set(config.get("cohorted_inline_discussions", []))
+
+    @property
     def is_newish(self):
         """
         Returns if the course has been flagged as new. If
