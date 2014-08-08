@@ -27,6 +27,7 @@ from external_auth.views import shib_login, course_specific_login, course_specif
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, Registration, CourseEnrollment
 from student.tests.factories import UserFactory
+from edxmako.tests import mako_middleware_process_request
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
@@ -91,6 +92,9 @@ class ShibSPTest(ModuleStoreTestCase):
         """
         no_remote_user_request = self.request_factory.get('/shib-login')
         no_remote_user_request.META.update({'Shib-Identity-Provider': IDP})
+        no_remote_user_request.user = AnonymousUser()
+
+        mako_middleware_process_request(no_remote_user_request)
         no_remote_user_response = shib_login(no_remote_user_request)
         self.assertEqual(no_remote_user_response.status_code, 403)
         self.assertIn("identity server did not return your ID information", no_remote_user_response.content)
@@ -155,6 +159,8 @@ class ShibSPTest(ModuleStoreTestCase):
                                      'REMOTE_USER': remote_user,
                                      'mail': remote_user})
                 request.user = AnonymousUser()
+
+                mako_middleware_process_request(request)
                 with patch('external_auth.views.AUDIT_LOG') as mock_audit_log:
                     response = shib_login(request)
                 audit_log_calls = mock_audit_log.method_calls
@@ -315,6 +321,8 @@ class ShibSPTest(ModuleStoreTestCase):
             request2 = self.request_factory.post('/create_account', data=postvars)
             request2.session = client.session
             request2.user = AnonymousUser()
+
+            mako_middleware_process_request(request2)
             with patch('student.views.AUDIT_LOG') as mock_audit_log:
                 _response2 = create_account(request2)
 

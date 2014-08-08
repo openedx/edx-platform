@@ -254,6 +254,22 @@ class CourseOutlineUnit(CourseOutlineChild):
     def is_browser_on_page(self):
         return self.q(css=self.BODY_SELECTOR).present
 
+    def publish(self):
+        """
+        Publish the unit.
+        """
+        click_css(self, self._bounded_selector('.action-publish'), require_notification=False)
+        modal = CourseOutlineModal(self)
+        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')
+        modal.save()
+
+    @property
+    def publish_action(self):
+        """
+        Returns the link for publishing a unit.
+        """
+        return self.q(css=self._bounded_selector('.action-publish')).first
+
 
 class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
     """
@@ -454,7 +470,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
 
 class CourseOutlineModal(object):
-    MODAL_SELECTOR = ".edit-outline-item-modal"
+    MODAL_SELECTOR = ".wrapper-modal-window"
 
     def __init__(self, page):
         self.page = page

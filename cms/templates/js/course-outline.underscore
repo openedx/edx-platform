@@ -1,8 +1,8 @@
 <%
-var category = xblockInfo.get('category');
 var releasedToStudents = xblockInfo.get('released_to_students');
 var visibilityState = xblockInfo.get('visibility_state');
 var published = xblockInfo.get('published');
+var hasChanges = xblockInfo.get('has_changes');
 
 var statusMessage = null;
 var statusType = null;
@@ -10,7 +10,7 @@ if (visibilityState === 'staff_only') {
     statusType = 'staff-only';
     statusMessage = gettext('Contains staff only content');
 } else if (visibilityState === 'needs_attention') {
-    if (category === 'vertical') {
+    if (xblockInfo.isVertical()) {
         statusType = 'warning';
         if (published && releasedToStudents) {
             statusMessage = gettext('Unpublished changes to live content');
@@ -63,6 +63,14 @@ if (xblockInfo.get('graded')) {
 
         <div class="<%= xblockType %>-header-actions">
             <ul class="actions-list">
+                <% if (xblockInfo.isVertical() && (!published || hasChanges)) { %>
+                    <li class="action-item action-publish">
+                        <a href="#" data-tooltip="<%= gettext('Publish') %>" class="publish-button action-button">
+                            <i class="icon icon-upload-alt"></i>
+                            <span class="sr action-button-text"><%= gettext('Publish') %></span>
+                        </a>
+                    </li>
+                <% } %>
                 <% if (xblockInfo.isEditableOnCourseOutline()) { %>
                     <li class="action-item action-configure">
                         <a href="#" data-tooltip="<%= gettext('Configure') %>" class="configure-button action-button">
@@ -141,7 +149,7 @@ if (xblockInfo.get('graded')) {
                 </a>
             </p>
         </div>
-    <% } else if (category !== 'vertical') { %>
+    <% } else if (!xblockInfo.isVertical()) { %>
         <div class="outline-content <%= xblockType %>-content">
             <ol class="<%= typeListClass %> is-sortable">
                 <li class="ui-splint ui-splint-indicator">

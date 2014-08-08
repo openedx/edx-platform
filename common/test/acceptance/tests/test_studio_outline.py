@@ -984,3 +984,53 @@ class UnitNavigationTest(CourseOutlineTest):
         self.course_outline_page.section_at(0).subsection_at(0).toggle_expand()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).go_to()
         self.assertTrue(unit.is_browser_on_page)
+
+
+class PublishUnitTest(CourseOutlineTest):
+    """
+    Feature: Publish the unit.
+    """
+
+    __test__ = True
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with a unit and a single HTML child.
+        """
+        self.courseware = CoursewarePage(self.browser, self.course_id)
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children()
+                )
+            )
+        )
+
+    def test_publishing(self):
+        """
+        Scenario: The publishing from the course outline shows published content in LMS
+            Given I have an unpublished unit
+            When I go to the course outline
+            Then I see publish button for the unit
+            When I publish the unit
+            Then I see that publish button disappears
+            And I see the changed content in LMS
+        """
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+        self.course_fixture.create_xblock(
+            vertical.locator,
+            XBlockFixtureDesc('html', 'Test HTML Component'),
+        )
+
+        self.course_outline_page.visit()
+        self.course_outline_page.section(SECTION_NAME).subsection(SUBSECTION_NAME).toggle_expand()
+        unit = self.course_outline_page.section(SECTION_NAME).subsection(SUBSECTION_NAME).unit_at(0)
+        # Should contain publish button
+        self.assertTrue(unit.publish_action)
+        unit.publish()
+        # Does not contain publish button
+        self.assertFalse(unit.publish_action)
+        self.courseware.visit()
+        # Verify that the unit was published
+        self.assertEqual(1, self.courseware.num_xblock_components)
+        self.assertEqual('html', self.courseware.xblock_component_type(0))
