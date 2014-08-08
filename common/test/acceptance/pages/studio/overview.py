@@ -470,7 +470,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
 
 class CourseOutlineModal(object):
-    MODAL_SELECTOR = ".course-outline-modal"
+    MODAL_SELECTOR = ".wrapper-modal-window"
 
     def __init__(self, page):
         self.page = page

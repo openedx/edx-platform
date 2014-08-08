@@ -34,7 +34,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             BaseModal.prototype.initialize.call(this);
             this.events = _.extend({}, BaseModal.prototype.events, this.events);
             this.template = this.loadTemplate('course-outline-modal');
-            this.options.title = this.options.title || this.getTitle();
+            this.options.title = this.getTitle();
+            if (this.options.xblockType) {
+                this.options.modalName = 'bulkpublish-' + this.options.xblockType;
+            }
         },
 
         afterRender: function () {
@@ -43,9 +46,9 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         },
 
         initializeEditors: function () {
-            this.options.editors = _.map(this.options.editors, function (editor) {
-                return new editor({
-                    parentElement: this.$('.edit-settings-form'),
+            this.options.editors = _.map(this.options.editors, function (Editor) {
+                return new Editor({
+                    parentElement: this.$('.modal-section'),
                     model: this.model
                 });
             }, this);
@@ -53,14 +56,14 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
 
         getTitle: function () {
             return interpolate(
-                gettext("%(display_name)s Settings"),
+                gettext('%(display_name)s Settings'),
                 { display_name: this.model.get('display_name') }, true
             );
         },
 
         getIntroductionMessage: function () {
             return interpolate(
-                gettext("Change the settings for %(display_name)s"),
+                gettext('Change the settings for %(display_name)s'),
                 { display_name: this.model.get('display_name') }, true
             );
         },
@@ -95,7 +98,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         getRequestData: function () {
             var requestData = _.map(this.options.editors, function (editor) {
                 return editor.getRequestData();
-            })
+            });
 
             return $.extend.apply(this, [true, {}].concat(requestData));
         }
@@ -104,18 +107,18 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
     PublishXBlockModal = CourseOutlineXBlockModal.extend({
         getTitle: function () {
             return interpolate(
-                gettext("Publish %(display_name)s"),
+                gettext('Publish %(display_name)s'),
                 { display_name: this.model.get('display_name') }, true
             );
         },
 
         getIntroductionMessage: function () {
-            return gettext("Publish all unpublished changes for this unit?");
+            return gettext('Publish all unpublished changes for this unit?');
         },
 
         addActionButtons: function() {
             if (this.options.addSaveButton) {
-                this.addActionButton('save', gettext('Publish'), true);
+                this.addActionButton('publish', gettext('Publish'), true);
             }
             this.addActionButton('cancel', gettext('Cancel'));
         }

@@ -147,7 +147,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
 
             editXBlock: function() {
                 var modal = CourseOutlineModalsFactory.getModal('edit', this.model, {
-                    onSave: this.refresh.bind(this)
+                    onSave: this.refresh.bind(this),
+                    xblockType: this.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
                 });
 
                 if (modal) {
@@ -157,7 +160,10 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
 
             publishXBlock: function() {
                 var modal = CourseOutlineModalsFactory.getModal('publish', this.model, {
-                    onSave: this.refresh.bind(this)
+                    onSave: this.refresh.bind(this),
+                    xblockType: this.getXBlockType(
+                        this.model.get('category'), this.parentView.model, true
+                    )
                 });
 
                 if (modal) {

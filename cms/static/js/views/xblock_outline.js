@@ -190,7 +190,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     xblockType = translate ? gettext('section') : 'section';
                 } else if (category === 'sequential') {
                     xblockType = translate ? gettext('subsection') : 'subsection';
-                } else if (category === 'vertical' && (!parentInfo || parentInfo.get('category') === 'sequential')) {
+                } else if (category === 'vertical' && (!parentInfo || parentInfo.isSequential())) {
                     xblockType = translate ? gettext('unit') : 'unit';
                 }
                 return xblockType;

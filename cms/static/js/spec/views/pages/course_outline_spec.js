@@ -362,13 +362,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     outlinePage.$('.section-header-actions .configure-button').click();
                     $("#start_date").val("1/2/2015");
                     // Section release date can't be cleared.
-                    expect($(".course-outline-modal .action-clear")).not.toExist();
+                    expect($(".wrapper-modal-window .action-clear")).not.toExist();
 
                     // Section does not contain due_date or grading type selector
                     expect($("due_date")).not.toExist();
                     expect($("grading_format")).not.toExist();
 
-                    $(".course-outline-modal .action-save").click();
+                    $(".wrapper-modal-window .action-save").click();
 
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                         "metadata":{
@@ -501,7 +501,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab");
-                    $(".course-outline-modal .action-save").click();
+                    $(".wrapper-modal-window .action-save").click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
                         "metadata":{
@@ -533,7 +533,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePage(this, mockCourseJSON, false);
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab");
-                    $(".course-outline-modal .action-save").click();
+                    $(".wrapper-modal-window .action-save").click();
 
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, {});
@@ -549,14 +549,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($("#due_date").val()).toBe('7/10/2014');
                     expect($("#grading_type").val()).toBe('Lab');
 
-                    $(".course-outline-modal .scheduled-date-input .action-clear").click();
-                    $(".course-outline-modal .due-date-input .action-clear").click();
+                    $(".wrapper-modal-window .scheduled-date-input .action-clear").click();
+                    $(".wrapper-modal-window .due-date-input .action-clear").click();
                     expect($("#start_date").val()).toBe('');
                     expect($("#due_date").val()).toBe('');
 
                     $("#grading_type").val('notgraded');
 
-                    $(".course-outline-modal .action-save").click();
+                    $(".wrapper-modal-window .action-save").click();
 
                     // This is the response for the change operation.
                     create_sinon.respondWithJson(requests, {});
@@ -615,7 +615,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         });
                     createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
                     getItemHeaders('unit').find('.publish-button').click();
-                    $(".course-outline-modal .action-save").click();
+                    $(".wrapper-modal-window .action-save").click();
                     create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-unit', {
                         publish : 'make_public'
                     });
