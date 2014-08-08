@@ -533,7 +533,13 @@ class UsersApiTests(ModuleStoreTestCase):
 
         group_url = self.groups_base_uri
         group_name = 'Alpha Group'
-        data = {'name': group_name, 'type': 'Engineer'}
+        group_xblock_id = 'location:GroupTester+TG101+1+group-project+079879fdabae47f6848f38a58f41f2c7'
+        group_test_value = 'values 2'
+        group_data = {
+            'xblock_id': group_xblock_id,
+            'key2': group_test_value
+        }
+        data = {'name': group_name, 'type': 'Engineer', 'data': group_data}
         response = self.do_post(group_url, data)
         group_id = response.data['id']
         user_groups_uri = '{}/groups'.format(test_uri)
@@ -571,6 +577,31 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['groups']), 1)
         self.assertEqual(response.data['groups'][0]['id'], group_id)
+
+        group_data_filters = {
+            'data__xblock_id': group_xblock_id,
+            'data__key2': group_test_value
+        }
+        group_type_uri = '{}?{}'.format(user_groups_uri, urlencode(group_data_filters))
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 1)
+
+        group_type_uri = '{}?{}'.format(user_groups_uri, urlencode({'data__key2': group_test_value}))
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 1)
+
+        group_type_uri = '{}?{}'.format(user_groups_uri, urlencode({'data__xblock_id': 'invalid_value',
+                                                                    'data__key2': group_test_value}))
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 0)
+
+        group_type_uri = '{}?{}'.format(user_groups_uri, urlencode({'data__key2': 'invalid_value'}))
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 0)
 
         error_type_uri = '{}?type={}'.format(user_groups_uri, 'error_type')
         response = self.do_get(error_type_uri)
