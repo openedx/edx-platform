@@ -101,9 +101,7 @@ class MongoModulestoreBuilder(object):
             yield modulestore
         finally:
             # Delete the created database
-            db = modulestore.database
-            db.connection.drop_database(db)
-            db.connection.close()
+            modulestore._drop_database()
 
             # Delete the created directory on the filesystem
             rmtree(fs_root)
@@ -146,10 +144,7 @@ class VersioningModulestoreBuilder(object):
         try:
             yield modulestore
         finally:
-            # Delete the created database
-            db = modulestore.db
-            db.connection.drop_database(db)
-            db.connection.close()
+            modulestore._drop_database()
 
             # Delete the created directory on the filesystem
             rmtree(fs_root)
@@ -220,9 +215,7 @@ class MongoContentstoreBuilder(object):
             yield contentstore
         finally:
             # Delete the created database
-            db = contentstore.fs_files.database
-            db.connection.drop_database(db)
-            db.connection.close()
+            contentstore._drop_database()
 
     def __repr__(self):
         return 'MongoContentstoreBuilder()'
