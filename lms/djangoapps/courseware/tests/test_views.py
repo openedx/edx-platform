@@ -148,6 +148,10 @@ class ViewsTestCase(TestCase):
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module, views.CONTENT_DEPTH)
 
+    def test_invalid_course_id(self):
+        response = self.client.get('/courses/MITx/3.091X/')
+        self.assertEqual(response.status_code, 404)
+
     def test_index_invalid_position(self):
         request_url = '/'.join([
             '/courses',
