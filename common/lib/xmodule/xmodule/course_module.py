@@ -220,8 +220,8 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."), 
-        default="Empty", 
+        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings
     )
@@ -453,7 +453,15 @@ class CourseFields(object):
         display_name=_("Certificates Downloadable Before End"),
         help=_("Enter true or false. If true, students can download certificates before the course ends, if they've met certificate requirements."),
         scope=Scope.settings,
-        default=False
+        default=False,
+        deprecated=True
+    )
+
+    certificates_display_behavior = String(
+        display_name=_("Certificates Display Behavior"),
+        help=_("Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' is the default behavior, where certificates will only appear after a course has ended. 'early_with_info' will display all certificate information before a course has ended. 'early_no_info' will hide all certificate information unless a student has earned a certificate."),
+        scope=Scope.settings,
+        default="end"
     )
     course_image = String(
         display_name=_("Course About Page Image"),
@@ -712,7 +720,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         Return True if it is acceptable to show the student a certificate download link
         """
-        return self.certificates_show_before_end or self.has_ended()
+        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
+        return show_early or self.has_ended()
 
     def has_started(self):
         return datetime.now(UTC()) > self.start
