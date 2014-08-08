@@ -5,7 +5,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
-            setScrollTop, redirect, hasChangedAttributes;
+            setScrollTop, redirect, hasChangedAttributes, keywordValidator;
 
         /**
          * Toggles the expanded state of the current element.
@@ -151,6 +151,34 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
+            var i = 0;
+        keywordValidator = (function () {
+            var regexp = /%%+[^%]+%%/g;
+            var keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'];
+            var validate = function (string) {
+                var found_keywords = string.match(regexp);
+                var invalid_keywords = [];
+                var num_found = found_keywords.length;
+                var curr_keyword;
+
+                for (var i = 0; i < num_found; i++) {
+                    curr_keyword = found_keywords[i];
+                    if ($.inArray(curr_keyword, keywords) == -1) {
+                        invalid_keywords.push(curr_keyword);
+                    }
+                }
+
+                return {
+                    'is_valid': invalid_keywords.length == 0? true : false,
+                    'invalid_keywords': invalid_keywords,
+                }
+
+            };
+            return {
+                'validate_string': validate,
+            };
+        }());
+
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
             'showLoadingIndicator': showLoadingIndicator,
@@ -162,6 +190,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'getScrollOffset': getScrollOffset,
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
-            'hasChangedAttributes': hasChangedAttributes
+            'hasChangedAttributes': hasChangedAttributes,
+            'keywordValidator': keywordValidator,
         };
     });
