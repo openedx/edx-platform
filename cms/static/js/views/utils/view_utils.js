@@ -156,7 +156,8 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             var regexp = /%%+[^%]+%%/g;
             var keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'];
             var validate = function (string) {
-                var found_keywords = string.match(regexp);
+                var regex_match = string.match(regexp);
+                var found_keywords = regex_match == null ? [] : regex_match
                 var invalid_keywords = [];
                 var num_found = found_keywords.length;
                 var curr_keyword;

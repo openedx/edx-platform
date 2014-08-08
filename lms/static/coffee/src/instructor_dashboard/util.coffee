@@ -286,7 +286,8 @@ class KeywordValidator
     @keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%']
 
     @validate_string: (string) =>
-      found_keywords = string.match(@keyword_regex)
+      regex_match = string.match(@keyword_regex)
+      found_keywords = if regex_match == null then [] else regex_match
       invalid_keywords = []
       is_valid = true
       keywords = @keywords
