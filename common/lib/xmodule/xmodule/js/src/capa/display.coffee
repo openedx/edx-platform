@@ -381,7 +381,8 @@ class @Problem
         @updateProgress response
         window.SR.readElts(answer_text)
     else
-      @$('[id^=answer_], [id^=solution_]').text ''
+      @$('[id^=answer_]').text ''
+      @$('[id^=solution_]').html '<solution><div class="detailed-solution"><p>Explanation available</p></div></solution>'
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
       `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
