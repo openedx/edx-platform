@@ -549,6 +549,10 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_post(user_groups_uri, data)
         self.assertEqual(response.status_code, 201)
 
+        course_id = unicode(self.course.id)
+        response = self.do_post('{}/{}/courses/'.format(group_url, group_id), {'course_id': course_id})
+        self.assertEqual(response.status_code, 201)
+
         response = self.do_get(fail_user_id_group_uri)
         self.assertEqual(response.status_code, 404)
 
@@ -560,6 +564,13 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get(group_type_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['groups']), 1)
+
+        course = {'course': course_id}
+        group_type_uri = '{}?{}'.format(user_groups_uri, urlencode(course))
+        response = self.do_get(group_type_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['groups']), 1)
+        self.assertEqual(response.data['groups'][0]['id'], group_id)
 
         error_type_uri = '{}?type={}'.format(user_groups_uri, 'error_type')
         response = self.do_get(error_type_uri)
