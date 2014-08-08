@@ -81,6 +81,7 @@
             "draggabilly": "js/vendor/draggabilly.pkgd",
             "URI": "js/vendor/URI.min",
             "ieshim": "js/src/ie_shim",
+            "tooltip_manager": "js/src/tooltip_manager",
 
             // externally hosted files
             "tender": [
@@ -213,6 +214,9 @@
             "URI": {
                 exports: "URI"
             },
+            "tooltip_manager": {
+                deps: ["jquery", "underscore"]
+            },
             "xblock/core": {
                 exports: "XBlock",
                 deps: ["jquery", "jquery.immediateDescendents"]
@@ -234,7 +238,7 @@
         deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim", "tooltip_manager"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }
@@ -249,18 +253,18 @@
 
 
     % if context_course:
-      <script type="text/javascript">
-  require(['js/models/course'], function(Course) {
-    window.course = new Course({
-      id: "${context_course.id}",
-      name: "${context_course.display_name_with_default | h}",
-      url_name: "${context_course.location.name | h}",
-      org: "${context_course.location.org | h}",
-      num: "${context_course.location.course | h}",
-      revision: "${context_course.location.revision | h}"
-    });
-  });
-      </script>
+        <script type="text/javascript">
+        require(['js/models/course'], function(Course) {
+            window.course = new Course({
+                id: "${context_course.id}",
+                name: "${context_course.display_name_with_default | h}",
+                url_name: "${context_course.location.name | h}",
+                org: "${context_course.location.org | h}",
+                num: "${context_course.location.course | h}",
+                revision: "${context_course.location.revision | h}"
+            });
+        });
+        </script>
     % endif
 
     <!-- view -->
