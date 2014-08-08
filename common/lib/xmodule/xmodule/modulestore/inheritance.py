@@ -148,7 +148,8 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings
     )
     video_speed_optimizations = Boolean(
-        help="Enable Video CDN.",
+        display_name=_("Enable video caching system"),
+        help=_("Enter true or false. If true then video caching system (CDN) will be used for HTML5 videos. Currently it only makes a difference for China."),
         default=True,
         scope=Scope.settings
     )
