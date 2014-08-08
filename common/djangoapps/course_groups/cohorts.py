@@ -74,6 +74,8 @@ def is_commentable_cohorted(course_key, commentable_id):
         # top level discussions have to be manually configured as cohorted
         # (default is not)
         ans = commentable_id in course.cohorted_discussions
+    elif course.inline_discussions_cohorting_default == False:
+        ans = commentable_id in course.cohorted_inline_discussions
     else:
         # inline discussions are cohorted by default
         ans = True
