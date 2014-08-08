@@ -11,7 +11,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -644,24 +643,32 @@ class TestRecommenderFileUploading(TestRecommender):
             'uploadedFileDir': '/'
         }
 
-    def upload_file(self, test_cases, xblock_name):
+    def attempt_upload_file_and_verify_result(self, test_case, xblock_name):
         """
-        Create a temp file and upload it by calling the corresponding ajax
-        event
+        Running on a test case, creating a temp file, uploading it by
+        calling the corresponding ajax event, and verifying that upload
+        happens or is rejected as expected.
+        """
+        temp = tempfile.NamedTemporaryFile(
+            prefix='upload_',
+            suffix=test_case['suffixes'],
+            delete=False
+        )
+        temp.seek(0)
+        temp.write(test_case['magic_number'].decode('hex'))
+        temp.flush()
+        url = self.get_handler_url('upload_screenshot', xblock_name)
+        response = self.client.post(url, {'file': open(temp.name, 'r')})
+        self.assertEqual(response.content, test_case['response'])
+        self.check_for_get_xblock_page_code(200)
+
+    def attempt_upload_files_and_verify_results(self, test_cases, xblock_name):
+        """
+        Running on a set of test cases and verifying that uploads
+        happen or are rejected as expected.
         """
         for test_case in test_cases:
-            temp = tempfile.NamedTemporaryFile(
-                prefix='upload_',
-                suffix=test_case['suffixes'],
-                delete=False
-            )
-            temp.seek(0)
-            temp.write(test_case['magic_number'].decode('hex'))
-            temp.flush()
-            url = self.get_handler_url('upload_screenshot', xblock_name)
-            response = self.client.post(url, {'file': open(temp.name, 'r')})
-            self.assertEqual(response.content, test_case['response'])
-            self.check_for_get_xblock_page_code(200)
+            self.attempt_upload_file_and_verify_result(test_case, xblock_name)
 
     def test_set_s3_info(self):
         """
@@ -689,7 +696,7 @@ class TestRecommenderFileUploading(TestRecommender):
                 'response': 'IMPROPER_S3_SETUP'
             }
         ]
-        self.upload_file(test_cases, self.xblock_names[0])
+        self.attempt_upload_files_and_verify_results(test_cases, self.xblock_names[0])
 
     def test_upload_screenshot_wrong_file_type(self):
         """
@@ -739,7 +746,7 @@ class TestRecommenderFileUploading(TestRecommender):
         # Assume correct, test in test_set_s3_info
         self.client.post(self.get_handler_url('set_s3_info', xblock_name), json.dumps(self.s3_info), '')
         # Upload file with wrong extension name or magic number
-        self.upload_file(test_cases, xblock_name)
+        self.attempt_upload_files_and_verify_results(test_cases, xblock_name)
 
     def test_upload_screenshot_multiple_blocks(self):
         """
@@ -759,7 +766,7 @@ class TestRecommenderFileUploading(TestRecommender):
                 'response': 'IMPROPER_S3_SETUP'
             }
         ]
-        self.upload_file(test_cases, xblock_name)
+        self.attempt_upload_files_and_verify_results(test_cases, xblock_name)
         # Set fake s3 information for the second xblock
         # Assume correct, test in test_set_s3_info
         self.client.post(self.get_handler_url('set_s3_info', xblock_name), json.dumps(self.s3_info), '')
@@ -770,7 +777,7 @@ class TestRecommenderFileUploading(TestRecommender):
                 'response': 'FILE_TYPE_ERROR'
             }
         ]
-        self.upload_file(test_cases, xblock_name)
+        self.attempt_upload_files_and_verify_results(test_cases, xblock_name)
 
     def test_upload_screenshot_correct_file_type(self):
         """
@@ -807,4 +814,4 @@ class TestRecommenderFileUploading(TestRecommender):
                 'response': 'IMPROPER_S3_SETUP'
             }
         ]
-        self.upload_file(test_cases, xblock_name)
+        self.attempt_upload_files_and_verify_results(test_cases, xblock_name)
