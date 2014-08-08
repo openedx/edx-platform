@@ -513,7 +513,7 @@ class GroupsCoursesList(SecureAPIView):
 
     def post(self, request, group_id):
         """
-        POST /api/groups/{group_id}/courses/{course_id}
+        POST /api/groups/{group_id}/courses/
         """
         response_data = {}
         try:
