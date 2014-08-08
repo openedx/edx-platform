@@ -290,11 +290,13 @@ outside the Instructor Dashboard.
 
 * :ref:`problem`
 
-* :ref:`ora`
+* :ref:`forum_events`
+
+* :ref:`ora2`
 
 * :ref:`AB_Event_Types`
 
-* :ref:`forum_events`
+* :ref:`ora`
 
 The descriptions that follow include what each event represents, the system
 component it originates from, the history of any changes made to the event over
@@ -414,8 +416,8 @@ Example
 
 Students who enroll with a ``student_courseenrollment.mode`` of 'audit' or
 'honor' in a course that has a verified certificate option see a **Challenge
-Yourself** link for the course on their dashboards. The browser emits this event
-when a student clicks this option, and the process of upgrading the
+Yourself** link for the course on their dashboards. The browser emits this
+event when a student clicks this option, and the process of upgrading the
 ``student_courseenrollment.mode`` for the student to 'verified' begins. See
 :ref:`student_courseenrollment`.
 
@@ -1536,7 +1538,8 @@ The browser emits ``problem_show`` events when a problem is shown.
      - Details
    * - ``problem``
      - string
-     - ID of the problem being shown. For example, i4x://MITx/6.00x/problem/L15:L15_Problem_2).
+     - ID of the problem being shown. For example,
+       i4x://MITx/6.00x/problem/L15:L15_Problem_2).
 
 ``reset_problem``
 ------------------------------------------------
@@ -1700,21 +1703,449 @@ for a problem and it is graded successfully.
      - Details
    * - ``[answers, contents]``
      - array
-     - ``answers`` provides the value checked by the user. ``contents`` delivers
-       HTML using data entered for the problem in Studio, including the display
-       name, problem text, and choices or response field labels. The array
-       includes each problem in a problem component that has multiple problems.
+     - ``answers`` provides the value checked by the user. ``contents``
+       delivers HTML using data entered for the problem in Studio, including
+       the display name, problem text, and choices or response field labels.
+       The array includes each problem in a problem component that has multiple
+       problems.
 
-.. _ora:
+.. _forum_events:
+
+==========================
+Forum Events
+==========================
+
+``edx.forum.searched``
+----------------------------------
+
+After a user executes a text search in the navigation sidebar of the Discussion
+tab of a course, the server emits an ``edx.forum.searched`` event.
+
+**Component**: Discussion Tab
+
+**Event Source**: Server
+
+**History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
+Jun 2014.
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``query``
+     - string
+     - The text entered into the search box by the user.
+   * - ``page``
+     - integer
+     - Results are returned in sets of 20 per page. Identifies the page of
+       results requested by the user.
+   * - ``total_results``
+     - integer
+     - The total number of results matching the query.
+   * - ``corrected_text``
+     - string
+     - A re-spelling of the query, suggested by the search engine, which was
+       automatically substituted for the original one.  This happens only when
+       there are no results for the original query, but the index contains
+       matches for a similar term or phrase.  Otherwise, this field is null.
+
+.. _ora2:
 
 ======================================
 Open Response Assessment Events 
 ======================================
 
-**History**: The events in this section record interactions with the prototype
-implementation of open response assessment (ORA) problem types. As of May 2014,
-new courses are not using this implementation of ORA and a complete redesign of
-this feature is in limited release.
+An open response assessment is a type of assignment that may not have
+definitively correct or incorrect answers. Students review a question and
+submit a text response and, optionally, an image file. To evaluate these
+responses to the questions, students use an instructor-definfed scoring rubric
+to assess different aspects of their own and one or more other students'
+essays. For more information about open response assessments, see `Creating a
+Peer Assessment`_.
+
+**Component**: Open Response Assessments
+
+**History:** Limited release of this open response assessment feature began in
+April 2014.
+
+openassessmentblock.get_peer_submission
+----------------------------------------
+
+The server emits these events when an essay is delivered to a student for
+evaluation. After students submit their own essays for evaluation, they use the
+scoring rubric to evaluate the essays of other course participants.
+
+**Event Source**: Server
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``course_id``
+     - string
+     - The identifier of the course that includes this assessment. For open
+       response assessment problems, the course ID is stated in org/course/run
+       format. 
+
+       (For courses created after mid-2014, the course ID is converted to this
+       format for open response assessment problems only.)
+
+   * - ``item_id``
+     - string
+     - The i4x:// style locator that identifies the problem in the course. 
+   * - ``submission_returned_uuid``
+     - string
+     - The unique identifer of the submission that the student retrieved for
+       assessment. 
+
+       If no assessment is available, this is set to "None".
+
+   * - ``requesting_student_id``
+     - string
+     - The course-specific anonymized user ID of the student who requested the
+       essay.
+
+**History**: Added 3 April 2014.
+       
+openassessmentblock.peer_assess and openassessmentblock.self_assess
+----------------------------------------------------------------------
+
+The server emits these events when a student either submits an assessment of a
+peer's essay or submits a self-assessment of her own essay.
+
+**Event Source**: Server
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``scorer_id``
+     - string
+     - The course-specific anonymized user ID of the student who submitted this
+       assessment.
+   * - ``feedback``
+     - string
+     - The student's comments about the submitted essay.
+   * - ``submission_uuid``
+     - string
+     - The unique identifier for the submitted essay.
+   * - ``score_type``
+     - string
+     - "PE" for a peer evaluation, "SE" for a self evaluation.
+   * - ``parts: [criterion, option, feedback]``
+     - array
+     - The ``parts`` field contains member fields for each ``criterion`` in the
+       rubric, the ``option`` that the student selected for it, and any
+       ``feedback`` comments that the student supplied. 
+
+       These member fields are repeated in an array to include all of the
+       rubric's criteria.
+
+       * ``criterion`` (object) contains ``points possible`` and ``name``
+         member fields
+       * ``option`` (string)
+       * ``feedback`` (string)
+       
+   * - ``rubric``
+     - dict
+     - This field contains the member field ``contenthash``, which identifies
+       the rubric that the student used to assess the essay.
+   * - ``scored_at``
+     - datetime
+     - Timestamp for when the assessment was submitted.
+       
+**History**: Added 3 April 2014.
+
+openassessmentblock.submit_feedback_on_assessments
+----------------------------------------------------
+
+The server emits these events when a student submits a suggestion, opinion, or
+other feedback about the assessment process.
+
+**Event Source**: Server
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``feedback_text``
+     - string
+     - The student's comments about the assessment process.
+   * - ``submission_uuid``
+     - string
+     - The unique identifier of the feedback submission.
+   * - ``options``
+     - array
+     - The label of each check box option that the student selected to evaluate
+       the assessment process.
+
+**History**: Added 3 April 2014.
+
+openassessment.create_submission
+--------------------------------
+
+The server emits these events each time a student submits an essay. The same
+event is emitted when a student submits an essay for peer assessment or for
+self assessment.
+
+**Event Source**: Server
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``answer``
+     - dict
+     - This field contains a ``text`` (string) member field for the essay. 
+       
+       For submissions that also include an image file, this field contains a
+       ``file_upload_key`` (string) member field with the AWS S3 key that
+       identifies the location of the image file on the Amazon S3 storage
+       service.
+
+   * - ``created_at``
+     - datetime
+     - Timestamp for when the student submitted the essay.
+   * - ``attempt_number``
+     - int
+     - This value is currently always set to 1.
+   * - ``submission_uuid``
+     - string
+     - The unique identifier of the submission.
+   * - ``submitted_at``
+     - datetime
+     - Timestamp for when the student submitted the essay. This value is
+       currently always the same as ``created_at``.
+       
+**History**: Added 3 April 2014.
+
+openassessment.save_submission
+-------------------------------
+
+The server emits these events when a student saves a response essay. Note that
+students save responses before they submit them for assessment.
+
+**Event Source**: Server
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``saved_response``
+     - dict
+     - This field contains a ``text`` (string) member field for the essay. 
+       
+       For submissions that also include an image file, this field contains a
+       ``file_upload_key`` (string) member field with the AWS S3 key that
+       identifies the location of the image file on the Amazon S3 storage
+       service.
+
+**History**: Added 3 April 2014.
+
+openassessment.student_training_assess_example
+-----------------------------------------------
+
+The server emits these events when a student submits an assessment for an
+example essay. To assess the example essay, the student uses a scoring rubric
+provided by the instructor. These events include the options the student
+selected to assess the example, and identifies any criteria that the student
+scored differently than the instructor.
+
+**Event Source**: Server
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``corrections``
+     - object
+     - A set of name/value pairs that identify criteria for which the student
+       selected a different option than the instructor, in the format
+       ``criterion_name: instructor-defined_option_name``.
+   * - ``submission_uuid``
+     - string
+     - The unique identifier of the submission. Identifies the student who
+       is undergoing training.
+   * - ``options_selected``
+     - object
+     - A set of name/value pairs that identify the option that the student
+       selected for each criterion in the rubric, in the format
+       ``'criterion_name': 'option_name'``.
+
+**History**: Added 6 August 2014.
+
+openassessment.upload_file 
+-----------------------------
+
+The browser emits these events when a student successfully uploads an image
+file as part of a response. Note that students complete the upload process
+before they submit the response.
+
+**Event Source**: Browser
+
+``event`` **Fields**:
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``fileType``
+     - string
+     - The MIME type of the uploaded file. Reported by the student's browser.
+   * - ``fileName``
+     - string
+     - The name of the uploaded file, as stored on the student's client
+       machine.
+   * - ``fileSize``
+     - int
+     - The size of the uploaded file in bytes. Reported by the student's
+       browser.
+       
+**History**: Added 6 August 2014.
+
+.. _AB_Event_Types:
+
+==========================
+A/B Testing Events
+==========================
+
+Course authors can configure course content to present modules that contain
+other modules. For example, a parent module can include two child modules with
+content that differs in some way for comparison testing. When a student
+navigates to a module that is set up for A/B testing in this way, the student
+is randomly assigned to a group and shown only one of the child modules.
+
+* Internally, a *partition* defines the type of experiment: comparing the
+  effectiveness of video alone to text alone, for example. A course can include
+  any number of modules with the same partition, or experiment type.
+
+* For each partition, students are randomly assigned to a *group*. The group
+  determines which content, either video or text in this example, is shown by
+  every module with that partitioning.
+
+The events that follow apply to modules that are set up to randomly assign
+students to groups so that different content can be shown to the different
+groups.
+
+**History**: These events were added on 12 Mar 2014.
+
+``assigned_user_to_partition``
+----------------------------------
+
+When a student views a module that is set up to test different child modules,
+the server checks the ``user_api_usercoursetag`` table for the student's
+assignment to the relevant partition, and to a group for that partition. 
+
+* The partition ID is the ``user_api_usercoursetag.key``.
+
+* The group ID is the ``user_api_usercoursetag.value``.
+
+If the student does not yet have an assignment, the server emits an
+``assigned_user_to_partition`` event and adds a row to the
+``user_api_usercoursetag`` table for the student. See
+:ref:`user_api_usercoursetag`.
+
+.. note:: After this event is emitted, the common ``context`` field in all subsequent events includes a ``course_user_tags`` member field with the student's assigned partition and group.
+
+**Component**: Split Test
+
+**Event Source**: Browser
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``group_id``
+     - integer
+     - Identifier of the group.
+   * - ``group_name``
+     - string
+     - Name of the group. 
+   * - ``partition_id``
+     - integer
+     - Identifier for the partition, in the format
+       ``xblock.partition_service.partition_ID`` where ID is an integer.
+   * - ``partition_name``
+     - string
+     - Name of the partition.
+
+``child_render``
+----------------------------------
+
+When a student views a module that is set up to test different content using
+child modules, the server emits a ``child_render`` event to identify
+the child module that was shown to the student.
+
+**Component**: Split Test
+
+**Event Source**: Server
+
+``event`` **Member Fields**: 
+
+.. list-table::
+   :widths: 15 15 60
+   :header-rows: 1
+
+   * - Field
+     - Type
+     - Details
+   * - ``child-id``
+     - string
+     - ID of the module that displays to the student. 
+
+.. _ora:
+
+============================================
+Open Response Assessment Events (Deprecated)
+============================================
+
+**History**: The events in this section recorded interactions with the
+prototype implementation of open response assessment (ORA) problem types. As of
+May 2014, new courses no longer used this implementation for open response
+assessments.
 
 ``oe_hide_question`` and ``oe_show_question``
 ---------------------------------------------------------------------------
@@ -1806,7 +2237,8 @@ The browser emits ``peer_grading_hide_question`` and
 ``peer_grading_show_question`` events when the user hides or redisplays a
 problem that is peer graded.
 
-**History**: These events were previously named ``peer_grading_hide_problem`` and ``peer_grading_show_problem``.
+**History**: These events were previously named ``peer_grading_hide_problem``
+and ``peer_grading_show_problem``.
 
 **Component**: Peer Grading
 
@@ -1834,7 +2266,8 @@ The browser emits ``staff_grading_hide_question`` and
 ``staff_grading_show_question`` events when the user hides or redisplays a
 problem that is staff graded.
 
-**History**: These events were previously named ``staff_grading_hide_problem`` and ``staff_grading_show_problem``.
+**History**: These events were previously named ``staff_grading_hide_problem``
+and ``staff_grading_show_problem``.
 
 **Component**: Staff Grading
 
@@ -1853,144 +2286,6 @@ problem that is staff graded.
      - string
      - The location of the question whose prompt is being shown or hidden.
 
-.. _AB_Event_Types:
-
-==========================
-A/B Testing Events
-==========================
-
-Course authors can configure course content to present modules that contain
-other modules. For example, a parent module can include two child modules with
-content that differs in some way for comparison testing. When a student
-navigates to a module that is set up for A/B testing in this way, the student is
-randomly assigned to a group and shown only one of the child modules.
-
-* Internally, a *partition* defines the type of experiment: comparing the
-  effectiveness of video alone to text alone, for example. A course can include
-  any number of modules with the same partition, or experiment type.
-
-* For each partition, students are randomly assigned to a *group*. The group
-  determines which content, either video or text in this example, is shown by
-  every module with that partitioning.
-
-The events that follow apply to modules that are set up to randomly assign
-students to groups so that different content can be shown to the different
-groups.
-
-**History**: These events were added on 12 Mar 2014.
-
-``assigned_user_to_partition``
-----------------------------------
-
-When a student views a module that is set up to test different child modules,
-the server checks the ``user_api_usercoursetag`` table for the student's
-assignment to the relevant partition, and to a group for that partition. 
-
-* The partition ID is the ``user_api_usercoursetag.key``.
-
-* The group ID is the ``user_api_usercoursetag.value``.
-
-If the student does not yet have an assignment, the server emits an
-``assigned_user_to_partition`` event and adds a row to the
-``user_api_usercoursetag`` table for the student. See
-:ref:`user_api_usercoursetag`.
-
-.. note:: After this event is emitted, the common ``context`` field in all subsequent events includes a ``course_user_tags`` member field with the student's assigned partition and group.
-
-**Component**: Split Test
-
-**Event Source**: Browser
-
-``event`` **Member Fields**: 
-
-.. list-table::
-   :widths: 15 15 60
-   :header-rows: 1
-
-   * - Field
-     - Type
-     - Details
-   * - ``group_id``
-     - integer
-     - Identifier of the group.
-   * - ``group_name``
-     - string
-     - Name of the group. 
-   * - ``partition_id``
-     - integer
-     - Identifier for the partition, in the format ``xblock.partition_service.partition_ID`` where ID is an integer.
-   * - ``partition_name``
-     - string
-     - Name of the partition.
-
-``child_render``
-----------------------------------
-
-When a student views a module that is set up to test different content using
-child modules, the server emits a ``child_render`` event to identify
-the child module that was shown to the student.
-
-**Component**: Split Test
-
-**Event Source**: Server
-
-``event`` **Member Fields**: 
-
-.. list-table::
-   :widths: 15 15 60
-   :header-rows: 1
-
-   * - Field
-     - Type
-     - Details
-   * - ``child-id``
-     - string
-     - ID of the module that displays to the student. 
-
-.. _forum_events:
-
-==========================
-Forum Events
-==========================
-
-``edx.forum.searched``
-----------------------------------
-
-After a user executes a text search in the navigation sidebar of the Discussion tab of a course, the server emits an ``edx.forum.searched`` event.
-
-**Component**: Discussion Tab
-
-**Event Source**: Server
-
-**History**: Added 16 May 2014.  The ``corrected_text`` field was added 5
-Jun 2014.
-
-``event`` **Fields**:
-
-.. list-table::
-   :widths: 15 15 60
-   :header-rows: 1
-
-   * - Field
-     - Type
-     - Details
-   * - ``query``
-     - string
-     - The text entered into the search box by the user.
-   * - ``page``
-     - integer
-     - Results are returned in sets of 20 per page. Identifies the page of
-       results requested by the user.
-   * - ``total_results``
-     - integer
-     - The total number of results matching the query.
-   * - ``corrected_text``
-     - string
-     - A re-spelling of the query, suggested by the search engine, which was
-       automatically substituted for the original one.  This happens only when
-       there are no results for the original query, but the index contains
-       matches for a similar term or phrase.  Otherwise, this field is null.
-
 .. _Instructor_Event_Types:
 
 *************************
@@ -2000,8 +2295,8 @@ Instructor Events
 This section lists the events that the server emits as a result of course team
 interaction with the Instructor Dashboard in the LMS.
 
-The schema definitions of each of these events include only the JSON fields that
-are common to all events.
+The schema definitions of each of these events include only the JSON fields
+that are common to all events. See :ref:`common`.
 
 * ``dump-answer-dist-csv``
 * ``dump-graded-assignments-config``
@@ -2274,3 +2569,6 @@ members also generate enrollment events.
   server emits a ``edx.course.enrollment.deactivated`` for each unenrollment.
 
 For details about the enrollment events, see :ref:`enrollment`.
+
+
+.. _Creating a Peer Assessment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/

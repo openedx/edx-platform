@@ -11,6 +11,8 @@ Change Log
 
    * - Date
      - Change
+   * - 08/12/14
+     - Added the :ref:`ora2` section to the :ref:`Tracking Logs` chapter.
    * - 08/01/14
      - Added the :ref:`Package` chapter with information to help data czars
        locate and download data package files.
