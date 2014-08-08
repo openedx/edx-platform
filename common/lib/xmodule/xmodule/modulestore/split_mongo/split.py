@@ -278,8 +278,9 @@ class BulkWriteMixin(object):
 
             # The structure hasn't been loaded from the db yet, so load it
             if structure is None:
-                structure = self.db_connection.get_structure(bulk_write_record.index['versions'][course_key.branch])
-                bulk_write_record.set_structure(course_key.branch, structure)
+                structure_id = bulk_write_record.index['versions'][course_key.branch]
+                structure = self.db_connection.get_structure(structure_id)
+                bulk_write_record._structures[course_key.branch] = structure
 
             return structure
         else:
