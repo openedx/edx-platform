@@ -38,7 +38,6 @@ from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
-
 log = logging.getLogger(__name__)
 
 HOST = MONGO_HOST

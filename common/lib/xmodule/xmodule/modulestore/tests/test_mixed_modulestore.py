@@ -27,6 +27,7 @@ if not settings.configured:
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 @ddt.ddt

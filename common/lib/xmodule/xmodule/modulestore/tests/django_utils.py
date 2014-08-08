@@ -13,6 +13,7 @@ import datetime
 import pytz
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 def mixed_store_config(data_dir, mappings):
@@ -94,7 +95,8 @@ def split_mongo_store_config(data_dir):
             'NAME': 'draft',
             'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
             'DOC_STORE_CONFIG': {
-                'host': 'localhost',
+                'host': MONGO_HOST,
+                'port': MONGO_PORT_NUM,
                 'db': 'test_xmodule',
                 'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
