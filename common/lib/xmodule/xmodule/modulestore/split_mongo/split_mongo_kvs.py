@@ -15,45 +15,52 @@ class SplitMongoKVS(InheritanceKeyValueStore):
     known to the MongoModuleStore (data, children, and metadata)
     """
 
-    def __init__(self, definition, fields, inherited_settings):
+    def __init__(self, definition, initial_values, inherited_settings, **kwargs):
         """
 
         :param definition: either a lazyloader or definition id for the definition
-        :param fields: a dictionary of the locally set fields
+        :param initial_values: a dictionary of the locally set values
         :param inherited_settings: the json value of each inheritable field from above this.
             Note, local fields may override and disagree w/ this b/c this says what the value
             should be if the field is undefined.
         """
         # deepcopy so that manipulations of fields does not pollute the source
-        super(SplitMongoKVS, self).__init__(copy.deepcopy(fields), inherited_settings)
+        super(SplitMongoKVS, self).__init__(copy.deepcopy(initial_values), inherited_settings)
         self._definition = definition  # either a DefinitionLazyLoader or the db id of the definition.
         # if the db id, then the definition is presumed to be loaded into _fields
 
+        # a decorator function for field values (to be called when a field is accessed)
+        self.field_decorator = kwargs.get('field_decorator', lambda x: x)
+
 
     def get(self, key):
-        # simplest case, field is directly set
+        # load the field, if needed
+        if key.field_name not in self._fields:
+            # parent undefined in editing runtime (I think)
+            if key.scope == Scope.parent:
+                # see STUD-624. Right now copies MongoKeyValueStore.get's behavior of returning None
+                return None
+            if key.scope == Scope.children:
+                # didn't find children in _fields; so, see if there's a default
+                raise KeyError()
+            elif key.scope == Scope.settings:
+                # get default which may be the inherited value
+                raise KeyError()
+            elif key.scope == Scope.content:
+                if isinstance(self._definition, DefinitionLazyLoader):
+                    self._load_definition()
+                else:
+                    raise KeyError()
+            else:
+                raise InvalidScopeError(key)
+
         if key.field_name in self._fields:
-            return self._fields[key.field_name]
+            field_value = self._fields[key.field_name]
 
-        # parent undefined in editing runtime (I think)
-        if key.scope == Scope.parent:
-            # see STUD-624. Right now copies MongoKeyValueStore.get's behavior of returning None
-            return None
-        if key.scope == Scope.children:
-            # didn't find children in _fields; so, see if there's a default
-            raise KeyError()
-        elif key.scope == Scope.settings:
-            # get default which may be the inherited value
-            raise KeyError()
-        elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._load_definition()
-                if key.field_name in self._fields:
-                    return self._fields[key.field_name]
+            # return the "decorated" field value
+            return self.field_decorator(field_value)
 
-            raise KeyError()
-        else:
-            raise InvalidScopeError(key)
+        return None
 
     def set(self, key, value):
         # handle any special cases

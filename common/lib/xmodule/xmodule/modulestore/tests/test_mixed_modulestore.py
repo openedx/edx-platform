@@ -1,6 +1,7 @@
 import pymongo
 from uuid import uuid4
 import ddt
+import itertools
 from importlib import import_module
 from collections import namedtuple
 import unittest
@@ -8,7 +9,6 @@ import datetime
 from pytz import UTC
 
 from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
@@ -21,6 +21,7 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import DuplicateCourseError
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -192,6 +193,10 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         return self.course_locations[string].course_key
 
+    def _initialize_mixed(self):
+        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
+        self.addCleanup(self.store.close_all_connections)
+
     def initdb(self, default):
         """
         Initialize the database and create one test course in it
@@ -203,8 +208,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
-        self.addCleanup(self.store.close_all_connections)
+        self._initialize_mixed()
 
         # convert to CourseKeys
         self.course_locations = {
@@ -216,12 +220,9 @@ class TestMixedModuleStore(unittest.TestCase):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        if default == 'split':
-            self.fake_location = CourseLocator(
-                'foo', 'bar', 'slowly', branch=ModuleStoreEnum.BranchName.draft
-            ).make_usage_key('vertical', 'baz')
-        else:
-            self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+
+        self.fake_location = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'fake')
+
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
@@ -247,6 +248,23 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.store.get_modulestore_type(
             SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
+
+    @ddt.data(*itertools.product(
+        (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
+        (True, False)
+    ))
+    @ddt.unpack
+    def test_duplicate_course_error(self, default_ms, reset_mixed_mappings):
+        """
+        Make sure we get back the store type we expect for given mappings
+        """
+        self._initialize_mixed()
+        with self.store.default_store(default_ms):
+            self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+            if reset_mixed_mappings:
+                self.store.mappings = {}
+            with self.assertRaises(DuplicateCourseError):
+                self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
 
     # split has one lookup for the course and then one for the course items
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
@@ -512,7 +530,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with check_mongo_calls(mongo_store, max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
-    @ddt.data(('draft', 3, 0), ('split', 6, 0))
+    @ddt.data(('draft', 2, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -1188,6 +1206,48 @@ class TestMixedModuleStore(unittest.TestCase):
             assertProblemNameEquals(problem_new_name)
             # there should be no published problems with the old name
             assertNumProblems(problem_original_name, 0)
+
+    def verify_default_store(self, store_type):
+        # verify default_store property
+        self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
+
+        # verify internal helper method
+        store = self.store._get_modulestore_for_courseid()
+        self.assertEquals(store.get_modulestore_type(), store_type)
+
+        # verify store used for creating a course
+        try:
+            course = self.store.create_course("org", "course{}".format(uuid4().hex[:3]), "run", self.user_id)
+            self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
+        except NotImplementedError:
+            self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    def test_default_store(self, default_ms):
+        """
+        Test the default store context manager
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(default_ms):
+            self.verify_default_store(default_ms)
+
+    def test_nested_default_store(self):
+        """
+        Test the default store context manager, nested within one another
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
+            with self.store.default_store(ModuleStoreEnum.Type.split):
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+                with self.store.default_store(ModuleStoreEnum.Type.xml):
+                    self.verify_default_store(ModuleStoreEnum.Type.xml)
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
 
 
 #=============================================================================================================

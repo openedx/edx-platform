@@ -272,7 +272,9 @@
         <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
         <%include file="widgets/header.html" args="online_help_token=online_help_token" />
 
-      <div id="page-alert"></div>
+      <div id="page-alert">
+      <%block name="page_alert"></%block>
+      </div>
 
       <div id="content">
       <%block name="content"></%block>

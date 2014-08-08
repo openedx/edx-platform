@@ -63,7 +63,7 @@ from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree,
-    LocalId, Locator
+    LocalId,
 )
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
@@ -77,7 +77,6 @@ from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.split_mongo import encode_key_for_mongo, decode_key_from_mongo
-import types
 from _collections import defaultdict
 
 
@@ -111,7 +110,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     """
 
     SCHEMA_VERSION = 1
-    reference_type = Locator
     # a list of field names to store in course index search_targets. Note, this will
     # only record one value per key. If branches disagree, the last one set wins.
     # It won't recompute the value on operations such as update_course_index (e.g., to revert to a prev
@@ -214,7 +212,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         system.module_data.update(new_module_data)
         return system.module_data
 
-    def _load_items(self, course_entry, block_ids, depth=0, lazy=True):
+    def _load_items(self, course_entry, block_ids, depth=0, lazy=True, **kwargs):
         '''
         Load & cache the given blocks from the course. Prefetch down to the
         given depth. Load the definitions into each block if lazy is False;
@@ -248,7 +246,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 branch=course_entry.get('branch'),
             )
             self.cache_items(system, block_ids, course_key, depth, lazy)
-        return [system.load_item(block_id, course_entry) for block_id in block_ids]
+        return [system.load_item(block_id, course_entry, **kwargs) for block_id in block_ids]
 
     def _get_cache(self, course_version_guid):
         """
@@ -333,7 +331,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         }
         return envelope
 
-    def get_courses(self, branch, qualifiers=None):
+    def get_courses(self, branch, qualifiers=None, **kwargs):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
@@ -373,12 +371,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 'structure': entry,
             }
             root = entry['root']
-            course_list = self._load_items(envelope, [root], 0, lazy=True)
+            course_list = self._load_items(envelope, [root], 0, lazy=True, **kwargs)
             if not isinstance(course_list[0], ErrorDescriptor):
                 result.append(course_list[0])
         return result
 
-    def get_course(self, course_id, depth=0):
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run)
+
+    def get_course(self, course_id, depth=0, **kwargs):
         '''
         Gets the course descriptor for the course identified by the locator
         '''
@@ -388,10 +395,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         course_entry = self._lookup_course(course_id)
         root = course_entry['structure']['root']
-        result = self._load_items(course_entry, [root], 0, lazy=True)
+        result = self._load_items(course_entry, [root], 0, lazy=True, **kwargs)
         return result[0]
 
-    def has_course(self, course_id, ignore_case=False):
+    def has_course(self, course_id, ignore_case=False, **kwargs):
         '''
         Does this course exist in this modulestore. This method does not verify that the branch &/or
         version in the course_id exists. Use get_course_index_info to check that.
@@ -423,7 +430,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         return self._get_block_from_structure(course_structure, usage_key.block_id) is not None
 
-    def get_item(self, usage_key, depth=0):
+    def get_item(self, usage_key, depth=0, **kwargs):
         """
         depth (int): An argument that some module stores may use to prefetch
             descendants of the queried modules for more efficient results later
@@ -437,7 +444,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             raise ItemNotFoundError(usage_key)
 
         course = self._lookup_course(usage_key)
-        items = self._load_items(course, [usage_key.block_id], depth, lazy=True)
+        items = self._load_items(course, [usage_key.block_id], depth, lazy=True, **kwargs)
         if len(items) == 0:
             raise ItemNotFoundError(usage_key)
         elif len(items) > 1:
@@ -490,7 +497,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_id = kwargs.pop('name')
             block = course['structure']['blocks'].get(block_id)
             if _block_matches_all(block):
-                return self._load_items(course, [block_id], lazy=True)
+                return self._load_items(course, [block_id], lazy=True, **kwargs)
             else:
                 return []
         # don't expect caller to know that children are in fields
@@ -501,7 +508,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 items.append(block_id)
 
         if len(items) > 0:
-            return self._load_items(course, items, 0, lazy=True)
+            return self._load_items(course, items, 0, lazy=True, **kwargs)
         else:
             return []
 
@@ -523,7 +530,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_id=decode_key_from_mongo(parent_id),
         )
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Return an array of all of the orphans in the course.
         """
@@ -820,6 +827,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
+        # split handles all the fields in one dict not separated by scope
+        fields = fields or {}
+        fields.update(kwargs.pop('metadata', {}) or {})
+        fields.update(kwargs.pop('definition_data', {}) or {})
+
         # find course_index entry if applicable and structures entry
         index_entry = self._get_index_if_valid(course_key, force, continue_version)
         structure = self._lookup_course(course_key)['structure']
@@ -940,18 +952,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # don't need to update the index b/c create_item did it for this version
         return xblock
 
-    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         See :meth: `.ModuleStoreWrite.clone_course` for documentation.
 
         In split, other than copying the assets, this is cheap as it merely creates a new version of the
         existing course.
         """
-        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
+        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
         source_index = self.get_course_index_info(source_course_id)
+        if source_index is None:
+            raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
         return self.create_course(
             dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields,
-            versions_dict=source_index['versions'], search_targets=source_index['search_targets']
+            versions_dict=source_index['versions'], search_targets=source_index['search_targets'], **kwargs
         )
 
     def create_course(
@@ -1087,10 +1101,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             self._update_search_targets(index_entry, fields)
         self.db_connection.insert_course_index(index_entry)
         # expensive hack to persist default field values set in __init__ method (e.g., wiki_slug)
-        course = self.get_course(locator)
-        return self.update_item(course, user_id)
+        course = self.get_course(locator, **kwargs)
+        return self.update_item(course, user_id, **kwargs)
 
-    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         """
         Save the descriptor's fields. it doesn't descend the course dag to save the children.
         Return the new descriptor (updated location).
@@ -1161,12 +1175,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
             new_locator = descriptor.location.map_into_course(course_key)
-            return self.get_item(new_locator)
+            return self.get_item(new_locator, **kwargs)
         else:
             # nothing changed, just return the one sent in
             return descriptor
 
-    def create_xblock(self, runtime, category, fields=None, block_id=None, definition_id=None, parent_xblock=None):
+    def create_xblock(self, runtime, category, fields=None, block_id=None, definition_id=None, parent_xblock=None, **kwargs):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of json_data. It does not persist it and can create one which
@@ -1193,7 +1207,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     if field_name in fields:
                         json_data['_inherited_settings'][field_name] = fields[field_name]
 
-        new_block = runtime.xblock_from_json(xblock_class, block_id, json_data)
+        new_block = runtime.xblock_from_json(xblock_class, block_id, json_data, **kwargs)
         if parent_xblock is not None:
             parent_xblock.children.append(new_block.scope_ids.usage_id)
             # decache pending children field settings
@@ -1726,7 +1740,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         xblock_class = self.mixologist.mix(xblock_class)
 
         for field_name, value in fields.iteritems():
-            if value:
+            if value is not None:
                 if isinstance(xblock_class.fields[field_name], Reference):
                     fields[field_name] = value.block_id
                 elif isinstance(xblock_class.fields[field_name], ReferenceList):
@@ -1844,6 +1858,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             destination_block['edit_info']['previous_version'] = previous_version
             destination_block['edit_info']['update_version'] = destination_version
             destination_block['edit_info']['edited_by'] = user_id
+            destination_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
         else:
             destination_block = self._new_block(
                 user_id, new_block['category'],
@@ -1939,7 +1954,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             for entry in entries
         ]
 
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
