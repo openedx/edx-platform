@@ -54,7 +54,7 @@ class CourseEndingTest(TestCase):
     def test_cert_info(self):
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_show_before_end=False)
+        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
 
         self.assertEqual(_cert_info(user, course, None),
                          {'status': 'processing',
@@ -133,21 +133,14 @@ class CourseEndingTest(TestCase):
                           'mode': 'honor'
                           })
 
-        # test when the status is true, we get the correct results out
-        course2.certificates_show_before_end = True
+        # test when the display is unavailable or notpassing, we get the correct results out
+        course2.certificates_display_behavior = 'early_no_info'
         cert_status = {'status': 'unavailable'}
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
         cert_status = {'status': 'notpassing', 'grade': '67',
                        'download_url': download_url, 'mode': 'honor'}
-        self.assertEqual(_cert_info(user, course2, cert_status),
-                         {'status': 'notpassing',
-                          'show_disabled_download_button': False,
-                          'show_download_url': False,
-                          'show_survey_button': False,
-                          'grade': '67',
-                          'mode': 'honor'
-                          })
+        self.assertIsNone(_cert_info(user, course2, cert_status))
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
