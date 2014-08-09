@@ -23,7 +23,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-
+from xmodule.modulestore.django import ModuleI18nService, ModuleUserService
 
 MODULE_DIR = path(__file__).dirname()
 # Location of common test DATA directory
@@ -73,13 +73,14 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
+    user = Mock(is_staff=False)
     return TestModuleSystem(
         static_url='/static',
         track_function=Mock(),
         get_module=Mock(),
         render_template=mock_render_template,
         replace_urls=str,
-        user=Mock(is_staff=False),
+        user=user,
         filestore=Mock(),
         debug=True,
         hostname="edx.org",
@@ -92,6 +93,10 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         get_user_role=Mock(is_staff=False),
         descriptor_runtime=get_test_descriptor_system(),
         user_location=Mock(),
+        services={
+            'i18n': ModuleI18nService(),
+            'user': ModuleUserService(user, course_id=course_id)
+        }
     )
 
 

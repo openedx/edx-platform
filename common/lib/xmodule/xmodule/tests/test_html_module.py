@@ -38,3 +38,11 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         module = HtmlModule(self.descriptor, module_system, field_data, Mock())
         self.assertEqual(module.get_html(), sample_xml)
 
+
+    def test_xblock_user_runtime_service(self):
+        user_service = self.runtime.service(self, 'user')
+        xblock_user = user_service.get_user()
+
+        # Make sure that xblock_user exists.
+        self.assertIsNotNone(xblock_user)
+

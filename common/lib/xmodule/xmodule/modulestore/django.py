@@ -20,6 +20,8 @@ from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
 from xmodule.contentstore.django import contentstore
 
+from lms.lib.xblock.models import XBlockUser
+
 # We may not always have the request_cache module available
 try:
     from request_cache.middleware import RequestCache
@@ -108,6 +110,22 @@ def clear_existing_modulestores():
     """
     global _MIXED_MODULESTORE  # pylint: disable=global-statement
     _MIXED_MODULESTORE = None
+
+
+class ModuleUserService(object):
+    """
+    Implement the XBlock runtime 'user' service.
+
+    Each instance of this runtime service takes a user and a course_id
+    and stores a XBlockUser object. It's possible to only wrap desired
+    attributes into the XBlockUser object.
+    """
+    def __init__(self, user, course_id=None):
+        self.xblock_user = XBlockUser(self, email=user.email,
+                                        full_name=user.profile.name)
+
+    def get_user(self):
+        return self.xblock_user
 
 
 class ModuleI18nService(object):
