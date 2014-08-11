@@ -278,7 +278,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3)
+    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
     @patch('bulk_email.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """

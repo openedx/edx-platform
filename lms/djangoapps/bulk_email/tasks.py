@@ -34,7 +34,7 @@ from django.core.urlresolvers import reverse
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
-    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
+    SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS, SEND_TO_STAFF
 )
 from courseware.courses import get_course, course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
@@ -44,6 +44,8 @@ from instructor_task.subtasks import (
     queue_subtasks_for_query,
     check_subtask_is_valid,
     update_subtask_status,
+    generate_lists_from_queryset,
+    get_number_of_subtasks_for_queryset,
 )
 from util.query import use_read_replica_if_available
 
@@ -91,47 +93,114 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_queryset(user_id, to_option, course_id, course_location):
+def _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
     """
-    Returns a query set of email recipients corresponding to the requested to_option category.
+    Generates lists of email recipients corresponding to the requested to_option category.
 
     `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
 
-    Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
-    will be properly deduped.
-    """
-    if to_option not in TO_OPTIONS:
-        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
-        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+    `recipient_fields` refers to the fields that each query will return
 
+    Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
+    will have been properly deduped in the call to `_get_querysets_for_to_option`.
+    """
+    recipient_qsets_and_ordering_keys = _get_qsets_and_ordering_keys_for_to_option(
+        to_option, course_id, user_id
+    )
+    non_empty_querysets = [
+        (qset, ordering_key) for qset, ordering_key in recipient_qsets_and_ordering_keys if qset.exists()
+    ]
+    for queryset, ordering_key in non_empty_querysets:
+        for item_sublist in generate_lists_from_queryset(
+            queryset.select_related(ordering_key),
+            settings.BULK_EMAIL_EMAILS_PER_QUERY,
+            ordering_key,
+            recipient_fields
+        ):
+            yield item_sublist
+
+def _get_qsets_and_ordering_keys_for_to_option(to_option, course_id, user_id):
+    """
+    Returns a list of tuples: querysets and their ordering keys 
+    corresponding for each to_option (i.e. [(queryset, ordering_key)])
+    """
     if to_option == SEND_TO_MYSELF:
-        recipient_qset = User.objects.filter(id=user_id)
+        queryset = use_read_replica_if_available(User.objects.filter(id=user_id))
+        return [(queryset, 'pk')]
     else:
         staff_qset = CourseStaffRole(course_id).users_with_role()
         instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        recipient_qset = (staff_qset | instructor_qset).distinct()
-        if to_option == SEND_TO_ALL:
-            # We also require students to have activated their accounts to
-            # provide verification that the provided email address is valid.
-            enrollment_qset = User.objects.filter(
-                is_active=True,
-                courseenrollment__course_id=course_id,
-                courseenrollment__is_active=True
-            )
-            # Now we do some queryset sidestepping to avoid doing a DISTINCT
-            # query across the course staff and the enrolled students, which
-            # forces the creation of a temporary table in the db.
-            unenrolled_staff_qset = recipient_qset.exclude(
-                courseenrollment__course_id=course_id, courseenrollment__is_active=True
-            )
-            # use read_replica if available:
-            unenrolled_staff_qset = use_read_replica_if_available(unenrolled_staff_qset)
+        staff_and_instructor_qset = (staff_qset | instructor_qset).distinct()
 
-            unenrolled_staff_ids = [user.id for user in unenrolled_staff_qset]
-            recipient_qset = enrollment_qset | User.objects.filter(id__in=unenrolled_staff_ids)
+        if to_option == SEND_TO_STAFF:
+            queryset = use_read_replica_if_available(staff_and_instructor_qset)
+            return [(queryset, 'pk')]
 
-    # again, use read_replica if available to lighten the load for large queries
-    return use_read_replica_if_available(recipient_qset)
+        elif to_option == SEND_TO_ALL:
+            # first email unenrolled staff members
+            unenrolled_staff_instr_qset = use_read_replica_if_available(
+                staff_and_instructor_qset.exclude(
+                    courseenrollment__course_id=course_id,
+                    courseenrollment__is_active=True
+                )
+            )
+            enrollment_qset = use_read_replica_if_available(
+                User.objects.filter(
+                    is_active=True,
+                    courseenrollment__course_id=course_id,
+                    courseenrollment__is_active=True
+                )
+            )
+            return [
+                (unenrolled_staff_instr_qset, 'pk'),
+                (enrollment_qset, 'courseenrollment__id')
+            ]
+
+
+def _get_querysets_for_to_option(to_option, course_id, user_id):
+    """Returns a list of querysets corresponding to each to_option"""
+    return [
+        queryset for queryset, _ in _get_qsets_and_ordering_keys_for_to_option(
+            to_option, course_id, user_id
+        )
+    ]
+
+
+def _get_num_items_for_to_option(to_option, course_id, user_id):
+    """
+    Returns the amount of recipients for a given to_option
+    """
+    return sum(
+        [queryset.count() for queryset in _get_querysets_for_to_option(to_option, course_id, user_id)]
+    )
+
+
+def _get_num_subtasks_for_to_option(to_option, course_id, user_id):
+    """
+    Returns the number of subtasks for a given to_option
+    """
+    num_subtasks = 0
+    recipient_qsets = _get_querysets_for_to_option(to_option, course_id, user_id)
+    for recipient_qset in recipient_qsets:
+        if recipient_qset.exists():
+            num_subtasks += get_number_of_subtasks_for_queryset(
+                recipient_qset.count(),
+                settings.BULK_EMAIL_EMAILS_PER_QUERY,
+                settings.BULK_EMAIL_EMAILS_PER_TASK
+            )
+    return num_subtasks
+
+
+def recipient_generator(user_id, to_option, course_id, recipient_fields):
+    """
+    Generates users for a given to_option. Because it iterates over
+    _recipient_lists_generator, it will execute the queries for users
+    in chunks.
+    `recipient_fields` refers to the fields that each query will return
+    """
+    for item_sublist in _recipient_lists_generator(user_id, to_option, course_id, recipient_fields):
+        for item in item_sublist:
+            yield item
 
 
 def _get_course_email_context(course):
@@ -229,8 +298,14 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         )
         return new_subtask
 
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
-    recipient_fields = ['profile__name', 'email']
+    recipient_fields = ['pk', 'profile__name', 'email', 'courseenrollment__id']
+
+    if to_option not in TO_OPTIONS:
+        raise ValueError("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+
+    item_generator = recipient_generator(user_id, to_option, course_id, recipient_fields)
+    total_num_items = _get_num_items_for_to_option(to_option, course_id, user_id)
+    total_num_subtasks = _get_num_subtasks_for_to_option(to_option, course_id, user_id)
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
              task_id, course_id, email_id, to_option)
@@ -239,9 +314,12 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         entry,
         action_name,
         _create_send_email_subtask,
-        recipient_qset,
+        item_generator,
         recipient_fields,
+        settings.BULK_EMAIL_EMAILS_PER_QUERY,
         settings.BULK_EMAIL_EMAILS_PER_TASK,
+        total_num_items,
+        total_num_subtasks,
     )
 
     # We want to return progress here, as this is what will be stored in the
