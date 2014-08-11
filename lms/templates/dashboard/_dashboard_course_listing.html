@@ -56,6 +56,11 @@
             <span class="label">${_("Enrolled as: ")}</span>
             <span class="sts-enrollment-value">${_("Auditing")}</span>
           </span>
+        % elif enrollment.mode == "professional":
+          <span class="sts-enrollment" title="${_("You're enrolled as a professional education student")}">
+          <span class="label">${_("Enrolled as: ")}</span>
+          <span class="sts-enrollment-value">${_("Professional Ed")}</span>
+        </span>
         % endif
     % endif
 
