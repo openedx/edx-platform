@@ -7,6 +7,7 @@ Run these tests @ Devstack:
 from datetime import datetime
 import json
 import uuid
+from urllib import urlencode
 
 from django.contrib.auth.models import Group, User
 from django.core.cache import cache
@@ -385,17 +386,40 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             'user': self.test_user.id,
             'reviewer': self.test_user.username,
             'question': 'Test question?',
-            'answer': 'Test answer!'
+            'answer': 'Test answer!',
+            'content_id': self.test_course_content_id
         }
         response = self.do_post(self.test_peer_reviews_uri, pr_data)
         self.assertEqual(response.status_code, 201)
-        pr_id = response.data['id']
+        pr1_id = response.data['id']
+        pr_data = {
+            'workgroup': workgroup_id,
+            'user': self.test_user.id,
+            'reviewer': self.test_user.username,
+            'question': 'Test question2',
+            'answer': 'Test answer2',
+            'content_id': self.test_course_id
+        }
+        response = self.do_post(self.test_peer_reviews_uri, pr_data)
+        self.assertEqual(response.status_code, 201)
+        pr2_id = response.data['id']
+
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
         peer_reviews_uri = '{}peer_reviews/'.format(test_uri)
         response = self.do_get(peer_reviews_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['id'], pr_id)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], pr1_id)
         self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
+
+        content_id = {"content_id": self.test_course_content_id}
+        test_uri = '{}{}/peer_reviews/?{}'.format(self.test_workgroups_uri, workgroup_id, urlencode(content_id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], pr1_id)
+        self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
+
 
     def test_workgroups_workgroup_reviews_get(self):
         data = {
@@ -409,16 +433,36 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             'workgroup': workgroup_id,
             'reviewer': self.test_user.username,
             'question': 'Test question?',
-            'answer': 'Test answer!'
+            'answer': 'Test answer!',
+            'content_id': self.test_course_content_id
         }
         response = self.do_post(self.test_workgroup_reviews_uri, wr_data)
         self.assertEqual(response.status_code, 201)
-        wr_id = response.data['id']
+        wr1_id = response.data['id']
+        wr_data = {
+            'workgroup': workgroup_id,
+            'reviewer': self.test_user.username,
+            'question': 'Test question?',
+            'answer': 'Test answer!',
+            'content_id': self.test_course_id
+        }
+        response = self.do_post(self.test_workgroup_reviews_uri, wr_data)
+        self.assertEqual(response.status_code, 201)
+
         test_uri = '{}{}/'.format(self.test_workgroups_uri, workgroup_id)
         workgroup_reviews_uri = '{}workgroup_reviews/'.format(test_uri)
         response = self.do_get(workgroup_reviews_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['id'], wr_id)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['id'], wr1_id)
+        self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
+
+        content_id = {"content_id": self.test_course_content_id}
+        test_uri = '{}{}/workgroup_reviews/?{}'.format(self.test_workgroups_uri, workgroup_id, urlencode(content_id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['id'], wr1_id)
         self.assertEqual(response.data[0]['reviewer'], self.test_user.username)
 
     def test_workgroups_submissions_get(self):
