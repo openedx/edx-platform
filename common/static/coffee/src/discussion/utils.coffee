@@ -21,6 +21,9 @@ class @DiscussionUtil
   @setUser: (user) ->
     @user = user
 
+  @getUser: () ->
+    @user
+
   @loadRoles: (roles)->
     @roleIds = roles
 
@@ -158,6 +161,13 @@ class @DiscussionUtil
         else
           params["$loading"].loaded()
     return request
+
+  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg) ->
+    if errorMsg
+      safeAjaxParams.error = => @discussionAlert(gettext("Sorry"), errorMsg)
+    undo = _.pick(model.attributes, _.keys(updates))
+    model.set(updates)
+    @safeAjax(safeAjaxParams).fail(() -> model.set(undo))
 
   @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
