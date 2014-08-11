@@ -1821,7 +1821,7 @@ this event when a response is delivered to a student for evaluation.
      - The i4x:// style locator that identifies the problem in the course. 
    * - ``submission_returned_uuid``
      - string
-     - The unique identifer of the submission that the student retrieved for
+     - The unique identifer of the response that the student retrieved for
        assessment. 
 
        If no assessment is available, this is set to "None".
@@ -1913,7 +1913,7 @@ other feedback about the assessment process.
      - The student's comments about the assessment process.
    * - ``submission_uuid``
      - string
-     - The unique identifier of the feedback submission.
+     - The unique identifier of the feedback.
    * - ``options``
      - array
      - The label of each check box option that the student selected to evaluate
@@ -1943,10 +1943,10 @@ assessment.
      - dict
      - This field contains a ``text`` (string) member field for the response. 
        
-       For submissions that also include an image file, this field contains a
+       For responses that also include an image file, this field contains a
        ``file_upload_key`` (string) member field with the AWS S3 key that
        identifies the location of the image file on the Amazon S3 storage
-       service.
+       service. This key is provided for reference only.
 
    * - ``created_at``
      - datetime
@@ -1956,7 +1956,7 @@ assessment.
      - This value is currently always set to 1.
    * - ``submission_uuid``
      - string
-     - The unique identifier of the submission.
+     - The unique identifier of the response.
    * - ``submitted_at``
      - datetime
      - Timestamp for when the student submitted the response. This value is
@@ -1985,7 +1985,7 @@ save responses before they submit them for assessment.
      - dict
      - This field contains a ``text`` (string) member field for the response. 
        
-       For submissions that also include an image file, this field contains a
+       For responses that also include an image file, this field contains a
        ``file_upload_key`` (string) member field with the AWS S3 key that
        identifies the location of the image file on the Amazon S3 storage
        service.
@@ -2019,7 +2019,7 @@ scored differently than the instructor.
        ``criterion_name: instructor-defined_option_name``.
    * - ``submission_uuid``
      - string
-     - The unique identifier of the submission. Identifies the student who
+     - The unique identifier of the response. Identifies the student who
        is undergoing training.
    * - ``options_selected``
      - object
