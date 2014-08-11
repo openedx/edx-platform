@@ -326,7 +326,7 @@ class TestTOC(ModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
-        with check_mongo_calls(self.modulestore, num_finds, num_sends):
+        with check_mongo_calls(num_finds, num_sends):
             self.toy_course = self.store.get_course(self.toy_loc, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 self.toy_loc, self.request.user, self.toy_course, depth=2)
@@ -352,7 +352,7 @@ class TestTOC(ModuleStoreTestCase):
                             'format': '', 'due': None, 'active': False}],
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
-            with check_mongo_calls(self.modulestore, 0, 0):
+            with check_mongo_calls(0, 0):
                 actual = render.toc_for_course(
                     self.request.user, self.request, self.toy_course, self.chapter, None, self.field_data_cache
                 )
