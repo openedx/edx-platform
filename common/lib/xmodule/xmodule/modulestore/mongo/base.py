@@ -24,6 +24,7 @@ from path import path
 from datetime import datetime
 from pytz import UTC
 
+from lms.lib.xblock.runtime import SettingsService
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
@@ -538,7 +539,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if apply_cached_metadata:
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
 
-        services = {}
+        services = {
+            'settings': SettingsService(),
+        }
         if self.i18n_service:
             services["i18n"] = self.i18n_service
 
@@ -811,7 +814,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
             definition_data = {}
 
         if system is None:
-            services = {}
+            services = {
+                'settings': SettingsService(),
+            }
             if self.i18n_service:
                 services["i18n"] = self.i18n_service
 
