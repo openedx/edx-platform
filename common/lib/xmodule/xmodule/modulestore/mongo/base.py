@@ -44,6 +44,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.settings_service import SettingsService
 
 log = logging.getLogger(__name__)
 
@@ -704,7 +705,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if apply_cached_metadata:
             cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
 
-        services = {}
+        # TODO: This needs to be moved out of the common lib, but without it some of the
+        # XBlock instantiations don't get the settings service included - why?
+        services = {
+            'settings': SettingsService(),
+        }
         if self.i18n_service:
             services["i18n"] = self.i18n_service
 
@@ -1000,7 +1005,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
         if runtime is None:
-            services = {}
+            # TODO: This needs to be moved out of the common lib, but without it some of the
+            # XBlock instantiations don't get the settings service included - why?
+            services = {
+                'settings': SettingsService(),
+            }
             if self.i18n_service:
                 services["i18n"] = self.i18n_service
 
