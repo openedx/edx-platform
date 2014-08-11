@@ -292,6 +292,41 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
+    def test_group_detail_delete(self):
+        local_username = self.test_username + str(randint(11, 99))
+        data = {
+            'email': self.test_email,
+            'username': local_username,
+            'password': self.test_password,
+            'first_name': 'Joe',
+            'last_name': 'Smith'
+        }
+        response = self.do_post(self.base_users_uri, data)
+        user_id = response.data['id']
+
+        data = {'name': self.test_group_name, 'type': 'test'}
+        response = self.do_post(self.base_groups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        group_id = response.data['id']
+
+        test_uri = '{}/{}/users'.format(self.base_groups_uri, group_id)
+        data = {'user_id': user_id}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        test_uri = '{}/{}'.format(self.base_groups_uri, group_id)
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_group_detail_delete_invalid_group(self):
+        test_uri = '{}/23209232'.format(self.base_groups_uri)
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
+
     def test_group_users_list_post(self):
         local_username = self.test_username + str(randint(11, 99))
         data = {
