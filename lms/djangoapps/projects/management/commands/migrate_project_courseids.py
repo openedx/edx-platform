@@ -9,7 +9,7 @@ from django.test import RequestFactory
 
 from api_manager.courseware_access import get_course, get_course_child
 from opaque_keys import InvalidKeyError
-from project.models import Project, WorkgroupReview, WorkgroupSubmissionReview
+from projects.models import Project, WorkgroupReview, WorkgroupSubmissionReview
 
 log = logging.getLogger(__name__)
 
