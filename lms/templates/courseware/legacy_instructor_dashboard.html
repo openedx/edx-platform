@@ -263,67 +263,13 @@ function goto( mode)
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
-    <p>
-      ${_("Specify a problem in the course here with its complete location:")}
-      <input type="text" name="problem_for_all_students" size="60">
-    </p>
-    ## Translators: A location (string of text) follows this sentence.
-    <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
-    <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
-    <p>
-      ${_("Then select an action:")}
-      <input type="submit" name="action" value="Reset ALL students' attempts">
-      <input type="submit" name="action" value="Rescore ALL students' problem submissions">
-    </p>
-    <p>
-    <p>${_("These actions run in the background, and status for active tasks will appear in a table below. To see status for all tasks submitted for this problem, click on this button:")}
-    </p>
-    <p>
-      <input type="submit" name="action" value="Show Background Task History">
-    </p>
+    <p>${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
 
-    <hr width="40%" style="align:left">
   %endif
 
     <h2>${_("Student-specific grade inspection and adjustment")}</h2>
-    <p>
-      ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
-      <input type="text" name="unique_student_identifier">
-    </p>
-    <p>
-      ${_("Click this, and a link to student's progress page will appear below:")}
-      <input type="submit" name="action" value="Get link to student's progress page">
-    </p>
-    <p>
-      ${_("Specify a problem in the course here with its complete location:")}
-      <input type="text" name="problem_for_student" size="60">
-    </p>
-    ## Translators: A location (string of text) follows this sentence.
-    <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
-    <tt>i4x://edX/Open_DemoX/problem/78c98390884243b89f6023745231c525</tt></p>
 
-    <p>
-      ${_("Then select an action:")}
-      <input type="submit" name="action" value="Reset student's attempts">
-      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-      <input type="submit" name="action" value="Rescore student's problem submission">
-      %endif
-    </p>
-
-    %if instructor_access:
-    <p>
-      ${_("You may also delete the entire state of a student for the specified module:")}
-      <input type="submit" name="action" value="Delete student state for module">
-    </p>
-    %endif
-    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-    <p>${_("Rescoring runs in the background, and status for active tasks will appear in a table below. "
-           "To see status for all tasks submitted for this problem and student, click on this button:")}
-    </p>
-    <p>
-      <input type="submit" name="action" value="Show Background Task History for Student">
-    </p>
-    %endif
+    <p>${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
 
  %endif
 
