@@ -1,6 +1,8 @@
   
 .. Links
 
+.. _edX Product and Engineering Newsletter: http://us5.campaign-archive2.com/?u=1822a33c054dc20e223ca40e2&id=090cb3ea4c&e=4a41f5542a
+
 .. _edX Release Announcements mailing list: http://eepurl.com/U84tj
 
 .. _edX Edge: https://edge.edx.org
@@ -32,9 +34,9 @@
 
 .. _Keys and Credentials for Data Transfers: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/credentials.html
 
-.. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#testing-your-course
+.. _Testing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/testing_courseware.html
 
-.. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#view-your-live-course
+.. _Switch Between Studio and Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/testing_courseware.html#view-your-live-course
 
 .. _Transcripts in Additional Languages: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#transcripts-in-additional-languages
 
@@ -62,21 +64,19 @@
 
 .. _Custom JavaScript Applications: http://edx.readthedocs.org/projects/userdocs/en/latest/extending_platform/javascript.html
 
-.. _Go to Studio from Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/view_course_content.html#go-to-studio-from-your-live-course
+.. _Go to Studio from Your Live Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/testing_courseware.html#open-studio-from-your-live-course
 
 .. _Student Answer Distribution: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_grades.html#review-answers
 
-.. _Releasing Your Course: http://ca.readthedocs.org/en/latest/releasing_course/index.html#releasing-your-course-index
+.. _Releasing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/index.html
 
 .. _Course Launching Activities: http://ca.readthedocs.org/en/latest/releasing_course/course_launching.html#launch
 
-.. _Adding Pages to a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/pages.html#adding-pages-to-a-course
+.. _Adding Pages to a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/pages.html
     
-.. _Show or Hide the Course Wiki Page: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/pages.html#show-or-hide-the-course-wiki-page
+.. _Show or Hide the Course Wiki Page: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/pages.html#show-or-hide-the-course-wiki-page
 
-.. _Building a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/index.html#building-a-course-index 
-
-.. _Creating Course Content: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/index.html#creating-course-content-index
+.. _Creating Course Content: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/en/latest/creating_content/index.html
 
 .. _Beta Testing a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/beta_testing.html#beta-testing
 
@@ -88,16 +88,13 @@
 
 .. _Getting Started: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/getting_started/index.html#getting-started-index
 
-.. _Building a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/index.html#building-a-course-index
-
+.. _Building a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/index.html
 
 .. _Creating Exercises and Tools: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/index.html
 
-.. _Running Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/index.html#running-your-course-index
+.. _Running Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/index.html
 
 .. _Information for Your Students: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/students/index.html#information-for-your-students-index
-
-
 
 .. _The Course Start Date: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/setting_up_student_view.html#the-course-start-date
 
@@ -113,7 +110,7 @@
 
 .. _Staff Debug Info: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/staff_debug_info.html
 
-.. _Add Files to a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/course_files.html
+.. _Add Files to a Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/building_course/course_files.html
 
 .. _Import LaTeX Code into an HTML Component: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_html_component.html#import-latex-code
 
@@ -141,7 +138,7 @@
 
 .. _Multiple Choice and Numerical Input Problem: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/mult_choice_num_input.html
 
-.. _Components: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/organizing_course.html#components
+.. _Components: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/course_components.html
 
 .. _Discussions: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/discussions.html  
 
@@ -151,11 +148,11 @@
 
 .. _External Graders: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/external_graders.html
 
-.. _duplicating components: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/organizing_course.html#duplicate-a-component
+.. _duplicating components: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/course_components.html#duplicate-a-component
 
 .. _Video Advanced Options: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#advanced-options
 
-.. _Organizaing Your Course Content: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/organizing_course.html
+.. _Organizaing Your Course Content: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/workflow.html
 
 .. _Custom JavaScript Problem: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html
 
@@ -187,6 +184,13 @@
 .. _Video Table of Contents: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/creating_content/create_video.html#video-toc
 
 .. _Download or view student data: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/running_course/course_student.html#view-and-download-student-data
+
+.. _Developing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/index.html
+
+
+.. Peer Assessments
+
+.. _Create an Open Response Assessment Assignment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/CreatePeerAssessment.html
 
 .. DATA DOCUMENTATION
 
