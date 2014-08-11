@@ -9,7 +9,8 @@ from .models import (
     StudentModule,
     XModuleUserStateSummaryField,
     XModuleStudentPrefsField,
-    XModuleStudentInfoField
+    XModuleStudentInfoField,
+    XModuleGlobalBlockField,
 )
 import logging
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
@@ -20,7 +21,7 @@ from django.contrib.auth.models import User
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
-from xblock.fields import Scope, UserScope
+from xblock.fields import Scope, UserScope, BlockScope
 
 log = logging.getLogger(__name__)
 
@@ -171,6 +172,12 @@ class FieldDataCache(object):
                 student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
+        elif scope == Scope(UserScope.NONE, BlockScope.TYPE):
+            return self._query(
+                XModuleGlobalBlockField,
+                module_type__in=set(descriptor.scope_ids.block_type for descriptor in self.descriptors),
+                field_name__in=set(field.name for field in fields),
+            )
         else:
             return []
 
@@ -196,6 +203,10 @@ class FieldDataCache(object):
             return (key.scope, key.block_scope_id, key.field_name)
         elif key.scope == Scope.user_info:
             return (key.scope, key.field_name)
+        elif key.scope == Scope(UserScope.NONE, BlockScope.TYPE):
+            return (key.scope, key.block_scope_id, key.field_name)
+        else:
+            raise InvalidScopeError(key)
 
     def _cache_key_from_field_object(self, scope, field_object):
         """
@@ -210,6 +221,10 @@ class FieldDataCache(object):
             return (scope, field_object.module_type, field_object.field_name)
         elif scope == Scope.user_info:
             return (scope, field_object.field_name)
+        elif scope == Scope(UserScope.NONE, BlockScope.TYPE):
+            return (scope, field_object.module_type, field_object.field_name)
+        else:
+            raise InvalidScopeError(key)
 
     def find(self, key):
         '''
@@ -265,6 +280,11 @@ class FieldDataCache(object):
                 field_name=key.field_name,
                 student=User.objects.get(id=key.user_id),
             )
+        elif key.scope == Scope(UserScope.NONE, BlockScope.TYPE):
+            field_object, _ = XModuleGlobalBlockField.objects.get_or_create(
+                field_name=key.field_name,
+                module_type=key.block_scope_id,
+            )
 
         cache_key = self._cache_key_from_kvs_key(key)
         self.cache[cache_key] = field_object
@@ -294,6 +314,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Scope.user_state,
         Scope.preferences,
         Scope.user_info,
+        Scope(UserScope.NONE, BlockScope.TYPE)
     )
 
     def __init__(self, field_data_cache):
