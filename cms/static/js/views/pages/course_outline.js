@@ -1,9 +1,9 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
+define(["domReady", "jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
         "js/views/course_outline"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
+    function (domReady, $, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -148,6 +148,21 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 this.locators = [];
             }
         };
+
+        var dismissNotification = function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: $('.dismiss-button').data('dismiss-link'),
+                type: 'DELETE',
+                success: function(result) {
+                    $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
+                }
+            });
+        };
+
+        domReady(function () {
+            $('.dismiss-button').bind('click', dismissNotification);
+        });
 
         return CourseOutlinePage;
     }); // end define();
