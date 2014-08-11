@@ -116,7 +116,8 @@ if Backbone?
         el: @newPostForm,
         collection: @discussion,
         course_settings: @course_settings,
-        topicId: discussionId
+        topicId: discussionId,
+        is_commentable_cohorted: response.is_commentable_cohorted
       )
       @newPostView.render()
       @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )

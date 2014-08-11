@@ -154,6 +154,7 @@ def inline_discussion(request, course_id, discussion_id):
     with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
         add_courseware_context(threads, course)
     return utils.JsonResponse({
+        'is_commentable_cohorted': is_commentable_cohorted(course_key, discussion_id),
         'discussion_data': threads,
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
