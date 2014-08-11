@@ -390,7 +390,8 @@ def course_listing(request):
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
-        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True)
     })
 
 
@@ -428,7 +429,6 @@ def course_index(request, course_key):
         'course_graders': json.dumps(
             CourseGradingModel.fetch(course_key).graders
         ),
-        'rerun_notification_id': current_action.id if current_action else None,
         'notification_dismiss_url': reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
                 'action_state_id': current_action.id,
             }) if current_action else None,
