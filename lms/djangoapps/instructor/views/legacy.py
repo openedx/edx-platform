@@ -227,23 +227,12 @@ def instructor_dashboard(request, course_id):
         datatable['title'] = _('List of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
-    elif 'Dump Grades' in action:
-        log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, get_grades=True, use_offline=use_offline)
-        datatable['title'] = _('Summary Grades of students enrolled in {course_key}').format(course_key=course_key.to_deprecated_string())
-        track.views.server_track(request, "dump-grades", {}, page="idashboard")
-
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = _('Raw Grades of students enrolled in {course_key}').format(course_key=course_key)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
-
-    elif 'Download CSV of all student grades' in action:
-        track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
-        return return_csv('grades_{0}.csv'.format(course_key.to_deprecated_string()),
-                          get_student_grade_summary_data(request, course, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
@@ -253,11 +242,6 @@ def instructor_dashboard(request, course_id):
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_key.to_deprecated_string()), get_answers_distribution(request, course_key))
-
-    elif 'Dump description of graded assignments configuration' in action:
-        # what is "graded assignments configuration"?
-        track.views.server_track(request, "dump-graded-assignments-config", {}, page="idashboard")
-        msg += dump_grading_context(course)
 
     #----------------------------------------
     # export grades to remote gradebook

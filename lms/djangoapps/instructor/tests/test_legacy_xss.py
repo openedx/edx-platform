@@ -63,6 +63,3 @@ class TestXss(ModuleStoreTestCase):
 
     def test_dump_list_of_enrolled(self):
         self._test_action("Dump list of enrolled students")
-
-    def test_dump_grades(self):
-        self._test_action("Dump Grades for all students in this course")
