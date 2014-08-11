@@ -229,6 +229,8 @@ CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
     'toy',
     'manual-testing-complete',
+    'split_test_module',
+    'split_test_module_draft',
 )
 
 

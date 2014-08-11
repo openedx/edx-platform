@@ -707,8 +707,8 @@ class EdxJSONEncoder(json.JSONEncoder):
     ISO date strings
     """
     def default(self, obj):
-        if isinstance(obj, Location):
-            return obj.to_deprecated_string()
+        if isinstance(obj, (CourseKey, UsageKey)):
+            return unicode(obj)
         elif isinstance(obj, datetime.datetime):
             if obj.tzinfo is not None:
                 if obj.utcoffset() is None:

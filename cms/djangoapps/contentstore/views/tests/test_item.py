@@ -932,7 +932,7 @@ class TestEditSplitModule(ItemTest):
 
         # group_id_to_child and children have not changed yet.
         split_test = self._assert_children(2)
-        group_id_to_child = split_test.group_id_to_child
+        group_id_to_child = split_test.group_id_to_child.copy()
         self.assertEqual(2, len(group_id_to_child))
 
         # Test environment and Studio use different module systems

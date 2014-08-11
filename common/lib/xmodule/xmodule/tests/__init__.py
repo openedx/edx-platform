@@ -16,7 +16,7 @@ from mock import Mock
 from path import path
 
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds, Scope
+from xblock.fields import ScopeIds, Scope, Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
@@ -159,6 +159,21 @@ class LogicTest(unittest.TestCase):
         return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
+def map_references(value, field, actual_course_key):
+    """
+    Map the references in value to actual_course_key and return value
+    """
+    if not value:  # if falsey
+        return value
+    if isinstance(field, Reference):
+        return value.map_into_course(actual_course_key)
+    if isinstance(field, ReferenceList):
+        return [sub.map_into_course(actual_course_key) for sub in value]
+    if isinstance(field, ReferenceValueDict):
+        return {key: ele.map_into_course(actual_course_key) for key, ele in value.iteritems()}
+    return value
+
+
 class CourseComparisonTest(unittest.TestCase):
     """
     Mixin that has methods for comparing courses for equality.
@@ -239,7 +254,7 @@ class CourseComparisonTest(unittest.TestCase):
             # compare fields
             self.assertEqual(expected_item.fields, actual_item.fields)
 
-            for field_name in expected_item.fields:
+            for field_name, field in expected_item.fields.iteritems():
                 if (expected_item.scope_ids.usage_id, field_name) in self.field_exclusions:
                     continue
 
@@ -250,8 +265,8 @@ class CourseComparisonTest(unittest.TestCase):
                 if field_name == 'children':
                     continue
 
-                exp_value = getattr(expected_item, field_name)
-                actual_value = getattr(actual_item, field_name)
+                exp_value = map_references(field.read_from(expected_item), field, actual_course_key)
+                actual_value = field.read_from(actual_item)
                 self.assertEqual(
                     exp_value,
                     actual_value,

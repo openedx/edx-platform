@@ -238,10 +238,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if not edit_info:
                     module.edited_by = module.edited_on = module.subtree_edited_on = \
                         module.subtree_edited_by = module.published_date = None
+                    raw_metadata = json_data.get('metadata', {})
                     # published_date was previously stored as a list of time components instead of a datetime
-                    if metadata.get('published_date'):
-                        module.published_date = datetime(*metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
-                    module.published_by = metadata.get('published_by')
+                    if raw_metadata.get('published_date'):
+                        module.published_date = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                    module.published_by = raw_metadata.get('published_by')
                 # otherwise restore the stored editing information
                 else:
                     module.edited_by = edit_info.get('edited_by')
@@ -280,22 +281,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         :param course_key: a CourseKey object for the given course
         :param jsonfields: a dict of the jsonified version of the fields
         """
+        result = {}
         for field_name, value in jsonfields.iteritems():
-            if value:
-                field = class_.fields.get(field_name)
-                if field is None:
-                    continue
-                elif isinstance(field, Reference):
-                    jsonfields[field_name] = self._convert_reference_to_key(value)
-                elif isinstance(field, ReferenceList):
-                    jsonfields[field_name] = [
-                        self._convert_reference_to_key(ele) for ele in value
-                    ]
-                elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, basestring)
-                        value[key] = self._convert_reference_to_key(subvalue)
-        return jsonfields
+            field = class_.fields.get(field_name)
+            if field is None:
+                continue
+            elif value is None:
+                result[field_name] = value
+            elif isinstance(field, Reference):
+                result[field_name] = self._convert_reference_to_key(value)
+            elif isinstance(field, ReferenceList):
+                result[field_name] = [
+                    self._convert_reference_to_key(ele) for ele in value
+                ]
+            elif isinstance(field, ReferenceValueDict):
+                result[field_name] = {
+                    key: self._convert_reference_to_key(subvalue) for key, subvalue in value.iteritems()
+                }
+            else:
+                result[field_name] = value
+        return result
 
     def lookup_item(self, location):
         """
@@ -1125,14 +1130,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
           therefore propagate subtree edit info up the tree
         """
         try:
-            definition_data = self._convert_reference_fields_to_strings(
-                xblock,
-                xblock.get_explicitly_set_fields_by_scope()
-            )
+            definition_data = self._serialize_scope(xblock, Scope.content)
             now = datetime.now(UTC)
             payload = {
                 'definition.data': definition_data,
-                'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
+                'metadata': self._serialize_scope(xblock, Scope.settings),
                 'edit_info.edited_on': now,
                 'edit_info.edited_by': user_id,
                 'edit_info.subtree_edited_on': now,
@@ -1144,7 +1146,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 payload['edit_info.published_by'] = user_id
 
             if xblock.has_children:
-                children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
+                children = self._serialize_scope(xblock, Scope.children)
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
 
@@ -1185,25 +1187,27 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return xblock
 
-    def _convert_reference_fields_to_strings(self, xblock, jsonfields):
+    def _serialize_scope(self, xblock, scope):
         """
         Find all fields of type reference and convert the payload from UsageKeys to deprecated strings
         :param xblock: the XBlock class
         :param jsonfields: a dict of the jsonified version of the fields
         """
-        assert isinstance(jsonfields, dict)
-        for field_name, value in jsonfields.iteritems():
-            if value:
-                if isinstance(xblock.fields[field_name], Reference):
-                    jsonfields[field_name] = value.to_deprecated_string()
-                elif isinstance(xblock.fields[field_name], ReferenceList):
+        jsonfields = {}
+        for field_name, field in xblock.fields.iteritems():
+            if (field.scope == scope and field.is_set_on(xblock)):
+                if isinstance(field, Reference):
+                    jsonfields[field_name] = field.read_from(xblock).to_deprecated_string()
+                elif isinstance(field, ReferenceList):
                     jsonfields[field_name] = [
-                        ele.to_deprecated_string() for ele in value
+                        ele.to_deprecated_string() for ele in field.read_from(xblock)
                     ]
-                elif isinstance(xblock.fields[field_name], ReferenceValueDict):
-                    for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, UsageKey)
-                        value[key] = subvalue.to_deprecated_string()
+                elif isinstance(field, ReferenceValueDict):
+                    jsonfields[field_name] = {
+                        key: unicode(subvalue) for key, subvalue in field.read_from(xblock).iteritems()
+                    }
+                else:
+                    jsonfields[field_name] = field.read_json(xblock)
         return jsonfields
 
     def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):

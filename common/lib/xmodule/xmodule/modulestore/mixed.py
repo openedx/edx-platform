@@ -170,8 +170,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # return the default store
         return self.default_modulestore
-        # return the first store, as the default
-        return self.default_modulestore
 
     @property
     def default_modulestore(self):
