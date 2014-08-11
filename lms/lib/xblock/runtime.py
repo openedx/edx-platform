@@ -211,12 +211,21 @@ class UserTagsService(object):
                                            self.runtime.course_id, key, value)
 
 
+class SettingsService(object):
+    """
+    Allow to access the server settings
+    """
+    def get(self, setting_name):
+        return getattr(settings, setting_name)
+
+
 class LmsModuleSystem(LmsHandlerUrls, LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem specialized to the LMS
     """
     def __init__(self, **kwargs):
         services = kwargs.setdefault('services', {})
+        services['settings'] = SettingsService()
         services['user_tags'] = UserTagsService(self)
         services['partitions'] = LmsPartitionService(
             user_tags_service=services['user_tags'],

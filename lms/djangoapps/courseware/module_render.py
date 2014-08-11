@@ -25,7 +25,7 @@ from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
+from lms.lib.xblock.runtime import LmsModuleSystem, SettingsService, unquote_slashes, quote_slashes
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -525,6 +525,7 @@ def get_module_system_for_user(user, field_data_cache,
         get_real_user=user_by_anonymous_id,
         services={
             'i18n': ModuleI18nService(),
+            'settings': SettingsService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
