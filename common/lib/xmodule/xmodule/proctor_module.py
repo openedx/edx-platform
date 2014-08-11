@@ -78,7 +78,14 @@ class ProctorPanel(object):
 
     def is_released(self):
         retdata = self.status()
-        return retdata.get('enabled', False)
+        enabled = retdata.get('enabled', False)
+        requested = retdata.get('requested', False)
+        # request the problem from the proctor automatically
+        if not enabled and not requested:
+            self.request()
+            retdata = self.status()
+            enabled = retdata.get('enabled', False)
+        return enabled
 
 
 class ProctorFields(object):
