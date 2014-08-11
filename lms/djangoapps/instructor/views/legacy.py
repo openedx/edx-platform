@@ -1045,7 +1045,7 @@ def instructor_dashboard(request, course_id):
 
     context['standard_dashboard_url'] = reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()})
 
-    return render_to_response('courseware/instructor_dashboard.html', context)
+    return render_to_response('courseware/legacy_instructor_dashboard.html', context)
 
 
 def _do_remote_gradebook(user, course, action, args=None, files=None):
