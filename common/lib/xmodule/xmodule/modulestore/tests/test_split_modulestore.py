@@ -9,7 +9,6 @@ from path import path
 import re
 import random
 
-from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -268,7 +267,7 @@ class SplitModuleTest(unittest.TestCase):
                         "category": "problem",
                         "fields": {
                             "display_name": "Problem 3.1",
-                            "graceperiod": "4 hours 0 minutes 0 seconds"
+                            "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
                         },
                     },
                     {
@@ -486,7 +485,7 @@ class SplitModuleTest(unittest.TestCase):
                         parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
-                        course.runtime, spec['category'], spec['fields'], block_id, parent_xblock=parent
+                        course.runtime, course.id, spec['category'], block_id, spec['fields'], parent_xblock=parent
                     )
                     new_ele_dict[spec['id']] = child
                 course = split_store.persist_xblock_dag(course, revision['user_id'])

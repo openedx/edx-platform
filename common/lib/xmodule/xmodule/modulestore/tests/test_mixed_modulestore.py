@@ -348,7 +348,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # split: 3 to get the course structure & the course definition (show_calculator is scope content)
     #  before the change. 1 during change to refetch the definition. 3 afterward (b/c it calls get_item to return the "new" object).
     #  2 sends to update index & structure (calculator is a setting field)
-    @ddt.data(('draft', 7, 5), ('split', 7, 2))
+    @ddt.data(('draft', 7, 5), ('split', 6, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
@@ -853,7 +853,6 @@ class TestMixedModuleStore(unittest.TestCase):
         # detached items (not considered as orphans)
         detached_locations = [
             course_id.make_usage_key('static_tab', 'StaticTab'),
-            course_id.make_usage_key('about', 'overview'),
             course_id.make_usage_key('course_info', 'updates'),
         ]
 

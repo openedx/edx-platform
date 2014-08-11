@@ -588,6 +588,27 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
             result[field.scope][field_name] = value
         return result
 
+    def create_course(self, org, course, run, user_id, fields=None, runtime=None, **kwargs):
+        """
+        Creates any necessary other things for the course as a side effect and doesn't return
+        anything useful. The real subclass should call this before it returns the course.
+        """
+        # clone a default 'about' overview module as well
+        about_location = self.make_course_key(org, course, run).make_usage_key('about', 'overview')
+
+        about_descriptor = XBlock.load_class('about')
+        overview_template = about_descriptor.get_template('overview.yaml')
+        self.create_item(
+            user_id,
+            about_location.course_key,
+            about_location.block_type,
+            block_id=about_location.block_id,
+            definition_data={'data': overview_template.get('data')},
+            metadata=overview_template.get('metadata'),
+            runtime=runtime,
+            continue_version=True,
+        )
+
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
         This base method just copies the assets. The lower level impls must do the actual cloning of

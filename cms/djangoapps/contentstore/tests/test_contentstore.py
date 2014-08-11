@@ -30,7 +30,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 
@@ -52,16 +52,6 @@ from course_action_state.managers import CourseActionStateItemNotFoundError
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
-
-
-class MongoCollectionFindWrapper(object):
-    def __init__(self, original):
-        self.original = original
-        self.counter = 0
-
-    def find(self, query, *args, **kwargs):
-        self.counter = self.counter + 1
-        return self.original(query, *args, **kwargs)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -89,7 +79,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         component_types should cause 'Video' to be present.
         """
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course = course_items[0]
         course.advanced_modules = component_types
         store.update_item(course, self.user.id)
@@ -116,7 +106,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_malformed_edit_unit_request(self):
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
 
         # just pick one vertical
         usage_key = course_items[0].id.make_usage_key('vertical', None)
@@ -126,7 +116,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def check_edit_unit(self, test_course_name):
         """Verifies the editing HTML in all the verticals in the given test course"""
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
 
         items = self.store.get_items(course_items[0].id, qualifiers={'category': 'vertical'})
         self._check_verticals(items)
@@ -148,7 +138,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         both draft and non-draft copies.
         '''
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
         html_usage_key = course_key.make_usage_key('html', 'test_html')
 
@@ -263,7 +253,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertEqual(num_drafts, 1)
 
     def test_no_static_link_rewrites_on_import(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course = course_items[0]
 
         handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
@@ -287,7 +277,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
     def test_import_polls(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
 
         items = self.store.get_items(course_key, qualifiers={'category': 'poll_question'})
@@ -307,7 +297,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         Tests the ajax callback to render an XModule
         """
         direct_store = self.store
-        _, course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
         usage_key = course_items[0].id.make_usage_key('vertical', 'vertical_test')
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         resp = self.client.get_json(
@@ -357,7 +347,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
         effort = self.store.get_item(course_key.make_usage_key('about', 'effort'))
         self.assertEqual(effort.data, '6 hours')
@@ -460,7 +450,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         content_store = contentstore()
         trash_store = contentstore('trashcan')
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
         location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
@@ -618,7 +608,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         course_id = course_items[0].id
 
@@ -845,7 +835,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_course_handouts_rewrites(self):
         # import a test course
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         handouts_location = course_id.make_usage_key('course_info', 'handouts')
@@ -864,18 +854,17 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        wrapper = MongoCollectionFindWrapper(mongo_store.collection.find)
-        mongo_store.collection.find = wrapper.find
-
+        # make sure we haven't done too many round trips to DB
+        # note we say 4 round trips here for:
+        # 1) to get the run id
+        # 2) the course,
+        # 3 & 4) for the chapters and sequentials
+        # Because we're querying from the top of the tree, we cache information needed for inheritance,
+        # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with mongo_store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            course = mongo_store.get_course(course_id, depth=2)
-
-            # make sure we haven't done too many round trips to DB
-            # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
-            # Because we're querying from the top of the tree, we cache information needed for inheritance,
-            # so we don't need to make an extra query to compute it.
-            self.assertEqual(wrapper.counter, 3)
+            with check_mongo_calls(mongo_store, 4, 0):
+                course = mongo_store.get_course(course_id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
             self.assertTrue(course_id.make_usage_key('sequential', 'vertical_sequential') in course.system.module_data)
@@ -883,19 +872,16 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
             # make sure we don't have a specific vertical which should be at depth=3
             self.assertFalse(course_id.make_usage_key('vertical', 'vertical_test') in course.system.module_data)
 
-        # Now, test with the branch set to draft.  We should have one extra round trip call to check for
-        # the existence of the draft versions
-        wrapper.counter = 0
-        mongo_store.get_course(course_id, depth=2)
-        self.assertEqual(wrapper.counter, 4)
-
+        # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
+        # beyond direct only categories
+        with mongo_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            with check_mongo_calls(mongo_store, 4, 0):
+                mongo_store.get_course(course_id, depth=2)
 
     def test_export_course_without_content_store(self):
-        content_store = contentstore()
-
         # Create toy course
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         root_dir = path(mkdtemp_clean())
@@ -1271,7 +1257,7 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
@@ -1400,7 +1386,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
 
         course = course_items[0]
         verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
@@ -1412,35 +1398,32 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = course.id.make_usage_key('html', 'new_component')
-
         # crate a new module and add it as a child to a vertical
-        new_object = self.store.create_xmodule(new_component_location)
-        self.store.update_item(new_object, self.user.id, allow_not_found=True)
         parent = verticals[0]
-        parent.children.append(new_component_location)
-        self.store.update_item(parent, self.user.id)
+        new_block = self.store.create_child(
+            self.user.id, parent.location, 'html', 'new_component'
+        )
 
         # flush the cache
-        new_module = self.store.get_item(new_component_location)
+        new_block = self.store.get_item(new_block.location)
 
         # check for grace period definition which should be defined at the course level
-        self.assertEqual(parent.graceperiod, new_module.graceperiod)
-        self.assertEqual(parent.start, new_module.start)
-        self.assertEqual(course.start, new_module.start)
+        self.assertEqual(parent.graceperiod, new_block.graceperiod)
+        self.assertEqual(parent.start, new_block.start)
+        self.assertEqual(course.start, new_block.start)
 
-        self.assertEqual(course.xqa_key, new_module.xqa_key)
+        self.assertEqual(course.xqa_key, new_block.xqa_key)
 
         #
         # now let's define an override at the leaf node level
         #
-        new_module.graceperiod = timedelta(1)
-        self.store.update_item(new_module, self.user.id)
+        new_block.graceperiod = timedelta(1)
+        self.store.update_item(new_block, self.user.id)
 
         # flush the cache and refetch
-        new_module = self.store.get_item(new_component_location)
+        new_block = self.store.get_item(new_block.location)
 
-        self.assertEqual(timedelta(1), new_module.graceperiod)
+        self.assertEqual(timedelta(1), new_block.graceperiod)
 
     def test_default_metadata_inheritance(self):
         course = CourseFactory.create()
@@ -1469,7 +1452,7 @@ class ContentStoreTest(ContentStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        __, courses = import_from_xml(
+        courses = import_from_xml(
             self.store,
             self.user.id,
             'common/test/data/',

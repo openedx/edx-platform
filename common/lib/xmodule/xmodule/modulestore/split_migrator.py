@@ -62,6 +62,7 @@ class SplitMigrator(object):
             new_org, new_course, new_run, user_id,
             fields=new_fields,
             master_branch=ModuleStoreEnum.BranchName.published,
+            skip_auto_publish=True,
             **kwargs
         )
 
@@ -101,6 +102,7 @@ class SplitMigrator(object):
                         module, course_version_locator, new_course.location.block_id
                     ),
                     continue_version=True,
+                    skip_auto_publish=True,
                     **kwargs
                 )
         # after done w/ published items, add version for DRAFT pointing to the published structure
