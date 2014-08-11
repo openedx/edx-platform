@@ -137,7 +137,7 @@ class WorkgroupPeerReviewSerializer(serializers.HyperlinkedModelSerializer):
         model = WorkgroupPeerReview
         fields = (
             'id', 'url', 'created', 'modified', 'question', 'answer',
-            'workgroup', 'user', 'reviewer'
+            'workgroup', 'user', 'reviewer', 'content_id'
         )
 
 
