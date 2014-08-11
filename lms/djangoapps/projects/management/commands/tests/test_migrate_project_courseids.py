@@ -9,7 +9,7 @@ from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from api_manager.management.commands import migrate_courseids
+from projects.management.commands import migrate_project_courseids
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -60,7 +60,7 @@ class MigrateCourseIdsTests(TestCase):
         self.new_style_content_id2 = unicode(self.chapter2.location)
 
 
-    def test_migrate_courseids(self):
+    def test_migrate_project_courseids(self):
         """
         Test the data migration
         """
@@ -81,7 +81,7 @@ class MigrateCourseIdsTests(TestCase):
 
 
         # Run the data migration
-        migrate_courseids.Command().handle()
+        migrate_project_courseids.Command().handle()
 
 
         # Confirm that the data has been properly migrated
