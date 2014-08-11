@@ -6,6 +6,7 @@ Run these tests @ Devstack:
 """
 import json
 import uuid
+from urllib import urlencode
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -54,7 +55,7 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
 
         self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'foo/bar/baz'
-        self.test_course_content_id = "i4x://blah"
+        self.test_course_content_id = unicode(self.chapter.scope_ids.usage_id)
         self.test_bogus_course_content_id = "14x://foo/bar/baz"
 
         self.test_question = "Does the question data come from the XBlock definition?"
@@ -124,6 +125,7 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id
         }
         response = self.do_post(self.test_peer_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -140,6 +142,7 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
         self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
@@ -153,6 +156,32 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.test_peer_reviews_uri, data)
         self.assertEqual(response.status_code, 400)
 
+    def test_peer_reviews_list_get(self):
+        data = {
+            'workgroup': self.test_workgroup.id,
+            'user': self.test_peer_user.id,
+            'reviewer': self.anonymous_user_id,
+            'question': self.test_question,
+            'answer': self.test_answer,
+            'content_id': self.test_course_content_id
+        }
+        response = self.do_post(self.test_peer_reviews_uri, data)
+        self.assertEqual(response.status_code, 201)
+        data = {
+            'workgroup': self.test_workgroup.id,
+            'user': self.test_peer_user.id,
+            'reviewer': self.anonymous_user_id,
+            'question': self.test_question,
+            'answer': self.test_answer,
+            'content_id': self.test_course_content_id
+        }
+        response = self.do_post(self.test_peer_reviews_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.do_get(self.test_peer_reviews_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
     def test_peer_reviews_detail_get(self):
         data = {
             'workgroup': self.test_workgroup.id,
@@ -160,6 +189,7 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
             'reviewer': self.anonymous_user_id,
             'question': self.test_question,
             'answer': self.test_answer,
+            'content_id': self.test_course_content_id,
         }
         response = self.do_post(self.test_peer_reviews_uri, data)
         self.assertEqual(response.status_code, 201)
@@ -173,10 +203,12 @@ class PeerReviewsApiTests(ModuleStoreTestCase):
         )
         self.assertEqual(response.data['url'], confirm_uri)
         self.assertGreater(response.data['id'], 0)
+        self.assertEqual(response.data['workgroup'], self.test_workgroup.id)
         self.assertEqual(response.data['user'], self.test_peer_user.id)
         self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
         self.assertEqual(response.data['question'], self.test_question)
         self.assertEqual(response.data['answer'], self.test_answer)
+        self.assertEqual(response.data['content_id'], self.test_course_content_id)
         self.assertIsNotNone(response.data['created'])
         self.assertIsNotNone(response.data['modified'])
 
