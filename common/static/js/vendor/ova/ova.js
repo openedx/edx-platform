@@ -2385,9 +2385,6 @@ OpenVideoAnnotation.Annotator = function (element, options) {
 	
 	if (typeof options.optionsAnnotator.store!='undefined')
 		this.annotator.addPlugin("Store", options.optionsAnnotator.store);
-		
-	if (typeof options.optionsAnnotator.highlightTags!='undefined')
-		this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
 
     if (typeof options.optionsAnnotator.diacriticMarks != 'undefined' && typeof Annotator.Plugin["Diacritics"] === 'function')
     	this.annotator.addPlugin("Diacritics", options.optionsAnnotator.diacriticMarks);
@@ -2408,7 +2405,10 @@ OpenVideoAnnotation.Annotator = function (element, options) {
             
     if (typeof Annotator.Plugin["Flagging"] === 'function') 
 		this.annotator.addPlugin("Flagging");
-		
+
+	if (typeof options.optionsAnnotator.highlightTags!='undefined')
+		this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
+	
 	//Will be add the player and the annotations plugin for video-js in the annotator
 	this.annotator.mplayer = this.mplayer;
 	this.annotator.editor.VideoJS=-1;
