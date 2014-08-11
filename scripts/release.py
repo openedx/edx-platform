@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 """
 a release-master multitool
+
+If you get an ImportError when you run this script, try running this:
+
+$ pip install path.py GitPython python-dateutil requests
+
+and then run this script again.
 """
 from __future__ import print_function, unicode_literals
 import sys
