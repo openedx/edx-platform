@@ -171,13 +171,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # return the default store
         return self.default_modulestore
 
-    @property
-    def default_modulestore(self):
-        """
-        Return the default modulestore
-        """
-        return self.modulestores[0]
-
     def _get_modulestore_by_type(self, modulestore_type):
         """
         This method should only really be used by tests and migration scripts when necessary.

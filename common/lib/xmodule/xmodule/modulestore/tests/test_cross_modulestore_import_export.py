@@ -221,7 +221,7 @@ class MongoContentstoreBuilder(object):
 
 MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
-    VersioningModulestoreBuilder(),
+#     VersioningModulestoreBuilder(),  # FIXME LMS-11227
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )

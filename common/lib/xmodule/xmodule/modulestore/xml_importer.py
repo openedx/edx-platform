@@ -431,7 +431,7 @@ def _import_module_and_update_references(
                 fields[field_name] = {
                     key: _convert_reference_fields_to_new_namespace(reference)
                     for key, reference
-                    in reference_dict.items()
+                    in reference_dict.iteritems()
                 }
             elif field_name == 'xml_attributes':
                 value = field.read_from(module)
