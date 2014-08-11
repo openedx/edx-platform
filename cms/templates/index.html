@@ -132,7 +132,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       % endif
 
       <!-- STATE: processing courses -->
-      %if len(unsucceeded_course_actions) > 0:
+      %if allow_course_reruns and len(unsucceeded_course_actions) > 0:
       <div class="courses courses-processing">
           <h3 class="title">Courses Being Processed</h3>
 
@@ -248,7 +248,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </a>
 
             <ul  class="item-actions course-actions">
-              % if course_creator_status=='granted':
+              % if allow_course_reruns and course_creator_status=='granted':
               <li class="action action-rerun">
                 <a href="${rerun_link}" class="button rerun-button">${_("Re-run Course")}</a>
               </li>
