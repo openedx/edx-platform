@@ -38,11 +38,11 @@ var cktsim = (function() {
     var res_check_rel = Math.sqrt(reltol); // Loose Newton residue check
 
 	function Circuit() {
-	    this.node_map = new Array();
+        this.node_map = [];
 	    this.ntypes = [];
         this.initial_conditions = [];
         this.devices = [];
-        this.device_map = new Array();
+        this.device_map = [];
         this.voltage_sources = [];
         this.current_sources = [];
 	    this.finalized = false;
@@ -191,7 +191,7 @@ var cktsim = (function() {
         Circuit.prototype.find_solution = function(load,maxiters) {
 	    var soln = this.solution;
 	    var rhs = this.rhs;
-	    var d_sol = new Array();
+	    var d_sol = [];
 	    var abssum_compare;
 	    var converged,abssum_old=0, abssum_rhs;
 	    var use_limiting = false;
@@ -307,7 +307,7 @@ var cktsim = (function() {
 		// Note that a dc solution was computed
 		this.diddc = true;
 		// create solution dictionary
-		var result = new Array();
+        var result = [];
 		// capture node voltages
 		for (var name in this.node_map) {
 		    var index = this.node_map[name];
@@ -415,7 +415,7 @@ var cktsim = (function() {
 	    // build array to hold list of results for each variable
 	    // last entry is for timepoints.
 	    var response = new Array(N + 1);
-	    for (var i = N; i >= 0; --i) response[i] = new Array();
+        for (var i = N; i >= 0; --i) response[i] = [];
 
 	    // Allocate back vectors for up to a second order method
 	    this.old3sol = new Array(this.N);
@@ -573,7 +573,7 @@ var cktsim = (function() {
 	    }
 
 	    // create solution dictionary
-	    var result = new Array();
+        var result = [];
 	    for (var name in this.node_map) {
 		var index = this.node_map[name];
 		result[name] = (index == -1) ? 0 : response[index];
@@ -615,7 +615,7 @@ var cktsim = (function() {
 	    // build array to hold list of magnitude and phases for each node
 	    // last entry is for frequency values
 	    var response = new Array(2*N + 1);
-	    for (var i = 2*N; i >= 0; --i) response[i] = new Array();
+        for (var i = 2*N; i >= 0; --i) response[i] = [];
 
 	    // multiplicative frequency increase between freq points
 	    var delta_f = Math.exp(Math.LN10/npts);
@@ -671,7 +671,7 @@ var cktsim = (function() {
 	    }
 
 	    // create solution dictionary
-	    var result = new Array();
+        var result = [];
 	    for (var name in this.node_map) {
 		var index = this.node_map[name];
 		result[name] = (index == -1) ? 0 : response[index];
@@ -1357,7 +1357,7 @@ var cktsim = (function() {
 
 	function parse_source(v) {
 	    // generic parser: parse v as either <value> or <fun>(<value>,...)
-	    var src = new Object();
+        var src = {};
 	    src.period = 0; // Default not periodic
 	    src.value = function(t) { return 0; }  // overridden below
 	    src.inflection_point = function(t) { return undefined; };  // may be overridden below
@@ -2061,7 +2061,7 @@ schematic = (function() {
 	    this.edits_allowed = true;
 	    var parts = input.getAttribute('parts');
 	    if (parts == undefined || parts == 'None') {
-		parts = new Array();
+            parts = [];
 		for (var p in parts_map) parts.push(p);
 	    } else if (parts == '') {
 		this.edits_allowed = false;
@@ -2098,7 +2098,7 @@ schematic = (function() {
 		this.submit_analyses = undefined;
 
 	    // toolbar
-	    this.tools = new Array();
+        this.tools = [];
 	    this.toolbar = [];
 
         /* DISABLE HELP BUTTON (target URL not consistent with multicourse hierarchy) -- SJSU
@@ -2193,7 +2193,7 @@ schematic = (function() {
 		this.status_div.style.height = status_height + 'px';
 	    } else this.status_div = undefined;
 
-	    this.connection_points = new Array();  // location string => list of cp's
+        this.connection_points = []; // location string => list of cp's
 	    this.components = [];
 	    this.dragging = false;
 	    this.select_rect = undefined;
@@ -2774,7 +2774,7 @@ schematic = (function() {
 		return;
 	    }
 
-	    var fields = new Array();
+        var fields = [];
 	    fields[fstart_lbl] = build_input('text',10,this.ac_fstart);
 	    fields[fstop_lbl] = build_input('text',10,this.ac_fstop);
 	    fields[source_name_lbl] = build_input('text',10,this.ac_source_name);
@@ -2903,7 +2903,7 @@ schematic = (function() {
 		return;
 	    }
 
-	    var fields = new Array();
+        var fields = [];
 	    fields[tstop_lbl] = build_input('text',10,this.tran_tstop);
 
 	    var content = build_table(fields);
@@ -3143,7 +3143,7 @@ schematic = (function() {
 		    this.message(this.operating_point);
 		else {
 		    // make a copy of the operating_point info so we can mess with it
-		    var temp = new Array();
+            var temp = [];
 		    for (var i in this.operating_point) temp[i] = this.operating_point[i];
 
 		    // run through connection points displaying (once) the voltage
@@ -4787,7 +4787,7 @@ schematic = (function() {
 	    this.y = y;
 	    this.rotation = rotation;
 	    this.selected = false;
-	    this.properties = new Array();
+        this.properties = [];
 	    this.bounding_box = [0,0,0,0];   // in device coords [left,top,right,bottom]
 	    this.bbox = this.bounding_box;   // in absolute coords
 	    this.connections = [];
@@ -5033,7 +5033,7 @@ schematic = (function() {
 	Component.prototype.edit_properties = function(x,y) {
 	    if (this.near(x,y)) {
 		// make an <input> widget for each property
-		var fields = new Array();
+        var fields = [];
 		for (var i in this.properties)
 		    // underscore at beginning of property name => system property
 		    if (i.charAt(0) != '_')
@@ -5454,7 +5454,7 @@ schematic = (function() {
 
 	Probe.prototype.edit_properties = function(x,y) {
 	    if (inside(this.bbox,x,y)) {
-		var fields = new Array();
+        var fields = [];
 		fields['Plot color'] = build_select(probe_colors,this.properties['color']);
 		fields['Plot offset'] = build_input('text',10,this.properties['offset']);
 
@@ -5749,7 +5749,7 @@ schematic = (function() {
 
 	Diode.prototype.edit_properties = function(x,y) {
 	    if (inside(this.bbox,x,y)) {
-		var fields = new Array();
+            var fields = [];
 		fields['name'] = build_input('text',10,this.properties['name']);
 		fields['area'] = build_input('text',10,this.properties['area']);
 		fields['type'] = build_select(diode_types,this.properties['type']);
