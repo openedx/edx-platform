@@ -3,7 +3,7 @@
 """
 Acceptance tests for CMS Video Module.
 """
-
+from nose.plugins.attrib import attr
 from unittest import skipIf
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
@@ -12,6 +12,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 
 
+@attr('shard_2')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class CMSVideoBaseTest(UniqueCourseTest):
     """
@@ -281,9 +282,9 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.open_advanced_tab()
 
-        self.video.set_settings_field_value('Video Start Time', '00:00:12')
+        self.video.set_field_value('Video Start Time', '00:00:12')
 
-        self.video.set_settings_field_value('Video Stop Time', '00:00:24')
+        self.video.set_field_value('Video Stop Time', '00:00:24')
 
         self.save_unit_settings()
 
