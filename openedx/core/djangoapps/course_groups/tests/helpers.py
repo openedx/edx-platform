@@ -46,7 +46,8 @@ def config_course_cohorts(
         discussions,
         cohorted,
         cohorted_discussions=None,
-        auto_cohort_groups=None
+        auto_cohort_groups=None,
+        always_cohort_inline_discussions=None  # pylint: disable=invalid-name
 ):
     """
     Given a course with no discussion set up, add the discussions and set
@@ -74,15 +75,18 @@ def config_course_cohorts(
 
     course.discussion_topics = topics
 
-    d = {"cohorted": cohorted}
+    config = {"cohorted": cohorted}
     if cohorted_discussions is not None:
-        d["cohorted_discussions"] = [to_id(name)
-                                     for name in cohorted_discussions]
+        config["cohorted_discussions"] = [to_id(name)
+                                          for name in cohorted_discussions]
 
     if auto_cohort_groups is not None:
-        d["auto_cohort_groups"] = auto_cohort_groups
+        config["auto_cohort_groups"] = auto_cohort_groups
 
-    course.cohort_config = d
+    if always_cohort_inline_discussions is not None:
+        config["always_cohort_inline_discussions"] = always_cohort_inline_discussions
+
+    course.cohort_config = config
 
     try:
         # Not implemented for XMLModulestore, which is used by test_cohorts.

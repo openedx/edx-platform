@@ -13,6 +13,7 @@ if Backbone?
           context = _.clone(@course_settings.attributes)
           _.extend(context, {
               cohort_options: @getCohortOptions(),
+              is_commentable_cohorted: @is_commentable_cohorted,
               mode: @mode,
               is_commentable_cohorted: @is_commentable_cohorted,
               form_id: @mode + (if @topicId then "-" + @topicId else "")
