@@ -607,7 +607,7 @@ def _import_course_draft(
                     _import_module(descriptor)
 
                 except Exception:
-                    logging.exception('There while importing draft descriptor %s', descriptor)
+                    logging.exception('while importing draft descriptor %s', descriptor)
 
 
 def allowed_metadata_by_category(category):
