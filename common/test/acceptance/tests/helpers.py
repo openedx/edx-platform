@@ -1,6 +1,7 @@
 """
 Test helper functions and base classes.
 """
+import json
 import unittest
 import functools
 import requests
@@ -194,3 +195,77 @@ class UniqueCourseTest(WebAppTest):
             self.course_info['number'],
             self.course_info['run']
         ])
+
+
+class YouTubeConfigError(Exception):
+    """
+    Error occurred while configuring YouTube Stub Server.
+    """
+    pass
+
+
+class YouTubeStubConfig(object):
+    """
+    Configure YouTube Stub Server.
+    """
+
+    PORT = 9080
+    URL = 'http://127.0.0.1:{}/'.format(PORT)
+
+    @classmethod
+    def configure(cls, config):
+        """
+        Allow callers to configure the stub server using the /set_config URL.
+
+        Arguments:
+            config (dict): Configuration dictionary.
+
+        Raises:
+            YouTubeConfigError
+
+        """
+        youtube_stub_config_url = cls.URL + 'set_config'
+
+        config_data = {param: json.dumps(value) for param, value in config.items()}
+        response = requests.put(youtube_stub_config_url, data=config_data)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
+                    youtube_stub_config_url, config, response.status_code))
+
+    @classmethod
+    def reset(cls):
+        """
+        Reset YouTube Stub Server Configurations using the /del_config URL.
+
+        Raises:
+            YouTubeConfigError
+
+        """
+        youtube_stub_config_url = cls.URL + 'del_config'
+
+        response = requests.delete(youtube_stub_config_url)
+
+        if not response.ok:
+            raise YouTubeConfigError(
+                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
+                    youtube_stub_config_url, response.status_code))
+
+    @classmethod
+    def get_configuration(cls):
+        """
+        Allow callers to get current stub server configuration.
+
+        Returns:
+            dict
+
+        """
+        youtube_stub_config_url = cls.URL + 'get_config'
+
+        response = requests.get(youtube_stub_config_url)
+
+        if response.ok:
+            return json.loads(response.content)
+        else:
+            return {}
