@@ -198,6 +198,16 @@ class GroupsDetail(SecureAPIView):
             response_data['name'] = existing_group.name
         return Response(response_data, status=status.HTTP_200_OK)
 
+    def delete(self, request, group_id):  # pylint: disable=W0612,W0613
+        """
+        DELETE removes an existing group from the system
+        """
+        try:
+            existing_group = Group.objects.get(id=group_id).delete()
+        except ObjectDoesNotExist:
+            pass
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+
 
 class GroupsUsersList(SecureAPIView):
     """
