@@ -1784,15 +1784,15 @@ see `Creating a Peer Assessment`_.
 
 **Component**: Open Response Assessments
 
-**History:** Limited release of this open response assessment feature began in
-April 2014.
+**History:** The open response assessment feature was released in August 2014;
+limited release of this feature began in April 2014.
 
 openassessmentblock.get_peer_submission
 ----------------------------------------
 
-After students submit their own essays for evaluation, they use the scoring
-rubric to evaluate the essays of other course participants. The server emits
-this event when an essay is delivered to a student for evaluation.
+After students submit their own responses for evaluation, they use the scoring
+rubric to evaluate the responses of other course participants. The server emits
+this event when a response is delivered to a student for evaluation.
 
 **Event Source**: Server
 
@@ -1829,14 +1829,14 @@ this event when an essay is delivered to a student for evaluation.
    * - ``requesting_student_id``
      - string
      - The course-specific anonymized user ID of the student who requested the
-       essay.
+       response.
 
        
 openassessmentblock.peer_assess and openassessmentblock.self_assess
 ----------------------------------------------------------------------
 
 The server emits this event when a student either submits an assessment of a
-peer's essay or submits a self-assessment of her own essay.
+peer's response or submits a self-assessment of her own response.
 
 **Event Source**: Server
 
@@ -1857,10 +1857,10 @@ peer's essay or submits a self-assessment of her own essay.
        assessment.
    * - ``feedback``
      - string
-     - The student's comments about the submitted essay.
+     - The student's comments about the submitted response.
    * - ``submission_uuid``
      - string
-     - The unique identifier for the submitted essay.
+     - The unique identifier for the submitted response.
    * - ``score_type``
      - string
      - "PE" for a peer evaluation, "SE" for a self evaluation.
@@ -1877,11 +1877,14 @@ peer's essay or submits a self-assessment of her own essay.
          member fields
        * ``option`` (string)
        * ``feedback`` (string)
+
+       When the only criterion in the rubric is student feedback, ``points
+       possible`` is 0 and the ``option`` field is not included.
        
    * - ``rubric``
      - dict
      - This field contains the member field ``contenthash``, which identifies
-       the rubric that the student used to assess the essay.
+       the rubric that the student used to assess the response.
    * - ``scored_at``
      - datetime
      - Timestamp for when the assessment was submitted.
@@ -1919,8 +1922,8 @@ other feedback about the assessment process.
 openassessment.create_submission
 --------------------------------
 
-The server emits this event when a student submits an essay. The same event is
-emitted when a student submits an essay for peer assessment or for self
+The server emits this event when a student submits a response. The same event
+is emitted when a student submits a response for peer assessment or for self
 assessment.
 
 **Event Source**: Server
@@ -1938,7 +1941,7 @@ assessment.
      - Details
    * - ``answer``
      - dict
-     - This field contains a ``text`` (string) member field for the essay. 
+     - This field contains a ``text`` (string) member field for the response. 
        
        For submissions that also include an image file, this field contains a
        ``file_upload_key`` (string) member field with the AWS S3 key that
@@ -1947,7 +1950,7 @@ assessment.
 
    * - ``created_at``
      - datetime
-     - Timestamp for when the student submitted the essay.
+     - Timestamp for when the student submitted the response.
    * - ``attempt_number``
      - int
      - This value is currently always set to 1.
@@ -1956,13 +1959,13 @@ assessment.
      - The unique identifier of the submission.
    * - ``submitted_at``
      - datetime
-     - Timestamp for when the student submitted the essay. This value is
+     - Timestamp for when the student submitted the response. This value is
        currently always the same as ``created_at``.
 
 openassessment.save_submission
 -------------------------------
 
-The server emits this event when a student saves a response essay. Students
+The server emits this event when a student saves a response. Students
 save responses before they submit them for assessment.
 
 **Event Source**: Server
@@ -1980,7 +1983,7 @@ save responses before they submit them for assessment.
      - Details
    * - ``saved_response``
      - dict
-     - This field contains a ``text`` (string) member field for the essay. 
+     - This field contains a ``text`` (string) member field for the response. 
        
        For submissions that also include an image file, this field contains a
        ``file_upload_key`` (string) member field with the AWS S3 key that
@@ -1991,7 +1994,7 @@ openassessment.student_training_assess_example
 -----------------------------------------------
 
 The server emits this event when a student submits an assessment for an
-example essay. To assess the example essay, the student uses a scoring rubric
+example response. To assess the example, the student uses a scoring rubric
 provided by the instructor. These events record the options the student
 selected to assess the example and identifies any criteria that the student
 scored differently than the instructor.
