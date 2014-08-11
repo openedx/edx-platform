@@ -20,7 +20,7 @@ The sections in this chapter describe:
   in the LMS.
 
 Student and instructor events are grouped into categories in this chapter. For
-an alphabetical list of events, see the :ref:`event_list`.
+a list of events, see the :ref:`event_list`.
 
 
 .. _sample_events:
@@ -149,8 +149,8 @@ If you use a JSON formatter to "pretty print" this event, a version that is more
 Common Fields
 ********************
 
-This section describes the JSON fields that are common to the schema definitions
-of all events.
+This section describes the JSON fields that are common to the schema
+definitions of all events.
 
 =====================
 ``agent`` Field
@@ -183,8 +183,8 @@ The member fields are blank if values cannot be determined. The ``context``
 field can also contain additional member fields that apply to specific events
 only: see the description for each type of event.
 
-**History**: Added 23 Oct 2013; ``user_id`` added 6 Nov 2013. Other event fields
-may duplicate this data. ``course_user_tags`` added 12 Mar 2014.
+**History**: Added 23 Oct 2013; ``user_id`` added 6 Nov 2013. Other event
+fields may duplicate this data. ``course_user_tags`` added 12 Mar 2014.
 
 ===================
 ``event`` Field
@@ -300,7 +300,8 @@ outside the Instructor Dashboard.
 
 The descriptions that follow include what each event represents, the system
 component it originates from, the history of any changes made to the event over
-time, and any additional member fields that the ``context`` and ``event`` fields contain.
+time, and any additional member fields that the ``context`` and ``event``
+fields contain.
 
 The value in the ``event_source`` field (see the :ref:`common` section above)
 distinguishes between events that originate in the browser (in JavaScript) and
@@ -329,8 +330,8 @@ activities completed by a student.
   **Unregister** for the course.
 
 In addition, actions by instructors and course staff members also generate
-enrollment events. For the actions that members of the course team complete that
-result in these events, see :ref:`instructor_enrollment`.
+enrollment events. For the actions that members of the course team complete
+that result in these events, see :ref:`instructor_enrollment`.
 
 **Event Source**: Server
 
@@ -377,8 +378,8 @@ result in these events, see :ref:`instructor_enrollment`.
        replace the ``event`` ``event_type`` field.
    * - ``session``
      - string
-     - The Django session ID, if available. Can be used to identify events for a
-       specific user within a session. **History**: Added 07 May 2014.
+     - The Django session ID, if available. Can be used to identify events for
+       a specific user within a session. **History**: Added 07 May 2014.
 
 Example
 --------
@@ -490,8 +491,9 @@ The browser emits these events when a user selects a navigational control.
 
 **Event Source**: Browser
 
-``event`` **Member Fields**: All of the navigational events have the same fields
-in the ``event`` dict field.
+``event`` **Member Fields**: 
+
+All of the navigational events add the same fields to the ``event`` dict field:
 
 .. list-table::
    :widths: 15 15 60
@@ -631,7 +633,8 @@ to the same value.
 The browser emits ``speed_change_video`` events when a user selects a different
 playing speed for the video.
 
-**History**: Prior to 12 Feb 2014, this event was emitted when the user selected either the same speed or a different speed.  
+**History**: Prior to 12 Feb 2014, this event was emitted when the user
+selected either the same speed or a different speed.
 
 ``event`` **Member Fields**: 
 
@@ -655,7 +658,8 @@ playing speed for the video.
 ``load_video``
 -----------------
 
-The browser emits  ``load_video`` events when the video is fully rendered and ready to play. 
+The browser emits  ``load_video`` events when the video is fully rendered and
+ready to play.
 
 ``event`` **Member Fields**: 
 
@@ -727,7 +731,8 @@ Textbook Interaction Events
 ``book``
 ----------
 
-The browser emits ``book`` events when a user navigates within the PDF Viewer or the PNG Viewer.
+The browser emits ``book`` events when a user navigates within the PDF Viewer
+or the PNG Viewer.
 
 * For textbooks in PDF format, the URL in the common ``page`` field contains
   '/pdfbook/'.
@@ -810,8 +815,8 @@ on the icon to show or hide page thumbnails.
 ``textbook.pdf.thumbnail.navigated``
 ------------------------------------
 
-The browser emits ``textbook.pdf.thumbnail.navigated`` events when a user clicks
-on a thumbnail image to navigate to a page.
+The browser emits ``textbook.pdf.thumbnail.navigated`` events when a user
+clicks on a thumbnail image to navigate to a page.
 
 **Component**: PDF Viewer 
 
@@ -844,8 +849,8 @@ on a thumbnail image to navigate to a page.
 ``textbook.pdf.outline.toggled``
 ------------------------------------
 
-The browser emits ``textbook.pdf.outline.toggled`` events when a user clicks the
-outline icon to show or hide a list of the book's chapters.
+The browser emits ``textbook.pdf.outline.toggled`` events when a user clicks
+the outline icon to show or hide a list of the book's chapters.
 
 **Component**: PDF Viewer 
 
@@ -906,8 +911,8 @@ on a link in the outline to navigate to a chapter.
 ``textbook.pdf.page.navigated``
 ------------------------------------
 
-The browser emits ``textbook.pdf.page.navigated`` events when a user manually enters
-a page number.
+The browser emits ``textbook.pdf.page.navigated`` events when a user manually
+enters a page number.
 
 **Component**: PDF Viewer 
 
@@ -937,8 +942,8 @@ a page number.
 ``textbook.pdf.zoom.buttons.changed``
 --------------------------------------
 
-The browser emits ``textbook.pdf.zoom.buttons.changed`` events when a user clicks
-either the Zoom In or Zoom Out icon.
+The browser emits ``textbook.pdf.zoom.buttons.changed`` events when a user
+clicks either the Zoom In or Zoom Out icon.
 
 **Component**: PDF Viewer 
 
@@ -971,8 +976,8 @@ either the Zoom In or Zoom Out icon.
 ``textbook.pdf.zoom.menu.changed``
 ------------------------------------
 
-The browser emits ``textbook.pdf.zoom.menu.changed`` events when a user selects a
-magnification setting.
+The browser emits ``textbook.pdf.zoom.menu.changed`` events when a user selects
+a magnification setting.
 
 **Component**: PDF Viewer 
 
@@ -1040,8 +1045,8 @@ magnification setting from the zoom menu or resizes the browser window.
 ``textbook.pdf.display.scrolled``
 ------------------------------------
 
-The browser emits ``textbook.pdf.display.scrolled`` events each time the displayed
-page changes while a user scrolls up or down.
+The browser emits ``textbook.pdf.display.scrolled`` events each time the
+displayed page changes while a user scrolls up or down.
 
 **Component**: PDF Viewer 
 
@@ -1074,11 +1079,11 @@ page changes while a user scrolls up or down.
 ``textbook.pdf.search.executed``
 ------------------------------------
 
-The browser emits ``textbook.pdf.search.executed`` events when a user searches for a
-text value in the file. To reduce the number of events produced, instead of
-producing one event per entered character this event defines a search
-string as the set of characters that is consecutively entered in the search
-field within 500ms of each other.
+The browser emits ``textbook.pdf.search.executed`` events when a user searches
+for a text value in the file. To reduce the number of events produced, instead
+of producing one event per entered character this event defines a search string
+as the set of characters that is consecutively entered in the search field
+within 500ms of each other.
 
 **Component**: PDF Viewer 
 
@@ -1121,8 +1126,8 @@ field within 500ms of each other.
 ``textbook.pdf.search.navigatednext``
 ---------------------------------------------
 
-The browser emits ``textbook.pdf.search.navigatednext`` events when a user clicks
-on the Find Next or Find Previous icons for an entered search string.
+The browser emits ``textbook.pdf.search.navigatednext`` events when a user
+clicks on the Find Next or Find Previous icons for an entered search string.
 
 **Component**: PDF Viewer 
 
@@ -1283,7 +1288,8 @@ checked, styled as GET parameters.
 
 Both browser interactions and server requests produce ``problem_check`` events.
 
-The server emits ``problem_check`` events when a problem is successfully checked. 
+The server emits ``problem_check`` events when a problem is successfully
+checked.
   
 **Event Source**: Server
 
@@ -1292,7 +1298,8 @@ The server emits ``problem_check`` events when a problem is successfully checked
 * On 5 Mar 2014, the ``submission`` dictionary was added to the ``event`` field
   and  ``module`` was added to the ``context`` field.
 
-* Prior to 15 Oct 2013, this server-emitted event was named ``save_problem_check``.
+* Prior to 15 Oct 2013, this server-emitted event was named
+  ``save_problem_check``.
 
 * Prior to 15 Jul 2013, this event was emitted twice for the same action.
 
@@ -1381,11 +1388,13 @@ The server emits ``problem_check`` events when a problem is successfully checked
 
 .. no sample to check
 
-The server emits ``problem_check_fail`` events when a problem cannot be checked successfully.
+The server emits ``problem_check_fail`` events when a problem cannot be checked
+successfully.
 
 **Event Source**: Server
 
-**History**: Prior to 15 Oct 2013, this event was named ``save_problem_check_fail``.
+**History**: Prior to 15 Oct 2013, this event was named
+``save_problem_check_fail``.
 
 ``event`` **Member Fields**: 
 
@@ -1412,7 +1421,8 @@ The server emits ``problem_check_fail`` events when a problem cannot be checked 
 ``problem_reset``
 --------------------
 
-The browser emits ``problem_reset`` events when a user clicks **Reset** to reset the answer to a problem.
+The browser emits ``problem_reset`` events when a user clicks **Reset** to
+reset the answer to a problem.
 
 .. return Logger.log('problem_reset', [_this.answers, response.contents], _this.id);
 
@@ -1436,7 +1446,8 @@ The browser emits ``problem_reset`` events when a user clicks **Reset** to reset
 
 .. no sample to check
 
-The server emits ``problem_rescore`` events when a problem is successfully rescored.  
+The server emits ``problem_rescore`` events when a problem is successfully
+rescored.
 
 **Event Source**: Server
 
@@ -1482,7 +1493,8 @@ The server emits ``problem_rescore`` events when a problem is successfully resco
 
 .. no sample to check
 
-The server emits ``problem_rescore_fail`` events when a problem cannot be successfully rescored.  
+The server emits ``problem_rescore_fail`` events when a problem cannot be
+successfully rescored.
 
 **Event Source**: Server
 
@@ -1546,7 +1558,8 @@ The browser emits ``problem_show`` events when a problem is shown.
 
 .. no sample to check
 
-The server emits ``reset_problem`` events when a problem has been reset successfully. 
+The server emits ``reset_problem`` events when a problem has been reset
+successfully.
 
 .. %%what is the difference between reset_problem and problem_reset?
 
@@ -1576,7 +1589,8 @@ The server emits ``reset_problem`` events when a problem has been reset successf
 
 .. no sample to check
 
-The server emits ``reset_problem_fail`` events when a problem cannot be reset successfully. 
+The server emits ``reset_problem_fail`` events when a problem cannot be reset
+successfully.
 
 **Event Source**: Server
 
@@ -1630,7 +1644,8 @@ The server emits ``show_answer`` events when the answer to a problem is shown.
 
 .. no sample to check
 
-The server emits ``save_problem_fail``  events when a problem cannot be saved successfully. 
+The server emits ``save_problem_fail``  events when a problem cannot be saved
+successfully.
 
 **Event Source**: Server
 
@@ -1661,7 +1676,8 @@ The server emits ``save_problem_fail``  events when a problem cannot be saved su
 
 .. no sample to check
 
-The server emits ``save_problem_success`` events when a problem is saved successfully. 
+The server emits ``save_problem_success`` events when a problem is saved
+successfully.
 
 **Event Source**: Server
 
@@ -1718,10 +1734,10 @@ Forum Events
 ``edx.forum.searched``
 ----------------------------------
 
-After a user executes a text search in the navigation sidebar of the Discussion
-tab of a course, the server emits an ``edx.forum.searched`` event.
+After a user executes a text search in the navigation sidebar of the course
+**Discussion** page, the server emits an ``edx.forum.searched`` event.
 
-**Component**: Discussion Tab
+**Component**: Discussion
 
 **Event Source**: Server
 
@@ -1760,13 +1776,11 @@ Jun 2014.
 Open Response Assessment Events 
 ======================================
 
-An open response assessment is a type of assignment that may not have
-definitively correct or incorrect answers. Students review a question and
-submit a text response and, optionally, an image file. To evaluate these
-responses to the questions, students use an instructor-definfed scoring rubric
-to assess different aspects of their own and one or more other students'
-essays. For more information about open response assessments, see `Creating a
-Peer Assessment`_.
+In an open response assessment, students review a question and then submit a
+text response and, optionally, an image file. To evaluate their own and one or
+more other students' responses to the questions, students use an instructor-
+definfed scoring rubric. For more information about open response assessments,
+see `Creating a Peer Assessment`_.
 
 **Component**: Open Response Assessments
 
@@ -1776,11 +1790,13 @@ April 2014.
 openassessmentblock.get_peer_submission
 ----------------------------------------
 
-The server emits these events when an essay is delivered to a student for
-evaluation. After students submit their own essays for evaluation, they use the
-scoring rubric to evaluate the essays of other course participants.
+After students submit their own essays for evaluation, they use the scoring
+rubric to evaluate the essays of other course participants. The server emits
+this event when an essay is delivered to a student for evaluation.
 
 **Event Source**: Server
+
+**History**: Added 3 April 2014.
 
 ``event`` **Member Fields**: 
 
@@ -1815,15 +1831,16 @@ scoring rubric to evaluate the essays of other course participants.
      - The course-specific anonymized user ID of the student who requested the
        essay.
 
-**History**: Added 3 April 2014.
        
 openassessmentblock.peer_assess and openassessmentblock.self_assess
 ----------------------------------------------------------------------
 
-The server emits these events when a student either submits an assessment of a
+The server emits this event when a student either submits an assessment of a
 peer's essay or submits a self-assessment of her own essay.
 
 **Event Source**: Server
+
+**History**: Added 3 April 2014.
 
 ``event`` **Fields**:
 
@@ -1868,16 +1885,16 @@ peer's essay or submits a self-assessment of her own essay.
    * - ``scored_at``
      - datetime
      - Timestamp for when the assessment was submitted.
-       
-**History**: Added 3 April 2014.
 
 openassessmentblock.submit_feedback_on_assessments
 ----------------------------------------------------
 
-The server emits these events when a student submits a suggestion, opinion, or
+The server emits this event when a student submits a suggestion, opinion, or
 other feedback about the assessment process.
 
 **Event Source**: Server
+
+**History**: Added 3 April 2014.
 
 ``event`` **Fields**:
 
@@ -1899,16 +1916,16 @@ other feedback about the assessment process.
      - The label of each check box option that the student selected to evaluate
        the assessment process.
 
-**History**: Added 3 April 2014.
-
 openassessment.create_submission
 --------------------------------
 
-The server emits these events each time a student submits an essay. The same
-event is emitted when a student submits an essay for peer assessment or for
-self assessment.
+The server emits this event when a student submits an essay. The same event is
+emitted when a student submits an essay for peer assessment or for self
+assessment.
 
 **Event Source**: Server
+
+**History**: Added 3 April 2014.
 
 ``event`` **Fields**:
 
@@ -1941,16 +1958,16 @@ self assessment.
      - datetime
      - Timestamp for when the student submitted the essay. This value is
        currently always the same as ``created_at``.
-       
-**History**: Added 3 April 2014.
 
 openassessment.save_submission
 -------------------------------
 
-The server emits these events when a student saves a response essay. Note that
-students save responses before they submit them for assessment.
+The server emits this event when a student saves a response essay. Students
+save responses before they submit them for assessment.
 
 **Event Source**: Server
+
+**History**: Added 3 April 2014.
 
 ``event`` **Fields**:
 
@@ -1970,18 +1987,18 @@ students save responses before they submit them for assessment.
        identifies the location of the image file on the Amazon S3 storage
        service.
 
-**History**: Added 3 April 2014.
-
 openassessment.student_training_assess_example
 -----------------------------------------------
 
-The server emits these events when a student submits an assessment for an
+The server emits this event when a student submits an assessment for an
 example essay. To assess the example essay, the student uses a scoring rubric
-provided by the instructor. These events include the options the student
-selected to assess the example, and identifies any criteria that the student
+provided by the instructor. These events record the options the student
+selected to assess the example and identifies any criteria that the student
 scored differently than the instructor.
 
 **Event Source**: Server
+
+**History**: Added 6 August 2014.
 
 ``event`` **Fields**:
 
@@ -2007,16 +2024,16 @@ scored differently than the instructor.
        selected for each criterion in the rubric, in the format
        ``'criterion_name': 'option_name'``.
 
-**History**: Added 6 August 2014.
-
 openassessment.upload_file 
 -----------------------------
 
-The browser emits these events when a student successfully uploads an image
-file as part of a response. Note that students complete the upload process
-before they submit the response.
+The browser emits this event when a student successfully uploads an image file
+as part of a response. Students complete the upload process before they submit
+the response.
 
 **Event Source**: Browser
+
+**History**: Added 6 August 2014.
 
 ``event`` **Fields**:
 
@@ -2038,8 +2055,6 @@ before they submit the response.
      - int
      - The size of the uploaded file in bytes. Reported by the student's
        browser.
-       
-**History**: Added 6 August 2014.
 
 .. _AB_Event_Types:
 

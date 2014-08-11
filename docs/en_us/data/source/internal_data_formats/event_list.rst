@@ -76,15 +76,15 @@ Alphabetical Event List
      - :ref:`Instructor_Event_Types`
    * - ``modify_access``
      - :ref:`Instructor_Event_Types`
-   * - ``oe_feedback_response_selected`` (deprecated)
+   * - ``oe_feedback_response_selected``
      - :ref:`ora`
-   * - ``oe_hide_question`` (deprecated)
+   * - ``oe_hide_question``
      - :ref:`ora`
-   * - ``oe_show_full_feedback`` (deprecated)
+   * - ``oe_show_full_feedback``
      - :ref:`ora`
-   * - ``oe_show_question`` (deprecated)
+   * - ``oe_show_question``
      - :ref:`ora`
-   * - ``oe_show_respond_to_feedback`` (deprecated)
+   * - ``oe_show_respond_to_feedback``
      - :ref:`ora`
    * - ``openassessmentblock.get_peer_submission``
      - :ref:`ora2`
@@ -106,9 +106,9 @@ Alphabetical Event List
      - :ref:`navigational`
    * - ``pause_video``
      - :ref:`video`
-   * - ``peer_grading_hide_question`` (deprecated)
+   * - ``peer_grading_hide_question``
      - :ref:`ora`
-   * - ``peer_grading_show_question`` (deprecated)
+   * - ``peer_grading_show_question``
      - :ref:`ora`
    * - ``play_video``
      - :ref:`video`
@@ -146,7 +146,7 @@ Alphabetical Event List
      - :ref:`problem`
    * - ``reset-student-attempts``
      - :ref:`Instructor_Event_Types`
-   * - ``rubric_select`` (deprecated)
+   * - ``rubric_select``
      - :ref:`ora`
    * - ``save_problem_fail``
      - :ref:`problem`
@@ -164,9 +164,9 @@ Alphabetical Event List
      - :ref:`problem`
    * - ``speed_change_video``
      - :ref:`video`
-   * - ``staff_grading_hide_question`` (deprecated)
+   * - ``staff_grading_hide_question``
      - :ref:`ora`
-   * - ``staff_grading_show_question`` (deprecated)
+   * - ``staff_grading_show_question``
      - :ref:`ora`
    * - ``textbook.pdf.chapter.navigated``
      - :ref:`pdf`
