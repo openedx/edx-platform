@@ -47,11 +47,12 @@ class ProctorPanel(object):
         self.user = user
         self.ses = requests.session()
 
-    def _make_request(self, url, method="GET", data=None, json=True):
+    def _make_request(self, url, method="GET", data=None, params=None,
+                      json=True):
         ret = self.ses.request(
             method=method, url=urlparse.urljoin(self.proc_url, url),
             verify=False, data=data, auth=(self.proc_user, self.proc_pass),
-            params={'problem': self.procset_name})
+            params=params)
         if json:
             try:
                 data = ret.json()
@@ -64,12 +65,16 @@ class ProctorPanel(object):
         return data
 
     def request(self, json=True):
-        data = dict(uname=self.user.username, name=self.user.profile.name)
+        data = dict(uname=self.user.username, name=self.user.profile.name,
+                    email=self.user.email, problem=self.procset_name)
         return self._make_request('cmd/request/%s' % self.user.id,
                                   method='POST', data=data, json=json)
 
     def status(self, json=True):
-        return self._make_request('cmd/status/%s' % self.user.id, json=json)
+        params = dict(uname=self.user.username, name=self.user.profile.name,
+                      email=self.user.email, problem=self.procset_name)
+        return self._make_request('cmd/status/%s' % self.user.id, params=params,
+                                  json=json)
 
     def is_released(self):
         retdata = self.status()
