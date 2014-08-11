@@ -179,6 +179,9 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         View Peer Reviews for a specific Workgroup
         """
         peer_reviews = WorkgroupPeerReview.objects.filter(workgroup=pk)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        if content_id is not None:
+            peer_reviews = peer_reviews.filter(content_id=content_id)
         response_data = []
         if peer_reviews:
             for peer_review in peer_reviews:
@@ -192,6 +195,10 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
         View Workgroup Reviews for a specific Workgroup
         """
         workgroup_reviews = WorkgroupReview.objects.filter(workgroup=pk)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        if content_id is not None:
+            workgroup_reviews = workgroup_reviews.filter(content_id=content_id)
+
         response_data = []
         if workgroup_reviews:
             for workgroup_review in workgroup_reviews:
