@@ -201,6 +201,96 @@
          }
        });
      });
+     var generate_registration_code_form = $("form#generate_codes");
+     var generate_registration_button = $('input[name="generate-registration-codes-csv"]');
+     var registration_code_error = $('#generate_codes #registration_code_form_error');
+
+     function validateEmail(sEmail) {
+      filter = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
+      return filter.test(sEmail)
+     }
+     generate_registration_code_form.submit(function () {
+      registration_code_error.attr('style', 'display: none');
+      generate_registration_button.attr('disabled', true);
+      var company_name = $('input[name="company_name"]').val();
+      var total_registration_codes = $('input[name="total-registration-codes"]').val();
+      var purchaser_contact = $('input[name="purchaser_contact"]').val();
+      var sale_price = $('input[name="sale_price"]').val();
+      var purchaser_name = $('input[name="purchaser_name"]').val();
+      var purchaser_email = $('input[name="purchaser_email"]').val();
+
+      if (company_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Company Name');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if ($.isNumeric(company_name)) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the non-numeric value for Company Name');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (sale_price == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Sale Price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(sale_price))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the numeric value for Sale Price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (total_registration_codes == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Total Registration Codes');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(total_registration_codes))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the numeric value for Total Registration Codes');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (purchaser_contact == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Purchaser Contact');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (purchaser_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Purchaser Name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(purchaser_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the non-numeric value for Purchaser Name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (purchaser_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the Purchaser Email');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(purchaser_email))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please Enter the valid email address of Purchase');
+        generate_registration_button.removeAttr('disabled');
+      }
+
+      var modal_overLay = $('#lean_overlay')
+      var registration_code_modal = $('#registration_code_generation_modal');
+      registration_code_modal.hide();
+      modal_overLay.hide();
+     });
+
      $('#edit_coupon_form').submit(function () {
        $("#update_coupon_button").attr('disabled', true);
        // Get the Code and Discount value and trim it
