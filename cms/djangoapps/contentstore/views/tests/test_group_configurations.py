@@ -2,12 +2,12 @@
 Group Configuration Tests.
 """
 import json
-from unittest import skipUnless
-from django.conf import settings
+from mock import patch
 from contentstore.utils import reverse_course_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
+from util.testing import UrlResetMixin
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 
@@ -137,11 +137,11 @@ class GroupConfigurationsBaseTestCase(object):
 
 
 # pylint: disable=no-member
-@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsListHandlerTestCase(UrlResetMixin, CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
     """
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         """
         Set up GroupConfigurationsListHandlerTestCase.
@@ -233,14 +233,14 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
 
 
 # pylint: disable=no-member
-@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsDetailHandlerTestCase(UrlResetMixin, CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_detail_handler.
     """
 
     ID = 000000000000
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         """
         Set up GroupConfigurationsDetailHandlerTestCase.
@@ -387,11 +387,11 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
 
 
 # pylint: disable=no-member
-@skipUnless(settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
-class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
+class GroupConfigurationsUsageInfoTestCase(UrlResetMixin, CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations.
     """
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         """
         Set up group configurations and split test module.
@@ -439,7 +439,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {u'id': 2, u'name': u'Group C', u'version': 1},
             ],
             u'usage': [{
-                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_0',
+                'url': '/container/i4x://MITx/999/vertical/Test_Unit_0',
                 'label': 'Test Unit 0 / Test Content Experiment 0',
             }],
         }, {
@@ -479,10 +479,10 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {u'id': 2, u'name': u'Group C', u'version': 1},
             ],
             u'usage': [{
-                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_0',
+                'url': '/container/i4x://MITx/999/vertical/Test_Unit_0',
                 'label': 'Test Unit 0 / Test Content Experiment 0',
             }, {
-                'url': '/unit/i4x://MITx/999/vertical/Test_Unit_1',
+                'url': '/container/i4x://MITx/999/vertical/Test_Unit_1',
                 'label': 'Test Unit 1 / Test Content Experiment 1',
             }],
         }]
