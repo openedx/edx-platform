@@ -582,6 +582,13 @@ def try_change_enrollment(request):
 
 
 @require_POST
+def change_enrollment_autoreg(request):
+    # father forgive me for i have hacked
+    request.META['autoreg'] = True
+    return change_enrollment(request)
+
+
+@require_POST
 def change_enrollment(request):
     """
     Modify the enrollment status for the logged-in user.
@@ -639,9 +646,16 @@ def change_enrollment(request):
         # where they can choose which mode they want.
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
-            return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-            )
+            if request.META.get('autoreg', False):
+                # Go ahead and enroll the student as audit
+                CourseEnrollment.enroll(user, course.id, mode='audit')  # TODO check this is what we always want
+                return HttpResponse(
+                    reverse("course_modes_choose_autoreg", kwargs={'course_id': unicode(course_id)})
+                )
+            else:
+                return HttpResponse(
+                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+                )
 
         current_mode = available_modes[0]
         # only automatically enroll people if the only mode is 'honor'
