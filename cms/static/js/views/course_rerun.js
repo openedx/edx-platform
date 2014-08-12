@@ -3,7 +3,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
 
         var saveRerunCourse = function (e) {
             e.preventDefault();
-            // One final check for empty values
+            // One final check for errors
             var errors = _.reduce(
                 ['.rerun-course-name', '.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
                 function (acc, ele) {
@@ -133,6 +133,18 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 }
             };
 
+            // Ensure that all fields are not empty
+            var validateFilledFields = function () {
+                return _.reduce(
+                    ['.rerun-course-org', '.rerun-course-number', '.rerun-course-run', '.rerun-course-name'],
+                    function (acc, ele) {
+                        var $ele = $(ele);
+                        return $ele.val().length !== 0 ? acc : false;
+                    },
+                    true
+                );
+            };
+
             // Handle validation asynchronously
             _.each(
                 ['.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
@@ -148,6 +160,9 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                         var error = validateCourseItemEncoding($ele.val());
                         setNewCourseFieldInErr($ele.parent(), error);
                         validateTotalCourseItemsLength();
+                        if(!validateFilledFields()) {
+                            $('.rerun-course-save').addClass('is-disabled');
+                        }
                     });
                 }
             );
@@ -156,6 +171,9 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 var error = validateRequiredField($name.val());
                 setNewCourseFieldInErr($name.parent(), error);
                 validateTotalCourseItemsLength();
+                if(!validateFilledFields()) {
+                    $('.rerun-course-save').addClass('is-disabled');
+                }
             });
         });
     });
