@@ -158,9 +158,7 @@ access courseware:
 +-------------------------------------------+------+------+
 
 The course team can continue to add content in Studio after the beta test
-begins. When new content is ready for testing, be sure to change the
-**Visibility** setting for any units that are Private to Public. See
-:ref:`Units` or :ref:`Publishing Your Course`.
+begins. When new content is ready for testing, be sure to :ref:`publish the unit<Publish a Unit>`.
 
 ================================
 Define When the Beta Test Starts
