@@ -54,6 +54,7 @@ from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
 EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","company_reference","internal_reference"'
+EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -2794,3 +2795,23 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
+
+    def test_get_historical_coupon_codes(self):
+        """
+        Test to download a response of all the active coupon codes
+        """
+        get_coupon_code_url = reverse(
+            'get_coupon_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        for i in range(10):
+            coupon = Coupon(
+                code='test_code{0}'.format(i), description='test_description', course_id=self.course.id,
+                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True
+            )
+            coupon.save()
+
+        response = self.client.get(get_coupon_code_url)
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))

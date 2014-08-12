@@ -831,6 +831,10 @@ input[name="subject"] {
 
 }
 #e-commerce{
+  input {
+    margin-bottom: 1em;
+    line-height: 1.3em;
+  }
   .coupon-errors {
     background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
     font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
@@ -841,17 +845,11 @@ input[name="subject"] {
   .content{
     padding: 0 !important;
   }
-  input[name="course_registration_code_number"] {
-    margin-right: 10px;
-    height: 34px;
-    width: 258px;
-    border-radius: 3px;
-  }
   input[name="download_company_name"],
   input[name="active_company_name"], input[name="spent_company_name"] {
     margin-right: 8px;
     height: 36px;
-    width: 300px;
+    width: 254px;
     border-radius: 3px;
   }
   .coupons-table {
@@ -1041,14 +1039,14 @@ input[name="subject"] {
         margin-left: 0px !important;
       }
       li:nth-child(8){
-        margin-left: 0 !important;
+        margin-left: 0px !important;
+      }
+      li:last-child{
+        margin-left: 30px !important;
         input[type='checkbox'] {
           width: auto;
           height: auto;
         }
-      }
-      li:last-child{
-        margin-left: 30px !important;
       }
     }
     li#set-course-mode-modal-field-price{
