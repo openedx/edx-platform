@@ -24,10 +24,8 @@ class CourseMetadata(object):
                      'graded',
                      'hide_from_toc',
                      'pdf_textbooks',
-                     'user_partitions',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'video_speed_optimizations',
                      'visible_to_staff_only'
     ]
 
