@@ -59,6 +59,14 @@ STATICFILES_DIRS += [
     if os.path.isdir(COMMON_TEST_DATA_ROOT / course_dir)
 ]
 
+# Avoid having to run collectstatic before the unit test suite
+# If we don't add these settings, then Django templates that can't
+# find pipelined assets will raise a ValueError.
+# http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
+STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
+STATIC_URL = "/static/"
+PIPELINE_ENABLED=False
+
 # Add split as another store for testing
 MODULESTORE['default']['OPTIONS']['stores'].append(
     {
