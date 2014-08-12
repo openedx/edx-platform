@@ -17,8 +17,8 @@
 
   // messages - should be synced up with global messages in the future
   .message {
+    @include font-size(14);
     display: block;
-    font-size: 14px;
   }
 
   .message-status {
@@ -544,11 +544,11 @@
             position: relative;
 
             li {
+              @include font-size(9);
               position: absolute;
               top: 52px;
               width: 30px;
               margin-left: -15px;
-              font-size: 9px;
               text-align: center;
 
               &.increment-0 {
@@ -623,12 +623,12 @@
               }
 
               .remove-button {
+                @include font-size(10);
                 display: none;
                 position: absolute;
                 top: -17px;
                 right: 1px;
                 height: 17px;
-                font-size: 10px;
               }
 
               &:nth-child(1) {
@@ -653,17 +653,17 @@
               }
 
               .letter-grade {
+                @include font-size(16);
+                @include line-height(16);
                 @extend %t-strong;
                 display: block;
                 margin: 10px 15px 0 0;
-                font-size: 16px;
-                line-height: 14px;
               }
 
               .range {
+                @include font-size(10);
                 display: block;
                 margin-right: 15px;
-                font-size: 10px;
                 line-height: 12px;
               }
 

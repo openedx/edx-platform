@@ -845,7 +845,9 @@ body.uxdesign.alerts {
 
 // artifact styles
 .main-wrapper {
+
   .alert {
+    @include font-size(14);
     padding: 15px 20px;
     margin-bottom: 30px;
     border-radius: 3px;
@@ -853,7 +855,6 @@ body.uxdesign.alerts {
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    font-size: 14px;
     @include clearfix;
 
     .alert-message {
@@ -894,21 +895,21 @@ body.error {
   }
 
   h1 {
+    @include font-size(60);
     @extend %t-light;
     float: none;
     margin: 0;
-    font-size: 60px;
     color: $gray-d3;
   }
 
   .description {
+    @include font-size(21);
     margin-bottom: 50px;
-    font-size: 21px;
   }
 
   .back-button {
+    @include font-size(18);
     @include blue-button;
     padding: 14px 40px 18px;
-    font-size: 18px;
   }
 }

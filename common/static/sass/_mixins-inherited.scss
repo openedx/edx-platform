@@ -367,11 +367,11 @@
 
   .section-item {
     @include transition(background $tmg-avg ease-in-out 0);
+    @include font-size(13);
     position: relative;
     display: block;
     padding: 6px 8px 8px 16px;
     background: #edf1f5;
-    font-size: 13px;
 
     &:hover, &:focus {
       background: $blue-l5;
@@ -388,9 +388,9 @@
     .draft-item:after,
     .public-item:after,
     .private-item:after {
+      @include font-size(9);
       @extend %t-strong;
       margin-left: 3px;
-      font-size: 9px;
       text-transform: uppercase;
     }
 

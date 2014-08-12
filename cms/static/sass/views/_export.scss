@@ -90,14 +90,14 @@
 
   // OLD
   .description {
+    @include font-size(14);
     float: left;
     width: 62%;
     margin-right: 3%;
-    font-size: 14px;
 
     h2 {
+      @include font-size(19);
       @extend %t-strong;
-      font-size: 19px;
       margin-bottom: 20px;
     }
 
@@ -132,15 +132,15 @@
       text-align: center;
 
       h2 {
+        @include font-size(26);
         @extend %t-light;
         margin-bottom: 30px;
-        font-size: 26px;
       }
 
       .error-block {
+        @include font-size(13);
         display: none;
         margin-bottom: 15px;
-        font-size: 13px;
       }
 
       .error-block {
@@ -148,14 +148,14 @@
       }
 
       .button-export {
-        @include green-button;
+        @include green-button();
+        @include font-size(17);
         padding: 10px 50px 11px;
-        font-size: 17px;
       }
 
       .message-status {
+        @include font-size(12);
         margin-top: 10px;
-        font-size: 12px;
       }
 
       .progress-bar {

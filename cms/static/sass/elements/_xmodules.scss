@@ -191,12 +191,12 @@
     }
 
     .progress-bar {
+      @include font-size(18);
       display: block;
       height: 30px;
       margin: 10px 0;
       border: 1px solid $blue;
       text-align: center;
-      font-size: 1.14em;
 
       &.is-invisible {
         display: none;

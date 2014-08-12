@@ -414,9 +414,9 @@
     }
 
     .choose-file-button {
+      @include font-size(17);
       @include blue-button;
       padding: 10px 82px 12px;
-      font-size: 17px;
     }
 
     .progress-bar {

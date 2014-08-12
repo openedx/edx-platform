@@ -287,9 +287,9 @@ hr.divide {
 }
 
 .details {
+    @include font-size(14);
     display: none;
     margin-bottom: 30px;
-    font-size: 14px;
 }
 
 .window {
@@ -304,13 +304,13 @@ hr.divide {
   }
 
   .header {
+    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+    @include font-size(14);
     padding: 6px 14px;
     border-bottom: 1px solid $mediumGrey;
     border-radius: 2px 2px 0 0;
-    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     background-color: $lightBluishGrey;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
-    font-size: 14px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
@@ -324,9 +324,9 @@ hr.divide {
     }
 
     .description {
+      @include font-size(11);
       @extend %t-regular;
       display: block;
-      font-size: 11px;
       font-style: italic;
       line-height: 1.3;
       color: #999;
@@ -345,6 +345,8 @@ hr.divide {
 // system notifications
 .toast-notification {
   @include transition(all $tmg-f2 linear 0s);
+  @include font-size(13);
+  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   display: none;
   position: fixed;
   top: 20px;
@@ -354,10 +356,8 @@ hr.divide {
   padding: 15px 20px 17px;
   border-radius: 3px;
   border: 1px solid #333;
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   background-color: rgba(30, 30, 30, .92);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
-  font-size: 13px;
   text-align: center;
   color: #fff;
 
@@ -366,37 +366,37 @@ hr.divide {
   }
 
   strong {
+    @include font-size(16);
     @extend %t-strong;
     display: block;
     margin-bottom: 10px;
-    font-size: 16px;
     text-align: center;
   }
 
   .close-button {
+    @include font-size(22);
     @extend %t-strong;
     position: absolute;
     top: 0;
     right: 0;
     width: 27px;
     height: 27px;
-    font-size: 22px;
     line-height: 25px;
     color: #aaa;
     text-align: center;
 
     .close-icon {
+      @include font-size(16);
       @extend %t-strong;
-      font-size: 16px;
     }
   }
 
   .action-button {
     @include blue-button;
     @include box-sizing(border-box);
+    @include font-size(12);
     width: 100%;
     margin-top: 10px;
-    font-size: 12px;
     text-align: center;
   }
 }
@@ -513,13 +513,13 @@ hr.divide {
   opacity: 0.0;
 
   &:after {
+    @include font-size(20);
     content: '▾';
     display: block;
     position: absolute;
     bottom: -14px;
     left: 50%;
     margin-left: -7px;
-    font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
   }
 }
