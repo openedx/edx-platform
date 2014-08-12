@@ -31,6 +31,7 @@
 -e git+https://github.com/edx/opaque-keys.git@a7c506befdf9b97bbbb6961e0b0c7fa4807003eb#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
+-e git+https://github.com/edx/edx-val.git@73456f890b769f4acf7ce19d9fbeeec9cc7e56d9#egg=edx-val
 
 # OAuth2 Provider
 -e git+https://github.com/edx/django-oauth2-provider.git@455b37ad8690cbb3db96cc19784350162a6ce9d6#egg=django-oauth2-provider
