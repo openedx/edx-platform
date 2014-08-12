@@ -55,6 +55,15 @@ class ContainerPage(PageObject):
             Promise(_is_finished_loading, 'Finished rendering the xblock wrappers.').fulfill()
         )
 
+    def wait_for_component_menu(self):
+        """
+        Waits until the menu bar of components is present on the page.
+        """
+        EmptyPromise(
+            lambda: self.q(css='div.add-xblock-component').present,
+            'Wait for the menu of components to be present'
+        ).fulfill()
+
     @property
     def xblocks(self):
         """
