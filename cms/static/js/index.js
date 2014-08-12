@@ -4,7 +4,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
         var dismissNotification = function (e) {
             e.preventDefault();
             $.ajax({
-                url: $('.dismiss-button').data('dismiss-link'),
+                url: this.data('dismiss-link'),
                 type: 'DELETE',
                 success: function(result) {
                     window.location.reload()
