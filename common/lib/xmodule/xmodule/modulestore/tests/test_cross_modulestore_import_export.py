@@ -102,7 +102,7 @@ class MongoModulestoreBuilder(object):
             modulestore._drop_database()
 
             # Delete the created directory on the filesystem
-            rmtree(fs_root)
+            rmtree(fs_root, ignore_errors=True)
 
     def __repr__(self):
         return 'MongoModulestoreBuilder()'
@@ -145,7 +145,7 @@ class VersioningModulestoreBuilder(object):
             modulestore._drop_database()
 
             # Delete the created directory on the filesystem
-            rmtree(fs_root)
+            rmtree(fs_root, ignore_errors=True)
 
     def __repr__(self):
         return 'SplitModulestoreBuilder()'
@@ -242,7 +242,7 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest):
     def setUp(self):
         super(CrossStoreXMLRoundtrip, self).setUp()
         self.export_dir = mkdtemp()
-        self.addCleanup(rmtree, self.export_dir)
+        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     @ddt.data(*itertools.product(
         MODULESTORE_SETUPS,
