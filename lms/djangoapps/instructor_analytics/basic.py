@@ -185,7 +185,8 @@ def course_registration_features(features, registration_codes, csv_type):
         #  They have not been redeemed yet
         if csv_type is not None:
             try:
-                course_registration_dict['redeemed_by'] = getattr(registration_code.registrationcoderedemption_set.get(registration_code=registration_code), 'redeemed_by')
+                redeemed_by = getattr(registration_code.registrationcoderedemption_set.get(registration_code=registration_code), 'redeemed_by')
+                course_registration_dict['redeemed_by'] = getattr(redeemed_by, 'email')
             except ObjectDoesNotExist:
                 pass
 
