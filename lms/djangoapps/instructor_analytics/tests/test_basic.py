@@ -7,9 +7,12 @@ from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
 
-from instructor_analytics.basic import enrolled_students_features, sale_record_features, course_registration_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+from instructor_analytics.basic import (
+    sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features,
+    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+)
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -147,4 +150,26 @@ class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
             self.assertIn(
                 course_registration['invoice_id'],
                 [registration_code.invoice_id for registration_code in registration_codes]
+            )
+
+    def test_coupon_codes_features(self):
+        query_features = [
+            'course_id', 'percentage_discount', 'code_redeemed_count', 'description'
+        ]
+        for i in range(10):
+            coupon = Coupon(
+                code='test_code{0}'.format(i), description='test_description', course_id=self.course.id,
+                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True
+            )
+            coupon.save()
+        active_coupons = Coupon.objects.filter(course_id=self.course.id, is_active=True)
+        active_coupons_list = coupon_codes_features(query_features, active_coupons)
+        self.assertEqual(len(active_coupons_list), len(active_coupons))
+        for active_coupon in active_coupons_list:
+            self.assertEqual(set(active_coupon.keys()), set(query_features))
+            self.assertIn(active_coupon['percentage_discount'], [coupon.percentage_discount for coupon in active_coupons])
+            self.assertIn(active_coupon['description'], [coupon.description for coupon in active_coupons])
+            self.assertIn(
+                active_coupon['course_id'],
+                [coupon.course_id.to_deprecated_string() for coupon in active_coupons]
             )
