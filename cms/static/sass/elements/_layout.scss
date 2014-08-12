@@ -178,9 +178,9 @@
 
     .title-1 {
       @extend %t-title3;
+      @extend %t-strong;
       margin: 0;
       padding: 0;
-      font-weight: 600;
       color: $gray-d3;
     }
   }

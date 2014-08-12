@@ -127,8 +127,8 @@ abbr[title] {
 		margin: 0;
 	}
 	a {
+		@extend %t-regular;
 		float: none;
-		font-weight: normal;
 	}
 }
 
@@ -152,9 +152,9 @@ abbr[title] {
 		opacity: 0.8;
 
 		&:ui-state-active {
+			@extend %t-regular;
 			background-color: rgba(255, 255, 255, .3);
 			opacity: 1.0;
-			font-weight: 400;
 		}
 		a:focus {
 			outline: none;

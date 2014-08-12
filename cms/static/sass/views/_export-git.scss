@@ -23,15 +23,15 @@
   }
 
   h3 {
-      font-size: 19px;
-      font-weight: 700;
+    @extend %t-strong;
+    font-size: 19px;
   }
 
   .export-git-info-block {
 
     dt {
+      @extend %t-strong;
       font-size: 19px;
-      font-weight: 700;
       margin-top: 12px;
     }
 

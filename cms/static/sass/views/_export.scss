@@ -96,13 +96,13 @@
     font-size: 14px;
 
     h2 {
-      font-weight: 700;
+      @extend %t-strong;
       font-size: 19px;
       margin-bottom: 20px;
     }
 
     strong {
-      font-weight: 700;
+      @extend %t-strong;
     }
 
     p + p {
@@ -132,9 +132,9 @@
       text-align: center;
 
       h2 {
+        @extend %t-light;
         margin-bottom: 30px;
         font-size: 26px;
-        font-weight: 300;
       }
 
       .error-block {

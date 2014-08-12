@@ -52,12 +52,12 @@
 
           .group-configuration-title {
             @extend %t-title;
+            @extend %t-strong;
             @include font-size(22);
             @include line-height(22);
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
-            font-weight: bold;
 
             .group-toggle {
               display: inline-block;
@@ -248,21 +248,21 @@
           // add a group is below with groups styling
           .action-primary {
             @include blue-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
             text-transform: uppercase;
           }
 
           .action-secondary {
             @include grey-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
             text-transform: uppercase;
           }
 
@@ -282,7 +282,7 @@
           color: $gray;
 
           strong {
-            font-weight: 600;
+            @extend %t-strong;
           }
         }
 
@@ -300,7 +300,7 @@
             &.required {
 
               label {
-                font-weight: 600;
+                @extend %t-strong;
               }
 
               label:after {
@@ -393,7 +393,7 @@
               color: $gray-l1;
 
               .group-configuration-value {
-                font-weight: 600;
+                @extend %t-strong;
                 white-space: nowrap;
                 margin-left: ($baseline*0.5);
               }
@@ -405,7 +405,7 @@
           }
 
           label.required {
-            font-weight: 600;
+            @extend %t-strong;
 
             &:after {
               margin-left: ($baseline/4);
@@ -471,12 +471,12 @@
 
       .action-add-group {
         @extend %ui-btn-flat-outline;
+        @extend %t-strong;
         @include font-size(16);
         display: block;
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
-        font-weight: 600;
       }
     }
   }

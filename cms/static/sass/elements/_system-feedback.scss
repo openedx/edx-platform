@@ -8,13 +8,13 @@
 }
 
 .message-status {
-  display: none;
   @include border-top-radius(2px);
   @include box-sizing(border-box);
+  @extend %t-strong;
+  display: none;
   border-bottom: 2px solid $yellow-d2;
   margin: 0 0 $baseline 0;
   padding: ($baseline/2) $baseline;
-  font-weight: 500;
   background: $yellow-d1;
   color: $white;
 
@@ -234,7 +234,7 @@
 
       .action-primary {
         @extend %t-action4;
-        font-weight: 600;
+        @extend %t-strong;
       }
 
       .action-secondary {
@@ -396,7 +396,7 @@
   min-width: $fg-min-width;
 
   strong {
-    font-weight: 700;
+    @extend %t-strong;
   }
 
   [class^="icon"], .copy {
@@ -459,8 +459,8 @@
 
     .action-primary {
       @include blue-button();
+      @extend %t-strong;
       border-color: $blue-d2;
-      font-weight: 600;
     }
 
     .action-secondary {
@@ -576,7 +576,7 @@
   color: $white;
 
   strong {
-    font-weight: 700;
+    @extend %t-strong;
   }
 
   [class^="icon"], .copy {
@@ -609,37 +609,37 @@
       width: flex-grid(1, 12);
     }
 
-  	.copy {
-  		width: flex-grid(7, 12);
-  		margin-right: flex-gutter();
-  	}
+    .copy {
+      width: flex-grid(7, 12);
+      margin-right: flex-gutter();
+    }
 
-  	.nav-actions {
-  	  width: flex-grid(4, 12);
-      float: right;
-      margin-top: ($baseline/2);
-  	  text-align: right;
+    .nav-actions {
+     width: flex-grid(4, 12);
+     float: right;
+     margin-top: ($baseline/2);
+     text-align: right;
 
-  	  .nav-item {
-  	    display: inline-block;
-  	    vertical-align: middle;
-  	    margin-right: ($baseline/2);
+     .nav-item {
+       display: inline-block;
+       vertical-align: middle;
+       margin-right: ($baseline/2);
 
-  	    &:last-child {
-  	      margin-right: 0;
-  	    }
+       &:last-child {
+         margin-right: 0;
+       }
 
-        .action-primary {
-          @extend %t-action4;
-          font-weight: 600;
-        }
+       .action-primary {
+        @extend %t-action4;
+        @extend %t-strong;
+      }
 
-        .action-secondary {
-          @extend %t-action4;
-        }
-  	  }
-  	}
+      .action-secondary {
+        @extend %t-action4;
+      }
+    }
   }
+}
 
   // with cancel
   .action-alert-close {
@@ -863,7 +863,7 @@ body.uxdesign.alerts {
     }
 
     strong {
-      font-weight: 700;
+      @extend %t-strong;
     }
 
     .alert-action {
@@ -877,38 +877,38 @@ body.uxdesign.alerts {
 }
 
 body.error {
-	background: $gray-d4;
-	color: $gray-d3;
+  background: $gray-d4;
+  color: $gray-d3;
 
-	.primary-header {
-		display: none;
-	}
+  .primary-header {
+    display: none;
+  }
 
-	.error-prompt {
-		width: 700px;
-		margin: 150px auto;
-		padding: 60px 50px 90px;
-		border-radius: 3px;
-		background: $white;
-		text-align: center;
-	}
+  .error-prompt {
+    width: 700px;
+    margin: 150px auto;
+    padding: 60px 50px 90px;
+    border-radius: 3px;
+    background: $white;
+    text-align: center;
+  }
 
-	h1 {
-		float: none;
-		margin: 0;
-		font-size: 60px;
-		font-weight: 300;
-		color: $gray-d3;
-	}
+  h1 {
+    @extend %t-light;
+    float: none;
+    margin: 0;
+    font-size: 60px;
+    color: $gray-d3;
+  }
 
-	.description {
-		margin-bottom: 50px;
-		font-size: 21px;
-	}
+  .description {
+    margin-bottom: 50px;
+    font-size: 21px;
+  }
 
-	.back-button {
-		@include blue-button;
-		padding: 14px 40px 18px;
-		font-size: 18px;
-	}
+  .back-button {
+    @include blue-button;
+    padding: 14px 40px 18px;
+    font-size: 18px;
+  }
 }

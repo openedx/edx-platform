@@ -124,7 +124,7 @@ form[class^="create-"] {
 
   .title {
     @extend %t-title4;
-    font-weight: 600;
+    @extend %t-strong;
     padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
   }
 
@@ -146,7 +146,7 @@ form[class^="create-"] {
       &.required {
 
         label {
-          font-weight: 600;
+          @extend %t-strong;
         }
 
         label:after {
@@ -308,9 +308,9 @@ form[class^="create-"] {
 
     .action {
       @include transition(all $tmg-f2 linear 0s);
+      @extend %t-strong;
       display: inline-block;
       padding: ($baseline/5) $baseline;
-      font-weight: 600;
       text-transform: uppercase;
     }
 

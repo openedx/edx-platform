@@ -19,10 +19,10 @@
       .page-header {
 
         .page-header-title {
-          @extend %t-title;
           @include font-size(28);
           @include line-height(32);
-          font-weight: 600;
+          @extend %t-title;
+          @extend %t-strong;
         }
 
         .is-editable {
@@ -52,8 +52,8 @@
 
           .button {
             @extend %t-action3;
+            @extend %t-regular;
             padding: ($baseline/4) ($baseline*.75);
-            font-weight: 400;
           }
         }
       }
@@ -150,22 +150,22 @@
 
         .date,
         .user {
-          font-weight: 600;
+          @extend %t-strong;
         }
       }
 
       .wrapper-release {
 
         .release-date {
-          font-weight: 600;
+          @extend %t-strong;
         }
       }
 
       .wrapper-visibility {
 
         .copy {
+          @extend %t-strong;
           margin-bottom: ($baseline/10);
-          font-weight: 600;
         }
 
         [class^="icon-"] {
@@ -213,7 +213,7 @@
 
         .date,
         .user {
-          font-weight: 600;
+          @extend %t-strong;
         }
       }
     }

@@ -30,7 +30,7 @@ a {
 
 h1 {
   @extend %t-title4;
-  font-weight: 300;
+  @extend %t-light;
 }
 
 .waiting {
@@ -52,23 +52,23 @@ h1 {
 // typography - basic
 .page-header {
   @extend %t-title3;
+  @extend %t-strong;
   display: block;
-  font-weight: 600;
   color: $gray-d3;
 
   .navigation, .subtitle {
     @extend %t-title7;
+    @extend %t-regular;
     position: relative;
     top: ($baseline/4);
     display: block;
     color: $gray-l2;
-    font-weight: 400;
   }
 }
 
 .section-header {
   @extend %t-title4;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title7;
@@ -77,7 +77,7 @@ h1 {
 
 .area-header {
   @extend %t-title6;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title8;
@@ -86,7 +86,7 @@ h1 {
 
 .area-subheader {
   @extend %t-title7;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title9;
@@ -163,7 +163,7 @@ h1 {
 
 // typography - loose headings (BT: needs to be removed once html is clean)
 .title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
-  font-weight: 600;
+  @extend %t-strong;
 }
 
 // typography - primary content
@@ -214,22 +214,22 @@ h1 {
 
 .title-4 {
   @extend %t-title7;
+  @extend %t-regular;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 .title-5 {
   @extend %t-title7;
+  @extend %t-regular;
   color: $gray-l1;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 .title-6 {
   @extend %t-title7;
+  @extend %t-regular;
   color: $gray-l2;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 p, ul, ol, dl {
@@ -317,16 +317,16 @@ hr.divide {
   label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 700;
+    @extend %t-strong;
 
     &.inline-label {
       display: inline;
     }
 
     .description {
+      @extend %t-regular;
       display: block;
       font-size: 11px;
-      font-weight: 400;
       font-style: italic;
       line-height: 1.3;
       color: #999;
@@ -366,28 +366,28 @@ hr.divide {
   }
 
   strong {
+    @extend %t-strong;
     display: block;
     margin-bottom: 10px;
     font-size: 16px;
-    font-weight: 700;
     text-align: center;
   }
 
   .close-button {
+    @extend %t-strong;
     position: absolute;
     top: 0;
     right: 0;
     width: 27px;
     height: 27px;
     font-size: 22px;
-    font-weight: 700;
     line-height: 25px;
     color: #aaa;
     text-align: center;
 
     .close-icon {
+      @extend %t-strong;
       font-size: 16px;
-      font-weight: 700;
     }
   }
 
@@ -418,8 +418,8 @@ hr.divide {
   }
 
   &:after {
-    content: '';
     @extend .spinner-icon;
+    content: '';
     display: block;
     position: absolute;
     top: 50%;
@@ -475,12 +475,12 @@ hr.divide {
 .edit-button.standard,
 .delete-button.standard,
 .duplicate-button.standard {
-  @extend %t-action4;
   @include white-button;
+  @extend %t-regular;
+  @extend %t-action4;
   float: left;
   padding: 3px 10px 4px;
   margin-left: 7px;
-  font-weight: 400;
 
   .edit-icon,
   .delete-icon,
@@ -499,6 +499,7 @@ hr.divide {
 .tooltip {
   @include font-size(12);
   @include transition(opacity $tmg-f3 ease-out 0s);
+  @extend %t-regular;
   @extend %ui-depth5;
   position: absolute;
   top: 0;
@@ -506,7 +507,6 @@ hr.divide {
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);
-  font-weight: normal;
   line-height: 26px;
   color: $white;
   pointer-events: none;
@@ -635,8 +635,8 @@ body.js {
 
     .title {
       @extend %t-title5;
+      @extend %t-strong;
       margin: 0 0 ($baseline/2) 0;
-      font-weight: 600;
       color: $gray-d3;
     }
 
