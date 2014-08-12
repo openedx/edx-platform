@@ -16,6 +16,10 @@
       display: inline-block;
     }
   }
+
+  .more-wrapper {
+    position: relative;
+  }
 }
 
 // CASE: comment actions
@@ -28,14 +32,15 @@
 // UI: general actions dropdown
 .post-actions-dropdown, .response-actions-dropdown, .comment-actions-dropdown {
   @extend %ui-no-list;
+  display: none;
+  background-color: $white;
   text-align: left;
 
-  &.is-collapsed {
-    display: none;
-  }
-
   &.is-expanded {
-    display: inline-block;
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    display: block;
     box-shadow: 0 0 2px $shadow;
     border-radius: 3px;
   }
@@ -128,6 +133,10 @@
     &:hover .action-icon {
       color: $black;
     }
+
+    &.is-expanded {
+      visibility: hidden;
+    }
   }
 }
 
@@ -138,6 +147,7 @@
   margin: 0;
   display: block;
   padding: ($baseline/4);
+  white-space: nowrap;
 
   &:focus {
 

@@ -72,62 +72,71 @@
       </header>
       <ul class="post-actions-list">
         <li class="actions-item is-visible">
-          <a href="#" class="action-button action-more" style="display: none;">
-            <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-            <span class="action-label">${_("More")}</span>
-          </a>
-          <ul class="post-actions-dropdown is-expanded">
-            <li class="actions-item">
-              <a href="#" class="action-list-item action-report" role="checkbox" aria-checked="false">
-                <span class="sr">${_("Report abuse")}</span>
-                <span class="action-icon"><i class="icon icon-flag"></i></span>
-                <span class="action-label" aria-hidden="true">
-                  <span class="label-unchecked">${_("Report")}</span>
-                  <span class="label-checked">${_("Reported")}</span>
-                  <span class="label-checked-focused">${_("Unreport")}</span>
-                </span>
-              </a>
-            </li>
-            % if course and has_permission(user, 'openclose_thread', course.id):
-            <li class="actions-item">
-              <a class="action-list-item action-pin" href="javascript:void(0)" role="checkbox" aria-checked="false">
-                <span class="sr">${_("Pin")}</span>
-                <span class="action-icon"><i class="icon icon-pushpin"></i></span>
-                <span class="action-label" aria-hidden="true">
-                  <span class="label-unchecked">${_("Pin")}</span>
-                  <span class="label-checked">${_("Pinned")}</span>
-                  <span class="label-checked-focused">${_("Unpin")}</span>
-                </span>
-              </a>
-            </li>
-            % endif
-            <li class="actions-item" style="display: none">
-              <a class="action-list-item action-edit" href="javascript:void(0)">
-                <span class="action-icon"><i class="icon icon-pencil"></i></span>
-                <span class="action-label">${_("Edit")}</span>
-              </a>
-            </li>
-            <li class="actions-item" style="display: none">
-              <a class="action-list-item action-delete" href="javascript:void(0)">
-                <span class="action-icon"><i class="icon icon-remove"></i></span>
-                <span class="action-label">${_("Delete")}</span>
-              </a>
-            </li>
-            <li class="actions-item" style="display: none">
-              <a class="action-list-item action-close" href="javascript:void(0)">
-                <span class="sr">${_("Close")}</span>
-                <span class="action-icon"><i class="icon icon-lock"></i></span>
-                <span class="action-label" aria-hidden="true">
-                  <span class="label-unchecked">${_("Close")}</span>
-                  <span class="label-checked">${_("Closed")}</span>
-                  <span class="label-checked-focused">${_("Open")}</span>
-                </span>
-              </a>
-            </li>
-          </ul>
+          <div class="more-wrapper">
+            <a href="javascript:void(0)" class="action-button action-more" role="menu">
+              <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+              <span class="action-label">${_("More")}</span>
+            </a>
+            <ul class="post-actions-dropdown" role="menu">
+              <li class="actions-item">
+                ## TODO: what to do about a11y here?
+                <a href="javascript:void(0)" class="action-list-item action-hide-more" role="menuitem">
+                  <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                  <span class="action-label">${_("More")}</span>
+                </a>
+              </li>
+              <li class="actions-item">
+                <a href="javascript:void(0)" class="action-list-item action-report" role="menuitemcheckbox" aria-checked="false">
+                  <span class="sr">${_("Report abuse")}</span>
+                  <span class="action-icon"><i class="icon icon-flag"></i></span>
+                  <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${_("Report")}</span>
+                    <span class="label-checked">${_("Reported")}</span>
+                    <span class="label-checked-focused">${_("Unreport")}</span>
+                  </span>
+                </a>
+              </li>
+              % if course and has_permission(user, 'openclose_thread', course.id):
+              <li class="actions-item">
+                <a href="javascript:void(0)" class="action-list-item action-pin" role="menuitemcheckbox" aria-checked="false">
+                  <span class="sr">${_("Pin")}</span>
+                  <span class="action-icon"><i class="icon icon-pushpin"></i></span>
+                  <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${_("Pin")}</span>
+                    <span class="label-checked">${_("Pinned")}</span>
+                    <span class="label-checked-focused">${_("Unpin")}</span>
+                  </span>
+                </a>
+              </li>
+              % endif
+              <li class="actions-item">
+                <a href="javascript:void(0)" class="action-list-item action-edit" role="menuitem">
+                  <span class="action-icon"><i class="icon icon-pencil"></i></span>
+                  <span class="action-label">${_("Edit")}</span>
+                </a>
+              </li>
+              <li class="actions-item">
+                <a href="javascript:void(0)" class="action-list-item action-delete">
+                  <span class="action-icon"><i class="icon icon-remove"></i></span>
+                  <span class="action-label">${_("Delete")}</span>
+                </a>
+              </li>
+              <li class="actions-item">
+                <a href="javascript:void(0)" class="action-list-item action-close">
+                  <span class="sr">${_("Close")}</span>
+                  <span class="action-icon"><i class="icon icon-lock"></i></span>
+                  <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${_("Close")}</span>
+                    <span class="label-checked">${_("Closed")}</span>
+                    <span class="label-checked-focused">${_("Open")}</span>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </li>
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
+          <a href="javascript:void(0)" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
             ## Vote counts are populated by JS
             <span class="sr">${_("Vote")}</span>
             <span class="sr js-sr-vote-count"></span>
@@ -143,7 +152,7 @@
           </a>
         </li>
         <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-follow" role="checkbox" aria-checked="false">
+          <a href="javascript:void(0)" class="action-button action-follow" role="checkbox" aria-checked="false">
             <span class="sr">${_("Follow")}</span>
             <span class="action-icon"><i class="icon icon-star"></i></span>
             <span class="action-label" aria-hidden="true">
