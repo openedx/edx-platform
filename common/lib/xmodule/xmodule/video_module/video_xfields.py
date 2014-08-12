@@ -145,9 +145,13 @@ class VideoFields(object):
         scope=Scope.user_info,
         default=True
     )
-
     handout = String(
         help=_("Upload a handout to accompany this video. Students can download the handout by clicking Download Handout under the video."),
         display_name=_("Upload Handout"),
         scope=Scope.settings,
+    )
+    edx_video_id = String(
+        help=_("the common ID of a single video content across different formats of that video"),
+        display_name=_("edX Video ID"),
+        scope=Scope.content,
     )

@@ -96,6 +96,10 @@ urlpatterns += patterns(
         'group_configurations_detail_handler'),
 )
 
+urlpatterns += patterns('',
+    url(r'^edxval/', include('edxval.urls')),
+)
+
 js_info_dict = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
