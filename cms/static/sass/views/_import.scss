@@ -92,7 +92,7 @@
       }
 
       .file-name {
-        font-weight: bold;
+        @extend %t-strong;
       }
     }
 
@@ -151,7 +151,7 @@
 
         .title {
           @extend %t-title5;
-          font-weight: 600;
+          @extend %t-strong;
         }
 
         .copy {

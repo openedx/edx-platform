@@ -313,11 +313,11 @@
     }
 
     .xblock-header-primary {
+      @extend %t-light;
       display: flex;
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l4;
       background-color: $gray-l6;
-      font-weight: 300;
     }
 
     .xblock-render {
@@ -434,10 +434,10 @@
     .upload-setting {
       @extend %ui-btn-flat-outline;
       @extend %t-action3;
+      @extend %t-strong;
       @include box-sizing(border-box);
       display: inline-block;
       padding: ($baseline/2);
-      font-weight: 600;
       width: 49%;
       margin-right: 2%;
     }
@@ -445,10 +445,10 @@
     .download-setting {
       @extend %ui-btn-non;
       @extend %t-action4;
+      @extend %t-strong;
       @include box-sizing(border-box);
       display: inline-block;
       padding: ($baseline/2);
-      font-weight: 600;
       width: 49%;
       text-align: center;
       color: $blue;
@@ -521,8 +521,9 @@
     }
 
     .setting-label {
-      @extend %t-copy-sub1;
       @include transition(color $tmg-f2 ease-in-out 0s);
+      @extend %t-copy-sub1;
+      @extend %t-strong;
       vertical-align: middle;
       display: inline-block;
       position: relative;
@@ -530,7 +531,6 @@
       width: 25%;
       min-width: 100px;
       margin-right: ($baseline/2);
-      font-weight: 600;
 
       &.is-focused {
         color: $blue;
@@ -662,10 +662,10 @@
       .create-setting {
         @extend %ui-btn-flat-outline;
         @extend %t-action3;
+        @extend %t-strong;
         display: block;
         width: 100%;
         padding: ($baseline/2);
-        font-weight: 600;
 
         *[class^="icon-"] {
           margin-right: ($baseline/4);
@@ -733,10 +733,10 @@
       .create-setting {
         @extend %ui-btn-flat-outline;
         @extend %t-action3;
+        @extend %t-strong;
         display: block;
         width: 88%;
         padding: ($baseline/2);
-        font-weight: 600;
 
         *[class^="icon-"] {
           margin-right: ($baseline/4);

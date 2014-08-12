@@ -52,10 +52,10 @@
 
         .collapse-setting {
           @extend %t-action3;
+          @extend %t-strong;
           display: block;
           width: 100%;
           padding: ($baseline/2);
-          font-weight: 600;
 
           *[class^="icon-"] {
             margin-right: ($baseline/4);
@@ -140,8 +140,8 @@
         }
 
         .transcripts-message-status {
+          @extend %t-strong;
           color: $green;
-          font-weight: 700;
 
           &.status-error {
             color: $red;
@@ -282,9 +282,9 @@
         .create-setting {
           @extend %ui-btn-flat-outline;
           @extend %t-action3;
+          @extend %t-strong;
           display: block;
           padding: ($baseline/2);
-          font-weight: 600;
 
           *[class^="icon-"] {
             margin-right: ($baseline/4);
@@ -294,9 +294,9 @@
         .upload-setting {
           @extend %ui-btn-flat-outline;
           @extend %t-action3;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/2);
-          font-weight: 600;
           width: 49%;
           margin-right: 2%;
         }
@@ -304,9 +304,9 @@
         .download-setting {
           @extend %ui-btn-non;
           @extend %t-action4;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/2);
-          font-weight: 600;
           width: 49%;
           text-align: center;
           color: $blue;

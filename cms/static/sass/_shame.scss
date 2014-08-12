@@ -44,7 +44,7 @@
 // yes we have no boldness today - need to fix the resets
 body strong,
 body b {
-  font-weight: 700;
+  @extend %t-ultrastrong;
 }
 
 // ====================

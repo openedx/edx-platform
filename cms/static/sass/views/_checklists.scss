@@ -101,17 +101,17 @@
 
         .status-count {
           @extend %t-copy-base;
+          @extend %t-strong;
           margin-left: ($baseline/4);
           margin-right: ($baseline/4);
           color: $gray-d3;
-          font-weight: 600;
         }
 
         .status-amount {
           @extend %t-copy-base;
+          @extend %t-strong;
           margin-left: ($baseline/4);
           color: $gray-d3;
-          font-weight: 600;
         }
       }
     }
@@ -140,7 +140,7 @@
       .action-secondary {
         @include grey-button();
         @extend %t-action3;
-        font-weight: 400;
+        @extend %t-regular;
         float: right;
 
         .icon-delete {
@@ -232,11 +232,11 @@
       }
 
       .task-details {
+        @extend %t-strong;
         display: inline-block;
         vertical-align: text-top;
         float: left;
         width: flex-grid(6,9);
-        font-weight: 500;
 
         .task-name {
           @include transition(color $tmg-f2 ease-in-out 0s);

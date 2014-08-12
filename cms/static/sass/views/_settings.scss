@@ -22,13 +22,13 @@
   }
 
   .message-status {
-    display: none;
     @include border-top-radius(2px);
     @include box-sizing(border-box);
+    @extend %t-strong;
+    display: none;
     border-bottom: 2px solid $yellow;
     margin: 0 0 20px 0;
     padding: 10px 20px;
-    font-weight: 500;
     background: $paleYellow;
 
     .text {
@@ -116,7 +116,7 @@
     .remove-item {
       @include white-button;
       @extend %t-action3;
-      font-weight: 400;
+      @extend %t-strong;
     }
 
     .new-button {
@@ -140,7 +140,7 @@
         &.required {
 
           label {
-            font-weight: 600;
+            @extend %t-strong;
           }
 
           label:after {
@@ -154,10 +154,10 @@
         }
 
         label {
-          @extend %t-copy-sub1;
           @include transition(color $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub1;
+          @extend %t-strong;
           margin: 0 0 ($baseline/4) 0;
-          font-weight: 400;
 
           &.is-focused {
             color: $blue;
@@ -266,12 +266,12 @@
 
         input, textarea {
           @extend %t-copy-lead1;
+          @extend %t-strong;
           box-shadow: none;
           border: none;
           background: none;
           padding: 0;
           margin: 0;
-          font-weight: 600;
         }
       }
 
@@ -338,7 +338,7 @@
           .action-primary {
             @extend %btn-primary-blue;
             @extend %t-action3;
-            font-weight: 600;
+            @extend %t-strong;
 
             [class^="icon-"] {
               @extend %t-icon5;
@@ -653,10 +653,10 @@
               }
 
               .letter-grade {
+                @extend %t-strong;
                 display: block;
                 margin: 10px 15px 0 0;
                 font-size: 16px;
-                font-weight: 700;
                 line-height: 14px;
               }
 
@@ -799,8 +799,8 @@
         position: relative;
 
         .title {
+          @extend %t-strong;
           margin-top: ($baseline/2);
-          font-weight: 600;
         }
 
         .field {
