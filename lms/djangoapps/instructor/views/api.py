@@ -670,6 +670,23 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_coupon_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Active Coupons.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    active_coupons = Coupon.objects.filter(course_id=course_id, is_active=True)
+    query_features = [
+        'course_id', 'percentage_discount', 'code_redeemed_count', 'description'
+    ]
+    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, active_coupons)
+    header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
+    return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
+
+
 def save_registration_codes(request, course_id, generated_codes_list, invoice):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table

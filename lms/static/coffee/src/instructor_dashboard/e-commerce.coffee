@@ -14,7 +14,8 @@ class ECommerce
     @$download_company_name = @$section.find("input[name='download_company_name']'")
     @$active_company_name = @$section.find("input[name='active_company_name']'")
     @$spent_company_name = @$section.find('input[name="spent_company_name"]')
-
+    @$download_coupon_codes = @$section.find('input[name="download-coupon-codes-csv"]')
+    
     @$download_registration_codes_form = @$section.find("form#download_registration_codes")
     @$active_registration_codes_form = @$section.find("form#active_registration_codes")
     @$spent_registration_codes_form = @$section.find("form#spent_registration_codes")
@@ -28,10 +29,14 @@ class ECommerce
       url = @$list_purchase_csv_btn.data 'endpoint'
       url += '/csv'
       location.href = url
-
+    
     @$list_sale_csv_btn.click (e) =>
       url = @$list_sale_csv_btn.data 'endpoint'
       url += '/csv'
+      location.href = url
+
+    @$download_coupon_codes.click (e) =>
+      url = @$download_coupon_codes.data 'endpoint'
       location.href = url
 
     @$download_registration_codes_form.submit (e) =>

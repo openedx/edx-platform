@@ -20,6 +20,7 @@ SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_email', 'compa
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
+COUPON_FEATURES = ('course_id', 'percentage_discount', 'description')
 
 
 def sale_record_features(course_id, features):
@@ -147,6 +148,36 @@ def enrolled_students_features(course_id, features):
         return student_dict
 
     return [extract_student(student, features) for student in students]
+
+
+def coupon_codes_features(features, coupons_list):
+    """
+    Return list of Coupon Codes as dictionaries.
+
+    coupon_codes_features
+    would return [
+        {'course_id': 'edX/Open_DemoX/edx_demo_course,, 'discount': '213'  ..... }
+        {'course_id': 'edX/Open_DemoX/edx_demo_course,, 'discount': '234'  ..... }
+    ]
+    """
+
+    def extract_coupon(coupon, features):
+        """ convert coupon_codes to dictionary
+        :param coupon_codes:
+        :param features:
+        """
+        coupon_features = [x for x in COUPON_FEATURES if x in features]
+
+        coupon_dict = dict((feature, getattr(coupon, feature)) for feature in coupon_features)
+        coupon_dict['code_redeemed_count'] = coupon.couponredemption_set.all().count()
+
+        # we have to capture the redeemed_by value in the case of the downloading and spent registration
+        # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
+        #  They have not been redeemed yet
+
+        coupon_dict['course_id'] = coupon_dict['course_id'].to_deprecated_string()
+        return coupon_dict
+    return [extract_coupon(coupon, features) for coupon in coupons_list]
 
 
 def course_registration_features(features, registration_codes, csv_type):
