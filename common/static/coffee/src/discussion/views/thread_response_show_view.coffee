@@ -6,7 +6,13 @@ if Backbone?
 
     renderTemplate: ->
         @template = _.template($("#thread-response-show-template").html())
-        @template(@model.toJSON())
+        context = _.extend({
+            author_display: @getAuthorDisplay(),
+            endorser_display: @getEndorserDisplay()
+          },
+          @model.attributes
+        )
+        @template(context)
 
     render: ->
       @$el.html(@renderTemplate())
@@ -14,21 +20,12 @@ if Backbone?
       @renderAttrs()
       @$el.find(".posted-details .timeago").timeago()
       @convertMath()
-      @markAsStaff()
       @
 
     convertMath: ->
       element = @$(".response-body")
       element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
-
-    markAsStaff: ->
-      if DiscussionUtil.isStaff(@model.get("user_id"))
-        @$el.addClass("staff")
-        @$el.prepend('<span class="staff-banner">' + gettext('staff') + '</span>')
-      else if DiscussionUtil.isTA(@model.get("user_id"))
-        @$el.addClass("community-ta")
-        @$el.prepend('<span class="community-ta-banner">' + gettext('Community TA') + '</span>')
 
     edit: (event) ->
         @trigger "response:edit", event

@@ -50,23 +50,20 @@
 
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
-              ${"<% if (obj.username) { %>"}
-              <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-              ${"<% } else { %>"}
-              ${_('anonymous') | h}
-              ${"<% } %>"}
               ## This part is incredibly gross but necessary to combine i18n in
               ## mako with logic in underscore.
               ## Translators: post_type describes the kind of post this is
               ## (e.g. "question" or "discussion"); time_ago is how much time
               ## has passed since the post was created (e.g. "4 hours ago")
-              ${"{post_type} posted {time_ago}".format(
+              ${"{post_type} posted {time_ago} by {author}".format(
                   post_type="<%- thread_type %>",
-                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>"
+                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
+                  author="<%= author_display %>"
               )}
-
-              <span class="post-status-closed top-post-status" style="display: none">
-                ${_("&bull; This thread is closed.")}
+              <span class="post-labels">
+                  <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
+                  <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+                  <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
               </span>
           </p>
       </header>
@@ -138,20 +135,19 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header class="response-header response-local">
-        ${"<% if (obj.username) { %>"}
-        <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
-        ${"<% } else { %>"}
-        <span class="anonymous"><em>${_('anonymous')}</em></span>
-        ${"<% } %>"}
+        ${'<%= author_display %>'}
         <p class="posted-details">
             <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
+            <span class="post-labels">
+                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+            </span>
             <%
             js_block = u"""
                 interpolate(
                     endorsement.username ? "{user_fmt_str}" : "{anon_fmt_str}",
                     {{
                         'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
-                        'user': endorsement.username
+                        'user': endorser_display
                     }},
                     true
                 )""".format(
@@ -208,20 +204,18 @@
     js_block = u"""
       interpolate(
         '{}',
-        {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
+        {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>', 'author': author_display}},
         true
         )""".format(
                ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
-               escapejs(_('posted %(time_ago)s by'))
+               escapejs(_('posted %(time_ago)s by %(author)s'))
              )
            %>
     <p class="posted-details">
     ${'<%='}${js_block}${'%>'}
-    ${"<% if (obj.username) { %>"}
-    <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
-    ${"<% } else { %>"}
-    ${_('anonymous')}
-    ${"<% } %>"}
+      <span class="post-labels">
+        <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+      </span>
     </p>
   </div>
 </script>
@@ -270,16 +264,16 @@
         js_block = u"""
         var labels = "";
         if (pinned) {{
-            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
         }}
         if (typeof(subscribed) != "undefined" && subscribed) {{
-            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+            labels += '<li class="post-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
         }}
         if (staff_authored) {{
-            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
         }}
         if (community_ta_authored) {{
-            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
         }}
         if (labels != "") {{
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -624,4 +618,17 @@ ${secondaryAction("delete", "remove", _("Delete"))}
         </li>
         ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
     </ul>
+</script>
+
+<script aria-hidden="true" type="text/template" id="post-user-display-template">
+    ${"<% if (username) { %>"}
+    <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
+        ${"<% if (is_community_ta) { %>"}
+        <span class="user-label-community-ta">${_("Community TA")}</span>
+        ${"<% } else if (is_staff) { %>"}
+        <span class="user-label-staff">${_("Staff")}</span>
+        ${"<% } %>"}
+    ${"<% } else { %>"}
+    ${_('anonymous') | h}
+    ${"<% } %>"}
 </script>

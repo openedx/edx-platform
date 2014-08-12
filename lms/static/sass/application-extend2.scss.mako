@@ -57,6 +57,7 @@
 @import "discussion/views/profile";
 @import "discussion/elements/actions";
 @import "discussion/elements/editor";
+@import "discussion/elements/labels";
 @import "discussion/elements/navigation";
 @import "discussion/views/response";
 @import 'discussion/utilities/developer';

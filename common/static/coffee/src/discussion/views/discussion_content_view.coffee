@@ -111,6 +111,7 @@ if Backbone?
 
       pinned: (pinned) ->
         @updateButtonState(".action-pin", pinned)
+        @$(".post-label-pinned").toggle(pinned)
 
       abuse_flaggers: (abuse_flaggers) ->
         flagged = (
@@ -118,10 +119,11 @@ if Backbone?
           (DiscussionUtil.isFlagModerator and abuse_flaggers.length > 0)
         )
         @updateButtonState(".action-report", flagged)
+        @$(".post-label-reported").toggle(flagged)
 
       closed: (closed) ->
         @updateButtonState(".action-close", closed)
-        @$(".post-status-closed").toggle(closed)
+        @$(".post-label-closed").toggle(closed)
     })
 
     showSecondaryActions: (event) =>
@@ -242,3 +244,21 @@ if Backbone?
         {url: @model.urlFor("close"), type: "POST", data: updates, $elem: $(event.currentTarget)},
         msg
       )
+
+    getAuthorDisplay: ->
+      _.template($("#post-user-display-template").html())(
+        username: @model.get('username') || null
+        user_url: @model.get('user_url')
+        is_community_ta: @model.get('community_ta_authored')
+        is_staff: @model.get('staff_authored')
+      )
+
+    getEndorserDisplay: ->
+      endorsement = @model.get('endorsement')
+      if endorsement and endorsement.username
+        _.template($("#post-user-display-template").html())(
+          username: endorsement.username
+          user_url: DiscussionUtil.urlFor('user_profile', endorsement.user_id)
+          is_community_ta: DiscussionUtil.isTA(endorsement.user_id)
+          is_staff: DiscussionUtil.isStaff(endorsement.user_id)
+        )

@@ -94,7 +94,7 @@ body.discussion {
     }
 
     h1 {
-      margin-bottom: ($baseline/2);
+      margin-bottom: ($baseline/4);
       font-size: 28px;
       font-weight: 700;
       letter-spacing: 0;
@@ -103,18 +103,14 @@ body.discussion {
 
     .posted-details {
       font-size: 12px;
-      font-style: italic;
       color: #888;
 
       .username {
-        display: block;
-        font-size: 16px;
         font-weight: 700;
       }
 
       .timeago, .top-post-status {
         color: inherit;
-        font-style: italic;
       }
     }
 
@@ -244,30 +240,6 @@ body.discussion {
 
   .posted-details {
     font-size: 11px;
-  }
-
-  .staff-label {
-    margin-left: ($baseline/4);
-    padding: 0 ($baseline/5);
-    border-radius: 2px;
-    background: #009FE2;
-    font-size: 9px;
-    font-weight: 700;
-    font-style: normal;
-    color: white;
-    text-transform: uppercase;
-  }
-
-  .community-ta-label{
-    margin-left: ($baseline/10);
-    padding: 0 ($baseline/5);
-    border-radius: 2px;
-    background: $forum-color-community-ta;
-    font-size: 9px;
-    font-weight: 700;
-    font-style: normal;
-    color: white;
-    text-transform: uppercase;
   }
 
   .main-article.new {
