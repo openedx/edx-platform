@@ -15,6 +15,7 @@ def clean_test_files():
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
     sh("find . -type f -name \"*.pyc\" -delete")
     sh("rm -rf test_root/log/auto_screenshots/*")
+    sh("rm -rf /tmp/mako_[cl]ms")
 
 
 def clean_dir(directory):
