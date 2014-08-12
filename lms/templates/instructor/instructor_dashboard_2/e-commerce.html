@@ -73,6 +73,8 @@
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
+            <p>Click to generate a CSV file of all Coupon Codes:</p>
+            <input type="button" name="download-coupon-codes-csv" value="${_("Download coupon codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
             <h3 class="coupon-errors" id="coupon-error"></h3>
             <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
                class="add blue-button">${_("+ Add Coupon")}</a></span>
@@ -286,35 +288,6 @@
 
      $('#edit_coupon_form').submit(function () {
        $("#update_coupon_button").attr('disabled', true);
-       // Get the Code and Discount value and trim it
-       var code = $.trim($('#edit_coupon_code').val());
-       var coupon_discount = $.trim($('#edit_coupon_discount').val());
-
-       // Check if empty of not
-       if (code === '') {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (coupon_discount == '0') {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Value Greater than 0')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (parseInt(coupon_discount) > 100) {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
-       if (!$.isNumeric(coupon_discount)) {
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
-         $("#update_coupon_button").removeAttr('disabled');
-         return false;
-       }
      });
      $('#course_price_link').click(function () {
        reset_input_fields();

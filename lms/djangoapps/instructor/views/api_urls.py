@@ -70,6 +70,10 @@ urlpatterns = patterns('',  # nopep8
     url(r'spent_registration_codes$',
         'instructor.views.api.spent_registration_codes', name="spent_registration_codes"),
 
+    # Coupon Codes..
+    url(r'get_coupon_codes',
+        'instructor.views.api.get_coupon_codes', name="get_coupon_codes"),
+
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
