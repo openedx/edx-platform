@@ -581,7 +581,6 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         request = Request.blank('/translation', POST={'file': ('filename', SRT_content)})
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
         self.assertEqual(response.status,  '400 Bad Request')
-
         # Language, good filename and good content.
         request = Request.blank('/translation/uk', POST={'file': ('filename.srt', SRT_content)})
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
