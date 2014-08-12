@@ -32,3 +32,4 @@
 -e git+https://github.com/edx/opaque-keys.git@454bd984d9539550c6290020e92ee2d6094038d0#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@0d7847f9dfa2281640527b4dc51f5854f950f9b7#egg=i18n-tools
+-e git+https://github.com/edx/edx-val.git@df4728fc863a6c77124604842a4b2efa4836e124#egg=edx-val
