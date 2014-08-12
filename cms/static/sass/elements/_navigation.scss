@@ -118,7 +118,7 @@ nav {
 
     .nav-item {
       @extend %t-action3;
-      @extend %t-strong;
+      @extend %t-regular;
       display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-l5;

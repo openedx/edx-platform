@@ -19,9 +19,9 @@
   color: $white;
 
   [class^="icon-"] {
+    @extend %t-icon5;
     position: relative;
     top: 1px;
-    @include font-size(16);
     display: inline-block;
     margin-right: ($baseline/2);
   }
@@ -79,7 +79,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $blue-d2;
     }
 
@@ -97,7 +97,7 @@
 
     .nav-actions .action-primary {
       @include orange-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $orange-d2;
       color: $gray-d4;
     }
@@ -116,7 +116,7 @@
 
     .nav-actions .action-primary {
       @include red-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $red-d2;
     }
 
@@ -134,7 +134,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $blue-d2;
     }
 
@@ -152,7 +152,7 @@
 
     .nav-actions .action-primary {
       @include green-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $green-d2;
     }
 
@@ -170,7 +170,7 @@
 
     .nav-actions .action-primary {
       @include pink-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $pink-d2;
     }
 
@@ -407,7 +407,7 @@
 
   [class^="icon"] {
     @include transition (color 0.50s ease-in-out 0s);
-    @include font-size(22);
+    @extend %t-icon3;
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
     margin-top: ($baseline/4);
@@ -585,7 +585,7 @@
 
   [class^="icon"] {
     @include transition (color 0.50s ease-in-out 0s);
-    @include font-size(22);
+    @extend %t-icon3;
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
     text-align: right;
@@ -656,7 +656,7 @@
     }
 
     [class^="icon"] {
-      @include font-size(14);
+      @extend %t-icon6;
       color: $white;
       width: auto;
       margin: 0;
@@ -847,7 +847,7 @@ body.uxdesign.alerts {
 .main-wrapper {
 
   .alert {
-    @include font-size(14);
+    @extend %t-copy-sub1;
     padding: 15px 20px;
     margin-bottom: 30px;
     border-radius: 3px;
@@ -895,7 +895,7 @@ body.error {
   }
 
   h1 {
-    @include font-size(60);
+    @extend %t-title1;
     @extend %t-light;
     float: none;
     margin: 0;
@@ -903,13 +903,13 @@ body.error {
   }
 
   .description {
-    @include font-size(21);
+    @extend %t-copy-lead2;
     margin-bottom: 50px;
   }
 
   .back-button {
-    @include font-size(18);
-    @include blue-button;
+    @include blue-button();
+    @extend %t-action1;
     padding: 14px 40px 18px;
   }
 }

@@ -17,7 +17,7 @@
 
   // messages - should be synced up with global messages in the future
   .message {
-    @include font-size(14);
+    @extend %t-copy-sub1;
     display: block;
   }
 
@@ -120,8 +120,7 @@
     }
 
     .new-button {
-      // @extend %t-action3; - bad buttons won't render this properly
-      @include font-size(14);
+      @extend %t-action3;
     }
 
     // form basics
@@ -623,7 +622,7 @@
               }
 
               .remove-button {
-                @include font-size(10);
+                @extend %t-action5;
                 display: none;
                 position: absolute;
                 top: -17px;
@@ -653,11 +652,10 @@
               }
 
               .letter-grade {
-                @include font-size(16);
-                @include line-height(16);
+                @extend %t-copy-base;
                 @extend %t-strong;
                 display: block;
-                margin: 10px 15px 0 0;
+                margin: 5px 15px 0 0;
               }
 
               .range {

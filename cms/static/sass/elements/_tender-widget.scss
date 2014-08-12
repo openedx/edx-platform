@@ -65,7 +65,7 @@
 }
 
 .widget-layout .header h1 {
-  @include font-size(22);
+  @extend %t-title4;
 }
 
 .widget-layout .content {
@@ -86,14 +86,14 @@
 }
 
 .widget-layout label {
-  @include font-size(14);
+  @extend %t-copy-sub1;
   @extend %t-strong;
   margin-bottom: 5px;
   color: #4c4c4c;
 }
 
 .widget-layout input[type="text"], .widget-layout textarea {
-  @include font-size(16);
+  @extend %t-copy-base;
   padding: 10px;
   color: rgb(0,0,0) !important;
   border: 1px solid #b0b6c2;
@@ -177,7 +177,7 @@
 }
 
 .widget-layout #discussion_body:before {
-  @include font-size(14);
+  @extend %t-copy-sub1;
   @extend %t-strong;
   content: "What Question or Feedback Would You Like to Share?";
   display: block;
@@ -214,7 +214,7 @@
 }
 
 .widget-layout .form-actions .btn-post_topic {
-  @include font-size(16);
+  @extend %t-copy-base;
   @extend %t-strong;
   display: block;
   width: 100%;

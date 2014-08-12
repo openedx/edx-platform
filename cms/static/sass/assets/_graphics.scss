@@ -156,7 +156,7 @@
 .draft-tag,
 .public-tag,
 .private-tag {
-	@include font-size(9);
+	@extend %t-action5;
 	@extend %t-strong;
 	margin-left: 3px;
 	text-transform: uppercase;

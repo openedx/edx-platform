@@ -19,9 +19,7 @@
       .page-header {
 
         .page-header-title {
-          @include font-size(28);
-          @include line-height(32);
-          @extend %t-title;
+          @extend %t-title4;
           @extend %t-strong;
         }
 

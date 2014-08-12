@@ -3,7 +3,7 @@
 
 // JQUI calendar
 .ui-datepicker {
-  @include font-size(12);
+  @extend %t-copy-sub2;
   border-color: $darkGrey;
   border-radius: 2px;
   background: #fff;
@@ -92,8 +92,7 @@
   background: none;
 }
 .ui-widget {
-  @include font-size(16);
-  font-family: 'Open Sans', sans-serif;
+  @extend %t-copy-base;
 }
 
 .ui-widget-header {

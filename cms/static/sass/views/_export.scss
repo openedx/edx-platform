@@ -90,13 +90,13 @@
 
   // OLD
   .description {
-    @include font-size(14);
+    @extend %t-copy-sub1;
     float: left;
     width: 62%;
     margin-right: 3%;
 
     h2 {
-      @include font-size(19);
+      @extend %t-title5;
       @extend %t-strong;
       margin-bottom: 20px;
     }
@@ -132,13 +132,13 @@
       text-align: center;
 
       h2 {
-        @include font-size(26);
+        @extend %t-title4;
         @extend %t-light;
         margin-bottom: 30px;
       }
 
       .error-block {
-        @include font-size(13);
+        @extend %t-copy-sub1;
         display: none;
         margin-bottom: 15px;
       }
@@ -149,12 +149,12 @@
 
       .button-export {
         @include green-button();
-        @include font-size(17);
+        @extend %t-action1;
         padding: 10px 50px 11px;
       }
 
       .message-status {
-        @include font-size(12);
+        @extend %t-copy-sub2;
         margin-top: 10px;
       }
 

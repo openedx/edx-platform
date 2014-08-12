@@ -309,16 +309,16 @@
       }
 
       .action-signup {
-        @include blue-button;
-        @include font-size(14);
+        @include blue-button();
+        @extend %t-action3;
         @extend %t-strong;
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
       }
 
       .action-signin {
-        @include white-button;
-        @include font-size(14);
+        @include white-button();
+        @extend %t-action3;
         @extend %t-strong;
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;

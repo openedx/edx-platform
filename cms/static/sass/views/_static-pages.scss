@@ -331,8 +331,8 @@
   }
 
   .xblock-student_view {
-    @include font-size(24);
     @include transition(background-color $tmg-s3 linear 0s);
+    @extend %t-title4;
     padding: 20px 20px 22px;
     background: #fff;
   }
@@ -347,7 +347,7 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
     .page-name {
-      @include font-size(19);
+      @extend %t-title5;
       @extend %t-strong;
     }
 
@@ -373,14 +373,14 @@
   }
 
   .page-display-name-input {
-    @include font-size(20);
+    @extend %t-copy-lead1;
     width: 100%;
   }
 
   .page-contents {
-    @include font-size(13);
     @include box-sizing(border-box);
     @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, .3));
+    @extend %t-copy-sub1;
     width: 100%;
     height: 360px;
     padding: 15px;

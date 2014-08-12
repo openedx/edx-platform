@@ -6,9 +6,9 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-  @include font-size(11);
   @include box-sizing(border-box);
   @include linear-gradient($gray-l5, $white);
+  @extend %t-copy-sub2;
   padding: 6px 8px 8px;
   border: 1px solid $gray-l2;
   border-radius: 2px;
@@ -60,8 +60,7 @@ textarea.text {
 form {
 
   input[type=file] {
-    @include font-size(14);
-    line-height: 1;
+    @extend %t-copy-sub1;
   }
 
   .note {
@@ -382,7 +381,7 @@ input.search {
 }
 
 label {
-  @include font-size(12);
+  @extend %t-copy-sub2;
 }
 
 code {
@@ -393,7 +392,7 @@ code {
 }
 
 .CodeMirror {
-  @include font-size(13);
+  @extend %t-copy-sub1;
   background: #fff;
 }
 

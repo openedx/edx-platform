@@ -54,13 +54,13 @@
     }
 
     h1 {
-      @include font-size(24);
+      @extend %t-title4;
       @extend %t-light;
       float: none;
     }
 
     h2 {
-      @include font-size(14);
+      @extend %t-title7;
       @extend %t-strong;
       margin-bottom: 18px;
       line-height: 30px;
@@ -70,7 +70,7 @@
     }
 
     h3 {
-      @include font-size(16);
+      @extend %t-title6;
       @extend %t-strong;
       margin: 34px 0 11px;
     }
@@ -78,7 +78,7 @@
 
   .update-contents {
     p {
-      @include font-size(16);
+      @extend %t-copy-base;
       line-height: 25px;
     }
 
@@ -111,7 +111,7 @@
     }
 
     pre {
-      @include font-size(16);
+      @extend %t-copy-base;
       margin: 1em 0;
       color: $baseFontColor;
       font-family: monospace, serif;
@@ -144,8 +144,8 @@
 
     .edit-button,
     .delete-button {
-      @include font-size(12);
-      @include white-button;
+      @include white-button();
+      @extend %t-action4;
       @extend %t-regular;
       float: left;
       padding: 3px 10px 4px;
@@ -169,14 +169,14 @@
   background: $lightGrey;
 
   .title {
-    @include font-size(22);
+    @extend %t-title4;
     @extend %t-light;
     margin-bottom: 24px;
   }
 
   .edit-button {
     @include white-button();
-    @include font-size(12);
+    @extend %t-action4;
     @extend %t-regular;
     float: right;
     padding: 3px 10px 4px;
@@ -189,7 +189,7 @@
   }
 
   .handouts-content {
-    font-size: 14px;
+    @extend %t-copy-sub1;
   }
 
   .treeview-handoutsnav li {

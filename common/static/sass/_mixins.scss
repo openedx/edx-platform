@@ -297,7 +297,7 @@
   .button,
   .action {
     @extend %btn-primary-green;
-    @include font-size(14);
+    @extend %t-action3;
     margin-left: $baseline;
 
     [class^="icon-"] {

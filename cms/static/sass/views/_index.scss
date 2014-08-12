@@ -163,8 +163,8 @@
               opacity: 0.0;
 
               [class^="icon-"] {
-                @include font-size(18);
                 @include border-top-radius(3px);
+                @extend %t-icon4;
                 display: inline-block;
                 padding: ($baseline/2);
                 background: $blue;

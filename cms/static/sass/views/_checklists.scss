@@ -63,7 +63,7 @@
 
         .ui-toggle-expansion {
           @include transition(all $tmg-f2 ease-in-out 0s);
-          @include font-size(21);
+          @extend %t-action1;
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/2);
@@ -93,7 +93,7 @@
 
 
         .icon-ok {
-          @include font-size(20);
+          @extend %t-icon4;
           display: inline-block;
           margin-left: ($baseline/2);
           color: $gray-l4;
@@ -130,7 +130,7 @@
         float: left;
 
         .icon-add {
-          @include font-size(12);
+          @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
@@ -144,7 +144,7 @@
         float: right;
 
         .icon-delete {
-          @include font-size(12);
+          @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/4);
