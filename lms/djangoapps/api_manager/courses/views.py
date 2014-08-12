@@ -1561,9 +1561,10 @@ class CoursesLeadersList(SecureListAPIView):
             data['points'] = user_points
 
         points = queryset.aggregate(total=Sum('grade'))
-        users_total = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
-        if users_total:
-            course_avg = round(points['total'] / float(users_total), 1)
+        if points and points['total'] is not None:
+            users_total = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+            if users_total:
+                course_avg = round(points['total'] / float(users_total), 1)
         data['course_avg'] = course_avg
         queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
                                                                    'student__profile__title',
