@@ -1534,13 +1534,14 @@ class CoursesLeadersList(SecureListAPIView):
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         queryset = StudentModule.objects.filter(
             course_id__exact=course_key,
             grade__isnull=False,
             max_grade__isnull=False,
             max_grade__gt=0,
             student__is_active=True
-        ).exclude(student__in=_get_aggregate_exclusion_user_ids(course_key))
+        ).exclude(student__in=exclude_users)
 
         if content_id:
             content_descriptor, content_key, existing_content = get_course_child(request, request.user, course_key, content_id)  # pylint: disable=W0612
@@ -1560,9 +1561,9 @@ class CoursesLeadersList(SecureListAPIView):
             data['points'] = user_points
 
         points = queryset.aggregate(total=Sum('grade'))
-        users = queryset.filter(student__is_active=True).aggregate(total=Count('student__id', distinct=True))
-        if users and users['total']:
-            course_avg = round(points['total'] / float(users['total']), 1)
+        users_total = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+        if users_total:
+            course_avg = round(points['total'] / float(users_total), 1)
         data['course_avg'] = course_avg
         queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
                                                                    'student__profile__title',
@@ -1614,12 +1615,9 @@ class CoursesCompletionsLeadersList(SecureAPIView):
             data['completions'] = user_completions
 
         total_completions = queryset.filter(user__is_active=True).count()
-        users = CourseModuleCompletion.objects.filter(user__is_active=True)\
-            .exclude(user__in=exclude_users)\
-            .aggregate(total=Count('user__id', distinct=True))
-
-        if users and users['total'] > 0:
-            course_avg = round(total_completions / float(users['total']), 1)
+        total_users = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+        if total_users:
+            course_avg = round(total_completions / float(total_users), 1)
         data['course_avg'] = course_avg
 
         queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
