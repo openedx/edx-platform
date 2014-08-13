@@ -407,78 +407,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Email'):
-    %if email_msg:
-        <p></p><p>${email_msg}</p>
-    %endif
-
-    <ul class="list-fields">
-      <li class="field">
-        <label for="id_to">${_("Send to:")}</label>
-        <select id="id_to" name="to_option">
-          <option value="myself">${_("Myself")}</option>
-          %if to_option == "staff":
-          <option value="staff" selected="selected">${_("Staff and instructors")}</option>
-          %else:
-          <option value="staff">${_("Staff and instructors")}</option>
-              %endif
-              %if to_option == "all":
-                <option value="all" selected="selected">${_("All (students, staff and instructors)")}</option>
-              %else:
-          <option value="all">${_("All (students, staff and instructors)")}</option>
-          %endif
-        </select>
-      </li>
-
-      <li class="field">
-        <label for="id_subject">${_("Subject: ")}</label>
-        %if subject:
-          <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
-        %else:
-          <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
-        %endif
-        <span class="tip">${_("(Max 128 characters)")}</span>
-      </li>
-
-      <li class="field">
-        <label>Message:</label>
-        <div class="email-editor">
-          ${editor}
-        </div>
-        <input type="hidden" name="message" value="">
-      </li>
-    </ul>
-
-    <div class="submit-email-action">
-      <p class="copy">${_("Please try not to email students more than once per week. Important things to consider before sending:")}</p>
-      <ul class="list-advice">
-        <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
-      </ul>
-      <div class="submit-email-warning">
-        <p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
-          ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
-        <b>${_("A queued email CANNOT be cancelled.")}</b></p>
-      </div>
-      <br />
-      <input type="submit" name="action" value="Send email">
-    </div>
-    <script type="text/javascript">
-      $(document).ready(function(){
-        var emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-        document.idashform.onsubmit = function() {
-          this.message.value = emailEditor.save()['data'];
-          return true;
-        }
-      });
-    </script>
-
-    <br />
-    <p>These email actions run in the background, and status for active email tasks will appear in a table below.
-       To see status for all bulk email tasks submitted for this course, click on this button:
-    </p>
-    <p>
-      <input type="submit" name="action" value="Show Background Email Task History">
-    </p>
+    <p class="deprecated">${_("To send email, please visit the 'Email' section of the instructor dashboard.")}</p>
 %endif
 
     </form>

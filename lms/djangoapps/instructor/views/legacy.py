@@ -58,8 +58,7 @@ from instructor_task.api import (
     get_instructor_task_history,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
-    submit_reset_problem_attempts_for_all_students,
-    submit_bulk_course_email
+    submit_reset_problem_attempts_for_all_students
 )
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -446,55 +445,6 @@ def instructor_dashboard(request, course_id):
             datatable = ret['datatable']
 
     #----------------------------------------
-    # email
-
-    elif action == 'Send email':
-        email_to_option = request.POST.get("to_option")
-        email_subject = request.POST.get("subject")
-        html_message = request.POST.get("message")
-
-        if bulk_email_is_enabled_for_course(course_key):
-            try:
-                # Create the CourseEmail object.  This is saved immediately, so that
-                # any transaction that has been pending up to this point will also be
-                # committed.
-                email = CourseEmail.create(
-                    course_key.to_deprecated_string(), request.user, email_to_option, email_subject, html_message
-                )
-
-                # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-                submit_bulk_course_email(request, course_key, email.id)  # pylint: disable=no-member
-
-            except Exception as err:  # pylint: disable=broad-except
-                # Catch any errors and deliver a message to the user
-                error_msg = "Failed to send email! ({0})".format(err)
-                msg += "<font color='red'>" + error_msg + "</font>"
-                log.exception(error_msg)
-
-            else:
-                # If sending the task succeeds, deliver a success message to the user.
-                if email_to_option == "all":
-                    text = _(
-                        "Your email was successfully queued for sending. "
-                        "Please note that for large classes, it may take up to an hour "
-                        "(or more, if other courses are simultaneously sending email) "
-                        "to send all emails."
-                    )
-                else:
-                    text = _('Your email was successfully queued for sending.')
-                email_msg = '<div class="msg msg-confirm"><p class="copy">{text}</p></div>'.format(text=text)
-        else:
-            msg += "<font color='red'>Email is not enabled for this course.</font>"
-
-    elif "Show Background Email Task History" in action:
-        message, datatable = get_background_task_table(course_key, task_type='bulk_course_email')
-        msg += message
-
-    elif "Show Background Email Task History" in action:
-        message, datatable = get_background_task_table(course_key, task_type='bulk_course_email')
-        msg += message
-
-    #----------------------------------------
     # psychometrics
 
     elif action == 'Generate Histogram and IRT Plot':
@@ -578,27 +528,6 @@ def instructor_dashboard(request, course_id):
     if is_studio_course:
         studio_url = get_cms_course_link(course)
 
-    email_editor = None
-    # HTML editor for email
-    if idash_mode == 'Email' and is_studio_course:
-        html_module = HtmlDescriptor(
-            course.system,
-            DictFieldData({'data': html_message}),
-            ScopeIds(None, None, None, course_key.make_usage_key('html', 'dummy'))
-        )
-        fragment = html_module.render('studio_view')
-        fragment = wrap_xblock(
-            'LmsRuntime', html_module, 'studio_view', fragment, None,
-            extra_data={"course-id": course_key.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
-            request_token=request_token(request),
-        )
-        email_editor = fragment.content
-
-    # Enable instructor email only if the following conditions are met:
-    # 1. Feature flag is on
-    # 2. We have explicitly enabled email for the given course via django-admin
-    # 3. It is NOT an XML course
     if bulk_email_is_enabled_for_course(course_key):
         show_email_tab = True
 
@@ -628,10 +557,6 @@ def instructor_dashboard(request, course_id):
         'modeflag': {idash_mode: 'selectedmode'},
         'studio_url': studio_url,
 
-        'to_option': email_to_option,      # email
-        'subject': email_subject,          # email
-        'editor': email_editor,            # email
-        'email_msg': email_msg,            # email
         'show_email_tab': show_email_tab,  # email
 
         'problems': problems,  # psychometrics
