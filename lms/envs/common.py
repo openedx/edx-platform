@@ -410,8 +410,9 @@ LMS_MIGRATION_ALLOWED_IPS = []
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
-COURSE_ID_PATTERN = r'(?P<course_id>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
-COURSE_KEY_PATTERN = r'(?P<course_key_string>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
+# Note: these intentionally greedily grab all chars up to the next slash including any pluses
+COURSE_ID_PATTERN = r'(?P<course_id>[^/+]+(/|\+)[^/+]+\2[^/]+)'
+COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+?(/|\+)[^/]+?\2[^/]+)'
 USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
