@@ -140,7 +140,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             %for display_name, org, num, run, state_failed, state_in_progress, dismiss_link in sorted(unsucceeded_course_actions, key=lambda s: s[0].lower() if s[0] is not None else ''):
             <!-- STATE: re-run is processing -->
             %if state_in_progress:
-            <li class="wrapper-course has-status">
+            <li class="wrapper-course has-status" data-test-unsucceeded="${org}/${num}/${run}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${display_name}</h3>
@@ -178,7 +178,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
             <!-- STATE: re-run has error -->
             %if state_failed:
-            <li class="wrapper-course has-status">
+            <li class="wrapper-course has-status" data-test-unsucceeded="${org}/${num}/${run}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
                   <h3 class="course-title">${display_name}</h3>
@@ -229,7 +229,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       <div class="courses">
         <ul class="list-courses">
           %for course, url, lms_link, rerun_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-          <li class="course-item">
+          <li class="course-item" data-test-course="${org}/${num}/${run}">
             <a class="course-link" href="${url}">
               <h3 class="course-title">${course}</h3>
 
