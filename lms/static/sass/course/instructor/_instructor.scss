@@ -2,6 +2,11 @@
   display: table;
   position: relative;
 
+  // deprecated content
+  .deprecated {
+    font-style: italic;
+  }
+
   .beta-button-wrapper {
     position: absolute;
     top: 2em;
