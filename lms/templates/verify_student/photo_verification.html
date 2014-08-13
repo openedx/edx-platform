@@ -177,12 +177,13 @@
 
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
-                        <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
-
-                        %if upgrade:
-                          <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
-                        %else:
-                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</dd>
+                        %if "professional" not in modes_dict:
+                          <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
+                            %if upgrade:
+                              <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
+                            %else:
+                              <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="{}">'.format(course_modes_choose_url), a_end="</a>")}</dd>
+                            %endif
                         %endif
                       </dl>
                     </div>
@@ -366,6 +367,7 @@
                     </ul>
                   </li>
 
+                  %if len(suggested_prices) > 0:
                   <li class="review-task  review-task-contribution">
                     <h4 class="title">${_("Check Your Contribution Level")}</h4>
 
@@ -376,12 +378,28 @@
                     <%include file="/course_modes/_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
                   </li>
+                  %else:
+                  <li class="review-task  review-task-contribution">
+                    <h4 class="title">${_("Your Course Total")}</h4>
+                    <div class="copy">
+                      <p>${_("To complete your registration, you will need to pay:")}</p>
+                    </div>
+                    <ul class="list-fields contribution-options">
+                        <li class="field contribution-option">
+                            <span class="deco-denomination">$</span>
+                            <span class="label-value">${chosen_price}</span>
+                            <span class="denomination-name">${currency}</span>
+                            </label>
+                        </li>
+                    </ul>
+                  </li>
+                  %endif
                 </ol>
               </div>
 
               <nav class="nav-wizard">
                 <div class="prompt-verify">
-                  <h3 class="title">Before proceeding, please confirm that your details match</h3>
+                  <h3 class="title">${_("Before proceeding, please confirm that your details match")}</h3>
 
                    <p class="copy"> ${_("Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.")}</p>
 
