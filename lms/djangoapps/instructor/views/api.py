@@ -672,7 +672,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     # csv headers
     query_features = [
         'code', 'course_id', 'company_name', 'created_by',
-        'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
+        'redeemed_by', 'invoice_id', 'purchaser', 'company_reference', 'internal_reference'
     ]
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
@@ -770,7 +770,7 @@ def generate_registration_codes(request, course_id):
         'course_url': course_url,
     }
     # composes registration codes invoice email
-    subject = 'Invoice for {course_name}'.format(course_name=course.display_name)
+    subject = u'Invoice for {course_name}'.format(course_name=course.display_name)
     message = render_to_string('emails/registration_codes_sale_invoice.txt', context)
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
@@ -779,13 +779,17 @@ def generate_registration_codes(request, course_id):
     csv_writer = csv.writer(csv_file)
     for registration_code in course_registration_codes:
         csv_writer.writerow([registration_code.code])
-    email = EmailMessage()
-    email.subject = subject
-    email.body = message
-    email.from_email = from_address
-    email.to = recipient_list
-    email.attach('{file_name}.csv'.format(file_name=subject), csv_file.getvalue(), 'text/csv')
-    email.send()
+
+    # send a unique email for each recipient, don't put all email addresses in a single email
+    for recipient in recipient_list:
+        email = EmailMessage()
+        email.subject = subject
+        email.body = message
+        email.from_email = from_address
+        email.to = [recipient]
+        email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
+        email.send()
+
     return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
 
 @ensure_csrf_cookie

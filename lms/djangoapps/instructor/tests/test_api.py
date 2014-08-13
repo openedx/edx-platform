@@ -53,6 +53,7 @@ from course_modes.models import CourseMode
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
+EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","company_reference","internal_reference"'
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -2497,10 +2498,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 17)
 
     @patch.object(instructor.views.api, 'random_code_generator',
@@ -2524,10 +2522,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
 
     @patch.object(instructor.views.api, 'random_code_generator',
@@ -2549,10 +2544,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 4)
 
     def test_spent_course_registration_codes_csv(self):
@@ -2567,10 +2559,9 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
+
         self.assertEqual(len(body.split('\n')), 7)
 
         generate_code_url = reverse(
@@ -2604,10 +2595,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_active_course_registration_codes_csv(self):
@@ -2622,10 +2610,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 9)
 
         generate_code_url = reverse(
@@ -2646,10 +2631,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_get_all_course_registration_codes_csv(self):
@@ -2665,10 +2647,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 14)
 
         generate_code_url = reverse(
@@ -2689,10 +2668,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_get_codes_with_sale_invoice(self):
@@ -2719,7 +2695,4 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","company_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
