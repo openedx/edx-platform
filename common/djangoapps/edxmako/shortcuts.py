@@ -92,7 +92,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance['marketing_link'] = marketing_link
 
     # In various testing contexts, there might not be a current request context.
-    if edxmako.middleware.REQUEST_CONTEXT.context is not None:
+    if getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None) is not None:
         for d in edxmako.middleware.REQUEST_CONTEXT.context:
             context_dictionary.update(d)
     for d in context_instance:

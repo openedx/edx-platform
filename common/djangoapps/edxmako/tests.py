@@ -65,11 +65,11 @@ class MakoMiddlewareTest(TestCase):
 
         self.middleware.process_request(self.request)
         # requestcontext should not be None.
-        self.assertIsNotNone(edxmako.middleware.REQUEST_CONTEXT.context)
+        self.assertIsNotNone(getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None))
 
         self.middleware.process_response(self.request, self.response)
         # requestcontext should be None.
-        self.assertIsNone(edxmako.middleware.REQUEST_CONTEXT.context)
+        self.assertIsNone(getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None))
 
 
 def mako_middleware_process_request(request):
