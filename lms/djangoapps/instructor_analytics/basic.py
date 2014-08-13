@@ -16,7 +16,7 @@ ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
-COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'transaction_group_name', 'created_by')
+COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by')
 
 
 def purchase_transactions(course_id, features):
@@ -120,13 +120,16 @@ def course_registration_features(features, registration_codes, csv_type):
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
+        course_registration_dict['company_name'] = None
+        if registration_code.invoice:
+            course_registration_dict['company_name'] = getattr(registration_code.invoice, 'company_name')
         course_registration_dict['redeemed_by'] = None
         if registration_code.invoice:
             sale_invoice = Invoice.objects.get(id=registration_code.invoice_id)
             course_registration_dict['invoice_id'] = sale_invoice.id
-            course_registration_dict['purchaser'] = sale_invoice.purchaser_name
+            course_registration_dict['purchaser'] = sale_invoice.company_contact_name
             course_registration_dict['total_price'] = sale_invoice.total_amount
-            course_registration_dict['reference'] = sale_invoice.reference
+            course_registration_dict['reference'] = sale_invoice.company_reference
 
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
