@@ -661,6 +661,7 @@ hr.divide {
     text-align: center;
 
     .close-icon {
+      @extend %t-strong;
       @extend %t-action2;
       @extend %t-strong;
     }
@@ -775,6 +776,7 @@ hr.divide {
   @include transition(opacity $tmg-f3 ease-out 0s);
   @include font-size(12);
   @extend %t-regular;
+  @extend %t-regular;
   @extend %ui-depth5;
   position: absolute;
   top: 0;
@@ -789,7 +791,7 @@ hr.divide {
 
   &:after {
     @include font-size(20);
-    content: '▾';
+    content: '???';
     display: block;
     position: absolute;
     bottom: -14px;
