@@ -248,8 +248,17 @@ def create_unit_from_course_outline():
 
     world.wait_for_mathjax()
     world.wait_for_xmodule()
+    world.wait_for_loading()
 
     assert world.is_css_present('ul.new-component-type')
+
+
+@world.absorb
+def wait_for_loading():
+    """
+    Waits for the loading indicator to be hidden.
+    """
+    world.wait_for(lambda _driver: len(world.browser.find_by_css('div.ui-loading.is-hidden')) > 0)
 
 
 @step('I have clicked the new unit button$')
