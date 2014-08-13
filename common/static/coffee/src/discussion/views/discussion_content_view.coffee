@@ -24,8 +24,16 @@ if Backbone?
         disable: -> @$(".action-delete").closest("li").hide()
 
       can_openclose:
-        enable: -> @$(".action-close").closest("li").show()
-        disable: -> @$(".action-close").closest("li").hide()
+        enable: ->
+          _.each(
+            [".action-close", ".action-pin"],
+            (selector) -> @$(selector).closest("li").show()
+          )
+        disable: ->
+          _.each(
+            [".action-close", ".action-pin"],
+            (selector) -> @$(selector).closest("li").hide()
+          )
 
     renderPartialAttrs: ->
       for attr, value of @model.changedAttributes()

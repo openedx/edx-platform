@@ -96,7 +96,6 @@
                   </span>
                 </a>
               </li>
-              % if course and has_permission(user, 'openclose_thread', course.id):
               <li class="actions-item">
                 <a href="javascript:void(0)" class="action-list-item action-pin" role="menuitemcheckbox" aria-checked="false">
                   <span class="sr">${_("Pin")}</span>
@@ -108,7 +107,6 @@
                   </span>
                 </a>
               </li>
-              % endif
               <li class="actions-item">
                 <a href="javascript:void(0)" class="action-list-item action-edit" role="menuitem">
                   <span class="action-icon"><i class="icon icon-pencil"></i></span>
