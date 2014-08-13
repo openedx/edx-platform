@@ -15,9 +15,7 @@ $fg-min-width: 900px;
 // ====================
 
 // fonts
-$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
-$f-decorative: '';
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // ====================
@@ -230,6 +228,3 @@ $body-line-height: golden-ratio(.875em, 1);
 // carried over from LMS for xmodules
 $action-primary-active-bg: #1AA1DE; // $m-blue
 $very-light-text: #fff;
-
-
-
