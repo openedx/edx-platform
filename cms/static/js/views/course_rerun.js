@@ -52,7 +52,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             );
             // Go into creating re-run state
             $('.rerun-course-save').addClass('is-disabled').addClass('is-processing').html(
-               '<i class="icon-refresh icon-spin"></i>' + gettext('Processing Re-run Request')
+               '<i class="icon icon-refresh icon-spin"></i>' + gettext('Processing Re-run Request')
             );
             $('.action-cancel').addClass('is-hidden');
         };
