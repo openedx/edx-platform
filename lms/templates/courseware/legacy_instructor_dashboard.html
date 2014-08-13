@@ -314,38 +314,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Forum Admin'):
-  %if instructor_access:
-    <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List course forum admins">
-    <p>
-    <input type="text" name="forumadmin"> <input type="submit" name="action" value="Remove forum admin">
-    <input type="submit" name="action" value="Add forum admin">
-    <hr width="40%" style="align:left">
-  %endif
-
-  %if instructor_access or forum_admin_access:
-    <p>
-    <input type="submit" name="action" value="List course forum moderators">
-    <input type="submit" name="action" value="List course forum community TAs">
-    <p>
-    <input type="text" name="forummoderator">
-    <input type="submit" name="action" value="Remove forum moderator">
-    <input type="submit" name="action" value="Add forum moderator">
-    <input type="submit" name="action" value="Remove forum community TA">
-    <input type="submit" name="action" value="Add forum community TA">
-    <hr width="40%" style="align:left">
-  %else:
-  <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
-  %endif
-
-  <br />
-  <h2>${_("Explanation of Roles:")}</h2>
-  <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
-  "responses, and see posts from all cohorts (if the course is cohorted). Moderators' posts are marked as 'staff'.")}</p>
-  <p>${_("Forum Admins: have moderator privileges, as well as the ability to edit the list of forum moderators "
-  "(e.g. to appoint a new moderator). Admins' posts are marked as 'staff'.")}</p>
-  <p>${_("Community TAs: have forum moderator privileges, and their posts are labelled 'Community TA'.")}</p>
+    <p class="deprecated">${_("To manage forum roles, please visit the 'Membership' section of the instructor dashboard.")}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
