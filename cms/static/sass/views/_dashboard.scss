@@ -236,7 +236,7 @@
     		margin: ($baseline/2);
     		font-weight: 700;
 
-    		[class^="icon-"] {
+    		.icon {
     			margin-right: ($baseline/4);
     		}
     	}
@@ -333,12 +333,12 @@
 
         .value {
 
-          .copy, *[class^="icon"] {
+          .copy, .icon {
             display: inline-block;
             vertical-align: middle;
           }
 
-          *[class^="icon"] {
+          .icon {
             @extend %t-icon4;
             margin-right: ($baseline/2);
           }
