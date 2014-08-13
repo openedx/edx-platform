@@ -182,8 +182,8 @@
     };
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
     
-    if (typeof Annotator != 'undefined'){
-            //remove old instances
+    var startosda = function() {
+        //remove old instances
         if (Annotator._instances.length !== 0) {
           $('#imageHolder').annotator("destroy");
         }
@@ -219,5 +219,12 @@
         // if it is in instructor mode only (1), the annotator should be destroyed for all except the instructor
         if ("${annotation_mode}" == "instructor" && "${instructor_email}" == "" && !is_staff)
             osda.annotator.destroy();
+    }
+    if (typeof Annotator !== 'undefined') {
+        startosda();
+    } else {
+        require(["osda"], function(osda){
+            startosda();
+        });
     }
 </script>
