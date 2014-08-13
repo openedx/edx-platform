@@ -74,7 +74,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
     def test_course_registration_features(self):
         query_features = [
             'code', 'course_id', 'company_name', 'created_by',
-            'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
+            'redeemed_by', 'invoice_id', 'purchaser', 'company_reference', 'internal_reference'
         ]
         order = Order(user=self.instructor, status='purchased')
         order.save()
