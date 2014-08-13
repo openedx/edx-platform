@@ -34,7 +34,7 @@ class CourseLeadersSerializer(serializers.Serializer):
         formats points_scored to two decimal points
         """
         points_scored = obj['points_scored'] or 0
-        return round(points_scored, 2)
+        return int(round(points_scored))
 
 
 class CourseCompletionsLeadersSerializer(serializers.Serializer):
@@ -43,7 +43,18 @@ class CourseCompletionsLeadersSerializer(serializers.Serializer):
     username = serializers.CharField(source='user__username')
     title = serializers.CharField(source='user__profile__title')
     avatar_url = serializers.CharField(source='user__profile__avatar_url')
-    completions = serializers.IntegerField()
+    completions = serializers.SerializerMethodField('get_completion_percentage')
+
+    def get_completion_percentage(self, obj):
+        """
+        formats get completions as percentage
+        """
+        total_completions = self.context['total_completions'] or 0
+        completions = obj['completions'] or 0
+        completion_percentage = 0
+        if total_completions > 0:
+            completion_percentage = int(round(100 * completions / total_completions))
+        return completion_percentage
 
 
 class CourseSerializer(serializers.Serializer):

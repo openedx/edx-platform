@@ -1571,7 +1571,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['leaders']), 3)
         self.assertEqual(response.data['course_avg'], 3.4)
         self.assertEqual(response.data['position'], 2)
-        self.assertEqual(response.data['points'], 4.5)
+        self.assertEqual(response.data['points'], 5)
 
         # Filter by user who has never accessed a course module
         test_user = UserFactory.create(username="testusernocoursemod")
@@ -1656,7 +1656,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
         self.assertEqual(response.data['position'], 1)
-        self.assertEqual(response.data['completions'], 10)
+        self.assertEqual(response.data['completions'], 40)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)

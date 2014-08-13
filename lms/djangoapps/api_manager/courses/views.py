@@ -1558,7 +1558,7 @@ class CoursesLeadersList(SecureListAPIView):
                 filter(points__gt=user_points).exclude(student__id=user_id).count()  # excluding user to overcome
                 #  float comparison bug
             data['position'] = users_above + 1
-            data['points'] = user_points
+            data['points'] = int(round(user_points))
 
         points = queryset.aggregate(total=Sum('grade'))
         if points and points['total'] is not None:
@@ -1607,15 +1607,18 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)\
             .exclude(user__in=exclude_users)
+        total_completions = queryset.filter(user__is_active=True).count()
 
         if user_id:
             user_completions = queryset.filter(user__id=user_id).count()
             completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
                 .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
             data['position'] = completions_above_user + 1
-            data['completions'] = user_completions
+            completion_percentage = 0
+            if total_completions > 0:
+                completion_percentage = int(round(100 * user_completions/total_completions))
+            data['completions'] = completion_percentage
 
-        total_completions = queryset.filter(user__is_active=True).count()
         total_users = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
         if total_users:
             course_avg = round(total_completions / float(total_users), 1)
@@ -1623,8 +1626,9 @@ class CoursesCompletionsLeadersList(SecureAPIView):
 
         queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
                                                                 'user__profile__avatar_url')\
-            .annotate(completions=Count('content_id')).order_by('-completions')[:count]
-        serializer = CourseCompletionsLeadersSerializer(queryset, many=True)
+                       .annotate(completions=Count('content_id')).order_by('-completions')[:count]
+        serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
+                                                        context={'total_completions': total_completions})
         data['leaders'] = serializer.data  # pylint: disable=E1101
         return Response(data, status=status.HTTP_200_OK)
 
