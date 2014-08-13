@@ -847,8 +847,8 @@ input[name="subject"] {
     width: 258px;
     border-radius: 3px;
   }
-  input[name="transaction_group_name"], input[name="download_transaction_group_name"],
-  input[name="active_transaction_group_name"], input[name="spent_transaction_group_name"] {
+  input[name="download_company_name"],
+  input[name="active_company_name"], input[name="spent_company_name"] {
     margin-right: 8px;
     height: 36px;
     width: 300px;
@@ -960,6 +960,12 @@ input[name="subject"] {
   #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
       background: #fff;
+    }
+    span.tip-text {
+      font-size: 12px;
+      display: block;
+      margin-top: 5px;
+      color: #646464
     }
     top:-95px !important;
     width: 650px;
