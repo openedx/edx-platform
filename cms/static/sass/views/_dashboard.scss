@@ -236,7 +236,7 @@
         @extend %t-strong;
         margin: ($baseline/2);
 
-        [class^="icon-"] {
+        .icon {
           margin-right: ($baseline/4);
         }
       }
@@ -302,6 +302,14 @@
       padding-bottom: ($baseline/2);
       color: $gray-l2;
     }
+
+    .title {
+      @extend %t-title6;
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
+      color: $gray-l2;
+    }
 	}
 
   .list-courses {
@@ -333,12 +341,12 @@
 
         .value {
 
-          .copy, *[class^="icon"] {
+          .copy, .icon {
             display: inline-block;
             vertical-align: middle;
           }
 
-          *[class^="icon"] {
+          .icon {
             @extend %t-icon4;
             margin-right: ($baseline/2);
           }
