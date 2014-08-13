@@ -104,7 +104,7 @@
 
       .action-primary {
         @include blue-button();
-        @include font-size(14); // needed due to bad button mixins for now
+        @extend %t-action3;
         border-color: $blue-d1;
         color: $white;
       }

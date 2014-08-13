@@ -247,8 +247,8 @@ p, ul, ol, dl {
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
-  @include grey-button;
-  @include font-size(10);
+  @include grey-button();
+  @extend %t-action5;
   margin: ($baseline/2);
   padding: 3px ($baseline/2) 4px ($baseline/2);
 
@@ -287,9 +287,9 @@ hr.divide {
 }
 
 .details {
+    @extend %t-copy-sub1;
     display: none;
     margin-bottom: 30px;
-    font-size: 14px;
 }
 
 .window {
@@ -304,13 +304,13 @@ hr.divide {
   }
 
   .header {
+    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+    @extend %t-title7;
     padding: 6px 14px;
     border-bottom: 1px solid $mediumGrey;
     border-radius: 2px 2px 0 0;
-    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     background-color: $lightBluishGrey;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
-    font-size: 14px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
@@ -324,11 +324,10 @@ hr.divide {
     }
 
     .description {
+      @extend %t-copy-sub2;
       @extend %t-regular;
       display: block;
-      font-size: 11px;
       font-style: italic;
-      line-height: 1.3;
       color: #999;
     }
   }
@@ -345,6 +344,8 @@ hr.divide {
 // system notifications
 .toast-notification {
   @include transition(all $tmg-f2 linear 0s);
+  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
+  @extend %t-copy-sub1;
   display: none;
   position: fixed;
   top: 20px;
@@ -354,10 +355,8 @@ hr.divide {
   padding: 15px 20px 17px;
   border-radius: 3px;
   border: 1px solid #333;
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   background-color: rgba(30, 30, 30, .92);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
-  font-size: 13px;
   text-align: center;
   color: #fff;
 
@@ -366,37 +365,37 @@ hr.divide {
   }
 
   strong {
+    @extend %t-copy-base;
     @extend %t-strong;
     display: block;
     margin-bottom: 10px;
-    font-size: 16px;
     text-align: center;
   }
 
   .close-button {
+    @extend %t-action1;
     @extend %t-strong;
     position: absolute;
     top: 0;
     right: 0;
     width: 27px;
     height: 27px;
-    font-size: 22px;
     line-height: 25px;
     color: #aaa;
     text-align: center;
 
     .close-icon {
+      @extend %t-action2;
       @extend %t-strong;
-      font-size: 16px;
     }
   }
 
   .action-button {
     @include blue-button;
     @include box-sizing(border-box);
+    @extend %t-action4;
     width: 100%;
     margin-top: 10px;
-    font-size: 12px;
     text-align: center;
   }
 }
@@ -463,7 +462,7 @@ hr.divide {
   }
 
   .icon-eye-open {
-    @include font-size(16);
+    @extend %t-action2;
     display: inline-block;
     vertical-align: middle;
     margin-right: 8px;
@@ -497,8 +496,8 @@ hr.divide {
 }
 
 .tooltip {
-  @include font-size(12);
   @include transition(opacity $tmg-f3 ease-out 0s);
+  @include font-size(12);
   @extend %t-regular;
   @extend %ui-depth5;
   position: absolute;
@@ -513,13 +512,13 @@ hr.divide {
   opacity: 0.0;
 
   &:after {
+    @include font-size(20);
     content: '▾';
     display: block;
     position: absolute;
     bottom: -14px;
     left: 50%;
     margin-left: -7px;
-    font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
   }
 }
@@ -563,7 +562,7 @@ hr.divider {
 
 // ui - skipnav
 .nav-skip {
-  @include font-size(13);
+  @extend %t-action3;
   display: block;
   position: absolute;
   left: 0px;
@@ -615,7 +614,7 @@ body.js {
       }
 
       [class^="icon-"] {
-        @include font-size(18);
+        @extend %t-action1;
         color: $white;
       }
 

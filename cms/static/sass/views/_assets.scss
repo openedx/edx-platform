@@ -35,7 +35,7 @@
     color: $gray;
 
     .new-button {
-      @include font-size(14);
+      @extend %t-action3;
       margin-left: $baseline;
 
       [class^="icon-"] {
@@ -414,9 +414,9 @@
     }
 
     .choose-file-button {
-      @include blue-button;
+      @include blue-button();
+      @extend %t-action2;
       padding: 10px 82px 12px;
-      font-size: 17px;
     }
 
     .progress-bar {

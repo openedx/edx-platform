@@ -54,15 +54,15 @@
     }
 
     h1 {
+      @extend %t-title4;
       @extend %t-light;
       float: none;
-      font-size: 24px;
     }
 
     h2 {
+      @extend %t-title7;
       @extend %t-strong;
       margin-bottom: 18px;
-      font-size: 14px;
       line-height: 30px;
       color: #646464;
       letter-spacing: 1px;
@@ -70,15 +70,15 @@
     }
 
     h3 {
+      @extend %t-title6;
       @extend %t-strong;
       margin: 34px 0 11px;
-      font-size: 16px;
     }
   }
 
   .update-contents {
     p {
-      font-size: 16px;
+      @extend %t-copy-base;
       line-height: 25px;
     }
 
@@ -111,10 +111,10 @@
     }
 
     pre {
+      @extend %t-copy-base;
       margin: 1em 0;
       color: $baseFontColor;
       font-family: monospace, serif;
-      font-size: 1em;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
@@ -143,13 +143,13 @@
     float: right;
 
     .edit-button,
-    .delete-button{
-      @include white-button;
+    .delete-button {
+      @include white-button();
+      @extend %t-action4;
       @extend %t-regular;
       float: left;
       padding: 3px 10px 4px;
       margin-left: 7px;
-      font-size: 12px;
 
       .edit-icon,
       .delete-icon {
@@ -169,18 +169,18 @@
   background: $lightGrey;
 
   .title {
+    @extend %t-title4;
     @extend %t-light;
     margin-bottom: 24px;
-    font-size: 22px;
   }
 
   .edit-button {
-    @include white-button;
+    @include white-button();
+    @extend %t-action4;
     @extend %t-regular;
     float: right;
     padding: 3px 10px 4px;
     margin-left: 7px;
-    font-size: 12px;
 
     .edit-icon,
     .delete-icon {
@@ -189,7 +189,7 @@
   }
 
   .handouts-content {
-    font-size: 14px;
+    @extend %t-copy-sub1;
   }
 
   .treeview-handoutsnav li {

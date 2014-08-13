@@ -28,7 +28,7 @@
     }
 
     .new-button {
-      @include font-size(14);
+      @extend %t-action3;
       margin-left: $baseline;
 
       [class^="icon-"] {
@@ -51,10 +51,8 @@
           }
 
           .group-configuration-title {
-            @extend %t-title;
+            @extend %t-title4;
             @extend %t-strong;
-            @include font-size(22);
-            @include line-height(22);
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
@@ -109,7 +107,7 @@
 
           .ui-toggle-expansion {
             @include transition(rotate .15s ease-in-out .25s);
-            @include font-size(21);
+            @extend %t-action1;
             display: inline-block;
             width: ($baseline*0.75);
             vertical-align: baseline;
@@ -133,9 +131,7 @@
             margin-bottom: ($baseline*0.75);
 
             .group {
-              @extend %t-copy-sub2;
-              @include font-size(18);
-              @include line-height(16);
+              @extend %t-copy-lead1;
               padding: ($baseline/7) 0 ($baseline/4);
               border-top: 1px solid $gray-l4;
               white-space: nowrap;
@@ -193,7 +189,7 @@
         }
 
         .wrapper-group-configuration-usages {
-          @include font-size(14);
+          @extend %t-copy-sub1;
           background-color: #f8f8f8;
           box-shadow: 0 2px 2px 0 $shadow inset;
           padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
@@ -445,7 +441,7 @@
 
             .action-close {
               @include transition(color 0.25s ease-in-out);
-              @include font-size(22);
+              @extend %t-action1;
               display: inline-block;
               border: 0;
               padding: 0;
@@ -471,8 +467,8 @@
 
       .action-add-group {
         @extend %ui-btn-flat-outline;
+        @extend %t-action2;
         @extend %t-strong;
-        @include font-size(16);
         display: block;
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;

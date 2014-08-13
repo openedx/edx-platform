@@ -119,8 +119,8 @@
 
 // mixins - grandfathered
 @mixin button {
-  @include font-size(14);
   @include transition(background-color 0.15s, box-shadow 0.15s);
+  @extend %t-action3;
   @extend %t-strong;
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0);
   display: inline-block;
@@ -367,11 +367,11 @@
 
   .section-item {
     @include transition(background $tmg-avg ease-in-out 0);
+    @extend %t-action3;
     position: relative;
     display: block;
     padding: 6px 8px 8px 16px;
     background: #edf1f5;
-    font-size: 13px;
 
     &:hover, &:focus {
       background: $blue-l5;
@@ -389,8 +389,8 @@
     .public-item:after,
     .private-item:after {
       @extend %t-strong;
+      @extend %t-action5;
       margin-left: 3px;
-      font-size: 9px;
       text-transform: uppercase;
     }
 

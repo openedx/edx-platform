@@ -166,7 +166,7 @@
 
         .icon-cog {
           @include transition(all $tmg-f1 ease-in-out $tmg-f1);
-          @include font-size(20);
+          @extend %t-icon4;
           position: absolute;
           top: ($baseline/2);
           left: -($baseline);

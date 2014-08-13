@@ -23,20 +23,20 @@
   }
 
   h3 {
+    @extend %t-title5;
     @extend %t-strong;
-    font-size: 19px;
   }
 
   .export-git-info-block {
 
     dt {
+      @extend %t-copy-lead1;
       @extend %t-strong;
-      font-size: 19px;
       margin-top: 12px;
     }
 
     dd {
-      font-size: 17px;
+      @extend %t-copy-base;
       margin-bottom: 20px;
     }
 
