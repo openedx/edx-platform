@@ -201,11 +201,15 @@ function goto( mode)
     </div>
     % endif
 
-    <p>
+    <p class="deprecated">
       ${_("To view the Gradebook (small courses only), please visit the 'Student Admin' section of the instructor dashboard.")}
     </p>
     <p>
     <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
+    </p>
+
+    <p class="deprecated">
+      ${_("To perform grade downloads, please visit the 'Data Download' section of the instructor dashboard.")}
     </p>
 
     <p class="is-deprecated">
@@ -263,13 +267,13 @@ function goto( mode)
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
-    <p>${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
+    <p class="deprecated">${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
 
   %endif
 
     <h2>${_("Student-specific grade inspection and adjustment")}</h2>
 
-    <p>${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
+    <p class="deprecated">${_("To perform these actions, please visit the 'Student Admin' section of the instructor dashboard.")}</p>
 
  %endif
 
