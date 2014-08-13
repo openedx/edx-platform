@@ -48,7 +48,7 @@ class Template(MakoTemplate):
         context_dictionary = {}
 
         # In various testing contexts, there might not be a current request context.
-        if getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None) is not None:
+        if getattr(edxmako.middleware.REQUEST_CONTEXT, "context", None):
             for d in edxmako.middleware.REQUEST_CONTEXT.context:
                 context_dictionary.update(d)
         for d in context_instance:
