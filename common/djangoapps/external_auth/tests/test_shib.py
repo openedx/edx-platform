@@ -13,6 +13,7 @@ from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.importlib import import_module
 
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -513,6 +514,11 @@ class ShibSPTest(ModuleStoreTestCase):
         for course in [shib_course, open_enroll_course]:
             for student in [shib_student, other_ext_student, int_student]:
                 request = self.request_factory.post('/change_enrollment')
+
+                # Add a session to the request
+                SessionMiddleware().process_request(request)
+                request.session.save()
+
                 request.POST.update({'enrollment_action': 'enroll',
                                      'course_id': course.id.to_deprecated_string()})
                 request.user = student
