@@ -302,6 +302,14 @@
       padding-bottom: ($baseline/2);
       color: $gray-l2;
     }
+
+    .title {
+      @extend %t-title6;
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: ($baseline/2);
+      color: $gray-l2;
+    }
 	}
 
   .list-courses {

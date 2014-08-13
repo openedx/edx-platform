@@ -73,6 +73,12 @@
 
     .rerun-course-save {
       @include blue-button;
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/4);
+      }
     }
 
     .rerun-course-cancel {
