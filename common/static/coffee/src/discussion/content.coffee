@@ -191,7 +191,7 @@ if Backbone?
 
     canBeEndorsed: =>
       user_id = window.user.get("id")
-      user_id && (DiscussionUtil.isStaff(user_id) || @get('thread').get('user_id') == user_id)
+      user_id && (DiscussionUtil.isStaff(user_id) || (@get('thread').get('thread_type') == 'question' && @get('thread').get('user_id') == user_id))
 
   class @Comments extends Backbone.Collection
 

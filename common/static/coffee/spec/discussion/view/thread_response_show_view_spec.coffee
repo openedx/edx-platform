@@ -137,6 +137,19 @@ describe "ThreadResponseShowView", ->
         endorseButton.click()
         expect(endorseButton).toHaveClass("is-endorsed")
 
+    it "does not allow the author of a discussion thread to endorse", ->
+        @thread.set({
+            "thread_type": "discussion",
+            "user_id": window.user.id
+        })
+        @view.render()
+        endorseButton = @view.$(".action-endorse")
+        expect(endorseButton.length).toEqual(1)
+        expect(endorseButton).toHaveCss({"display": "none"})
+        expect(endorseButton).not.toHaveClass("is-clickable")
+        endorseButton.click()
+        expect(endorseButton).not.toHaveClass("is-endorsed")
+
     it "does not allow a student who is not the author of a question thread to mark an answer", ->
         @thread.set({
             "thread_type": "question",
