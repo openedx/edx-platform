@@ -314,39 +314,6 @@ def instructor_dashboard(request, course_id):
                     msg += msg2
 
     #----------------------------------------
-    # Admin
-
-    elif 'List course staff' in action:
-        role = CourseStaffRole(course.id)
-        datatable = _role_members_table(role, _("List of Staff"), course_key)
-        track.views.server_track(request, "list-staff", {}, page="idashboard")
-
-    elif 'List course instructors' in action and GlobalStaff().has_user(request.user):
-        role = CourseInstructorRole(course.id)
-        datatable = _role_members_table(role, _("List of Instructors"), course_key)
-        track.views.server_track(request, "list-instructors", {}, page="idashboard")
-
-    elif action == 'Add course staff':
-        uname = request.POST['staffuser']
-        role = CourseStaffRole(course.id)
-        msg += add_user_to_role(request, uname, role, 'staff', 'staff')
-
-    elif action == 'Add instructor' and request.user.is_staff:
-        uname = request.POST['instructor']
-        role = CourseInstructorRole(course.id)
-        msg += add_user_to_role(request, uname, role, 'instructor', 'instructor')
-
-    elif action == 'Remove course staff':
-        uname = request.POST['staffuser']
-        role = CourseStaffRole(course.id)
-        msg += remove_user_from_role(request, uname, role, 'staff', 'staff')
-
-    elif action == 'Remove instructor' and request.user.is_staff:
-        uname = request.POST['instructor']
-        role = CourseInstructorRole(course.id)
-        msg += remove_user_from_role(request, uname, role, 'instructor', 'instructor')
-
-    #----------------------------------------
     # DataDump
 
     elif 'Download CSV of all student profile data' in action:
