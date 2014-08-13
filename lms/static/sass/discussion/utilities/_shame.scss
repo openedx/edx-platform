@@ -79,9 +79,9 @@
 // elsewhere in our CSS.
 
 // Override global ul rules
-.forum-nav-thread-list, .forum-nav-thread-labels {
-  margin: 0;
-  padding-left: 0;
+.forum-nav-thread, .forum-nav-thread-list, .forum-nav-thread-labels {
+  margin: 0 !important;
+  padding-left: 0 !important;
 }
 
 li[class*=forum-nav-thread-label-] {

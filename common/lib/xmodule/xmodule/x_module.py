@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 import yaml
-import xml.sax.saxutils as saxutils
 
 from functools import partial
 from lxml import etree
@@ -1245,7 +1244,11 @@ class DiscussionService(object):
         import lms.lib.comment_client as cc
         from courseware.access import has_access
         from courseware.courses import get_course_with_access
-        from django_comment_client.forum.views import get_threads
+        from django_comment_client.forum.views import (
+            get_threads,
+            make_course_settings,
+            _attr_safe_json
+        )
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
         from course_groups.cohorts import (
@@ -1277,22 +1280,26 @@ class DiscussionService(object):
         cohorts = get_course_cohorts(course_id)
         cohorted_commentables = get_cohorted_commentables(course_id)
 
+        course_settings = make_course_settings(course, include_category_map=True)
+
         context = {
             'course': course,
             'course_id': course_id,
             'staff_access': has_access(user, 'staff', course),
-            'threads': saxutils.escape(json.dumps(threads), escapedict),
+            'threads': _attr_safe_json(threads),
             'thread_pages': query_params['num_pages'],
-            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'user_info': _attr_safe_json(user_info),
             'flag_moderator': flag_moderator,
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
+            'annotated_content_info': _attr_safe_json(annotated_content_info),
             'category_map': category_map,
-            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
+            'roles': _attr_safe_json(utils.get_role_ids(course_id)),
             'is_moderator': cached_has_permission(user, "see_all_cohorts", course_id),
             'cohorts': cohorts,
             'user_cohort': user_cohort_id,
+            'sort_preference': user_info['default_sort_key'],
             'cohorted_commentables': cohorted_commentables,
             'is_course_cohorted': is_course_cohorted(course_id),
+            'course_settings': _attr_safe_json(course_settings),
             'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
             'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
             'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),
