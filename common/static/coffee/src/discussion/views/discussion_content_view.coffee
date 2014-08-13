@@ -27,12 +27,12 @@ if Backbone?
         enable: ->
           _.each(
             [".action-close", ".action-pin"],
-            (selector) -> @$(selector).closest("li").show()
+            (selector) => @$(selector).closest("li").show()
           )
         disable: ->
           _.each(
             [".action-close", ".action-pin"],
-            (selector) -> @$(selector).closest("li").hide()
+            (selector) => @$(selector).closest("li").hide()
           )
 
     renderPartialAttrs: ->
