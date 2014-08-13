@@ -639,7 +639,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, company_name, invoice):
+def save_registration_codes(request, course_id, generated_codes_list, invoice):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -649,17 +649,16 @@ def save_registration_codes(request, course_id, generated_codes_list, company_na
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
+        return save_registration_codes(request, course_id, generated_codes_list, invoice)
 
     course_registration = CourseRegistrationCode(
-        code=code, course_id=course_id.to_deprecated_string(),
-        transaction_group_name=company_name, created_by=request.user, invoice=invoice
+        code=code, course_id=course_id.to_deprecated_string(), created_by=request.user, invoice=invoice
     )
     try:
         course_registration.save()
         generated_codes_list.append(course_registration)
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, company_name, invoice)
+        return save_registration_codes(request, course_id, generated_codes_list, invoice)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -672,7 +671,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     """
     # csv headers
     query_features = [
-        'code', 'course_id', 'transaction_group_name', 'created_by',
+        'code', 'course_id', 'company_name', 'created_by',
         'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
     ]
 
@@ -702,11 +701,11 @@ def get_registration_codes(request, course_id):  # pylint: disable=W0613
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     #filter all the  course registration codes
-    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
 
-    group_name = request.POST['download_transaction_group_name']
-    if group_name:
-        registration_codes = registration_codes.filter(transaction_group_name=group_name)
+    company_name = request.POST['download_company_name']
+    if company_name:
+        registration_codes = registration_codes.filter(invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
@@ -732,21 +731,22 @@ def generate_registration_codes(request, course_id):
     company_name = request.POST['company_name']
 
     sale_price = request.POST['sale_price']
-    purchaser_contact = request.POST['purchaser_contact']
-    purchaser_name = request.POST['purchaser_name']
-    purchaser_email = request.POST['purchaser_email']
+    contact_name = request.POST['contact_name']
+    contact_email = request.POST['contact_email']
     company_tax_id = request.POST['tax']
     reference = request.POST['reference']
-    recipient_list = [purchaser_email]
+    internal_reference = request.POST['internal_reference']
+    recipient_list = [contact_email]
     if request.POST.get('invoice', False):
         recipient_list.append(request.user.email)
 
     sale_invoice = Invoice.objects.create(
-        total_amount=sale_price, purchaser_name=purchaser_name, purchaser_contact=purchaser_contact,
-        purchaser_email=purchaser_email, tax_id=company_tax_id, reference=reference
+        total_amount=sale_price, company_name=company_name, company_contact_name=contact_name,
+        course_id=course_id, company_contact_email=contact_email, tax_id=company_tax_id,
+        company_reference=reference, internal_reference=internal_reference
     )
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, company_name, sale_invoice)
+        save_registration_codes(request, course_id, course_registration_codes, sale_invoice)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
     course = get_course_by_id(course_id, depth=None)
@@ -760,7 +760,6 @@ def generate_registration_codes(request, course_id):
     )
     context = {
         'invoice': sale_invoice,
-        'company_name': company_name,
         'site_name': site_name,
         'course': course,
         'course_price': course_price,
@@ -800,11 +799,11 @@ def active_registration_codes(request, course_id):  # pylint: disable=W0613
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # find all the registration codes in this course
-    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
 
-    group_name = request.POST['active_transaction_group_name']
-    if group_name:
-        registration_codes_list = registration_codes_list.filter(transaction_group_name=group_name)
+    company_name = request.POST['active_company_name']
+    if company_name:
+        registration_codes_list = registration_codes_list.filter(invoice__company_name=company_name)
     # find the redeemed registration codes if any exist in the db
     code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
     if code_redemption_set.exists():
@@ -827,17 +826,21 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # find the redeemed registration codes if any exist in the db
-    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(
+        registration_code__course_id=course_id
+    )
     spent_codes_list = []
     if code_redemption_set.exists():
         redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
         # filter the Registration Codes by course id and the redeemed codes and
         # you will get a list of all the spent(Redeemed) Registration Codes
-        spent_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id, code__in=redeemed_registration_codes).order_by('transaction_group_name')
+        spent_codes_list = CourseRegistrationCode.objects.filter(
+            course_id=course_id, code__in=redeemed_registration_codes
+        ).order_by('invoice__company_name')
 
-        group_name = request.POST['spent_transaction_group_name']
-        if group_name:
-            spent_codes_list = spent_codes_list.filter(transaction_group_name=group_name)  # pylint:  disable=E1103
+        company_name = request.POST['spent_company_name']
+        if company_name:
+            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint:  disable=E1103
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)

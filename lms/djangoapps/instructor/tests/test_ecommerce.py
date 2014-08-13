@@ -175,8 +175,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
-            transaction_group_name='Test Group', created_by=self.instructor
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
         )
         course_registration.save()
 
@@ -293,8 +292,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('coupon with the coupon id ({coupon_id}) already exist'.format(coupon_id=coupon.id) in response.content)  # pylint: disable=E1101
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(),
-            transaction_group_name='Test Group', created_by=self.instructor
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
         )
         course_registration.save()
 

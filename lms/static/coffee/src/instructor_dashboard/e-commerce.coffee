@@ -10,9 +10,9 @@ class ECommerce
     @$section.data 'wrapper', @
     # gather elements
     @$list_purchase_csv_btn = @$section.find("input[name='list-purchase-transaction-csv']'")
-    @$download_transaction_group_name = @$section.find("input[name='download_transaction_group_name']'")
-    @$active_transaction_group_name = @$section.find("input[name='active_transaction_group_name']'")
-    @$spent_transaction_group_name = @$section.find('input[name="spent_transaction_group_name"]')
+    @$download_company_name = @$section.find("input[name='download_company_name']'")
+    @$active_company_name = @$section.find("input[name='active_company_name']'")
+    @$spent_company_name = @$section.find('input[name="spent_company_name"]')
 
     @$download_registration_codes_form = @$section.find("form#download_registration_codes")
     @$active_registration_codes_form = @$section.find("form#active_registration_codes")
@@ -52,9 +52,9 @@ class ECommerce
 
   clear_display: ->
     @$coupoon_error.attr('style', 'display: none')
-    @$download_transaction_group_name.val('')
-    @$active_transaction_group_name.val('')
-    @$spent_transaction_group_name.val('')
+    @$download_company_name.val('')
+    @$active_company_name.val('')
+    @$spent_company_name.val('')
 
   isInt = (n) -> return n % 1 == 0;
     # Clear any generated tables, warning messages, etc.
