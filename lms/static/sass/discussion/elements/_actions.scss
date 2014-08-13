@@ -30,7 +30,7 @@
 // ====================
 
 // UI: general actions dropdown
-.post-actions-dropdown, .response-actions-dropdown, .comment-actions-dropdown {
+.actions-dropdown {
   @extend %ui-no-list;
   display: none;
   background-color: $white;
@@ -191,6 +191,10 @@
 // CASE: comment action
 .comment-actions-list .action-button.action-more {
   height: ($baseline*1.5);
+
+  .action-label {
+    display: none;
+  }
 }
 
 .action-button, .action-list-item {

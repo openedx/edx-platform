@@ -124,14 +124,14 @@ if Backbone?
       event.preventDefault()
       event.stopPropagation()
       @$(".action-more").addClass("is-expanded")
-      @$(".post-actions-dropdown, .response-actions-dropdown, .comment-actions-dropdown").addClass("is-expanded")
+      @$(".actions-dropdown").addClass("is-expanded")
       $("body").on("click", @hideSecondaryActions)
 
     hideSecondaryActions: (event) =>
       event.preventDefault()
       event.stopPropagation()
       @$(".action-more").removeClass("is-expanded")
-      @$(".post-actions-dropdown, .response-actions-dropdown, .comment-actions-dropdown").removeClass("is-expanded")
+      @$(".actions-dropdown").removeClass("is-expanded")
       $("body").off("click", @hideSecondaryActions)
 
     toggleFollow: (event) =>

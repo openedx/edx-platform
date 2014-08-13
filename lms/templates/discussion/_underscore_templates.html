@@ -70,97 +70,16 @@
               </span>
           </p>
       </header>
-      <ul class="post-actions-list">
-        <li class="actions-item is-visible">
-          <div class="more-wrapper">
-            <a href="javascript:void(0)" class="action-button action-more" role="menu">
-              <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-              <span class="action-label">${_("More")}</span>
-            </a>
-            <ul class="post-actions-dropdown" role="menu">
-              <li class="actions-item">
-                ## TODO: what to do about a11y here?
-                <a href="javascript:void(0)" class="action-list-item action-hide-more" role="menuitem">
-                  <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-                  <span class="action-label">${_("More")}</span>
-                </a>
-              </li>
-              <li class="actions-item">
-                <a href="javascript:void(0)" class="action-list-item action-report" role="menuitemcheckbox" aria-checked="false">
-                  <span class="sr">${_("Report abuse")}</span>
-                  <span class="action-icon"><i class="icon icon-flag"></i></span>
-                  <span class="action-label" aria-hidden="true">
-                    <span class="label-unchecked">${_("Report")}</span>
-                    <span class="label-checked">${_("Reported")}</span>
-                    <span class="label-checked-focused">${_("Unreport")}</span>
-                  </span>
-                </a>
-              </li>
-              <li class="actions-item">
-                <a href="javascript:void(0)" class="action-list-item action-pin" role="menuitemcheckbox" aria-checked="false">
-                  <span class="sr">${_("Pin")}</span>
-                  <span class="action-icon"><i class="icon icon-pushpin"></i></span>
-                  <span class="action-label" aria-hidden="true">
-                    <span class="label-unchecked">${_("Pin")}</span>
-                    <span class="label-checked">${_("Pinned")}</span>
-                    <span class="label-checked-focused">${_("Unpin")}</span>
-                  </span>
-                </a>
-              </li>
-              <li class="actions-item">
-                <a href="javascript:void(0)" class="action-list-item action-edit" role="menuitem">
-                  <span class="action-icon"><i class="icon icon-pencil"></i></span>
-                  <span class="action-label">${_("Edit")}</span>
-                </a>
-              </li>
-              <li class="actions-item">
-                <a href="javascript:void(0)" class="action-list-item action-delete">
-                  <span class="action-icon"><i class="icon icon-remove"></i></span>
-                  <span class="action-label">${_("Delete")}</span>
-                </a>
-              </li>
-              <li class="actions-item">
-                <a href="javascript:void(0)" class="action-list-item action-close">
-                  <span class="sr">${_("Close")}</span>
-                  <span class="action-icon"><i class="icon icon-lock"></i></span>
-                  <span class="action-label" aria-hidden="true">
-                    <span class="label-unchecked">${_("Close")}</span>
-                    <span class="label-checked">${_("Closed")}</span>
-                    <span class="label-checked-focused">${_("Open")}</span>
-                  </span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li class="actions-item action-primary is-visible">
-          <a href="javascript:void(0)" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
-            ## Vote counts are populated by JS
-            <span class="sr">${_("Vote")}</span>
-            <span class="sr js-sr-vote-count"></span>
-            <span class="action-icon" aria-hidden="true">
-              <i class="icon icon-plus"></i>
-              <span class="js-visual-vote-count"></span>
-            </span>
-            <span class="action-label" aria-hidden="true">
-              <span class="label-unchecked">${_("Vote")}</span>
-              <span class="label-checked">${_("Voted")}</span>
-              <span class="label-checked-focused">${_("Unvote")}</span>
-            </span>
-          </a>
-        </li>
-        <li class="actions-item action-primary is-visible">
-          <a href="javascript:void(0)" class="action-button action-follow" role="checkbox" aria-checked="false">
-            <span class="sr">${_("Follow")}</span>
-            <span class="action-icon"><i class="icon icon-star"></i></span>
-            <span class="action-label" aria-hidden="true">
-              <span class="label-unchecked">${_("Follow")}</span>
-              <span class="label-checked">${_("Following")}</span>
-              <span class="label-checked-focused">${_("Unfollow")}</span>
-            </span>
-          </a>
-        </li>
-      </ul>
+      ${"""<%=
+          _.template(
+              $('#forum-actions').html(),
+              {
+                  contentType: 'post',
+                  primaryActions: ['vote', 'follow'],
+                  secondaryActions: ['report', 'pin', 'edit', 'delete', 'close']
+              }
+          )
+      %>"""}
 
       <div class="post-body">${'<%- body %>'}</div>
 
@@ -247,75 +166,16 @@
             ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
         </p>
     </header>
-      <ul class="response-actions-list">
-        <li class="actions-item">
-          <a href="#" class="action-button action-more">
-            <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-            <span class="action-label">${_("More")}</span>
-          </a>
-          <ul class="response-actions-dropdown is-collapsed">
-            <li class="actions-item">
-              <a href="#" class="action-list-item action-report" role="checkbox" aria-checked="false">
-                <span class="action-icon"><i class="icon icon-flag"></i></span>
-                <span class="action-label">${_("Report")}</span>
-              </a>
-            </li>
-            <li class="actions-item" style="display: none">
-              <a class="action-list-item action-edit" href="javascript:void(0)">
-                <span class="action-icon"><i class="icon icon-pencil"></i></span>
-                <span class="action-label">${_("Edit")}</span>
-              </a>
-            </li>
-            <li class="actions-item" style="display: none">
-              <a class="action-list-item action-delete" href="javascript:void(0)">
-                <span class="action-icon"><i class="icon icon-remove"></i></span>
-                <span class="action-label">${_("Delete")}</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
-            ## Vote counts are populated by JS
-            <span class="sr">${_("Vote")}</span>
-            <span class="sr js-sr-vote-count"></span>
-            <span class="action-icon" aria-hidden="true">
-              <i class="icon icon-plus"></i>
-              <span class="js-visual-vote-count"></span>
-            </span>
-            <span class="action-label" aria-hidden="true">
-              <span class="label-unchecked">${_("Vote")}</span>
-              <span class="label-checked">${_("Voted")}</span>
-              <span class="label-checked-focused">${_("Unvote")}</span>
-            </span>
-          </a>
-        </li>
-        ${"<% if (thread.get('thread_type') == 'question') { %>"}
-        <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-answer" role="checkbox" aria-checked="false">
-            <span class="sr">${_("Mark as Answer")}</span>
-            <span class="action-icon"><i class="icon icon-ok"></i></span>
-            <span class="action-label">
-              <span class="label-unchecked">${_("Mark as Answer")}</span>
-              <span class="label-checked">${_("Marked as Answer")}</span>
-              <span class="label-checked-focused">${_("Unmark as Answer")}</span>
-            </span>
-          </a>
-        </li>
-        ${"<% } else { %>"}
-        <li class="actions-item action-primary is-visible">
-          <a href="#" class="action-button action-endorse" role="checkbox" aria-checked="false">
-            <span class="sr">${_("Endorse")}</span>
-            <span class="action-icon"><i class="icon icon-ok"></i></span>
-            <span class="action-label">
-              <span class="label-unchecked">${_("Endorse")}</span>
-              <span class="label-checked">${_("Endorsed")}</span>
-              <span class="label-checked-focused">${_("Unendorse")}</span>
-            </span>
-          </a>
-        </li>
-        ${"<% } %>"}
-      </ul>
+    ${"""<%=
+        _.template(
+            $('#forum-actions').html(),
+            {
+                contentType: 'response',
+                primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
+                secondaryActions: ['report', 'edit', 'delete']
+            }
+        )
+    %>"""}
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
 </script>
 
@@ -334,33 +194,16 @@
 <script aria-hidden="true" type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <ul class="comment-actions-list">
-      <li class="actions-item">
-        <a href="#" class="action-button action-more">
-          <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-        </a>
-        <ul class="comment-actions-dropdown is-collapsed">
-          <li class="actions-item">
-            <a href="#" class="action-list-item action-report" role="checkbox" aria-checked="false">
-              <span class="action-icon"><i class="icon icon-flag"></i></span>
-              <span class="action-label">${_("Report")}</span>
-            </a>
-          </li>
-          <li class="actions-item">
-            <a href="#" class="action-list-item action-delete" role="button">
-              <span class="action-icon"><i class="icon icon-remove"></i></span>
-              <span class="action-label">${_("Delete")}</span>
-            </a>
-          </li>
-          <li class="actions-item">
-            <a href="#" class="action-list-item action-edit" role="button" aria-pressed="false">
-              <span class="action-icon"><i class="icon icon-pencil"></i></span>
-              <span class="action-label">${_("Edit")}</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
+    ${"""<%=
+        _.template(
+            $('#forum-actions').html(),
+            {
+                contentType: 'comment',
+                primaryActions: [],
+                secondaryActions: ['report', 'edit', 'delete']
+            }
+        )
+    %>"""}
     <%
     js_block = u"""
       interpolate(
@@ -684,4 +527,101 @@
         <span class="topic-title">${'<%- text %>'}</span>
         <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
     </li>
+</script>
+
+<%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label, checked_focused_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item action-primary is-visible">
+            <a href="javascript:void(0)" class="action-button action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                    <span class="label-checked-focused">${checked_focused_label}</span>
+                </span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("Unfollow"))}
+${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Endorsed"), _("Unendorse"))}
+${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Marked as Answer"), _("Unmark as Answer"))}
+
+<script type="text/template" id="forum-action-vote">
+    <li class="actions-item action-primary is-visible">
+        <a href="#" class="action-button action-vote vote-btn" role="checkbox" aria-checked="false">
+            ## Vote counts are populated by JS
+            <span class="sr">${_("Vote")}</span>
+            <span class="sr js-sr-vote-count"></span>
+            <span class="action-icon" aria-hidden="true">
+                <i class="icon icon-plus"></i>
+                <span class="js-visual-vote-count"></span>
+            </span>
+            <span class="action-label" aria-hidden="true">
+                <span class="label-unchecked">${_("Vote")}</span>
+                <span class="label-checked">${_("Voted")}</span>
+                <span class="label-checked-focused">${_("Unvote")}</span>
+            </span>
+        </a>
+    </li>
+</script>
+
+<%def name="secondaryStateAction(action_class, icon, sr_label, unchecked_label, checked_label, checked_focused_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                    <span class="label-checked-focused">${checked_focused_label}</span>
+                </span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Reported"), _("Unreport"))}
+${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Pinned"), _("Unpin"))}
+${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Closed"), _("Open"))}
+
+<%def name="secondaryAction(action_class, icon, label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}">
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-label">${label}</span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryAction("edit", "pencil", _("Edit"))}
+${secondaryAction("delete", "remove", _("Delete"))}
+
+<script type="text/template" id="forum-actions">
+    <ul class="${"<%= contentType %>"}-actions-list">
+        <li class="actions-item is-visible">
+            <div class="more-wrapper">
+                <a href="javascript:void(0)" class="action-button action-more" role="menu">
+                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                    <span class="action-label">${_("More")}</span>
+                </a>
+                <ul class="actions-dropdown">
+                    <li class="actions-item">
+                        ## TODO: what to do about a11y here?
+                        <a href="javascript:void(0)" class="action-list-item action-hide-more">
+                            <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                            <span class="action-label">${_("More")}</span>
+                        </a>
+                    </li>
+                    ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+                </ul>
+            </div>
+        </li>
+        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+    </ul>
 </script>
