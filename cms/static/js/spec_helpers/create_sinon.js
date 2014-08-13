@@ -10,7 +10,7 @@ define(["sinon", "underscore"], function(sinon, _) {
      * errors were that one test suite was incorrectly being linked as the parent of an unrelated
      * test suite (causing both suites' afterEach methods to be called). No solution for the root
      * cause has been found, but initializing sinon and cleaning it up on a method-by-method
-     * basis seems to work. For more details, see STUD-1040.
+     * basis seems to work. For more details, see STUD-1264.
      */
 
     /**
