@@ -80,11 +80,11 @@ class MakoMiddlewareTest(TestCase):
         Test render_to_string() when makomiddleware has not initialized
         the threadlocal REQUEST_CONTEXT.context.
         """
-
-        if hasattr(edxmako.middleware.REQUEST_CONTEXT, "context"):
-            del edxmako.middleware.REQUEST_CONTEXT.context
-        self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
-
+        context_copy = edxmako.middleware.REQUEST_CONTEXT.copy()
+        if hasattr(context_copy, "context"):
+            del context_copy.context
+        with patch.dict(edxmako.middleware.REQUEST_CONTEXT, context_copy):
+            self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
 
 
 def mako_middleware_process_request(request):
