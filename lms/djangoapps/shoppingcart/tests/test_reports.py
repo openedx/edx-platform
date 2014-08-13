@@ -222,7 +222,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         self.CORRECT_CSV = dedent("""
             Purchase Time,Order ID,Status,Quantity,Unit Cost,Total Cost,Currency,Description,Comments
             {time_str},1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
-            {time_str},1,purchased,1,40,40,usd,"Certificate of Achievement, verified cert for course Robot Super Course",
+            {time_str},1,purchased,1,40,40,usd,verified cert for course Robot Super Course,
             """.format(time_str=str(self.now)))
 
     def test_purchased_items_btw_dates(self):

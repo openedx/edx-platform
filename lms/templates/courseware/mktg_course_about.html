@@ -55,7 +55,15 @@
         <a class="action action-register register ${'has-option-verified' if len(course_modes) > 1 else ''}" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong>
             %if len(course_modes) > 1:
             <span class="track">
-            and choose your student track
+            ## Translators: This is the second line on a button users can click.  The first line is "Register for COURSE_NAME"
+            ## The "choose your student track" means users can select between taking the course as an auditor, as a verified student, etc
+            ${_("and choose your student track")}
+            </span>
+            %elif "professional" in course_modes:
+            <span class="track">
+            ## Translators: This is the second line on a button users can click.  The first line is "Register for COURSE_NAME"
+            ## 'Verification' here refers to verifying one's identity in order to receive a verified certificate.
+            ${_("and proceed to verification")}
             </span>
             %endif
         </a>

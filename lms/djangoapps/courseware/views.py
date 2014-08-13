@@ -708,7 +708,7 @@ def mktg_course_about(request, course_id):
 
     show_courseware_link = (has_access(request.user, 'load', course) or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
-    course_modes = CourseMode.modes_for_course(course.id)
+    course_modes = CourseMode.modes_for_course_dict(course.id)
 
     return render_to_response('courseware/mktg_course_about.html', {
         'course': course,
