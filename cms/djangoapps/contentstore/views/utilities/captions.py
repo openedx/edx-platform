@@ -86,7 +86,7 @@ def json_update_videos(request, locations):
         try:
             #update transcripts
             item = modulestore().get_item(key)
-            download_youtube_subs({1.0: item.youtube_id_1_0}, item, settings)
+            download_youtube_subs(item.youtube_id_1_0, item, settings)
 
             #get new status
             videos = {'youtube': item.youtube_id_1_0}
