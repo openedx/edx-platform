@@ -1601,12 +1601,11 @@ class RerunCourseTest(ContentStoreTestCase):
 
     def create_course_listing_html(self, course_key):
         """Creates html fragment that is created for the given course_key in the course listing section"""
-        return '<a class="course-link" href="/course/{}"'.format(course_key)
+        return 'data-test-course="{}/{}/{}"'.format(course_key.org, course_key.course, course_key.run)
 
     def create_unsucceeded_course_action_html(self, course_key):
         """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
-        # TODO Update this once the Rerun UI LMS-11011 is implemented.
-        return '<div class="unsucceeded-course-action" href="/course/{}"'.format(course_key)
+        return 'data-test-unsucceeded="{}/{}/{}"'.format(course_key.org, course_key.course, course_key.run)
 
     def assertInCourseListing(self, course_key):
         """
@@ -1614,7 +1613,7 @@ class RerunCourseTest(ContentStoreTestCase):
         and NOT in the unsucceeded course action section of the html.
         """
         course_listing_html = self.client.get_html('/course/')
-        self.assertIn(course_key.run, course_listing_html.content)
+        self.assertIn(self.create_course_listing_html(course_key), course_listing_html.content)
         self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
 
     def assertInUnsucceededCourseActions(self, course_key):
@@ -1623,8 +1622,8 @@ class RerunCourseTest(ContentStoreTestCase):
         and NOT in the accessible course listing section of the html.
         """
         course_listing_html = self.client.get_html('/course/')
-        self.assertNotIn(course_key.run, course_listing_html.content)
-        # TODO Verify the course is in the unsucceeded listing once LMS-11011 is implemented.
+        self.assertNotIn(self.create_course_listing_html(course_key), course_listing_html.content)
+        self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
 
     def test_rerun_course_success(self):
 
@@ -1667,7 +1666,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertInCourseListing(existent_course_key)
 
         # Verify that the failed course is NOT in the course listings
-        self.assertInUnsucceededCourseActions(non_existent_course_key)
+        self.assertInUnsucceededCourseActions(destination_course_key)
 
     def test_rerun_course_fail_duplicate_course(self):
         existent_course_key = CourseFactory.create().id
