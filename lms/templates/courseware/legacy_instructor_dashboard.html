@@ -298,24 +298,11 @@ function goto( mode)
 %if modeflag.get('Admin'):
 
   %if instructor_access:
-    <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List course staff members">
-    <p>
-    <input type="text" name="staffuser">
-    <input type="submit" name="action" value="Remove course staff">
-    <input type="submit" name="action" value="Add course staff">
-    <hr width="40%" style="align:left">
+    <p class="deprecated">${_("To add or remove course staff, please visit the 'Membership' section of the instructor dashboard.")}</p>
   %endif
 
   %if admin_access:
-    <hr width="40%" style="align:left">
-    <p>
-    <input type="submit" name="action" value="List course instructors">
-    <p>
-    <input type="text" name="instructor"> <input type="submit" name="action" value="Remove instructor">
-    <input type="submit" name="action" value="Add instructor">
-    <hr width="40%" style="align:left">
+    <p class="deprecated">${_("To add or remove course instructors, please visit the 'Membership' section of the instructor dashboard.")}</p>
   %endif
 
   %if settings.FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
