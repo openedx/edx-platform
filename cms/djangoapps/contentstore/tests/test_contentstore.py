@@ -47,6 +47,9 @@ from student.roles import CourseCreatorRole, CourseInstructorRole
 from opaque_keys import InvalidKeyError
 from contentstore.tests.utils import get_url
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+
+from unittest import skipIf
+
 from course_action_state.managers import CourseActionStateItemNotFoundError
 
 
@@ -1649,6 +1652,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertInCourseListing(source_course.id)
         self.assertInCourseListing(destination_course_key)
 
+    @skipIf(not settings.FEATURES.get('ALLOW_COURSE_RERUNS', False), "ALLOW_COURSE_RERUNS are not enabled")
     def test_rerun_course_fail_no_source_course(self):
         existent_course_key = CourseFactory.create().id
         non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
