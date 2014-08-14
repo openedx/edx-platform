@@ -46,7 +46,7 @@ def strip_key(func):
 
         # remove version and branch, by default
         rem_vers = kwargs.pop('remove_version', True)
-        rem_branch = kwargs.pop('remove_branch', False)
+        rem_branch = kwargs.pop('remove_branch', True)
 
         # helper function for stripping individual values
         def strip_key_func(val):
