@@ -2,6 +2,7 @@
 <%namespace name='static' file='/static_content.html'/>
 ${static.css(group='style-vendor-tinymce-content', raw=True)}
 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
+${static.css(group='style-xmodule-annotations', raw=True)}
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -165,6 +166,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     };
 
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+    var ova, Catch, annotator, catchOptions;
     var startova = function() {
     	//remove old instances
         if (Annotator._instances.length !== 0) {
@@ -172,7 +174,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
         }
         delete ova;
         //Load the plugin Video/Text Annotation
-        var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
+        ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
 
         ova.annotator.addPlugin('Tags');
         var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
@@ -180,8 +182,8 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
                 '${user.email}';
 
         //Catch
-        var annotator = ova.annotator;
-        var catchOptions = {
+        annotator = ova.annotator;
+        catchOptions = {
                 media:'video',
                 externalLink:false,
                 imageUrlRoot:imgURLRoot,
@@ -194,7 +196,7 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
                 instructor_email: "${instructor_email}",
                 annotation_mode: "${annotation_mode}",
             };
-        var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
     }
     if (typeof Annotator !== 'undefined') {
         startova();

@@ -82,6 +82,8 @@
             "URI": "js/vendor/URI.min",
             "ieshim": "js/src/ie_shim",
             "tooltip_manager": "js/src/tooltip_manager",
+            
+            // Files needed for Annotations feature
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
             "video.dev": "js/vendor/ova/video.dev",
@@ -100,6 +102,7 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            // end of Annotation tool files
 
             // externally hosted files
             "tender": [
@@ -254,6 +257,8 @@
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
             },
+
+            // the following are all needed for annotation tools
             "video.dev": {
                 exports:"videojs"
             },
@@ -298,6 +303,7 @@
                 exports: "osda",
                 deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars", "URI"]
             },
+            // end of annotation tool files
         },
         // load jquery and gettext automatically
         deps: ["jquery", "gettext"],
