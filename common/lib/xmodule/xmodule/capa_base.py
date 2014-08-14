@@ -1384,6 +1384,7 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('reset_problem_fail', event_info)
             return {
                 'success': False,
+                # Translators: A student must "make an attempt" to solve the problem on the page before they can reset it.
                 'error': _("Refresh the page and make an attempt before resetting."),
             }
 

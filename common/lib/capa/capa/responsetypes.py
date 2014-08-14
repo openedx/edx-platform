@@ -1218,8 +1218,12 @@ class NumericalResponse(LoncapaResponse):
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
                 if boundary.imag != 0:
+                    # Translators: This is an error message for a math problem. If the instructor provided a boundary
+                    # (end limit) for a variable that is a complex number (a + bi), this message displays.
                     raise StudentInputError(_("There was a problem with the staff answer to this problem: complex boundary."))
                 if isnan(boundary):
+                    # Translators: This is an error message for a math problem. If the instructor did not provide
+                    # a boundary (end limit) for a variable, this message displays.
                     raise StudentInputError(_("There was a problem with the staff answer to this problem: empty boundary."))
                 boundaries.append(boundary.real)
                 if compare_with_tolerance(
