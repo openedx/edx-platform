@@ -268,7 +268,9 @@ class PendingInstructorTasks
   ### Pending Instructor Tasks Section ####
   constructor: (@$section) ->
     # Currently running tasks
+    @$running_tasks_section = find_and_assert @$section, ".running-tasks-section"
     @$table_running_tasks = find_and_assert @$section, ".running-tasks-table"
+    @$no_tasks_message = find_and_assert @$section, ".no-pending-tasks-message"
 
     # start polling for task list
     # if the list is in the DOM
@@ -287,8 +289,14 @@ class PendingInstructorTasks
       success: (data) =>
         if data.tasks.length
           create_task_list_table @$table_running_tasks, data.tasks
+          @$no_tasks_message.hide()
+          @$running_tasks_section.show()
         else
           console.log "No pending instructor tasks to display"
+          @$running_tasks_section.hide()
+          @$no_tasks_message.empty()
+          @$no_tasks_message.append $('<p>').text gettext("No tasks currently running.")
+          @$no_tasks_message.show()
       error: std_ajax_err => console.error "Error finding pending instructor tasks to display"
     ### /Pending Instructor Tasks Section ####
 
