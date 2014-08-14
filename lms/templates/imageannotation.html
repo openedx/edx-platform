@@ -221,11 +221,17 @@
         if ("${annotation_mode}" == "instructor" && "${instructor_email}" == "" && !is_staff)
             osda.annotator.destroy();
     }
+
+    // if the following is true, template is being rendered in LMS, otherwise it is in Studio
     if (typeof Annotator !== 'undefined') {
         startosda();
     } else {
-        require(["osda"], function(osda){
-            startosda();
-        });
+        try {
+            require(["osda"], function(osda){
+                startosda();
+            });
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
     }
 </script>
