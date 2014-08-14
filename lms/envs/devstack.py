@@ -120,6 +120,15 @@ FEATURES['API'] = True
 EDX_API_KEY = None
 
 
+########################## SECURITY #######################
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
@@ -130,14 +139,3 @@ except ImportError:
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
-
-########################## SECURITY #######################
-
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
-FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
-FEATURES['SQUELCH_PII_IN_LOGS'] = False
-FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
-
-PASSWORD_MIN_LENGTH = None
-PASSWORD_COMPLEXITY = {}
