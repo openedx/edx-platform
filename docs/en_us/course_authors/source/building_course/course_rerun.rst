@@ -16,10 +16,10 @@ any way.
    * - Type of Content
      - Duplicated to New Course?
    * - Course start date
-     - No. Set to January 1, 2030.
+     - No. Set to midnight on January 1, 2030 (UTC).
    * - All other course dates
-     - Yes.  
-   * - Course outline structure (sections, subsections, units) and state (published, hidden)
+     - Yes. You will need to update all release dates and due dates. 
+   * - Course outline structure (sections, subsections, units) and state (published, hidden from students)
      - Yes. 
    * - Individual problems and other components
      - Yes.
@@ -37,11 +37,13 @@ any way.
      - No.
    * - Course team privileges, including admins, discussion moderators, and beta testers
      - No. Only your own role (as a course admin and instructor) is defined.
-   * - Discussion posts, responses, comments, and other data
-     - No.
    * - Student answers, progress, and grading data
      - No.
    * - Certificates
+     - No.
+   * - Discussion posts, responses, comments, and other data
+     - No.
+   * - Wiki contributions
      - No.
 
 See :ref:`Use Re-Run to Create a Course<Use ReRun to Create a Course>` and
