@@ -205,9 +205,10 @@ class TemplateTests(unittest.TestCase):
             data="<problem></problem>"
         )
 
-        # course root only updated 2x
+        # The draft course root has 2 revisions: the published revision, and then the subsequent
+        # changes to the draft revision
         version_history = self.split_store.get_block_generations(test_course.location)
-        # create course causes 2 versions for the time being; skip the first.
+        # Base calculations on the draft revision, not the initial published revision
         version_history = version_history.children[0]
         self.assertEqual(version_history.locator.version_guid, test_course.location.version_guid)
         self.assertEqual(len(version_history.children), 1)

@@ -16,6 +16,7 @@ class TestBulkWriteMixin(unittest.TestCase):
         self.bulk.SCHEMA_VERSION = 1
         self.clear_cache = self.bulk._clear_cache = Mock(name='_clear_cache')
         self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoConnection)
+        self.conn.get_course_index.return_value = {'initial': 'index'}
 
         self.course_key = CourseLocator('org', 'course', 'run-a')
         self.course_key_b = CourseLocator('org', 'course', 'run-b')
@@ -112,7 +113,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key, self.structure)
         self.assertConnCalls()
         self.bulk._end_bulk_write_operation(self.course_key)
-        self.assertConnCalls(call.insert_structure(self.structure))
+        self.assertConnCalls(call.upsert_structure(self.structure))
 
     def test_write_multiple_structures_on_close(self):
         self.conn.get_course_index.return_value = None
@@ -124,7 +125,7 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertConnCalls()
         self.bulk._end_bulk_write_operation(self.course_key)
         self.assertItemsEqual(
-            [call.insert_structure(self.structure), call.insert_structure(other_structure)],
+            [call.upsert_structure(self.structure), call.upsert_structure(other_structure)],
             self.conn.mock_calls
         )
 
@@ -134,10 +135,11 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk._begin_bulk_write_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key, self.structure)
+        self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.structure['_id']}})
         self.assertConnCalls()
         self.bulk._end_bulk_write_operation(self.course_key)
         self.assertConnCalls(
-            call.insert_structure(self.structure),
+            call.upsert_structure(self.structure),
             call.update_course_index(
                 {'versions': {self.course_key.branch: self.structure['_id']}},
                 from_index=original_index
@@ -152,12 +154,12 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
         other_structure = {'another': 'structure', '_id': ObjectId()}
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
-        self.assertConnCalls()
+        self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
         self.bulk._end_bulk_write_operation(self.course_key)
         self.assertItemsEqual(
             [
-                call.insert_structure(self.structure),
-                call.insert_structure(other_structure),
+                call.upsert_structure(self.structure),
+                call.upsert_structure(other_structure),
                 call.update_course_index(
                     {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}},
                     from_index=original_index
@@ -178,6 +180,225 @@ class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, Tes
     """
     pass
 
+
+@ddt.ddt
+class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
+    """
+    Tests of BulkWriteMixin methods for finding many structures or indexes
+    """
+    def test_no_bulk_find_matching_course_indexes(self):
+        branch = Mock(name='branch')
+        search_targets = MagicMock(name='search_targets')
+        self.conn.find_matching_course_indexes.return_value = [Mock(name='result')]
+        result = self.bulk.find_matching_course_indexes(branch, search_targets)
+        self.assertConnCalls(call.find_matching_course_indexes(branch, search_targets))
+        self.assertEqual(result, self.conn.find_matching_course_indexes.return_value)
+        self.assertCacheNotCleared()
+
+    @ddt.data(
+        (None, None, [], []),
+        (
+            'draft',
+            None,
+            [{'versions': {'draft': '123'}}],
+            [
+                {'versions': {'published': '123'}},
+                {}
+            ],
+        ),
+        (
+            'draft',
+            {'f1': 'v1'},
+            [{'versions': {'draft': '123'}, 'search_targets': {'f1': 'v1'}}],
+            [
+                {'versions': {'draft': '123'}, 'search_targets': {'f1': 'value2'}},
+                {'versions': {'published': '123'}, 'search_targets': {'f1': 'v1'}},
+                {'search_targets': {'f1': 'v1'}},
+                {'versions': {'draft': '123'}},
+            ],
+        ),
+        (
+            None,
+            {'f1': 'v1'},
+            [
+                {'versions': {'draft': '123'}, 'search_targets': {'f1': 'v1'}},
+                {'versions': {'published': '123'}, 'search_targets': {'f1': 'v1'}},
+                {'search_targets': {'f1': 'v1'}},
+            ],
+            [
+                {'versions': {'draft': '123'}, 'search_targets': {'f1': 'v2'}},
+                {'versions': {'draft': '123'}, 'search_targets': {'f2': 'v1'}},
+                {'versions': {'draft': '123'}},
+            ],
+        ),
+        (
+            None,
+            {'f1': 'v1', 'f2': 2},
+            [
+                {'search_targets': {'f1': 'v1', 'f2': 2}},
+                {'search_targets': {'f1': 'v1', 'f2': 2}},
+            ],
+            [
+                {'versions': {'draft': '123'}, 'search_targets': {'f1': 'v1'}},
+                {'search_targets': {'f1': 'v1'}},
+                {'versions': {'draft': '123'}, 'search_targets': {'f1': 'v2'}},
+                {'versions': {'draft': '123'}},
+            ],
+        ),
+    )
+    @ddt.unpack
+    def test_find_matching_course_indexes(self, branch, search_targets, matching, unmatching):
+        db_indexes = [Mock(name='from_db')]
+        for n, index in enumerate(matching + unmatching):
+            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk.insert_course_index(course_key, index)
+
+        expected = matching + db_indexes
+        self.conn.find_matching_course_indexes.return_value = db_indexes
+        result = self.bulk.find_matching_course_indexes(branch, search_targets)
+        self.assertItemsEqual(result, expected)
+        for item in unmatching:
+            self.assertNotIn(item, result)
+
+    def test_no_bulk_find_structures_by_id(self):
+        ids = [Mock(name='id')]
+        self.conn.find_structures_by_id.return_value = [MagicMock(name='result')]
+        result = self.bulk.find_structures_by_id(ids)
+        self.assertConnCalls(call.find_structures_by_id(ids))
+        self.assertEqual(result, self.conn.find_structures_by_id.return_value)
+        self.assertCacheNotCleared()
+
+    @ddt.data(
+        ([], [], []),
+        ([1, 2, 3], [1, 2], [1, 2]),
+        ([1, 2, 3], [1], [1, 2]),
+        ([1, 2, 3], [], [1, 2]),
+    )
+    @ddt.unpack
+    def test_find_structures_by_id(self, search_ids, active_ids, db_ids):
+        db_structure = lambda _id: {'db': 'structure', '_id': _id}
+        active_structure = lambda _id: {'active': 'structure', '_id': _id}
+
+        db_structures = [db_structure(_id) for _id in db_ids if _id not in active_ids]
+        for n, _id in enumerate(active_ids):
+            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk.update_structure(course_key, active_structure(_id))
+
+        self.conn.find_structures_by_id.return_value = db_structures
+        results = self.bulk.find_structures_by_id(search_ids)
+        self.conn.find_structures_by_id.assert_called_once_with(list(set(search_ids) - set(active_ids)))
+        for _id in active_ids:
+            if _id in search_ids:
+                self.assertIn(active_structure(_id), results)
+            else:
+                self.assertNotIn(active_structure(_id), results)
+        for _id in db_ids:
+            if _id in search_ids and _id not in active_ids:
+                self.assertIn(db_structure(_id), results)
+            else:
+                self.assertNotIn(db_structure(_id), results)
+
+    def test_no_bulk_find_structures_derived_from(self):
+        ids = [Mock(name='id')]
+        self.conn.find_structures_derived_from.return_value = [MagicMock(name='result')]
+        result = self.bulk.find_structures_derived_from(ids)
+        self.assertConnCalls(call.find_structures_derived_from(ids))
+        self.assertEqual(result, self.conn.find_structures_derived_from.return_value)
+        self.assertCacheNotCleared()
+
+    @ddt.data(
+        # Test values are:
+        #   - previous_versions to search for
+        #   - documents in the cache with $previous_version.$_id
+        #   - documents in the db with $previous_version.$_id
+        ([], [], []),
+        (['1', '2', '3'], ['1.a', '1.b', '2.c'], ['1.a', '2.c']),
+        (['1', '2', '3'], ['1.a'], ['1.a', '2.c']),
+        (['1', '2', '3'], [], ['1.a', '2.c']),
+        (['1', '2', '3'], ['4.d'], ['1.a', '2.c']),
+    )
+    @ddt.unpack
+    def test_find_structures_derived_from(self, search_ids, active_ids, db_ids):
+        def db_structure(_id):
+            previous, _, current = _id.partition('.')
+            return {'db': 'structure', 'previous_version': previous, '_id': current}
+        def active_structure(_id):
+            previous, _, current = _id.partition('.')
+            return {'active': 'structure', 'previous_version': previous, '_id': current}
+
+        db_structures = [db_structure(_id) for _id in db_ids]
+        active_structures = []
+        for n, _id in enumerate(active_ids):
+            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            self.bulk._begin_bulk_write_operation(course_key)
+            structure = active_structure(_id)
+            self.bulk.update_structure(course_key, structure)
+            active_structures.append(structure)
+
+        self.conn.find_structures_derived_from.return_value = db_structures
+        results = self.bulk.find_structures_derived_from(search_ids)
+        self.conn.find_structures_derived_from.assert_called_once_with(search_ids)
+        for structure in active_structures:
+            if structure['previous_version'] in search_ids:
+                self.assertIn(structure, results)
+            else:
+                self.assertNotIn(structure, results)
+        for structure in db_structures:
+            if (
+                structure['previous_version'] in search_ids and  # We're searching for this document
+                not any(active.endswith(structure['_id']) for active in active_ids)  # This document doesn't match any active _ids
+            ):
+                self.assertIn(structure, results)
+            else:
+                self.assertNotIn(structure, results)
+
+    def test_no_bulk_find_ancestor_structures(self):
+        original_version = Mock(name='original_version')
+        block_id = Mock(name='block_id')
+        self.conn.find_ancestor_structures.return_value = [MagicMock(name='result')]
+        result = self.bulk.find_ancestor_structures(original_version, block_id)
+        self.assertConnCalls(call.find_ancestor_structures(original_version, block_id))
+        self.assertEqual(result, self.conn.find_ancestor_structures.return_value)
+        self.assertCacheNotCleared()
+
+    @ddt.data(
+        # Test values are:
+        #   - original_version
+        #   - block_id
+        #   - matching documents in the cache
+        #   - non-matching documents in the cache
+        #   - expected documents returned from the db
+        #   - unexpected documents returned from the db
+        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], [], []),
+        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}, '_id': 'foo'}], [], [], [{'_id': 'foo'}]),
+        ('ov', 'bi', [], [{'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], []),
+        ('ov', 'bi', [], [{'original_version': 'ov'}], [], []),
+        ('ov', 'bi', [], [], [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], []),
+        (
+            'ov',
+            'bi',
+            [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}],
+            [],
+            [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'bar'}}}}],
+            []
+        ),
+    )
+    @ddt.unpack
+    def test_find_ancestor_structures(self, original_version, block_id, active_match, active_unmatch, db_match, db_unmatch):
+        for structure in active_match + active_unmatch + db_match + db_unmatch:
+            structure.setdefault('_id', ObjectId())
+
+        for n, structure in enumerate(active_match + active_unmatch):
+            course_key = CourseLocator('org', 'course', 'run{}'.format(n))
+            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk.update_structure(course_key, structure)
+
+        self.conn.find_ancestor_structures.return_value = db_match + db_unmatch
+        results = self.bulk.find_ancestor_structures(original_version, block_id)
+        self.conn.find_ancestor_structures.assert_called_once_with(original_version, block_id)
+        self.assertItemsEqual(active_match + db_match, results)
 
 @ddt.ddt
 class TestBulkWriteMixinOpen(TestBulkWriteMixin):
@@ -210,6 +431,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
     def test_read_structure_after_write_no_db(self, version_guid):
         # Reading a structure that's already been written shouldn't hit the db at all
+        self.structure['_id'] = version_guid
         self.bulk.update_structure(self.course_key, self.structure)
         result = self.bulk.get_structure(self.course_key, version_guid)
         self.assertEquals(self.conn.get_structure.call_count, 0)
@@ -219,7 +441,8 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     def test_read_structure_after_write_after_read(self, version_guid):
         # Reading a structure that's been updated after being pulled from the db should
         # still get the updated value
-        result = self.bulk.get_structure(self.course_key, version_guid)
+        self.structure['_id'] = version_guid
+        self.bulk.get_structure(self.course_key, version_guid)
         self.bulk.update_structure(self.course_key, self.structure)
         result = self.bulk.get_structure(self.course_key, version_guid)
         self.assertEquals(self.conn.get_structure.call_count, 1)
@@ -277,6 +500,23 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
             self.bulk.version_structure(self.course_key, self.structure, 'user_id')['_id'],
             self.structure['_id']
         )
+
+    def test_copy_branch_versions(self):
+        # Directly updating an index so that the draft branch points to the published index
+        # version should work, and should only persist a single structure
+        self.maxDiff = None
+        published_structure = {'published': 'structure', '_id': ObjectId()}
+        self.bulk.update_structure(self.course_key, published_structure)
+        index = {'versions': {'published': published_structure['_id']}}
+        self.bulk.insert_course_index(self.course_key, index)
+        index_copy = copy.deepcopy(index)
+        index_copy['versions']['draft'] = index['versions']['published']
+        self.bulk.update_course_index(self.course_key, index_copy)
+        self.bulk._end_bulk_write_operation(self.course_key)
+        self.conn.upsert_structure.assert_called_once_with(published_structure)
+        self.conn.update_course_index.assert_called_once_with(index_copy, from_index=self.conn.get_course_index.return_value)
+        self.conn.get_course_index.assert_called_once_with(self.course_key)
+
 
 class TestBulkWriteMixinOpenAfterPrevTransaction(TestBulkWriteMixinOpen, TestBulkWriteMixinPreviousTransaction):
     """

@@ -57,24 +57,36 @@ class MongoConnection(object):
         """
         return self.structures.find_one({'_id': key})
 
-    def find_matching_structures(self, query):
+    def find_structures_by_id(self, ids):
         """
-        Find the structure matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
-        """
-        return self.structures.find(query)
+        Return all structures that specified in ``ids``.
 
-    def insert_structure(self, structure):
+        Arguments:
+            ids (list): A list of structure ids
         """
-        Create the structure in the db
-        """
-        self.structures.insert(structure)
+        return self.structures.find({'_id': {'$in': ids}})
 
-    def update_structure(self, structure):
+    def find_structures_derived_from(self, ids):
         """
-        Update the db record for structure
+        Return all structures that were immediately derived from a structure listed in ``ids``.
+
+        Arguments:
+            ids (list): A list of structure ids
         """
-        self.structures.update({'_id': structure['_id']}, structure)
+        return self.structures.find({'previous_version': {'$in': ids}})
+
+    def find_ancestor_structures(self, original_version, block_id):
+        """
+        Find all structures that originated from ``original_version`` that contain ``block_id``.
+
+        Arguments:
+            original_version (str or ObjectID): The id of a structure
+            block_id (str): The id of the block in question
+        """
+        return self.structures.find({
+            'original_version': original_version,
+            'blocks.{}.edit_info.update_version'.format(block_id): {'$exists': True}
+        })
 
     def upsert_structure(self, structure):
         """
@@ -94,11 +106,23 @@ class MongoConnection(object):
             ])
         )
 
-    def find_matching_course_indexes(self, query):
+    def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
-        Find the course_index matching the query. Right now the query must be a legal mongo query
-        :param query: a mongo-style query of {key: [value|{$in ..}|..], ..}
+        Find the course_index matching particular conditions.
+
+        Arguments:
+            branch: If specified, this branch must exist in the returned courses
+            search_targets: If specified, this must be a dictionary specifying field values
+                that must exist in the search_targets of the returned courses
         """
+        query = son.SON()
+        if branch is not None:
+            query['versions.{}'.format(branch)] = {'$exists': True}
+
+        if search_targets:
+            for key, value in search_targets.iteritems():
+                query['search_targets.{}'.format(key)] = value
+
         return self.course_index.find(query)
 
     def insert_course_index(self, course_index):

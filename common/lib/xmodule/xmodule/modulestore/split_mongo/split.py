@@ -107,28 +107,57 @@ EXCLUDE_ALL = '*'
 
 class BulkWriteRecord(object):
     def __init__(self):
-        self.active_count = 0
-        self.dirty_branches = set()
+        self._active_count = 0
         self.initial_index = None
         self.index = None
-        self._structures = {}
+        self.structures = {}
+        self.structures_in_db = set()
 
-    def set_structure(self, branch, structure):
-        if self.index is not None:
-            self.index['versions'][branch] = structure['_id']
-        self._structures[branch] = structure
+        # This stores the set of branches for whom version_structure
+        # has been called
+        self.dirty_branches = set()
+
+    @property
+    def active(self):
+        """
+        Return whether this bulk write is active.
+        """
+        return self._active_count > 0
+
+    def nest(self):
+        """
+        Record another level of nesting of this bulk write operation
+        """
+        self._active_count += 1
+
+    def unnest(self):
+        """
+        Record the completion of a level of nesting of the bulk write operation
+        """
+        self._active_count -= 1
+
+    @property
+    def is_root(self):
+        """
+        Return whether the bulk write is at the root (first) level of nesting
+        """
+        return self._active_count == 1
+
+    def structure_for_branch(self, branch):
+        return self.structures.get(self.index.get('versions', {}).get(branch))
+
+    def set_structure_for_branch(self, branch, structure):
+        self.index.get('versions', {})[branch] = structure['_id']
+        self.structures[structure['_id']] = structure
         self.dirty_branches.add(branch)
 
-    def get_structure(self, branch):
-        return self._structures.get(branch)
-
     def __repr__(self):
-        return u"BulkWriteRecord<{}, {}, {}, {}, {}>".format(
-            self.active_count,
-            self.dirty_branches,
+        return u"BulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
+            self._active_count,
             self.initial_index,
             self.index,
-            self._structures,
+            self.structures,
+            self.structures_in_db,
         )
 
 
@@ -177,6 +206,15 @@ class BulkWriteMixin(object):
             # If nothing org/course/run aren't set, use a bulk record that is identified just by the version_guid
             return self._active_bulk_writes.records[course_key.replace(org=None, course=None, run=None, branch=None)]
 
+    @property
+    def _active_records(self):
+        """
+        Yield all active (CourseLocator, BulkWriteRecord) tuples.
+        """
+        for course_key, record in getattr(self._active_bulk_writes, 'records', {}).iteritems():
+            if record.active:
+                yield (course_key, record)
+
     def _clear_bulk_write_record(self, course_key):
         if not isinstance(course_key, CourseLocator):
             raise TypeError('{!r} is not a CourseLocator'.format(course_key))
@@ -194,14 +232,16 @@ class BulkWriteMixin(object):
         Begin a bulk write operation on course_key.
         """
         bulk_write_record = self._get_bulk_write_record(course_key)
-        bulk_write_record.active_count += 1
 
-        if bulk_write_record.active_count > 1:
-            return
+        # Increment the number of active bulk operations (bulk operations
+        # on the same course can be nested)
+        bulk_write_record.nest()
 
-        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
-        # Ensure that any edits to the index don't pollute the initial_index
-        bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
+        # If this is the highest level bulk operation, then initialize it
+        if bulk_write_record.is_root:
+            bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
+            # Ensure that any edits to the index don't pollute the initial_index
+            bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
 
     def _end_bulk_write_operation(self, course_key):
         """
@@ -209,23 +249,20 @@ class BulkWriteMixin(object):
         """
         # If no bulk write is active, return
         bulk_write_record = self._get_bulk_write_record(course_key)
-        if bulk_write_record.active_count == 0:
+        if not bulk_write_record.active:
             return
 
-        bulk_write_record.active_count -= 1
+        bulk_write_record.unnest()
 
-        # If more than one nested bulk write is active, decrement and continue
-        if bulk_write_record.active_count > 0:
+        # If this wasn't the outermost context, then don't close out the
+        # bulk write operation.
+        if bulk_write_record.active:
             return
 
-        # If this is the last active bulk write, and the content is dirty,
-        # then mark it as inactive, and update the database
-        if bulk_write_record.dirty_branches:
-            for branch in bulk_write_record.dirty_branches:
-                try:
-                    self.db_connection.insert_structure(bulk_write_record.get_structure(branch))
-                except DuplicateKeyError:
-                    pass  # The structure already exists, so we don't have to write it out again
+        # This is the last active bulk write. If the content is dirty,
+        # then update the database
+        for _id in bulk_write_record.structures.viewkeys() - bulk_write_record.structures_in_db:
+            self.db_connection.upsert_structure(bulk_write_record.structures[_id])
 
         if bulk_write_record.index is not None and bulk_write_record.index != bulk_write_record.initial_index:
             if bulk_write_record.initial_index is None:
@@ -239,7 +276,7 @@ class BulkWriteMixin(object):
         """
         Return whether a bulk write is active on `course_key`.
         """
-        return self._get_bulk_write_record(course_key, ignore_case).active_count > 0
+        return self._get_bulk_write_record(course_key, ignore_case).active
 
     def get_course_index(self, course_key, ignore_case=False):
         """
@@ -252,7 +289,7 @@ class BulkWriteMixin(object):
 
     def insert_course_index(self, course_key, index_entry):
         bulk_write_record = self._get_bulk_write_record(course_key)
-        if bulk_write_record.active_count > 0:
+        if bulk_write_record.active:
             bulk_write_record.index = index_entry
         else:
             self.db_connection.insert_course_index(index_entry)
@@ -266,21 +303,22 @@ class BulkWriteMixin(object):
         Does not return anything useful.
         """
         bulk_write_record = self._get_bulk_write_record(course_key)
-        if bulk_write_record.active_count > 0:
+        if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
             self.db_connection.update_course_index(updated_index_entry)
 
     def get_structure(self, course_key, version_guid):
         bulk_write_record = self._get_bulk_write_record(course_key)
-        if bulk_write_record.active_count > 0:
-            structure = bulk_write_record.get_structure(course_key.branch)
+        if bulk_write_record.active:
+            structure = bulk_write_record.structures.get(version_guid)
 
             # The structure hasn't been loaded from the db yet, so load it
             if structure is None:
-                structure_id = bulk_write_record.index['versions'][course_key.branch]
-                structure = self.db_connection.get_structure(structure_id)
-                bulk_write_record._structures[course_key.branch] = structure
+                structure = self.db_connection.get_structure(version_guid)
+                bulk_write_record.structures[version_guid] = structure
+                if structure is not None:
+                    bulk_write_record.structures_in_db.add(version_guid)
 
             return structure
         else:
@@ -289,24 +327,26 @@ class BulkWriteMixin(object):
             return self.db_connection.get_structure(version_guid)
 
     def update_structure(self, course_key, structure):
+        """
+        Update a course structure, respecting the current bulk operation status
+        (no data will be written to the database if a bulk operation is active.)
+        """
         self._clear_cache(structure['_id'])
         bulk_write_record = self._get_bulk_write_record(course_key)
-        if bulk_write_record.active_count > 0:
-            bulk_write_record.set_structure(course_key.branch, structure)
+        if bulk_write_record.active:
+            bulk_write_record.structures[structure['_id']] = structure
         else:
             self.db_connection.upsert_structure(structure)
 
     def version_structure(self, course_key, structure, user_id):
         """
         Copy the structure and update the history info (edited_by, edited_on, previous_version)
-        :param structure:
-        :param user_id:
         """
         bulk_write_record = self._get_bulk_write_record(course_key)
 
         # If we have an active bulk write, and it's already been edited, then just use that structure
-        if bulk_write_record.active_count > 0 and course_key.branch in bulk_write_record.dirty_branches:
-            return bulk_write_record.get_structure(course_key.branch)
+        if bulk_write_record.active and course_key.branch in bulk_write_record.dirty_branches:
+            return bulk_write_record.structure_for_branch(course_key.branch)
 
         # Otherwise, make a new structure
         new_structure = copy.deepcopy(structure)
@@ -317,10 +357,131 @@ class BulkWriteMixin(object):
         new_structure['schema_version'] = self.SCHEMA_VERSION
 
         # If we're in a bulk write, update the structure used there, and mark it as dirty
-        if bulk_write_record.active_count > 0:
-            bulk_write_record.set_structure(course_key.branch, new_structure)
+        if bulk_write_record.active:
+            bulk_write_record.set_structure_for_branch(course_key.branch, new_structure)
 
         return new_structure
+
+    def version_block(self, block_info, user_id, update_version):
+        """
+        Update the block_info dictionary based on it having been edited
+        """
+        if block_info['edit_info'].get('update_version') == update_version:
+            return
+
+        block_info['edit_info'] = {
+            'edited_on': datetime.datetime.now(UTC),
+            'edited_by': user_id,
+            'previous_version': block_info['edit_info']['update_version'],
+            'update_version': update_version,
+        }
+
+    def find_matching_course_indexes(self, branch=None, search_targets=None):
+        """
+        Find the course_indexes which have the specified branch and search_targets.
+        """
+        indexes = self.db_connection.find_matching_course_indexes(branch, search_targets)
+
+        for _, record in self._active_records:
+            if branch and branch not in record.index.get('versions', {}):
+                continue
+
+            if search_targets:
+                if any(
+                    'search_targets' not in record.index or
+                    field not in record.index['search_targets'] or
+                    record.index['search_targets'][field] != value
+                    for field, value in search_targets.iteritems()
+                ):
+                    continue
+
+            indexes.append(record.index)
+
+        return indexes
+
+    def find_structures_by_id(self, ids):
+        """
+        Return all structures that specified in ``ids``.
+
+        If a structure with the same id is in both the cache and the database,
+        the cached version will be preferred.
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        structures = []
+        ids = set(ids)
+
+        for _, record in self._active_records:
+            for structure in record.structures.values():
+                structure_id = structure.get('_id')
+                if structure_id in ids:
+                    ids.remove(structure_id)
+                    structures.append(structure)
+
+        structures.extend(self.db_connection.find_structures_by_id(list(ids)))
+        return structures
+
+    def find_structures_derived_from(self, ids):
+        """
+        Return all structures that were immediately derived from a structure listed in ``ids``.
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        found_structure_ids = set()
+        structures = []
+
+        for _, record in self._active_records:
+            for structure in record.structures.values():
+                if structure.get('previous_version') in ids:
+                    structures.append(structure)
+                    if '_id' in structure:
+                        found_structure_ids.add(structure['_id'])
+
+        structures.extend(
+            structure
+            for structure in self.db_connection.find_structures_derived_from(ids)
+            if structure['_id'] not in found_structure_ids
+        )
+        return structures
+
+    def find_ancestor_structures(self, original_version, block_id):
+        """
+        Find all structures that originated from ``original_version`` that contain ``block_id``.
+
+        Any structure found in the cache will be preferred to a structure with the same id from the database.
+
+        Arguments:
+            original_version (str or ObjectID): The id of a structure
+            block_id (str): The id of the block in question
+        """
+        found_structure_ids = set()
+        structures = []
+
+        for _, record in self._active_records:
+            for structure in record.structures.values():
+                if 'original_version' not in structure:
+                    continue
+
+                if structure['original_version'] != original_version:
+                    continue
+
+                if block_id not in structure.get('blocks', {}):
+                    continue
+
+                if 'update_version' not in structure['blocks'][block_id].get('edit_info', {}):
+                    continue
+
+                structures.append(structure)
+                found_structure_ids.add(structure['_id'])
+
+        structures.extend(
+            structure
+            for structure in self.db_connection.find_ancestor_structures(original_version, block_id)
+            if structure['_id'] not in found_structure_ids
+        )
+        return structures
 
 
 class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
@@ -555,10 +716,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         :param branch: the branch for which to return courses.
         :param qualifiers: an optional dict restricting which elements should match
         '''
-        if qualifiers is None:
-            qualifiers = {}
-        qualifiers.update({"versions.{}".format(branch): {"$exists": True}})
-        matching_indexes = self.db_connection.find_matching_course_indexes(qualifiers)
+        matching_indexes = self.find_matching_course_indexes(branch)
 
         # collect ids and then query for those
         version_guids = []
@@ -568,7 +726,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             version_guids.append(version_guid)
             id_version_map[version_guid] = course_index
 
-        matching_structures = self.db_connection.find_matching_structures({'_id': {'$in': version_guids}})
+        matching_structures = self.find_structures_by_id(version_guids)
 
         # get the blocks for each course index (s/b the root)
         result = []
@@ -834,15 +992,14 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
 
         # TODO if depth is significant, it may make sense to get all that have the same original_version
         # and reconstruct the subtree from version_guid
-        next_entries = self.db_connection.find_matching_structures({'previous_version': version_guid})
+        next_entries = self.find_structures_derived_from([version_guid])
         # must only scan cursor's once
         next_versions = [struct for struct in next_entries]
         result = {version_guid: [CourseLocator(version_guid=struct['_id']) for struct in next_versions]}
         depth = 1
         while depth < version_history_depth and len(next_versions) > 0:
             depth += 1
-            next_entries = self.db_connection.find_matching_structures({'previous_version':
-                {'$in': [struct['_id'] for struct in next_versions]}})
+            next_entries = self.find_structures_derived_from([struct['_id'] for struct in next_versions])
             next_versions = [struct for struct in next_entries]
             for course_structure in next_versions:
                 result.setdefault(course_structure['previous_version'], []).append(
@@ -861,12 +1018,9 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         # course_agnostic means we don't care if the head and version don't align, trust the version
         course_struct = self._lookup_course(block_locator.course_key.course_agnostic())['structure']
         block_id = block_locator.block_id
-        update_version_field = 'blocks.{}.edit_info.update_version'.format(block_id)
-        all_versions_with_block = self.db_connection.find_matching_structures(
-            {
-                'original_version': course_struct['original_version'],
-                update_version_field: {'$exists': True},
-            }
+        all_versions_with_block = self.find_ancestor_structures(
+            original_version=course_struct['original_version'],
+            block_id=block_id
         )
         # find (all) root versions and build map {previous: {successors}..}
         possible_roots = []
@@ -1063,12 +1217,6 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
 
             new_id = new_structure['_id']
 
-            edit_info = {
-                'edited_on': datetime.datetime.now(UTC),
-                'edited_by': user_id,
-                'previous_version': None,
-                'update_version': new_id,
-            }
             # generate usage id
             if block_id is not None:
                 if encode_key_for_mongo(block_id) in new_structure['blocks']:
@@ -1081,12 +1229,13 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             block_fields = partitioned_fields.get(Scope.settings, {})
             if Scope.children in partitioned_fields:
                 block_fields.update(partitioned_fields[Scope.children])
-            self._update_block_in_structure(new_structure, new_block_id, {
-                "category": block_type,
-                "definition": definition_locator.definition_id,
-                "fields": self._serialize_fields(block_type, block_fields),
-                'edit_info': edit_info,
-            })
+            self._update_block_in_structure(new_structure, new_block_id, self._new_block(
+                user_id,
+                block_type,
+                block_fields,
+                definition_locator.definition_id,
+                new_id,
+            ))
 
             self.update_structure(course_key, new_structure)
 
@@ -1145,12 +1294,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             if parent['edit_info']['update_version'] != new_structure['_id']:
                 # if the parent hadn't been previously changed in this bulk transaction, indicate that it's
                 # part of the bulk transaction
-                parent['edit_info'] = {
-                    'edited_on': datetime.datetime.now(UTC),
-                    'edited_by': user_id,
-                    'previous_version': parent['edit_info']['update_version'],
-                    'update_version': new_structure['_id'],
-                }
+                self.version_block(parent, user_id, new_structure['_id'])
 
             # db update
             self.update_structure(parent_usage_key.course_key, new_structure)
@@ -1412,12 +1556,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
                 block_data["fields"] = settings
 
                 new_id = new_structure['_id']
-                block_data['edit_info'] = {
-                    'edited_on': datetime.datetime.now(UTC),
-                    'edited_by': user_id,
-                    'previous_version': block_data['edit_info']['update_version'],
-                    'update_version': new_id,
-                }
+                self.version_block(block_data, user_id, new_id)
                 self.update_structure(course_key, new_structure)
                 # update the index entry if appropriate
                 if index_entry is not None:
@@ -1567,18 +1706,22 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             block_fields['children'] = children
 
         if is_updated:
-            previous_version = None if is_new else structure_blocks[encoded_block_id]['edit_info'].get('update_version')
-            structure_blocks[encoded_block_id] = {
-                "category": xblock.category,
-                "definition": xblock.definition_locator.definition_id,
-                "fields": block_fields,
-                'edit_info': {
-                    'previous_version': previous_version,
-                    'update_version': new_id,
-                    'edited_by': user_id,
-                    'edited_on': datetime.datetime.now(UTC)
-                }
-            }
+            if is_new:
+                block_info = self._new_block(
+                    user_id,
+                    xblock.category,
+                    block_fields,
+                    xblock.definition_locator.definition_id,
+                    new_id,
+                    raw=True
+                )
+            else:
+                block_info = structure_blocks[encoded_block_id]
+                block_info['fields'] = block_fields
+                block_info['definition'] = xblock.definition_locator.definition_id
+                self.version_block(block_info, user_id, new_id)
+
+            structure_blocks[encoded_block_id] = block_info
 
         return is_updated
 
@@ -2188,8 +2331,8 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
 
         Returns: list of branch-agnostic course_keys
         """
-        entries = self.db_connection.find_matching_course_indexes(
-            {'search_targets.{}'.format(field_name): field_value}
+        entries = self.find_matching_course_indexes(
+            search_targets={field_name: field_value}
         )
         return [
             CourseLocator(entry['org'], entry['course'], entry['run'])  # Branch agnostic

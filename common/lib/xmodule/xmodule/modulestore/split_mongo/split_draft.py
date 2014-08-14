@@ -103,7 +103,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
     def create_item(
         self, user_id, course_key, block_type, block_id=None,
         definition_locator=None, fields=None,
-        force=False, continue_version=False, skip_auto_publish=False, **kwargs
+        force=False, skip_auto_publish=False, **kwargs
     ):
         """
         See :py:meth `ModuleStoreDraftAndPublished.create_item`
@@ -113,7 +113,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             item = super(DraftVersioningModuleStore, self).create_item(
                 user_id, course_key, block_type, block_id=block_id,
                 definition_locator=definition_locator, fields=fields,
-                force=force, continue_version=continue_version, **kwargs
+                force=force, **kwargs
             )
             if not skip_auto_publish:
                 self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
@@ -121,13 +121,13 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
     def create_child(
             self, user_id, parent_usage_key, block_type, block_id=None,
-            fields=None, continue_version=False, **kwargs
+            fields=None, **kwargs
     ):
         parent_usage_key = self._map_revision_to_branch(parent_usage_key)
         with self.bulk_write_operations(parent_usage_key.course_key):
             item = super(DraftVersioningModuleStore, self).create_child(
                 user_id, parent_usage_key, block_type, block_id=block_id,
-                fields=fields, continue_version=continue_version, **kwargs
+                fields=fields, **kwargs
             )
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
