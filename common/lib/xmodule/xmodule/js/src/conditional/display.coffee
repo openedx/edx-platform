@@ -33,4 +33,4 @@ class @Conditional
           else
             $(element).show()
 
-        XBlock.initializeBlocks @el @requestToken
+        XBlock.initializeBlocks(@el, @requestToken)
