@@ -47,6 +47,10 @@ CELERY_ALWAYS_EAGER = True
 # CELERY_ALWAYS_EAGER = False
 # BROKER_URL = 'redis://'
 
+################################ COURSE RERUNS ################################
+
+FEATURES['ALLOW_COURSE_RERUNS'] = True
+
 ################################ DEBUG TOOLBAR ################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
