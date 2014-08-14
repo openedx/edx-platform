@@ -48,11 +48,11 @@
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}Help Center{link_end}.').format(
-        link_start='<a href="{url}" target="_blank">'.format(
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} Help Center. {link_start}Access Help Center{link_end}').format(
+        link_start='<div class="help-buttons"><a id="help-center-button" href="{url}" target="_blank">'.format(
           url='https://stanfordonline.zendesk.com/hc/en-us'
         ),
-        link_end='</a>',
+        link_end='</a></div>',
         platform_name=platform_name)}
       </p>
 
