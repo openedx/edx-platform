@@ -33,4 +33,6 @@ class @Conditional
           else
             $(element).show()
 
-        XBlock.initializeBlocks(@el, @requestToken)
+        # The children are rendered with a new request, so they have a different request-token.
+        # Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
+        XBlock.initializeBlocks(@el)
