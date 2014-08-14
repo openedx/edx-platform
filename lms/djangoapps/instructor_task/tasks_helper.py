@@ -380,6 +380,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
         track_function=make_track_function(),
         xqueue_callback_url_prefix=xqueue_callback_url_prefix,
         grade_bucket_type=grade_bucket_type,
+        # This module isn't being used for front-end rendering
         request_token=None,
     )
 

@@ -310,6 +310,7 @@ def _section_data_download(course_key, access):
 
 def _section_send_email(course_key, access, course):
     """ Provide data for the corresponding bulk email section """
+    # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
         DictFieldData({'data': ''}),
@@ -320,6 +321,8 @@ def _section_send_email(course_key, access, course):
         'LmsRuntime', html_module, 'studio_view', fragment, None,
         extra_data={"course-id": course_key.to_deprecated_string()},
         usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+        # Generate a new request_token here at random, because this module isn't connected to any other
+        # xblock rendering.
         request_token=uuid.uuid1().get_hex()
     )
     email_editor = fragment.content
