@@ -55,7 +55,7 @@ if Backbone?
     attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
       closed: (closed) ->
         @$(".discussion-reply-new").toggle(not closed)
-        @$(".add-response-btn").toggle(not closed)
+        @$(".add-response-btn").toggle(not closed && @responses.length > 0)
     })
 
     expand: (event) ->
