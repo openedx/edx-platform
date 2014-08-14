@@ -148,12 +148,18 @@ class GroupsDetail(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status.HTTP_404_NOT_FOUND)
         profile, _ = GroupProfile.objects.get_or_create(group_id=group_id)
+        group_name = request.DATA.get('name', None)
+        if group_name:
+            formatted_name = '{:04d}: {}'.format(existing_group.id, group_name)
+            existing_group.name = formatted_name
+            profile.name = group_name
         group_type = request.DATA.get('type', None)
         if group_type:
             profile.group_type = group_type
         data = request.DATA.get('data', None)
         if data:
             profile.data = json.dumps(data)
+        existing_group.save()
         profile.save()
         response_data['id'] = existing_group.id
         response_data['name'] = profile.name
