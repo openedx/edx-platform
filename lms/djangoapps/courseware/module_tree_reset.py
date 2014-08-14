@@ -125,6 +125,8 @@ class ProctorModuleInfo(object):
     def __init__(self, course_id):
         self.ms = modulestore()
         self.course = self.ms.get_course(course_id)
+        if not self.course:
+            raise Exception("course does not exist: %s" % course_id)
         self.get_released_proctor_modules()
 
     def _get_student_obj(self, student):
