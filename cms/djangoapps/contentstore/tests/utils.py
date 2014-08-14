@@ -250,8 +250,9 @@ class CourseTestCase(ModuleStoreTestCase):
         self.assertEqual(len(course1_items), len(course2_items))
 
         for course1_item in course1_items:
-            course2_item_location = course1_item.location.map_into_course(course2_id)
-            if course1_item.location.category == 'course':
+            course1_item_loc = course1_item.location
+            course2_item_location = course2_id.make_usage_key(course1_item_loc.block_type, course1_item_loc.block_id)
+            if course1_item_loc.block_type == 'course':
                 # mongo uses the run as the name, split uses 'course'
                 store = self.store._get_modulestore_for_courseid(course2_id)  # pylint: disable=protected-access
                 new_name = 'course' if isinstance(store, SplitMongoModuleStore) else course2_item_location.run
@@ -271,7 +272,7 @@ class CourseTestCase(ModuleStoreTestCase):
                     c1_state,
                     c2_state,
                     "Publish states not equal: course item {} in state {} != course item {} in state {}".format(
-                        course1_item.location, c1_state, course2_item.location, c2_state
+                        course1_item_loc, c1_state, course2_item.location, c2_state
                     )
                 )
 
@@ -289,11 +290,12 @@ class CourseTestCase(ModuleStoreTestCase):
                 expected_children = []
                 for course1_item_child in course1_item.children:
                     expected_children.append(
-                        course1_item_child.map_into_course(course2_id)
+                        course2_id.make_usage_key(course1_item_child.block_type, course1_item_child.block_id)
                     )
-                # also process course2_children just in case they have version guids
-                course2_children = [child.version_agnostic() for child in course2_item.children]
-                self.assertEqual(expected_children, course2_children)
+                try:
+                    self.assertEqual(expected_children, course2_item.children)
+                except AssertionError:
+                    raise  # FIXME just here for a debug breakpoint
 
         # compare assets
         content_store = self.store.contentstore
