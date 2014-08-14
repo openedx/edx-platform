@@ -200,6 +200,17 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 simplefilter('ignore')  # Change to "default" to see the first instance of each hit
                         # or "error" to convert all into errors
 
+############################# SECURITY SETTINGS ################################
+# Default to advanced security in common.py, so tests can reset here to use
+# a simpler security model
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
