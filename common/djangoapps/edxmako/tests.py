@@ -75,16 +75,24 @@ class MakoMiddlewareTest(TestCase):
         self.assertIsNone(edxmako.middleware.REQUEST_CONTEXT.context)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def test_render_to_string_when_no_global_context(self):
+    @patch("edxmako.middleware.REQUEST_CONTEXT")
+    def test_render_to_string_when_no_global_context_lms(self, context_mock):
         """
         Test render_to_string() when makomiddleware has not initialized
-        the threadlocal REQUEST_CONTEXT.context.
+        the threadlocal REQUEST_CONTEXT.context. This is meant to run in LMS.
         """
-        context_copy = edxmako.middleware.REQUEST_CONTEXT.copy()
-        if hasattr(context_copy, "context"):
-            del context_copy.context
-        with patch.dict(edxmako.middleware.REQUEST_CONTEXT, context_copy):
-            self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
+        del context_mock.context
+        self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @patch("edxmako.middleware.REQUEST_CONTEXT")
+    def test_render_to_string_when_no_global_context_cms(self, context_mock):
+        """
+        Test render_to_string() when makomiddleware has not initialized
+        the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
+        """
+        del context_mock.context
+        self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
 
 
 def mako_middleware_process_request(request):
