@@ -83,7 +83,6 @@ class DiscussionResponsePaginationTestMixin(object):
 
     def test_pagination_no_responses(self):
         self.setup_thread(0)
-        from nose.tools import set_trace; set_trace()
         self.assert_response_display_correct(0, 0)
 
     def test_pagination_few_responses(self):
