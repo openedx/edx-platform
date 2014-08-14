@@ -9,6 +9,7 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
@@ -27,7 +28,8 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     """
         # Snippet of what would be in the django settings envs file
     db_config = {
-        'host': 'localhost',
+        'host': MONGO_HOST,
+        'port': MONGO_PORT_NUM,
         'db': 'test_xmodule',
     }
 

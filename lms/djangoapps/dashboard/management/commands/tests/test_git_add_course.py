@@ -1,7 +1,6 @@
 """
 Provide tests for git_add_course management command.
 """
-
 import logging
 import os
 import shutil
@@ -21,9 +20,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+
 
 TEST_MONGODB_LOG = {
-    'host': 'localhost',
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
     'user': '',
     'password': '',
     'db': 'test_xlog',
