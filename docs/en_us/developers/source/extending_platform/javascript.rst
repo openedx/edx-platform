@@ -313,3 +313,9 @@ The following table describes the attributes of the ``jsinput`` element.
      - The same-origin policy (SOP), meaning that all elements have the same
        protocol, host, and port. To bypass the SOP, set to ``true``.
      - false
+   * - loading_timeout
+     - Timeout (in ms) that lets a heavy JS application load before JSInput is
+       initialized. If multiple JSInput have the above parameter set and are
+       included in a page, the largest value will be retained.
+     - 300
+
