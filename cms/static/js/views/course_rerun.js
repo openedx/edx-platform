@@ -1,4 +1,4 @@
-require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
+define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
     function (domReady, $, _, CancelOnEscape) {
 
         var saveRerunCourse = function (e) {
@@ -87,7 +87,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             }
         };
 
-        domReady(function () {
+        var onReady = function () {
             var $cancelButton = $('.rerun-course-cancel');
             var $courseRun = $('.rerun-course-run');
             $courseRun.focus().select();
@@ -175,5 +175,16 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                     $('.rerun-course-save').addClass('is-disabled');
                 }
             });
-        });
+        };
+
+        domReady(onReady);
+
+        // Return these functions so that they can be tested
+        return {
+            saveRerunCourse: saveRerunCourse,
+            cancelRerunCourse: cancelRerunCourse,
+            validateRequiredField: validateRequiredField,
+            setNewCourseFieldInErr: setNewCourseFieldInErr,
+            onReady: onReady
+        };
     });
