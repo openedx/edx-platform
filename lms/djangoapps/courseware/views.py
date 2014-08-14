@@ -7,6 +7,7 @@ import urllib
 import json
 
 from collections import defaultdict
+from django.utils import translation
 from django.utils.translation import ugettext as _
 
 from django.conf import settings
@@ -710,15 +711,30 @@ def mktg_course_about(request, course_id):
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course_dict(course.id)
 
-    return render_to_response('courseware/mktg_course_about.html', {
+    context = {
         'course': course,
         'registered': registered,
         'allow_registration': allow_registration,
         'course_target': course_target,
         'show_courseware_link': show_courseware_link,
         'course_modes': course_modes,
-    })
+    }
 
+    # The edx.org marketing site currently displays only in English.
+    # To avoid displaying a different language in the register / access button,
+    # we force the language to English.
+    # However, OpenEdX installations with a different marketing front-end
+    # may want to respect the language specified by the user or the site settings.
+    force_english = settings.FEATURES.get('IS_EDX_DOMAIN', False)
+    if force_english:
+        translation.activate('en-us')
+
+    try:
+        return render_to_response('courseware/mktg_course_about.html', context)
+    finally:
+        # Just to be safe, reset the language if we forced it to be English.
+        if force_english:
+            translation.deactivate()
 
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
