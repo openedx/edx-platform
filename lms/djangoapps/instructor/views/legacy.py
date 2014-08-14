@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from xmodule_modifiers import wrap_xblock
+from xmodule_modifiers import wrap_xblock, request_token
 import xmodule.graders as xmgraders
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -985,7 +985,8 @@ def instructor_dashboard(request, course_id):
         fragment = wrap_xblock(
             'LmsRuntime', html_module, 'studio_view', fragment, None,
             extra_data={"course-id": course_key.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            request_token=request_token(request),
         )
         email_editor = fragment.content
 

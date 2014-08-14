@@ -2,6 +2,7 @@ class @Conditional
 
   constructor: (element, callerElId) ->
     @el = $(element).find('.conditional-wrapper')
+    @requestToken = $(element).data('request-token')
 
     @callerElId = callerElId
 
@@ -32,4 +33,6 @@ class @Conditional
           else
             $(element).show()
 
-        XBlock.initializeBlocks @el
+        # The children are rendered with a new request, so they have a different request-token.
+        # Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
+        XBlock.initializeBlocks(@el)

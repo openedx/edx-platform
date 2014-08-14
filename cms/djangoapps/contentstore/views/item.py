@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 from functools import partial
 from static_replace import replace_static_urls
-from xmodule_modifiers import wrap_xblock
+from xmodule_modifiers import wrap_xblock, request_token
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -206,7 +206,12 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
-        xblock.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime', usage_id_serializer=unicode))
+        xblock.runtime.wrappers.append(partial(
+            wrap_xblock,
+            'StudioRuntime',
+            usage_id_serializer=unicode,
+            request_token=request_token(request),
+        ))
 
         if view_name == STUDIO_VIEW:
             try:
