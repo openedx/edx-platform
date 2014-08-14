@@ -1,12 +1,14 @@
 """
 Instructor Dashboard Views
 """
-from django.views.decorators.http import require_POST
 
-from django.contrib.auth.decorators import login_required
 import logging
 import datetime
+import uuid
 import pytz
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -308,6 +310,7 @@ def _section_data_download(course_key, access):
 
 def _section_send_email(course_key, access, course):
     """ Provide data for the corresponding bulk email section """
+    # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
         DictFieldData({'data': ''}),
@@ -317,7 +320,10 @@ def _section_send_email(course_key, access, course):
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
         extra_data={"course-id": course_key.to_deprecated_string()},
-        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+        # Generate a new request_token here at random, because this module isn't connected to any other
+        # xblock rendering.
+        request_token=uuid.uuid1().get_hex()
     )
     email_editor = fragment.content
     section_data = {

@@ -18,7 +18,7 @@ function ABTestSelector(runtime, elem) {
             var child_group_id = $(this).data('group-id').toString();
             if(child_group_id === group_id) {
                 _this.content_container.html($(this).text());
-                XBlock.initializeBlocks(_this.content_container);
+                XBlock.initializeBlocks(_this.content_container, $(elem).data('request-token'));
             }
         });
     }
