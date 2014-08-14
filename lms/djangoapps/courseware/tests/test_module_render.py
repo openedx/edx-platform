@@ -802,12 +802,13 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             descriptor.module_class = xblock_class.module_class
 
         return render.get_module_for_descriptor_internal(
-            self.user,
-            descriptor,
-            Mock(spec=FieldDataCache),
-            course_id,
-            Mock(),  # Track Function
-            Mock(),  # XQueue Callback Url Prefix
+            user=self.user,
+            descriptor=descriptor,
+            field_data_cache=Mock(spec=FieldDataCache),
+            course_id=course_id,
+            track_function=Mock(),  # Track Function
+            xqueue_callback_url_prefix=Mock(),  # XQueue Callback Url Prefix
+            request_token='request_token',
         ).xmodule_runtime.anonymous_student_id
 
     @ddt.data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)

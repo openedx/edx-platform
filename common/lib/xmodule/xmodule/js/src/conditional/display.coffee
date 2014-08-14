@@ -2,6 +2,7 @@ class @Conditional
 
   constructor: (element, callerElId) ->
     @el = $(element).find('.conditional-wrapper')
+    @requestToken = $(element).data('request-token')
 
     @callerElId = callerElId
 
@@ -32,4 +33,4 @@ class @Conditional
           else
             $(element).show()
 
-        XBlock.initializeBlocks @el
+        XBlock.initializeBlocks @el @requestToken
