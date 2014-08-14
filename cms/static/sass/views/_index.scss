@@ -63,11 +63,11 @@
 
       h1 {
         @extend %t-title2;
+        @extend %t-strong;
         float: none;
         margin: 0 0 ($baseline/2) 0;
         border-bottom: 1px solid $blue-l1;
         padding: 0;
-        font-weight: 500;
         color: $white;
       }
 
@@ -76,7 +76,7 @@
       }
 
       .logo {
-        font-weight: 600;
+        @extend %t-strong;
         margin-left: ($baseline/2);
       }
 
@@ -163,8 +163,8 @@
               opacity: 0.0;
 
               [class^="icon-"] {
-                @include font-size(18);
                 @include border-top-radius(3px);
+                @extend %t-icon4;
                 display: inline-block;
                 padding: ($baseline/2);
                 background: $blue;
@@ -197,8 +197,8 @@
 
           h3 {
             @extend %t-title4;
+            @extend %t-strong;
             margin: 0 0 ($baseline/2) 0;
-            font-weight: 600;
           }
 
           > p {
@@ -207,8 +207,8 @@
           }
 
           strong {
+            @extend %t-strong;
             color: $gray-d2;
-            font-weight: 500;
           }
 
           .list-proofpoints {
@@ -232,8 +232,8 @@
 
               .title {
                 @extend %t-copy-base;
+                @extend %t-strong;
                 margin: 0 0 ($baseline/4) 0;
-                font-weight: 500;
                 color: $gray-d3;
               }
 
@@ -323,10 +323,10 @@
           text-align: center;
 
           &.action-primary {
-            @extend %t-action1;
             @include blue-button;
+            @extend %t-action1;
+            @extend %t-strong;
             padding: ($baseline*0.75) ($baseline/2);
-            font-weight: 600;
             text-align: center;
             text-transform: uppercase;
           }

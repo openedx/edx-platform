@@ -113,6 +113,21 @@ class CourseMode(models.Model):
             return None
 
     @classmethod
+    def verified_mode_for_course(cls, course_id):
+        """
+        Since we have two separate modes that can go through the verify flow,
+        we want to be able to select the 'correct' verified mode for a given course.
+
+        Currently, we prefer to return the professional mode over the verified one
+        if both exist for the given course.
+        """
+        modes_dict = cls.modes_for_course_dict(course_id)
+        verified_mode = modes_dict.get('verified', None)
+        professional_mode = modes_dict.get('professional', None)
+        # we prefer professional over verify
+        return professional_mode if professional_mode else verified_mode
+
+    @classmethod
     def min_course_price_for_verified_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course int he appropriate currency over all the

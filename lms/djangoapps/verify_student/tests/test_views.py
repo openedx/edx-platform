@@ -68,7 +68,8 @@ class TestVerifyView(TestCase):
         verified_mode = CourseMode(course_id=self.course_key,
                                    mode_slug="verified",
                                    mode_display_name="Verified Certificate",
-                                   min_price=50)
+                                   min_price=50,
+                                   suggested_prices="50.0,100.0")
         verified_mode.save()
 
     def test_invalid_course(self):
@@ -76,8 +77,20 @@ class TestVerifyView(TestCase):
         url = reverse('verify_student_verify',
                       kwargs={"course_id": fake_course_id})
         response = self.client.get(url)
-
         self.assertEquals(response.status_code, 302)
+
+    def test_valid_course_registration_text(self):
+        url = reverse('verify_student_verify',
+                      kwargs={"course_id": unicode(self.course_key)})
+        response = self.client.get(url)
+
+        self.assertIn("You are registering for", response.content)
+
+    def test_valid_course_upgrade_text(self):
+        url = reverse('verify_student_verify',
+                      kwargs={"course_id": unicode(self.course_key)})
+        response = self.client.get(url, {'upgrade': "True"})
+        self.assertIn("You are upgrading your registration for", response.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

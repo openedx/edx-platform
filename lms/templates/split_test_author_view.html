@@ -27,22 +27,20 @@ show_link = settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and group_confi
 % endif
 % if len(messages) > 0:
     <%
+    general_validation = split_test.descriptor.general_validation_message
     def get_validation_icon(validation_type):
-        if validation_type == 'error':
+        if validation_type == ValidationMessageType.error:
             return 'icon-exclamation-sign'
-        elif validation_type == 'warning':
+        elif validation_type == ValidationMessageType.warning:
             return 'icon-warning-sign'
         return None
 
-    error_messages = (message for message in messages if message.message_type==ValidationMessageType.error)
-    has_errors = next(error_messages, False)
-    aggregate_validation_class = 'has-errors' if has_errors else 'has-warnings'
-    aggregate_validation_type = 'error' if has_errors else 'warning'
+    aggregate_validation_class = 'has-errors' if general_validation['type']==ValidationMessageType.error else ' has-warnings'
     %>
     <div class="xblock-message validation ${aggregate_validation_class}">
     % if is_configured:
-        <p class="${aggregate_validation_type}"><i class="${get_validation_icon(aggregate_validation_type)}"></i>
-        ${_("This content experiment has issues that affect content visibility.")}
+        <p class="${general_validation['type']}"><i class="${get_validation_icon(general_validation['type'])}"></i>
+        ${general_validation['message']}
         </p>
     % endif
     % if is_root or not is_configured:

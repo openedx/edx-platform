@@ -53,7 +53,19 @@
       <ol class="group-configuration-usage">
         <% _.each(usage, function(unit) { %>
           <li class="group-configuration-usage-unit">
-            <a href=<%= unit.url %> ><%= unit.label %></a>
+            <p><a href=<%= unit.url %> ><%= unit.label %></a></p>
+            <% if (unit.validation) { %>
+              <p>
+                <% if (unit.validation.type === 'warning') { %>
+                  <i class="icon-warning-sign"></i>
+                <% } else if (unit.validation.type === 'error') { %>
+                  <i class="icon-exclamation-sign"></i>
+                <% } %>
+                <span class="group-configuration-validation-message">
+                  <%= unit.validation.message %>
+                </span>
+              </p>
+            <% } %>
           </li>
         <% }) %>
       </ol>

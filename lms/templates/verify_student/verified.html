@@ -85,8 +85,11 @@ $(document).ready(function() {
         </div>
 
         <nav class="nav-wizard is-ready">
-
+        %if "professional" in modes_dict:
+          <span class="help help-inline price-value">${_("Your Course Total is $ ")} <strong>${chosen_price}</strong></span>
+        %else:
           <span class="help help-inline price-value">${_("You have decided to pay $ ")} <strong>${chosen_price}</strong></span>
+        %endif
 
           <ol class="wizard-steps">
             <li class="wizard-step step-proceed">

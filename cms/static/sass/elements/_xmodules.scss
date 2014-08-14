@@ -52,10 +52,10 @@
 
         .collapse-setting {
           @extend %t-action3;
+          @extend %t-strong;
           display: block;
           width: 100%;
           padding: ($baseline/2);
-          font-weight: 600;
 
           *[class^="icon-"] {
             margin-right: ($baseline/4);
@@ -136,12 +136,12 @@
         margin-top: 10px;
 
         .transcripts-message {
-          @include font-size(12);
+          @extend %t-copy-sub2;
         }
 
         .transcripts-message-status {
+          @extend %t-strong;
           color: $green;
-          font-weight: 700;
 
           &.status-error {
             color: $red;
@@ -149,15 +149,15 @@
 
           [class^="icon-"],
           [class*=" icon-"] {
+            @extend %t-icon4;
             margin-right: 5px;
-            @include font-size(18);
           }
         }
 
         .transcripts-error-message {
+          @extend %t-copy-sub1;
           background: $red;
           color: $white;
-          @include font-size(14);
           padding: ($baseline/3);
 
           &.is-invisible {
@@ -191,12 +191,12 @@
     }
 
     .progress-bar {
+      @extend %t-copy-lead1;
       display: block;
       height: 30px;
       margin: 10px 0;
       border: 1px solid $blue;
       text-align: center;
-      font-size: 1.14em;
 
       &.is-invisible {
         display: none;
@@ -282,9 +282,9 @@
         .create-setting {
           @extend %ui-btn-flat-outline;
           @extend %t-action3;
+          @extend %t-strong;
           display: block;
           padding: ($baseline/2);
-          font-weight: 600;
 
           *[class^="icon-"] {
             margin-right: ($baseline/4);
@@ -294,9 +294,9 @@
         .upload-setting {
           @extend %ui-btn-flat-outline;
           @extend %t-action3;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/2);
-          font-weight: 600;
           width: 49%;
           margin-right: 2%;
         }
@@ -304,9 +304,9 @@
         .download-setting {
           @extend %ui-btn-non;
           @extend %t-action4;
+          @extend %t-strong;
           display: inline-block;
           padding: ($baseline/2);
-          font-weight: 600;
           width: 49%;
           text-align: center;
           color: $blue;
@@ -318,7 +318,7 @@
 
         .remove-setting {
           @include transition(color .25s ease-in-out);
-          @include font-size(20);
+          @extend %t-action1;
           display: inline-block;
           background: transparent;
           color: $blue-l3;

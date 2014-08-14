@@ -106,6 +106,9 @@ FEATURES = {
 
     # Toggles Group Configuration editing functionality
     'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
+
+    # Modulestore to use for new courses
+    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
 }
 ENABLE_JASMINE = False
 
@@ -126,7 +129,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-
+GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
@@ -370,6 +373,23 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule.css',
     },
+    'style-xmodule-annotations': {
+        'source_filenames': [
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
+            'css/vendor/ova/grouping-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
+        ],
+        'output_filename': 'css/cms-style-xmodule-annotations.css',
+    },
 }
 
 # test_order: Determines the position of this chunk of javascript on
@@ -551,7 +571,10 @@ INSTALLED_APPS = (
     'cities',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
+
+    # Additional problem types
+    'edx_jsme',    # Molecular Structure
 )
 
 

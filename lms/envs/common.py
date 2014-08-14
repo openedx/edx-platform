@@ -148,7 +148,7 @@ FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # segment.io for LMS--need to explicitly turn it on for production.
+    # Segment.io for LMS--need to explicitly turn it on for production.
     'SEGMENT_IO_LMS': False,
 
     # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
@@ -307,7 +307,7 @@ NODE_PATH = ':'.join(node_paths)
 
 # For geolocation ip database
 GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
-
+GEOIPV6_PATH = REPO_ROOT / "common/static/data/geoip/GeoIPv6.dat"
 
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
@@ -471,6 +471,9 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 GOOGLE_ANALYTICS_ACCOUNT = None
 GOOGLE_ANALYTICS_LINKEDIN = 'GOOGLE_ANALYTICS_LINKEDIN_DUMMY'
 
+######################## OPTIMIZELY ###########################
+OPTIMIZELY_PROJECT_ID = None
+
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
@@ -504,7 +507,6 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {},
-            'reference_type': 'Location',
             'stores': [
                 {
                     'NAME': 'draft',
@@ -522,6 +524,16 @@ MODULESTORE = {
                     'OPTIONS': {
                         'data_dir': DATA_DIR,
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                    }
+                },
+                {
+                    'NAME': 'split',
+                    'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': {
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                        'fs_root': DATA_DIR,
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 },
             ]
@@ -937,18 +949,6 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
-            'css/vendor/ova/annotator.css',
-            'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
-            'css/vendor/ova/rangeslider.css',
-            'css/vendor/ova/share-annotator.css',
-            'css/vendor/ova/richText-annotator.css',
-            'css/vendor/ova/tags-annotator.css',
-            'css/vendor/ova/flagging-annotator.css',
-            'css/vendor/ova/diacritic-annotator.css',
-            'css/vendor/ova/grouping-annotator.css',
-            'css/vendor/ova/ova.css',
-            'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
@@ -997,6 +997,23 @@ PIPELINE_CSS = {
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
+    },
+    'style-xmodule-annotations': {
+        'source_filenames': [
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
+            'css/vendor/ova/grouping-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
+        ],
+        'output_filename': 'css/lms-style-xmodule-annotations.css',
     },
 }
 
@@ -1331,7 +1348,10 @@ INSTALLED_APPS = (
     #cities
     'cities',
     # Course action state
-    'course_action_state'
+    'course_action_state',
+
+    # Additional problem types
+    'edx_jsme',    # Molecular Structure
 )
 
 ######################### MARKETING SITE ###############################

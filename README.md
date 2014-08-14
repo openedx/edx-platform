@@ -57,7 +57,10 @@ Issue Tracker
 
 [We use JIRA for our issue tracker](https://openedx.atlassian.net/), not
 GitHub Issues. To file a bug or request a new feature, please make a free
-account on our JIRA and create a new issue!
+account on our JIRA and create a new issue! If you're filing a bug,
+we'd appreciate it if you would follow
+[our guidelines for filing high-quality, actionable bug reports](https://openedx.atlassian.net/wiki/display/SUST/How+to+File+a+Quality+Bug+Report).
+Thanks!
 
 How to Contribute
 -----------------

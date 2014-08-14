@@ -29,7 +29,6 @@ from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xmodule.html_module import AboutDescriptor
 from xblock.runtime import KvsFieldData
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
@@ -37,10 +36,11 @@ from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceVa
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locations import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, ReferentialIntegrityError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
 
@@ -354,8 +354,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
-    reference_type = SlashSeparatedCourseKey
-
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
     # pylint: disable=W0201
@@ -476,6 +474,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             self._course_run_cache[cache_key] = matching_courses[0]['_id']['name']
 
         return course_key.replace(run=self._course_run_cache[cache_key])
+
+    def for_branch_setting(self, location):
+        """
+        Returns the Location that is for the current branch setting.
+        """
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return location.replace(revision=MongoRevisionKey.published)
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
+            return location.replace(revision=MongoRevisionKey.draft)
+        return location.replace(revision=MongoRevisionKey.published)
 
     def _compute_metadata_inheritance_tree(self, course_id):
         '''
@@ -716,7 +724,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             for item in items
         ]
 
-    def get_courses(self):
+    def get_courses(self, **kwargs):
         '''
         Returns a list of course descriptors.
         '''
@@ -751,7 +759,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             raise ItemNotFoundError(location)
         return item
 
-    def get_course(self, course_key, depth=0):
+    def make_course_key(self, org, course, run):
+        """
+        Return a valid :class:`~opaque_keys.edx.keys.CourseKey` for this modulestore
+        that matches the supplied `org`, `course`, and `run`.
+
+        This key may represent a course that doesn't exist in this modulestore.
+        """
+        return CourseLocator(org, course, run, deprecated=True)
+
+    def get_course(self, course_key, depth=0, **kwargs):
         """
         Get the course with the given courseid (org/course/run)
         """
@@ -763,7 +780,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         except ItemNotFoundError:
             return None
 
-    def has_course(self, course_key, ignore_case=False):
+    def has_course(self, course_key, ignore_case=False, **kwargs):
         """
         Returns the course_id of the course if it was found, else None
         Note: we return the course_id instead of a boolean here since the found course may have
@@ -838,7 +855,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             for key in ('tag', 'org', 'course', 'category', 'name', 'revision')
         ])
 
-    def get_items(self, course_id, settings=None, content=None, key_revision=MongoRevisionKey.published, **kwargs):
+    def get_items(
+            self,
+            course_id,
+            settings=None,
+            content=None,
+            key_revision=MongoRevisionKey.published,
+            qualifiers=None,
+            **kwargs
+    ):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -853,15 +878,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Args:
             course_id (CourseKey): the course identifier
             settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
+                and rules as qualifiers below
             content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
+                rules as qualifiers below.
             key_revision (str): the revision of the items you're looking for.
                 MongoRevisionKey.draft - only returns drafts
                 MongoRevisionKey.published (equates to None) - only returns published
                 If you want one of each matching xblock but preferring draft to published, call this same method
                 on the draft modulestore with ModuleStoreEnum.RevisionOption.draft_preferred.
-            kwargs (key=value): what to look for within the course.
+            qualifiers (dict): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
@@ -869,20 +894,21 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 This modulestore does not allow searching dates by comparison or edited_by, previous_version,
                 update_version info.
         """
+        qualifiers = qualifiers.copy() if qualifiers else {}  # copy the qualifiers (destructively manipulated here)
         query = self._course_key_to_son(course_id)
         query['_id.revision'] = key_revision
         for field in ['category', 'name']:
-            if field in kwargs:
-                query['_id.' + field] = kwargs.pop(field)
+            if field in qualifiers:
+                query['_id.' + field] = qualifiers.pop(field)
 
         for key, value in (settings or {}).iteritems():
             query['metadata.' + key] = value
         for key, value in (content or {}).iteritems():
             query['definition.data.' + key] = value
-        if 'children' in kwargs:
-            query['definition.children'] = kwargs.pop('children')
+        if 'children' in qualifiers:
+            query['definition.children'] = qualifiers.pop('children')
 
-        query.update(kwargs)
+        query.update(qualifiers)
         items = self.collection.find(
             query,
             sort=[SORT_REVISION_FAVOR_DRAFT],
@@ -919,54 +945,39 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         ])
         courses = self.collection.find(course_search_location, fields=('_id'))
         if courses.count() > 0:
-            raise InvalidLocationError(
-                "There are already courses with the given org and course id: {}".format([
-                    course['_id'] for course in courses
-                ]))
+            raise DuplicateCourseError(course_id, courses[0]['_id'])
 
-        location = course_id.make_usage_key('course', course_id.run)
-        course = self.create_xmodule(
-            location,
-            fields=fields,
-            **kwargs
-        )
-        self.update_item(course, user_id, allow_not_found=True)
+        xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
-        # clone a default 'about' overview module as well
-        about_location = location.replace(
-            category='about',
-            name='overview'
-        )
-        overview_template = AboutDescriptor.get_template('overview.yaml')
-        self.create_item(
-            user_id,
-            about_location.course_key,
-            about_location.block_type,
-            block_id=about_location.block_id,
-            definition_data=overview_template.get('data'),
-            runtime=course.system
+        # create any other necessary things as a side effect
+        super(MongoModuleStore, self).create_course(
+            org, course, run, user_id, runtime=xblock.runtime, **kwargs
         )
 
-        return course
+        return xblock
 
-    def create_xmodule(self, location, definition_data=None, metadata=None, runtime=None, fields={}, **kwargs):
+    def create_xblock(
+        self, runtime, course_key, block_type, block_id=None, fields=None,
+        metadata=None, definition_data=None, **kwargs
+    ):
         """
-        Create the new xmodule but don't save it. Returns the new module.
+        Create the new xblock but don't save it. Returns the new module.
 
-        :param location: a Location--must have a category
-        :param definition_data: can be empty. The initial definition_data for the kvs
-        :param metadata: can be empty, the initial metadata for the kvs
         :param runtime: if you already have an xblock from the course, the xblock.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
-        location = location.replace(run=self.fill_in_run(location.course_key).run)
-        # differs from split mongo in that I believe most of this logic should be above the persistence
-        # layer but added it here to enable quick conversion. I'll need to reconcile these.
         if metadata is None:
             metadata = {}
 
         if definition_data is None:
             definition_data = {}
+
+        # @Cale, should this use LocalId like we do in split?
+        if block_id is None:
+            if block_type == 'course':
+                block_id = course_key.run
+            else:
+                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
         if runtime is None:
             services = {}
@@ -976,7 +987,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             runtime = CachingDescriptorSystem(
                 modulestore=self,
                 module_data={},
-                course_key=location.course_key,
+                course_key=course_key,
                 default_class=self.default_class,
                 resources_fs=None,
                 error_tracker=self.error_tracker,
@@ -986,14 +997,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 select=self.xblock_select,
                 services=services,
             )
-        xblock_class = runtime.load_block_type(location.category)
-        dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
+        xblock_class = runtime.load_block_type(block_type)
+        location = course_key.make_usage_key(block_type, block_id)
+        dbmodel = self._create_new_field_data(block_type, location, definition_data, metadata)
         xmodule = runtime.construct_xblock_from_class(
             xblock_class,
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both.
-            ScopeIds(None, location.category, location, location),
+            ScopeIds(None, block_type, location, location),
             dbmodel,
         )
         if fields is not None:
@@ -1018,10 +1030,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 a new identifier will be generated
         """
         if block_id is None:
-            block_id = uuid4().hex
+            if block_type == 'course':
+                block_id = course_key.run
+            else:
+                block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
-        location = course_key.make_usage_key(block_type, block_id)
-        xblock = self.create_xmodule(location, **kwargs)
+        runtime = kwargs.pop('runtime', None)
+        xblock = self.create_xblock(runtime, course_key, block_type, block_id, **kwargs)
         xblock = self.update_item(xblock, user_id, allow_not_found=True)
 
         return xblock
@@ -1048,6 +1063,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             self.update_item(parent, user_id)
 
         return xblock
+
+    def import_xblock(self, user_id, course_key, block_type, block_id, fields=None, runtime=None, **kwargs):
+        """
+        Simple implementation of overwriting any existing xblock
+        """
+        if block_type == 'course':
+            block_id = course_key.run
+        xblock = self.create_xblock(runtime, course_key, block_type, block_id, fields)
+        return self.update_item(xblock, user_id, allow_not_found=True)
 
     def _get_course_for_item(self, location, depth=0):
         '''
@@ -1253,7 +1277,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         return ModuleStoreEnum.Type.mongo
 
-    def get_orphans(self, course_key):
+    def get_orphans(self, course_key, **kwargs):
         """
         Return an array of all of the locations for orphans in the course.
         """
@@ -1274,7 +1298,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         item_locs -= all_reachable
         return [course_key.make_usage_key_from_deprecated_string(item_loc) for item_loc in item_locs]
 
-    def get_courses_for_wiki(self, wiki_slug):
+    def get_courses_for_wiki(self, wiki_slug, **kwargs):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug

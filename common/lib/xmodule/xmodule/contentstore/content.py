@@ -1,4 +1,5 @@
 import re
+import uuid
 XASSET_LOCATION_TAG = 'c4x'
 XASSET_SRCREF_PREFIX = 'xasset:'
 
@@ -10,8 +11,9 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode
 
-from opaque_keys.edx.locations import AssetLocation
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import AssetLocator
+from opaque_keys.edx.keys import CourseKey, AssetKey
+from opaque_keys import InvalidKeyError
 from PIL import Image
 
 
@@ -52,12 +54,10 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
-        return AssetLocation(
-            course_key.org, course_key.course, course_key.run,
+        return course_key.make_asset_key(
             'asset' if not is_thumbnail else 'thumbnail',
-            AssetLocation.clean_keeping_underscores(path),
-            revision
-        )
+            AssetLocator.clean_keeping_underscores(path)
+        ).for_branch(None)
 
     def get_id(self):
         return self.location
@@ -104,16 +104,23 @@ class StaticContent(object):
             return None
 
         assert(isinstance(course_key, CourseKey))
-        return course_key.make_asset_key('asset', '').to_deprecated_string()
+        placeholder_id = uuid.uuid4().hex
+        # create a dummy asset location with a fake but unique name. strip off the name, and return it
+        url_path = unicode(course_key.make_asset_key('asset', placeholder_id).for_branch(None))
+        return url_path.replace(placeholder_id, '')
 
     @staticmethod
     def get_location_from_path(path):
         """
         Generate an AssetKey for the given path (old c4x/org/course/asset/name syntax)
         """
-        # TODO OpaqueKeys after opaque keys deprecation is working
-        # return AssetLocation.from_string(path)
-        return AssetLocation.from_deprecated_string(path)
+        try:
+            return AssetKey.from_string(path)
+        except InvalidKeyError:
+            # TODO - re-address this once LMS-11198 is tackled.
+            if path.startswith('/'):
+                # try stripping off the leading slash and try again
+                return AssetKey.from_string(path[1:])
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):

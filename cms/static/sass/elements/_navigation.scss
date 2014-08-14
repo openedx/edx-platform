@@ -118,11 +118,11 @@ nav {
 
     .nav-item {
       @extend %t-action3;
+      @extend %t-regular;
       display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-l5;
       padding: 0 0($baseline/4) 0;
-      font-weight: 500;
 
       &:last-child {
         margin-bottom: 0;

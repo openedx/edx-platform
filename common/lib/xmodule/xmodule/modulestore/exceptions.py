@@ -63,6 +63,12 @@ class VersionConflictError(Exception):
         self.requestedLocation = requestedLocation
         self.currentHeadVersionGuid = currentHeadVersionGuid
 
+    def __str__(self, *args, **kwargs):
+        """
+        Print requested and current head info
+        """
+        return u'Requested {} but {} is current head'.format(self.requestedLocation, self.currentHeadVersionGuid)
+
 
 class DuplicateCourseError(Exception):
     """

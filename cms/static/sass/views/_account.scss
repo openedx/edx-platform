@@ -29,9 +29,9 @@
 
       h1 {
         @extend %t-title3;
+        @extend %t-strong;
         margin: 0;
         padding: 0;
-        font-weight: 600;
       }
 
       .action {
@@ -70,13 +70,13 @@
         margin-top: $baseline;
 
         .action-primary {
-          @include blue-button;
-          @extend %t-action2;
+          @include blue-button();
           @include transition(all $tmg-f3 linear 0s);
+          @extend %t-action2;
+          @extend %t-strong;
           display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
-          font-weight: 600;
           text-transform: uppercase;
         }
       }
@@ -96,7 +96,7 @@
           &.required {
 
             label {
-              font-weight: 600;
+              @extend %t-strong;
             }
 
             label:after {
@@ -228,9 +228,9 @@
 
       h3 {
         @extend %t-title7;
+        @extend %t-strong;
         margin: 0 0 ($baseline/4) 0;
         color: $gray-d2;
-        font-weight: 600;
       }
 
     }

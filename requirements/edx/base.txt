@@ -126,7 +126,6 @@ rednose==0.3
 selenium==2.39.0
 splinter==0.5.4
 testtools==0.9.34
-flaky==0.2.0
 
 #sentry
 raven==3.5.2
@@ -140,7 +139,7 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/mitocw/django-cas.git
 
 # edX packages
-edx-submissions==0.0.3
+edx-submissions==0.0.6
 
 #suds WS
 git+https://github.com/ovnicraft/suds.git

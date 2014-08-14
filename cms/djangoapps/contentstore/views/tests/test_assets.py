@@ -49,7 +49,7 @@ class BasicAssetsTestCase(AssetsTestCase):
 
     def test_pdf_asset(self):
         module_store = modulestore()
-        _, course_items = import_from_xml(
+        course_items = import_from_xml(
             module_store,
             self.user.id,
             'common/test/data/',
@@ -193,7 +193,7 @@ class LockAssetTestCase(AssetsTestCase):
 
         # Load the toy course.
         module_store = modulestore()
-        _, course_items = import_from_xml(
+        course_items = import_from_xml(
             module_store,
             self.user.id,
             'common/test/data/',

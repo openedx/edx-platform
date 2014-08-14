@@ -6,15 +6,15 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-  padding: 6px 8px 8px;
   @include box-sizing(border-box);
+  @include linear-gradient($gray-l5, $white);
+  @extend %t-copy-sub2;
+  padding: 6px 8px 8px;
   border: 1px solid $gray-l2;
   border-radius: 2px;
-  @include linear-gradient($gray-l5, $white);
   background-color: $gray-l5;
   box-shadow: inset 0 1px 2px $shadow-l1;
   font-family: 'Open Sans', sans-serif;
-  font-size: 11px;
   color: $baseFontColor;
   outline: 0;
 
@@ -60,8 +60,7 @@ textarea.text {
 form {
 
   input[type=file] {
-    @include font-size(14);
-    line-height: 1;
+    @extend %t-copy-sub1;
   }
 
   .note {
@@ -124,7 +123,7 @@ form[class^="create-"] {
 
   .title {
     @extend %t-title4;
-    font-weight: 600;
+    @extend %t-strong;
     padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
   }
 
@@ -146,7 +145,7 @@ form[class^="create-"] {
       &.required {
 
         label {
-          font-weight: 600;
+          @extend %t-strong;
         }
 
         label:after {
@@ -308,9 +307,9 @@ form[class^="create-"] {
 
     .action {
       @include transition(all $tmg-f2 linear 0s);
+      @extend %t-strong;
       display: inline-block;
       padding: ($baseline/5) $baseline;
-      font-weight: 600;
       text-transform: uppercase;
     }
 
@@ -382,7 +381,7 @@ input.search {
 }
 
 label {
-  font-size: 12px;
+  @extend %t-copy-sub2;
 }
 
 code {
@@ -393,7 +392,7 @@ code {
 }
 
 .CodeMirror {
-  font-size: 13px;
+  @extend %t-copy-sub1;
   background: #fff;
 }
 

@@ -11,10 +11,10 @@
 
   .bar-mod-title {
     @extend %t-title6;
+    @extend %t-strong;
     display: block;
     padding: ($baseline/2) ($baseline*.75);
     background-color: $gray-l4;
-    font-weight: 600;
   }
 
   .bar-mod-content {
@@ -24,8 +24,8 @@
 
     .title {
       @extend %t-title8;
+      @extend %t-strong;
       margin-bottom: ($baseline/4);
-      font-weight: 600;
       color: $gray-l2;
       text-transform: uppercase;
     }
@@ -108,9 +108,9 @@
 
     h5 {
       @extend %t-title5;
+      @extend %t-strong;
       margin-bottom: ($baseline*.75);
       color: $green-d1;
-      font-weight: 600;
     }
 
     // add component - list of green buttons
@@ -198,12 +198,12 @@
     a {
       @include clearfix();
       @include transition(none);
+      @extend %t-strong;
       display: block;
       border: 0px;
       padding: 7px $baseline;
       background: $white;
       color: $gray-d3;
-      font-weight: 500;
 
 
       &:hover {

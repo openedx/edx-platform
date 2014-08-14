@@ -35,7 +35,8 @@ starts follow.
 
 **Review First Week Content**
 
-* Verify that all units are present and published. See :ref:`Units`.
+* Verify that all units are present and published. See :ref:`Developing Course
+  Units`.
 * Check all assignments for completeness and verify their due dates. See
   :ref:`Working with Problem Components`.
 * Verify that videos, transcripts, and download links are in place and

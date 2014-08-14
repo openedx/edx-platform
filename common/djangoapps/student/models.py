@@ -970,7 +970,7 @@ class CourseEnrollment(models.Model):
         """
         paid_course = CourseMode.objects.filter(Q(course_id=self.course_id) & Q(mode_slug='honor') &
                                                 (Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=datetime.now(pytz.UTC)))).exclude(min_price=0)
-        if paid_course:
+        if paid_course or self.mode == 'professional':
             return True
 
         return False

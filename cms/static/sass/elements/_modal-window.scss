@@ -25,8 +25,8 @@
 
     .title {
       @extend %t-title5;
+      @extend %t-strong;
       margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
-      font-weight: 600;
       color: $black;
     }
 
@@ -104,7 +104,7 @@
 
       .action-primary {
         @include blue-button();
-        @include font-size(14); // needed due to bad button mixins for now
+        @extend %t-action3;
         border-color: $blue-d1;
         color: $white;
       }
@@ -253,9 +253,9 @@
 
         label {
           @extend %t-copy-sub1;
+          @extend %t-strong;
           @include transition(color $tmg-f3 ease-in-out 0s);
           margin: 0 0 ($baseline/4) 0;
-          font-weight: 600;
 
           &.is-focused {
             color: $blue;
@@ -391,11 +391,11 @@
 
         .component-name {
           @extend %t-title5;
+          @extend %t-strong;
           display: inline-block;
           vertical-align: middle;
           width: 48%;
           margin-left: ($baseline/2);
-          font-weight: 600;
           color: $black;
 
           em {
@@ -419,12 +419,12 @@
             a.tab {
               @extend %btn-secondary-gray;
               @extend %t-copy-sub1;
+              @extend %t-regular;
               background-image: none;
               box-shadow: none;
               border: 0;
               padding: ($baseline/4) ($baseline/2);
               text-transform: uppercase;
-              font-weight: normal;
 
               &.current {
                 background-color: $gray-d1;

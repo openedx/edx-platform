@@ -118,7 +118,7 @@
   // forms
   .new-section-name,
   .new-subsection-name-input {
-    @include font-size(16);
+    @extend %t-copy-base;
     display: inline-block;
     width: 515px;
     padding: ($baseline/4);
@@ -126,11 +126,11 @@
   }
 
   .new-subsection-name-input {
-    @include font-size(14);
+    @extend %t-copy-sub1;
   }
   .new-section-name-save,
   .new-subsection-name-save {
-    @include blue-button;
+    @include blue-button();
     margin: 0 5px;
     padding: 4px 20px 7px;
     color: $white;
@@ -138,7 +138,7 @@
 
   .new-section-name-cancel,
   .new-subsection-name-cancel {
-    @include white-button;
+    @include white-button();
     padding: 4px 20px 7px;
     color: $gray-l1;
   }

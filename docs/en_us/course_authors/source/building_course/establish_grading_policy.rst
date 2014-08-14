@@ -13,7 +13,7 @@ Establishing a grading policy takes several steps. You must:
 #. :ref:`Set the Grade Range`
 #. :ref:`Set the Grace Period`
 #. :ref:`Configure the Assignment Types`
-#. :ref:`Set the Assignment Type for Graded Subsections`
+#. :ref:`Graded Subsections`
 #. :ref:`The Student View of Grades`
 
 
@@ -166,28 +166,33 @@ You configure the following fields for each assignment type:
   will drop the lowest-scored assignments first.
 
 
-.. _Set the Assignment Type for Graded Subsections:
+.. _Graded Subsections:
 
 **********************************************
-Set the Assignment Type for Graded Subsections
+Graded Subsections
 **********************************************
-After you configure assignment types, as you are organizing your course, you set
-the assignment type for subsections that contain problems that are to be graded.
+
+After you configure assignment types, as you are organizing your course, you
+set the assignment type for subsections that contain problems that are to be
+graded.
 
 Each subsection that contains problems to be graded can include only one
-assignment type. See :ref:`subsections` for more information.
+assignment type. 
 
-.. note:: You can only set assignment types and due dates at the subsection
- level. You cannot set assignment types or due dates for entire sections or
- for individual units within subsections. Additionally, you can designate a
- subsection as one, and only one, of the assignment types you configured.
+.. note:: 
+ You can only set assignment types and due dates at the subsection level. You
+ cannot set assignment types or due dates for entire sections or for individual
+ units within subsections. Additionally, you can designate a subsection as one,
+ and only one, of the assignment types you configured.
   
-See :ref:`subsections` for general instructions on configuring a subsection. See
-:ref:`Set the Grading Policy` for instructions on designating a subsection as a
-graded assignment.
+See :ref:`Developing Course Subsections` for general instructions on
+configuring a subsection.
+
+See :ref:`Set the Assignment Type and Due Date for a Subsection` for
+instructions on designating a subsection as a graded assignment.
 
 Within a graded subsection, you create problems of the type designated for that
-subsection. You cannotß not mix problems of different assignment types in the
+subsection. You cannot not mix problems of different assignment types in the
 same subsection.
 
 For example, if you want to create a homework assignment and a lab for a
@@ -195,74 +200,12 @@ specific topic, create two subsections. Set one subsection as the Homework
 assignment type and the other as the Lab assignment type. Both subsections can
 contain other content as well as the actual homework or lab problems.
 
-.. note:: You can create problems in Studio without specifying that the
- subsection is an assignment type. However, such problems do not count toward
- a student's grade.
+.. note:: 
+ You can create problems in Studio without specifying that the subsection is an
+ assignment type. However, such problems do not count toward a student's grade.
 
-See :ref:`Working with Problem Components` for instructions on creating problems. 
-
-.. _Set the Grading Policy:
-
-=======================
-Set the Grading Policy
-=======================
-
-You can designate a subsection as one of the assignment types that you specified
-in the grading policy.
-
-You set the grading policy for the subsection from two places:
-
-* The course outline 
-* The subsection page
-
-From the course outline, click the checkmark next to the subsection.  Then
-select a grading policy from the popup menu:
-
-    .. image:: ../Images/course_outline_set_grade.png
-       :alt: Image of the assignment type for a subsection
-
-From the subsection page, click the text next to the **Graded as** label, then
-select a grading policy from the popup menu:
-
-    .. image:: ../Images/subsection_set_grade.png
-       :alt: Image of the assignment type on the subsection page
-
-See :ref:`Establish a Grading Policy` for more information.
-
-
-==================
-Set the Due Date
-==================
-
-For subsections that contain graded problems, you can set a due date. Students
-must complete the problems in the subsection before the due date to get credit.
-All problems in a subsection have the same due date.
-
-#. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time
-   fields appear.
-#. Place the cursor in the Due Date field, and pick a day from the popup
-   calendar.
-#. Place the cursor in the Due Time field and pick a time.
-
-.. note:: When you set a due date, keep in mind that students will be in
- different time zones. By default, the time zone appears as UTC, not the
- student's local time. If you tell your students an assignment is due at 5:00
- PM, make sure to specify that the time is 5:00 PM UTC and point them to a
- time converter.
-
-You can also :ref:`Set the Grace Period` for your assignments to cover any
-misunderstandings about time. For example, some classes have set a grace period
-of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
-
-Students see the due date in the course accordion under the subsection title.
-For example:
-
-.. image::  ../Images/Subsection_due_date.png
-  :alt: Image of subsection due dates in the course accordion
-
-There are several problems in this subsection, all due November 3, 2013 at 23:30
-UTC.
-
+See :ref:`Working with Problem Components` for instructions on creating
+problems.
 
 
 

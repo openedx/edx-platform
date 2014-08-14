@@ -16,13 +16,16 @@ from mock import Mock
 from path import path
 
 from xblock.field_data import DictFieldData
-from xblock.fields import ScopeIds
+from xblock.fields import ScopeIds, Scope
 
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore.mongo.draft import DraftModuleStore
+from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 
 
 MODULE_DIR = path(__file__).dirname()
@@ -193,32 +196,45 @@ class CourseComparisonTest(unittest.TestCase):
         Any field value mentioned in ``self.field_exclusions`` by the key (usage_id, field_name)
         will be ignored for the purpose of equality checking.
         """
-        expected_items = expected_store.get_items(expected_course_key)
-        actual_items = actual_store.get_items(actual_course_key)
+        # compare published
+        expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+        actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
         self.assertGreater(len(expected_items), 0)
+        self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
+
+        # compare draft
+        if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+            revision = ModuleStoreEnum.RevisionOption.draft_only
+        else:
+            revision = None
+        expected_items = expected_store.get_items(expected_course_key, revision=revision)
+        if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+            revision = ModuleStoreEnum.RevisionOption.draft_only
+        else:
+            revision = None
+        actual_items = actual_store.get_items(actual_course_key, revision=revision)
+        self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
+
+    def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
         self.assertEqual(len(expected_items), len(actual_items))
 
-        actual_item_map = {item.location: item for item in actual_items}
+        actual_item_map = {
+            item.location.block_id: item
+            for item in actual_items
+        }
 
         for expected_item in expected_items:
-            actual_item_location = expected_item.location.map_into_course(actual_course_key)
+            actual_item_location = actual_course_key.make_usage_key(expected_item.category, expected_item.location.block_id)
+            # split and old mongo use different names for the course root but we don't know which
+            # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
             if expected_item.location.category == 'course':
                 actual_item_location = actual_item_location.replace(name=actual_item_location.run)
-            actual_item = actual_item_map.get(actual_item_location)
-
-            # compare published state
-            exp_pub_state = expected_store.compute_publish_state(expected_item)
-            act_pub_state = actual_store.compute_publish_state(actual_item)
-            self.assertEqual(
-                exp_pub_state,
-                act_pub_state,
-                'Published states for usages {} and {} differ: {!r} != {!r}'.format(
-                    expected_item.location,
-                    actual_item.location,
-                    exp_pub_state,
-                    act_pub_state
-                )
-            )
+            actual_item = actual_item_map.get(actual_item_location.block_id)
+            # must be split
+            if actual_item is None and expected_item.location.category == 'course':
+                actual_item_location = actual_item_location.replace(name='course')
+                actual_item = actual_item_map.get(actual_item_location.block_id)
+            self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(actual_item_location, actual_item_map))
 
             # compare fields
             self.assertEqual(expected_item.fields, actual_item.fields)
@@ -251,12 +267,20 @@ class CourseComparisonTest(unittest.TestCase):
             # compare children
             self.assertEqual(expected_item.has_children, actual_item.has_children)
             if expected_item.has_children:
-                expected_children = []
-                for course1_item_child in expected_item.children:
-                    expected_children.append(
-                        course1_item_child.map_into_course(actual_course_key)
-                    )
-                self.assertEqual(expected_children, actual_item.children)
+                actual_course_key = actual_item.location.course_key.version_agnostic()
+                expected_children = [
+                    course1_item_child.location.map_into_course(actual_course_key)
+                    for course1_item_child in expected_item.get_children()
+                    # get_children was returning drafts for published parents :-(
+                    if expect_drafts or not getattr(course1_item_child, 'is_draft', False)
+                ]
+                actual_children = [
+                    item_child.location.version_agnostic()
+                    for item_child in actual_item.get_children()
+                    # get_children was returning drafts for published parents :-(
+                    if expect_drafts or not getattr(item_child, 'is_draft', False)
+                ]
+                self.assertEqual(expected_children, actual_children)
 
     def assertAssetEqual(self, expected_course_key, expected_asset, actual_course_key, actual_asset):
         """
@@ -296,7 +320,6 @@ class CourseComparisonTest(unittest.TestCase):
         ``actual_course_key`` in ``actual_store`` are identical, allowing for differences related
         to their being from different course keys.
         """
-
         expected_content, expected_count = expected_store.get_all_content_for_course(expected_course_key)
         actual_content, actual_count = actual_store.get_all_content_for_course(actual_course_key)
 

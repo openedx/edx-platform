@@ -290,7 +290,7 @@
 
   .ui-toggle-expansion {
     @include transition(all $tmg-f2 ease-in-out 0s);
-    @include font-size(18);
+    @extend %t-action1;
     display: inline-block;
     margin-right: ($baseline/4);
     color: $gray-l3;

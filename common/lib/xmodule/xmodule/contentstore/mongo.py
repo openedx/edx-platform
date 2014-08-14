@@ -94,7 +94,10 @@ class MongoContentStore(ContentStore):
                 fp = self.fs.get(content_id)
                 thumbnail_location = getattr(fp, 'thumbnail_location', None)
                 if thumbnail_location:
-                    thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
+                    thumbnail_location = location.course_key.make_asset_key(
+                        'thumbnail',
+                        thumbnail_location[4]
+                    )
                 return StaticContentStream(
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
@@ -105,7 +108,10 @@ class MongoContentStore(ContentStore):
                 with self.fs.get(content_id) as fp:
                     thumbnail_location = getattr(fp, 'thumbnail_location', None)
                     if thumbnail_location:
-                        thumbnail_location = location.course_key.make_asset_key('thumbnail', thumbnail_location[4])
+                        thumbnail_location = location.course_key.make_asset_key(
+                            'thumbnail',
+                            thumbnail_location[4]
+                        )
                     return StaticContent(
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
@@ -304,7 +310,9 @@ class MongoContentStore(ContentStore):
                 asset_id = asset_key
             else:  # add the run, since it's the last field, we're golden
                 asset_key['run'] = dest_course_key.run
-                asset_id = unicode(dest_course_key.make_asset_key(asset_key['category'], asset_key['name']))
+                asset_id = unicode(
+                    dest_course_key.make_asset_key(asset_key['category'], asset_key['name']).for_branch(None)
+                )
 
             self.fs.put(
                 source_content.read(),
@@ -347,7 +355,7 @@ class MongoContentStore(ContentStore):
             # NOTE, there's no need to state that run doesn't exist in the negative case b/c access via
             # SON requires equivalence (same keys and values in exact same order)
             dbkey['run'] = location.run
-            content_id = unicode(location)
+            content_id = unicode(location.for_branch(None))
         return content_id, dbkey
 
     def make_id_son(self, fs_entry):

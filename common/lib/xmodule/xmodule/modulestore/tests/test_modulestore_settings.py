@@ -45,7 +45,6 @@ class ModuleStoreSettingsMigration(TestCase):
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
                 "mappings": {},
-                "reference_type": "Location",
                 "stores": {
                     "an_old_mongo_store": {
                         "DOC_STORE_CONFIG": {},
@@ -77,15 +76,47 @@ class ModuleStoreSettingsMigration(TestCase):
         }
     }
 
+    ALREADY_UPDATED_MIXED_CONFIG = {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+            'OPTIONS': {
+                'mappings': {},
+                'stores': [
+                    {
+                        'NAME': 'split',
+                        'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
+                        'DOC_STORE_CONFIG': {},
+                        'OPTIONS': {
+                            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                            'fs_root': "fs_root",
+                            'render_template': 'edxmako.shortcuts.render_to_string',
+                        }
+                    },
+                    {
+                        'NAME': 'draft',
+                        'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
+                        'DOC_STORE_CONFIG': {},
+                        'OPTIONS': {
+                            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+                            'fs_root': "fs_root",
+                            'render_template': 'edxmako.shortcuts.render_to_string',
+                        }
+                    },
+                ]
+            }
+        }
+    }
+
+
     def _get_mixed_stores(self, mixed_setting):
         """
-        Helper for accessing stores in a configuration setting for the Mixed modulestore
+        Helper for accessing stores in a configuration setting for the Mixed modulestore.
         """
         return mixed_setting["default"]["OPTIONS"]["stores"]
 
     def assertStoreValuesEqual(self, store_setting1, store_setting2):
         """
-        Tests whether the fields in the given store_settings are equal
+        Tests whether the fields in the given store_settings are equal.
         """
         store_fields = ["OPTIONS", "DOC_STORE_CONFIG"]
         for field in store_fields:
@@ -108,26 +139,56 @@ class ModuleStoreSettingsMigration(TestCase):
 
         return new_mixed_setting, new_stores[0]
 
+    def is_split_configured(self, mixed_setting):
+        """
+        Tests whether the split module store is configured in the given setting.
+        """
+        stores = self._get_mixed_stores(mixed_setting)
+        split_settings = [store for store in stores if store['ENGINE'].endswith('.DraftVersioningModuleStore')]
+        if len(split_settings):
+            # there should only be one setting for split
+            self.assertEquals(len(split_settings), 1)
+            # verify name
+            self.assertEquals(split_settings[0]['NAME'], 'split')
+            # verify split config settings equal those of mongo
+            self.assertStoreValuesEqual(
+                split_settings[0],
+                next((store for store in stores if 'DraftModuleStore' in store['ENGINE']), None)
+            )
+        return len(split_settings) > 0
+
     def test_convert_into_mixed(self):
         old_setting = self.OLD_CONFIG
-        _, new_default_store_setting = self.assertMigrated(old_setting)
+        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         self.assertEqual(new_default_store_setting["ENGINE"], old_setting["default"]["ENGINE"])
+        self.assertFalse(self.is_split_configured(new_mixed_setting))
 
     def test_convert_from_old_mongo_to_draft_store(self):
         old_setting = self.OLD_CONFIG_WITH_DIRECT_MONGO
-        _, new_default_store_setting = self.assertMigrated(old_setting)
+        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_setting)
         self.assertStoreValuesEqual(new_default_store_setting, old_setting["default"])
         self.assertEqual(new_default_store_setting["ENGINE"], "xmodule.modulestore.mongo.draft.DraftModuleStore")
+        self.assertTrue(self.is_split_configured(new_mixed_setting))
 
     def test_convert_from_dict_to_list(self):
         old_mixed_setting = self.OLD_MIXED_CONFIG_WITH_DICT
         new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
         self.assertEqual(new_default_store_setting["ENGINE"], "the_default_store")
+        self.assertTrue(self.is_split_configured(new_mixed_setting))
+
+        # exclude split when comparing old and new, since split was added as part of the migration
+        new_stores = [store for store in self._get_mixed_stores(new_mixed_setting) if store['NAME'] != 'split']
+        old_stores = self._get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
 
         # compare each store configured in mixed
-        old_stores = self._get_mixed_stores(self.OLD_MIXED_CONFIG_WITH_DICT)
-        new_stores = self._get_mixed_stores(new_mixed_setting)
         self.assertEqual(len(new_stores), len(old_stores))
-        for new_store_setting in self._get_mixed_stores(new_mixed_setting):
-            self.assertStoreValuesEqual(new_store_setting, old_stores[new_store_setting['NAME']])
+        for new_store in new_stores:
+            self.assertStoreValuesEqual(new_store, old_stores[new_store['NAME']])
+
+    def test_no_conversion(self):
+        # make sure there is no migration done on an already updated config
+        old_mixed_setting = self.ALREADY_UPDATED_MIXED_CONFIG
+        new_mixed_setting, new_default_store_setting = self.assertMigrated(old_mixed_setting)
+        self.assertTrue(self.is_split_configured(new_mixed_setting))
+        self.assertEquals(old_mixed_setting, new_mixed_setting)

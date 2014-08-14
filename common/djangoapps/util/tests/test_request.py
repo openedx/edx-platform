@@ -1,8 +1,12 @@
-from django.test.client import RequestFactory
-from django.conf import settings
-from util.request import safe_get_host
-from django.core.exceptions import SuspiciousOperation
+"""Tests for util.request module."""
+
 import unittest
+
+from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
+from django.test.client import RequestFactory
+
+from util.request import course_id_from_url, safe_get_host
 
 
 class ResponseTestCase(unittest.TestCase):
@@ -37,3 +41,15 @@ class ResponseTestCase(unittest.TestCase):
         settings.ALLOWED_HOSTS = ["the_valid_website.com"]
         with self.assertRaises(SuspiciousOperation):
             safe_get_host(request)
+
+    def test_course_id_from_url(self):
+        """ Test course_id_from_url(). """
+
+        self.assertIsNone(course_id_from_url('/login'))
+        self.assertIsNone(course_id_from_url('/course/edX/maths/2020'))
+        self.assertIsNone(course_id_from_url('/courses/edX/maths/'))
+
+        course_id = course_id_from_url('/courses/edX/maths/2020')
+        self.assertEqual(course_id.org, 'edX')
+        self.assertEqual(course_id.course, 'maths')
+        self.assertEqual(course_id.run, '2020')

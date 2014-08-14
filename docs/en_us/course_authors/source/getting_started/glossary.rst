@@ -1,8 +1,8 @@
 .. _Glossary:
 
-###################################################
+############
 Glossary
-###################################################
+############
 
 .. _A:
 
@@ -84,7 +84,9 @@ C
  
 **Component**
 
-  The part of a unit that contains your actual course content. A unit can contain one or more components. For more information, see :ref:`Components`.
+  The part of a unit that contains your actual course content. A unit can
+  contain one or more components. For more information, see :ref:`Developing
+  Course Components`.
 
 
 .. _Course Accordion:
@@ -152,9 +154,8 @@ D
   responsible for receiving course data from edX, and transferring it securely
   to researchers and other interested parties after it is received.
 
-  See `edX Research Guide`_.
-
-.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
+  See the `edX Research
+  Guide<http://edx.readthedocs.org/projects/devdata/en/latest/>`.
 
 .. _Discussion:
  
@@ -229,7 +230,7 @@ F
 
 **Forum**
 
-  See :ref:`Discussion`.
+  See `Discussion`_.
 
 .. _G:
 
@@ -407,19 +408,11 @@ P
  
 **Preview Mode**
 
-  A view that allows you to see all the units of your course as students see them, regardless of whether the visibility of each unit is set to Public or Private and regardless of whether the release dates have passed.
+  A view that allows you to see all the units of your course as students see
+  them, regardless of the unit status and regardless of whether the release
+  dates have passed.
 
-  See :ref:`Preview Your Course` for more information.
-
-
-.. _Private Unit:
- 
-**Private Unit**
-
-  A unit whose **Visibility** option is set to Private so that students cannot see the unit, even if it is located in a subsection that has been released.
-
-  See :ref:`Public and Private Units` for more information.
-
+  See :ref:`Preview Course Content` for more information.
 
 
 
@@ -439,15 +432,6 @@ P
 
 The page in the learning management system that shows students their scores on graded assignments in the course.
 
-
-
-.. _Public Unit:
- 
-**Public Unit**
-
-  A unit whose **Visibility** option is set to Public so that the unit is visible to students, if the subsection that contains the unit has been released.
-
-  See :ref:`Public and Private Units` for more information.
 
 .. _R:
 
@@ -480,7 +464,7 @@ S
 
   The topmost category in your course. A section can represent a time period in your course or another organizing principle.
 
-  See :ref:`Sections` for more information.
+  See :ref:`Developing Course Sections` for more information.
 
 
 .. _Short Course Description:
@@ -507,9 +491,7 @@ S
 
   A division that represents a topic in your course, or another organizing principle. Subsections are found inside sections and contain units. Subsections can also be called "lessons."
 
-  See :ref:`Subsections` for more information.
-
-
+  See :ref:`Developing Course Subsections` for more information.
 
 
 .. _T:

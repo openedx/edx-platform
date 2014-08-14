@@ -24,9 +24,9 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition, Group
 
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from opaque_keys.edx.locations import Location
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
@@ -106,7 +106,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     Handle incoming requests for notifications in a RESTful way.
 
     course_key_string and action_state_id must both be set; else a HttpBadResponseRequest is returned.
-    
+
     For each of these operations, the requesting user must have access to the course;
     else a PermissionDenied error is returned.
 
@@ -441,7 +441,7 @@ def _create_or_rerun_course(request):
     """
     To be called by requests that create a new destination course (i.e., create_new_course and rerun_course)
     Returns the destination course_key and overriding fields for the new course.
-    Raises InvalidLocationError and InvalidKeyError
+    Raises DuplicateCourseError and InvalidKeyError
     """
     if not auth.has_access(request.user, CourseCreatorRole()):
         raise PermissionDenied()
@@ -460,15 +460,14 @@ def _create_or_rerun_course(request):
                     status=400
                 )
 
-        course_key = SlashSeparatedCourseKey(org, number, run)
         fields = {'display_name': display_name} if display_name is not None else {}
 
         if 'source_course_key' in request.json:
-            return _rerun_course(request, course_key, fields)
+            return _rerun_course(request, org, number, run, fields)
         else:
-            return _create_new_course(request, course_key, fields)
+            return _create_new_course(request, org, number, run, fields)
 
-    except InvalidLocationError:
+    except DuplicateCourseError:
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
@@ -488,27 +487,30 @@ def _create_or_rerun_course(request):
         )
 
 
-def _create_new_course(request, course_key, fields):
+def _create_new_course(request, org, number, run, fields):
     """
     Create a new course.
     Returns the URL for the course overview page.
+    Raises DuplicateCourseError if the course already exists
     """
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
     # w/ xmodule.course_module.CourseDescriptor.__init__
-    wiki_slug = u"{0}.{1}.{2}".format(course_key.org, course_key.course, course_key.run)
+    wiki_slug = u"{0}.{1}.{2}".format(org, number, run)
     definition_data = {'wiki_slug': wiki_slug}
     fields.update(definition_data)
 
-    # Creating the course raises InvalidLocationError if an existing course with this org/name is found
-    new_course = modulestore().create_course(
-        course_key.org,
-        course_key.course,
-        course_key.run,
-        request.user.id,
-        fields=fields,
-    )
+    store = modulestore()
+    with store.default_store(settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE', 'mongo')):
+        # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
+        new_course = store.create_course(
+            org,
+            number,
+            run,
+            request.user.id,
+            fields=fields,
+        )
 
     # Make sure user has instructor and staff access to the new course
     add_instructor(new_course.id, request.user, request.user)
@@ -521,7 +523,7 @@ def _create_new_course(request, course_key, fields):
     })
 
 
-def _rerun_course(request, destination_course_key, fields):
+def _rerun_course(request, org, number, run, fields):
     """
     Reruns an existing course.
     Returns the URL for the course listing page.
@@ -532,6 +534,15 @@ def _rerun_course(request, destination_course_key, fields):
     if not has_course_access(request.user, source_course_key):
         raise PermissionDenied()
 
+    # create destination course key
+    store = modulestore()
+    with store.default_store('split'):
+        destination_course_key = store.make_course_key(org, number, run)
+
+     # verify org course and run don't already exist
+    if store.has_course(destination_course_key, ignore_case=True):
+        raise DuplicateCourseError(source_course_key, destination_course_key)
+
     # Make sure user has instructor and staff access to the destination course
     # so the user can see the updated status for that course
     add_instructor(destination_course_key, request.user, request.user)
@@ -540,10 +551,13 @@ def _rerun_course(request, destination_course_key, fields):
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user)
 
     # Rerun the course as a new celery task
-    rerun_course.delay(source_course_key, destination_course_key, request.user.id, fields)
+    rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, fields)
 
     # Return course listing page
-    return JsonResponse({'url': reverse_url('course_handler')})
+    return JsonResponse({
+        'url': reverse_url('course_handler'),
+        'destination_course_key': unicode(destination_course_key)
+    })
 
 
 # pylint: disable=unused-argument
@@ -828,9 +842,6 @@ class TextbookValidationError(Exception):
     "An error thrown when a textbook input is invalid"
     pass
 
-class SyllabusValidationError(Exception):
-    "An error thrown when a syllabus input is invalid"
-    pass
 
 def validate_textbooks_json(text):
     """
@@ -870,43 +881,6 @@ def validate_textbook_json(textbook):
         raise TextbookValidationError("textbook ID must start with a digit")
     return textbook
 
-def validate_syllabuses_json(text):
-    """
-    Validate the given text as representing a single topic syllabus
-    """
-    try:
-        syllabuses = json.loads(text)
-    except ValueError:
-        raise SyllabusValidationError("invalid JSON")
-    if not isinstance(syllabuses, (list, tuple)):
-        raise SyllabusValidationError("must be JSON list")
-    for syllabus in syllabuses:
-        validate_syllabus_json(syllabus)
-    # check specified IDs for uniqueness
-    all_ids = [syllabus["id"] for syllabus in syllabuses if "id" in syllabus]
-    unique_ids = set(all_ids)
-    if len(all_ids) > len(unique_ids):
-        raise SyllabusValidationError("IDs must be unique")
-    return syllabuses
-
-def validate_syllabus_json(syllabus):
-    """
-    Validate the given text as representing a list of topic_syllabuses
-    """
-    if isinstance(syllabus, basestring):
-        try:
-            syllabus = json.loads(syllabus)
-        except ValueError:
-            raise SyllabusValidationError("invalid JSON")
-    if not isinstance(syllabus, dict):
-        raise SyllabusValidationError("must be JSON object")
-    if not syllabus.get("tab_title"):
-        raise SyllabusValidationError("must have tab_title")
-    tid = str(syllabus.get("id", ""))
-    if tid and not tid[0].isdigit():
-        raise SyllabusValidationError("syllabus ID must start with a digit")
-    return syllabus
-
 
 def assign_textbook_id(textbook, used_ids=()):
     """
@@ -921,94 +895,6 @@ def assign_textbook_id(textbook, used_ids=()):
         # add a random ASCII character to the end
         tid = tid + random.choice(string.ascii_lowercase)
     return tid
-
-def assign_syllabus_id(syllabus, used_ids=()):
-    """
-    Return an ID that can be assigned to a syllabus
-    and doesn't match the used_ids
-    """
-    tid = Location.clean(syllabus["tab_title"])
-    if not tid[0].isdigit():
-        # stick a random digit in front
-        tid = random.choice(string.digits) + tid
-    while tid in used_ids:
-        # add a random ASCII character to the end
-        tid = tid + random.choice(string.ascii_lowercase)
-    return tid
-
-@require_http_methods(("GET", "POST", "PUT"))
-@login_required
-@ensure_csrf_cookie
-def syllabus_list_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
-    """
-    A RESTful handler for syllabus collections.
-
-    GET
-        html: return syllabus list page (Backbone application)
-        json: return JSON representation of all syllabus in this course
-    POST
-        json: create a new syllabus for this course
-    PUT
-        json: overwrite all syllabus in the course with the given list
-    """
-    
-    locator, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
-    store = get_modulestore(course.location)
-    if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
-        # return HTML page
-        syllabus_url = locator.url_reverse('/syllabuses')
-        return render_to_response('syllabuses.html', {
-            'context_course': course,
-            'syllabuses': course.topic_syllabuses,
-            'syllabus_url': syllabus_url,
-        })
-    
-    # from here on down, we know the client has requested JSON
-    if request.method == 'GET':
-        return JsonResponse(course.topic_syllabuses)
-    elif request.method == 'PUT':
-        try:
-            syllabuses = validate_syllabuses_json(request.body)
-        except SyllabusValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-
-        tids = set(t["id"] for t in syllabuses if "id" in t)
-        for syllabus in syllabuses:
-            if not "id" in syllabus:
-                tid = assign_syllabus_id(syllabus, tids)
-                syllabus["id"] = tid
-                tids.add(tid)
-
-        if not any(tab['type'] == 'topic_syllabuses' for tab in course.tabs):
-            course.tabs.append({"type": "topic_syllabuses"})
-        course.topic_syllabuses = syllabuses
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
-        return JsonResponse(course.topic_syllabuses)
-    elif request.method == 'POST':
-        # create a new syllabus for the course
-        try:
-            syllabus = validate_syllabus_json(request.body)
-        except SyllabusValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-        if not syllabus.get("id"):
-            tids = set(t["id"] for t in course.topic_syllabuses if "id" in t)
-            syllabus["id"] = assign_syllabus_id(syllabus, tids)
-        existing = course.topic_syllabuses
-        existing.append(syllabus)
-        course.topic_syllabuses = existing
-        if not any(tab['type'] == 'topic_syllabuses' for tab in course.tabs):
-            tabs = course.tabs
-            tabs.append({"type": "topic_syllabuses"})
-            course.tabs = tabs
-        store.update_metadata(course.location, own_metadata(course))
-        resp = JsonResponse(syllabus, status=201)
-        resp["Location"] = locator.url_reverse('syllabuses', syllabus["id"])
-        return resp
 
 
 @require_http_methods(("GET", "POST", "PUT"))
@@ -1085,68 +971,6 @@ def textbooks_list_handler(request, course_key_string):
         )
         return resp
 
-@login_required
-@ensure_csrf_cookie
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def syllabus_detail_handler(request, tid, tag=None, package_id=None, branch=None, version_guid=None, block=None):
-    """
-    JSON API endpoint for manipulating a syllabus via its internal ID.
-    Used by the Backbone application.
-
-    GET
-        json: return JSON representation of syllabus
-    POST or PUT
-        json: update syllabus based on provided information
-    DELETE
-        json: remove syllabus
-    """
-    __, course = _get_locator_and_course(
-        package_id, branch, version_guid, block, request.user
-    )
-    store = get_modulestore(course.location)
-    matching_id = [tb for tb in course.topic_syllabuses
-                   if str(tb.get("id")) == str(tid)]
-    if matching_id:
-        syllabus = matching_id[0]
-    else:
-        syllabus = None
-
-    if request.method == 'GET':
-        if not syllabus:
-            return JsonResponse(status=404)
-        return JsonResponse(syllabus)
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                        # django is rewriting one to the other
-        try:
-            new_syllabus = validate_syllabus_json(request.body)
-        except SyllabusValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-        new_syllabus["id"] = tid
-        if syllabus:
-            i = course.topic_syllabuses.index(syllabus)
-            new_syllabuses = course.topic_syllabuses[0:i]
-            new_syllabuses.append(new_syllabus)
-            new_syllabuses.extend(course.topic_syllabuses[i + 1:])
-            course.topic_syllabuses = new_syllabuses
-        else:
-            course.topic_syllabuses.append(new_syllabus)
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
-        return JsonResponse(new_syllabus, status=201)
-    elif request.method == 'DELETE':
-        if not syllabus:
-            return JsonResponse(status=404)
-        i = course.topic_syllabuses.index(syllabus)
-        new_syllabuses = course.topic_syllabuses[0:i]
-        new_syllabuses.extend(course.topic_syllabuses[i + 1:])
-        course.topic_syllabuses = new_syllabuses
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
-        return JsonResponse()
 
 @login_required
 @ensure_csrf_cookie
@@ -1248,12 +1072,11 @@ class GroupConfiguration(object):
         if len(self.configuration.get('groups', [])) < 2:
             raise GroupConfigurationsValidationError(_("must have at least two groups"))
 
-    def generate_id(self):
+    def generate_id(self, used_ids):
         """
         Generate unique id for the group configuration.
         If this id is already used, we generate new one.
         """
-        used_ids = self.get_used_ids()
         cid = random.randint(100, 10 ** 12)
 
         while cid in used_ids:
@@ -1265,21 +1088,18 @@ class GroupConfiguration(object):
         """
         Assign id for the json representation of group configuration.
         """
-        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id()
+        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id(self.get_used_ids())
 
     def assign_group_ids(self):
         """
         Assign ids for the group_configuration's groups.
         """
-        # this is temporary logic, we are going to build default groups on front-end
-        if not self.configuration.get('groups'):
-            self.configuration['groups'] = [
-                {'name': 'Group A'}, {'name': 'Group B'},
-            ]
-
+        used_ids = [g.id for p in self.course.user_partitions for g in p.groups]
         # Assign ids to every group in configuration.
-        for index, group in enumerate(self.configuration.get('groups', [])):
-            group['id'] = index
+        for group in self.configuration.get('groups', []):
+            if group.get('id') is None:
+                group["id"] = self.generate_id(used_ids)
+                used_ids.append(group["id"])
 
     def get_used_ids(self):
         """
@@ -1303,20 +1123,49 @@ class GroupConfiguration(object):
     @staticmethod
     def get_usage_info(course, store):
         """
-        Get all units names and their urls that have experiments and associated
-        with configurations.
+        Get usage information for all Group Configurations.
+        """
+        split_tests = store.get_items(course.id, qualifiers={'category': 'split_test'})
+        return GroupConfiguration._get_usage_info(store, course, split_tests)
+
+    @staticmethod
+    def add_usage_info(course, store):
+        """
+        Add usage information to group configurations jsons in course.
+
+        Returns json of group configurations updated with usage information.
+        """
+        usage_info = GroupConfiguration.get_usage_info(course, store)
+        configurations = []
+        for partition in course.user_partitions:
+            configuration = partition.to_json()
+            configuration['usage'] = usage_info.get(partition.id, [])
+            configurations.append(configuration)
+        return configurations
+
+    @staticmethod
+    def _get_usage_info(store, course, split_tests):
+        """
+        Returns all units names, their urls and validation messages.
 
         Returns:
         {'user_partition_id':
             [
-                {'label': 'Unit Name / Experiment Name', 'url': 'url_to_unit_1'},
-                {'label': 'Another Unit Name / Another Experiment Name', 'url': 'url_to_unit_1'}
+                {
+                    'label': 'Unit 1 / Experiment 1',
+                    'url': 'url_to_unit_1',
+                    'validation': {'message': 'a validation message', 'type': 'warning'}
+                },
+                {
+                    'label': 'Unit 2 / Experiment 2',
+                    'url': 'url_to_unit_2',
+                    'validation': {'message': 'another validation message', 'type': 'error'}
+                }
             ],
         }
         """
         usage_info = {}
-        descriptors = store.get_items(course.id, category='split_test')
-        for split_test in descriptors:
+        for split_test in split_tests:
             if split_test.user_partition_id not in usage_info:
                 usage_info[split_test.user_partition_id] = []
 
@@ -1337,24 +1186,28 @@ class GroupConfiguration(object):
             )
             usage_info[split_test.user_partition_id].append({
                 'label': '{} / {}'.format(unit.display_name, split_test.display_name),
-                'url': unit_url
+                'url': unit_url,
+                'validation': split_test.general_validation_message,
             })
         return usage_info
 
     @staticmethod
-    def add_usage_info(course, store):
+    def update_usage_info(store, course, configuration):
         """
-        Add usage information to group configurations json.
+        Update usage information for particular Group Configuration.
 
-        Returns json of group configurations updated with usage information.
+        Returns json of particular group configuration updated with usage information.
         """
-        usage_info = GroupConfiguration.get_usage_info(course, store)
-        configurations = []
-        for partition in course.user_partitions:
-            configuration = partition.to_json()
-            configuration['usage'] = usage_info.get(partition.id, [])
-            configurations.append(configuration)
-        return configurations
+        # Get all Experiments that use particular Group Configuration in course.
+        split_tests = store.get_items(
+            course.id,
+            category='split_test',
+            content={'user_partition_id': configuration.id}
+        )
+        configuration_json = configuration.to_json()
+        usage_information = GroupConfiguration._get_usage_info(store, course, split_tests)
+        configuration_json['usage'] = usage_information.get(configuration.id, [])
+        return configuration_json
 
 
 @require_http_methods(("GET", "POST"))
@@ -1410,7 +1263,7 @@ def group_configurations_list_handler(request, course_key_string):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("POST", "PUT"))
+@require_http_methods(("POST", "PUT", "DELETE"))
 def group_configurations_detail_handler(request, course_key_string, group_configuration_id):
     """
     JSON API endpoint for manipulating a group configuration via its internal ID.
@@ -1442,7 +1295,24 @@ def group_configurations_detail_handler(request, course_key_string, group_config
         else:
             course.user_partitions.append(new_configuration)
         store.update_item(course, request.user.id)
-        return JsonResponse(new_configuration.to_json(), status=201)
+        configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
+        return JsonResponse(configuration, status=201)
+    elif request.method == "DELETE":
+        if not configuration:
+            return JsonResponse(status=404)
+
+        # Verify that group configuration is not already in use.
+        usages = GroupConfiguration.get_usage_info(course, store)
+        if usages.get(int(group_configuration_id)):
+            return JsonResponse(
+                {"error": _("This Group Configuration is already in use and cannot be removed.")},
+                status=400
+            )
+
+        index = course.user_partitions.index(configuration)
+        course.user_partitions.pop(index)
+        store.update_item(course, request.user.id)
+        return JsonResponse(status=204)
 
 
 def _get_course_creator_status(user):

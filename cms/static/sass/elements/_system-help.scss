@@ -8,7 +8,7 @@
 
   .title {
     @extend %t-title4;
-    font-weight: 600;
+    @extend %t-strong;
   }
 
   .copy {
@@ -16,7 +16,7 @@
   }
 
   strong {
-    font-weight: 600;
+    @extend %t-strong;
   }
 
   // CASE: has links alongside
@@ -56,8 +56,8 @@
 
   .title {
     @extend %t-title6;
+    @extend %t-strong;
     margin-bottom: ($baseline/2);
-    font-weight: 700;
   }
 
   .copy {
@@ -72,7 +72,7 @@
   }
 
   strong {
-    font-weight: 600;
+    @extend %t-strong;
   }
 
   &.has-status {
@@ -230,9 +230,9 @@
 
   h3, .title {
     @extend %t-title7;
+    @extend %t-strong;
     margin: 0 0 ($baseline/4) 0;
     color: $gray-d2;
-    font-weight: 600;
   }
 
   p, .copy {

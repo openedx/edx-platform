@@ -58,7 +58,7 @@ class XBlockImportTest(ModuleStoreTestCase):
                 the expected field value set.
 
         """
-        _, courses = import_from_xml(
+        courses = import_from_xml(
             self.store, self.user.id, 'common/test/data', [course_dir]
         )
 

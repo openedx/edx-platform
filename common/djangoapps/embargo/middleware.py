@@ -86,13 +86,17 @@ class EmbargoMiddleware(object):
                           (ip_addr, course_id)
                 else:
                     msg = "Embargo: Restricting IP address %s because IP is blacklisted." % ip_addr
-
                 log.info(msg)
                 return response
+            # ipv6 support
+            if ip_addr.find(':') >= 0:
+                country_code_from_ip = pygeoip.GeoIP(settings.GEOIPV6_PATH).country_code_by_addr(ip_addr)
+            else:
+                country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
 
-            country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
             is_embargoed = country_code_from_ip in EmbargoedState.current().embargoed_countries_list
-            # Fail if country is embargoed and the ip address isn't explicitly whitelisted
+            # Fail if country is embargoed and the ip address isn't explicitly
+            # whitelisted
             if is_embargoed and ip_addr not in IPFilter.current().whitelist_ips:
                 if course_is_embargoed:
                     msg = "Embargo: Restricting IP address %s to course %s because IP is from country %s." % \

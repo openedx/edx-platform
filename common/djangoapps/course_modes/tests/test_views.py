@@ -98,3 +98,45 @@ class CourseModeViewTest(TestCase):
         self.assertEquals(response.status_code, 200)
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
+
+
+class ProfessionalModeViewTest(TestCase):
+    """
+    Tests for redirects specific to the 'professional' course mode.
+    Can't really put this in the ddt-style tests in CourseModeViewTest,
+    since 'professional' mode implies it is the *only* mode for a course
+    """
+    def setUp(self):
+        self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
+        CourseModeFactory(mode_slug='professional', course_id=self.course_id)
+        self.user = UserFactory()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_professional_registration(self):
+        self.client.login(
+            username=self.user.username,
+            password='test'
+        )
+
+        response = self.client.get(
+            reverse('course_modes_choose', args=[self.course_id.to_deprecated_string()]),
+            follow=False,
+        )
+
+        self.assertEquals(response.status_code, 302)
+        self.assertTrue(response['Location'].endswith(reverse('verify_student_show_requirements', args=[unicode(self.course_id)])))
+
+        CourseEnrollmentFactory(
+            user=self.user,
+            is_active=True,
+            mode="professional",
+            course_id=unicode(self.course_id),
+        )
+
+        response = self.client.get(
+            reverse('course_modes_choose', args=[self.course_id.to_deprecated_string()]),
+            follow=False,
+        )
+
+        self.assertEquals(response.status_code, 302)
+        self.assertTrue(response['Location'].endswith(reverse('dashboard')))

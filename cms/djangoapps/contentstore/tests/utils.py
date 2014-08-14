@@ -190,7 +190,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         items = self.store.get_items(
             course_id,
-            category='vertical',
+            qualifiers={'category': 'vertical'},
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.check_verticals(items)
@@ -247,7 +247,14 @@ class CourseTestCase(ModuleStoreTestCase):
         course1_items = self.store.get_items(course1_id)
         course2_items = self.store.get_items(course2_id)
         self.assertGreater(len(course1_items), 0)  # ensure it found content instead of [] == []
-        self.assertEqual(len(course1_items), len(course2_items))
+        if len(course1_items) != len(course2_items):
+            course1_block_ids = set([item.location.block_id for item in course1_items])
+            course2_block_ids = set([item.location.block_id for item in course2_items])
+            raise AssertionError(
+                u"Course1 extra blocks: {}; course2 extra blocks: {}".format(
+                    course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids
+                )
+            )
 
         for course1_item in course1_items:
             course2_item_location = course1_item.location.map_into_course(course2_id)

@@ -3,150 +3,150 @@
 
 .view-dashboard {
 
-	// temp
-	.content {
-		margin-bottom: ($baseline*5);
+  // temp
+  .content {
+    margin-bottom: ($baseline*5);
 
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 
-	// ====================
+  // ====================
 
-	// basic layout
-	.content-primary, .content-supplementary {
-	  @include box-sizing(border-box);
-	  float: left;
-	}
+  // basic layout
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
 
-	.content-primary {
-	  width: flex-grid(9, 12);
-	  margin-right: flex-gutter();
-	}
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
 
-	.content-supplementary {
-	  width: flex-grid(3, 12);
-	}
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
-	// ====================
+  // ====================
 
-	// elements - notices
-	.content .notice-incontext {
-		width: flexgrid(9, 9);
+  // elements - notices
+  .content .notice-incontext {
+    width: flexgrid(9, 9);
 
-	  // CASE: notice has actions {
-	  &.has-actions, &.list-notices .notice-item.has-actions {
+    // CASE: notice has actions {
+    &.has-actions, &.list-notices .notice-item.has-actions {
 
-	    .msg, .list-actions {
-	      display: inline-block;
-	      vertical-align: middle;
-	    }
+      .msg, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
 
-	    .msg {
-	      width: flex-grid(6, 9);
-	      margin-right: flex-gutter();
-	    }
+      .msg {
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
 
-	    .list-actions {
-	      width: flex-grid(3, 9);
-	      text-align: right;
-	      margin-top: 0;
+      .list-actions {
+        width: flex-grid(3, 9);
+        text-align: right;
+        margin-top: 0;
 
-	      .action-item {
+        .action-item {
 
-	      }
+        }
 
-	      .action-create-course {
-	      	@extend %btn-primary-green;
-	      	@extend %t-action3;
-	      }
-	    }
-	  }
-	}
-
-
-
-	// elements - course creation rights controls
-	.wrapper-creationrights {
-		overflow: hidden;
-
-		.ui-toggle-control {
-			@extend %ui-depth2;
-			@extend %btn-secondary-gray;
-			@include clearfix();
-			display: block;
-			text-align: left;
-
-			// STATE: hover - syncing up colors with current so transition is smoother
-			&:hover {
-				background: $gray-d1;
-				color: $white;
-			}
-
-			.label {
-				@extend %t-action3;
-				float: left;
-				width: flex-grid(8, 9);
-				margin: 3px flex-gutter() 0 0;
-			}
-
-			.icon-remove-sign {
-				@extend %t-action1;
-				@include transform(rotate(45deg));
-				@include transform-origin(center center);
-				@include transition(all $tmg-f1 linear 0s);
-				float: right;
-				text-align: right;
-			}
-		}
-
-		.ui-toggle-target {
-			@extend %ui-depth1;
-			@include transition(opacity $tmg-f1 ease-in-out 0s);
-			position: relative;
-			top: -2px;
-			display: none;
-			opacity: 0;
-		}
-
-		// CASE: when the content area is shown
-		&.is-shown {
-
-			.ui-toggle-control {
-				@include border-bottom-radius(0);
-
-				.icon-remove-sign {
-					@include transform(rotate(90deg));
-					@include transform-origin(center center);
-				}
-			}
-
-			.ui-toggle-target {
-				display: block;
-				opacity: 1.0;
-			}
-		}
+        .action-create-course {
+          @extend %btn-primary-green;
+          @extend %t-action3;
+        }
+      }
+    }
+  }
 
 
-	}
 
-	// elements - course creation rights controls
-	.status-creationrights {
-		margin-top: $baseline;
+  // elements - course creation rights controls
+  .wrapper-creationrights {
+    overflow: hidden;
 
-		.title {
-			@extend %t-title7;
-			margin-bottom: ($baseline/4);
-			font-weight: 700;
-			color: $gray-d1;
-		}
+    .ui-toggle-control {
+      @extend %ui-depth2;
+      @extend %btn-secondary-gray;
+      @include clearfix();
+      display: block;
+      text-align: left;
 
-		.copy {
+      // STATE: hover - syncing up colors with current so transition is smoother
+      &:hover {
+        background: $gray-d1;
+        color: $white;
+      }
 
-		}
+      .label {
+        @extend %t-action3;
+        float: left;
+        width: flex-grid(8, 9);
+        margin: 3px flex-gutter() 0 0;
+      }
 
-		.list-actions, .form-actions {
+      .icon-remove-sign {
+        @extend %t-action1;
+        @include transform(rotate(45deg));
+        @include transform-origin(center center);
+        @include transition(all $tmg-f1 linear 0s);
+        float: right;
+        text-align: right;
+      }
+    }
+
+    .ui-toggle-target {
+      @extend %ui-depth1;
+      @include transition(opacity $tmg-f1 ease-in-out 0s);
+      position: relative;
+      top: -2px;
+      display: none;
+      opacity: 0;
+    }
+
+    // CASE: when the content area is shown
+    &.is-shown {
+
+      .ui-toggle-control {
+        @include border-bottom-radius(0);
+
+        .icon-remove-sign {
+          @include transform(rotate(90deg));
+          @include transform-origin(center center);
+        }
+      }
+
+      .ui-toggle-target {
+        display: block;
+        opacity: 1.0;
+      }
+    }
+
+
+  }
+
+  // elements - course creation rights controls
+  .status-creationrights {
+    margin-top: $baseline;
+
+    .title {
+      @extend %t-title7;
+      @extend %t-strong;
+      margin-bottom: ($baseline/4);
+      color: $gray-d1;
+    }
+
+    .copy {
+
+    }
+
+    .list-actions, .form-actions {
       margin-top: ($baseline*0.75);
 
       .action-item {
@@ -161,29 +161,29 @@
       // specific - request button
       // BT: should we abstract these states out for all buttons like this
       .action-request {
-      	position: relative;
-      	overflow: hidden;
+        position: relative;
+        overflow: hidden;
 
-      	.icon-cog {
-      		@include transition(all $tmg-f1 ease-in-out $tmg-f1);
-      		@include font-size(20);
-      		position: absolute;
-      		top: ($baseline/2);
-					left: -($baseline);
-      		visibility: hidden;
-      		opacity: 0.0;
-      	}
+        .icon-cog {
+          @include transition(all $tmg-f1 ease-in-out $tmg-f1);
+          @extend %t-icon4;
+          position: absolute;
+          top: ($baseline/2);
+          left: -($baseline);
+          visibility: hidden;
+          opacity: 0.0;
+        }
 
         // state: submitting
-      	&.is-submitting {
-      		padding-left: ($baseline*2);
+        &.is-submitting {
+          padding-left: ($baseline*2);
 
-					.icon-cog {
-						left: ($baseline*0.75);
-						visibility: visible;
-						opacity: 1.0;
-					}
-      	}
+          .icon-cog {
+            left: ($baseline*0.75);
+            visibility: visible;
+            opacity: 1.0;
+          }
+        }
 
         // state: has an error
         &.has-error {
@@ -202,112 +202,112 @@
 
     .status-update {
 
-    	.label {
-				@extend %cont-text-sr;
-    	}
+      .label {
+        @extend %cont-text-sr;
+      }
 
-    	.value {
-    		border-radius: ($baseline/4);
-    		position: relative;
-    		overflow: hidden;
-    		padding: ($baseline/5) ($baseline/2);
-    		background: $gray;
+      .value {
+        border-radius: ($baseline/4);
+        position: relative;
+        overflow: hidden;
+        padding: ($baseline/5) ($baseline/2);
+        background: $gray;
 
-    		.status-indicator {
-    		  position: absolute;
-    		  top: 0;
-    		  left: 0;
-    		  display: block;
-    		  width: 100%;
-    		  height: ($baseline/4);
-    		  opacity: 0.40;
-    		}
-    	}
+        .status-indicator {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: block;
+          width: 100%;
+          height: ($baseline/4);
+          opacity: 0.40;
+        }
+      }
 
-			.value-formal, .value-description {
-				border-radius: ($baseline/10);
-				display: inline-block;
-				vertical-align: middle;
-				color: $white;
-			}
+      .value-formal, .value-description {
+        border-radius: ($baseline/10);
+        display: inline-block;
+        vertical-align: middle;
+        color: $white;
+      }
 
-    	.value-formal {
-    		@extend %t-title5;
-    		margin: ($baseline/2);
-    		font-weight: 700;
+      .value-formal {
+        @extend %t-title5;
+        @extend %t-strong;
+        margin: ($baseline/2);
 
-    		[class^="icon-"] {
-    			margin-right: ($baseline/4);
-    		}
-    	}
+        [class^="icon-"] {
+          margin-right: ($baseline/4);
+        }
+      }
 
-    	.value-description {
-    		@extend %t-copy-sub1;
-    		position: relative;
-    		color: $white;
-				opacity: 0.85;
-    	}
+      .value-description {
+        @extend %t-copy-sub1;
+        position: relative;
+        color: $white;
+        opacity: 0.85;
+      }
     }
 
-		// CASE: rights are not requested yet
-		&.is-unrequested {
+    // CASE: rights are not requested yet
+    &.is-unrequested {
 
-			.title {
-				@extend %cont-text-sr;
-			}
-		}
+      .title {
+        @extend %cont-text-sr;
+      }
+    }
 
-		// CASE: status is pending
-		&.is-pending {
+    // CASE: status is pending
+    &.is-pending {
 
-			.status-update {
+      .status-update {
 
-				.value {
-					background: $orange;
-				}
+        .value {
+          background: $orange;
+        }
 
-				.status-indicator {
-					background: $orange-d1;
-				}
-			}
-		}
+        .status-indicator {
+          background: $orange-d1;
+        }
+      }
+    }
 
 
     // CASE: status is denied
     &.is-denied {
 
-    	.status-update {
+      .status-update {
 
-    		.value {
-    			background: $red-l1;
-    		}
+        .value {
+          background: $red-l1;
+        }
 
-    		.status-indicator {
-    			background: $red-s1;
-    		}
-    	}
+        .status-indicator {
+          background: $red-s1;
+        }
+      }
     }
-	}
+  }
 
-	// ====================
+  // ====================
 
   // ELEM: course listings
-	.courses {
-	  margin: $baseline 0;
-	}
+  .courses {
+    margin: $baseline 0;
+  }
 
-	.list-courses {
-		margin-top: $baseline;
-		border-radius: 3px;
-		border: 1px solid $gray;
-		background: $white;
-		box-shadow: 0 1px 2px $shadow-l1;
+  .list-courses {
+    margin-top: $baseline;
+    border-radius: 3px;
+    border: 1px solid $gray;
+    background: $white;
+    box-shadow: 0 1px 2px $shadow-l1;
 
-		.course-item {
+    .course-item {
       @include box-sizing(border-box);
       width: flex-grid(9, 9);
-			position: relative;
-			border-bottom: 1px solid $gray-l1;
+      position: relative;
+      border-bottom: 1px solid $gray-l1;
       padding: $baseline;
 
       // STATE: hover/focus
@@ -344,8 +344,8 @@
       // course title
       .course-title {
         @extend %t-title4;
+        @extend %t-light;
         margin: 0 ($baseline*2) ($baseline/4) 0;
-        font-weight: 300;
       }
 
       // course metadata
@@ -405,8 +405,8 @@
           border-bottom: none;
         }
       }
-		}
-	}
+    }
+  }
 
   // ELEM: new user form
   .wrapper-create-course {
@@ -430,70 +430,70 @@
 
   // course listings
 
-	.create-course {
+  .create-course {
 
-		.row {
-			@include clearfix();
-			margin-bottom: ($baseline*0.75);
-		}
+    .row {
+      @include clearfix();
+      margin-bottom: ($baseline*0.75);
+    }
 
-		.column {
-			float: left;
-			width: 48%;
-		}
+    .column {
+      float: left;
+      width: 48%;
+    }
 
-		.column:first-child {
-			margin-right: 4%;
-		}
+    .column:first-child {
+      margin-right: 4%;
+    }
 
-		label {
-			@extend %t-title7;
-			display: block;
-			font-weight: 700;
-		}
+    label {
+      @extend %t-title7;
+      @extend %t-strong;
+      display: block;
+    }
 
-		.new-course-org,
-		.new-course-number,
-		.new-course-name,
-		.new-course-run {
-			width: 100%;
-		}
+    .new-course-org,
+    .new-course-number,
+    .new-course-name,
+    .new-course-run {
+      width: 100%;
+    }
 
-		.new-course-name {
-			@extend %t-title5;
-			font-weight: 300;
-		}
+    .new-course-name {
+      @extend %t-title5;
+      @extend %t-light;
+    }
 
-		.new-course-save {
-			@include blue-button;
-		}
+    .new-course-save {
+      @include blue-button;
+    }
 
-		.new-course-cancel {
-			@include white-button;
-		}
+    .new-course-cancel {
+      @include white-button;
+    }
 
-		.item-details {
-			padding-bottom: 0;
-		}
+    .item-details {
+      padding-bottom: 0;
+    }
 
-	    .wrap-error {
-	      @include transition(all $tmg-f2 ease 0s);
-	      height: 0;
-	      overflow: hidden;
-	      opacity: 0;
-	    }
+      .wrap-error {
+        @include transition(all $tmg-f2 ease 0s);
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+      }
 
-	    .wrap-error.is-shown {
-	      height: 65px;
-	      opacity: 1;
-	    }
+      .wrap-error.is-shown {
+        height: 65px;
+        opacity: 1;
+      }
 
-	    .message-status {
-	      display: block;
-	      margin-bottom: 0;
-	      padding: ($baseline*.5) ($baseline*1.5) 8px ($baseline*1.5);
-	      font-weight: bold;
-	    }
+      .message-status {
+        @extend %t-strong;
+        display: block;
+        margin-bottom: 0;
+        padding: ($baseline*.5) ($baseline*1.5) 8px ($baseline*1.5);
+      }
 
-	}
+  }
 }

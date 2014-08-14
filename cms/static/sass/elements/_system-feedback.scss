@@ -8,20 +8,20 @@
 }
 
 .message-status {
-  display: none;
   @include border-top-radius(2px);
   @include box-sizing(border-box);
+  @extend %t-strong;
+  display: none;
   border-bottom: 2px solid $yellow-d2;
   margin: 0 0 $baseline 0;
   padding: ($baseline/2) $baseline;
-  font-weight: 500;
   background: $yellow-d1;
   color: $white;
 
   [class^="icon-"] {
+    @extend %t-icon5;
     position: relative;
     top: 1px;
-    @include font-size(16);
     display: inline-block;
     margin-right: ($baseline/2);
   }
@@ -79,7 +79,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $blue-d2;
     }
 
@@ -97,7 +97,7 @@
 
     .nav-actions .action-primary {
       @include orange-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $orange-d2;
       color: $gray-d4;
     }
@@ -116,7 +116,7 @@
 
     .nav-actions .action-primary {
       @include red-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $red-d2;
     }
 
@@ -134,7 +134,7 @@
 
     .nav-actions .action-primary {
       @include blue-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $blue-d2;
     }
 
@@ -152,7 +152,7 @@
 
     .nav-actions .action-primary {
       @include green-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $green-d2;
     }
 
@@ -170,7 +170,7 @@
 
     .nav-actions .action-primary {
       @include pink-button();
-      @include font-size(12); // needed due to bad button mixins for now
+      @extend %t-action4;
       border-color: $pink-d2;
     }
 
@@ -234,7 +234,7 @@
 
       .action-primary {
         @extend %t-action4;
-        font-weight: 600;
+        @extend %t-strong;
       }
 
       .action-secondary {
@@ -396,7 +396,7 @@
   min-width: $fg-min-width;
 
   strong {
-    font-weight: 700;
+    @extend %t-strong;
   }
 
   [class^="icon"], .copy {
@@ -407,7 +407,7 @@
 
   [class^="icon"] {
     @include transition (color 0.50s ease-in-out 0s);
-    @include font-size(22);
+    @extend %t-icon3;
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
     margin-top: ($baseline/4);
@@ -459,8 +459,8 @@
 
     .action-primary {
       @include blue-button();
+      @extend %t-strong;
       border-color: $blue-d2;
-      font-weight: 600;
     }
 
     .action-secondary {
@@ -576,7 +576,7 @@
   color: $white;
 
   strong {
-    font-weight: 700;
+    @extend %t-strong;
   }
 
   [class^="icon"], .copy {
@@ -585,7 +585,7 @@
 
   [class^="icon"] {
     @include transition (color 0.50s ease-in-out 0s);
-    @include font-size(22);
+    @extend %t-icon3;
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
     text-align: right;
@@ -609,37 +609,37 @@
       width: flex-grid(1, 12);
     }
 
-  	.copy {
-  		width: flex-grid(7, 12);
-  		margin-right: flex-gutter();
-  	}
+    .copy {
+      width: flex-grid(7, 12);
+      margin-right: flex-gutter();
+    }
 
-  	.nav-actions {
-  	  width: flex-grid(4, 12);
-      float: right;
-      margin-top: ($baseline/2);
-  	  text-align: right;
+    .nav-actions {
+     width: flex-grid(4, 12);
+     float: right;
+     margin-top: ($baseline/2);
+     text-align: right;
 
-  	  .nav-item {
-  	    display: inline-block;
-  	    vertical-align: middle;
-  	    margin-right: ($baseline/2);
+     .nav-item {
+       display: inline-block;
+       vertical-align: middle;
+       margin-right: ($baseline/2);
 
-  	    &:last-child {
-  	      margin-right: 0;
-  	    }
+       &:last-child {
+         margin-right: 0;
+       }
 
-        .action-primary {
-          @extend %t-action4;
-          font-weight: 600;
-        }
+       .action-primary {
+        @extend %t-action4;
+        @extend %t-strong;
+      }
 
-        .action-secondary {
-          @extend %t-action4;
-        }
-  	  }
-  	}
+      .action-secondary {
+        @extend %t-action4;
+      }
+    }
   }
+}
 
   // with cancel
   .action-alert-close {
@@ -656,7 +656,7 @@
     }
 
     [class^="icon"] {
-      @include font-size(14);
+      @extend %t-icon6;
       color: $white;
       width: auto;
       margin: 0;
@@ -845,7 +845,9 @@ body.uxdesign.alerts {
 
 // artifact styles
 .main-wrapper {
+
   .alert {
+    @extend %t-copy-sub1;
     padding: 15px 20px;
     margin-bottom: 30px;
     border-radius: 3px;
@@ -853,7 +855,6 @@ body.uxdesign.alerts {
     border-radius: 3px;
     background: #fbf6e1;
     // background: #edbd3c;
-    font-size: 14px;
     @include clearfix;
 
     .alert-message {
@@ -863,7 +864,7 @@ body.uxdesign.alerts {
     }
 
     strong {
-      font-weight: 700;
+      @extend %t-strong;
     }
 
     .alert-action {
@@ -877,38 +878,38 @@ body.uxdesign.alerts {
 }
 
 body.error {
-	background: $gray-d4;
-	color: $gray-d3;
+  background: $gray-d4;
+  color: $gray-d3;
 
-	.primary-header {
-		display: none;
-	}
+  .primary-header {
+    display: none;
+  }
 
-	.error-prompt {
-		width: 700px;
-		margin: 150px auto;
-		padding: 60px 50px 90px;
-		border-radius: 3px;
-		background: $white;
-		text-align: center;
-	}
+  .error-prompt {
+    width: 700px;
+    margin: 150px auto;
+    padding: 60px 50px 90px;
+    border-radius: 3px;
+    background: $white;
+    text-align: center;
+  }
 
-	h1 {
-		float: none;
-		margin: 0;
-		font-size: 60px;
-		font-weight: 300;
-		color: $gray-d3;
-	}
+  h1 {
+    @extend %t-title1;
+    @extend %t-light;
+    float: none;
+    margin: 0;
+    color: $gray-d3;
+  }
 
-	.description {
-		margin-bottom: 50px;
-		font-size: 21px;
-	}
+  .description {
+    @extend %t-copy-lead2;
+    margin-bottom: 50px;
+  }
 
-	.back-button {
-		@include blue-button;
-		padding: 14px 40px 18px;
-		font-size: 18px;
-	}
+  .back-button {
+    @include blue-button();
+    @extend %t-action1;
+    padding: 14px 40px 18px;
+  }
 }

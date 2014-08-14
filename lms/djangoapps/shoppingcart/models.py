@@ -704,8 +704,13 @@ class CertificateItem(OrderItem):
         item.qty = 1
         item.unit_cost = cost
         course_name = modulestore().get_course(course_id).display_name
-        item.line_desc = _("Certificate of Achievement, {mode_name} for course {course}").format(mode_name=mode_info.name,
-                                                                                                 course=course_name)
+        # Translators: In this particular case, mode_name refers to a
+        # particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
+        # by which a user could enroll in the given course.
+        item.line_desc = _("{mode_name} for course {course}").format(
+            mode_name=mode_info.name,
+            course=course_name
+        )
         item.currency = currency
         order.currency = currency
         order.save()
@@ -728,7 +733,7 @@ class CertificateItem(OrderItem):
 
     @property
     def single_item_receipt_template(self):
-        if self.mode == 'verified':
+        if self.mode in ('verified', 'professional'):
             return 'shoppingcart/verified_cert_receipt.html'
         else:
             return super(CertificateItem, self).single_item_receipt_template
