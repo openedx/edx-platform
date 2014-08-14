@@ -219,6 +219,10 @@ class ProctorModule(ProctorFields, XModule):
                 username = data.get("username")
                 wipe_history = data.get("wipe_history") == "on"
                 return self.reset(username, wipe_history=wipe_history)
+            if dispatch == 'submission_history':
+                username = data.get("username")
+                return self.submission_history(username)
+
             #if dispatch == 'status':
                 #return self.status()
             # if dispatch == 'grades':
@@ -256,6 +260,29 @@ class ProctorModule(ProctorFields, XModule):
         except Exception as err:
             log.exception("Failed to get status for %s" % student)
             status = {'msg': 'Error getting grades for %s' % student,
+                      'error': True, 'errstr': str(err)}
+        return json.dumps(status)
+
+    def submission_history(self, username):
+        try:
+            pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
+            pset = self.get_children()[0]
+            rand = pset.get_children()[0]
+            locations = [i.location.url() for i in rand.get_children()]
+            shist = pminfo.submission_history(username, locations)
+            entries = shist.get('history_entries')
+            status = []
+            for e in entries:
+                state = json.loads(e.state)
+                status.append(dict(location=e.student_module.module_state_key,
+                                   attempt=state['attempts'],
+                                   created=str(e.created),
+                                   grade=e.grade,
+                                   max_grade=e.max_grade,
+                                   answers=state['student_answers']))
+        except Exception as err:
+            log.exception("Failed to get status for %s" % username)
+            status = {'msg': 'Error getting grades for %s' % username,
                       'error': True, 'errstr': str(err)}
         return json.dumps(status)
 

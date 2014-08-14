@@ -5,6 +5,7 @@
 <% override_label = "On" if staff_release else "Off" %>
 <div aria-hidden="true" class="wrap-instructor-info">
     <a class="instructor-info-action" href="#proctor_admin_${element_id}" id="proctor_admin" rel="leanModal">${_("Proctor Student Admin")}</a>
+    <a class="instructor-info-action" href="#proctor_history_${element_id}" id="proctor_history" rel="leanModal">${_("Proctor Submission History")}</a>
     <a class="instructor-info-action" href="#proctor_release_${element_id}" id="proctor_override">${_("Proctor Override")}: <b>${_(override_label)}</b></a>
 </div>
 <hr/>
@@ -28,6 +29,24 @@
   </div>
 </section>
 
+<section aria-hidden="true" class="modal history-modal" id="proctor_history_${element_id}" style="width:80%; left:20%; height:80%; overflow:auto;" >
+  <div class="inner-wrapper" style="color:black">
+    <header>
+      <h2>${_("Proctor Submission History")}</h2>
+    </header>
+    <form id="proctor_${element_id}_history_form">
+      <label for="proctor_${element_id}_student_username_hist">${_("User:")}</label>
+      <input name="username" id="proctor_${element_id}_student_username_hist" type="text" placeholder=""/>
+      <input name="location" type="hidden" id="proctor_${element_id}_hist_location" value="${location}"/>
+      <div class="submit">
+          <button id="proctor_${element_id}_hist_submit" name="submit" type="submit">${_("Fetch Submission History")}</button>
+      </div>
+    </form>
+    <div id="proctor_${element_id}_hist_text" class="staff_info" style="display:block">
+    </div>
+  </div>
+</section>
+
 <script type="text/javascript">
 proctor_override = function(){
     var data = {enabled: "${not staff_release}"};
@@ -37,39 +56,75 @@ proctor_override = function(){
 }
 $('#proctor_override').click(proctor_override);
 
-$('#proctor_${element_id}_reset_form').submit(function(e) {
-    e.preventDefault();
-    $('#proctor_${element_id}_submit').attr("disabled", true);
-    $('#proctor_${element_id}_submit').html('${_("Processing, please wait...")}');
-    $('#proctor_${element_id}_text').html("");
-    $.ajax({
-        url: '${ajax_url}/reset',
-        type: 'POST',
-        dataType: 'json',
-        data: $('#proctor_${element_id}_reset_form').serialize(),
-        success: function(data) {
-            var msg = '';
-            if ('error' in data) {
-                msg = "ERROR: " + data['error'];
-            } else {
-                var uname = $('#proctor_${element_id}_student_username').val();
-                msg = "Successfully reset attempts for user: " + uname;
-            }
-            $('#proctor_${element_id}_text').html(msg);
-        },
-        error: function(xhr, stat, error){
-            console.debug(xhr);
-            console.debug(stat);
-            console.debug(error);
-            $('#proctor_${element_id}_text').html('FATAL: ' + error);
-         },
-        complete: function(){
-            $('#proctor_${element_id}_submit').removeAttr("disabled");
-            $('#proctor_${element_id}_submit').html('${_("Reset Attempts")}');
-        },
+setup_form = function(url, form_el, uname_el, submit_el, text_el, success){
+    var submit_text = submit_el.html()
+
+    form_el.submit(function(e) {
+        e.preventDefault();
+        submit_el.attr("disabled", true);
+        submit_el.html('${_("Processing, please wait...")}');
+        text_el.html("");
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: form_el.serialize(),
+            success: success,
+            error: function(xhr, stat, error){
+                console.debug(xhr);
+                console.debug(stat);
+                console.debug(error);
+                text_el.html('FATAL: ' + error);
+             },
+            complete: function(){
+                submit_el.removeAttr("disabled");
+                submit_el.html(submit_text);
+            },
+        });
+        return false;
     });
-    return false;
-});
+}
+
+reset_success = function(data) {
+    var text_el = $('#proctor_${element_id}_text');
+    var uname_el = $('#proctor_${element_id}_student_username');
+    var msg = '';
+    if ('error' in data) {
+        msg = "ERROR: " + data['error'];
+    } else {
+        var uname = uname_el.val();
+        msg = "Successfully reset attempts for user: " + uname;
+    }
+    text_el.html(msg);
+}
+
+setup_form('${ajax_url}/reset',
+           $('#proctor_${element_id}_reset_form'),
+           $('#proctor_${element_id}_student_username'),
+           $('#proctor_${element_id}_submit'),
+           $('#proctor_${element_id}_text'),
+           reset_success);
+
+hist_success = function(data) {
+    var text_el = $('#proctor_${element_id}_hist_text');
+    var uname_el = $('#proctor_${element_id}_student_username_hist');
+    var msg = '';
+    if ('error' in data) {
+        msg = "ERROR: " + data['error'];
+    } else {
+        var uname = uname_el.val();
+        msg = "Submission history for " + uname + ":\n" + JSON.stringify(data, undefined, 2);
+    }
+    text_el.html(msg);
+}
+
+setup_form('${ajax_url}/submission_history',
+           $('#proctor_${element_id}_history_form'),
+           $('#proctor_${element_id}_student_username_hist'),
+           $('#proctor_${element_id}_hist_submit'),
+           $('#proctor_${element_id}_hist_text'),
+           hist_success);
+
 </script>
 
 % endif
