@@ -4,6 +4,7 @@ import datetime
 from collections import OrderedDict
 
 import pytz
+from django.db.models import Q
 from django.db import transaction
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -374,8 +375,11 @@ class ProctorModuleInfo(object):
             student_id=student.id)
 
         history_entries = StudentModuleHistory.objects.filter(
+            Q(state__contains='"attempts"') &
+            Q(state__contains='"correct_map"') &
+            Q(state__contains='"student_answers"'),
             student_module__in=student_modules, grade__isnull=False,
-            state__contains='"attempts"',
+            max_grade__isnull=False,
         ).order_by('-id')
 
         seen_states = []
@@ -383,7 +387,12 @@ class ProctorModuleInfo(object):
 
         for entry in history_entries:
             state = json.loads(entry.state)
-            if state in seen_states:
+            cmap = state['correct_map']
+            real_grade = len([i for i in cmap.values() if
+                              i['correctness'] == 'correct'])
+            if entry.grade != real_grade:
+                continue
+            elif state in seen_states:
                 continue
             else:
                 seen_states.append(state)
