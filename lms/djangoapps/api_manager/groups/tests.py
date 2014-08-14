@@ -265,9 +265,10 @@ class GroupsApiTests(ModuleStoreTestCase):
         group_id = response.data['id']
         test_uri = response.data['uri']
         self.assertEqual(response.status_code, 201)
+        group_name = 'Updated Name'
         group_type = 'seriesX'
         data = {
-            'name': self.test_group_name,
+            'name': group_name,
             'type': group_type,
             'data': {
                 'display_name': 'My updated series'
@@ -276,7 +277,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['id'], group_id)
-        self.assertEqual(response.data['name'], self.test_group_name)
+        self.assertEqual(response.data['name'], group_name)
         self.assertEqual(response.data['uri'], test_uri)
 
     def test_group_detail_post_invalid_group(self):
