@@ -6,11 +6,12 @@ if Backbone?
 
     renderTemplate: ->
         @template = _.template($("#thread-response-show-template").html())
-        context = _.extend({
-            author_display: @getAuthorDisplay(),
-            endorser_display: @getEndorserDisplay()
-          },
-          @model.attributes
+        context = _.extend(
+            {
+                author_display: @getAuthorDisplay(),
+                endorser_display: @getEndorserDisplay()
+            },
+            @model.attributes
         )
         @template(context)
 
