@@ -123,7 +123,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           </div>
 
           <div class="actions">
-            <input type="hidden" value="${ allow_unicode_course_id }" class="allow-unicode-course-id" />
+            <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
             <input type="submit" value="${_('Create')}" class="action action-primary new-course-save" />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
@@ -132,7 +132,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       % endif
 
       <!-- STATE: processing courses -->
-      %if allow_course_reruns and len(unsucceeded_course_actions) > 0:
+      %if allow_course_reruns and rerun_creator_status and len(unsucceeded_course_actions) > 0:
       <div class="courses courses-processing">
           <h3 class="title">Courses Being Processed</h3>
 
@@ -248,7 +248,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </a>
 
             <ul  class="item-actions course-actions">
-              % if allow_course_reruns and course_creator_status=='granted':
+              % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
               <li class="action action-rerun">
                 <a href="${rerun_link}" class="button rerun-button">${_("Re-run Course")}</a>
               </li>
@@ -259,7 +259,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             </ul>
           </li>
           %endfor
-          % if course_creator_status=='granted':
+          % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
           <script type="text/javascript">
               $('.course-item').addClass('can-rerun');
           </script>
