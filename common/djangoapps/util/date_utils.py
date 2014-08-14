@@ -34,7 +34,16 @@ def get_default_time_display(dtime):
     return (localized + timezone).strip()
 
 def set_time_zone(dtime, tz):
-    """Sets the given date time object to the given timezone"""
+    """
+    Sets the given date time object to the given timezone
+
+    Args:
+        dtime (datetime object) - the datetime object to be edited
+        tz (string) - the timezone to set the datetime object, expressed as a
+        pytz timezone string. Example: US/Pacific
+
+    If an unknown timezone is given, defaults to UTC
+    """
     try:
         to_tz = timezone(tz)
     except UnknownTimeZoneError:
