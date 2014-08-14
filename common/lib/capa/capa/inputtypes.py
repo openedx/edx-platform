@@ -585,8 +585,10 @@ class JSInput(InputTypeBase):
                                              #   set state
             Attribute('width', "400"),       # iframe width
             Attribute('height', "300"),      # iframe height
-            Attribute('sop', None)           # SOP will be relaxed only if this
-                                             # attribute is set to false.
+            Attribute('sop', None),           # SOP will be relaxed only if this
+                                              # attribute is set to false.
+            Attribute('loading_timeout', None)  # Timeout that is used when
+                                                # loading JS application.
         ]
 
     def _extra_context(self):
