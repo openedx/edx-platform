@@ -48,35 +48,41 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <h1>${'<%- title %>'}</h1>
-          <p class="posted-details">
-              ## This part is incredibly gross but necessary to combine i18n in
-              ## mako with logic in underscore.
-              ## Translators: post_type describes the kind of post this is
-              ## (e.g. "question" or "discussion"); time_ago is how much time
-              ## has passed since the post was created (e.g. "4 hours ago")
-              ${"{post_type} posted {time_ago} by {author}".format(
-                  post_type="<%- thread_type %>",
-                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
-                  author="<%= author_display %>"
-              )}
-              <span class="post-labels">
-                  <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
-                  <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-                  <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
-              </span>
-          </p>
+<<<<<<< HEAD
+          <div class="post-header-content">
+
+            <h1>${'<%- title %>'}</h1>
+            <p class="posted-details">
+                ## This part is incredibly gross but necessary to combine i18n in
+                ## mako with logic in underscore.
+                ## Translators: post_type describes the kind of post this is
+                ## (e.g. "question" or "discussion"); time_ago is how much time
+                ## has passed since the post was created (e.g. "4 hours ago")
+                ${"{post_type} posted {time_ago} by {author}".format(
+                    post_type="<%- thread_type %>",
+                    time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
+                    author="<%= author_display %>"
+                )}
+                <span class="post-labels">
+                    <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
+                    <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+                    <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
+                </span>
+            </p>
+          </div>
+          <div class="post-header-actions">
+            ${"""<%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['report', 'pin', 'edit', 'delete', 'close']
+                    }
+                )
+            %>"""}
+          </div>
       </header>
-      ${"""<%=
-          _.template(
-              $('#forum-actions').html(),
-              {
-                  contentType: 'post',
-                  primaryActions: ['vote', 'follow'],
-                  secondaryActions: ['report', 'pin', 'edit', 'delete', 'close']
-              }
-          )
-      %>"""}
 
       <div class="post-body">${'<%- body %>'}</div>
 
@@ -135,6 +141,8 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header class="response-header response-local">
+<<<<<<< HEAD
+      <div class="response-header-content">
         ${'<%= author_display %>'}
         <p class="posted-details">
             <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
@@ -159,19 +167,23 @@
                     anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
                 )
             %>
-            ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
-        </p>
+              ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+          </p>
+          </div>
+          <div class="response-header-actions">
+            ${"""<%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentType: 'response',
+                        primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
+                        secondaryActions: ['report', 'edit', 'delete']
+                    }
+                )
+            %>"""}
+          </div>
     </header>
-    ${"""<%=
-        _.template(
-            $('#forum-actions').html(),
-            {
-                contentType: 'response',
-                primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
-                secondaryActions: ['report', 'edit', 'delete']
-            }
-        )
-    %>"""}
+
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
 </script>
 
@@ -528,20 +540,20 @@
         <li class="actions-item action-primary is-visible">
             <a href="javascript:void(0)" class="action-button action-${action_class}" role="checkbox" aria-checked="false">
                 <span class="sr">${sr_label}</span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
                     <span class="label-checked-focused">${checked_focused_label}</span>
                 </span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
             </a>
         </li>
     </script>
 </%def>
 
-${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("Unfollow"))}
 ${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Endorsed"), _("Unendorse"))}
 ${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Marked as Answer"), _("Unmark as Answer"))}
+${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("Unfollow"))}
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item action-primary is-visible">
@@ -549,14 +561,14 @@ ${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Mar
             ## Vote counts are populated by JS
             <span class="sr">${_("Vote")}</span>
             <span class="sr js-sr-vote-count"></span>
+
+             <span class="action-label" aria-hidden="true">
+               <span class="js-visual-vote-count"></span>
+               ${_("Vote")}
+             </span>
+
             <span class="action-icon" aria-hidden="true">
                 <i class="icon icon-plus"></i>
-                <span class="js-visual-vote-count"></span>
-            </span>
-            <span class="action-label" aria-hidden="true">
-                <span class="label-unchecked">${_("Vote")}</span>
-                <span class="label-checked">${_("Voted")}</span>
-                <span class="label-checked-focused">${_("Unvote")}</span>
             </span>
         </a>
     </li>
@@ -567,11 +579,13 @@ ${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Mar
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="checkbox" aria-checked="false">
                 <span class="sr">${sr_label}</span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
                     <span class="label-checked-focused">${checked_focused_label}</span>
+                </span>
+                <span class="action-icon">
+                  <i class="icon icon-${icon}"></i>
                 </span>
             </a>
         </li>
@@ -586,8 +600,8 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Closed"), _("
     <script type="text/template" id="forum-action-${action_class}">
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-${action_class}">
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
                 <span class="action-label">${label}</span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
             </a>
         </li>
     </script>
@@ -598,25 +612,21 @@ ${secondaryAction("delete", "remove", _("Delete"))}
 
 <script type="text/template" id="forum-actions">
     <ul class="${"<%= contentType %>"}-actions-list">
+        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
         <li class="actions-item is-visible">
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="menu">
-                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
                     <span class="action-label">${_("More")}</span>
+                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
                 </a>
-                <ul class="actions-dropdown">
-                    <li class="actions-item">
+                <div class="actions-dropdown">
+                  <ul class="actions-dropdown-list">
                         ## TODO: what to do about a11y here?
-                        <a href="javascript:void(0)" class="action-list-item action-hide-more">
-                            <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
-                            <span class="action-label">${_("More")}</span>
-                        </a>
-                    </li>
                     ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
-                </ul>
+                  </ul>
+                </div>
             </div>
         </li>
-        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
     </ul>
 </script>
 

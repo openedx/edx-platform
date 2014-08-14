@@ -11,17 +11,16 @@ body.discussion, .discussion-module {
     background-color: $white;
     box-shadow: 0 1px 3px $shadow;
 
-    .post-header {
+    .post-header-content {
       display: inline-block;
+      vertical-align: top;
       width: flex-grid(8,12);
     }
 
-    // layout styling for thread-actions
-    .post-actions-list {
+    .post-header-actions {
       display: inline-block;
-      width: flex-grid(4,12);
       vertical-align: top;
-      float: right;
+      width: flex-grid(4,12);
     }
 
     .post-body {
@@ -35,15 +34,16 @@ body.discussion, .discussion-module {
       font-weight: 700;
     }
 
-    .response-header {
+    .response-header-content {
       display: inline-block;
+      vertical-align: top;
       width: flex-grid(8,12);
     }
 
-    .response-actions-list {
+    .response-header-actions {
       display: inline-block;
-      width: flex-grid(4,12);
       vertical-align: top;
+      width: flex-grid(4,12);
     }
   }
 
