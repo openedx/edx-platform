@@ -190,18 +190,48 @@
 
         .wrapper-group-configuration-usages {
           @extend %t-copy-sub1;
-          background-color: #f8f8f8;
           box-shadow: 0 2px 2px 0 $shadow inset;
           padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
+          color: $gray-l1;
 
           .group-configuration-usage {
-            color: $gray-l1;
             margin-left: $baseline;
 
             .group-configuration-usage-unit {
               padding: ($baseline/4) 0;
+
+              a {
+                font-weight: 600;
+              }
+
+              .icon-warning-sign {
+                margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+                color: $orange;
+              }
+
+              .icon-exclamation-sign {
+                margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+                color: $red-l2;
+              }
             }
           }
+        }
+      }
+
+      .wrapper-group-configuration-validation {
+        @extend %t-copy-sub1;
+        background-color: #f8f8f8;
+        margin-top: $baseline;
+        padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
+
+        .icon-warning-sign {
+          margin: ($baseline/2) $baseline 0 0;
+          color: $orange;
+          float: left;
+        }
+
+        .group-configuration-validation-text {
+          overflow: auto;
         }
       }
 

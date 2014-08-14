@@ -32,6 +32,14 @@
             <ol class="groups list-input enum"></ol>
             <button class="action action-add-group"><i class="icon-plus"></i> <%= gettext("Add another group") %></button>
         </fieldset>
+        <% if (!_.isEmpty(usage)) { %>
+            <div class="wrapper-group-configuration-validation">
+                <i class="icon-warning-sign"></i>
+                <p class="group-configuration-validation-text">
+                    <%= gettext('This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.') %>
+                </p>
+            </div>
+        <% } %>
     </div>
     <div class="actions">
         <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
