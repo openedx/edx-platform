@@ -13,7 +13,3 @@
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
-# This XBlock shows a list of recommendations. 
-# It is an R&D prototype, intended for roll-out one location in one course. 
-# It should not be used without learning sciences support in the current state. 
--e git+https://github.com/pmitros/RecommenderXBlock.git@b4f3596d095d88bb4540f0d04ab81836d84edc98#egg=recommender-xblock
