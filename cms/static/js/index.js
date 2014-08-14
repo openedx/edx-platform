@@ -77,6 +77,25 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             $('.new-course-save').off('click');
         };
 
+        // Check that a course (org, number, run) doesn't use any special characters
+        var validateCourseItemEncoding = function (item) {
+            var required = validateRequiredField(item);
+            if (required) {
+                return required;
+            }
+            if ($('.allow-unicode-course-id').val() === 'True'){
+                if (/\s/g.test(item)) {
+                    return gettext('Please do not use any spaces in this field.');
+                }
+            }
+            else{
+               if (item !== encodeURIComponent(item)) {
+                   return gettext('Please do not use any spaces or special characters in this field.');
+               }
+            }
+            return '';
+        };
+
         var addNewCourse = function (e) {
             e.preventDefault();
             $('.new-course-button').addClass('is-disabled');
@@ -88,25 +107,6 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             $('.new-course-save').on('click', saveNewCourse);
             $cancelButton.bind('click', cancelNewCourse);
             CancelOnEscape($cancelButton);
-
-            // Check that a course (org, number, run) doesn't use any special characters
-            var validateCourseItemEncoding = function (item) {
-                var required = validateRequiredField(item);
-                if (required) {
-                    return required;
-                }
-                if ($('.allow-unicode-course-id').val() === 'True'){
-                    if (/\s/g.test(item)) {
-                        return gettext('Please do not use any spaces in this field.');
-                    }
-                }
-                else{
-                   if (item !== encodeURIComponent(item)) {
-                       return gettext('Please do not use any spaces or special characters in this field.');
-                   }
-                }
-                return '';
-            };
 
             // Ensure that org/course_num/run < 65 chars.
             var validateTotalCourseItemsLength = function () {
