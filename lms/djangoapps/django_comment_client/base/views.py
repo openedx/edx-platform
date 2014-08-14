@@ -35,6 +35,7 @@ from django_comment_client.utils import JsonResponse, JsonError, extract, add_co
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
+import track.views
 
 log = logging.getLogger(__name__)
 
@@ -65,6 +66,11 @@ def ajax_content_response(request, course_id, content):
         'content': safe_content(content),
         'annotated_content_info': annotated_content_info,
     })
+
+
+def track_forum_event(request, event_type, data):
+    data["user_id"] = request.user.id
+    track.views.server_track(request, event_type, data, page="forum")
 
 
 @require_POST
@@ -131,6 +137,8 @@ def create_thread(request, course_id, commentable_id):
             thread.group_id = group_id
 
     thread.save()
+    event_data = {'forum_id': commentable_id, 'thread_id': thread.id}
+    track_forum_event(request, 'forum.thread.created', event_data)
 
     #patch for backward compatibility to comments service
     if not 'pinned' in thread.attributes:
@@ -200,6 +208,13 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         body=post["body"]
     )
     comment.save()
+    event_data = {'comment_id': comment.id}
+    if thread_id:
+        event_data['thread_id'] = thread_id
+    if parent_id:
+        event_data['parent_id'] = parent_id
+    track_forum_event(request, 'forum.thread.commented', event_data)
+
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
