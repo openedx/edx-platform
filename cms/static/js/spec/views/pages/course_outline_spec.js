@@ -7,7 +7,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState,
                 createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
                 mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
-                mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore');
+                mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
+                mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
             createMockCourseJSON = function(id, displayName, children) {
                 return {
@@ -163,6 +164,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePage(this, mockCourseJSON);
                     verifyItemsExpanded('subsection', false);
                     expect(getItemsOfType('unit')).not.toExist();
+                });
+            });
+
+            describe("Rerun notification", function () {
+                it("can be dismissed", function () {
+                    appendSetFixtures(mockRerunNotification);
+                    createCourseOutlinePage(this, mockEmptyCourseJSON);
+                    expect($('.wrapper-alert-announcement')).not.toHaveClass('is-hidden');
+                    $('.dismiss-button').click();
+                    create_sinon.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
+                    create_sinon.respondToDelete(requests);
+                    expect($('.wrapper-alert-announcement')).toHaveClass('is-hidden');
                 });
             });
 
