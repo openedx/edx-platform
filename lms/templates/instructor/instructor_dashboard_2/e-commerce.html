@@ -10,14 +10,14 @@
       <div class="wrap">
          <h2>Registration Codes</h2>
          <div>
-            <span class="code_tip">Click to add information About Registration Code Generation
-            <a id="registration_code_generation_link" href="#registration_code_generation_modal" rel="leanModal" class="add blue-button">Registration Code Generation</a>
+            <span class="code_tip">Click to generate Registration Codes
+            <a id="registration_code_generation_link" href="#registration_code_generation_modal" rel="leanModal" class="add blue-button">Generate Registration Codes</a>
             </span>
             <p>Click to generate a CSV file of all Course Registrations Codes:</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="download_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="download_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
             </form>
             </p>
@@ -25,7 +25,7 @@
             <p>
             <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="active_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="active_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
             </form>
             </p>
@@ -33,7 +33,7 @@
             <p>
             <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="spent_transaction_group_name" placeholder="Transaction Group Name (Optional)"/>
+               <input type="text" name="spent_company_name" placeholder="Company Name (Optional)"/>
                <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
             </form>
             </p>
@@ -212,24 +212,23 @@
      generate_registration_code_form.submit(function () {
       registration_code_error.attr('style', 'display: none');
       generate_registration_button.attr('disabled', true);
-      var company_name = $('input[name="company_name"]').val();
       var total_registration_codes = $('input[name="total-registration-codes"]').val();
-      var purchaser_contact = $('input[name="purchaser_contact"]').val();
+      var contact_name = $('input[name="contact_name"]').val();
       var sale_price = $('input[name="sale_price"]').val();
-      var purchaser_name = $('input[name="purchaser_name"]').val();
-      var purchaser_email = $('input[name="purchaser_email"]').val();
+      var company_name = $('input[name="company_name"]').val();
+      var contact_email = $('input[name="contact_email"]').val();
 
       if (company_name == '') {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please Enter the Company Name');
         generate_registration_button.removeAttr('disabled');
-        return false
+        return false;
       }
-      if ($.isNumeric(company_name)) {
+      if (($.isNumeric(company_name))) {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please Enter the non-numeric value for Company Name');
         generate_registration_button.removeAttr('disabled');
-        return false
+        return false;
       }
       if (sale_price == '') {
         registration_code_error.attr('style', 'display: block !important');
@@ -255,33 +254,21 @@
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (purchaser_contact == '') {
+      if (contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Purchaser Contact');
+        registration_code_error.text('Please Enter the Contact Name');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (purchaser_name == '') {
+      if (contact_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Purchaser Name');
+        registration_code_error.text('Please Enter the Contact Email');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (($.isNumeric(purchaser_name))) {
+      if (!(validateEmail(contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the non-numeric value for Purchaser Name');
-        generate_registration_button.removeAttr('disabled');
-        return false;
-      }
-      if (purchaser_email == '') {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Purchaser Email');
-        generate_registration_button.removeAttr('disabled');
-        return false;
-      }
-      if (!(validateEmail(purchaser_email))) {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the valid email address of Purchase');
+        registration_code_error.text('Please Enter the valid email address');
         generate_registration_button.removeAttr('disabled');
       }
 
@@ -488,12 +475,12 @@
      $('textarea#coupon_description').val('');
      $('input[name="company_name"]').val('');
      $('input[name="total-registration-codes"]').val('');
-     $('input[name="purchaser_contact"]').val('');
+     $('input[name="contact_name"]').val('');
      $('input[name="sale_price"]').val('');
-     $('input[name="purchaser_name"]').val('');
-     $('input[name="purchaser_email"]').val('');
+     $('input[name="contact_email"]').val('');
      $('input[name="tax"]').val('');
      $('input[name="invoice"]').attr('checked', 'checked');
      $('input[name="reference"]').val('');
+     $('input[name="internal_reference"]').val('');
    }
 </script>

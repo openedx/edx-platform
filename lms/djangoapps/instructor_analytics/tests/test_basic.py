@@ -4,11 +4,14 @@ Tests for instructor.basic
 
 from django.test import TestCase
 from student.models import CourseEnrollment
+from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order
 
 from instructor_analytics.basic import enrolled_students_features, course_registration_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+from courseware.tests.factories import InstructorFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class TestAnalyticsBasic(TestCase):
@@ -19,6 +22,7 @@ class TestAnalyticsBasic(TestCase):
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
+        self.instructor = InstructorFactory(course_key=self.course_key)
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
@@ -44,28 +48,39 @@ class TestAnalyticsBasic(TestCase):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
 
+
+class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
+    """ Test basic course registration codes analytics functions. """
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {
+            'total-registration-codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
     def test_course_registration_features(self):
         query_features = [
-            'code', 'course_id', 'transaction_group_name', 'created_by',
-            'redeemed_by', 'invoice_id', 'purchaser', 'total_price', 'reference'
+            'code', 'course_id', 'company_name', 'created_by',
+            'redeemed_by', 'invoice_id', 'purchaser', 'company_reference', 'internal_reference'
         ]
-        #create invoice
-        sale_invoice = Invoice.objects.create(
-            total_amount=1234.32, purchaser_name='Test', purchaser_contact='Testw',
-            purchaser_email='test@test.com', tax_id='2Fwe23S', reference="Not Aplicable"
-        )
-        for i in range(5):
-            course_code = CourseRegistrationCode(
-                code="test_code{}".format(i), course_id=self.course_key.to_deprecated_string(),
-                transaction_group_name='TestName', created_by=self.users[0], invoice=sale_invoice
-            )
-            course_code.save()
-
-        order = Order(user=self.users[0], status='purchased')
+        order = Order(user=self.instructor, status='purchased')
         order.save()
 
         registration_code_redemption = RegistrationCodeRedemption(
-            order=order, registration_code_id=1, redeemed_by=self.users[0]
+            order=order, registration_code_id=1, redeemed_by=self.instructor
         )
         registration_code_redemption.save()
         registration_codes = CourseRegistrationCode.objects.all()
@@ -79,8 +94,8 @@ class TestAnalyticsBasic(TestCase):
                 [registration_code.course_id.to_deprecated_string() for registration_code in registration_codes]
             )
             self.assertIn(
-                course_registration['transaction_group_name'],
-                [registration_code.transaction_group_name for registration_code in registration_codes]
+                course_registration['company_name'],
+                [getattr(registration_code.invoice, 'company_name') for registration_code in registration_codes]
             )
             self.assertIn(
                 course_registration['invoice_id'],

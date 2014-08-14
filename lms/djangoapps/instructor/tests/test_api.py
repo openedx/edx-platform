@@ -45,13 +45,14 @@ from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
-    CourseRegistrationCode, RegistrationCodeRedemption, Order,
-    PaidCourseRegistration, Coupon, Invoice
+    RegistrationCodeRedemption, Order,
+    PaidCourseRegistration, Coupon
 )
 from course_modes.models import CourseMode
 
 from .test_tools import msk_from_problem_urlname, get_extended_due
 
+EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","company_reference","internal_reference"'
 
 @common_exceptions_400
 def view_success(request):  # pylint: disable=W0613
@@ -2361,20 +2362,17 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
-        #create invoice
-        self.sale_invoice = Invoice.objects.create(
-            total_amount=1234.32, purchaser_name='Test', purchaser_contact='Testw',
-            purchaser_email='test@test.com', tax_id='2Fwe23S', reference="Not Aplicable"
-        )
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
 
-        # Active Registration Codes
-        for i in range(12):
-            course_registration_code = CourseRegistrationCode(
-                code='MyCode0{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                transaction_group_name='Test Group', created_by=self.instructor
-            )
-            course_registration_code.save()
+        data = {
+            'total-registration-codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+        }
 
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
         for i in range(5):
             order = Order(user=self.instructor, status='purchased')
             order.save()
@@ -2395,19 +2393,16 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total-registration-codes': 15.0, 'company_name': 'Test Group', 'sale_price': 122.45,
-            'purchaser_contact': 'Test123', 'purchaser_name': 'Test', 'purchaser_email': 'test@123.com',
-            'tax': '123A23F', 'reference': '', 'invoice': '23F2Test'
+            'total-registration-codes': 15, 'company_name': 'Group Alpha', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 17)
 
     @patch.object(instructor.views.api, 'random_code_generator',
@@ -2422,19 +2417,16 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         coupon = Coupon(code='first', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor)
         coupon.save()
         data = {
-            'total-registration-codes': 3, 'company_name': 'Test Group', 'sale_price': 122.45,
-            'purchaser_contact': 'Test123', 'purchaser_name': 'Test', 'purchaser_email': 'test@123.com',
-            'tax': '123A23F', 'reference': '', 'invoice': ''
+            'total-registration-codes': 3, 'company_name': 'Group Alpha', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
 
     @patch.object(instructor.views.api, 'random_code_generator',
@@ -2448,18 +2440,15 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total-registration-codes': 2, 'company_name': 'Test Group', 'sale_price': 122.45,
-            'purchaser_contact': 'Test123', 'purchaser_name': 'Test', 'purchaser_email': 'test@123.com',
-            'tax': '123A23F', 'reference': '', 'invoice': ''
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 4)
 
     def test_spent_course_registration_codes_csv(self):
@@ -2469,23 +2458,29 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         url = reverse('spent_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
-        data = {'spent_transaction_group_name': ''}
+        data = {'spent_company_name': ''}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
+
         self.assertEqual(len(body.split('\n')), 7)
 
-        for i in range(9):
-            course_registration_code = CourseRegistrationCode(
-                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                transaction_group_name='Group Alpha', created_by=self.instructor
-            )
-            course_registration_code.save()
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+
+        data = {
+            'total-registration-codes': 9, 'company_name': 'Group Alpha', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
 
         for i in range(9):
             order = Order(user=self.instructor, status='purchased')
@@ -2499,15 +2494,12 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             )
             registration_code_redemption.save()
 
-        data = {'spent_transaction_group_name': 'Group Alpha'}
+        data = {'spent_company_name': 'Group Alpha'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_active_course_registration_codes_csv(self):
@@ -2517,90 +2509,94 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         url = reverse('active_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
-        data = {'active_transaction_group_name': ''}
+        data = {'active_company_name': ''}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 9)
 
-        for i in range(9):
-            course_registration_code = CourseRegistrationCode(
-                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                transaction_group_name='Group Alpha', created_by=self.instructor
-            )
-            course_registration_code.save()
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
 
-        data = {'active_transaction_group_name': 'Group Alpha'}
+        data = {
+            'total-registration-codes': 9, 'company_name': 'Group Alpha', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
+        data = {'active_company_name': 'Group Alpha'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_get_all_course_registration_codes_csv(self):
         """
         Test to generate a response of all the course registration codes
         """
-        url = reverse('get_registration_codes',
-                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+        url = reverse(
+            'get_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
 
-        data = {'download_transaction_group_name': ''}
+        data = {'download_company_name': ''}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 14)
 
-        for i in range(9):
-            course_registration_code = CourseRegistrationCode(
-                code='TestCode{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                transaction_group_name='Group Alpha', created_by=self.instructor
-            )
-            course_registration_code.save()
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
 
-        data = {'download_transaction_group_name': 'Group Alpha'}
+        data = {
+            'total-registration-codes': 9, 'company_name': 'Group Alpha', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
+        data = {'download_company_name': 'Group Alpha'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
 
     def test_get_codes_with_sale_invoice(self):
         """
         Test to generate a response of all the course registration codes
         """
-        for i in range(5):
-            course_registration_code = CourseRegistrationCode(
-                code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                transaction_group_name='Group Invoice', created_by=self.instructor, invoice=self.sale_invoice
-            )
-            course_registration_code.save()
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+
+        data = {
+            'total-registration-codes': 5.5, 'company_name': 'Group Invoice', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': True
+        }
+
+        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
 
         url = reverse('get_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
-        data = {'download_transaction_group_name': 'Group Invoice'}
+        data = {'download_company_name': 'Group Invoice'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200, response.content)
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
-        self.assertTrue(body.startswith(
-            '"code","course_id","transaction_group_name","created_by","redeemed_by",'
-            '"invoice_id","purchaser","total_price","reference"')
-        )
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))

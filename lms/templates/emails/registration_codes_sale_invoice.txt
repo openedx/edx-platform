@@ -2,21 +2,21 @@
 
 ${_("Professional Education Invoicing Center")}
 
-${_("Portland Street, 9th floor Cambridge, MA, 02139 finance@edx.org")}
+${_("Portland Street, ")}
+${_("9th floor Cambridge, MA,")}
+${_("02139 finance@edx.org")}
 
 ${_("---------------------------------")}
 
 ${_("Bill To:")}
 
-${_("({company_name})").format(company_name=company_name)}
+${_("{company_name}").format(company_name=invoice.company_name)}
 
-${_("({purchaser_name})").format(purchaser_name=invoice.purchaser_name)}
+${_("{purchaser_name}").format(purchaser_name=invoice.company_contact_name)}
 
 % if invoice.tax_id:
-${_("(Tax ID: {tax_id})").format(tax_id=invoice.tax_id)}
+${_("Tax ID: {tax_id}").format(tax_id=invoice.tax_id)}
 %endif
-
-${_("(Purchase Order Number: {id})").format(id=invoice.id)}
 
 ${_("---------------------------------")}
 
@@ -35,7 +35,7 @@ ${_("---------------------------------")}
 
 ${_("Thank you for your purchase! Failure to pay this invoice will result the invalidation of student enrollments")}
 ${_("that use these codes. All purchases are final. Please refer to the cancellation policy")}
-${_("on ({site_name}.edx.org) for more information.").format(site_name=site_name)}
+${_("on {site_name} for more information.").format(site_name=site_name)}
 
 ${_("---------------------------------")}
 
