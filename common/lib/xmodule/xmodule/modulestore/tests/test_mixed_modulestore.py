@@ -472,7 +472,6 @@ class TestMixedModuleStore(unittest.TestCase):
         )
 
         # verify pre delete state (just to verify that the test is valid)
-        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == ModuleStoreEnum.BranchName.draft)
         if hasattr(private_vert.location, 'version_guid'):
             # change to the HEAD version
             vert_loc = private_vert.location.for_version(private_leaf.location.version_guid)
@@ -699,20 +698,22 @@ class TestMixedModuleStore(unittest.TestCase):
         Make sure that path_to_location works
         """
         self.initdb(default_ms)
-        self._create_block_hierarchy()
 
         course_key = self.course_locations[self.MONGO_COURSEID].course_key
-        should_work = (
-            (self.problem_x1a_2,
-             (course_key, u"Chapter_x", u"Sequential_x1", '1')),
-            (self.chapter_x,
-             (course_key, "Chapter_x", None, None)),
-        )
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self._create_block_hierarchy()
 
-        mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
-        for location, expected in should_work:
-            with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
-                self.assertEqual(path_to_location(self.store, location), expected)
+            should_work = (
+                (self.problem_x1a_2,
+                 (course_key, u"Chapter_x", u"Sequential_x1", '1')),
+                (self.chapter_x,
+                 (course_key, "Chapter_x", None, None)),
+            )
+
+            mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
+            for location, expected in should_work:
+                with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
+                    self.assertEqual(path_to_location(self.store, location), expected)
 
         not_found = (
             course_key.make_usage_key('video', 'WelcomeX'),

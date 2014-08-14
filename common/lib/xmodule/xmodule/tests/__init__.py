@@ -212,23 +212,27 @@ class CourseComparisonTest(unittest.TestCase):
         will be ignored for the purpose of equality checking.
         """
         # compare published
-        expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-        actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
-        self.assertGreater(len(expected_items), 0)
-        self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
+        with expected_store.branch_setting(ModuleStoreEnum.Branch.published_only, expected_course_key):
+            with actual_store.branch_setting(ModuleStoreEnum.Branch.published_only, actual_course_key):
+                expected_items = expected_store.get_items(expected_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+                actual_items = actual_store.get_items(actual_course_key, revision=ModuleStoreEnum.RevisionOption.published_only)
+                self.assertGreater(len(expected_items), 0)
+                self._assertCoursesEqual(expected_items, actual_items, actual_course_key)
 
-        # compare draft
-        if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-            revision = ModuleStoreEnum.RevisionOption.draft_only
-        else:
-            revision = None
-        expected_items = expected_store.get_items(expected_course_key, revision=revision)
-        if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
-            revision = ModuleStoreEnum.RevisionOption.draft_only
-        else:
-            revision = None
-        actual_items = actual_store.get_items(actual_course_key, revision=revision)
-        self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
+        with expected_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, expected_course_key):
+            with actual_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, actual_course_key):
+                # compare draft
+                if expected_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                    revision = ModuleStoreEnum.RevisionOption.draft_only
+                else:
+                    revision = None
+                expected_items = expected_store.get_items(expected_course_key, revision=revision)
+                if actual_store.get_modulestore_type(None) == ModuleStoreEnum.Type.split:
+                    revision = ModuleStoreEnum.RevisionOption.draft_only
+                else:
+                    revision = None
+                actual_items = actual_store.get_items(actual_course_key, revision=revision)
+                self._assertCoursesEqual(expected_items, actual_items, actual_course_key, expect_drafts=True)
 
     def _assertCoursesEqual(self, expected_items, actual_items, actual_course_key, expect_drafts=False):
         self.assertEqual(len(expected_items), len(actual_items))
@@ -282,18 +286,15 @@ class CourseComparisonTest(unittest.TestCase):
             # compare children
             self.assertEqual(expected_item.has_children, actual_item.has_children)
             if expected_item.has_children:
-                actual_course_key = actual_item.location.course_key.version_agnostic()
                 expected_children = [
-                    course1_item_child.location.map_into_course(actual_course_key)
+                    (course1_item_child.location.block_type, course1_item_child.location.block_id)
+                    # get_children() rather than children to strip privates from public parents
                     for course1_item_child in expected_item.get_children()
-                    # get_children was returning drafts for published parents :-(
-                    if expect_drafts or not getattr(course1_item_child, 'is_draft', False)
                 ]
                 actual_children = [
-                    item_child.location.version_agnostic()
+                    (item_child.location.block_type, item_child.location.block_id)
+                    # get_children() rather than children to strip privates from public parents
                     for item_child in actual_item.get_children()
-                    # get_children was returning drafts for published parents :-(
-                    if expect_drafts or not getattr(item_child, 'is_draft', False)
                 ]
                 self.assertEqual(expected_children, actual_children)
 
