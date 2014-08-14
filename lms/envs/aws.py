@@ -682,3 +682,15 @@ ENV_TOKENS.get('CERTIFICATES_STATIC_VERIFY_URL', CERTIFICATES_STATIC_VERIFY_URL)
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
     INSTALLED_APPS += ('lti_provider',)
     AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+
+############# Student Gradebook #################
+if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('gradebook',)
+
+##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
+API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
+
+EXCLUDE_MIDDLEWARE_CLASSES = ENV_TOKENS.get('EXCLUDE_MIDDLEWARE_CLASSES', [])
+
+MIDDLEWARE_CLASSES = tuple(_class for _class in MIDDLEWARE_CLASSES if _class not in EXCLUDE_MIDDLEWARE_CLASSES)
+>>>>>>> b103b35... cdodge/make-some-middleware-optional: allow for runtimes to specify which pieces of middleware should be removed. This helps with some performance characteristics.
