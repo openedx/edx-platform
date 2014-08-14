@@ -382,10 +382,11 @@ class ProctorModuleInfo(object):
         entries = []
 
         for entry in history_entries:
-            if entry.state in seen_states:
+            state = json.loads(entry.state)
+            if state in seen_states:
                 continue
             else:
-                seen_states.append(entry.state)
+                seen_states.append(state)
                 entries.append(entry)
 
         context = {
