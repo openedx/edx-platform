@@ -31,6 +31,7 @@
                 <%namespace name='static' file='/static_content.html'/>
                 ${static.css(group='style-vendor-tinymce-content', raw=True)}
                 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
+                ${static.css(group='style-xmodule-annotations', raw=True)}
             </div> 
             <div id="catchDIV">
                 <div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
@@ -181,7 +182,7 @@
 
     };
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-    
+    var osda, annotator, catchOptions, Catch;
     var startosda = function() {
         //remove old instances
         if (Annotator._instances.length !== 0) {
@@ -189,15 +190,15 @@
         }
         delete osda;
         //Load the plugin Image/Text Annotation
-        var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
+        osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
         
         var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
             '${instructor_email}':
             '${user.email}';
 
         //Catch
-        var annotator = osda.annotator;
-        var catchOptions = {
+        annotator = osda.annotator;
+        catchOptions = {
             media:'image',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
@@ -214,7 +215,7 @@
         // if annotations are opened to everyone (2) or if they want to create no annotations (1 with no instructor)
         // then the table at the bottom of the source should be displayed
         if ("${annotation_mode}" == "everyone" || ("${annotation_mode}" == "instructor" && "${instructor_email}" != ""))
-            var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 
         // if it is in instructor mode only (1), the annotator should be destroyed for all except the instructor
         if ("${annotation_mode}" == "instructor" && "${instructor_email}" == "" && !is_staff)
