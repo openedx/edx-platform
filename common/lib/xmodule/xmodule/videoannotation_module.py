@@ -133,8 +133,8 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'annotation_mode': self.annotation_mode,
         }
         fragment = Fragment(self.system.render_template('videoannotation.html', context))
-        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
-        fragment.add_javascript_url("/static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
+        fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/tinymce.full.min.js")
+        fragment.add_javascript_url(self.runtime.STATIC_URL + "js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js")
         return fragment
 
 
