@@ -128,8 +128,8 @@ def course_registration_features(features, registration_codes, csv_type):
             sale_invoice = Invoice.objects.get(id=registration_code.invoice_id)
             course_registration_dict['invoice_id'] = sale_invoice.id
             course_registration_dict['purchaser'] = sale_invoice.company_contact_name
-            course_registration_dict['total_price'] = sale_invoice.total_amount
-            course_registration_dict['reference'] = sale_invoice.company_reference
+            course_registration_dict['company_reference'] = sale_invoice.company_reference
+            course_registration_dict['internal_reference'] = sale_invoice.internal_reference
 
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
