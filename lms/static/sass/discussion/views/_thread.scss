@@ -31,6 +31,10 @@ body.discussion, .discussion-module {
   // response layout
   .discussion-response {
 
+    .username {
+      font-weight: 700;
+    }
+
     .response-header {
       display: inline-block;
       width: flex-grid(8,12);
@@ -98,3 +102,4 @@ body.discussion, .discussion-thread.expanded {
     box-shadow: 0 1px 3px $shadow;
   }
 }
+

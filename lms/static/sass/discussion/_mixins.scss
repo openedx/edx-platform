@@ -114,3 +114,39 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+@mixin forum-post-label($color) {
+  @extend %t-weight4;
+  @include font-size(9);
+  display: inline;
+  margin-top: ($baseline/4);
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 1px 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  border-color: $color;
+  color: $color;
+
+  .icon {
+    margin-right: ($baseline/5);
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+@mixin forum-user-label($color) {
+  margin-left: ($baseline/4);
+  padding: 0 ($baseline/5);
+  border-radius: 2px;
+  background: $color;
+  font-size: 9px;
+  font-weight: 700;
+  font-style: normal;
+  color: white;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
