@@ -11,7 +11,7 @@ from django.dispatch import Signal
 from django.core.cache import get_cache
 
 from xmodule.modulestore import Location
-from courseware.models import StudentModule
+from courseware.models import StudentModule, StudentModuleHistory
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 from instructor.offline_gradecalc import student_grades
@@ -361,3 +361,38 @@ class ProctorModuleInfo(object):
                     log.exception("Failed to do reset of %s for %s" %
                                   (f['assignment'], student))
         return failed
+
+    def submission_history(self, student, locations):
+        """
+        Return history of all submission attempts by a student for a list of
+        problems.
+        """
+        student = self._get_student_obj(student)
+        student_modules = StudentModule.objects.filter(
+            course_id=self.course.id,
+            module_state_key__in=locations,
+            student_id=student.id)
+
+        history_entries = StudentModuleHistory.objects.filter(
+            student_module__in=student_modules, grade__isnull=False,
+            state__contains='"attempts"',
+        ).order_by('-id')
+
+        seen_states = []
+        entries = []
+
+        for entry in history_entries:
+            if entry.state in seen_states:
+                continue
+            else:
+                seen_states.append(entry.state)
+                entries.append(entry)
+
+        context = {
+            'history_entries': entries,
+            'username': student.username,
+            'locations': locations,
+            'course_id': self.course.id
+        }
+
+        return context
