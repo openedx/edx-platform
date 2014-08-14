@@ -1,3 +1,3 @@
-% if settings.FEATURES.get('OPTIMIZELY_LMS'):
-<script src="//cdn.optimizely.com/js/1706490390.js"></script>
+% if settings.OPTIMIZELY_PROJECT_ID:
+<script src=${'//cdn.optimizely.com/js/{}.js'.format(settings.OPTIMIZELY_PROJECT_ID)}></script>
 % endif
