@@ -352,7 +352,7 @@ CatchAnnotation.prototype = {
         // if the default tab is instructor, we must refresh the catch to pull the ones
         // under the instructor's email. Calling changeUserId will update this.options.userId
         // and most importantly refresh not only the highlights (from Annotator) 
-        // but also the table below from the annotations database server (called Catch). 
+        // but also the table below from the annotations database server (called Catch).
         if(this.options.default_tab.toLowerCase() === 'instructor') {
             this.changeUserId(this.options.instructor_email);
         }
@@ -717,7 +717,7 @@ CatchAnnotation.prototype = {
         var isInList = false;
         var list = $('#mainCatch .annotationList .annotationRow.item');
         for (_i = 0, _len = list.length; _i < _len; _i++) {
-             if ($(list[_i]).parent().attr('annotationid') === an.id)
+             if (parseInt($(list[_i]).parent().attr('annotationid'), 10) === an.id)
                   isInList = true;
         }
         return isInList;
@@ -800,7 +800,7 @@ CatchAnnotation.prototype = {
         $(evt.target).parents('.detailHeader:first').find('#myLocationMap .map').html(imgSrc);
     },
     _onPlaySelectionClick: function(evt) {
-        var id = $(evt.target).find('.idAnnotation').html();
+        var id = parseInt($(evt.target).find('.idAnnotation').html(), 10);
         var uri = $(evt.target).find('.uri').html();
         var container = $(evt.target).find('.container').html();
         if (this.options.externalLink) {
@@ -858,7 +858,7 @@ CatchAnnotation.prototype = {
     },
     _onZoomToImageBoundsButtonClick: function(evt){
         var zoomToBounds = $(evt.target).hasClass('zoomToImageBounds')?$(evt.target):$(evt.target).parents('.zoomToImageBounds:first');
-        var osdaId = zoomToBounds.find('.idAnnotation').html();
+        var osdaId = parseInt(zoomToBounds.find('.idAnnotation').html(), 10);
         var uri = zoomToBounds.find('.uri').html();
 
         var allannotations = this.annotator.plugins['Store'].annotations;
@@ -887,7 +887,7 @@ CatchAnnotation.prototype = {
     },
     _onQuoteMediaButton: function(evt) {
         var quote = $(evt.target).hasClass('quote')?$(evt.target):$(evt.target).parents('.quote:first');
-        var id = quote.find('.idAnnotation').html();
+        var id = parseInt(quote.find('.idAnnotation').html(), 10);
         var uri = quote.find('.uri').html();
         if (typeof id === 'undefined' || id === ''){
             this.refreshCatch();
@@ -927,7 +927,7 @@ CatchAnnotation.prototype = {
     },
     _refreshReplies: function(evt) {
         var item = $(evt.target).parents('.annotationItem:first');
-        var anId = item.attr('annotationId');
+        var anId = parseInt(item.attr('annotationId'), 10);
             
         var replyElem = $(evt.target).parents('.annotationItem:first').find('.replies');
         var annotator = this.annotator;
@@ -954,7 +954,7 @@ CatchAnnotation.prototype = {
             if (typeof replyItems !== 'undefined' && replyItems.length > 0) {
                 annotations.forEach(function(ann) {
                     replyItems.each(function(item) {
-                        var id = $(replyItems[item]).attr('annotationid');
+                        var id = parseInt($(replyItems[item]).attr('annotationid'), 10);
                         if (id === ann.id) {
                             var perm = self.annotator.plugins.Permissions;
                             if (!perm.options.userAuthorize('delete', ann, perm.user)) {
@@ -1031,7 +1031,7 @@ CatchAnnotation.prototype = {
             if (confirm("Would you like to delete the annotation?")) {
                 var annotator = this.annotator;
                 var item = $(evt.target).parents('.annotationItem:first');
-                var id = item.attr('annotationId');
+                var id = parseInt(item.attr('annotationId'), 10);
                 var store = annotator.plugins.Store;
                 var annotations = store.annotations;
                 var permissions = annotator.plugins.Permissions;
@@ -1048,7 +1048,7 @@ CatchAnnotation.prototype = {
            
             var annotator = this.annotator;
             var item = $(evt.target).parents('.annotationItem:first');
-            var id = item.attr('annotationId');
+            var id = parseInt(item.attr('annotationId'), 10);
             var store = annotator.plugins.Store;
             var annotations = store.annotations;
             var permissions = annotator.plugins.Permissions;

@@ -371,6 +371,23 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-xmodule.css',
     },
+    'style-xmodule-annotations': {
+        'source_filenames': [
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/diacritic-annotator.css',
+            'css/vendor/ova/grouping-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
+        ],
+        'output_filename': 'css/cms-style-xmodule-annotations.css',
+    },
 }
 
 # test_order: Determines the position of this chunk of javascript on
