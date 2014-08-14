@@ -1,9 +1,9 @@
 /**
  * This page is used to show the user an outline of the course.
  */
-define(["domReady", "jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
+define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
         "js/views/course_outline"],
-    function (domReady, $, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
+    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -25,6 +25,7 @@ define(["domReady", "jquery", "underscore", "gettext", "js/views/pages/base_page
                     self.outlineView.handleAddEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
+                $('.dismiss-button').bind('click', this.dismissNotification)
             },
 
             setCollapseExpandVisibility: function() {
@@ -97,6 +98,20 @@ define(["domReady", "jquery", "underscore", "gettext", "js/views/pages/base_page
                         }
                     }, this);
                 }
+            },
+
+            /**
+             * Dismiss the course rerun notification.
+             */
+            dismissNotification: function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $('.dismiss-button').data('dismiss-link'),
+                    type: 'DELETE',
+                    success: function(result) {
+                        $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
+                    }
+                });
             }
         });
 
@@ -148,21 +163,6 @@ define(["domReady", "jquery", "underscore", "gettext", "js/views/pages/base_page
                 this.locators = [];
             }
         };
-
-        var dismissNotification = function (e) {
-            e.preventDefault();
-            $.ajax({
-                url: $('.dismiss-button').data('dismiss-link'),
-                type: 'DELETE',
-                success: function(result) {
-                    $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
-                }
-            });
-        };
-
-        domReady(function () {
-            $('.dismiss-button').bind('click', dismissNotification);
-        });
 
         return CourseOutlinePage;
     }); // end define();
