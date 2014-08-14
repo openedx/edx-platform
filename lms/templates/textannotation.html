@@ -204,11 +204,16 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
         Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
     }
 
+    // if the following is true, template is being rendered in LMS, otherwise it is in Studio
     if (typeof Annotator !== 'undefined') {
         startova();
     } else {
-        require(["ova"], function(ova){
-            startova();
-        });
+        try {
+            require(["ova"], function(ova) {
+                startova();
+            });
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
     }
 </script>

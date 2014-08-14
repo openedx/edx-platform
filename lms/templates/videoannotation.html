@@ -201,8 +201,12 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
     if (typeof Annotator !== 'undefined') {
         startova();
     } else {
-        require(["ova"], function(ova){
-            startova();
-        });
+        try {
+            require(["ova"], function(ova) {
+                startova();
+            });
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
     }
 </script>
