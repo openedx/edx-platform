@@ -48,18 +48,19 @@
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}Help Center{link_end}.').format(
-        link_start='<a href="{url}" target="_blank">'.format(
-          url='https://stanfordonline.zendesk.com/hc/en-us'
-        ),
-        link_end='</a>',
-        platform_name=platform_name)}
-      </p>
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} Help Center.').format(platform_name=platform_name)}</p>
+	
+	<div class="help-buttons">
+	  <a id="help-center-button" href="{url}" target="_blank">
+		${_('Access the Help Center')}
+	  </a>
+	</div>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(
+	<hr>
+
+    <p>${_("Can't find an answer to your question? You can contact the {platform_name} general support team directly:").format(
         platform_name=platform_name
       )}</p>
-    <hr>
 
     <div class="help-buttons">
       <a href="#" id="feedback_link_problem">${_('Report a problem')}</a>
