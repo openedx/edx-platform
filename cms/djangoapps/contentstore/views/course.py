@@ -235,6 +235,8 @@ def course_rerun_handler(request, course_key_string):
     GET
         html: return html page with form to rerun a course for the given course id
     """
+    if not GlobalStaff().has_user(request.user):
+        raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     course_module = _get_course_module(course_key, request.user, depth=3)
     if request.method == 'GET':
@@ -390,8 +392,9 @@ def course_listing(request):
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
+        'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True)
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', False)
     })
 
 
