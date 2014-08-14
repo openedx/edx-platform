@@ -28,14 +28,14 @@ class CloneCourseTest(CourseTestCase):
         # 3. clone course (mongo -> split)
         with self.store.default_store(ModuleStoreEnum.Type.split):
             split_course3_id = CourseLocator(
-                org="edx3", course="split3", run="2013_Fall", branch=ModuleStoreEnum.BranchName.draft
+                org="edx3", course="split3", run="2013_Fall"
             )
             self.store.clone_course(mongo_course2_id, split_course3_id, self.user.id)
             self.assertCoursesEqual(mongo_course2_id, split_course3_id)
 
             # 4. clone course (split -> split)
             split_course4_id = CourseLocator(
-                org="edx4", course="split4", run="2013_Fall", branch=ModuleStoreEnum.BranchName.draft
+                org="edx4", course="split4", run="2013_Fall"
             )
             self.store.clone_course(split_course3_id, split_course4_id, self.user.id)
             self.assertCoursesEqual(split_course3_id, split_course4_id)

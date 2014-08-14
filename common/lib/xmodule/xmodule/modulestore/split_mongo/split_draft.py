@@ -51,6 +51,15 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
         return item
 
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, revision=None, **kwargs):
+        """
+        See :py:meth: xmodule.modulestore.split_mongo.split.SplitMongoModuleStore.clone_course
+        """
+        dest_course_id = self._map_revision_to_branch(dest_course_id, revision=revision)
+        return super(DraftVersioningModuleStore, self).clone_course(
+            source_course_id, dest_course_id, user_id, fields=fields, **kwargs
+        )
+
     def get_courses(self, **kwargs):
         """
         Returns all the courses on the Draft or Published branch depending on the branch setting.

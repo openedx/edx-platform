@@ -166,17 +166,16 @@ class SplitMigrator(object):
             )
             new_parent = self.split_modulestore.get_item(split_parent_loc, **kwargs)
             # this only occurs if the parent was also awaiting adoption: skip this one, go to next
-            if any(new_locator == child.version_agnostic() for child in new_parent.children):
+            if any(new_locator.block_id == child.block_id for child in new_parent.children):
                 continue
             # find index for module: new_parent may be missing quite a few of old_parent's children
             new_parent_cursor = 0
             for old_child_loc in old_parent.children:
-                if old_child_loc == draft_location:
+                if old_child_loc.block_id == draft_location.block_id:
                     break  # moved cursor enough, insert it here
-                sibling_loc = new_draft_course_loc.make_usage_key(old_child_loc.category, old_child_loc.block_id)
                 # sibling may move cursor
                 for idx in range(new_parent_cursor, len(new_parent.children)):
-                    if new_parent.children[idx].version_agnostic() == sibling_loc:
+                    if new_parent.children[idx].block_id == old_child_loc.block_id:
                         new_parent_cursor = idx + 1
                         break  # skipped sibs enough, pick back up scan
             new_parent.children.insert(new_parent_cursor, new_locator)
