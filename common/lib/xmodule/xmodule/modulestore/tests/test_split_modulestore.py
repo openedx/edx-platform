@@ -608,13 +608,6 @@ class SplitModuleCourseTests(SplitModuleTest):
 
         _verify_published_course(modulestore().get_courses(branch=BRANCH_NAME_PUBLISHED))
 
-    def test_search_qualifiers(self):
-        # query w/ search criteria
-        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, qualifiers={'org': 'testx'})
-        self.assertEqual(len(courses), 2)
-        self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
-        self.assertIsNotNone(self.findByIdInResult(courses, "head23456"))
-
     def test_has_course(self):
         '''
         Test the various calling forms for has_course

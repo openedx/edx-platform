@@ -703,7 +703,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         }
         return envelope
 
-    def get_courses(self, branch, qualifiers=None, **kwargs):
+    def get_courses(self, branch, **kwargs):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
@@ -714,7 +714,6 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         To get specific versions via guid use get_course.
 
         :param branch: the branch for which to return courses.
-        :param qualifiers: an optional dict restricting which elements should match
         '''
         matching_indexes = self.find_matching_course_indexes(branch)
 
