@@ -15,6 +15,7 @@
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
+-e git+https://github.com/jazkarta/edx-jsme.git@813079fd5218ed275248d2a1fcae2fcbf20a0838#egg=edx-jsme
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@f0e53538be7ce90584a03cc7dd3f06bd43e12ac2#egg=XBlock
