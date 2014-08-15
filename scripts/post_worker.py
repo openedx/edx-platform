@@ -27,4 +27,10 @@ if count > 0:
     shutil.copyfile(output_filename, file_dest)
     print "done copying file"
 
+# TODO: fold the remaining bash script into the Python script
+# finding if there is any screenshots
+# print "checking for screenshots"
+# for (path, dirs, files) in os.walk('test_root/log'):
+#    print files
+
 print "TDDIUM_SESSION_ID:", os.environ['TDDIUM_SESSION_ID']
