@@ -99,7 +99,7 @@ class MongoConnection(object):
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
     """
     def __init__(
-        self, db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+        self, db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
     ):
         """
         Create & open the connection, authenticate, and provide pointers to the collections
@@ -113,6 +113,10 @@ class MongoConnection(object):
             ),
             db
         )
+
+        # Remove when adding official Split support for asset metadata storage.
+        if asset_collection:
+            pass
 
         if user is not None and password is not None:
             self.database.authenticate(user, password)
