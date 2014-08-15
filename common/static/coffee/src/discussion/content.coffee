@@ -108,13 +108,21 @@ if Backbone?
       @get("abuse_flaggers").pop(window.user.get('id'))
       @trigger "change", @
 
+    isFlagged: ->
+      user = DiscussionUtil.getUser()
+      flaggers = @get("abuse_flaggers")
+      user and (user.id in flaggers or (DiscussionUtil.isPrivilegedUser(user.id) and flaggers.length > 0))
+
+    incrementVote: (increment) ->
+      newVotes = _.clone(@get("votes"))
+      newVotes.up_count = newVotes.up_count + increment
+      @set("votes", newVotes)
+
     vote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
-      @trigger "change", @
+      @incrementVote(1)
 
     unvote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
-      @trigger "change", @
+      @incrementVote(-1)
     
   class @Thread extends @Content
     urlMappers:

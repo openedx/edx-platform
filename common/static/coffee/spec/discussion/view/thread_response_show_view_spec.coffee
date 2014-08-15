@@ -1,39 +1,9 @@
 describe "ThreadResponseShowView", ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures(
-            """
-            <script type="text/template" id="thread-response-show-template">
-                <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false"></a>
-                <a
-                    href="javascript:void(0)"
-                    class="endorse-btn action-endorse <%= thread.get('thread_type') == 'question' ? 'mark-answer' : '' %>"
-                    style="cursor: default; display: none;"
-                    data-tooltip="<%= thread.get('thread_type') == 'question' ? 'mark as answer' : 'endorse' %>"
-                >
-                    <span class="check-icon" style="pointer-events: none; "></span>
-                </a>
-                <p class="posted-details">
-                    <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-                    <% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> -
-                    <%=
-                        interpolate(
-                            endorsement.username ? "marked as answer %(time_ago)s by %(user)s" : "marked as answer %(time_ago)s",
-                            {
-                                'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
-                                'user': endorsement.username
-                            },
-                            true
-                        )
-                    %>
-                    <% } %>
-                </p>
-            </script>
+        DiscussionSpecHelper.setUnderscoreFixtures()
 
-            <div class="discussion-post"></div>
-            """
-        )
-
+        @user = DiscussionUtil.getUser()
         @thread = new Thread({"thread_type": "discussion"})
         @commentData = {
             id: "dummy",
@@ -43,32 +13,34 @@ describe "ThreadResponseShowView", ->
             created_at: "2013-04-03T20:08:39Z",
             endorsed: false,
             abuse_flaggers: [],
-            votes: {up_count: "42"}
+            votes: {up_count: 42},
+            type: "comment"
         }
         @comment = new Comment(@commentData)
         @comment.set("thread", @thread)
-        @view = new ThreadResponseShowView({ model: @comment })
-        @view.setElement($(".discussion-post"))
+        @view = new ThreadResponseShowView({ model: @comment, $el: $("#fixture-element") })
 
         # Avoid unnecessary boilerplate
         spyOn(ThreadResponseShowView.prototype, "convertMath")
 
         @view.render()
 
-    it "renders the vote correctly", ->
-        DiscussionViewSpecHelper.checkRenderVote(@view, @comment)
+    describe "voting", ->
 
-    it "votes correctly", ->
-        DiscussionViewSpecHelper.checkVote(@view, @comment, @commentData, true)
+        it "renders the vote state correctly", ->
+            DiscussionViewSpecHelper.checkRenderVote(@view, @comment)
 
-    it "unvotes correctly", ->
-        DiscussionViewSpecHelper.checkUnvote(@view, @comment, @commentData, true)
+        it "votes correctly via click", ->
+            DiscussionViewSpecHelper.checkUpvote(@view, @comment, @user, $.Event("click"))
 
-    it 'toggles the vote correctly', ->
-        DiscussionViewSpecHelper.checkToggleVote(@view, @comment)
+        it "votes correctly via spacebar", ->
+            DiscussionViewSpecHelper.checkUpvote(@view, @comment, @user, $.Event("keydown", {which: 32}))
 
-    it "vote button activates on appropriate events", ->
-        DiscussionViewSpecHelper.checkVoteButtonEvents(@view)
+        it "unvotes correctly via click", ->
+            DiscussionViewSpecHelper.checkUnvote(@view, @comment, @user, $.Event("click"))
+
+        it "unvotes correctly via spacebar", ->
+            DiscussionViewSpecHelper.checkUnvote(@view, @comment, @user, $.Event("keydown", {which: 32}))
 
     it "renders endorsement correctly for a marked answer in a question thread", ->
         endorsement = {
@@ -81,7 +53,7 @@ describe "ThreadResponseShowView", ->
           "endorsement": endorsement
         })
         @view.render()
-        expect(@view.$(".posted-details").text()).toMatch(
+        expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
           "marked as answer less than a minute ago by " + endorsement.username
         )
 
@@ -97,17 +69,45 @@ describe "ThreadResponseShowView", ->
         })
         @view.render()
         expect(@view.$(".posted-details").text()).toMatch("marked as answer less than a minute ago")
-        expect(@view.$(".posted-details").text()).not.toMatch(" by ")
+        expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
+
+    it "renders endorsement correctly for an endorsed response in a discussion thread", ->
+        endorsement = {
+          "username": "test_endorser",
+          "time": new Date().toISOString()
+        }
+        @thread.set("thread_type", "discussion")
+        @comment.set({
+          "endorsed": true,
+          "endorsement": endorsement
+        })
+        @view.render()
+        expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
+          "endorsed less than a minute ago by " + endorsement.username
+        )
+
+    it "renders anonymous endorsement correctly for an endorsed response in a discussion thread", ->
+        endorsement = {
+          "username": null,
+          "time": new Date().toISOString()
+        }
+        @thread.set("thread_type", "discussion")
+        @comment.set({
+          "endorsed": true,
+          "endorsement": endorsement
+        })
+        @view.render()
+        expect(@view.$(".posted-details").text()).toMatch("endorsed less than a minute ago")
+        expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
 
     it "re-renders correctly when endorsement changes", ->
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set("thread_type", "question")
+        @view.render()
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
-        @view.$(".action-endorse").click()
-        expect(@view.$(".posted-details").text()).toMatch(
-          "marked as answer less than a minute ago by " + user.get("username")
-        )
-        @view.$(".action-endorse").click()
+        @view.$(".action-answer").click()
+        expect(@view.$(".posted-details").text()).toMatch("marked as answer")
+        @view.$(".action-answer").click()
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
 
     it "allows a moderator to mark an answer in a question thread", ->
@@ -117,12 +117,11 @@ describe "ThreadResponseShowView", ->
             "user_id": (parseInt(window.user.id) + 1).toString()
         })
         @view.render()
-        endorseButton = @view.$(".action-endorse")
+        endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
-        expect(endorseButton).not.toHaveCss({"display": "none"})
-        expect(endorseButton).toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).not.toHaveClass("is-hidden")
         endorseButton.click()
-        expect(endorseButton).toHaveClass("is-endorsed")
+        expect(endorseButton).toHaveClass("is-checked")
 
     it "allows the author of a question thread to mark an answer", ->
         @thread.set({
@@ -130,12 +129,11 @@ describe "ThreadResponseShowView", ->
             "user_id": window.user.id
         })
         @view.render()
-        endorseButton = @view.$(".action-endorse")
+        endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
-        expect(endorseButton).not.toHaveCss({"display": "none"})
-        expect(endorseButton).toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).not.toHaveClass("is-hidden")
         endorseButton.click()
-        expect(endorseButton).toHaveClass("is-endorsed")
+        expect(endorseButton).toHaveClass("is-checked")
 
     it "does not allow the author of a discussion thread to endorse", ->
         @thread.set({
@@ -145,10 +143,7 @@ describe "ThreadResponseShowView", ->
         @view.render()
         endorseButton = @view.$(".action-endorse")
         expect(endorseButton.length).toEqual(1)
-        expect(endorseButton).toHaveCss({"display": "none"})
-        expect(endorseButton).not.toHaveClass("is-clickable")
-        endorseButton.click()
-        expect(endorseButton).not.toHaveClass("is-endorsed")
+        expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden")
 
     it "does not allow a student who is not the author of a question thread to mark an answer", ->
         @thread.set({
@@ -156,9 +151,70 @@ describe "ThreadResponseShowView", ->
             "user_id": (parseInt(window.user.id) + 1).toString()
         })
         @view.render()
-        endorseButton = @view.$(".action-endorse")
+        endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
-        expect(endorseButton).toHaveCss({"display": "none"})
-        expect(endorseButton).not.toHaveClass("is-clickable")
-        endorseButton.click()
-        expect(endorseButton).not.toHaveClass("is-endorsed")
+        expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden")
+
+    describe "labels", ->
+
+        expectOneElement = (view, selector, visible=true) =>
+            view.render()
+            elements = view.$el.find(selector)
+            expect(elements.length).toEqual(1)
+            if visible
+                expect(elements).not.toHaveClass("is-hidden")
+            else
+                expect(elements).toHaveClass("is-hidden")
+
+        it 'displays the reported label when appropriate for a non-staff user', ->
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should not be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported', false)
+
+        it 'displays the reported label when appropriate for a flag moderator', ->
+            DiscussionSpecHelper.makeModerator()
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should still be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported')
+
+    describe "endorser display", ->
+
+        beforeEach ->
+            @comment.set('endorsement', {
+                "username": "test_endorser",
+                "time": new Date().toISOString()
+            })
+            spyOn(DiscussionUtil, 'urlFor').andReturn('test_endorser_url')
+
+        checkUserLink = (element, is_ta, is_staff) ->
+            expect(element.find('a.username').length).toEqual(1)
+            expect(element.find('a.username').text()).toEqual('test_endorser')
+            expect(element.find('a.username').attr('href')).toEqual('test_endorser_url')
+            expect(element.find('.user-label-community-ta').length).toEqual(if is_ta then 1 else 0)
+            expect(element.find('.user-label-staff').length).toEqual(if is_staff then 1 else 0)
+
+        it "renders nothing when the response has not been endorsed", ->
+            @comment.set('endorsement', null)
+            expect(@view.getEndorserDisplay()).toBeNull()
+
+        it "renders correctly for a student-endorsed response", ->
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, false, false)
+
+        it "renders correctly for a community TA-endorsed response", ->
+            spyOn(DiscussionUtil, 'isTA').andReturn(true)
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, true, false)
+
+        it "renders correctly for a staff-endorsed response", ->
+            spyOn(DiscussionUtil, 'isStaff').andReturn(true)
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, false, true)
