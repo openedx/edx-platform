@@ -38,12 +38,12 @@
     @include transition(opacity .2s ease-in-out 0s);
     z-index: 100;
     position: absolute;
-    top: $baseline;
+    top: 17px;
     right: 0;
     opacity: 0.0;
     pointer-events: none;
     overflow: hidden;
-    min-width: ($baseline*7);
+    min-width: ($baseline*6.5);
     height: 0;
 
     &.is-expanded {
@@ -66,7 +66,7 @@
       &:after,
       &:before {
         bottom: 100%;
-        right: 5px;
+        right: 3px;
         border: solid transparent;
         content: " ";
         height: 0;
@@ -79,14 +79,14 @@
       &:after {
         border-color: rgba(255, 255, 255, 0);
         border-bottom-color: $white;
-        border-width: 10px;
+        border-width: 6px;
         margin-right: 1px;
       }
 
       &:before {
         border-color: rgba(178, 178, 178, 0);
         border-bottom-color: $gray-l3;
-        border-width: 11px;
+        border-width: 7px;
       }
     }
 
@@ -256,10 +256,10 @@
 
     // UI: secondary action
     .action-list-item {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub2;
       margin: 0;
       display: block;
-      padding: ($baseline/4);
+      padding: ($baseline/10) 0;
       white-space: nowrap;
       text-align: right;
       color: $gray-l1;
@@ -294,16 +294,6 @@
           }
         }
       }
-    }
-  }
-
-
-  // CASE: comment action
-  .comment-actions-list .action-button.action-more {
-    height: ($baseline*1.5);
-
-    .action-label {
-      display: none;
     }
   }
 

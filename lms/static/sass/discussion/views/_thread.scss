@@ -13,13 +13,13 @@ body.discussion, .discussion-module {
 
     .post-header-content {
       display: inline-block;
-      vertical-align: top;
+      vertical-align: middle;
       width: flex-grid(9,12);
     }
 
     .post-header-actions {
       display: inline-block;
-      vertical-align: top;
+      vertical-align: middle;
       width: flex-grid(3,12);
     }
 
@@ -38,13 +38,13 @@ body.discussion, .discussion-module {
     .response-header-content {
       display: inline-block;
       vertical-align: top;
-      width: flex-grid(8,12);
+      width: flex-grid(9,12);
     }
 
     .response-header-actions {
       display: inline-block;
       vertical-align: top;
-      width: flex-grid(4,12);
+      width: flex-grid(3,12);
       float: right;
     }
   }
