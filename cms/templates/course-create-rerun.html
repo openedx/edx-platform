@@ -1,20 +1,3 @@
-<!--
-
-DESIGN/UI NOTES:
-
-* changed tip-based UI text to have is-hidden/is-shown stateful classes rather than is-hiding/is-showing
-* create-course and new-course prefixed classes have been changed to use rerun-courses
-* changed form <input /> elements to <button> elements
-
-- - -
-
-TODO:
-
-* sync up styling of stateful classes
-* need to add support for allow_unicode_course_id in real view's template
-
- -->
-
 <%inherit file="base.html" />
 
 <%! from django.utils.translation import ugettext as _ %>
@@ -58,7 +41,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
         <span class="course-original-title">${display_name}</span>
       </h2>
     </header>
-  </div> <!-- /mast -->
+  </div>
 
   <div class="wrapper-content wrapper">
     <div class="inner-wrapper">
@@ -71,9 +54,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
                 <strong>${_("Note: Together, the organization, course number, and course run must uniquely identify this new course instance.")}</strong>
               <p>
             </div>
-          </div><!-- /introduction -->
-
-          <!-- - - - -->
+          </div>
 
           <div class="wrapper-rerun-course">
             <form class="form-create rerun-course course-info" id="rerun-course-form" name="rerun-course-form">
@@ -140,7 +121,7 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
             </form>
           </div>
 
-        </article><!-- /content-primary -->
+        </article>
 
         <aside class="content-supplementary" role="complimentary">
           <div class="bit">
@@ -163,10 +144,10 @@ require(["domReady!", "jquery", "jquery.form", "js/views/course_rerun"], functio
               <li class="item-detail">${_("Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Sed posuere consectetur est at lobortis. Maecenas faucibus mollis interdum.")}</li>
             </ul>
           </div>
-        </aside><!-- /content-supplementary -->
+        </aside>
 
       </section>
-    </div><!-- /content -->
+    </div>
 
   </div>
 </div>
