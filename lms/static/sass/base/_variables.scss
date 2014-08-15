@@ -112,6 +112,11 @@ $green-u3: desaturate($green,45%);
 
 // TODO: both blue and yellow variables differ from CMS rgb value, need to confirm change to CMS variable is ok in current platform uses before switching.
 $blue: rgb(29,157,217);
+$blue-l1: tint($blue,20%);
+$blue-l2: tint($blue,40%);
+$blue-l3: tint($blue,60%);
+$blue-l4: tint($blue,80%);
+$blue-l5: tint($blue,90%);
 $yellow: rgb(255, 252, 221);
 
 // COLORS: old variables

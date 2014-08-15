@@ -1,0 +1,265 @@
+// discussion - elements - actions
+// ====================
+
+// UI: general action list
+.post-actions-list, .response-actions-list, .comment-actions-list {
+  @extend %ui-no-list;
+  text-align: right;
+
+  .actions-item {
+    @include box-sizing(border-box);
+    vertical-align: top;
+    display: inline-block;
+    margin: 0 ($baseline/4);
+
+    &.is-visible {
+      display: inline-block;
+    }
+  }
+
+  .more-wrapper {
+    position: relative;
+  }
+}
+
+// CASE: comment actions
+.comment-actions-list .actions-item {
+  height: auto;
+}
+
+// ====================
+
+// UI: general actions dropdown
+.actions-dropdown {
+  @extend %ui-no-list;
+  display: none;
+  background-color: $white;
+  text-align: left;
+
+  &.is-expanded {
+    position: absolute;
+    top: 0;
+    z-index: 100;
+    display: block;
+    box-shadow: 0 0 2px $shadow;
+    border-radius: 3px;
+  }
+
+  .actions-item {
+    display: block;
+    margin: 0;
+  }
+}
+
+// ====================
+
+// UI: general action
+.action-button {
+  @include box-sizing(border-box);
+  border-radius: 3px;
+  text-align: center;
+  padding: ($baseline/4);
+  display: inline-block;
+  height: ($baseline*2.5);
+  min-width: ($baseline*2.5);
+  width: auto;
+  text-align: center;
+
+  // STATE: hover styling
+  &:hover {
+    box-shadow: 0 0 2px $shadow;
+    border-radius: 3px;
+
+    .action-label {
+      color: $black;
+    }
+  }
+
+  &:focus {
+    box-shadow: 0 0 3px $blue;
+  }
+
+  .action-icon {
+    display: block;
+    @include font-size(16);
+    @include line-height(16);
+
+  }
+
+  .action-label {
+    @include font-size(10);
+    @include line-height(10);
+    display: block;
+    text-transform: uppercase;
+    color: $gray-l2 ;
+  }
+
+  // STATE: checked action
+  &.is-checked {
+    box-shadow: 0 2px $shadow inset;
+
+    .action-icon, .action-label {
+      color: $white;
+    }
+
+    // CASE: follow action
+    &.action-follow {
+      background-color: $forum-color-following;
+    }
+
+    // CASE: vote action
+    &.action-vote {
+      background-color: $green;
+    }
+
+    // CASE: endorse action
+    &.action-endorse {
+      background-color: $blue;
+    }
+
+    // CASE: answer action
+    &.action-answer {
+      background-color: $green;
+    }
+  }
+
+  // CASE: more button
+  &.action-more {
+
+    .action-icon {
+      color: $gray-l2;
+    }
+
+    &:hover .action-icon {
+      color: $black;
+    }
+
+    &.is-expanded {
+      visibility: hidden;
+    }
+  }
+}
+
+// ====================
+
+// UI: secondary action
+.action-list-item {
+  margin: 0;
+  display: block;
+  padding: ($baseline/4);
+  white-space: nowrap;
+
+  &:focus {
+
+  }
+
+  &:hover {
+    background-color: $gray-l4;
+  }
+  .action-icon {
+    display: inline-block;
+    width: ($baseline/2);
+    @include font-size(10);
+    @include line-height(10);
+  }
+
+  .action-label {
+    @include font-size(10);
+    @include line-height(10);
+    display: inline-block;
+    text-transform: uppercase;
+  }
+
+  // CASE: checked
+  &.is-checked {
+    // CASE: pin action
+    &.action-pin {
+      .action-icon, .action-label {
+        color: $pink;
+      }
+    }
+
+    // CASE: report action
+    &.action-report {
+      .action-icon, .action-label {
+        color: $pink;
+      }
+    }
+  }
+}
+
+// CASE: comment action
+.comment-actions-list .action-button.action-more {
+  height: ($baseline*1.5);
+
+  .action-label {
+    display: none;
+  }
+}
+
+.action-button, .action-list-item {
+  .action-label {
+    .label-checked, .label-checked-focused {
+      display: none;
+    }
+  }
+
+  &.is-checked {
+    .label-unchecked {
+      display: none;
+    }
+
+    .label-checked {
+      display: inline;
+    }
+
+    &:hover, &:focus {
+      .label-checked {
+        display: none;
+      }
+
+      .label-checked-focused {
+        display: inline;
+      }
+    }
+  }
+}
+
+// ====================
+
+// TO-DO refactor all styling below this actions line.
+
+
+// vote and endorse buttons
+.container .discussion-body {
+
+  .vote-btn {
+
+    .plus-icon {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 8px 6px 0 0;
+      background: url(../images/vote-plus-icon.png) no-repeat;
+      font-size: 18px;
+      text-indent: -9999px;
+      color: #17b429;
+      overflow: hidden;
+    }
+  }
+
+  .endorse-btn {
+
+    .check-icon {
+      display: block;
+      width: 13px;
+      height: 12px;
+      margin: 8px auto;
+      background: url(../images/endorse-icon.png) no-repeat;
+    }
+
+    &.is-endorsed .check-icon {
+      background-position: 0 -12px;
+    }
+  }
+}

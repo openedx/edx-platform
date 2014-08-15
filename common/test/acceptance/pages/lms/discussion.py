@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 
@@ -38,6 +40,25 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def _is_element_visible(self, selector):
         query = self._find_within(selector)
         return query.present and query.visible
+
+    @contextmanager
+    def _secondary_action_menu_open(self, ancestor_selector):
+        """
+        Given the selector for an ancestor of a secondary menu, return a context
+        manager that will open and close the menu
+        """
+        self._find_within(ancestor_selector + " .action-more").click()
+        EmptyPromise(
+            lambda: self._is_element_visible(ancestor_selector + " .actions-dropdown"),
+            "Secondary action menu opened"
+        ).fulfill()
+        yield
+        if self._is_element_visible(ancestor_selector + " .actions-dropdown"):
+            self._find_within(ancestor_selector + " .action-hide-more").click()
+            EmptyPromise(
+                lambda: not self._is_element_visible(ancestor_selector + " .actions-dropdown"),
+                "Secondary action menu closed"
+            ).fulfill()
 
     def get_response_total_text(self):
         """Returns the response count text, or None if not present"""
@@ -85,11 +106,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
-        self._find_within(".response_{} .discussion-response .action-edit".format(response_id)).first.click()
-        EmptyPromise(
-            lambda: self.is_response_editor_visible(response_id),
-            "Response edit started"
-        ).fulfill()
+        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            self._find_within(".response_{} .discussion-response .action-edit".format(response_id)).first.click()
+            EmptyPromise(
+                lambda: self.is_response_editor_visible(response_id),
+                "Response edit started"
+            ).fulfill()
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
@@ -116,11 +138,13 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_comment_deletable(self, comment_id):
         """Returns true if the delete comment button is present, false otherwise"""
-        return self._is_element_visible("#comment_{} div.action-delete".format(comment_id))
+        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+            return self._is_element_visible("#comment_{} .action-delete".format(comment_id))
 
     def delete_comment(self, comment_id):
         with self.handle_alert():
-            self._find_within("#comment_{} div.action-delete".format(comment_id)).first.click()
+            with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+                self._find_within("#comment_{} .action-delete".format(comment_id)).first.click()
         EmptyPromise(
             lambda: not self.is_comment_visible(comment_id),
             "Deleted comment was removed"
@@ -128,7 +152,8 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
 
     def is_comment_editable(self, comment_id):
         """Returns true if the edit comment button is present, false otherwise"""
-        return self._is_element_visible("#comment_{} .action-edit".format(comment_id))
+        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+            return self._is_element_visible("#comment_{} .action-edit".format(comment_id))
 
     def is_comment_editor_visible(self, comment_id):
         """Returns true if the comment editor is present, false otherwise"""
@@ -140,15 +165,16 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def start_comment_edit(self, comment_id):
         """Click the edit button for the comment, loading the editing view"""
         old_body = self.get_comment_body(comment_id)
-        self._find_within("#comment_{} .action-edit".format(comment_id)).first.click()
-        EmptyPromise(
-            lambda: (
-                self.is_comment_editor_visible(comment_id) and
-                not self.is_comment_visible(comment_id) and
-                self._get_comment_editor_value(comment_id) == old_body
-            ),
-            "Comment edit started"
-        ).fulfill()
+        with self._secondary_action_menu_open("#comment_{}".format(comment_id)):
+            self._find_within("#comment_{} .action-edit".format(comment_id)).first.click()
+            EmptyPromise(
+                lambda: (
+                    self.is_comment_editor_visible(comment_id) and
+                    not self.is_comment_visible(comment_id) and
+                    self._get_comment_editor_value(comment_id) == old_body
+                ),
+                "Comment edit started"
+            ).fulfill()
 
     def set_comment_editor_value(self, comment_id, new_body):
         """Replace the contents of the comment editor"""
