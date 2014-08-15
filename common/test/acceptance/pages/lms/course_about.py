@@ -16,7 +16,6 @@ class CourseAboutPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='section.course-info').present
 
-
     def register(self):
         """
         Navigate to the registration page.

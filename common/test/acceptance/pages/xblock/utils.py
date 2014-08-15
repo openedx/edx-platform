@@ -3,6 +3,7 @@ Utility methods useful for XBlock page tests.
 """
 from bok_choy.promise import Promise
 
+
 def wait_for_xblock_initialization(page, xblock_css):
     """
     Wait for the xblock with the given CSS to finish initializing.

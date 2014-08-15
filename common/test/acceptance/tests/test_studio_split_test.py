@@ -624,7 +624,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see the group configuration is saved successfully
         """
         def try_to_save_and_verify_error_message(message):
-             # Try to save
+            # Try to save
             config.save()
             # Verify that configuration is still in editing mode
             self.assertEqual(config.mode, 'edit')

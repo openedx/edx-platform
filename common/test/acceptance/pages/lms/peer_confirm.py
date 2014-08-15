@@ -28,5 +28,5 @@ class PeerConfirmPage(PageObject):
         Otherwise, try to continue to calibration grading.
         """
         self.q(css='input.calibration-interstitial-page-button'
-            if is_calibrating else 'input.interstitial-page-button'
-        ).first.click()
+               if is_calibrating else 'input.interstitial-page-button'
+               ).first.click()
