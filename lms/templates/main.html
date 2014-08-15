@@ -84,7 +84,10 @@
     google_analytics_file = microsite.get_template_path('google_analytics.html')
 
     if getattr(settings, 'SITE_NAME', '').endswith('edx.org'):
-      footer_file = microsite.get_template_path('edx_footer.html')
+        if settings.FEATURES.get('ENABLE_NEW_EDX_FOOTER', False):
+            footer_file = microsite.get_template_path('edx_footer.html')
+        else:
+            footer_file = microsite.get_template_path('original_edx_footer.html')
     else:
       footer_file = microsite.get_template_path('footer.html')
 

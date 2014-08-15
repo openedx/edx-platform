@@ -18,8 +18,9 @@ class TestFooter(TestCase):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
 
-        # assert that footer template has been properly overriden on homepage
-        self.assertContains(resp, 'EdX is a non-profit created by founding partners Harvard and MIT')
+        # assert that footer template has been properly overridden on homepage
+        # test the top-level element class; which is less likely to change than copy.
+        self.assertContains(resp, 'edx-footer')
 
     @override_settings(SITE_NAME="example.com")
     def test_openedx_footer(self):
@@ -31,5 +32,6 @@ class TestFooter(TestCase):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
 
-        # assert that footer template has been properly overriden on homepage
-        self.assertContains(resp, 'Powered by Open edX')
+        # assert that footer template has been properly overridden on homepage
+        # test the top-level element class; which is less likely to change than copy.
+        self.assertContains(resp, 'wrapper-footer')

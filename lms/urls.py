@@ -118,15 +118,24 @@ urlpatterns += ((
 # Semi-static views only used by edX, not by themes
 if not settings.FEATURES["USE_CUSTOM_THEME"]:
     urlpatterns += (
-        url(r'^jobs$', 'static_template_view.views.render',
-            {'template': 'jobs.html'}, name="jobs"),
-        url(r'^press$', 'student.views.press', name="press"),
-        url(r'^media-kit$', 'static_template_view.views.render',
-            {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^blog$', 'static_template_view.views.render',
+            {'template': 'blog.html'}, name="blog"),
+        url(r'^contact$', 'static_template_view.views.render',
+            {'template': 'contact.html'}, name="contact"),
+        url(r'^donate$', 'static_template_view.views.render',
+            {'template': 'donate.html'}, name="donate"),
         url(r'^faq$', 'static_template_view.views.render',
-            {'template': 'faq.html'}, name="faq_edx"),
+            {'template': 'faq.html'}, name="faq"),
         url(r'^help$', 'static_template_view.views.render',
             {'template': 'help.html'}, name="help_edx"),
+        url(r'^jobs$', 'static_template_view.views.render',
+            {'template': 'jobs.html'}, name="jobs"),
+        url(r'^news$', 'static_template_view.views.render',
+            {'template': 'news.html'}, name="news"),
+        url(r'^press$', 'static_template_view.views.render',
+            {'template': 'press.html'}, name="press"),
+        url(r'^media-kit$', 'static_template_view.views.render',
+            {'template': 'media-kit.html'}, name="media-kit"),
 
         # TODO: (bridger) The copyright has been removed until it is updated for edX
         # url(r'^copyright$', 'static_template_view.views.render',

@@ -36,7 +36,7 @@ site_status_msg = get_site_status_msg(course_id)
 % endif
 </%block>
 
-  <header class="global-new ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
+  <header class="${"global slim" if course else "global-new"}" aria-label="${_('Global Navigation')}">
     <nav>
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">

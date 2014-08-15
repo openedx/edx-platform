@@ -20,4 +20,4 @@ Feature: LMS.Homepage for web users
     | jobs    | Jobs   |
     | faq     | FAQ    |
     | contact | Contact|
-    | press   | Press  |
+    | press   | News   |
