@@ -1,7 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
-
+## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
+## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-wrapper">
@@ -50,48 +51,43 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
-          <h1>${'<%- title %>'}</h1>
-          <p class="posted-details">
-              ${"<% if (obj.username) { %>"}
-              <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-              ${"<% } else { %>"}
-              ${_('anonymous') | h}
-              ${"<% } %>"}
-              ## This part is incredibly gross but necessary to combine i18n in
-              ## mako with logic in underscore.
-              ## Translators: post_type describes the kind of post this is
-              ## (e.g. "question" or "discussion"); time_ago is how much time
-              ## has passed since the post was created (e.g. "4 hours ago")
-              ${"{post_type} posted {time_ago}".format(
-                  post_type="<%- thread_type %>",
-                  time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>"
-              )}
+          <div class="post-header-content">
 
-              <span class="post-status-closed top-post-status" style="display: none">
-                ${_("&bull; This thread is closed.")}
-              </span>
-          </p>
-          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="${_('follow') | h}" role="checkbox" aria-checked="false">
-            <span class="sr">${_("Follow this post")}</span>
-          </a>
+            <h1>${'<%- title %>'}</h1>
+            <p class="posted-details">
+                ## This part is incredibly gross but necessary to combine i18n in
+                ## mako with logic in underscore.
+                ## Translators: post_type describes the kind of post this is
+                ## (e.g. "question" or "discussion"); time_ago is how much time
+                ## has passed since the post was created (e.g. "4 hours ago")
+                ${_("{post_type} posted {time_ago} by {author}").format(
+                    post_type="<%- thread_type %>",
+                    time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
+                    author="<%= author_display %>"
+                )}
+            </p>
+            <div class="post-labels">
+                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
+                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+                <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
+            </div>
+          </div>
+          <div class="post-header-actions post-extended-content">
+            ${"""<%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
+                    }
+                )
+            %>"""}
+          </div>
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
-
-
-      % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
-
-      %else:
-      ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned">
-      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pinned")}</span></div>
-      ${"<% }  %>"}
-      % endif
 
       <%  js_block = u"""
           var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
@@ -104,14 +100,6 @@
       ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
           <div class="post-context">${'<%'}${js_block}${'%>'}</div>
       ${'<% } %>'}
-
-      <div class="post-extended-content">
-          <ul class="moderator-actions">
-              <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
-              <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
-              <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
-          </ul>
-      </div>
   </div>
 </script>
 
@@ -156,57 +144,58 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header>
-        <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
-        <%
-            tooltip_expr = u"<%- thread.get('thread_type') == 'question' ? '{mark_answer}' : '{endorse}' %>".format(
-                endorse=_("endorse"),
-                mark_answer=_("mark as answer")
-            )
-        %>
-        <a
-            href="javascript:void(0)"
-            class="endorse-btn action-endorse ${"<%= thread.get('thread_type') == 'question' ? 'mark-answer' : '' %>"}"
-            data-tooltip="${tooltip_expr}"
-        >
-            <span class="check-icon"></span>
-        </a>
-        ${"<% if (obj.username) { %>"}
-        <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
-        ${"<% } else { %>"}
-        <span class="anonymous"><em>${_('anonymous')}</em></span>
-        ${"<% } %>"}
+      <div class="response-header-content">
+        ${'<%= author_display %>'}
         <p class="posted-details">
             <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
             <%
             js_block = u"""
                 interpolate(
-                    endorsement.username ? "{user_fmt_str}" : "{anon_fmt_str}",
+                    thread.get("thread_type") == "question" ?
+                      (endorsement.username ? "{question_user_fmt_str}" : "{question_anon_fmt_str}") :
+                      (endorsement.username ? "{discussion_user_fmt_str}" : "{discussion_anon_fmt_str}"),
                     {{
                         'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
-                        'user': endorsement.username
+                        'user': endorser_display
                     }},
                     true
                 )""".format(
                     ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
                     ## like "4 hours ago" or "about a month ago"
-                    user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
+                    question_user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
                     ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
                     ## like "4 hours ago" or "about a month ago"
-                    anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                    question_anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_user_fmt_str=escapejs(_("endorsed %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_anon_fmt_str=escapejs(_("endorsed %(time_ago)s")),
                 )
             %>
-            ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
-        </p>
+              ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+          </p>
+          <div class="post-labels">
+              <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+          </div>
+          </div>
+          <div class="response-header-actions">
+            ${"""<%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentId: cid,
+                        contentType: 'response',
+                        primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
+                        secondaryActions: ['edit', 'delete', 'report']
+                    }
+                )
+            %>"""}
+          </div>
     </header>
+
     <div class="response-body">${"<%- body %>"}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
-    </div>
-    <ul class="moderator-actions">
-        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
-        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
-        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
-    </ul>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-edit-template">
@@ -224,31 +213,34 @@
 <script aria-hidden="true" type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse') | h}" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
-    <div style="display: none" class="discussion-delete-comment action-delete" data-tooltip="${_('Delete Comment') | h}" role="button" tabindex="0">
-      <i class="icon icon-remove"></i><span class="sr">${_("Delete Comment")}</span></div>
-    <div class="discussion-edit-comment action-edit" data-tooltip="${_('Edit') | h}" role="button" tabindex="0">
-      <i class="icon icon-pencil"></i><span class="sr">${_("Edit")}</span></div>
-      <%
-      js_block = u"""
-        interpolate(
-          '{}',
-          {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
-          true
-          )""".format(
-                 ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
-                 escapejs(_('-posted %(time_ago)s by'))
-               )
-             %>
-      <p class="posted-details">
-      ${'<%='}${js_block}${'%>'}
-      ${"<% if (obj.username) { %>"}
-      <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
-      ${"<% } else { %>"}
-      ${_('anonymous')}
-      ${"<% } %>"}
+    ${"""<%=
+        _.template(
+            $('#forum-actions').html(),
+            {
+                contentId: cid,
+                contentType: 'comment',
+                primaryActions: [],
+                secondaryActions: ['edit', 'delete', 'report']
+            }
+        )
+    %>"""}
+    <%
+    js_block = u"""
+      interpolate(
+        '{}',
+        {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>', 'author': author_display}},
+        true
+      )""".format(
+        ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+        escapejs(_('posted %(time_ago)s by %(author)s'))
+      )
+    %>
+    <p class="posted-details">
+    ${'<%='}${js_block}${'%>'}
     </p>
+    <div class="post-labels">
+      <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+    </div>
   </div>
 </script>
 
@@ -296,16 +288,16 @@
         js_block = u"""
         var labels = "";
         if (pinned) {{
-            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
         }}
         if (typeof(subscribed) != "undefined" && subscribed) {{
-            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+            labels += '<li class="post-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
         }}
         if (staff_authored) {{
-            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
         }}
         if (community_ta_authored) {{
-            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
         }}
         if (labels != "") {{
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -553,4 +545,108 @@
         <span class="topic-title">${'<%- text %>'}</span>
         <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
     </li>
+</script>
+
+<%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-button action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                </span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Unendorse"))}
+${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Unmark as Answer"))}
+${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
+
+<script type="text/template" id="forum-action-vote">
+    <li class="actions-item">
+        <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
+            ## Vote counts are populated by JS
+            <span class="sr">${_("Vote")}</span>
+            <span class="sr js-sr-vote-count"></span>
+
+            <span class="action-label" aria-hidden="true">
+              <span class="js-visual-vote-count"></span>
+            </span>
+
+            <span class="action-icon" aria-hidden="true">
+                <i class="icon icon-plus"></i>
+            </span>
+        </a>
+    </li>
+</script>
+
+<%def name="secondaryStateAction(action_class, icon, sr_label, unchecked_label, checked_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                </span>
+                <span class="action-icon">
+                  <i class="icon icon-${icon}"></i>
+                </span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Unreport"))}
+${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Unpin"))}
+${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
+
+<%def name="secondaryAction(action_class, icon, label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="button">
+                <span class="action-label">${label}</span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryAction("edit", "pencil", _("Edit"))}
+${secondaryAction("delete", "remove", _("Delete"))}
+
+<script type="text/template" id="forum-actions">
+    <ul class="${"<%= contentType %>"}-actions-list">
+        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+        <li class="actions-item is-visible">
+            <div class="more-wrapper">
+                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
+                    <span class="action-label">${_("More")}</span>
+                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                </a>
+                <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
+                  <ul class="actions-dropdown-list">
+                    ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+                  </ul>
+                </div>
+            </div>
+        </li>
+    </ul>
+</script>
+
+<script aria-hidden="true" type="text/template" id="post-user-display-template">
+    ${"<% if (username) { %>"}
+    <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
+        ${"<% if (is_community_ta) { %>"}
+        <span class="user-label-community-ta">${_("Community TA")}</span>
+        ${"<% } else if (is_staff) { %>"}
+        <span class="user-label-staff">${_("Staff")}</span>
+        ${"<% } %>"}
+    ${"<% } else { %>"}
+    ${_('anonymous') | h}
+    ${"<% } %>"}
 </script>

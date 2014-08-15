@@ -136,3 +136,21 @@ li[class*=forum-nav-thread-label-] {
     line-height: 14px;
   }
 }
+
+// -------
+// Actions
+// -------
+
+.discussion.container, .discussion-module {
+
+  // Override courseware
+  .post-actions-list, .response-actions-list, .comment-actions-list {
+    @extend %t-copy-sub2;
+    padding-left: 0 !important;
+  }
+
+  // Override global span
+  .action-label span, .action-icon span {
+    color: inherit;
+  }
+}

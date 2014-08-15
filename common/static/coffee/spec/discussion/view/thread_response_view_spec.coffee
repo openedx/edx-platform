@@ -1,17 +1,12 @@
 describe 'ThreadResponseView', ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures """
-            <script id="thread-response-template" type="text/template">
-                <a href="#" class="action-show-comments">Show comments</a>
-                <ol class="comments"></ol>
-            </script>
-            <div id="thread-response-fixture"/>
-        """
+        DiscussionSpecHelper.setUnderscoreFixtures()
+
         @response = new Comment {
             children: [{}, {}]
         }
-        @view = new ThreadResponseView({model: @response, el: $("#thread-response-fixture")})
+        @view = new ThreadResponseView({model: @response, el: $("#fixture-element")})
         spyOn(ThreadResponseShowView.prototype, "render")
         spyOn(ResponseCommentView.prototype, "render")
 
@@ -24,7 +19,7 @@ describe 'ThreadResponseView', ->
         it 'hides "show comments" link if collapseComments is set but response has no comments', ->
             @response = new Comment { children: [] }
             @view = new ThreadResponseView({
-                model: @response, el: $("#thread-response-fixture"),
+                model: @response, el: $("#fixture-element"),
                 collapseComments: true
             })
             @view.render()
@@ -33,7 +28,7 @@ describe 'ThreadResponseView', ->
 
         it 'hides comments if collapseComments is set and shows them when "show comments" link is clicked', ->
             @view = new ThreadResponseView({
-                model: @response, el: $("#thread-response-fixture"),
+                model: @response, el: $("#fixture-element"),
                 collapseComments: true
             })
             @view.render()

@@ -2,25 +2,7 @@ describe 'ResponseCommentShowView', ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
         # set up the container for the response to go in
-        setFixtures """
-        <ol class="responses"></ol>
-        <script id="response-comment-show-template" type="text/template">
-            <div id="comment_<%- id %>">
-            <div class="response-body"><%- body %></div>
-            <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">
-            <i class="icon"></i><span class="flag-label"></span></div>
-            <div style="display:none" class="discussion-delete-comment action-delete" data-role="comment-delete" data-tooltip="Delete Comment" role="button" aria-pressed="false" tabindex="0">
-              <i class="icon icon-remove"></i><span class="sr delete-label">Delete Comment</span></div>
-            <div style="display:none" class="discussion-edit-comment action-edit" data-tooltip="Edit Comment" role="button" tabindex="0">
-              <i class="icon icon-pencil"></i><span class="sr">Edit Comment</span></div>
-            <p class="posted-details">&ndash;posted <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
-            <% if (obj.username) { %>
-            <a href="<%- user_url %>" class="profile-link"><%- username %></a>
-            <% } else {print('anonymous');} %>
-            </p>
-            </div>
-        </script>
-        """
+        DiscussionSpecHelper.setUnderscoreFixtures()
 
         # set up a model for a new Comment
         @comment = new Comment {
@@ -47,11 +29,6 @@ describe 'ResponseCommentShowView', ->
 
         beforeEach ->
             spyOn(@view, 'renderAttrs')
-            spyOn(@view, 'markAsStaff')
-
-        it 'produces the correct HTML', ->
-            @view.render()
-            expect(@view.el.innerHTML).toContain('"discussion-flag-abuse notflagged"')
 
         it 'can be flagged for abuse', ->
             @comment.flagAbuse()
@@ -91,3 +68,35 @@ describe 'ResponseCommentShowView', ->
             @view.bind "comment:edit", triggerTarget
             @view.edit()
             expect(triggerTarget).toHaveBeenCalled()
+
+    describe "labels", ->
+
+        expectOneElement = (view, selector, visible=true) =>
+            view.render()
+            elements = view.$el.find(selector)
+            expect(elements.length).toEqual(1)
+            if visible
+                expect(elements).not.toHaveClass("is-hidden")
+            else
+                expect(elements).toHaveClass("is-hidden")
+
+        it 'displays the reported label when appropriate for a non-staff user', ->
+            @comment.set('abuse_flaggers', [])
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should not be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported', false)
+
+        it 'displays the reported label when appropriate for a flag moderator', ->
+            DiscussionSpecHelper.makeModerator()
+            @comment.set('abuse_flaggers', [])
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should still be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported')

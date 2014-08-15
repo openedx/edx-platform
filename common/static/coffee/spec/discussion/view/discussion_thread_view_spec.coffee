@@ -1,38 +1,7 @@
 describe "DiscussionThreadView", ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures(
-            """
-            <script type="text/template" id="thread-template">
-                <article class="discussion-article">
-                    <div class="forum-thread-main-wrapper">
-                        <div class="thread-content-wrapper"></div>
-                        <div class="post-extended-content">
-                            <ol class="responses js-marked-answer-list"></ol>
-                        </div>
-                    </div>
-                    <div class="post-extended-content">
-                        <div class="response-count"></div>
-                        <ol class="responses js-response-list"></ol>
-                        <div class="response-pagination"></div>
-                    </div>
-                    <div class="post-tools">
-                        <a href="javascript:void(0)" class="forum-thread-expand">Expand</a>
-                        <a href="javascript:void(0)" class="forum-thread-collapse">Collapse</a>
-                    </div>
-                </article>
-            </script>
-            <script type="text/template" id="thread-show-template">
-                <div class="discussion-post">
-                    <div class="post-body"><%- body %></div>
-                </div>
-            </script>
-            <script type="text/template" id="thread-response-template">
-                <div class="response"></div>
-            </script>
-            <div class="thread-fixture"/>
-            """
-        )
+        DiscussionSpecHelper.setUnderscoreFixtures()
 
         jasmine.Clock.useMock()
         @threadData = DiscussionViewSpecHelper.makeThreadWithProps({})
@@ -73,7 +42,7 @@ describe "DiscussionThreadView", ->
 
     describe "tab mode", ->
         beforeEach ->
-            @view = new DiscussionThreadView({ model: @thread, el: $(".thread-fixture"), mode: "tab"})
+            @view = new DiscussionThreadView({ model: @thread, el: $("#fixture-element"), mode: "tab"})
 
         describe "response count and pagination", ->
             it "correctly render for a thread with no responses", ->
@@ -114,7 +83,7 @@ describe "DiscussionThreadView", ->
 
     describe "inline mode", ->
         beforeEach ->
-            @view = new DiscussionThreadView({ model: @thread, el: $(".thread-fixture"), mode: "inline"})
+            @view = new DiscussionThreadView({ model: @thread, el: $("#fixture-element"), mode: "inline"})
 
         describe "render", ->
             it "shows content that should be visible when collapsed", ->
@@ -159,7 +128,7 @@ describe "DiscussionThreadView", ->
         beforeEach ->
             @thread.set("thread_type", "question")
             @view = new DiscussionThreadView(
-                {model: @thread, el: $(".thread-fixture"), mode: "tab"}
+                {model: @thread, el: $("#fixture-element"), mode: "tab"}
             )
 
         renderTestCase = (view, numEndorsed, numNonEndorsed) ->
@@ -173,8 +142,8 @@ describe "DiscussionThreadView", ->
                     non_endorsed_resp_total: numNonEndorsed
                 }
             )
-            expect(view.$(".js-marked-answer-list .response").length).toEqual(numEndorsed)
-            expect(view.$(".js-response-list .response").length).toEqual(numNonEndorsed)
+            expect(view.$(".js-marked-answer-list .discussion-response").length).toEqual(numEndorsed)
+            expect(view.$(".js-response-list .discussion-response").length).toEqual(numNonEndorsed)
             assertResponseCountAndPaginationCorrect(
                 view,
                 ngettext(
@@ -209,8 +178,8 @@ describe "DiscussionThreadView", ->
                 non_endorsed_resp_total: 41
             })
             @view.$el.find(".load-response-button").click()
-            expect($(".js-marked-answer-list .response").length).toEqual(3)
-            expect($(".js-response-list .response").length).toEqual(6)
+            expect($(".js-marked-answer-list .discussion-response").length).toEqual(3)
+            expect($(".js-response-list .discussion-response").length).toEqual(6)
             assertResponseCountAndPaginationCorrect(
                 @view,
                 "41 other responses",

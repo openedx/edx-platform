@@ -230,51 +230,6 @@
   display: block;
 }
 
-%forum-nav-thread-label {
-  @extend %t-weight4;
-  @include font-size(9);
-  display: inline;
-  margin-top: ($baseline/4);
-  border: 1px solid;
-  border-radius: 3px;
-  padding: 1px 6px;
-  text-transform: uppercase;
-  white-space: nowrap;
-
-  &:last-child {
-    margin-right: 0;
-  }
-
-  .icon {
-    margin-right: ($baseline/5);
-  }
-
-}
-
-.forum-nav-thread-label-pinned {
-  @extend %forum-nav-thread-label;
-  border-color: $forum-color-pinned;
-  color: $forum-color-pinned;
-}
-
-.forum-nav-thread-label-following {
-  @extend %forum-nav-thread-label;
-  border-color: $forum-color-following;
-  color: $forum-color-following;
-}
-
-.forum-nav-thread-label-staff {
-  @extend %forum-nav-thread-label;
-  border-color: $forum-color-staff;
-  color: $forum-color-staff;
-}
-
-.forum-nav-thread-label-community-ta {
-  @extend %forum-nav-thread-label;
-  border-color: $forum-color-community-ta;
-  color: $forum-color-community-ta;
-}
-
 %forum-nav-thread-wrapper-2-content {
   @include font-size(11);
   display: inline-block;
