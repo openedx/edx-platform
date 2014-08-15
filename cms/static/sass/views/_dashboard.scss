@@ -381,6 +381,7 @@
 
             .button {
               @extend %btn-secondary-white;
+              padding:($baseline/4) ($baseline/2);
             }
 
             .icon,.button-copy {
