@@ -3,7 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
-from shoppingcart.models import PaidCourseRegistration, CouponRedemption, Invoice
+from shoppingcart.models import PaidCourseRegistration, CouponRedemption, Invoice, RegistrationCodeRedemption
 from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,8 +15,57 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
+SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_email', 'company_contact_name', 'tax_id',
+                 'company_reference', 'internal_reference')
+
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
-COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by')
+COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
+
+
+def sale_record_features(course_id, features):
+    """
+    Return list of sales features as dictionaries.
+
+    sales_records(course_id, ['company_name, total_codes', total_amount])
+    would return [
+        {'company_name': 'group_A', 'total_codes': '1', total_amount:'total_amount1 in decimal'.}
+        {'company_name': 'group_B', 'total_codes': '2', total_amount:'total_amount2 in decimal'.}
+        {'company_name': 'group_C', 'total_codes': '3', total_amount:'total_amount3 in decimal'.}
+    ]
+    """
+    sales = Invoice.objects.filter(course_id=course_id)
+
+    def sale_records_info(sale, features):
+        """ convert sales records to dictionary """
+
+        sale_features = [x for x in SALE_FEATURES if x in features]
+        course_reg_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
+
+        # Extracting sale information
+        sale_dict = dict((feature, getattr(sale, feature))
+                         for feature in sale_features)
+
+        total_used_codes = RegistrationCodeRedemption.objects.filter(registration_code__in=sale.courseregistrationcode_set.all()).count()
+        sale_dict.update({"invoice_number": getattr(sale, 'id')})
+        sale_dict.update({"total_codes": sale.courseregistrationcode_set.all().count()})
+        sale_dict.update({'total_used_codes': total_used_codes})
+
+        codes = list()
+        for reg_code in sale.courseregistrationcode_set.all():
+            codes.append(reg_code.code)
+
+        # Extracting registration code information
+        obj_course_reg_code = sale.courseregistrationcode_set.all()[:1].get()
+        course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
+                               for feature in course_reg_features)
+
+        course_reg_dict['course_id'] = course_id.to_deprecated_string()
+        course_reg_dict.update({'codes': ", ".join(codes)})
+        sale_dict.update(dict(course_reg_dict.items()))
+
+        return sale_dict
+
+    return [sale_records_info(sale, features) for sale in sales]
 
 
 def purchase_transactions(course_id, features):

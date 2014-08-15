@@ -46,7 +46,7 @@ from instructor_task.api_helper import AlreadyRunningError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order,
-    PaidCourseRegistration, Coupon
+    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
 from course_modes.models import CourseMode
 
@@ -1363,6 +1363,13 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
                              percentage_discount=10, created_by=self.instructor, is_active=True)
         self.coupon.save()
 
+        #create testing invoice 1
+        self.sale_invoice_1 = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
+            company_contact_email='test1@test.com', tax_id='2Fwe23S', internal_reference="A",
+            company_reference='', course_id=self.course.id
+        )
+
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
@@ -1376,6 +1383,114 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         url = reverse('get_purchase_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url + '/csv', {})
         self.assertEqual(response['Content-Type'], 'text/csv')
+
+    def test_get_sale_records_features_csv(self):
+        """
+        Test that the response from get_sale_records is in csv format.
+        """
+        for i in range(2):
+            course_registration_code = CourseRegistrationCode(
+                code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=self.sale_invoice_1
+            )
+            course_registration_code.save()
+
+        url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url + '/csv', {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+    def test_get_sale_records_features_json(self):
+        """
+        Test that the response from get_sale_records is in json format.
+        """
+        for i in range(5):
+            course_registration_code = CourseRegistrationCode(
+                code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=self.sale_invoice_1
+            )
+            course_registration_code.save()
+
+        url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('sale', res_json)
+
+        for res in res_json['sale']:
+            self.validate_sale_records_response(res, course_registration_code, self.sale_invoice_1, 0)
+
+    def test_get_sale_records_features_with_used_code(self):
+        """
+        Test that the response from get_sale_records is in json format and using one of the registration codes.
+        """
+        for i in range(5):
+            course_registration_code = CourseRegistrationCode(
+                code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=self.sale_invoice_1
+            )
+            course_registration_code.save()
+
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+
+        # now using registration code
+        self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'qwerty0'})
+
+        url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('sale', res_json)
+
+        for res in res_json['sale']:
+            self.validate_sale_records_response(res, course_registration_code, self.sale_invoice_1, 1)
+
+    def test_get_sale_records_features_with_multiple_invoices(self):
+        """
+        Test that the response from get_sale_records is in json format for multiple invoices
+        """
+        for i in range(5):
+            course_registration_code = CourseRegistrationCode(
+                code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=self.sale_invoice_1
+            )
+            course_registration_code.save()
+
+        #create test invoice 2
+        sale_invoice_2 = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test2', company_contact_name='Testw_2',
+            company_contact_email='test2@test.com', tax_id='2Fwe23S', internal_reference="B",
+            company_reference='', course_id=self.course.id
+        )
+
+        for i in range(5):
+            course_registration_code = CourseRegistrationCode(
+                code='xyzmn{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=sale_invoice_2
+            )
+            course_registration_code.save()
+
+        url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('sale', res_json)
+
+        self.validate_sale_records_response(res_json['sale'][0], course_registration_code, self.sale_invoice_1, 0)
+        self.validate_sale_records_response(res_json['sale'][1], course_registration_code, sale_invoice_2, 0)
+
+    def validate_sale_records_response(self, res, course_registration_code, invoice, used_codes):
+        """
+        validate sale records attribute values with the response object
+        """
+        self.assertEqual(res['total_amount'], invoice.total_amount)
+        self.assertEqual(res['company_contact_email'], invoice.company_contact_email)
+        self.assertEqual(res['company_contact_name'], invoice.company_contact_name)
+        self.assertEqual(res['company_name'], invoice.company_name)
+        self.assertEqual(res['internal_reference'], invoice.internal_reference)
+        self.assertEqual(res['company_reference'], invoice.company_reference)
+        self.assertEqual(res['tax_id'], invoice.tax_id)
+        self.assertEqual(res['invoice_number'], invoice.id)
+        self.assertEqual(res['created_by'], course_registration_code.created_by.username)
+        self.assertEqual(res['course_id'], invoice.course_id.to_deprecated_string())
+        self.assertEqual(res['total_used_codes'], used_codes)
+        self.assertEqual(res['total_codes'], 5)
 
     def test_get_ecommerce_purchase_features_with_coupon_info(self):
         """
@@ -2560,7 +2675,6 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
-
 
         for i in range(9):
             order = Order(user=self.instructor, status='purchased')

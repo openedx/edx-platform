@@ -10,6 +10,7 @@ class ECommerce
     @$section.data 'wrapper', @
     # gather elements
     @$list_purchase_csv_btn = @$section.find("input[name='list-purchase-transaction-csv']'")
+    @$list_sale_csv_btn = @$section.find("input[name='list-sale-csv']'")
     @$download_company_name = @$section.find("input[name='download_company_name']'")
     @$active_company_name = @$section.find("input[name='active_company_name']'")
     @$spent_company_name = @$section.find('input[name="spent_company_name"]')
@@ -25,6 +26,11 @@ class ECommerce
     # and the csv button
     @$list_purchase_csv_btn.click (e) =>
       url = @$list_purchase_csv_btn.data 'endpoint'
+      url += '/csv'
+      location.href = url
+
+    @$list_sale_csv_btn.click (e) =>
+      url = @$list_sale_csv_btn.data 'endpoint'
       url += '/csv'
       location.href = url
 
