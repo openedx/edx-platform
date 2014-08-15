@@ -661,7 +661,6 @@ hr.divide {
     text-align: center;
 
     .close-icon {
-      @extend %t-strong;
       @extend %t-action2;
       @extend %t-strong;
     }
@@ -775,7 +774,6 @@ hr.divide {
 .tooltip {
   @include transition(opacity $tmg-f3 ease-out 0s);
   @include font-size(12);
-  @extend %t-regular;
   @extend %t-regular;
   @extend %ui-depth5;
   position: absolute;
