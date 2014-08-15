@@ -47,8 +47,6 @@ class TestSortedCountryList(TestCase):
         soup = BeautifulSoup(response.content)
         country = soup.find(id="country")
         options = country.findAll("option")
-        from nose.tools import set_trace
-        set_trace()
         af_option = options[1]
         self.assertEqual(
             af_option.text,
