@@ -221,7 +221,7 @@ FEATURES = {
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
     # whether to use password policy enforcement or not
-    'ENFORCE_PASSWORD_POLICY': False,
+    'ENFORCE_PASSWORD_POLICY': True,
 
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
@@ -230,10 +230,10 @@ FEATURES = {
     'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
 
     # Turn off account locking if failed login attempts exceeds a limit
-    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
     # Hide any Personally Identifiable Information from application logs
-    'SQUELCH_PII_IN_LOGS': False,
+    'SQUELCH_PII_IN_LOGS': True,
 
     # Toggles the embargo functionality, which enable embargoing for particular courses
     'EMBARGO': False,
@@ -257,10 +257,10 @@ FEATURES = {
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
-    'PREVENT_CONCURRENT_LOGINS': False,
+    'PREVENT_CONCURRENT_LOGINS': True,
 
     # Turn off Advanced Security by default
-    'ADVANCED_SECURITY': False,
+    'ADVANCED_SECURITY': True,
 
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
@@ -1380,9 +1380,9 @@ PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE = None
 
 #### PASSWORD POLICY SETTINGS #####
 
-PASSWORD_MIN_LENGTH = None
+PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = None
-PASSWORD_COMPLEXITY = {}
+PASSWORD_COMPLEXITY = { "UPPER":  1, "LOWER":  1, "DIGITS": 1 }
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
 
