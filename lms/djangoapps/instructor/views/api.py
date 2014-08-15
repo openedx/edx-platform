@@ -716,7 +716,11 @@ def random_code_generator():
     generate a random alphanumeric code of length defined in
     REGISTRATION_CODE_LENGTH settings
     """
-    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    chars = ''
+    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
+        # removing vowel words and specific characters
+        chars += char.strip('aAeEiIoOuU1l')
+
     code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
     return string.join((random.choice(chars) for _ in range(code_length)), '')
 
