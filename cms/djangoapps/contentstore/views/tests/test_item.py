@@ -1,8 +1,9 @@
 """Tests for items views."""
-
+import os
 import json
 from datetime import datetime, timedelta
 import ddt
+from unittest import skipUnless
 
 from mock import patch
 from pytz import UTC
@@ -12,7 +13,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
-from contentstore.utils import reverse_usage_url
+from contentstore.utils import reverse_usage_url, reverse_course_url
 from contentstore.views.preview import StudioUserService
 
 from contentstore.views.component import (
@@ -177,6 +178,54 @@ class GetItem(ItemTest):
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn('Announcement', html)
         self.assertIn('Zooming', html)
+
+
+    @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
+    def test_split_test_edited(self):
+        """
+        Test that rename of a group changes display name of child vertical.
+        """
+        self.course.user_partitions = [UserPartition(
+            0, 'first_partition', 'First Partition',
+            [Group("0", 'alpha'), Group("1", 'beta')]
+        )]
+        self.store.update_item(self.course, self.user.id)
+        root_usage_key = self._create_vertical()
+        resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
+        split_test_usage_key = self.response_usage_key(resp)
+        self.client.ajax_post(
+            reverse_usage_url("xblock_handler", split_test_usage_key), 
+            data={'metadata': {'user_partition_id': str(0)}}
+        )
+        html, __ = self._get_container_preview(split_test_usage_key)
+        self.assertIn('alpha', html)
+        self.assertIn('beta', html)
+
+        # Rename groups in group configuration
+        GROUP_CONFIGURATION_JSON = {
+            u'id': 0,
+            u'name': u'first_partition',
+            u'description': u'First Partition',
+            u'version': 1,
+            u'groups': [
+                {u'id': 0, u'name': u'New_NAME_A', u'version': 1},
+                {u'id': 1, u'name': u'New_NAME_B', u'version': 1},
+            ],
+        }
+
+        response = self.client.put(
+            reverse_course_url('group_configurations_detail_handler', self.course.id, kwargs={'group_configuration_id': 0}),
+            data=json.dumps(GROUP_CONFIGURATION_JSON),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 201)
+        html, __ = self._get_container_preview(split_test_usage_key)
+        self.assertNotIn('alpha', html)
+        self.assertNotIn('beta', html)
+        self.assertIn('New_NAME_A', html)
+        self.assertIn('New_NAME_B', html)
 
 
 class DeleteItem(ItemTest):
@@ -806,8 +855,8 @@ class TestEditSplitModule(ItemTest):
         vertical_1 = self.get_item_from_modulestore(split_test.children[1], verify_is_draft=True)
         self.assertEqual("vertical", vertical_0.category)
         self.assertEqual("vertical", vertical_1.category)
-        self.assertEqual("alpha", vertical_0.display_name)
-        self.assertEqual("beta", vertical_1.display_name)
+        self.assertEqual("Group ID 0", vertical_0.display_name)
+        self.assertEqual("Group ID 1", vertical_1.display_name)
 
         # Verify that the group_id_to_child mapping is correct.
         self.assertEqual(2, len(split_test.group_id_to_child))
