@@ -61,8 +61,14 @@
             <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
             <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
          </div>
-      </div>
-      <!-- end wrap -->
+      </div><!-- end wrap -->
+      <div class="wrap">
+         <h2>${_("Sales")}</h2>
+         <div>
+            <p>${_("Click to generate a CSV file for all sales records in this course")}</p>
+            <p><input type="button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p>
+         </div>
+      </div><!-- end wrap -->
       %endif
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
