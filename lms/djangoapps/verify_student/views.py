@@ -111,6 +111,9 @@ class VerifyView(View):
             "upgrade": upgrade == u'True',
             "can_audit": CourseMode.mode_for_course(course_id, 'audit') is not None,
             "modes_dict": CourseMode.modes_for_course_dict(course_id),
+
+            # TODO (ECOM-16): Remove once the AB test completes
+            "autoreg": request.session.get('auto_register', False),
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -160,6 +163,9 @@ class VerifiedView(View):
             "upgrade": upgrade == u'True',
             "can_audit": "audit" in modes_dict,
             "modes_dict": modes_dict,
+
+            # TODO (ECOM-16): Remove once the AB test completes
+            "autoreg": request.session.get('auto_register', False),
         }
         return render_to_response('verify_student/verified.html', context)
 
@@ -326,6 +332,9 @@ def show_requirements(request, course_id):
         "is_not_active": not request.user.is_active,
         "upgrade": upgrade == u'True',
         "modes_dict": modes_dict,
+
+        # TODO (ECOM-16): Remove once the AB test completes
+        "autoreg": request.session.get('auto_register', False),
     }
     return render_to_response("verify_student/show_requirements.html", context)
 

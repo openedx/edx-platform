@@ -224,6 +224,17 @@ if settings.COURSEWARE_ENABLED:
             'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
+        # Used for an AB-test of auto-registration
+        # TODO (ECOM-16): Based on the AB-test, update the default behavior and change
+        # this URL to point to the original view.  Eventually, this URL
+        # should be removed, but not the AB test completes.
+        url(
+            r'^change_enrollment_autoreg$',
+            'student.views.change_enrollment',
+            {'auto_register': True},
+            name="change_enrollment_autoreg",
+        ),
+
         #About the course
         url(r'^courses/{}/about$'.format(settings.COURSE_ID_PATTERN),
             'courseware.views.course_about', name="about_course"),
