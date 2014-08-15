@@ -397,7 +397,7 @@ if settings.FEATURES.get('CLASS_DASHBOARD'):
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
-    urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+    urlpatterns += (url(r'^administrator/', include(admin.site.urls)),)
 
 if settings.FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (

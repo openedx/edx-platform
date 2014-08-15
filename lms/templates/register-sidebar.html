@@ -37,7 +37,7 @@ from django.core.urlresolvers import reverse
   % if stanford_theme_enabled():
     <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
   % else:
-    <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
+    <p>${_("As part of joining {platform_name}, you must wait until administrator confirm your sign up request. If you have any question, contact administrator via e-mail. we communicate mostly through email.").format(platform_name=platform_name)}</p>
   % endif
 </div>
 

@@ -5,11 +5,11 @@ ${_("Thank you for signing up for {platform_name}! To activate "
 "your account, please copy and paste this address into your web "
 "browser's address bar:").format(platform_name=settings.PLATFORM_NAME)}
 
-% if is_secure:
-  https://${ site }/activate/${ key }
-% else:
-  http://${ site }/activate/${ key }
-% endif
+#% if is_secure:
+#  https://${ site }/activate/${ key }
+#% else:
+#  http://${ site }/activate/${ key }
+#% endif
 
 ## Temporary hack until we develop a better way to adjust language
 % if stanford_theme_enabled():

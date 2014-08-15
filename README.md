@@ -2,6 +2,8 @@ This is the main edX platform which consists of LMS and Studio.
 
 See [code.edx.org](http://code.edx.org/) for other parts of the edX code base.
 
+KMU Customized version
+
 Installation
 ------------
 
@@ -12,7 +14,7 @@ Please refer to the following wiki pages in our [configuration repo](https://git
 * [edX Production Stack](https://github.com/edx/configuration/wiki/edX-Production-Stack)
 <br/>Using Vagrant/Virtualbox this will setup all edX services on a single server in a production like configuration.
 * [edX Ubuntu 12.04 64-bit Installation](https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-64-bit-Installation)
-<br/>This will install edX on an existing Ubuntu 12.04 server.
+<br/>This will install edX on an existing Ubuntu 12.04 server..!!!!
 
 
 License
@@ -29,7 +31,7 @@ Documentation
 Documentation for developers, researchers, and course staff is located in the
 `docs` subdirectory. Documentation is built using
 [Sphinx](http://sphinx-doc.org/): you can [view the built documentation on
-ReadTheDocs](http://docs.edx.org/).
+ReadTheDocs](http://docs.edx.org/)..
 
 Getting Help
 ------------
