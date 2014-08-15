@@ -7,9 +7,8 @@ tddium:
       :version: "1.8.5.5"
   :hooks:
     :pre_setup: "virtualenv $HOME/python-env && $HOME/python-env/bin/pip install -r requirements/edx/paver.txt && $HOME/python-env/bin/pip install -r requirements/edx/pre.txt && $HOME/python-env/bin/pip install -r requirements/edx/base.txt && $HOME/python-env/bin/pip install -r requirements/edx/github.txt && $HOME/python-env/bin/pip install -r requirements/edx/local.txt && $HOME/python-env/bin/pip install -r requirements/edx/post.txt"
-    :post_build: 'for i in $(find test_root/log -name *.png); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; echo "copying file $i"; done'
     # :post_build: "paver coverage; paver bokchoy_coverage; for i in $(find reports -name cover); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; done"
-    :post_worker: 'python ./scripts/post_worker.py'
+    :post_worker: 'python ./scripts/post_worker.py; echo "attaching failed screenshots (if any)"; for i in $(find test_root/log -name *.png); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; echo "copying file $i"; done'
   :cache:
     :key_paths:
       - requirements/edx/paver.txt
