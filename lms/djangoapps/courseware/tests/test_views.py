@@ -258,28 +258,43 @@ class ViewsTestCase(TestCase):
         self.assertIn('Coming Soon', response.content)
 
     def test_course_mktg_register(self):
-        admin = AdminFactory()
-        self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_key.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self._load_mktg_about()
         self.assertIn('Register for', response.content)
         self.assertNotIn('and choose your student track', response.content)
 
     def test_course_mktg_register_multiple_modes(self):
-        admin = AdminFactory()
-        CourseMode.objects.get_or_create(mode_slug='honor',
-                                         mode_display_name='Honor Code Certificate',
-                                         course_id=self.course_key)
-        CourseMode.objects.get_or_create(mode_slug='verified',
-                                         mode_display_name='Verified Certificate',
-                                         course_id=self.course_key)
-        self.client.login(username=admin.username, password='test')
-        url = reverse('mktg_about_course', kwargs={'course_id': self.course_key.to_deprecated_string()})
-        response = self.client.get(url)
+        CourseMode.objects.get_or_create(
+            mode_slug='honor',
+            mode_display_name='Honor Code Certificate',
+            course_id=self.course_key
+        )
+        CourseMode.objects.get_or_create(
+            mode_slug='verified',
+            mode_display_name='Verified Certificate',
+            course_id=self.course_key
+        )
+
+        response = self._load_mktg_about()
         self.assertIn('Register for', response.content)
         self.assertIn('and choose your student track', response.content)
         # clean up course modes
         CourseMode.objects.all().delete()
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    def test_mktg_about_language_edx_domain(self):
+        # Since we're in an edx-controlled domain, and our marketing site
+        # supports only English, override the language setting
+        # and use English.
+        response = self._load_mktg_about(language='eo')
+        self.assertContains(response, "Register for")
+
+    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
+    def test_mktg_about_language_openedx(self):
+        # If we're in an OpenEdX installation,
+        # may want to support languages other than English,
+        # so respect the language code.
+        response = self._load_mktg_about(language='eo')
+        self.assertContains(response, u"Régïstér för".encode('utf-8'))
 
     def test_submission_history_accepts_valid_ids(self):
         # log into a staff account
@@ -319,6 +334,30 @@ class ViewsTestCase(TestCase):
         })
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
+
+    def _load_mktg_about(self, language=None):
+        """
+        Retrieve the marketing about button (iframed into the marketing site)
+        and return the HTTP response.
+
+        Keyword Args:
+            language (string): If provided, send this in the 'Accept-Language' HTTP header.
+
+        Returns:
+            Response
+
+        """
+        # Log in as an administrator to guarantee that we can access the button
+        admin = AdminFactory()
+        self.client.login(username=admin.username, password='test')
+
+        # If provided, set the language header
+        headers = {}
+        if language is not None:
+            headers['HTTP_ACCEPT_LANGUAGE'] = language
+
+        url = reverse('mktg_about_course', kwargs={'course_id': unicode(self.course_key)})
+        return self.client.get(url, **headers)
 
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
