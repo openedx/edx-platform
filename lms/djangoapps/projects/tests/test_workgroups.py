@@ -91,6 +91,11 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
             content_id=self.test_course_content_id
         )
 
+        self.test_project2 = Project.objects.create(
+            course_id=self.test_course_id,
+            content_id=unicode(self.test_group_project.scope_ids.usage_id)
+        )
+
         self.test_user_email = str(uuid.uuid4())
         self.test_user_username = str(uuid.uuid4())
         self.test_user = User.objects.create(
@@ -274,6 +279,60 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         cohort = get_cohort_by_name(self.test_course.id, cohort_name, CourseUserGroup.WORKGROUP)
         self.assertIsNotNone(cohort)
         self.assertTrue(is_user_in_cohort(cohort, self.test_user.id, CourseUserGroup.WORKGROUP))
+
+
+    def test_workgroups_users_post_preexisting_workgroup(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+        data = {
+            'name': "Workgroup 2",
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_workgroups_users_post_preexisting_project(self):
+        data = {
+            'name': self.test_workgroup_name,
+            'project': self.test_project.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
+
+        # Second project created in setUp, adding a new workgroup
+        data = {
+            'name': "Workgroup 2",
+            'project': self.test_project2.id
+        }
+        response = self.do_post(self.test_workgroups_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.test_workgroups_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+
+        # Assign the test user to the alternate project/workgroup
+        data = {"id": self.test_user.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 400)
+
 
     def test_workgroups_users_post_with_cohort_backfill(self):
         """
