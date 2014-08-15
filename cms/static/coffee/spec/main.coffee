@@ -234,6 +234,7 @@ define([
     "js/spec/views/pages/group_configurations_spec",
     "js/spec/views/pages/course_outline_spec",
     "js/spec/views/pages/course_rerun_spec",
+    "js/spec/views/pages/index_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
