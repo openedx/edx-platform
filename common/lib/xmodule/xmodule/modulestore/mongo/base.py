@@ -24,6 +24,7 @@ from fs.osfs import OSFS
 from path import path
 from datetime import datetime
 from pytz import UTC
+from contracts import contract, new_contract
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
@@ -41,11 +42,17 @@ from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, 
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
-from opaque_keys.edx.keys import UsageKey, CourseKey
+from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.assetstore import AssetMetadata, AssetThumbnailMetadata
 
 log = logging.getLogger(__name__)
+
+new_contract('CourseKey', CourseKey)
+new_contract('AssetKey', AssetKey)
+new_contract('AssetMetadata', AssetMetadata)
+new_contract('AssetThumbnailMetadata', AssetThumbnailMetadata)
 
 # sort order that returns DRAFT items first
 SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
@@ -194,7 +201,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             try:
                 category = json_data['location']['category']
                 class_ = self.load_block_type(category)
-
 
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
@@ -443,7 +449,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)
 
         def do_connection(
-            db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+            db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
         ):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
@@ -459,6 +465,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 db
             )
             self.collection = self.database[collection]
+
+            # Collection which stores asset metadata.
+            self.asset_collection = None
+            if asset_collection is not None:
+                self.asset_collection = self.database[asset_collection]
 
             if user is not None and password is not None:
                 self.database.authenticate(user, password)
@@ -1435,6 +1446,147 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         field_data = KvsFieldData(kvs)
         return field_data
+
+    def _find_course_assets(self, course_key):
+        """
+        Internal; finds (or creates) course asset info about all assets for a particular course
+
+        Arguments:
+            course_key (CourseKey): course identifier
+
+        Returns:
+            Asset info for the course
+        """
+        if self.asset_collection is None:
+            return None
+
+        # Using the course_key, find or insert the course asset metadata document.
+        # A single document exists per course to store the course asset metadata.
+        course_assets = self.asset_collection.find_one(
+            {'course_id': unicode(course_key)},
+            fields=('course_id', 'storage', 'assets', 'thumbnails')
+        )
+
+        if course_assets is None:
+            # Not found, so create.
+            course_assets = {'course_id': unicode(course_key), 'storage': 'FILLMEIN-TMP', 'assets': [], 'thumbnails': []}
+            course_assets['_id'] = self.asset_collection.insert(course_assets)
+
+        return course_assets
+
+    @contract(course_key='CourseKey', asset_metadata='AssetMetadata | AssetThumbnailMetadata', user_id='str | unicode')
+    def _save_asset_info(self, course_key, asset_metadata, user_id, thumbnail=False):
+        """
+        Saves the info for a particular course's asset/thumbnail.
+
+        Arguments:
+            course_key (CourseKey): course identifier
+            asset_metadata (AssetMetadata/AssetThumbnailMetadata): data about the course asset/thumbnail
+            thumbnail (bool): True if saving thumbnail metadata, False if saving asset metadata
+
+        Returns:
+            True if info save was successful, else False
+        """
+        if self.asset_collection is None:
+            return False
+
+        course_assets, asset_idx = self._find_course_asset(course_key, asset_metadata.asset_id.path, thumbnail)
+        info = 'thumbnails' if thumbnail else 'assets'
+        all_assets = course_assets[info]
+
+        # Set the edited information for assets only - not thumbnails.
+        if not thumbnail:
+            asset_metadata.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
+
+        # Translate metadata to Mongo format.
+        metadata_to_insert = asset_metadata.to_mongo()
+        if asset_idx is None:
+            # Append new metadata.
+            # Future optimization: Insert in order & binary search to retrieve.
+            all_assets.append(metadata_to_insert)
+        else:
+            # Replace existing metadata.
+            all_assets[asset_idx] = metadata_to_insert
+
+        # Update the document.
+        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_assets}})
+        return True
+
+    @contract(asset_key='AssetKey', attr_dict=dict)
+    def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
+        """
+        Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
+
+        Arguments:
+            asset_key (AssetKey): asset identifier
+            attr_dict (dict): attribute: value pairs to set
+
+        Raises:
+            ItemNotFoundError if no such item exists
+            AttributeError is attr is one of the build in attrs.
+        """
+        if self.asset_collection is None:
+            return
+
+        course_assets, asset_idx = self._find_course_asset(asset_key.course_key, asset_key.path)
+        if asset_idx is None:
+            raise ItemNotFoundError(asset_key)
+
+        # Form an AssetMetadata.
+        all_assets = course_assets['assets']
+        md = AssetMetadata(asset_key, asset_key.path)
+        md.from_mongo(all_assets[asset_idx])
+        md.update(attr_dict)
+        md.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
+
+        # Generate a Mongo doc from the metadata and update the course asset info.
+        all_assets[asset_idx] = md.to_mongo()
+
+        self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {'assets': all_assets}})
+
+    @contract(asset_key='AssetKey')
+    def _delete_asset_data(self, asset_key, thumbnail=False):
+        """
+        Internal; deletes a single asset's metadata -or- thumbnail.
+
+        Arguments:
+            asset_key (AssetKey): key containing original asset/thumbnail filename
+            thumbnail: True if thumbnail deletion, False if asset metadata deletion
+
+        Returns:
+            Number of asset metadata/thumbnail entries deleted (0 or 1)
+        """
+        if self.asset_collection is None:
+            return 0
+
+        course_assets, asset_idx = self._find_course_asset(asset_key.course_key, asset_key.path, get_thumbnail=thumbnail)
+        if asset_idx is None:
+            return 0
+
+        info = 'thumbnails' if thumbnail else 'assets'
+
+        all_asset_info = course_assets[info]
+        all_asset_info.pop(asset_idx)
+
+        # Update the document.
+        self.asset_collection.update({'_id': course_assets['_id']}, {'$set': {info: all_asset_info}})
+        return 1
+
+    @contract(course_key='CourseKey')
+    def delete_all_asset_metadata(self, course_key):
+        """
+        Delete all of the assets which use this course_key as an identifier.
+
+        Arguments:
+            course_key (CourseKey): course_identifier
+        """
+        if self.asset_collection is None:
+            return
+
+        # Using the course_id, find the course asset metadata document.
+        # A single document exists per course to store the course asset metadata.
+        course_assets = self._find_course_assets(course_key)
+        self.asset_collection.remove(course_assets['_id'])
 
     def heartbeat(self):
         """
