@@ -243,6 +243,12 @@
     }
   }
 
+  // learn more (aka external help button)
+  .external-help-button {
+    @extend %ui-btn-flat-outline;
+    @extend %sizing;
+  }
+
   // actions
   .list-actions {
     @extend %cont-no-list;
