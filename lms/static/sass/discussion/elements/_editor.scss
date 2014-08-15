@@ -3,11 +3,11 @@
 
 // UI: general editor styling
 
-// TO-DO: isolate out all editing styling from _discussion.scss and clean up cases defined below once general syling exists
+// TO-DO: refactor top level selectors for each UI,CASE,STATE included below. These are kept from their old references in discusison.scss but should be cleaned up
 
 // =========================
 
-// CASE: new post
+// UI: new post
 .forum-new-post-form {
   .wmd-input {
     @include discussion-wmd-input;
@@ -36,12 +36,10 @@
   }
 }
 
-// =========================
+// CASE: new post inline styling
+// TO-DO: remove this entire case if we can rely on the post editing form styling from above.
+body.discussion, .discussion-module .forum-new-post-form {
 
-// CASE: inline styling
-// TO-DO: additional styling cleanup here necessary, for now this case was ported over from _discussion.scss
-.discussion-module {
-  
   .wmd-panel {
     width: 100%;
     min-width: 500px;
@@ -59,6 +57,8 @@
     font-size: 0.8em;
     font-family: Monaco, 'Lucida Console', monospace;
     line-height: 1.6em;
+    border: 1px solid #c8c8c8;
+    background-color: #e9e9e9;
 
     &::-webkit-input-placeholder {
       color: #888;
@@ -122,11 +122,8 @@
 
   .wmd-prompt-dialog {
     @extend .modal;
-    background: $white;
-  }
-
-  .wmd-prompt-dialog {
     padding: $baseline;
+    background: $white;
 
     > div {
       font-size: 0.8em;
@@ -161,8 +158,187 @@
 
   .wmd-button {
     span {
-      background-image: url("/static/images/wmd-buttons.png");
       display: inline-block;
     }
   }
+}
+
+// =========================
+
+// STATE: post editing form
+body.discussion {
+  .edit-post-form {
+    @include clearfix;
+    margin-bottom: ($baseline*2);
+    width: 100%;
+    @include box-sizing(border-box);
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .form-row {
+      margin-top: $baseline;
+    }
+
+    .post-cancel {
+      @include white-button;
+      float: left;
+      margin: ($baseline/2) 0 0 ($baseline*.75);
+    }
+
+    .post-update {
+      @include blue-button;
+      float: left;
+      margin-top: ($baseline/2);
+      padding-bottom: ($baseline/10);
+      height: 37px;
+
+      &:hover, &:focus {
+        border-color: #222;
+      }
+    }
+
+    .edit-post-title {
+      @include box-sizing(border-box);
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      padding: 0 ($baseline/2);
+      width: 100%;
+      height: 40px;
+      box-shadow: 0 1px 3px $shadow-l1 inset;
+      color: $dark-gray;
+      font-size: 16px;
+      font-family: $sans-serif;
+    }
+  }
+
+  .comments .edit-post-form h1 {
+    @extend %t-title6;
+  }
+}
+
+// CASE: post editing form -- inline
+// TO-DO: remove this entire case if we can rely on the post editing form styling from above.
+.discussion-module {
+  .edit-post-form {
+    width: 100%;
+    margin-bottom: $baseline;
+    @include clearfix;
+    @include box-sizing(border-box);
+
+    .form-row {
+      margin-top: $baseline;
+    }
+
+    .post-cancel {
+      @include white-button;
+      float: left;
+      margin: $baseline/2 0 0 15px;
+    }
+
+    .post-update {
+      @include blue-button;
+      float: left;
+      height: 37px;
+      margin-top: $baseline/2;
+      padding-bottom: 2px;
+
+      &:hover, &:focus {
+        border-color: #222;
+      }
+    }
+
+    .edit-post-title {
+      width: 100%;
+      height: 40px;
+      padding: 0 $baseline/2;
+      @include box-sizing(border-box);
+      border-radius: 3px;
+      border: 1px solid #aaa;
+      font-size: 16px;
+      font-family: $sans-serif;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    }
+  }
+}
+
+// =========================
+
+// UI: new response
+
+.container .discussion-body {
+  .discussion-reply-new {
+    padding: $baseline ($baseline*1.5);
+    @include clearfix;
+    @include transition(opacity .2s linear 0s);
+
+    h4 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+}
+
+// =========================
+
+// UI: new comment
+.container .discussion-body {
+
+  .comment-form {
+    @include clearfix;
+
+    .comment-form-input {
+      padding: ($baseline/4) ($baseline/2);
+      background-color: $white;
+      font-size: 14px;
+    }
+
+    .discussion-submit-comment {
+      @include blue-button;
+      float: left;
+      margin-top: 8px;
+    }
+
+    .wmd-input {
+      height: 40px;
+    }
+
+    .discussion-errors {
+      margin: 0;
+    }
+  }
+
+  .comment-form {
+    padding: ($baseline/2) 0;
+
+    .wmd-input {
+      @include transition(all .2s linear 0s);
+    }
+
+    .wmd-button {
+      background: transparent;
+
+      span {
+        background-image: url(../images/wmd-buttons-transparent.png);
+      }
+    }
+  }
+
+  .comment-form-input {
+    width: 100%;
+    height: 31px;
+    padding: 0 ($baseline/2);
+    @include box-sizing(border-box);
+    border: 1px solid #b2b2b2;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px $shadow-l1 inset;
+    @include transition(border-color .1s linear 0s);
+
+    &:focus {
+      border-color: #4697c1;
+    }
+  }
+
 }

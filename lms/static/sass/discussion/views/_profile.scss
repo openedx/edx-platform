@@ -1,0 +1,34 @@
+// discussion - view - profile
+// ====================
+
+section.user-profile {
+  display: table-cell;
+  border-right: 1px solid #ddd;
+  border-radius: 3px 0 0 3px;
+  background-color: $sidebar-color;
+  box-shadow: none;
+
+  .user-profile {
+    padding: 32px 36px;
+  }
+
+  .sidebar-username {
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .sidebar-user-roles {
+    margin-top: 6px;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  .sidebar-threads-count {
+    margin-top: 14px;
+  }
+
+  .sidebar-threads-count span,
+  .sidebar-comments-count span {
+    font-weight: 700;
+  }
+}

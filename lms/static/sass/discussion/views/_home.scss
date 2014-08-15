@@ -1,0 +1,151 @@
+// discussion - views - home
+// ====================
+
+.container .discussion-body {
+
+  .blank-slate {
+
+    .home-header {
+      margin: 0;
+    }
+
+    .home-title {
+      font-size: 18px;
+      color: $black;
+      margin-bottom: ($baseline/4);
+    }
+
+    .home-description {
+      font-size: 12px;
+      line-height: 1;
+      margin-bottom: ($baseline/2);
+    }
+
+    .home-stats {
+      padding: $baseline 0;
+
+      .label-area {
+        display: inline-block;
+        min-width: ($baseline*5);
+        width: 25%;
+        vertical-align: middle;
+
+        .profile-link {
+          font-weight: 700;
+        }
+      }
+
+      .stats-grouping {
+        display: inline-block;
+        width: 70%;
+        padding-left: $baseline;
+
+        .profile-stat {
+          display: inline-block;
+          width: 32.5%;
+          vertical-align: middle;
+          font-size: 12px;
+
+          .count {
+            display: inline-block;
+            font-size: 28px;
+            padding: 0 ($baseline/2);
+            vertical-align: middle;
+          }
+
+          .profile-stat-label{
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+
+    .home-helpgrid {
+      border-bottom: none;
+      border-radius: 3px;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+    }
+  }
+
+  .helpgrid-row {
+    border-bottom: 1px solid #b2b2b2;
+
+    .row-title {
+      padding: ($baseline*1.5) $baseline;
+      background-color: #dedede;
+      font-size: 12px;
+    }
+
+    .row-item-full, .row-item {
+      font-size: 12px;
+      padding: 0px ($baseline/2);
+      width: 26%;
+      vertical-align: middle;
+
+      .icon {
+        padding: 0 ($baseline/2);
+        font-size: 24px;
+        vertical-align: middle;
+        display: table-cell;
+      }
+
+      .icon-stack i {
+        padding: 0 ($baseline/2);
+      }
+
+      .row-description {
+        vertical-align: middle;
+        display: table-cell;
+      }
+    }
+
+    .row-item-full {
+
+      .notification-checkbox {
+        display: inline-block;
+        padding: ($baseline/4) 0 ($baseline/2) 0;
+        margin-right: ($baseline/2);
+        border-radius: 5px;
+        border: 1px solid $gray-l2;
+
+        .email-setting {
+          display: inline-block;
+          text-align: center;
+          vertical-align: middle;
+          margin-left: ($baseline/2);
+        }
+
+        .icon {
+          display: inline-block;
+        }
+
+        .email-setting:checked ~ .icon {
+          color: $green;
+        }
+      }
+
+      .row-description {
+        display: inline-block;
+        width: 80%;
+      }
+    }
+  }
+
+  .helpgrid-row-navigation {
+    .icon-reorder {color: $light-gray;}
+    .icon-search {color: $light-gray;}
+    .icon-sort {color: $light-gray;}
+  }
+
+  .helpgrid-row-participation {
+    .icon-plus {color: $green;}
+    .icon-flag {color: $pink;}
+    .icon-star {color: $blue;}
+  }
+
+  .helpgrid-row-notification {
+    .icon-sign-blank {color: $green;}
+    .icon-envelope {color: $light-gray;}
+  }
+}

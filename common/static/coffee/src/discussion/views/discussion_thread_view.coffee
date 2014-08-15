@@ -52,6 +52,12 @@ if Backbone?
       else # mode == "inline"
         @collapse()
 
+    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
+      closed: (closed) ->
+        @$(".discussion-reply-new").toggle(not closed)
+        @$(".add-response-btn").toggle(not closed && @responses.length > 0)
+    })
+
     expand: (event) ->
       if event
         event.preventDefault()
@@ -215,9 +221,8 @@ if Backbone?
     addComment: =>
       @model.comment()
 
-    endorseThread: (endorsed) =>
-      is_endorsed = @$el.find(".is-endorsed").length > 0
-      @model.set 'endorsed', is_endorsed
+    endorseThread: =>
+      @model.set 'endorsed', @$el.find(".action-answer.is-checked").length > 0
 
     submitComment: (event) ->
       event.preventDefault()
