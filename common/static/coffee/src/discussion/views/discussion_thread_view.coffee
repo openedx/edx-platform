@@ -52,6 +52,12 @@ if Backbone?
       else # mode == "inline"
         @collapse()
 
+    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
+      closed: (closed) ->
+        @$(".discussion-reply-new").toggle(not closed)
+        @renderAddResponseButton()
+    })
+
     expand: (event) ->
       if event
         event.preventDefault()
@@ -200,8 +206,8 @@ if Backbone?
         @$el.find(listSelector).append(view.el)
         view.afterInsert()
 
-    renderAddResponseButton: ->
-      if @model.hasResponses() and @model.can('can_reply')
+    renderAddResponseButton: =>
+      if @model.hasResponses() and @model.can('can_reply') and !@model.get('closed')
         @$el.find('div.add-response').show()
       else
         @$el.find('div.add-response').hide()
@@ -215,9 +221,8 @@ if Backbone?
     addComment: =>
       @model.comment()
 
-    endorseThread: (endorsed) =>
-      is_endorsed = @$el.find(".is-endorsed").length > 0
-      @model.set 'endorsed', is_endorsed
+    endorseThread: =>
+      @model.set 'endorsed', @$el.find(".action-answer.is-checked").length > 0
 
     submitComment: (event) ->
       event.preventDefault()
