@@ -32,7 +32,7 @@ var JSInput = (function ($, undefined) {
 
     /*      END     Utils                                   */
 
-    var loadingTimeout = 300;
+    var loadingTimeout = getLoadingTimeout();
 
     function jsinputConstructor(elem) {
         // Define an class that will be instantiated for each jsinput element
@@ -207,13 +207,17 @@ var JSInput = (function ($, undefined) {
     }
 
     function getLoadingTimeout() {
-        var allSections = $('section.jsinput'), timeout;
+        var allSections = $('section.jsinput'), t,
+            timeout = 300; // Default value
+
         allSections.each(function(index, value) {
-            timeout = $(value).attr("data-loading-timeout");
-            if (timeout && isFinite(timeout)) {
-                loadingTimeout = Math.max(loadingTimeout, timeout);
+            t = $(value).attr("data-loading-timeout");
+            if (t && isFinite(t)) {
+                timeout = Math.max(t, timeout);
             }
         });
+
+        return timeout;
     }
 
     // This is ugly, but without a timeout pages with multiple/heavy jsinputs
@@ -221,7 +225,6 @@ var JSInput = (function ($, undefined) {
     // 300 ms is arbitrary but this has functioned with the only application 
     // that has ever used JSInput, jsVGL. Something more sturdy should be put in
     // place.
-    getLoadingTimeout();
     if ($.isReady) {
         setTimeout(walkDOM, loadingTimeout);
     } else {
