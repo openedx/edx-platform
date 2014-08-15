@@ -35,7 +35,7 @@
   // UI: general actions dropdown layout
   .actions-dropdown {
     @extend %ui-no-list;
-    @include transition(opacity .5s ease-in-out 0s);
+    @include transition(opacity .2s ease-in-out 0s);
     z-index: 100;
     position: absolute;
     top: $baseline;
@@ -108,23 +108,25 @@
     color: $gray-l1;
 
     .action-icon {
-      @extend %t-icon6;
+      @extend %t-icon7;
       display: inline-block;
-      vertical-align: middle;
       height: $baseline;
       width: $baseline;
       border: 1px solid $gray-l3;
       border-radius: 3px;
-      padding: 4px;
       text-align: center;
       color: $gray-l1;
+
+      .icon {
+        vertical-align: middle;
+      }
     }
 
     .action-label {
-      @extend %t-copy-sub1;
+      @extend %t-copy-sub2;
       display: inline-block;
       vertical-align: middle;
-      padding: 3px 8px;
+      padding: 0 8px;
       color: $gray-l1;
       opacity: 0;
     }
