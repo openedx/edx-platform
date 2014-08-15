@@ -223,7 +223,7 @@ class MongoContentstoreBuilder(object):
 
 MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
-    VersioningModulestoreBuilder(),
+#     VersioningModulestoreBuilder(),  # FIXME LMS-11227
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
@@ -231,6 +231,8 @@ CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
     'toy',
     'manual-testing-complete',
+    'split_test_module',
+    'split_test_module_draft',
 )
 
 
