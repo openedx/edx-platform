@@ -19,6 +19,9 @@ SITE_NAME = 'localhost:{}'.format(LETTUCE_SERVER_PORT)
 import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
 
+# set root logger level
+logging.getLogger().setLevel(logging.ERROR)
+
 import os
 from random import choice
 import string
