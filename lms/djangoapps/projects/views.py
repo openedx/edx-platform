@@ -157,7 +157,21 @@ class WorkgroupsViewSet(viewsets.ModelViewSet):
             except ObjectDoesNotExist:
                 message = 'User {} does not exist'.format(user_id)
                 return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+
             workgroup = self.get_object()
+
+            # Ensure the user is not already assigned to a workgroup for this project
+            existing_workgroups = Workgroup.objects.filter(users=user).filter(project=workgroup.project)
+            if len(existing_workgroups):
+                message = 'User {} already assigned to a workgroup for this project'.format(user_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+
+            # Ensure the user is not already assigned to a project for this course
+            existing_projects = Project.objects.filter(course_id=workgroup.project.course_id).filter(workgroups__users__id=user.id)
+            if len(existing_projects):
+                message = 'User {} already assigned to a project for this course'.format(user_id)
+                return Response({"detail": message}, status.HTTP_400_BAD_REQUEST)
+
             workgroup.users.add(user)
             workgroup.save()
 
