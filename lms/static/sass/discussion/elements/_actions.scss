@@ -201,8 +201,7 @@
       }
     }
 
-    &.action-endorse,
-    &.action-answer {
+    &.action-endorse {
 
       &.is-checked {
 
@@ -223,6 +222,32 @@
         .action-icon {
           border: 1px solid $blue-d1;
           background-color: $blue-d1;
+          color: $white;
+        }
+      }
+    }
+
+    &.action-answer {
+
+      &.is-checked {
+
+        .action-icon {
+          background-color: $green-d1;
+          border: 1px solid $green-d2;
+          color: $white;
+        }
+      }
+
+      &:hover {
+        border: 1px solid $green-d2;
+
+        .action-label {
+          color: $green-d2;
+        }
+
+        .action-icon {
+          border: 1px solid $green-d1;
+          background-color: $green-d1;
           color: $white;
         }
       }
