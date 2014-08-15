@@ -1,5 +1,5 @@
-define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
-    function (domReady, $, _, CancelOnEscape) {
+define(["domReady", "jquery", "underscore"],
+    function (domReady, $, _) {
 
         var saveRerunCourse = function (e) {
             e.preventDefault();
@@ -93,7 +93,6 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             $courseRun.focus().select();
             $('.rerun-course-save').on('click', saveRerunCourse);
             $cancelButton.bind('click', cancelRerunCourse);
-            CancelOnEscape($cancelButton);
             $('.cancel-button').bind('click', cancelRerunCourse);
 
             // Check that a course (org, number, run) doesn't use any special characters

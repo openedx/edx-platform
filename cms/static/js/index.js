@@ -1,4 +1,4 @@
-require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
+define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
     function (domReady, $, _, CancelOnEscape) {
 
         var dismissNotification = function (e) {
@@ -172,9 +172,15 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
             }
         };
 
-
-        domReady(function () {
+        var onReady = function () {
             $('.new-course-button').bind('click', addNewCourse);
             $('.dismiss-button').bind('click', dismissNotification);
-        });
+        };
+
+        domReady(onReady);
+
+        return {
+            dismissNotification: dismissNotification,
+            onReady: onReady
+        };
     });
