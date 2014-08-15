@@ -121,17 +121,21 @@ create_task_list_table = ($table_tasks, tasks_data) ->
 
 # Formats the subject field for email content history table
 subject_formatter = (row, cell, value, columnDef, dataContext) ->
-  if !value then return gettext("An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.")
+  if value is null then return gettext("An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.")
   subject_text = $('<span>').text(value['subject']).html()
   return '<p><a href="#email_message_' + value['id']+ '" id="email_message_' + value['id'] + '_trig">' + subject_text + '</a></p>'
 
+# Formats the author field for the email content history table
+sent_by_formatter = (row, cell, value, columnDef, dataContext) ->
+  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+
 # Formats the created field for the email content history table
 created_formatter = (row, cell, value, columnDef, dataContext) ->
-  if !value then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
 
 # Formats the number sent field for the email content history table
 number_sent_formatter = (row, cell, value, columndDef, dataContext) ->
-  if !value then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
 
 # Creates a table to display the content of bulk course emails
 # sent in the past
@@ -153,6 +157,14 @@ create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
       minWidth: 80
       cssClass: "email-content-cell"
       formatter: subject_formatter
+    ,
+      id: 'requester'
+      field: 'requester'
+      name: gettext('Sent By')
+      minWidth: 80
+      maxWidth: 100
+      cssClass: "email-content-cell"
+      formatter: sent_by_formatter
     ,
       id: 'created'
       field: 'created'
@@ -203,7 +215,7 @@ create_email_message_views = ($messages_wrapper, emails) ->
     # HTML escape the subject line
     subject_text = $('<span>').text(email_info.email['subject']).html()
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Subject:') + '</em> ' + subject_text)
-
+    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent By:') + '</em> ' + email_info.requester)
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Time Sent:') + '</em> ' + email_info.created)
     $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent To:') + '</em> ' + email_info.sent_to)
     $email_wrapper.append $email_header

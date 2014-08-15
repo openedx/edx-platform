@@ -1980,22 +1980,27 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         """
         patch.stopall()
 
-    def setup_fake_email_info(self, num_emails):
+    def setup_fake_email_info(self, num_emails, with_failures=False):
         """ Initialize the specified number of fake emails """
         for email_id in range(num_emails):
             num_sent = random.randint(1, 15401)
-            self.tasks[email_id] = FakeContentTask(email_id, num_sent, 'expected')
+            if with_failures:
+                failed = random.randint(1, 15401)
+            else:
+                failed = 0
+
+            self.tasks[email_id] = FakeContentTask(email_id, num_sent, failed, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
-            self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent)
+            self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent, failed)
 
     def get_matching_mock_email(self, **kwargs):
         """ Returns the matching mock emails for the given id """
         email_id = kwargs.get('id', 0)
         return self.emails[email_id]
 
-    def get_email_content_response(self, num_emails, task_history_request):
+    def get_email_content_response(self, num_emails, task_history_request, with_failures=False):
         """ Calls the list_email_content endpoint and returns the repsonse """
-        self.setup_fake_email_info(num_emails)
+        self.setup_fake_email_info(num_emails, with_failures)
         task_history_request.return_value = self.tasks.values()
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
@@ -2003,6 +2008,19 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
             response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
         return response
+
+    def check_emails_sent(self, num_emails, task_history_request, with_failures=False):
+        """ Tests sending emails with or without failures """
+        response = self.get_email_content_response(num_emails, task_history_request, with_failures)
+        self.assertTrue(task_history_request.called)
+        expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
+        actual_email_info = json.loads(response.content)['emails']
+
+        self.assertEqual(len(actual_email_info), num_emails)
+        for exp_email, act_email in zip(expected_email_info, actual_email_info):
+            self.assertDictEqual(exp_email, act_email)
+
+        self.assertEqual(expected_email_info, actual_email_info)
 
     def test_content_list_one_email(self, task_history_request):
         """ Test listing of bulk emails when email list has one email """
@@ -2030,20 +2048,11 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def test_content_list_email_content_many(self, task_history_request):
         """ Test listing of bulk emails sent large amount of emails """
-        response = self.get_email_content_response(50, task_history_request)
-        self.assertTrue(task_history_request.called)
-        expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
-        actual_email_info = json.loads(response.content)['emails']
-
-        self.assertEqual(len(actual_email_info), 50)
-        for exp_email, act_email in zip(expected_email_info, actual_email_info):
-            self.assertDictEqual(exp_email, act_email)
-
-        self.assertEqual(actual_email_info, expected_email_info)
+        self.check_emails_sent(50, task_history_request)
 
     def test_list_email_content_error(self, task_history_request):
         """ Test handling of error retrieving email """
-        invalid_task = FakeContentTask(0, 0, 'test')
+        invalid_task = FakeContentTask(0, 0, 0, 'test')
         invalid_task.make_invalid_input()
         task_history_request.return_value = [invalid_task]
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -2054,8 +2063,35 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         returned_email_info = json.loads(response.content)['emails']
         self.assertEqual(len(returned_email_info), 1)
         returned_info = returned_email_info[0]
-        for info in ['created', 'sent_to', 'email', 'number_sent']:
+        for info in ['created', 'sent_to', 'email', 'number_sent', 'requester']:
             self.assertEqual(returned_info[info], None)
+
+    def test_list_email_with_failure(self, task_history_request):
+        """ Test the handling of email task that had failures """
+        self.check_emails_sent(1, task_history_request, True)
+
+    def test_list_many_emails_with_failures(self, task_history_request):
+        """ Test the handling of many emails with failures """
+        self.check_emails_sent(50, task_history_request, True)
+
+    def test_list_email_with_no_successes(self, task_history_request):
+        task_info = FakeContentTask(0, 0, 10, 'expected')
+        email = FakeEmail(0)
+        email_info = FakeEmailInfo(email, 0, 10)
+        task_history_request.return_value = [task_info]
+        url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+            mock_email_info.return_value = email
+            response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(task_history_request.called)
+        returned_info_list = json.loads(response.content)['emails']
+
+        self.assertEqual(len(returned_info_list), 1)
+        returned_info = returned_info_list[0]
+        expected_info = email_info.to_dict()
+        self.assertDictEqual(expected_info, returned_info)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
