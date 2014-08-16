@@ -161,8 +161,16 @@ def title_or_url(node):
 
 def set_due_date_extension(course, unit, student, due_date):
     """
-    Sets a due date extension.
+    Sets a due date extension. Raises DashboardError if the extended
+    due date is invalid.
     """
+    if due_date:
+        # Check that the new due date is valid:
+        original_due_date = getattr(unit, 'due', None)
+
+        if due_date < original_due_date:
+            raise DashboardError(_("An extended due date must be later than the original due date."))
+
     def set_due_date(node):
         """
         Recursively set the due date on a node and all of its children.
