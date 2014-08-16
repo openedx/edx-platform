@@ -161,13 +161,15 @@ def title_or_url(node):
 
 def set_due_date_extension(course, unit, student, due_date):
     """
-    Sets a due date extension. Raises DashboardError if the extended
+    Sets a due date extension. Raises DashboardError if the unit or extended
     due date is invalid.
     """
     if due_date:
         # Check that the new due date is valid:
         original_due_date = getattr(unit, 'due', None)
 
+        if not original_due_date:
+            raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location))
         if due_date < original_due_date:
             raise DashboardError(_("An extended due date must be later than the original due date."))
 
