@@ -100,7 +100,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
 
             onSync: function(model) {
                 if (ViewUtils.hasChangedAttributes(model, [
-                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state'
+                    'has_changes', 'published', 'edited_on', 'edited_by', 'visibility_state', 'has_explicit_staff_lock'
                 ])) {
                    this.render();
                 }
@@ -118,7 +118,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     publishedBy: this.model.get('published_by'),
                     released: this.model.get('released_to_students'),
                     releaseDate: this.model.get('release_date'),
-                    releaseDateFrom: this.model.get('release_date_from')
+                    releaseDateFrom: this.model.get('release_date_from'),
+                    hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
+                    staffLockFrom: this.model.get('staff_lock_from')
                 }));
 
                 return this;
@@ -161,12 +163,13 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
             },
 
             toggleStaffLock: function (e) {
-                var xblockInfo = this.model, self=this, enableStaffLock,
+                var xblockInfo = this.model, self=this, enableStaffLock, hasInheritedStaffLock,
                     saveAndPublishStaffLock, revertCheckBox;
                 if (e && e.preventDefault) {
                     e.preventDefault();
                 }
-                enableStaffLock = xblockInfo.get('visibility_state') !== VisibilityState.staffOnly;
+                enableStaffLock = !xblockInfo.get('has_explicit_staff_lock');
+                hasInheritedStaffLock = xblockInfo.get('ancestor_has_staff_lock');
 
                 revertCheckBox = function() {
                     self.checkStaffLock(!enableStaffLock);
@@ -189,8 +192,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 };
 
                 this.checkStaffLock(enableStaffLock);
-                if (enableStaffLock) {
-                    ViewUtils.runOperationShowingMessage(gettext('Hiding Unit from Students&hellip;'),
+                if (enableStaffLock && !hasInheritedStaffLock) {
+                    ViewUtils.runOperationShowingMessage(gettext('Hiding from Students&hellip;'),
+                        _.bind(saveAndPublishStaffLock, self));
+                } else if (enableStaffLock && hasInheritedStaffLock) {
+                    ViewUtils.runOperationShowingMessage(gettext('Explicitly Hiding from Students&hellip;'),
+                        _.bind(saveAndPublishStaffLock, self));
+                } else if (!enableStaffLock && hasInheritedStaffLock) {
+                    ViewUtils.runOperationShowingMessage(gettext('Inheriting Student Visibility&hellip;'),
                         _.bind(saveAndPublishStaffLock, self));
                 } else {
                     ViewUtils.confirmThenRunOperation(gettext("Make Visible to Students"),

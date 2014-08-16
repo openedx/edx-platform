@@ -6,7 +6,7 @@ var published = xblockInfo.get('published');
 
 var statusMessage = null;
 var statusType = null;
-if (visibilityState === 'staff_only') {
+if (staffOnlyMessage) {
     statusType = 'staff-only';
     statusMessage = gettext('Contains staff only content');
 } else if (visibilityState === 'needs_attention') {

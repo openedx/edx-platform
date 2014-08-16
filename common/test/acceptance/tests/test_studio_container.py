@@ -455,7 +455,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         # Start date set in course fixture to 1970.
         self._verify_release_date_info(
-            unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC with Section "Test Section"'
+            unit, self.RELEASE_TITLE_RELEASED, 'Jan 01, 1970 at 00:00 UTC\nwith Section "Test Section"'
         )
         self._verify_last_published_and_saved(unit, self.LAST_PUBLISHED, self.LAST_PUBLISHED)
         # Should not be able to click on Publish action -- but I don't know how to test that it is not clickable.
@@ -548,7 +548,7 @@ class UnitPublishingTest(ContainerBase):
         self._verify_publish_title(unit, self.PUBLISHED_LIVE_STATUS)
         self.assertTrue(unit.currently_visible_to_students)
         self._verify_release_date_info(
-            unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + ' with Section "Unlocked Section"'
+            unit, self.RELEASE_TITLE_RELEASED, self.past_start_date_text + '\n' + 'with Section "Unlocked Section"'
         )
         self._view_published_version(unit)
         self._verify_student_view_visible(['problem'])
@@ -560,6 +560,7 @@ class UnitPublishingTest(ContainerBase):
             When I go to the unit page in Studio
             And when I select "Hide from students"
             Then the unit does not have a warning that it is visible to students
+            And the unit does not display inherited staff lock
             And when I click on the View Live Button
             Then I see the content in the unit when logged in as staff
             And when I view the course as a student
@@ -569,6 +570,7 @@ class UnitPublishingTest(ContainerBase):
         checked = unit.toggle_staff_lock()
         self.assertTrue(checked)
         self.assertFalse(unit.currently_visible_to_students)
+        self.assertFalse(unit.shows_inherited_staff_lock())
         self._verify_publish_title(unit, self.LOCKED_STATUS)
         self._view_published_version(unit)
         # Will initially be in staff view, locked component should be visible.
@@ -592,7 +594,7 @@ class UnitPublishingTest(ContainerBase):
         self.assertFalse(unit.currently_visible_to_students)
         self._verify_release_date_info(
             unit, self.RELEASE_TITLE_RELEASE,
-            self.past_start_date_text + ' with Subsection "Subsection With Locked Unit"'
+            self.past_start_date_text + '\n' + 'with Subsection "Subsection With Locked Unit"'
         )
         self._view_published_version(unit)
         self._verify_student_view_locked()
@@ -619,6 +621,46 @@ class UnitPublishingTest(ContainerBase):
         self._verify_components_visible(['discussion'])
         # Switch to student view and verify visible.
         self._verify_student_view_visible(['discussion'])
+
+    def test_explicit_lock_overrides_implicit_subsection_lock_information(self):
+        """
+        Scenario: A unit's explicit staff lock hides its inherited subsection staff lock information
+            Given I have a course with sections, subsections, and units
+            And I have enabled explicit staff lock on a subsection
+            When I visit the unit page
+            Then the unit page shows its inherited staff lock
+            And I enable explicit staff locking
+            Then the unit page does not show its inherited staff lock
+            And when I disable explicit staff locking
+            Then the unit page now shows its inherited staff lock
+        """
+        self.outline.visit()
+        self.outline.expand_all_subsections()
+        subsection = self.outline.section_at(0).subsection_at(0)
+        unit = subsection.unit_at(0)
+        subsection.set_staff_lock(True)
+        unit_page = unit.go_to()
+        self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
+
+    def test_explicit_lock_overrides_implicit_section_lock_information(self):
+        """
+        Scenario: A unit's explicit staff lock hides its inherited subsection staff lock information
+            Given I have a course with sections, subsections, and units
+            And I have enabled explicit staff lock on a section
+            When I visit the unit page
+            Then the unit page shows its inherited staff lock
+            And I enable explicit staff locking
+            Then the unit page does not show its inherited staff lock
+            And when I disable explicit staff locking
+            Then the unit page now shows its inherited staff lock
+        """
+        self.outline.visit()
+        self.outline.expand_all_subsections()
+        section = self.outline.section_at(0)
+        unit = section.subsection_at(0).unit_at(0)
+        section.set_staff_lock(True)
+        unit_page = unit.go_to()
+        self._verify_explicit_lock_overrides_implicit_lock_information(unit_page)
 
     def test_published_unit_with_draft_child(self):
         """
@@ -747,6 +789,16 @@ class UnitPublishingTest(ContainerBase):
         """
         self.assertTrue(expected_published_prefix in unit.last_published_text)
         self.assertTrue(expected_saved_prefix in unit.last_saved_text)
+
+    def _verify_explicit_lock_overrides_implicit_lock_information(self, unit_page):
+        """
+        Verifies that a unit with inherited staff lock does not display inherited information when explicitly locked.
+        """
+        self.assertTrue(unit_page.shows_inherited_staff_lock())
+        unit_page.toggle_staff_lock(inherits_staff_lock=True)
+        self.assertFalse(unit_page.shows_inherited_staff_lock())
+        unit_page.toggle_staff_lock(inherits_staff_lock=True)
+        self.assertTrue(unit_page.shows_inherited_staff_lock())
 
     # TODO: need to work with Jay/Christine to get testing of "Preview" working.
     # def test_preview(self):

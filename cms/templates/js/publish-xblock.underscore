@@ -46,10 +46,11 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <h5 class="title"><%= releaseLabel %></h5>
         <p class="copy">
             <% if (releaseDate) { %>
-                <% var message = gettext("%(release_date)s with %(section_or_subsection)s") %>
-                <%= interpolate(message, {
-                    release_date: '<span class="release-date">' + releaseDate + '</span>',
-                    section_or_subsection: '<span class="release-with">' + releaseDateFrom + '</span>' }, true) %>
+                <span class="release-date"><%= releaseDate %></span>
+                <span class="release-with">
+                    <%= interpolate(gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true) %>
+                </span>
+
             <% } else { %>
                 <%= gettext("Unscheduled") %>
             <% } %>
@@ -65,13 +66,20 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <% } %>
         </h5>
         <% if (visibleToStaffOnly) { %>
-            <p class="copy"><%= gettext("Staff Only") %></p>
+            <p class="copy">
+                <%= gettext("Staff Only") %>
+                <% if (!hasExplicitStaffLock) { %>
+                    <span class="inherited-from">
+                        <%= interpolate(gettext("with %(section_or_subsection)s"),{ section_or_subsection: staffLockFrom }, true) %>
+                    </span>
+                <% } %>
+            </p>
         <% } else { %>
             <p class="copy"><%= gettext("Staff and Students") %></p>
         <% } %>
         <p class="action-inline">
-            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= visibleToStaffOnly %>">
-                <% if (visibleToStaffOnly) { %>
+            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
+                <% if (hasExplicitStaffLock) { %>
                     <i class="icon-check"></i>
                 <% } else { %>
                     <i class="icon-check-empty"></i>

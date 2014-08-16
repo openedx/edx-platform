@@ -1,19 +1,19 @@
 /**
  * The EditSectionXBlockModal is a Backbone view that shows an editor in a modal window.
- * It has nested views: for release date, due date and grading format.
+ * It has nested views: for release date, due date, grading format, and staff lock.
  * It is invoked using the editXBlock method and uses xblock_info as a model,
  * and upon save parent invokes refresh function that fetches updated model and
  * re-renders edited course outline.
  */
 define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_modal',
-    'date', 'js/views/utils/xblock_utils', 'js/utils/date_utils'
+    'date', 'js/views/utils/xblock_utils', 'js/utils/date_utils', 'js/views/utils/view_utils'
 ],
     function(
-        $, Backbone, _, gettext, BaseModal, date, XBlockViewUtils, DateUtils
+        $, Backbone, _, gettext, BaseModal, date, XBlockViewUtils, DateUtils, ViewUtils
     ) {
         'use strict';
         var EditSectionXBlockModal, BaseDateView, ReleaseDateView, DueDateView,
-            GradingView;
+            GradingView, StaffLockView;
 
         EditSectionXBlockModal = BaseModal.extend({
             events : {
@@ -38,13 +38,10 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
             },
 
             getTitle: function () {
-                if (this.model.isChapter() || this.model.isSequential()) {
-                    return _.template(
-                        gettext('<%= sectionName %> Settings'),
-                        {sectionName: this.model.get('display_name')});
-                } else {
-                    return '';
-                }
+                return _.template(
+                    gettext('<%= sectionName %> Settings'),
+                    { sectionName: this.model.get('display_name') }
+                );
             },
 
             getContentHtml: function() {
@@ -61,9 +58,12 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
                 var requestData = _.extend({}, this.getRequestData(), {
                     metadata: this.getMetadata()
                 });
-                XBlockViewUtils.updateXBlockFields(this.model, requestData, {
-                    success: this.options.onSave
-                });
+                // Only update if something changed to prevent items from erroneously entering draft state
+                if (!_.isEqual(requestData, { metadata: {} })) {
+                    XBlockViewUtils.updateXBlockFields(this.model, requestData, {
+                        success: this.options.onSave
+                    });
+                }
                 this.hide();
             },
 
@@ -89,7 +89,8 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
              */
             getContext: function () {
                 return _.extend({
-                    xblockInfo: this.model
+                    xblockInfo: this.model,
+                    xblockType: XBlockViewUtils.getXBlockType(this.model.get('category'), this.parentInfo, true)
                 }, this.invokeComponentMethod('getContext'));
             },
 
@@ -115,12 +116,22 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
             initializeComponents: function () {
                 this.components = [];
                 this.components.push(
-                    new ReleaseDateView({
-                        selector: '.scheduled-date-input',
+                    new StaffLockView({
+                        selector: '.edit-staff-lock',
                         parentView: this,
                         model: this.model
                     })
                 );
+
+                if (this.model.isChapter() || this.model.isSequential()) {
+                    this.components.push(
+                        new ReleaseDateView({
+                            selector: '.scheduled-date-input',
+                            parentView: this,
+                            model: this.model
+                        })
+                    );
+                }
 
                 if (this.model.isSequential()) {
                     this.components.push(
@@ -237,6 +248,50 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/modals/base_mod
                 return {
                     graderTypes: JSON.parse(this.model.get('course_graders'))
                 };
+            }
+        });
+
+        StaffLockView = Backbone.View.extend({
+            isModelLocked: function() {
+                return this.model.get('has_explicit_staff_lock');
+            },
+
+            isAncestorLocked: function() {
+                return this.model.get('ancestor_has_staff_lock');
+            },
+
+            afterRender: function () {
+                this.setElement(this.options.parentView.$(this.options.selector).get(0));
+                this.setLock(this.isModelLocked());
+            },
+
+            setLock: function(value) {
+                this.$('#staff_lock').prop('checked', value);
+            },
+
+            isLocked: function() {
+                return this.$('#staff_lock').is(':checked');
+            },
+
+            hasChanges: function() {
+                return this.isModelLocked() != this.isLocked();
+            },
+
+            getRequestData: function() {
+                return this.hasChanges() ? { publish: 'republish' } : {};
+            },
+
+            getMetadata: function() {
+                // Setting visible_to_staff_only to null when disabled will delete the field from this
+                // xblock, allowing it to inherit the value of its ancestors.
+                return this.hasChanges() ? { visible_to_staff_only: this.isLocked() ? true : null } : {};
+            },
+
+            getContext: function () {
+                return {
+                    hasExplicitStaffLock: this.isModelLocked(),
+                    ancestorLocked: this.isAncestorLocked()
+                }
             }
         });
 

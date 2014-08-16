@@ -75,6 +75,16 @@ class CourseOutlineItem(object):
         """
         return self.q(css=self._bounded_selector(self.STATUS_MESSAGE_SELECTOR)).text[0]
 
+    @property
+    def has_staff_lock_warning(self):
+        """ Returns True iff the 'Contains staff only content' message is visible """
+        return self.status_message == 'Contains staff only content' if self.has_status_message else False
+
+    @property
+    def is_staff_only(self):
+        """ Returns True if the visiblity state of this item is staff only (has a black sidebar) """
+        return "is-staff-only" in self.q(css=self._bounded_selector(''))[0].get_attribute("class")
+
     def edit_name(self):
         """
         Puts the item's name into editable form.
@@ -101,6 +111,14 @@ class CourseOutlineItem(object):
         """
         self.q(css=self._bounded_selector(self.NAME_INPUT_SELECTOR)).results[0].send_keys(Keys.ENTER)
         self.wait_for_ajax()
+
+    def set_staff_lock(self, is_locked):
+        """
+        Sets the explicit staff lock of item on the container page to is_locked.
+        """
+        modal = self.edit()
+        modal.is_explicitly_locked = is_locked
+        modal.save()
 
     def in_editable_form(self):
         """
@@ -452,6 +470,17 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         else:
             return ExpandCollapseLinkState.EXPAND
 
+    def expand_all_subsections(self):
+        """
+        Expands all the subsections in this course.
+        """
+        for section in self.sections():
+            if section.is_collapsed:
+                section.toggle_expand()
+            for subsection in section.subsections():
+                if subsection.is_collapsed:
+                    subsection.toggle_expand()
+
 
 class CourseOutlineModal(object):
     MODAL_SELECTOR = ".edit-outline-item-modal"
@@ -553,6 +582,28 @@ class CourseOutlineModal(object):
             lambda: self.policy == grading_label,
             "Grading label is updated.",
         ).fulfill()
+
+    @property
+    def is_explicitly_locked(self):
+        """
+        Returns true if the explict staff lock checkbox is checked, false otherwise.
+        """
+        return self.find_css('#staff_lock')[0].is_selected()
+
+    @is_explicitly_locked.setter
+    def is_explicitly_locked(self, value):
+        """
+        Checks the explicit staff lock box if value is true, otherwise unchecks the box.
+        """
+        if value != self.is_explicitly_locked:
+            self.find_css('label[for="staff_lock"]').click()
+        EmptyPromise(lambda: value == self.is_explicitly_locked, "Explicit staff lock is updated").fulfill()
+
+    def shows_staff_lock_warning(self):
+        """
+        Returns true iff the staff lock warning is visible.
+        """
+        return self.find_css('.staff-lock .tip-warning').visible
 
     def get_selected_option_text(self, element):
         """

@@ -57,9 +57,9 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 var xblockInfo = this.model,
                     childInfo = xblockInfo.get('child_info'),
                     parentInfo = this.parentInfo,
-                    xblockType = this.getXBlockType(this.model.get('category'), this.parentInfo),
-                    xblockTypeDisplayName = this.getXBlockType(this.model.get('category'), this.parentInfo, true),
-                    parentType = parentInfo ? this.getXBlockType(parentInfo.get('category')) : null,
+                    xblockType = XBlockViewUtils.getXBlockType(this.model.get('category'), this.parentInfo),
+                    xblockTypeDisplayName = XBlockViewUtils.getXBlockType(this.model.get('category'), this.parentInfo, true),
+                    parentType = parentInfo ? XBlockViewUtils.getXBlockType(parentInfo.get('category')) : null,
                     addChildName = null,
                     defaultNewChildName = null,
                     html,
@@ -78,12 +78,14 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     xblockType: xblockType,
                     xblockTypeDisplayName: xblockTypeDisplayName,
                     parentType: parentType,
-                    childType: childInfo ? this.getXBlockType(childInfo.category, xblockInfo) : null,
+                    childType: childInfo ? XBlockViewUtils.getXBlockType(childInfo.category, xblockInfo) : null,
                     childCategory: childInfo ? childInfo.category : null,
                     addChildLabel: addChildName,
                     defaultNewChildName: defaultNewChildName,
                     isCollapsed: isCollapsed,
-                    includesChildren: this.shouldRenderChildren()
+                    includesChildren: this.shouldRenderChildren(),
+                    hasExplicitStaffLock: this.model.get('has_explicit_staff_lock'),
+                    staffOnlyMessage: this.model.get('staff_only_message')
                 });
                 if (this.parentInfo) {
                     this.setElement($(html));
@@ -184,18 +186,6 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 });
             },
 
-            getXBlockType: function(category, parentInfo, translate) {
-                var xblockType = category;
-                if (category === 'chapter') {
-                    xblockType = translate ? gettext('section') : 'section';
-                } else if (category === 'sequential') {
-                    xblockType = translate ? gettext('subsection') : 'subsection';
-                } else if (category === 'vertical' && (!parentInfo || parentInfo.get('category') === 'sequential')) {
-                    xblockType = translate ? gettext('unit') : 'unit';
-                }
-                return xblockType;
-            },
-
             onSync: function(event) {
                 if (ViewUtils.hasChangedAttributes(this.model, ['visibility_state', 'child_info', 'display_name'])) {
                    this.onXBlockChange();
@@ -266,7 +256,7 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 var self = this,
                     parentView = this.parentView;
                 event.preventDefault();
-                var xblockType = this.getXBlockType(this.model.get('category'), parentView.model, true);
+                var xblockType = XBlockViewUtils.getXBlockType(this.model.get('category'), parentView.model, true);
                 XBlockViewUtils.deleteXBlock(this.model, xblockType).done(function() {
                     if (parentView) {
                         parentView.onChildDeleted(self, event);
