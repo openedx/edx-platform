@@ -31,6 +31,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from course_modes.models import CourseMode
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
@@ -63,6 +64,97 @@ class StartView(TestCase):
 
     def must_be_logged_in(self):
         self.assertHttpForbidden(self.client.get(self.start_url()))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestCreateOrderView(TestCase):
+    """
+    Tests for the create_order view of verified course registration process
+    """
+    def setUp(self):
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_id = 'Robot/999/Test_Course'
+        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        verified_mode = CourseMode(
+            course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
+            mode_slug="verified",
+            mode_display_name="Verified Certificate",
+            min_price=50
+        )
+        verified_mode.save()
+        course_mode_post_data = {
+            'certificate_mode': 'Select Certificate',
+            'contribution': 50,
+            'contribution-other-amt': '',
+            'explain': ''
+        }
+        self.client.post(
+            reverse("course_modes_choose", kwargs={'course_id': self.course_id}),
+            course_mode_post_data
+        )
+
+    def test_invalid_photos_data(self):
+        """
+        Test that the invalid photo data cannot be submitted
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': '',
+            'photo_id_image': ''
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        json_response = json.loads(response.content)
+        self.assertFalse(json_response.get('success'))
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_invalid_amount(self):
+        """
+        Test that the user cannot give invalid amount
+        """
+        create_order_post_data = {
+            'contribution': '1.a',
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEquals(response.status_code, 400)
+        self.assertIn('Selected price is not valid number.', response.content)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_invalid_mode(self):
+        """
+        Test that the course without verified mode cannot be processed
+        """
+        course_id = 'Fake/999/Test_Course'
+        CourseFactory.create(org='Fake', number='999', display_name='Test Course')
+        create_order_post_data = {
+            'contribution': '50',
+            'course_id': course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEquals(response.status_code, 400)
+        self.assertIn('This course doesn\'t support verified certificates', response.content)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_create_order_success(self):
+        """
+        Test that the order is created successfully when given valid data
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        json_response = json.loads(response.content)
+        self.assertTrue(json_response.get('success'))
+        self.assertIsNotNone(json_response.get('orderNumber'))
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
