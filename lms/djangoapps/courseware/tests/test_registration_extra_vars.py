@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from mock import patch
 from bs4 import BeautifulSoup
 from django.utils import translation
-
+from django.test.utils import override_settings
 
 class TestSortedCountryList(TestCase):
     """
@@ -37,14 +37,13 @@ class TestSortedCountryList(TestCase):
         self.assertLess(options[1].text, options[10].text)
 
     @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
-    @patch('django.conf.settings.LANGUAGE_CODE', 'fr')
+    @override_settings(LANGUAGE_CODE = 'fr')
     def test_country_sorting_french (self):
         """
         Test that country list is always sorted alphabetically in French
         """
         user_language = 'fr'
         with translation.override(user_language):
-            print "user_language:", user_language
             self.client.session['django_language'] = user_language  
             self.client.cookies['django_language'] = user_language
             response = self.client.get(self.url, **{'Accept-Language': user_language})
