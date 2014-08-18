@@ -53,15 +53,18 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.default_class = default_class
         self.local_modules = {}
 
-    def _load_item(self, block_id, course_entry_override=None, **kwargs):
-        if isinstance(block_id, BlockUsageLocator):
-            if isinstance(block_id.block_id, LocalId):
+    def _load_item(self, usage_key, course_entry_override=None, **kwargs):
+        # usage_key is either a UsageKey or just the block_id. if a usage_key,
+        if isinstance(usage_key, BlockUsageLocator):
+            if isinstance(usage_key.block_id, LocalId):
                 try:
-                    return self.local_modules[block_id]
+                    return self.local_modules[usage_key]
                 except KeyError:
                     raise ItemNotFoundError
             else:
-                block_id = block_id.block_id
+                block_id = usage_key.block_id
+        else:
+            block_id = usage_key
 
         json_data = self.module_data.get(block_id)
         if json_data is None:
@@ -77,7 +80,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 raise ItemNotFoundError(block_id)
 
         class_ = self.load_block_type(json_data.get('category'))
-        return self.xblock_from_json(class_, block_id, json_data, course_entry_override, **kwargs)
+        new_item = self.xblock_from_json(class_, block_id, json_data, course_entry_override, **kwargs)
+        if isinstance(usage_key, BlockUsageLocator):
+            # trust the passed in key to know the caller's expectations of which fields are filled in.
+            # particularly useful for strip_keys so may go away when we're version aware
+            new_item.location = usage_key
+        return new_item
 
     # xblock's runtime does not always pass enough contextual information to figure out
     # which named container (course x branch) or which parent is requesting an item. Because split allows
@@ -107,14 +115,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         if block_id is None:
             block_id = LocalId()
 
+        block_course_key = CourseLocator(
+            version_guid=course_entry_override['structure']['_id'],
+            org=course_entry_override.get('org'),
+            course=course_entry_override.get('course'),
+            run=course_entry_override.get('run'),
+            branch=course_entry_override.get('branch'),
+        )
         block_locator = BlockUsageLocator(
-            CourseLocator(
-                version_guid=course_entry_override['structure']['_id'],
-                org=course_entry_override.get('org'),
-                course=course_entry_override.get('course'),
-                run=course_entry_override.get('run'),
-                branch=course_entry_override.get('branch'),
-            ),
+            block_course_key,
             block_type=json_data.get('category'),
             block_id=block_id,
         )
