@@ -349,6 +349,11 @@ class VideoPage(PageObject):
 
         """
         button_selector = self.get_element_selector(VIDEO_BUTTONS[button])
+
+        # If we are going to click pause button, Ensure that player is not in buffering state
+        if button == 'pause':
+            self.wait_for(lambda: self.state != 'buffering', 'Player is Ready for Pause')
+
         self.q(css=button_selector).first.click()
 
         button_states = {'play': 'playing', 'pause': 'pause'}
