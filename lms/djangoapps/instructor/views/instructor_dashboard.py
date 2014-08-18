@@ -38,8 +38,8 @@ from student.roles import CourseFinanceAdminRole
 from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from analyticsclient.client import RestClient, ClientError
-from analyticsclient.course import Course
+from analyticsclient.client import Client
+from analyticsclient.exceptions import ClientError
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -386,16 +386,17 @@ def _update_active_students(course_key, section_data):
     section_data['active_student_count_end'] = 'N/A'
 
     try:
-        client = RestClient(base_url=base_url, auth_token=auth_token)
-        course = Course(client, course_key.to_deprecated_string())
+        client = Client(base_url=base_url, auth_token=auth_token)
+        course = client.courses(unicode(course_key))
 
-        section_data['active_student_count'] = course.recent_active_user_count['count']
+        recent_activity = course.recent_activity()
+        section_data['active_student_count'] = recent_activity['count']
 
         def format_date(value):
             return value.split('T')[0]
 
-        start = course.recent_active_user_count['interval_start']
-        end = course.recent_active_user_count['interval_end']
+        start = recent_activity['interval_start']
+        end = recent_activity['interval_end']
 
         section_data['active_student_count_start'] = format_date(start)
         section_data['active_student_count_end'] = format_date(end)
