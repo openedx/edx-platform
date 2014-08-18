@@ -55,7 +55,7 @@ if Backbone?
     attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
       closed: (closed) ->
         @$(".discussion-reply-new").toggle(not closed)
-        @$(".add-response-btn").toggle(not closed && @responses.length > 0)
+        @renderAddResponseButton()
     })
 
     expand: (event) ->
@@ -206,8 +206,8 @@ if Backbone?
         @$el.find(listSelector).append(view.el)
         view.afterInsert()
 
-    renderAddResponseButton: ->
-      if @model.hasResponses() and @model.can('can_reply')
+    renderAddResponseButton: =>
+      if @model.hasResponses() and @model.can('can_reply') and !@model.get('closed')
         @$el.find('div.add-response').show()
       else
         @$el.find('div.add-response').hide()

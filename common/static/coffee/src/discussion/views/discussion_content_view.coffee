@@ -104,9 +104,19 @@ if Backbone?
         button = @$el.find(selector)
         numVotes = votes.up_count
         button.find(".js-sr-vote-count").html(
-          interpolate(gettext("currently %(numVotes)s votes"), {numVotes: numVotes}, true)
+          interpolate(
+            ngettext("currently %(numVotes)s vote", "currently %(numVotes)s votes", numVotes),
+            {numVotes: numVotes},
+            true
+          )
         )
-        button.find(".js-visual-vote-count").html("" + numVotes)
+        button.find(".js-visual-vote-count").html(
+          interpolate(
+            ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
+            {numVotes: numVotes},
+            true
+          )
+        )
 
       pinned: (pinned) ->
         @updateButtonState(".action-pin", pinned)
@@ -231,7 +241,7 @@ if Backbone?
 
     toggleClose: (event) =>
       event.preventDefault()
-      is_closing = not model.get('closed')
+      is_closing = not @model.get('closed')
       if is_closing
         msg = gettext("We had some trouble closing this thread.  Please try again.")
       else
