@@ -7,9 +7,9 @@ from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice
 
-from instructor_analytics.basic import enrolled_students_features, course_registration_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+from instructor_analytics.basic import enrolled_students_features, sale_record_features, course_registration_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -47,6 +47,53 @@ class TestAnalyticsBasic(TestCase):
     def test_available_features(self):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
         self.assertEqual(set(AVAILABLE_FEATURES), set(STUDENT_FEATURES + PROFILE_FEATURES))
+
+
+class TestCourseSaleRecordsAnalyticsBasic(TestCase):
+    """ Test basic course sale records analytics functions. """
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_course_sale_features(self):
+
+        query_features = [
+            'company_name', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
+            'tax_id', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
+            'codes', 'course_id'
+        ]
+
+        #create invoice
+        sale_invoice = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='Testw_1',
+            company_contact_email='test2@test.com', tax_id='2Fwe23S', internal_reference="ABC",
+            company_reference='', course_id=self.course.id
+        )
+        for i in range(5):
+            course_code = CourseRegistrationCode(
+                code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=sale_invoice
+            )
+            course_code.save()
+
+        course_sale_records_list = sale_record_features(self.course.id, query_features)
+
+        for sale_record in course_sale_records_list:
+            self.assertEqual(sale_record['total_amount'], sale_invoice.total_amount)
+            self.assertEqual(sale_record['company_contact_email'], sale_invoice.company_contact_email)
+            self.assertEqual(sale_record['company_contact_name'], sale_invoice.company_contact_name)
+            self.assertEqual(sale_record['company_name'], sale_invoice.company_name)
+            self.assertEqual(sale_record['internal_reference'], sale_invoice.internal_reference)
+            self.assertEqual(sale_record['company_reference'], sale_invoice.company_reference)
+            self.assertEqual(sale_record['tax_id'], sale_invoice.tax_id)
+            self.assertEqual(sale_record['invoice_number'], sale_invoice.id)
+            self.assertEqual(sale_record['created_by'], self.instructor)
+            self.assertEqual(sale_record['total_used_codes'], 0)
+            self.assertEqual(sale_record['total_codes'], 5)
 
 
 class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
