@@ -24,15 +24,21 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
+
+
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -58,8 +64,8 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestVerifyView(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestVerifyView(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
@@ -93,8 +99,8 @@ class TestVerifyView(TestCase):
         self.assertIn("You are upgrading your registration for", response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestVerifiedView(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestVerifiedView(ModuleStoreTestCase):
     """
     Tests for VerifiedView.
     """
@@ -121,8 +127,8 @@ class TestVerifiedView(TestCase):
         self.assertIn('dashboard', response._headers.get('location')[1])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestReverifyView(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestReverifyView(ModuleStoreTestCase):
     """
     Tests for the reverification views
 
@@ -167,8 +173,8 @@ class TestReverifyView(TestCase):
         self.assertTrue(context['error'])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestPhotoVerificationResultsCallback(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
     """
@@ -379,8 +385,8 @@ class TestPhotoVerificationResultsCallback(TestCase):
         self.assertIsNotNone(CourseEnrollment.objects.get(course_id=self.course_id))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestMidCourseReverifyView(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestMidCourseReverifyView(ModuleStoreTestCase):
     """ Tests for the midcourse reverification views """
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
@@ -490,8 +496,8 @@ class TestMidCourseReverifyView(TestCase):
         self.assertEquals(response.status_code, 200)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestReverificationBanner(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestReverificationBanner(ModuleStoreTestCase):
     """ Tests for the midcourse reverification  failed toggle banner off """
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -511,3 +517,40 @@ class TestReverificationBanner(TestCase):
         self.client.post(reverse('verify_student_toggle_failed_banner_off'))
         photo_verification = SoftwareSecurePhotoVerification.objects.get(user=self.user, window=self.window)
         self.assertFalse(photo_verification.display)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestCreateOrder(ModuleStoreTestCase):
+    """ Tests for the create order view. """
+
+    def setUp(self):
+        """ Create a user and course. """
+        self.user = UserFactory.create(username="test", password="test")
+        self.course = CourseFactory.create()
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        self.client.login(username="test", password="test")
+
+    def test_create_order_already_verified(self):
+        # Verify the student so we don't need to submit photos
+        self._verify_student()
+
+        # Create an order
+        url = reverse('verify_student_create_order')
+        params = {
+            'course_id': unicode(self.course.id),
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the information will be sent to the correct callback URL
+        # (configured by test settings)
+        data = json.loads(response.content)
+        self.assertEqual(data['override_custom_receipt_page'], "http://testserver/shoppingcart/postpay_callback/")
+
+    def _verify_student(self):
+        """ Simulate that the student's identity has already been verified. """
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Fake payment page for use in acceptance tests.
 This view is enabled in the URLs by the feature flag `ENABLE_PAYMENT_FAKE`.
@@ -21,7 +22,7 @@ from edxmako.shortcuts import render_to_response
 # We use the same hashing function as the software under test,
 # because it mainly uses standard libraries, and I want
 # to avoid duplicating that code.
-from shoppingcart.processors.CyberSource import processor_hash
+from shoppingcart.processors.CyberSource2 import processor_hash
 
 
 class PaymentFakeView(View):
@@ -51,7 +52,7 @@ class PaymentFakeView(View):
         * Triggers a POST to `postpay_callback()` on submit.
 
         * Has hidden fields for all the data CyberSource sends to the callback.
-            - Most of this data is duplicated from the request POST params (e.g. `amount` and `course_id`)
+            - Most of this data is duplicated from the request POST params (e.g. `amount`)
             - Other params contain fake data (always the same user name and address.
             - Still other params are calculated (signatures)
 
@@ -63,7 +64,7 @@ class PaymentFakeView(View):
         served by the shopping cart app.
         """
         if self._is_signature_valid(request.POST):
-            return self._payment_page_response(request.POST, '/shoppingcart/postpay_callback/')
+            return self._payment_page_response(request.POST)
 
         else:
             return render_to_response('shoppingcart/test/fake_payment_error.html')
@@ -91,22 +92,17 @@ class PaymentFakeView(View):
         Return a bool indicating  whether the client sent
         us a valid signature in the payment page request.
         """
-
-        # Calculate the fields signature
-        fields_sig = processor_hash(post_params.get('orderPage_signedFields'))
-
         # Retrieve the list of signed fields
-        signed_fields = post_params.get('orderPage_signedFields').split(',')
+        signed_fields = post_params.get('signed_field_names').split(',')
 
         # Calculate the public signature
         hash_val = ",".join([
             "{0}={1}".format(key, post_params[key])
             for key in signed_fields
-        ]) + ",signedFieldsPublicSignature={0}".format(fields_sig)
-
+        ])
         public_sig = processor_hash(hash_val)
 
-        return public_sig == post_params.get('orderPage_signaturePublic')
+        return (public_sig == post_params.get('signature'))
 
     @classmethod
     def response_post_params(cls, post_params):
@@ -117,88 +113,76 @@ class PaymentFakeView(View):
             # Indicate whether the payment was successful
             "decision": "ACCEPT" if cls.PAYMENT_STATUS_RESPONSE == "success" else "REJECT",
 
-            # Reflect back whatever the client sent us,
-            # defaulting to `None` if a paramter wasn't received
-            "course_id": post_params.get('course_id'),
-            "orderAmount": post_params.get('amount'),
-            "ccAuthReply_amount": post_params.get('amount'),
-            "orderPage_transactionType": post_params.get('orderPage_transactionType'),
-            "orderPage_serialNumber": post_params.get('orderPage_serialNumber'),
-            "orderNumber": post_params.get('orderNumber'),
-            "orderCurrency": post_params.get('currency'),
-            "match": post_params.get('match'),
-            "merchantID": post_params.get('merchantID'),
+            # Reflect back parameters we were sent by the client
+            "req_amount": post_params.get('amount'),
+            "auth_amount": post_params.get('amount'),
+            "req_reference_number": post_params.get('reference_number'),
+            "req_transaction_uuid": post_params.get('transaction_uuid'),
+            "req_access_key": post_params.get('access_key'),
+            "req_transaction_type": post_params.get('transaction_type'),
+            "req_override_custom_receipt_page": post_params.get('override_custom_receipt_page'),
+            "req_payment_method": post_params.get('payment_method'),
+            "req_currency": post_params.get('currency'),
+            "req_locale": post_params.get('locale'),
+            "signed_date_time": post_params.get('signed_date_time'),
 
-            # Send fake user data
-            "billTo_firstName": "John",
-            "billTo_lastName": "Doe",
-            "billTo_street1": "123 Fake Street",
-            "billTo_state": "MA",
-            "billTo_city": "Boston",
-            "billTo_postalCode": "02134",
-            "billTo_country": "us",
-
-            # Send fake data for other fields
-            "card_cardType": "001",
-            "card_accountNumber": "############1111",
-            "card_expirationMonth": "08",
-            "card_expirationYear": "2019",
-            "paymentOption": "card",
-            "orderPage_environment": "TEST",
-            "orderPage_requestToken": "unused",
-            "reconciliationID": "39093601YKVO1I5D",
-            "ccAuthReply_authorizationCode": "888888",
-            "ccAuthReply_avsCodeRaw": "I1",
-            "reasonCode": "100",
-            "requestID": "3777139938170178147615",
-            "ccAuthReply_reasonCode": "100",
-            "ccAuthReply_authorizedDateTime": "2013-08-28T181954Z",
-            "ccAuthReply_processorResponse": "100",
-            "ccAuthReply_avsCode": "X",
-
-            # We don't use these signatures
-            "transactionSignature": "unused=",
-            "decision_publicSignature": "unused=",
-            "orderAmount_publicSignature": "unused=",
-            "orderNumber_publicSignature": "unused=",
-            "orderCurrency_publicSignature": "unused=",
+            # Fake data
+            "req_bill_to_address_city": "Boston",
+            "req_card_number": "xxxxxxxxxxxx1111",
+            "req_bill_to_address_state": "MA",
+            "req_bill_to_address_line1": "123 Fake Street",
+            "utf8": u"✓",
+            "reason_code": "100",
+            "req_card_expiry_date": "01-2018",
+            "req_bill_to_forename": "John",
+            "req_bill_to_surname": "Doe",
+            "auth_code": "888888",
+            "req_bill_to_address_postal_code": "02139",
+            "message": "Request was processed successfully.",
+            "auth_response": "100",
+            "auth_trans_ref_no": "84997128QYI23CJT",
+            "auth_time": "2014-08-18T110622Z",
+            "bill_trans_ref_no": "84997128QYI23CJT",
+            "auth_avs_code": "X",
+            "req_bill_to_email": "john@example.com",
+            "auth_avs_code_raw": "I1",
+            "req_profile_id": "0000001",
+            "req_card_type": "001",
+            "req_bill_to_address_country": "US",
+            "transaction_id": "4083599817820176195662",
         }
 
         # Indicate which fields we are including in the signature
         # Order is important
         signed_fields = [
-            'billTo_lastName', 'orderAmount', 'course_id',
-            'billTo_street1', 'card_accountNumber', 'orderAmount_publicSignature',
-            'orderPage_serialNumber', 'orderCurrency', 'reconciliationID',
-            'decision', 'ccAuthReply_processorResponse', 'billTo_state',
-            'billTo_firstName', 'card_expirationYear', 'billTo_city',
-            'billTo_postalCode', 'orderPage_requestToken', 'ccAuthReply_amount',
-            'orderCurrency_publicSignature', 'orderPage_transactionType',
-            'ccAuthReply_authorizationCode', 'decision_publicSignature',
-            'match', 'ccAuthReply_avsCodeRaw', 'paymentOption',
-            'billTo_country', 'reasonCode', 'ccAuthReply_reasonCode',
-            'orderPage_environment', 'card_expirationMonth', 'merchantID',
-            'orderNumber_publicSignature', 'requestID', 'orderNumber',
-            'ccAuthReply_authorizedDateTime', 'card_cardType', 'ccAuthReply_avsCode'
+            'transaction_id', 'decision', 'req_access_key', 'req_profile_id',
+            'req_transaction_uuid', 'req_transaction_type', 'req_reference_number',
+            'req_amount', 'req_currency', 'req_locale',
+            'req_payment_method', 'req_override_custom_receipt_page',
+            'req_bill_to_forename', 'req_bill_to_surname',
+            'req_bill_to_email', 'req_bill_to_address_line1',
+            'req_bill_to_address_city', 'req_bill_to_address_state',
+            'req_bill_to_address_country', 'req_bill_to_address_postal_code',
+            'req_card_number', 'req_card_type', 'req_card_expiry_date',
+            'message', 'reason_code', 'auth_avs_code',
+            'auth_avs_code_raw', 'auth_response', 'auth_amount',
+            'auth_code', 'auth_trans_ref_no', 'auth_time',
+            'bill_trans_ref_no', 'signed_field_names', 'signed_date_time'
         ]
 
         # Add the list of signed fields
-        resp_params['signedFields'] = ",".join(signed_fields)
-
-        # Calculate the fields signature
-        signed_fields_sig = processor_hash(resp_params['signedFields'])
+        resp_params['signed_field_names'] = ",".join(signed_fields)
 
         # Calculate the public signature
         hash_val = ",".join([
             "{0}={1}".format(key, resp_params[key])
             for key in signed_fields
-        ]) + ",signedFieldsPublicSignature={0}".format(signed_fields_sig)
-
-        resp_params['signedDataPublicSignature'] = processor_hash(hash_val)
+        ])
+        resp_params['signature'] = processor_hash(hash_val)
 
         return resp_params
 
-    def _payment_page_response(self, post_params, callback_url):
+    def _payment_page_response(self, post_params):
         """
         Render the payment page to a response.  This is an HTML form
         that triggers a POST request to `callback_url`.
@@ -210,9 +194,10 @@ class PaymentFakeView(View):
         we either:
 
         1) Use fake static data (e.g. always send user name "John Doe")
-        2) Use the same info we received (e.g. send the same `course_id` and `amount`)
+        2) Use the same info we received (e.g. send the same `amount`)
         3) Dynamically calculate signatures using a shared secret
         """
+        callback_url = post_params.get('override_custom_receipt_page', '/shoppingcart/postpay_callback/')
 
         # Build the context dict used to render the HTML form,
         # filling in values for the hidden input fields.
