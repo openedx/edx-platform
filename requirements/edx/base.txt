@@ -134,4 +134,4 @@ git+https://github.com/mfogel/django-settings-context-processor.git
 git+https://github.com/mitocw/django-cas.git
 
 # edX packages
-edx-submissions==0.0.3
+edx-submissions==0.0.6
