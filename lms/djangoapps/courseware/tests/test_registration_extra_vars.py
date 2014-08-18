@@ -37,11 +37,12 @@ class TestSortedCountryList(TestCase):
         self.assertLess(options[1].text, options[10].text)
 
     @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
+    @patch('django.conf.settings.LANGUAGE_CODE', 'fr')
     def test_country_sorting_french (self):
         """
         Test that country list is always sorted alphabetically in French
         """
-        user_language = 'fr-fr'
+        user_language = 'fr'
         with translation.override(user_language):
             print "user_language:", user_language
             self.client.session['django_language'] = user_language  
@@ -50,8 +51,6 @@ class TestSortedCountryList(TestCase):
             soup = BeautifulSoup(response.content)
             country = soup.find(id="country")
             options = country.findAll("option")
-            from nose.tools import set_trace
-            set_trace()
             af_option = options[1]
             self.assertEqual(
                 af_option.text,
