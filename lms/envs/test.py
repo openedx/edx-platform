@@ -220,6 +220,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee
@@ -231,10 +232,13 @@ RANDOM_SHARED_SECRET = ''.join(
     for x in range(250)
 )
 
-CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
-CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
-CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
+CC_PROCESSOR_NAME = 'CyberSource2'
+CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = "edx"
+CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
+
+FEATURES['STORE_BILLING_INFO'] = True
 
 ########################### SYSADMIN DASHBOARD ################################
 FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
