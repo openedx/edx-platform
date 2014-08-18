@@ -12,6 +12,9 @@ August, 2014
 
    * - Date
      - Change
+   * - 08/18/14
+     - Expanded the :ref:`Example Messages to Students` in the :ref:`Launch`
+       chapter.
    * - 08/12/14
      - Updated documentation to address the new publishing workflow and user
        interface. 
