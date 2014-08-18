@@ -8,6 +8,8 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import patch
 from bs4 import BeautifulSoup
+from django.utils import translation
+
 
 class TestSortedCountryList(TestCase):
     """
@@ -32,30 +34,32 @@ class TestSortedCountryList(TestCase):
             u'Afghanistan',
         )
         # testing two option elements to be in alphabetical order
-        self.assertTrue(options[1].text < options[10].text)
+        self.assertLess(options[1].text, options[10].text)
 
     @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
     def test_country_sorting_french (self):
         """
         Test that country list is always sorted alphabetically in French
         """
-        from django.utils import translation
-        user_language = 'fr'
-        translation.activate(user_language)
-        #self.client.cookies['django_language'] = 'fr'
-        response = self.client.get(self.url, **{'Accept-Language': 'fr'})
-        soup = BeautifulSoup(response.content)
-        country = soup.find(id="country")
-        options = country.findAll("option")
-        af_option = options[1]
-        self.assertEqual(
-            af_option.text,
-            u'Afghanistan',
-        )
-        # testing two option elements to be in alphabetical order
-        self.assertTrue(options[1].text < options[10].text)
-        translation.deactivate(user_language)
-
+        user_language = 'fr-fr'
+        with translation.override(user_language):
+            print "user_language:", user_language
+            self.client.session['django_language'] = user_language  
+            self.client.cookies['django_language'] = user_language
+            response = self.client.get(self.url, **{'Accept-Language': user_language})
+            soup = BeautifulSoup(response.content)
+            country = soup.find(id="country")
+            options = country.findAll("option")
+            from nose.tools import set_trace
+            set_trace()
+            af_option = options[1]
+            self.assertEqual(
+                af_option.text,
+                u'Afghanistan',
+            )
+            # testing two option elements to be in alphabetical order
+            self.assertLess(options[1].text, options[10].text)
+        
 class TestExtraRegistrationVariables(TestCase):
     """
     Test that extra registration variables are properly checked according to settings
