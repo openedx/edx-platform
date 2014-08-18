@@ -16,8 +16,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
 from util.json_request import JsonResponse
+from util.date_utils import get_default_time_display
 from edxmako.shortcuts import render_to_response
 
+from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -376,6 +378,8 @@ def course_index(request, course_key):
     sections = course_module.get_children()
     course_structure = _course_outline_json(request, course_module)
     locator_to_show = request.REQUEST.get('show', None)
+    course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
+    settings_url = reverse_course_url('settings_handler', course_key)
 
     try:
         current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
@@ -392,6 +396,8 @@ def course_index(request, course_key):
             CourseGradingModel.fetch(course_key).graders
         ),
         'rerun_notification_id': current_action.id if current_action else None,
+        'course_release_date': course_release_date,
+        'settings_url': settings_url,
     })
 
 
