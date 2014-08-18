@@ -5,6 +5,7 @@
   import hashlib
   import copy
   import json
+  from xmodule.modulestore import EdxJSONEncoder
   hlskey = hashlib.md5(module.location.to_deprecated_string().encode('utf-8')).hexdigest()
 %>
 
@@ -33,4 +34,4 @@
     <%include file="source-edit.html" />
 % endif
 
-<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy) | h}'/>
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy, cls=EdxJSONEncoder) | h}'/>
