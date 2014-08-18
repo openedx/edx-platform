@@ -264,6 +264,11 @@ FEATURES = {
     # Default to false here b/c dev environments won't have the api, will override in aws.py
     'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
 
+    # TODO: ECOM-136
+    # Enables the new navigation template and styles. This should be enabled
+    # when the styles appropriately match the edX.org website.
+    'ENABLE_NEW_EDX_HEADER': False,
+
 }
 
 # Ignore static asset files on import which match this pattern

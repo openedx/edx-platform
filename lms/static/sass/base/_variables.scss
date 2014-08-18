@@ -217,6 +217,10 @@ $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
+$courseware-border-bottom-color: #44a2de;
+$courseware-button-border-color: #e6e6e6;
+$courseware-hover-color: #333435;
+$courseware-navigation-color: #009ee7;
 
 // ====================
 
@@ -393,6 +397,9 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 $f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// Header specific sans-serif
+$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 
 // SPLINT: colors
 
