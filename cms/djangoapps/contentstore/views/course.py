@@ -348,33 +348,36 @@ def course_listing(request):
 
     def format_course_for_view(course):
         """
-        return tuple of the data which the view requires for each course
+        Return a dict of the data which the view requires for each course
         """
-        return (
-            course.display_name,
-            reverse_course_url('course_handler', course.id),
-            get_lms_link_for_item(course.location),
-            _get_rerun_link_for_item(course.id),
-            course.display_org_with_default,
-            course.display_number_with_default,
-            course.location.run
-        )
+        return {
+            'display_name': course.display_name,
+            'course_key': unicode(course.location.course_key),
+            'url': reverse_course_url('course_handler', course.id),
+            'lms_link': get_lms_link_for_item(course.location),
+            'rerun_link': _get_rerun_link_for_item(course.id),
+            'org': course.display_org_with_default,
+            'number': course.display_number_with_default,
+            'run': course.location.run
+        }
 
     def format_unsucceeded_course_for_view(uca):
         """
-        return tuple of the data which the view requires for each unsucceeded course
+        Return a dict of the data which the view requires for each unsucceeded course
         """
-        return (
-            uca.display_name,
-            uca.course_key.org,
-            uca.course_key.course,
-            uca.course_key.run,
-            True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
-                'action_state_id': uca.id,
-            }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
-        )
+        return {
+            'display_name': uca.display_name,
+            'course_key': unicode(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            'dismiss_link':
+                reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
+                    'action_state_id': uca.id,
+                }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+        }
 
     # remove any courses in courses that are also in the unsucceeded_course_actions list
     unsucceeded_action_course_keys = [uca.course_key for uca in unsucceeded_course_actions]
