@@ -377,7 +377,7 @@ Feature: CMS Transcripts
         And I click transcript button "choose" number 2
         And I see value "uk_transcripts|t_not_exist" in the field "Default Timed Transcript"
 
-    # Flaky test fails occasionally in master. https://edx-wiki.atlassian.net/browse/BLD-927
+    # Flaky test fails occasionally in master. https://openedx.atlassian.net/browse/BLD-892
     #21
     #Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save - > change it to another one HTML5 source w/o #transcripts - click on use existing - >  change it to another one HTML5 source w/o transcripts - click on use existing
     #    Given I have created a Video component with subtitles "t_not_exist"
