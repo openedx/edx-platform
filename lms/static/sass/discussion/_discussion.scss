@@ -538,7 +538,7 @@ body.discussion {
     .discussion-response {
       @include box-sizing(border-box);
       border-radius: 3px 3px 0 0;
-      padding: $baseline $baseline 0;
+      padding: $baseline;
       background-color: $white;
     }
     .posted-by {
