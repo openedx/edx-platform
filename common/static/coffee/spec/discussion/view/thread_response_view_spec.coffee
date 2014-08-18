@@ -1,17 +1,12 @@
 describe 'ThreadResponseView', ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures """
-            <script id="thread-response-template" type="text/template">
-                <a href="#" class="action-show-comments">Show comments</a>
-                <ol class="comments"></ol>
-            </script>
-            <div id="thread-response-fixture"/>
-        """
+        DiscussionSpecHelper.setUnderscoreFixtures()
+
         @response = new Comment {
             children: [{}, {}]
         }
-        @view = new ThreadResponseView({model: @response, el: $("#thread-response-fixture")})
+        @view = new ThreadResponseView({model: @response, el: $("#fixture-element")})
         spyOn(ThreadResponseShowView.prototype, "render")
         spyOn(ResponseCommentView.prototype, "render")
 
