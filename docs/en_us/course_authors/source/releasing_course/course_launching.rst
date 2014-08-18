@@ -248,7 +248,6 @@ messages that have been sent, such as:
 * The change in the number of people who were sent course-related messages over
   time.
 
-
 To produce the Email Task History report:
 
 #. View the live version of your course.
@@ -315,6 +314,7 @@ milestones, as models for your own course communications.
 * :ref:`Midcourse Events`
 * :ref:`Technical Issue`
 * :ref:`Course Farewell and Certificates`
+* :ref:`New Course Run Announcement`
 
 These messages are styled as email messages, but you could also post this
 information in a course discussion topic or on the **Course Info** page.
@@ -331,17 +331,18 @@ Pre-launch reminders raise awareness of the course start date, publicize the
 course, and generate excitement. In addition to the course start date and time,
 the example that follows also lets students know that:
 
-* UTC is used in edX courses. Alternatively, you could include information about
-  your course or the edX platform that will contribute to your students'
+* UTC is used in edX courses. Alternatively, you could include information
+  about your course or the edX platform that will contribute to your students'
   success.
 
-* The course has a companion social media site. Alternatively, you might include
-  information about planned meetups or other community-building opportunities.
+* The course has a companion social media site. Alternatively, you might
+  include information about planned meetups or other community-building
+  opportunities.
 
 You may want to send out more than one message before the course launches: use
 this template as a starting point for crafting the different messages you want
-to deliver. Replace values enclosed by {braces} with information that applies to
-your course.
+to deliver. Replace values enclosed by {braces} with information that applies
+to your course.
 
 :: 
 
@@ -598,3 +599,53 @@ about future access to course materials. Be sure to replace values enclosed by
   Good luck on the final exam and beyond!
 
   {name} and the {course number} staff
+
+.. _New Course Run Announcement:
+
+===============================
+New Course Run Announcement
+===============================
+
+When you prepare a course for a new run, you can use the bulk email feature in
+its previous run (or runs) to inform an engaged and knowledgeable audience:
+your former students. Announcing a new run to students of an earlier run gives
+you the opportunity to highlight key aspects of the course, such as the quality
+and variety of its discussions, or the global interest and relevance of the
+subject, as demonstrated by past enrollment. You can also reveal new features
+or content that have been added to the new course run. By emphasizing the
+value of the course, you get people thinking and talking about their
+experiences, build excitement, and encourage re-enrollment.
+
+This message template offers students who did not complete the course, or who
+did not previously choose the verified certificate track, the opportunity to do
+so. It also invites students to share the course with colleagues and and
+friends. 
+
+When preparing a message from this template, search for values enclosed by
+{braces} and replace them with information that applies to your course.
+
+::
+
+  Subject: Announcing a new run of {course name}
+
+  Hello {course number} leaners,
+
+  The next run of {course number} {course name} begins on {date}! We are glad
+  to share this news with you, the students who made the earlier run{s} of
+  {course number} so succesful.
+
+  {Success story from the previous run.} 
+
+  {New content or features for the upcoming run.}
+
+  Perhaps you want to share the {course name} experience with a friend or
+  colleague, earn an ID-verified certificate of achievement, or work through
+  course content that you weren't able to complete before. When {course number}
+  is offered in {time frame}, we welcome you to join the community of learners
+  again.
+
+  To learn more and to register, visit the {course name} page {add link}.
+
+  We hope to see you in the course,
+
+  The {course number} Staff
