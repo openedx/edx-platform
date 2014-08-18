@@ -137,24 +137,24 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           <h3 class="title">Courses Being Processed</h3>
 
           <ul class="list-courses">
-            %for display_name, org, num, run, state_failed, state_in_progress, dismiss_link in sorted(unsucceeded_course_actions, key=lambda s: s[0].lower() if s[0] is not None else ''):
+            %for course_info in sorted(unsucceeded_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
             <!-- STATE: re-run is processing -->
-            %if state_in_progress:
-            <li class="wrapper-course has-status" data-test-unsucceeded="${org}/${num}/${run}">
+            %if course_info['is_in_progress']:
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun is-processing">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">${display_name}</h3>
+                  <h3 class="course-title">${course_info['display_name']}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
-                      <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
+                      <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
                     </span>
                     <span class="course-num metadata-item">
                       <span class="label">${_("Course Number:")}</span>
-                      <span class="value">${num}</span>
+                      <span class="value">${course_info['number']}</span>
                     </span>
                     <span class="course-run metadata-item">
-                      <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                     </span>
                   </div>
                 </div>
@@ -177,22 +177,22 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <!-- - - - -->
 
             <!-- STATE: re-run has error -->
-            %if state_failed:
-            <li class="wrapper-course has-status" data-test-unsucceeded="${org}/${num}/${run}">
+            %if course_info['is_failed']:
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
               <div class="course-item course-rerun has-error">
                 <div class="course-details" href="#">
-                  <h3 class="course-title">${display_name}</h3>
+                  <h3 class="course-title">${course_info['display_name']}</h3>
 
                   <div class="course-metadata">
                     <span class="course-org metadata-item">
-                      <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
+                      <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
                     </span>
                     <span class="course-num metadata-item">
                       <span class="label">${_("Course Number:")}</span>
-                      <span class="value">${num}</span>
+                      <span class="value">${course_info['number']}</span>
                     </span>
                     <span class="course-run metadata-item">
-                      <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                     </span>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
-                    <a href="#" class="button dismiss-button" data-dismiss-link="${dismiss_link}">
+                    <a href="#" class="button dismiss-button" data-dismiss-link="${course_info['dismiss_link']}">
                       <i class="icon icon-remove-sign"></i>
                       <span class="button-copy">${_("Dismiss")}</span>
                     </a>
@@ -228,21 +228,21 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link, rerun_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-          <li class="course-item" data-test-course="${org}/${num}/${run}">
-            <a class="course-link" href="${url}">
-              <h3 class="course-title">${course}</h3>
+          %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+          <li class="course-item" data-course-key="${course_info['course_key']}">
+            <a class="course-link" href="${course_info['url']}">
+              <h3 class="course-title">${course_info['display_name']}</h3>
 
               <div class="course-metadata">
                 <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
+                  <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
                 </span>
                 <span class="course-num metadata-item">
                   <span class="label">${_("Course Number:")}</span>
-                  <span class="value">${num}</span>
+                  <span class="value">${course_info['number']}</span>
                 </span>
                 <span class="course-run metadata-item">
-                  <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
+                  <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                 </span>
               </div>
             </a>
@@ -250,11 +250,11 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
             <ul  class="item-actions course-actions">
               % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
               <li class="action action-rerun">
-                <a href="${rerun_link}" class="button rerun-button">${_("Re-run Course")}</a>
+                <a href="${course_info['rerun_link']}" class="button rerun-button">${_("Re-run Course")}</a>
               </li>
               % endif
               <li class="action action-view">
-                <a href="${lms_link}" rel="external" class="button view-button">${_("View Live")}</a>
+                <a href="${course_info['lms_link']}" rel="external" class="button view-button">${_("View Live")}</a>
               </li>
             </ul>
           </li>

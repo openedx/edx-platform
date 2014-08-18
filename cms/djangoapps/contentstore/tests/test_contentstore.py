@@ -5,6 +5,7 @@
 import copy
 import mock
 import shutil
+import lxml
 
 from datetime import timedelta
 from fs.osfs import OSFS
@@ -1585,31 +1586,31 @@ class RerunCourseTest(ContentStoreTestCase):
             destination_course_key = CourseKey.from_string(json_resp['destination_course_key'])
         return destination_course_key
 
-    def create_course_listing_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the course listing section"""
-        return 'data-test-course="{}/{}/{}"'.format(course_key.org, course_key.course, course_key.run)
+    def get_course_listing_elements(self, html, course_key):
+        """Returns the elements in the course listing section of html that have the given course_key"""
+        return html.cssselect('.course-item[data-course-key="{}"]'.format(unicode(course_key)))
 
-    def create_unsucceeded_course_action_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
-        return 'data-test-unsucceeded="{}/{}/{}"'.format(course_key.org, course_key.course, course_key.run)
+    def get_unsucceeded_course_action_elements(self, html, course_key):
+        """Returns the elements in the unsucceeded course action section that have the given course_key"""
+        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(unicode(course_key)))
 
     def assertInCourseListing(self, course_key):
         """
         Asserts that the given course key is in the accessible course listing section of the html
         and NOT in the unsucceeded course action section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertIn(self.create_course_listing_html(course_key), course_listing_html.content)
-        self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 1)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
     def assertInUnsucceededCourseActions(self, course_key):
         """
         Asserts that the given course key is in the unsucceeded course action section of the html
         and NOT in the accessible course listing section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertNotIn(self.create_course_listing_html(course_key), course_listing_html.content)
-        self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 
     def test_rerun_course_success(self):
 
