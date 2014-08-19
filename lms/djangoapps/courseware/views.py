@@ -311,7 +311,7 @@ def index(request, course_id, chapter=None, section=None,
                         u' far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
-        studio_url = get_studio_url(course_key, 'course')
+        studio_url = get_studio_url(course, 'course')
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -419,7 +419,7 @@ def index(request, course_id, chapter=None, section=None,
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
-            studio_url = get_studio_url(course_key, 'course')
+            studio_url = get_studio_url(course, 'course')
             prev_section = get_current_child(chapter_module)
             if prev_section is None:
                 # Something went wrong -- perhaps this chapter has no sections visible to the user
@@ -553,7 +553,7 @@ def course_info(request, course_id):
     staff_access = has_access(request.user, 'staff', course)
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
     reverifications = fetch_reverify_banner_info(request, course_key)
-    studio_url = get_studio_url(course_key, 'course_info')
+    studio_url = get_studio_url(course, 'course_info')
 
     context = {
         'request': request,
@@ -655,7 +655,7 @@ def course_about(request, course_id):
     course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
     staff_access = has_access(request.user, 'staff', course)
-    studio_url = get_studio_url(course_key, 'settings/details')
+    studio_url = get_studio_url(course, 'settings/details')
 
     if has_access(request.user, 'load', course):
         course_target = reverse('info', args=[course.id.to_deprecated_string()])
@@ -812,7 +812,7 @@ def _progress(request, course_key, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     courseware_summary = grades.progress_summary(student, request, course)
-    studio_url = get_studio_url(course_key, 'settings/grading')
+    studio_url = get_studio_url(course, 'settings/grading')
     grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
