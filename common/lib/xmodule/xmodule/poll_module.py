@@ -94,11 +94,11 @@ class PollModule(PollFields, XModule):
     def get_html(self):
         """Renders parameters to template."""
         params = {
-                  'element_id': self.location.html_id(),
-                  'element_class': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  'configuration_json': self.dump_poll(),
-                  }
+            'element_id': self.location.block_id,
+            'element_class': self.location.category,
+            'ajax_url': self.system.ajax_url,
+            'configuration_json': self.dump_poll(),
+        }
         self.content = self.system.render_template('poll.html', params)
         return self.content
 

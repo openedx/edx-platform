@@ -107,7 +107,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         """ Renders parameters to template. """
 
         # these 3 will be used in class methods
-        self.html_id = self.location.html_id()
+        self.html_id = self.location.block_id
         self.html_class = self.location.category
 
         self.configuration_json = self.build_configuration_json()

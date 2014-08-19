@@ -64,7 +64,7 @@ class AnnotatableModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.element_id = self.location.html_id()
+        self.element_id = self.location.block_id
         self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
     def _get_annotation_class_attr(self, index, el):

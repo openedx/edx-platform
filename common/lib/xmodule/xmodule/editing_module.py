@@ -54,7 +54,7 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
         _context = super(TabsEditingDescriptor, self).get_context()
         _context.update({
             'tabs': self.tabs,
-            'html_id': self.location.html_id(),  # element_id
+            'html_id': self.location.block_id,  # element_id
             'data': self.data,
         })
         return _context
