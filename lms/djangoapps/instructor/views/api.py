@@ -59,6 +59,8 @@ import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
+from user_api.models import UserPreference
+from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
@@ -772,6 +774,7 @@ def generate_registration_codes(request, course_id):
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course_registration_codes = []
+    invoice_copy = False
 
     # covert the course registration code number into integer
     try:
@@ -790,7 +793,9 @@ def generate_registration_codes(request, course_id):
     recipient_list = [contact_email]
     if request.POST.get('invoice', False):
         recipient_list.append(request.user.email)
+        invoice_copy = True
 
+    UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price, company_name=company_name, company_contact_name=contact_name,
         course_id=course_id, company_contact_email=contact_email, tax_id=company_tax_id,
@@ -1486,6 +1491,20 @@ def proxy_legacy_analytics(request, course_id):
             "Error from analytics server ({}).".format(res.status_code),
             status=500
         )
+
+
+@require_POST
+def get_user_invoice_preference(request, course_id):  # pylint: disable=W0613
+    """
+    Gets invoice copy user's preferences.
+    """
+    invoice_copy_preference = True
+    if UserPreference.get_preference(request.user, INVOICE_KEY) is not None:
+        invoice_copy_preference = UserPreference.get_preference(request.user, INVOICE_KEY) == 'True'
+
+    return JsonResponse({
+        'invoice_copy': invoice_copy_preference
+    })
 
 
 def _display_unit(unit):

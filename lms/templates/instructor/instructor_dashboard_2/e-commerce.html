@@ -11,7 +11,7 @@
          <h2>Registration Codes</h2>
          <div>
             <span class="code_tip">Click to generate Registration Codes
-            <a id="registration_code_generation_link" href="#registration_code_generation_modal" rel="leanModal" class="add blue-button">Generate Registration Codes</a>
+            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">Generate Registration Codes</a>
             </span>
             <p>Click to generate a CSV file of all Course Registrations Codes:</p>
             <p>
@@ -113,6 +113,7 @@
                      </tbody>
                   </table>
                   <a id="edit-modal-trigger" href="#edit-coupon-modal" rel="leanModal"></a>
+                  <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
                   %endif
                </section>
             </div>
@@ -154,6 +155,19 @@
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
          $(this).removeAttr('href')
        }
+     });
+     $('#registration_code_generation_link').click(function(event){
+         event.preventDefault();
+
+         $.ajax({
+         type: "POST",
+         url: "${section_data['get_user_invoice_preference_url']}",
+         success: function (data) {
+             $('#invoice-copy').prop('checked', data.invoice_copy);
+             $('#registration_code_generation_link-trigger').click();
+           }
+       });
+
      });
      $('a.edit-right').click(function (event) {
        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
