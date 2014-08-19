@@ -1,5 +1,5 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/course_rerun",
-        "js/views/utils/create_course_utils"],
+        "js/views/utils/create_course_utils", "jquery.simulate"],
     function ($, create_sinon, view_helpers, CourseRerunUtils, CreateCourseUtilsFactory) {
         describe("Create course rerun page", function () {
             var selectors = {
@@ -99,6 +99,14 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect($(selectors.save)).toHaveClass(classes.disabled);
                     setErrorMessage(selectors.org, '');
                     expect($(selectors.save)).toHaveClass(classes.disabled);
+                });
+
+                it("shows an error message when non URL characters are entered", function () {
+                    var input = $(selectors.org);
+                    expect(input.parent()).not.toHaveClass(classes.error);
+                    input.val("%")
+                    input.simulate("keyup", { keyCode: $.simulate.keyCode.ENTER });
+                    expect(input.parent()).toHaveClass(classes.error);
                 });
             });
 
