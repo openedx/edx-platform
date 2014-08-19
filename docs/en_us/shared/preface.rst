@@ -238,7 +238,7 @@ edX Global Community meetup_ group.
 .. _newsletters: http://edx.us5.list-manage.com/subscribe?u=1822a33c054dc20e223ca40e2&id=aba723f1aa
 .. _release: http://edx.us5.list-manage2.com/subscribe?u=1822a33c054dc20e223ca40e2&id=83e46bd293
 .. _openedx-studio: http://groups.google.com/forum/#!forum/openedx-studio
-.. _Twitter:  http://twitter.com/edXstatus/status/475026709256101888
+.. _Twitter:  http://twitter.com/edXstatus
 .. _edX Status: http://status.edx.org/
 .. _Open edX Product: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+edX+Product+Home
 .. _Open edX Public Product Roadmap: https://openedx.atlassian.net/wiki/display/PROD/Product+Roadmap
