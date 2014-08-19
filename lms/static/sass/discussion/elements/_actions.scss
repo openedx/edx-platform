@@ -259,7 +259,7 @@
 
       &:hover,
       &:focus {
-        border: 1px solid $action-secondary-active-fg;
+        border: 1px solid $gray;
 
         .action-label {
           opacity: 1;
@@ -267,8 +267,8 @@
         }
 
         .action-icon {
-          border: 1px solid $action-secondary-active-bg;
-          background-color: $action-secondary-active-bg;
+          border: 1px solid $gray;
+          background-color: $gray;
           color: $white;
         }
       }
@@ -289,7 +289,7 @@
       text-align: right;
       color: $gray-l1;
 
-      &:hover, &:hover span {
+      &:hover {
         color: $link-color;
       }
 
@@ -297,26 +297,29 @@
         display: inline-block;
         width: ($baseline/2);
         margin-left: ($baseline/4);
+        color: inherit;
       }
 
       .action-label {
         display: inline-block;
+        color: inherit;
       }
 
       // CASE: checked
       &.is-checked {
         // CASE: pin action
         &.action-pin {
-          .action-icon, .action-label {
-            color: $pink;
-          }
+          color: $pink;
         }
 
         // CASE: report action
         &.action-report {
-          .action-icon, .action-label {
-            color: $pink;
-          }
+          color: $pink;
+        }
+
+        // CASE: hover for any action
+        &:hover {
+          color: $link-color;
         }
       }
     }
