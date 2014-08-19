@@ -1,19 +1,18 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/index"],
-    function ($, create_sinon, view_helpers, IndexPage) {
+    function ($, create_sinon, view_helpers, IndexUtils) {
         describe("Course listing page", function () {
             var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore');
 
             beforeEach(function () {
                 view_helpers.installMockAnalytics();
                 appendSetFixtures(mockIndexPageHTML);
-                IndexPage.onReady();
+                IndexUtils.onReady();
             });
 
             afterEach(function () {
                 view_helpers.removeMockAnalytics();
                 delete window.source_course_key;
             });
-
 
             it("can dismiss notifications", function () {
                 var requests = create_sinon.requests(this);

@@ -1,5 +1,5 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/course_rerun"],
-    function ($, create_sinon, view_helpers, CourseRerunPage) {
+    function ($, create_sinon, view_helpers, CourseRerunUtils) {
         describe("Create course rerun page", function () {
             var selectors = {
                     courseOrg: '.rerun-course-org',
@@ -30,7 +30,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 view_helpers.installMockAnalytics();
                 window.source_course_key = 'test_course_key';
                 appendSetFixtures(mockCreateCourseRerunHTML);
-                CourseRerunPage.onReady();
+                CourseRerunUtils.onReady();
             });
 
             afterEach(function () {
@@ -38,33 +38,33 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 delete window.source_course_key;
             });
 
-            describe("validateRequiredField", function () {
-                it("has a message for an empty string", function () {
-                    var message = CourseRerunPage.validateRequiredField('');
+            describe("Field validation", function () {
+                it("returns a message for an empty string", function () {
+                    var message = CourseRerunUtils.validateRequiredField('');
                     expect(message).not.toBe('');
                 });
 
-                it("does not have a message for a non empty string", function () {
-                    var message = CourseRerunPage.validateRequiredField('edX');
+                it("does not return a message for a non empty string", function () {
+                    var message = CourseRerunUtils.validateRequiredField('edX');
                     expect(message).toBe('');
                 });
             });
 
-            describe("setNewCourseFieldInErr", function () {
+            describe("Error messages", function () {
                 var setErrorMessage = function(selector, message) {
                     var element = $(selector).parent();
-                    CourseRerunPage.setNewCourseFieldInErr(element, message);
+                    CourseRerunUtils.setNewCourseFieldInErr(element, message);
                     return element;
                 };
 
-                it("can show an error message", function () {
+                it("shows an error message", function () {
                     var element = setErrorMessage(selectors.courseOrg, 'error message');
                     expect(element).toHaveClass(classes.error);
                     expect(element.children(selectors.errorField)).not.toHaveClass(classes.hidden);
                     expect(element.children(selectors.errorField)).toContainText('error message');
                 });
 
-                it("can hide an error message", function () {
+                it("hides an error message", function () {
                     var element = setErrorMessage(selectors.courseOrg, '');
                     expect(element).not.toHaveClass(classes.error);
                     expect(element.children(selectors.errorField)).toHaveClass(classes.hidden);
@@ -93,7 +93,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 });
             });
 
-            it("can save course reruns", function () {
+            it("saves course reruns", function () {
                 var requests = create_sinon.requests(this);
                 window.source_course_key = 'test_course_key';
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');

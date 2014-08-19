@@ -7,7 +7,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 url: $(this).data('dismiss-link'),
                 type: 'DELETE',
                 success: function(result) {
-                    window.location.reload()
+                    window.location.reload();
                 }
             });
         };

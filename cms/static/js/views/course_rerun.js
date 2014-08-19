@@ -41,7 +41,7 @@ define(["domReady", "jquery", "underscore"],
                 },
                 function (data) {
                     if (data.url !== undefined) {
-                        window.location = data.url
+                        window.location = data.url;
                     } else if (data.ErrMsg !== undefined) {
                         $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
                         $('#course_rerun_error').html('<p>' + data.ErrMsg + '</p>');
@@ -64,7 +64,7 @@ define(["domReady", "jquery", "underscore"],
             $('#course_rerun_error').html('');
             $('wrapper-error').removeClass('is-shown').addClass('is-hidden');
             $('.rerun-course-save').off('click');
-            window.location.href = '/course/'
+            window.location.href = '/course/';
         };
 
         var validateRequiredField = function (msg) {
