@@ -27,6 +27,10 @@ update_module_store_settings(
     }
 )
 
+DJFS = {'type': 'osfs',
+        'directory_root': 'cms/static/djpyfs',
+        'url_root': '/static/djpyfs'}
+
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
 CONTENTSTORE = {
@@ -129,7 +133,7 @@ CELERY_ALWAYS_EAGER = True
 
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware', 'djpyfs')
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (

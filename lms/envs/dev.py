@@ -50,6 +50,10 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             dev_env=True,
                             debug=True)
 
+DJFS = {'type': 'osfs',
+        'directory_root': 'lms/static/djpyfs',
+        'url_root': '/static/djpyfs'}
+
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
 DATABASES = {
@@ -217,7 +221,8 @@ CELERY_ALWAYS_EAGER = True
 
 INSTALLED_APPS += ('debug_toolbar',)
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+                       'debug_toolbar.middleware.DebugToolbarMiddleware',
+                       'djpyfs')
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
