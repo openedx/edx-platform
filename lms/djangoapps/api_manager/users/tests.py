@@ -30,7 +30,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
 
-
 class SecureClient(Client):
 
     """ Django test client using a "secure" connection. """
@@ -52,7 +51,7 @@ class UsersApiTests(ModuleStoreTestCase):
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
         self.test_username = str(uuid.uuid4())
-        self.test_password = str(uuid.uuid4())
+        self.test_password = 'Test.Me64!'
         self.test_email = str(uuid.uuid4()) + '@test.org'
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
@@ -79,11 +78,6 @@ class UsersApiTests(ModuleStoreTestCase):
             due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence"
         )
-        self.test_project = Project.objects.create(
-            course_id=unicode(self.course.id),
-            content_id=unicode(self.course_content.scope_ids.usage_id)
-        )
-
         self.course2 = CourseFactory.create(display_name="TEST COURSE2", org='TESTORG2')
         self.course2_content = ItemFactory.create(
             category="videosequence",
@@ -91,10 +85,6 @@ class UsersApiTests(ModuleStoreTestCase):
             data=self.test_course_data,
             due=datetime(2016, 5, 16, 14, 30),
             display_name="View_Sequence2"
-        )
-        self.second_test_project = Project.objects.create(
-            course_id=unicode(self.course2.id),
-            content_id=unicode(self.course2_content.scope_ids.usage_id)
         )
 
         self.user = UserFactory()
@@ -163,7 +153,7 @@ class UsersApiTests(ModuleStoreTestCase):
             data = {
                 'email': 'test{}@example.com'.format(i),
                 'username': 'test_user{}'.format(i),
-                'password': 'test_pass',
+                'password': self.test_password,
                 'first_name': 'John{}'.format(i),
                 'last_name': 'Doe{}'.format(i)
             }
@@ -228,7 +218,7 @@ class UsersApiTests(ModuleStoreTestCase):
             data = {
                 'email': 'test{}@example.com'.format(i),
                 'username': 'test_user{}'.format(i),
-                'password': 'test_pass',
+                'password': self.test_password,
                 'first_name': 'John{}'.format(i),
                 'last_name': 'Doe{}'.format(i)
             }
@@ -1265,12 +1255,24 @@ class UsersApiTests(ModuleStoreTestCase):
         # create anonymous user
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         for i in xrange(1, 12):
-            project_id = self.test_project.id
-            if i > 7:  # set to other project
-                project_id = self.second_test_project.id
+            course = CourseFactory.create(
+                display_name="TEST COURSE {}".format(i),
+            )
+
+            course_content = ItemFactory.create(
+                category="videosequence",
+                parent_location=course.location,
+                data=self.test_course_data,
+                display_name="View_Sequence"
+            )
+
+            test_project = Project.objects.create(
+                course_id=unicode(course.id),
+                content_id=unicode(course_content.scope_ids.usage_id)
+            )
             data = {
                 'name': 'Workgroup ' + str(i),
-                'project': project_id
+                'project': test_project.id
             }
             response = self.do_post(test_workgroups_uri, data)
             self.assertEqual(response.status_code, 201)
@@ -1288,11 +1290,11 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['num_pages'], 2)
 
         # test with course_id filter and integer user id
-        course_id = {'course_id': unicode(self.course.id)}
+        course_id = {'course_id': unicode(course.id)}
         response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, user_id, urlencode(course_id)))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 7)
-        self.assertEqual(len(response.data['results']), 7)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(len(response.data['results']), 1)
         self.assertIsNotNone(response.data['results'][0]['name'])
         self.assertIsNotNone(response.data['results'][0]['project'])
 

@@ -8,6 +8,7 @@ from datetime import datetime
 from random import randint
 import uuid
 import json
+import mock
 from urllib import urlencode
 
 from django.core.cache import cache
@@ -31,6 +32,10 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
+@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
+                                                   'ADVANCED_SECURITY': False,
+                                                   'PREVENT_CONCURRENT_LOGINS': False
+                                                   })
 class GroupsApiTests(ModuleStoreTestCase):
     """ Test suite for Groups API views """
 
