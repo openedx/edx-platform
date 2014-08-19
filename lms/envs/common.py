@@ -324,6 +324,7 @@ OAUTH_DEFAULT_SCOPE = 0
 OAUTH_USERNAME_SCOPE = 1
 
 # Define OAuth scopes. Required by django-oauth2-provider.
+# The default scope value is OAUTH_SCOPES[0][0]
 OAUTH_SCOPES = (
     (OAUTH_DEFAULT_SCOPE, 'default'),
     (OAUTH_USERNAME_SCOPE, 'preferred_username'),
