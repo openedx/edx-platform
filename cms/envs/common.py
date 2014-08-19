@@ -104,9 +104,6 @@ FEATURES = {
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
 
-    # Toggles Group Configuration editing functionality
-    'ENABLE_GROUP_CONFIGURATIONS': os.environ.get('FEATURE_GROUP_CONFIGURATIONS'),
-
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
 }
