@@ -27,9 +27,11 @@ update_module_store_settings(
     }
 )
 
-DJFS = {'type': 'osfs',
-        'directory_root': 'cms/static/djpyfs',
-        'url_root': '/static/djpyfs'}
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'cms/static/djpyfs',
+    'url_root': '/static/djpyfs'
+}
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
