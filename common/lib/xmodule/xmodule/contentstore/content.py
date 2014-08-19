@@ -5,6 +5,8 @@ XASSET_SRCREF_PREFIX = 'xasset:'
 
 XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 
+STREAM_DATA_CHUNK_SIZE = 1024
+
 import os
 import logging
 import StringIO
@@ -164,9 +166,24 @@ class StaticContentStream(StaticContent):
 
     def stream_data(self):
         while True:
-            chunk = self._stream.read(1024)
+            chunk = self._stream.read(STREAM_DATA_CHUNK_SIZE)
             if len(chunk) == 0:
                 break
+            yield chunk
+
+    def stream_data_in_range(self, first_byte, last_byte):
+        """
+        Stream the data between first_byte and last_byte (included)
+        """
+        self._stream.seek(first_byte)
+        position = first_byte
+        while True:
+            if last_byte < position + STREAM_DATA_CHUNK_SIZE - 1:
+                chunk = self._stream.read(last_byte - position + 1)
+                yield chunk
+                break
+            chunk = self._stream.read(STREAM_DATA_CHUNK_SIZE)
+            position += STREAM_DATA_CHUNK_SIZE
             yield chunk
 
     def close(self):
