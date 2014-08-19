@@ -1,5 +1,7 @@
 .. _Preface:
 
+.. Doc team! Be sure that when you make any changes to this file that you also make them to the mirrored file in the edx-analytics-dashboard/docs repository. - Alison 19 Aug 14
+
 ############
 Preface
 ############
