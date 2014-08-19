@@ -47,7 +47,7 @@ class AccessTokenView(provider.oauth2.views.AccessTokenView):
                       (PublicPasswordBackend, ))
 
     def get_password_grant(self, _request, data, client):
-        # Use customize form to allow use of user email during authentication
+        # Use customized form to allow use of user email during authentication
         form = PasswordGrantForm(data, client=client)
         if not form.is_valid():
             raise OAuthError(form.errors)
