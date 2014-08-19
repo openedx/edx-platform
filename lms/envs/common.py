@@ -1321,7 +1321,10 @@ INSTALLED_APPS = (
     'monitoring',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
+    
+    # Language
+    'django_countries'
 )
 
 ######################### MARKETING SITE ###############################
