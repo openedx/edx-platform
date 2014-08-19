@@ -146,7 +146,7 @@ def get_lms_link_for_about_page(course_key):
 def course_image_url(course):
     """Returns the image url for the course."""
     loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-    path = loc.to_deprecated_string()
+    path = StaticContent.serialize_asset_key_with_slash(loc)
     return path
 
 

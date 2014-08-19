@@ -118,7 +118,7 @@ def course_image_url(course):
             url += '/images/course_image.jpg'
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
-        url = loc.to_deprecated_string()
+        url = StaticContent.serialize_asset_key_with_slash(loc)
     return url
 
 
