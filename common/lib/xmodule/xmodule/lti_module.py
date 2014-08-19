@@ -360,7 +360,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
             # These parameters do not participate in OAuth signing.
             'launch_url': self.launch_url.strip(),
-            'element_id': self.location.html_id(),
+            'element_id': self.location.block_id,
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,

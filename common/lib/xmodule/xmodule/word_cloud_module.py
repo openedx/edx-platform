@@ -232,7 +232,7 @@ class WordCloudModule(WordCloudFields, XModule):
     def get_html(self):
         """Template rendering."""
         context = {
-            'element_id': self.location.html_id(),
+            'element_id': self.location.block_id,
             'element_class': self.location.category,
             'ajax_url': self.system.ajax_url,
             'num_inputs': self.num_inputs,

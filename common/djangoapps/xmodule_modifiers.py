@@ -243,22 +243,22 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
             log.warning("Unable to read field in Staff Debug information", exc_info=True)
             field_contents.append((name, "WARNING: Unable to read field"))
 
-    staff_context = {'fields': field_contents,
-                     'xml_attributes': getattr(block, 'xml_attributes', {}),
-                     'location': block.location,
-                     'xqa_key': block.xqa_key,
-                     'source_file': source_file,
-                     'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
-                     'category': str(block.__class__.__name__),
-                     # Template uses element_id in js function names, so can't allow dashes
-                     'element_id': block.location.html_id().replace('-', '_'),
-                     'edit_link': edit_link,
-                     'user': user,
-                     'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
-                     'histogram': json.dumps(histogram),
-                     'render_histogram': render_histogram,
-                     'block_content': frag.content,
-                     'is_released': is_released,
-                     'has_instructor_access': has_instructor_access,
-                     }
+    staff_context = {
+        'fields': field_contents,
+        'xml_attributes': getattr(block, 'xml_attributes', {}),
+        'location': block.location,
+        'xqa_key': block.xqa_key,
+        'source_file': source_file,
+        'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
+        'category': block.location.block_type,
+        'element_id': block.location.block_id,
+        'edit_link': edit_link,
+        'user': user,
+        'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+        'histogram': json.dumps(histogram),
+        'render_histogram': render_histogram,
+        'block_content': frag.content,
+        'is_released': is_released,
+        'has_instructor_access': has_instructor_access,
+     }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
