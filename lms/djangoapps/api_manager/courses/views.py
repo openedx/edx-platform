@@ -27,7 +27,7 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 
 from xmodule.modulestore.django import modulestore
 
-from api_manager.courseware_access import get_course, get_course_child
+from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -1604,31 +1604,33 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
+        total_possible_completions = len(get_course_leaf_nodes(course_key,
+                                                               ['discussion-course', 'group-project']))
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)\
             .exclude(user__in=exclude_users)
-        total_completions = queryset.filter(user__is_active=True).count()
-
+        total_actual_completions = queryset.filter(user__is_active=True).count()
         if user_id:
             user_completions = queryset.filter(user__id=user_id).count()
             completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
                 .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
             data['position'] = completions_above_user + 1
             completion_percentage = 0
-            if total_completions > 0:
-                completion_percentage = int(round(100 * user_completions/total_completions))
+            if total_possible_completions > 0:
+                completion_percentage = int(round(100 * user_completions/total_possible_completions))
             data['completions'] = completion_percentage
 
         total_users = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
-        if total_users:
-            course_avg = round(total_completions / float(total_users), 1)
+        if total_users and total_actual_completions:
+            course_avg = round(total_actual_completions / float(total_users), 1)
+            course_avg = int(round(100 * course_avg / total_possible_completions))  # avg in percentage
         data['course_avg'] = course_avg
 
         queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
                                                                 'user__profile__avatar_url')\
                        .annotate(completions=Count('content_id')).order_by('-completions')[:count]
         serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
-                                                        context={'total_completions': total_completions})
+                                                        context={'total_completions': total_possible_completions})
         data['leaders'] = serializer.data  # pylint: disable=E1101
         return Response(data, status=status.HTTP_200_OK)
 
