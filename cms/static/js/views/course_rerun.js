@@ -1,21 +1,28 @@
-define(["domReady", "jquery", "underscore"],
-    function (domReady, $, _) {
+define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"],
+    function (domReady, $, _, CreateCourseUtilsFactory) {
+        var CreateCourseUtils = CreateCourseUtilsFactory({
+            name: '.rerun-course-name',
+            org: '.rerun-course-org',
+            number: '.rerun-course-number',
+            run: '.rerun-course-run',
+            save: '.rerun-course-save',
+            errorWrapper: '.wrapper-error',
+            errorMessage: '#course_rerun_error',
+            tipError: 'span.tip-error',
+            error: '.error',
+            allowUnicode: '.allow-unicode-course-id'
+        }, {
+            shown: 'is-shown',
+            showing: 'is-showing',
+            hiding: 'is-hidden',
+            disabled: 'is-disabled',
+            error: 'error'
+        });
 
         var saveRerunCourse = function (e) {
             e.preventDefault();
-            // One final check for errors
-            var errors = _.reduce(
-                ['.rerun-course-name', '.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
-                function (acc, ele) {
-                    var $ele = $(ele);
-                    var error = validateRequiredField($ele.val());
-                    setNewCourseFieldInErr($ele.parent('li'), error);
-                    return error ? true : acc;
-                },
-                false
-            );
 
-            if (errors) {
+            if (CreateCourseUtils.hasInvalidRequiredFields()) {
                 return;
             }
 
@@ -25,31 +32,22 @@ define(["domReady", "jquery", "underscore"],
             var number = $newCourseForm.find('.rerun-course-number').val();
             var run = $newCourseForm.find('.rerun-course-run').val();
 
-            analytics.track('Reran a Course', {
-                'source_course_key': source_course_key,
-                'org': org,
-                'number': number,
-                'display_name': display_name,
-                'run': run
+            course_info = {
+                source_course_key: source_course_key,
+                org: org,
+                number: number,
+                display_name: display_name,
+                run: run
+            };
+
+            analytics.track('Reran a Course', course_info);
+            CreateCourseUtils.createCourse(course_info, function (errorMessage) {
+                $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
+                $('#course_rerun_error').html('<p>' + errorMessage + '</p>');
+                $('.rerun-course-save').addClass('is-disabled').removeClass('is-processing').html(gettext('Create Re-run'));
+                $('.action-cancel').removeClass('is-hidden');
             });
-            $.postJSON('/course/', {
-                    'source_course_key': source_course_key,
-                    'org': org,
-                    'number': number,
-                    'display_name': display_name,
-                    'run': run
-                },
-                function (data) {
-                    if (data.url !== undefined) {
-                        window.location = data.url;
-                    } else if (data.ErrMsg !== undefined) {
-                        $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
-                        $('#course_rerun_error').html('<p>' + data.ErrMsg + '</p>');
-                        $('.rerun-course-save').addClass('is-disabled').removeClass('is-processing').html(gettext('Create Re-run'));
-                        $('.action-cancel').removeClass('is-hidden');
-                    }
-                }
-            );
+
             // Go into creating re-run state
             $('.rerun-course-save').addClass('is-disabled').addClass('is-processing').html(
                '<i class="icon icon-refresh icon-spin"></i>' + gettext('Processing Re-run Request')
@@ -67,26 +65,6 @@ define(["domReady", "jquery", "underscore"],
             window.location.href = '/course/';
         };
 
-        var validateRequiredField = function (msg) {
-            return msg.length === 0 ? gettext('Required field.') : '';
-        };
-
-        var setNewCourseFieldInErr = function (el, msg) {
-            if(msg) {
-                el.addClass('error');
-                el.children('span.tip-error').addClass('is-shown').removeClass('is-hidden').text(msg);
-                $('.rerun-course-save').addClass('is-disabled');
-            }
-            else {
-                el.removeClass('error');
-                el.children('span.tip-error').addClass('is-hidden').removeClass('is-shown');
-                // One "error" div is always present, but hidden or shown
-                if($('.error').length === 1) {
-                    $('.rerun-course-save').removeClass('is-disabled');
-                }
-            }
-        };
-
         var onReady = function () {
             var $cancelButton = $('.rerun-course-cancel');
             var $courseRun = $('.rerun-course-run');
@@ -95,85 +73,7 @@ define(["domReady", "jquery", "underscore"],
             $cancelButton.bind('click', cancelRerunCourse);
             $('.cancel-button').bind('click', cancelRerunCourse);
 
-            // Check that a course (org, number, run) doesn't use any special characters
-            var validateCourseItemEncoding = function (item) {
-                var required = validateRequiredField(item);
-                if (required) {
-                    return required;
-                }
-                if ($('.allow-unicode-course-id').val() === 'True'){
-                    if (/\s/g.test(item)) {
-                        return gettext('Please do not use any spaces in this field.');
-                    }
-                }
-                else{
-                   if (item !== encodeURIComponent(item)) {
-                       return gettext('Please do not use any spaces or special characters in this field.');
-                   }
-                }
-                return '';
-            };
-
-            // Ensure that org/course_num/run < 65 chars.
-            var validateTotalCourseItemsLength = function () {
-                var totalLength = _.reduce(
-                    ['.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
-                    function (sum, ele) {
-                        return sum + $(ele).val().length;
-                    }, 0
-                );
-                if (totalLength > 65) {
-                    $('.wrap-error').addClass('is-shown');
-                    $('#course_creation_error').html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
-                    $('.rerun-course-save').addClass('is-disabled');
-                }
-                else {
-                    $('.wrap-error').removeClass('is-shown');
-                }
-            };
-
-            // Ensure that all fields are not empty
-            var validateFilledFields = function () {
-                return _.reduce(
-                    ['.rerun-course-org', '.rerun-course-number', '.rerun-course-run', '.rerun-course-name'],
-                    function (acc, ele) {
-                        var $ele = $(ele);
-                        return $ele.val().length !== 0 ? acc : false;
-                    },
-                    true
-                );
-            };
-
-            // Handle validation asynchronously
-            _.each(
-                ['.rerun-course-org', '.rerun-course-number', '.rerun-course-run'],
-                function (ele) {
-                    var $ele = $(ele);
-                    $ele.on('keyup', function (event) {
-                        // Don't bother showing "required field" error when
-                        // the user tabs into a new field; this is distracting
-                        // and unnecessary
-                        if (event.keyCode === 9) {
-                            return;
-                        }
-                        var error = validateCourseItemEncoding($ele.val());
-                        setNewCourseFieldInErr($ele.parent(), error);
-                        validateTotalCourseItemsLength();
-                        if(!validateFilledFields()) {
-                            $('.rerun-course-save').addClass('is-disabled');
-                        }
-                    });
-                }
-            );
-            var $name = $('.rerun-course-name');
-            $name.on('keyup', function () {
-                var error = validateRequiredField($name.val());
-                setNewCourseFieldInErr($name.parent(), error);
-                validateTotalCourseItemsLength();
-                if(!validateFilledFields()) {
-                    $('.rerun-course-save').addClass('is-disabled');
-                }
-            });
+            CreateCourseUtils.configureHandlers();
         };
 
         domReady(onReady);
@@ -182,8 +82,6 @@ define(["domReady", "jquery", "underscore"],
         return {
             saveRerunCourse: saveRerunCourse,
             cancelRerunCourse: cancelRerunCourse,
-            validateRequiredField: validateRequiredField,
-            setNewCourseFieldInErr: setNewCourseFieldInErr,
             onReady: onReady
         };
     });
