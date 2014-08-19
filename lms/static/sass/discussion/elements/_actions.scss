@@ -14,10 +14,6 @@
       @include box-sizing(border-box);
       display: block;
       margin: ($baseline/4) 0;
-
-      &.is-visible {
-        display: block; // needed to override hidden?
-      }
     }
 
     .more-wrapper {
@@ -35,8 +31,8 @@
   // UI: general actions dropdown layout
   .actions-dropdown {
     @extend %ui-no-list;
+    @extend %ui-depth1;
     @include transition(opacity .2s ease-in-out 0s);
-    z-index: 100;
     position: absolute;
     top: 17px;
     right: 0;
@@ -349,45 +345,6 @@
         .label-checked-focused {
           display: inline;
         }
-      }
-    }
-  }
-
-  // ====================
-
-  // TO-DO refactor all styling below this actions line.
-
-
-  // vote and endorse buttons
-  .container .discussion-body {
-
-    .vote-btn {
-
-      .plus-icon {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        margin: 8px 6px 0 0;
-        background: url(../images/vote-plus-icon.png) no-repeat;
-        font-size: 18px;
-        text-indent: -9999px;
-        color: #17b429;
-        overflow: hidden;
-      }
-    }
-
-    .endorse-btn {
-
-      .check-icon {
-        display: block;
-        width: 13px;
-        height: 12px;
-        margin: 8px auto;
-        background: url(../images/endorse-icon.png) no-repeat;
-      }
-
-      &.is-endorsed .check-icon {
-        background-position: 0 -12px;
       }
     }
   }
