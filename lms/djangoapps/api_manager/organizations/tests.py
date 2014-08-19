@@ -6,6 +6,7 @@ Run these tests @ Devstack:
 """
 import json
 import uuid
+import mock
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -29,8 +30,11 @@ class SecureClient(Client):
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
+@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
+                                                   'ADVANCED_SECURITY': False,
+                                                   'PREVENT_CONCURRENT_LOGINS': False
+                                                   })
 class OrganizationsApiTests(ModuleStoreTestCase):
-
     """ Test suite for Users API views """
 
     def setUp(self):
