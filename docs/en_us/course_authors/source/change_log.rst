@@ -12,6 +12,8 @@ August, 2014
 
    * - Date
      - Change
+   * - 08/20/14
+     - Added :ref:`Browsers` to the :ref:`Getting Started Index` section
    * - 08/18/14
      - Expanded the :ref:`Example Messages to Students` in the :ref:`Launch`
        chapter.

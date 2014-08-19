@@ -8,7 +8,7 @@ Getting Started
    :maxdepth: 3
 
 
-
+   browsers
    accounts
    get_started
    accessibility
