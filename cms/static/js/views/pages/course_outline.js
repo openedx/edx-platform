@@ -25,7 +25,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     self.outlineView.handleAddEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
-                $('.dismiss-button').bind('click', this.dismissNotification)
+                $('.dismiss-button').bind('click', this.dismissNotification);
             },
 
             setCollapseExpandVisibility: function() {
