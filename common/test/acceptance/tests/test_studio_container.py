@@ -373,6 +373,49 @@ class EditContainerTest(NestedVerticalTest):
         self.modify_display_name_and_verify(container)
 
 
+@attr('shard_1')
+class BadComponentTest(ContainerBase):
+    """
+    Tests that components with bad content do not break the Unit page.
+    """
+
+    __test__ = True
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Sets up a course structure with a unit and a HTML component with bad data (runtime-class
+        of LmsRuntime), and a properly constructed problem.
+        """
+
+        self.html_content = """
+            <div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized"
+            data-runtime-class="LmsRuntime" data-init="XBlockToXModuleShim" data-block-type="html"
+            data-runtime-version="1" data-type="HTMLModule" data-course-id="GeorgetownX/HUMW-421-01"
+            data-usage-id="i4x:;_;_GeorgetownX;_HUMW-421-01;_html;_3010cbbecaa1484da6cf8ba01362346a">
+            <p>Text</p></div>
+            """
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('html', 'Unit HTML', data=self.html_content),
+                        XBlockFixtureDesc('problem', 'Unit Problem', data='<problem></problem>')
+                    )
+                )
+            )
+        )
+
+    def test_html_comp_visible(self):
+        """
+        Tests that bad HTML data within an HTML component doesn't prevent Studio from
+        displaying the components on the unit page.
+        """
+        unit = self.go_to_unit_page()
+        self.verify_ordering(unit, [{"": ["Unit HTML", "Unit Problem"]}])
+
+
+@attr('shard_1')
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
