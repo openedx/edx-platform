@@ -80,3 +80,15 @@ def get_course_total_score(course_summary):
             if section['section_total']:
                 score += section['section_total'][1]
     return score
+
+
+def get_course_leaf_nodes(course_key, detached_categories):
+    """
+    Get count of the leaf nodes with ability to exclude some categories
+    """
+    nodes = []
+    verticals = modulestore().get_items(course_key, category='vertical')
+    for vertical in verticals:
+        nodes.extend([unit.location for unit in vertical.get_children()
+                      if getattr(unit, 'category') not in detached_categories])
+    return nodes

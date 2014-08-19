@@ -21,7 +21,8 @@ TEST_API_KEY = str(uuid.uuid4())
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-@patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False})
+@patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+                                              'PREVENT_CONCURRENT_LOGINS': False})
 class SessionApiRateLimitingProtectionTest(TestCase):
     """
     Test api_manager.session.login.ratelimit
