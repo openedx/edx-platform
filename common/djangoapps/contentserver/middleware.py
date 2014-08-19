@@ -1,5 +1,6 @@
-from django.http import (HttpResponse, HttpResponseNotModified,
-    HttpResponseForbidden)
+from django.http import (
+    HttpResponse, HttpResponseNotModified, HttpResponseForbidden
+)
 from student.models import CourseEnrollment
 
 from xmodule.contentstore.django import contentstore
@@ -12,6 +13,7 @@ from xmodule.exceptions import NotFoundError
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
+
 
 class StaticContentServer(object):
     def process_request(self, request):
@@ -113,11 +115,11 @@ class StaticContentServer(object):
                                     first=first, last=last, length=content.length
                                 )
                                 response['Content-Length'] = str(last - first + 1)
-                                response.status_code = 206 # HTTP_206_PARTIAL_CONTENT
+                                response.status_code = 206  # HTTP_206_PARTIAL_CONTENT
                 if not response:
                     # Malformed Range attribute
                     response = HttpResponse()
-                    response.status_code = 400 # HTTP_400_BAD_REQUEST
+                    response.status_code = 400  # HTTP_400_BAD_REQUEST
                     return response
 
             else:

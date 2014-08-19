@@ -42,8 +42,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        import_from_xml(modulestore(), self.user.id, 'common/test/data/', ['toy'],
-                static_content_store=self.contentstore, verbose=True)
+        import_from_xml(
+            modulestore(), self.user.id, 'common/test/data/', ['toy'],
+            static_content_store=self.contentstore, verbose=True
+        )
 
         # A locked asset
         self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
@@ -109,8 +111,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0-')
 
         self.assertEqual(resp.status_code, 206)  # HTTP_206_PARTIAL_CONTENT
-        self.assertEqual(resp['Content-Range'], 'bytes {first}-{last}/{length}'.format(
-            first=0, last=self.length_unlocked-1, length=self.length_unlocked)
+        self.assertEqual(
+            resp['Content-Range'],
+            'bytes {first}-{last}/{length}'.format(
+                first=0, last=self.length_unlocked - 1,
+                length=self.length_unlocked
+            )
         )
         self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
 
