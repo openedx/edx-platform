@@ -15,6 +15,10 @@
       vertical-align: top;
     }
 
+    .incontext-editor-action-wrapper {
+      position: relative;
+    }
+
     .incontext-editor-open-action {
       @include transition(opacity $tmg-f1 ease-in-out 0);
       opacity: 0.0;
@@ -303,6 +307,11 @@
       }
     }
 
+    // in-context actions
+    .incontext-editor-action-wrapper {
+      top: -($baseline/20);
+    }
+
     // status
     .section-status {
       margin: 0 0 0 ($outline-indent-width*1.25);
@@ -386,6 +395,11 @@
         @extend %t-action2;
         margin-right: ($baseline/2);
       }
+    }
+
+    // in-context actions
+    .incontext-editor-action-wrapper {
+      top: -($baseline/10);
     }
 
     // status
