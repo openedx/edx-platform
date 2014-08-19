@@ -2,8 +2,8 @@
  * This page is used to show the user an outline of the course.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView) {
+        "js/views/course_outline", "js/views/utils/view_utils"],
+    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -25,7 +25,9 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     self.outlineView.handleAddEvent(event);
                 });
                 this.model.on('change', this.setCollapseExpandVisibility, this);
-                $('.dismiss-button').bind('click', this.dismissNotification);
+                $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
+                    $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
+                }));
             },
 
             setCollapseExpandVisibility: function() {
@@ -98,20 +100,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         }
                     }, this);
                 }
-            },
-
-            /**
-             * Dismiss the course rerun notification.
-             */
-            dismissNotification: function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: $('.dismiss-button').data('dismiss-link'),
-                    type: 'DELETE',
-                    success: function(result) {
-                        $('.wrapper-alert-announcement').removeClass('is-shown').addClass('is-hidden')
-                    }
-                });
             }
         });
 

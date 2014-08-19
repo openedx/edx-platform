@@ -1,20 +1,9 @@
 define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification",
-    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module"],
+    "js/utils/cancel_on_escape", "js/utils/date_utils", "js/utils/module", "js/views/utils/view_utils"],
     function (domReady, $, ui, _, gettext, NotificationView, CancelOnEscape,
-              DateUtils, ModuleUtils) {
+              DateUtils, ModuleUtils, ViewUtils) {
 
         var modalSelector = '.edit-section-publish-settings';
-
-        var dismissNotification = function (e) {
-            e.preventDefault();
-            $.ajax({
-                url: $('.dismiss-button').data('dismiss-link'),
-                type: 'GET',
-                success: function(result) {
-                    $('.wrapper-alert-announcement').remove()
-                }
-            });
-        };
 
         var toggleSections = function(e) {
             e.preventDefault();
@@ -233,7 +222,9 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             $('.toggle-button-sections').bind('click', toggleSections);
             $('.expand-collapse').bind('click', toggleSubmodules);
 
-            $('.dismiss-button').bind('click', dismissNotification);
+            $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
+                $('.wrapper-alert-announcement').remove();
+            }));
 
             var $body = $('body');
             $body.on('click', '.section-published-date .edit-release-date', editSectionPublishDate);
