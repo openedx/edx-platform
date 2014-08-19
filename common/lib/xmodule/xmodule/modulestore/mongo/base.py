@@ -361,7 +361,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None,
-                 pyfs_service=None,
+                 fs_service=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -405,7 +405,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
         self.i18n_service = i18n_service
-        self.pyfs_service = pyfs_service
+        self.fs_service = fs_service
 
         # performance optimization to prevent updating the meta-data inheritance tree during
         # bulk write operations
@@ -693,8 +693,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if self.i18n_service:
             services["i18n"] = self.i18n_service
 
-        if self.pyfs_service:
-            services["fs"] = self.pyfs_service
+        if self.fs_service:
+            services["fs"] = self.fs_service
 
         system = CachingDescriptorSystem(
             modulestore=self,
@@ -989,8 +989,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             if self.i18n_service:
                 services["i18n"] = self.i18n_service
 
-            if self.pyfs_service:
-                services["fs"] = self.pyfs_service
+            if self.fs_service:
+                services["fs"] = self.fs_service
 
             runtime = CachingDescriptorSystem(
                 modulestore=self,

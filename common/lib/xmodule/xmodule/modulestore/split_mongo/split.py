@@ -120,7 +120,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     def __init__(self, contentstore, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
-                 i18n_service=None, pyfs_service=None,
+                 i18n_service=None, fs_service=None,
                  services=None, **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -148,8 +148,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if i18n_service is not None:
             self.services["i18n"] = i18n_service
 
-        if pyfs_service is not None:
-            self.services["fs"] = pyfs_service
+        if fs_service is not None:
+            self.services["fs"] = fs_service
 
     def close_connections(self):
         """
