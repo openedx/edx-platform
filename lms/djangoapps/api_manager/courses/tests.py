@@ -48,6 +48,10 @@ def _fake_get_get_course_social_stats(course_id):
 @mock.patch("lms.lib.comment_client.user.get_course_social_stats", _fake_get_get_course_social_stats)
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
+@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
+                                                   'ADVANCED_SECURITY': False,
+                                                   'PREVENT_CONCURRENT_LOGINS': False
+                                                   })
 class CoursesApiTests(TestCase):
     """ Test suite for Courses API views """
 
@@ -133,12 +137,12 @@ class CoursesApiTests(TestCase):
         )
 
         self.sub_section = ItemFactory.create(
-            parent_location=self.course_content.location,
+            parent_location=self.chapter.location,
             category="sequential",
             display_name=u"test subsection",
         )
 
-        unit = ItemFactory.create(
+        self.unit = ItemFactory.create(
             parent_location=self.sub_section.location,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
@@ -171,7 +175,7 @@ class CoursesApiTests(TestCase):
                 module_type = 'group-project'
 
             self.item = ItemFactory.create(
-                parent_location=unit.location,
+                parent_location=self.unit.location,
                 category=category,
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
                 metadata={'rerandomize': 'always'},
@@ -325,7 +329,7 @@ class CoursesApiTests(TestCase):
         chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['children']), 1)
+        self.assertEqual(len(chapter['children']), 2)
 
         sequence = chapter['children'][0]
         self.assertEqual(sequence['category'], 'videosequence')
@@ -1597,7 +1601,6 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_courses_completions_leaders_list_get(self):
-
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
         users = []
         for i in xrange(1, 5):
@@ -1619,7 +1622,7 @@ class CoursesApiTests(TestCase):
             local_content_name = 'Video_Sequence{}'.format(i)
             local_content = ItemFactory.create(
                 category="videosequence",
-                parent_location=self.chapter.location,
+                parent_location=self.unit.location,
                 data=self.test_data,
                 display_name=local_content_name
             )
@@ -1647,7 +1650,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual(response.data['course_avg'], 6.3)
+        self.assertEqual(response.data['course_avg'], 24)
 
         # without count filter and user_id
         test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
@@ -1656,7 +1659,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
         self.assertEqual(response.data['position'], 1)
-        self.assertEqual(response.data['completions'], 40)
+        self.assertEqual(response.data['completions'], 38)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)

@@ -20,8 +20,9 @@ TEST_API_KEY = str(uuid.uuid4())
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
-@patch.dict("django.conf.settings.FEATURES", {'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True})
+@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True,
+                                              'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
+                                              'PREVENT_CONCURRENT_LOGINS': False})
 class SessionApiSecurityTest(TestCase):
     """
     Test api_manager.session.session_list view
