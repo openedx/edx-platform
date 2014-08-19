@@ -2501,6 +2501,46 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
             )
             registration_code_redemption.save()
 
+    def test_user_invoice_copy_preference(self):
+        """
+        Test to remember user invoice copy preference
+        """
+        url_reg_code = reverse('generate_registration_codes',
+                               kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {
+            'total-registration-codes': 5, 'company_name': 'Group Alpha', 'sale_price': 121.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com',
+            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': 'True'
+        }
+
+        # user invoice copy preference will be saved in api user preference; model
+        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+        # get user invoice copy preference.
+        url_user_invoice_preference = reverse('get_user_invoice_preference',
+                                              kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        response = self.client.post(url_user_invoice_preference, data)
+        result = json.loads(response.content)
+        self.assertEqual(result['invoice_copy'], True)
+
+        # updating the user invoice copy preference during code generation flow
+        data['invoice'] = ''
+        response = self.client.post(url_reg_code, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
+        # get user invoice copy preference.
+        url_user_invoice_preference = reverse('get_user_invoice_preference',
+                                              kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        response = self.client.post(url_user_invoice_preference, data)
+        result = json.loads(response.content)
+        self.assertEqual(result['invoice_copy'], False)
+
     def test_generate_course_registration_codes_csv(self):
         """
         Test to generate a response of all the generated course registration codes
