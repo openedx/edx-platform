@@ -4,13 +4,13 @@
 
 import json
 import os.path
-import unittest
 import urlparse
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.test import TestCase
+from django.test.utils import override_settings
 
 import provider.oauth2.models
 import provider.oauth2.views
@@ -24,7 +24,8 @@ import oauth2_provider.views
 import oauth2_provider.models
 
 
-ENABLE_OAUTH2 = settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER')
+OAUTH2_FEATURES = settings.FEATURES.copy()
+OAUTH2_FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 
 USERNAME = 'some_username'
 EMAIL = 'test@example.com'
@@ -93,6 +94,7 @@ class TrustedClientFactory(DjangoModelFactory):
 
 
 @ddt
+@override_settings(FEATURES=OAUTH2_FEATURES)
 class AccessTokenTest(TestCase):
     def setUp(self):
         self.url = reverse('oauth2:access_token')
@@ -103,7 +105,6 @@ class AccessTokenTest(TestCase):
         )
 
     @data(*CUSTOM_PASSWORD_GRANT_TEST_DATA)
-    @unittest.skipUnless(ENABLE_OAUTH2, "ENABLE_OAUTH2_PROVIDER not enabled")
     def test_custom_password_grants(self, test_data):
         ClientFactory.create(
             client_id=CLIENT_ID,
@@ -167,8 +168,9 @@ class ClientBaseTest(TestCase):
         return response
 
 
+@override_settings(FEATURES=OAUTH2_FEATURES)
 class TrustedClientTest(ClientBaseTest):
-    @unittest.skipUnless(ENABLE_OAUTH2, "ENABLE_OAUTH2_PROVIDER not enabled")
+
     def test_untrusted_client(self):
         response = self.login_and_authorize()
 
@@ -177,7 +179,6 @@ class TrustedClientTest(ClientBaseTest):
         # Check that the consent form is presented
         self.assertContains(response, form_action, status_code=200)
 
-    @unittest.skipUnless(ENABLE_OAUTH2, "ENABLE_OAUTH2_PROVIDER not enabled")
     def test_trusted_client(self):
         self.use_trusted_client()
 
@@ -186,7 +187,9 @@ class TrustedClientTest(ClientBaseTest):
         self.assertEqual(reverse('oauth2:redirect'), path(response['Location']))
 
 
+@override_settings(FEATURES=OAUTH2_FEATURES)
 class ClientScopeTest(ClientBaseTest):
+
     def get_access_token_response(self):
         response = self.login_and_authorize()
         self.assertEqual(302, response.status_code)
@@ -206,7 +209,6 @@ class ClientScopeTest(ClientBaseTest):
 
         return response
 
-    @unittest.skipUnless(ENABLE_OAUTH2, "ENABLE_OAUTH2_PROVIDER not enabled")
     def test_username_scope(self):
         self.use_trusted_client()
         self.set_scope('preferred_username')
@@ -219,7 +221,6 @@ class ClientScopeTest(ClientBaseTest):
         self.assertEqual(values.get('preferred_username'), USERNAME)
         self.assertIn('preferred_username', values.get('scope'))
 
-    @unittest.skipUnless(ENABLE_OAUTH2, "ENABLE_OAUTH2_PROVIDER not enabled")
     def test_no_scope(self):
         self.use_trusted_client()
 
