@@ -66,7 +66,7 @@ class MongoContentStore(ContentStore):
         self.delete(content_id)  # delete is a noop if the entry doesn't exist; so, don't waste time checking
 
         thumbnail_location = content.thumbnail_location.to_deprecated_list_repr() if content.thumbnail_location else None
-        with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
+        with self.fs.new_file(_id=content_id, filename=unicode(content.location), content_type=content.content_type,
                               displayname=content.name, content_son=content_son,
                               thumbnail_location=thumbnail_location,
                               import_path=content.import_path,
