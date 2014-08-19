@@ -3,6 +3,7 @@ import logging
 import mimetypes
 
 import static_replace
+import xblock.reference.plugins
 
 from functools import partial
 from requests.auth import HTTPBasicAuth
@@ -496,6 +497,7 @@ def get_module_system_for_user(user, field_data_cache,
         get_real_user=user_by_anonymous_id,
         services={
             'i18n': ModuleI18nService(),
+            'fs': xblock.reference.plugins.FSService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,

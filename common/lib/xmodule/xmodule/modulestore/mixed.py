@@ -91,7 +91,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, contentstore, mappings, stores, i18n_service=None, create_modulestore_instance=None, **kwargs):
+    def __init__(self, contentstore, mappings, stores, i18n_service=None, pyfs_service=None, create_modulestore_instance=None, **kwargs):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
@@ -130,6 +130,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 store_settings.get('DOC_STORE_CONFIG', {}),
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
+                pyfs_service=pyfs_service,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():

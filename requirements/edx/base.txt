@@ -137,3 +137,5 @@ git+https://github.com/mitocw/django-cas.git
 
 # edX packages
 edx-submissions==0.0.6
+
+-e git+https://github.com/pmitros/django-pyfs.git@514607d78535fd80bfd23184cd292ee5799b500d#egg=djpyfs
