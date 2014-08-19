@@ -110,7 +110,7 @@ class SequenceModule(SequenceFields, XModule):
             contents.append(childinfo)
 
         params = {'items': contents,
-                  'element_id': self.location.html_id(),
+                  'element_id': self.location.block_id,
                   'item_id': self.location.to_deprecated_string(),
                   'position': self.position,
                   'tag': self.location.category,

@@ -35,7 +35,7 @@ class TestVideoYouTube(TestVideo):
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': u'A Name',
             'end': 3610.0,
-            'id': self.item_descriptor.location.html_id(),
+            'id': self.item_descriptor.location.block_id,
             'show_captions': 'true',
             'handout': None,
             'download_video_link': u'example.mp4',
@@ -101,7 +101,7 @@ class TestVideoNonYouTube(TestVideo):
             'display_name': u'A Name',
             'download_video_link': u'example.mp4',
             'end': 3610.0,
-            'id': self.item_descriptor.location.html_id(),
+            'id': self.item_descriptor.location.block_id,
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -247,7 +247,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
-                'id': self.item_descriptor.location.html_id(),
+                'id': self.item_descriptor.location.block_id,
             })
             self.assertEqual(
                 context,
@@ -356,7 +356,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'id': self.item_descriptor.location.html_id(),
+                'id': self.item_descriptor.location.block_id,
             })
             expected_context.update(data['result'])
 
@@ -456,7 +456,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                     self.item_descriptor, 'transcript', 'available_translations'
                 ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'id': self.item_descriptor.location.html_id(),
+                'id': self.item_descriptor.location.block_id,
             })
             expected_context.update(data['result'])
 
