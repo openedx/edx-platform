@@ -107,6 +107,23 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 
 // ====================
 
+// JQuery UI tabs font-weight override
+.ui-tabs-nav {
+
+  .ui-state-default {
+    font-weight: normal;
+  }
+}
+
+// ====================
+
+// xmodule editor tab font-weight override
+.xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs .editor-tabs .inner_tab_wrap a.tab {
+  font-weight: normal !important;
+}
+
+// ====================
+
 // TODOs:
 
 // * font-weight syncing
