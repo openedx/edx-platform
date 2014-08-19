@@ -180,7 +180,7 @@ if settings.WIKI_ENABLED:
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_ID_PATTERN), include(wiki_pattern())),
     )
 
 if settings.COURSEWARE_ENABLED:
