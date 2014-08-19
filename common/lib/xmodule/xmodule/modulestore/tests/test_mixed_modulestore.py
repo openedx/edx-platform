@@ -22,7 +22,8 @@ from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.exceptions import DuplicateCourseError, NoPathToItem
+
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
@@ -722,6 +723,18 @@ class TestMixedModuleStore(unittest.TestCase):
         for location in not_found:
             with self.assertRaises(ItemNotFoundError):
                 path_to_location(self.store, location)
+
+        # Orphaned items should not be found.
+        orphan = course_key.make_usage_key('chapter', 'OrphanChapter')
+        self.store.create_item(
+            self.user_id,
+            orphan.course_key,
+            orphan.block_type,
+            block_id=orphan.block_id
+        )
+
+        with self.assertRaises(NoPathToItem):
+            path_to_location(self.store, orphan)
 
     def test_xml_path_to_location(self):
         """
