@@ -34,7 +34,7 @@ from util.password_policy_validators import (
 )
 
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.courseware_access import get_course, get_course_child, get_course_total_score
+from api_manager.courseware_access import get_course, get_course_child, get_course_total_score, get_course_key, course_exists
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
@@ -90,10 +90,9 @@ def _save_content_position(request, user, course_key, position):
     parent_content_id = position['parent_content_id']
     child_content_id = position['child_content_id']
     if unicode(course_key) == parent_content_id:
-        parent_descriptor, parent_key, parent_content = get_course(request, user, parent_content_id)  # pylint: disable=W0612
+        parent_descriptor, parent_key, parent_content = get_course(request, user, parent_content_id, load_content=True)  # pylint: disable=W0612
     else:
-        parent_descriptor, parent_key, parent_content = get_course_child(request, user, course_key, parent_content_id)  # pylint: disable=W0612
-
+        parent_descriptor, parent_key, parent_content = get_course_child(request, user, course_key, parent_content_id, load_content=True)  # pylint: disable=W0612
     if not parent_descriptor:
         return None
 
@@ -126,8 +125,7 @@ def _save_child_position(parent_descriptor, target_child_location):
             # Only save if position changed
             if position != parent_descriptor.position:
                 parent_descriptor.position = position
-    # Save this new position to the underlying KeyValueStore
-    parent_descriptor.save()
+                parent_descriptor.save()
 
 
 def _manage_role(course_descriptor, user, role, action):
@@ -807,13 +805,13 @@ class UsersCoursesDetail(SecureAPIView):
             user = User.objects.get(id=user_id, is_active=True)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
-        if not course_descriptor:
+        if not course_exists(request, user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
 
         if request.DATA['positions']:
+            course_key = get_course_key(course_id)
             response_data['positions'] = []
             for position in request.DATA['positions']:
                 content_position = _save_content_position(
@@ -865,7 +863,7 @@ class UsersCoursesDetail(SecureAPIView):
                 response_data['position_tree'][current_child_loc.category] = {}
                 response_data['position_tree'][current_child_loc.category]['id'] = unicode(current_child_loc)
 
-                _,_,parent_module = get_course_child(request, user, course_key, unicode(current_child_loc))
+                _,_,parent_module = get_course_child(request, user, course_key, unicode(current_child_loc), load_content=True)
 
             else:
                 parent_module = None
@@ -879,9 +877,9 @@ class UsersCoursesDetail(SecureAPIView):
             user = User.objects.get(id=user_id, is_active=True)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
-        course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
-        if not course_descriptor:
+        if not course_exists(request, user, course_id):
             return Response({}, status=status.HTTP_204_NO_CONTENT)
+        course_key = get_course_key(course_id)
         CourseEnrollment.unenroll(user, course_key)
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
@@ -1234,9 +1232,9 @@ class UsersRolesList(SecureListAPIView):
 
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
         if course_id:
-            course_descriptor, course_key, course_content = get_course(self.request, user, course_id)  # pylint: disable=W0612
-            if not course_descriptor:
+            if not course_exists(self.request, user, course_id):
                 raise Http404
+            course_key = get_course_key(course_id)
             queryset = queryset.filter(course_id=course_key)
 
         role = self.request.QUERY_PARAMS.get('role', None)
