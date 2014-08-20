@@ -80,7 +80,6 @@ def _set_global_settings(django_settings):
 
     # Register and configure python-social-auth with Django.
     django_settings.INSTALLED_APPS += (
-        'social.apps.django_app.default',
         'third_party_auth',
     )
 

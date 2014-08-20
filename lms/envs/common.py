@@ -1280,6 +1280,13 @@ INSTALLED_APPS = (
     'external_auth',
     'django_openid_auth',
 
+    # Social auth (used by common/djangoapps/third_party_auth)
+    # This used to be installed only if FEATURES['ENABLE_THIRD_PARTY_AUTH']
+    # was set to True.  It was moved here so that the database tables
+    # required by the app would be created before enabling
+    # third party auth.
+    'social.apps.django_app.default',
+
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
