@@ -117,6 +117,9 @@ FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
+    # Toggles OAuth2 authentication provider
+    'ENABLE_OAUTH2_PROVIDER': False,
+
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
@@ -314,6 +317,18 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
+
+############################## OAUTH2 SCOPES  ##################################
+# Use bit-shifting so that scopes can be easily combined and checked.
+OAUTH_DEFAULT_SCOPE = 0
+OAUTH_USERNAME_SCOPE = 1
+
+# Define OAuth scopes. Required by django-oauth2-provider.
+# The default scope value is OAUTH_SCOPES[0][0]
+OAUTH_SCOPES = (
+    (OAUTH_DEFAULT_SCOPE, 'default'),
+    (OAUTH_USERNAME_SCOPE, 'preferred_username'),
+)
 
 ################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -1289,6 +1304,11 @@ INSTALLED_APPS = (
     # External auth (OpenID, shib)
     'external_auth',
     'django_openid_auth',
+
+    # OAuth2 Provider
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider',
 
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
