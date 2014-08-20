@@ -126,6 +126,7 @@ define ["jquery", "jasmine", "js/spec_helpers/create_sinon", "squire"],
                 requests = create_sinon["requests"](this)
 
                 @view.render().$(".lock-checkbox").click()
+                expect(@model.get("locked")).toBeFalsy()
                 # return an error response
                 requests[0].respond(404)
                 # Don't call hide because that closes the notification showing the server error.
