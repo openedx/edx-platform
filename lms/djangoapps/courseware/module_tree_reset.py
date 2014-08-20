@@ -97,6 +97,10 @@ class TreeNodeSet(list):
                 msg += "    Resetting %s, old state=%s\n" % (module, state)
                 if not wipe_history and 'history' in old_state:
                     state['history'] = old_state['history']
+                # get_student_status uses this state but original code didn't
+                # preserve it so leaving it commented for now
+                # if 'position' in old_state:
+                #     state['position'] = old_state['position']
                 module.smstate.state = json.dumps(state)
                 module.smstate.grade = None
                 module.smstate.save()
