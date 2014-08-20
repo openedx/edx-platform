@@ -39,12 +39,12 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                     }, 0
                 );
                 if (totalLength > 65) {
-                    $(selectors.errorWrapper).addClass(classes.shown);
+                    $(selectors.errorWrapper).addClass(classes.shown).removeClass(classes.hiding);
                     $(selectors.errorMessage).html('<p>' + gettext('The combined length of the organization, course number, and course run fields cannot be more than 65 characters.') + '</p>');
                     $(selectors.save).addClass(classes.disabled);
                 }
                 else {
-                    $(selectors.errorWrapper).removeClass(classes.shown);
+                    $(selectors.errorWrapper).removeClass(classes.shown).addClass(classes.hiding);
                 }
             };
 
