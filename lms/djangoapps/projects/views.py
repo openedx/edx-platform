@@ -34,7 +34,7 @@ from .serializers import ProjectSerializer, WorkgroupSerializer, WorkgroupSubmis
 from .serializers import WorkgroupReviewSerializer, WorkgroupSubmissionReviewSerializer, WorkgroupPeerReviewSerializer
 
 
-def _get_course(request, user, course_id, depth=0):
+def _get_course(request, user, course_id, depth=0, load_content=False):
     """
     Utility method to obtain course components
     """
@@ -53,7 +53,7 @@ def _get_course(request, user, course_id, depth=0):
             course_descriptor = get_course(course_key, depth=depth)
         except ValueError:
             pass
-    if course_descriptor:
+    if course_descriptor and load_content:
         field_data_cache = FieldDataCache([course_descriptor], course_key, user)
         course_content = module_render.get_module(
             user,
@@ -64,7 +64,7 @@ def _get_course(request, user, course_id, depth=0):
     return course_descriptor, course_key, course_content
 
 
-def _get_course_child(request, user, course_key, content_id):
+def _get_course_child(request, user, course_key, content_id, load_content=False):
     """
     Return a course xmodule/xblock to the caller
     """
@@ -81,7 +81,7 @@ def _get_course_child(request, user, course_key, content_id):
     if content_key:
         store = modulestore()
         content_descriptor = store.get_item(content_key)
-    if content_descriptor:
+    if content_descriptor and load_content:
         field_data_cache = FieldDataCache([content_descriptor], course_key, user)
         content = module_render.get_module(
             user,
