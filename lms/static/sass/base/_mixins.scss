@@ -130,6 +130,11 @@
   width: 1px;
 }
 
+// really hide something
+.is-hidden {
+  display: none;
+}
+
 // extends - UI - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %ui-no-list {
   list-style: none;
