@@ -6,10 +6,10 @@ edX Browser Support
 
 The edX Platform runs on the following browsers:
 
-* Internet Explorer
-* Chrome
-* Safari
-* Firefox
+* `Internet Explorer <https://microsoft.com/ie>`_
+* `Chrome <https://www.google.com/chrome>`_
+* `Safari <https://www.apple.com/safari>`_
+* `Firefox <https://mozilla.org/firefox>`_
 
 The edX Platform is routinely tested and verified on the current
 and previous version of each of these browsers. We generally encourage the
@@ -31,7 +31,7 @@ with course content.
    :widths: 20 10 10 10 10 10
    :header-rows: 1
 
-   * - 
+   * -
      - Chrome
      - Safari
      - Firefox
@@ -60,7 +60,7 @@ The following table shows operating system and browser support for edX Studio, w
    :widths: 20 10 10 10 10 10
    :header-rows: 1
 
-   * - 
+   * -
      - Chrome
      - Safari
      - Firefox
