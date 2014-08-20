@@ -9,16 +9,15 @@ body.discussion, .discussion-module {
     padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
     border-radius: 3px 3px 0 0;
     background-color: $white;
-    box-shadow: 0 1px 3px $shadow;
 
     .post-header-content {
       display: inline-block;
-      vertical-align: middle;
       width: flex-grid(9,12);
     }
 
     .post-header-actions {
       display: inline-block;
+      float: right;
       vertical-align: middle;
       width: flex-grid(3,12);
     }

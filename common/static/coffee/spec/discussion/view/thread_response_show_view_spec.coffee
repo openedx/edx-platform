@@ -89,7 +89,7 @@ describe "ThreadResponseShowView", ->
         endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
         expect(endorseButton).not.toHaveCss({"display": "none"})
-        expect(endorseButton).toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).not.toHaveClass("is-hidden")
         endorseButton.click()
         expect(endorseButton).toHaveClass("is-checked")
 
@@ -102,7 +102,7 @@ describe "ThreadResponseShowView", ->
         endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
         expect(endorseButton).not.toHaveCss({"display": "none"})
-        expect(endorseButton).toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).not.toHaveClass("is-hidden")
         endorseButton.click()
         expect(endorseButton).toHaveClass("is-checked")
 
@@ -115,7 +115,7 @@ describe "ThreadResponseShowView", ->
         endorseButton = @view.$(".action-endorse")
         expect(endorseButton.length).toEqual(1)
         expect(endorseButton).toHaveCss({"display": "none"})
-        expect(endorseButton).not.toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden")
         endorseButton.click()
         expect(endorseButton).not.toHaveClass("is-checked")
 
@@ -128,6 +128,6 @@ describe "ThreadResponseShowView", ->
         endorseButton = @view.$(".action-answer")
         expect(endorseButton.length).toEqual(1)
         expect(endorseButton).toHaveCss({"display": "none"})
-        expect(endorseButton).not.toHaveClass("is-clickable")
+        expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden")
         endorseButton.click()
         expect(endorseButton).not.toHaveClass("is-checked")

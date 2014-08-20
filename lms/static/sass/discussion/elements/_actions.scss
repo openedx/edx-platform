@@ -1,4 +1,4 @@
-.discussion.container {
+.discussion.container, .discussion-module {
 
   // discussion - elements - actions
   // ====================
@@ -14,6 +14,10 @@
       @include box-sizing(border-box);
       display: block;
       margin: ($baseline/4) 0;
+
+      &.is-hidden {
+        display: none;
+      }
     }
 
     .more-wrapper {
@@ -89,6 +93,10 @@
     .actions-item {
       display: block;
       margin: 0;
+
+      &.is-hidden {
+        display: none;
+      }
     }
   }
 
@@ -100,7 +108,7 @@
     @include box-sizing(border-box);
     display: inline-block;
     border: 1px solid transparent;
-    border-radius: 3px;
+    border-radius: 5px;
     color: $gray-l1;
 
     .action-icon {
@@ -323,7 +331,7 @@
 
   .action-button, .action-list-item {
     .action-label {
-      .label-checked, .label-checked-focused {
+      .label-checked {
         display: none;
       }
     }
@@ -335,16 +343,6 @@
 
       .label-checked {
         display: inline;
-      }
-
-      &:hover, &:focus {
-        .label-checked {
-          display: none;
-        }
-
-        .label-checked-focused {
-          display: inline;
-        }
       }
     }
   }

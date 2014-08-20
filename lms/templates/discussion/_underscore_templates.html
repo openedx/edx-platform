@@ -65,12 +65,12 @@
                     time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
                     author="<%= author_display %>"
                 )}
-                <span class="post-labels">
-                    <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
-                    <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-                    <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
-                </span>
             </p>
+            <div class="post-labels">
+                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
+                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+                <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
+            </div>
           </div>
           <div class="post-header-actions">
             ${"""<%=
@@ -147,9 +147,6 @@
         ${'<%= author_display %>'}
         <p class="posted-details">
             <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
-            <span class="post-labels">
-                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-            </span>
             <%
             js_block = u"""
                 interpolate(
@@ -170,6 +167,9 @@
             %>
               ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
           </p>
+          <div class="post-labels">
+              <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+          </div>
           </div>
           <div class="response-header-actions">
             ${"""<%=
@@ -226,10 +226,10 @@
            %>
     <p class="posted-details">
     ${'<%='}${js_block}${'%>'}
-      <span class="post-labels">
-        <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-      </span>
     </p>
+    <div class="post-labels">
+      <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+    </div>
   </div>
 </script>
 
@@ -536,7 +536,7 @@
     </li>
 </script>
 
-<%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label, checked_focused_label)">
+<%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">
     <script type="text/template" id="forum-action-${action_class}">
         <li class="actions-item action-primary is-visible">
             <a href="javascript:void(0)" class="action-button action-${action_class}" role="checkbox" aria-checked="false">
@@ -544,7 +544,6 @@
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
-                    <span class="label-checked-focused">${checked_focused_label}</span>
                 </span>
                 <span class="action-icon"><i class="icon icon-${icon}"></i></span>
             </a>
@@ -552,9 +551,9 @@
     </script>
 </%def>
 
-${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Endorsed"), _("Unendorse"))}
-${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Marked as Answer"), _("Unmark as Answer"))}
-${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("Unfollow"))}
+${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Unendorse"))}
+${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Unmark as Answer"))}
+${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item action-primary is-visible">
@@ -574,7 +573,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("U
     </li>
 </script>
 
-<%def name="secondaryStateAction(action_class, icon, sr_label, unchecked_label, checked_label, checked_focused_label)">
+<%def name="secondaryStateAction(action_class, icon, sr_label, unchecked_label, checked_label)">
     <script type="text/template" id="forum-action-${action_class}">
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="checkbox" aria-checked="false">
@@ -582,7 +581,6 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("U
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
-                    <span class="label-checked-focused">${checked_focused_label}</span>
                 </span>
                 <span class="action-icon">
                   <i class="icon icon-${icon}"></i>
@@ -592,9 +590,9 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Following"), _("U
     </script>
 </%def>
 
-${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Reported"), _("Unreport"))}
-${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Pinned"), _("Unpin"))}
-${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Closed"), _("Open"))}
+${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Unreport"))}
+${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Unpin"))}
+${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
 
 <%def name="secondaryAction(action_class, icon, label)">
     <script type="text/template" id="forum-action-${action_class}">

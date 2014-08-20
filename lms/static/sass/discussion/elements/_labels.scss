@@ -2,12 +2,6 @@
 // ====================
 
 body.discussion, .discussion-module {
-
-  .post-labels {
-    display: inline;
-    margin-left: 8px;
-  }
-
   .post-label-pinned {
     @include forum-post-label($forum-color-pinned);
   }

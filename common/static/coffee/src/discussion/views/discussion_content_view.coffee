@@ -17,21 +17,21 @@ if Backbone?
 
     abilityRenderer:
       editable:
-        enable: -> @$(".action-edit").closest("li").show()
-        disable: -> @$(".action-edit").closest("li").hide()
+        enable: -> @$(".action-edit").closest("li").removeClass("is-hidden")
+        disable: -> @$(".action-edit").closest("li").addClass("is-hidden")
       can_delete:
-        enable: -> @$(".action-delete").closest("li").show()
-        disable: -> @$(".action-delete").closest("li").hide()
+        enable: -> @$(".action-delete").closest("li").removeClass("is-hidden")
+        disable: -> @$(".action-delete").closest("li").addClass("is-hidden")
       can_openclose:
         enable: ->
           _.each(
             [".action-close", ".action-pin"],
-            (selector) => @$(selector).closest("li").show()
+            (selector) => @$(selector).closest("li").removeClass("is-hidden")
           )
         disable: ->
           _.each(
             [".action-close", ".action-pin"],
-            (selector) => @$(selector).closest("li").hide()
+            (selector) => @$(selector).closest("li").addClass("is-hidden")
           )
 
     renderPartialAttrs: ->
@@ -91,7 +91,7 @@ if Backbone?
         selector = if @model.get("thread").get("thread_type") == "question" then ".action-answer" else ".action-endorse"
         @updateButtonState(selector, endorsed)
         $button = @$(selector)
-        $button.toggleClass("is-clickable", @model.canBeEndorsed())
+        $button.closest(".actions-item").toggleClass("is-hidden", not @model.canBeEndorsed())
         $button.toggleClass("is-checked", endorsed)
         if endorsed || @model.canBeEndorsed()
           $button.removeAttr("hidden")
@@ -120,7 +120,7 @@ if Backbone?
 
       pinned: (pinned) ->
         @updateButtonState(".action-pin", pinned)
-        @$(".post-label-pinned").toggle(pinned)
+        @$(".post-label-pinned").toggleClass("is-hidden", not pinned)
 
       abuse_flaggers: (abuse_flaggers) ->
         flagged = (
@@ -128,20 +128,20 @@ if Backbone?
           (DiscussionUtil.isFlagModerator and abuse_flaggers.length > 0)
         )
         @updateButtonState(".action-report", flagged)
-        @$(".post-label-reported").toggle(flagged)
+        @$(".post-label-reported").toggleClass("is-hidden", not flagged)
 
       closed: (closed) ->
         @updateButtonState(".action-close", closed)
-        @$(".post-label-closed").toggle(closed)
+        @$(".post-label-closed").toggleClass("is-hidden", not closed)
     })
 
     toggleSecondaryActions: (event) =>
       event.preventDefault()
       event.stopPropagation()
-      expand = not @$(".action-more").hasClass("is-expanded")
-      @$(".action-more").toggleClass("is-expanded", expand)
-      @$(".actions-dropdown").toggleClass("is-expanded", expand)
-      if expand
+      @secondaryActionsExpanded = !@secondaryActionsExpanded
+      @$(".action-more").toggleClass("is-expanded", @secondaryActionsExpanded)
+      @$(".actions-dropdown").toggleClass("is-expanded", @secondaryActionsExpanded)
+      if @secondaryActionsExpanded
         $("body").on("click", @toggleSecondaryActions)
       else
         $("body").off("click", @toggleSecondaryActions)
