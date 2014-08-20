@@ -370,3 +370,14 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+########################## SECURITY #######################
+
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
