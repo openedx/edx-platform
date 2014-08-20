@@ -1358,6 +1358,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # Country list
+    'django_countries'
 )
 
 ######################### MARKETING SITE ###############################
