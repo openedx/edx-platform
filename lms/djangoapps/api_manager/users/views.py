@@ -22,6 +22,7 @@ from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
+from notification_prefs.views import enable_notifications
 from lms.lib.comment_client.user import User as CommentUser
 from lms.lib.comment_client.utils import CommentClientRequestError
 from notification_prefs.views import enable_notifications
@@ -333,6 +334,9 @@ class UsersList(SecureListAPIView):
         profile.save()
 
         UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+        if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
+            enable_notifications(user)
+
         if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
             enable_notifications(user)
 
