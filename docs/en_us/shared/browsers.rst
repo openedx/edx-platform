@@ -12,20 +12,20 @@ The edX Platform runs on the following browsers:
 * Firefox
 
 The edX Platform is routinely tested and verified on the current
-and previous version of each of these browsers, but we generally encourage the
+and previous version of each of these browsers. We generally encourage the
 use of and fully support only the latest version.
 
-This page is updated as new major operating system and browser versions
-are released. All point releases are supported unless noted; these occasional
+This information is updated as new major operating system and browser versions
+are released. All point releases are supported unless noted; occasional
 exceptions are based on specific bug fixes or feature updates.
 
 ***********************************
 The edX Learning Management System
 ***********************************
 
-The following table shows operating system and browser support for the Learning
-Management System, which students and course staff use to interact with
-courseware.
+The following table shows operating system and browser support for the edX
+Learning Management System, which students and course staff use to interact
+with course content.
 
 .. list-table::
    :widths: 20 10 10 10 10 10
@@ -54,7 +54,7 @@ courseware.
 edX Studio
 ***********************************
 
-The following table shows operating system and browser support for edX Studio, which course staff use to build courseware.
+The following table shows operating system and browser support for edX Studio, which staff use to build a course.
 
 .. list-table::
    :widths: 20 10 10 10 10 10
