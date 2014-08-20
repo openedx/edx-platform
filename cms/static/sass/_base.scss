@@ -789,7 +789,7 @@ hr.divide {
 
   &:after {
     @include font-size(20);
-    content: '???';
+    content: '▾';
     display: block;
     position: absolute;
     bottom: -14px;
