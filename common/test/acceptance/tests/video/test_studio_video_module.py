@@ -109,6 +109,13 @@ class CMSVideoBaseTest(UniqueCourseTest):
         # The 0th entry is the unit page itself.
         self.unit_page.xblocks[1].open_advanced_tab()
 
+    def open_basic_tab(self):
+        """
+        Open components basic tab.
+        """
+        # The 0th entry is the unit page itself.
+        self.unit_page.xblocks[1].open_basic_tab()
+
     def save_unit_settings(self):
         """
         Save component settings.
@@ -281,9 +288,9 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.open_advanced_tab()
 
-        self.video.set_settings_field_value('Video Start Time', '00:00:12')
+        self.video.set_field_value('Video Start Time', '00:00:12')
 
-        self.video.set_settings_field_value('Video Stop Time', '00:00:24')
+        self.video.set_field_value('Video Stop Time', '00:00:24')
 
         self.save_unit_settings()
 
