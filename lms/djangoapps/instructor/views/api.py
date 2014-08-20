@@ -1416,11 +1416,17 @@ def reset_due_date(request, course_id):
     student = get_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     set_due_date_extension(course, unit, student, None)
+    if not getattr(unit, "due", None):
+        # It's possible the normal due date was deleted after an extension was granted:
+        return JsonResponse(
+            _("Successfully removed invalid due date extension (unit has no due date).")
+        )
 
+    original_due_date_str = unit.due.strftime('%Y-%m-%d %H:%M')
     return JsonResponse(_(
         'Successfully reset due date for student {0} for {1} '
         'to {2}').format(student.profile.name, _display_unit(unit),
-                         unit.due.strftime('%Y-%m-%d %H:%M')))
+                         original_due_date_str))
 
 
 @handle_dashboard_error

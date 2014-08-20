@@ -47,7 +47,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, PaidCourseRegistration, Coupon
 from course_modes.models import CourseMode
 
-from .test_tools import msk_from_problem_urlname, get_extended_due
+from .test_tools import msk_from_problem_urlname
+from ..views.tools import get_extended_due
 
 
 @common_exceptions_400
@@ -2219,11 +2220,13 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Fixtures.
         """
+        super(TestDueDateExtensions, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
-        week3 = ItemFactory.create(due=due)
+        week3 = ItemFactory.create()  # No due date
         course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
                            week3.location.to_deprecated_string()]
 
@@ -2283,6 +2286,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.week1 = week1
         self.homework = homework
         self.week2 = week2
+        self.week3 = week3
         self.user1 = user1
         self.user2 = user2
 
@@ -2300,6 +2304,32 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
                          get_extended_due(self.course, self.week1, self.user1))
 
+    def test_change_to_invalid_due_date(self):
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+            'due_datetime': '01/01/2009 00:00'
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
+
+    def test_change_nonexistent_due_date(self):
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week3.location.to_deprecated_string(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week3, self.user1)
+        )
+
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -2308,8 +2338,38 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'url': self.week1.location.to_deprecated_string(),
         })
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(None,
-                         get_extended_due(self.course, self.week1, self.user1))
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
+
+    def test_reset_nonexistent_extension(self):
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+
+    def test_reset_extension_to_deleted_date(self):
+        """
+        Test that we can delete a due date extension after deleting the normal
+        due date, without causing an error.
+        """
+        self.test_change_due_date()
+        self.week1.due = None
+        self.week1 = self.store.update_item(self.week1, self.user1.id)
+        # Now, week1's normal due date is deleted but the extension still exists.
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
 
     def test_show_unit_extensions(self):
         self.test_change_due_date()

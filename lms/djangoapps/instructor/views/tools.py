@@ -159,10 +159,40 @@ def title_or_url(node):
     return title
 
 
+def get_extended_due(course, unit, student):
+    """
+    Get the extended due date out of a student's state for a particular unit.
+    """
+    student_module = StudentModule.objects.get(
+        student_id=student.id,
+        course_id=course.id,
+        module_state_key=unit.location
+    )
+
+    state = json.loads(student_module.state)
+    extended = state.get('extended_due', None)
+    if extended:
+        return DATE_FIELD.from_json(extended)
+
+
 def set_due_date_extension(course, unit, student, due_date):
     """
-    Sets a due date extension.
+    Sets a due date extension. Raises DashboardError if the unit or extended
+    due date is invalid.
     """
+    if due_date:
+        # Check that the new due date is valid:
+        original_due_date = getattr(unit, 'due', None)
+
+        if not original_due_date:
+            raise DashboardError(_("Unit {0} has no due date to extend.").format(unit.location))
+        if due_date < original_due_date:
+            raise DashboardError(_("An extended due date must be later than the original due date."))
+    else:
+        # We are deleting a due date extension. Check that it exists:
+        if not get_extended_due(course, unit, student):
+            raise DashboardError(_("No due date extension is set for that student and unit."))
+
     def set_due_date(node):
         """
         Recursively set the due date on a node and all of its children.
