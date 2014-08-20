@@ -179,6 +179,9 @@ setup_instructor_dashboard_sections = (idash_content) ->
   ,
     constructor: window.InstructorDashboard.sections.SurveyDownload
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#survey"
+  ,
+    constructor: window.InstructorDashboard.sections.ProgressReport
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#progress_report"
   ]
 
   sections_to_initialize.map ({constructor, $element}) ->

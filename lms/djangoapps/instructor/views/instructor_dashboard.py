@@ -44,6 +44,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 log = logging.getLogger(__name__)
 
+from pgreport.views import get_pgreport_table
+from django.core.cache import cache
+from xmodule.contentstore.django import contentstore
+from gridfs.errors import NoFile
+import pytz
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -73,6 +79,7 @@ def instructor_dashboard_2(request, course_id):
         _section_data_download(course_key, access),
         _section_analytics(course_key, access),
         _section_survey(course_key, access),
+        _section_progress_report(course_key, access),
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
@@ -415,5 +422,43 @@ def _section_survey(course_key, access):
         'section_display_name': _('Survey'),
         'access': access,
         'get_survey_url': reverse('get_survey', kwargs={'course_id': course_key.to_deprecated_string()}),
+    }
+    return section_data
+
+
+def _section_progress_report(course_id, access):
+    """Report progress"""
+    course = get_course_by_id(course_id, depth=None)
+    summary, modules = get_pgreport_table(course_id)
+    module_tree = summary.pop("module_tree")
+    graded = cache.get('progress_summary')
+
+    if graded is not None:
+        summary["graded_count"] = int(graded)
+    store = contentstore()
+    org, cnum, _dummy = course_id.split('/')
+
+    try:
+        content = store.fs.get_last_version('/i4x/{}/{}/{}/progress_students.csv.gz'.format(
+            org, cnum, "pgreport"))
+        utc = pytz.utc.localize(content.upload_date)
+        tzdate = utc.astimezone(pytz.timezone(settings.TIME_ZONE))
+        current_csv = tzdate.strftime('%Y-%m-%d %H:%M:%S')
+    except NoFile:
+        current_csv = None
+
+    section_data = {
+        'section_key': 'progress_report',
+        'section_display_name': _('Progress Report'),
+        'access': access,
+        'course_display_name': course.display_name,
+        'summary_keys': summary.keys(),
+        'summary_values': summary,
+        'modules': modules,
+        'module_tree': module_tree,
+        'current_csv': current_csv,
+        'progress_report_url': reverse('create_pgreport_csv', kwargs={'course_id': course_id}),
+        'progress_csv_url': reverse('get_pgreport_csv', kwargs={'course_id': course_id}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
     }
     return section_data

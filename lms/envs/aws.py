@@ -484,3 +484,18 @@ FB_DESC = ENV_TOKENS.get('FB_DESC', "")
 FB_URL = ENV_TOKENS.get('FB_URL', "")
 FB_IMG = ENV_TOKENS.get('FB_IMG', "")
 FB_ACTION_TYPE = ENV_TOKENS.get('FB_ACTION_TYPE', "")
+
+
+CELERY_TIMEZONE = ENV_TOKENS.get('CELERY_TIMEZONE', TIME_ZONE)
+from celery.schedules import crontab
+task_schedule = ENV_TOKENS.get('TASK_SCHEDULE', {})
+CELERYBEAT_SCHEDULE = {}
+for name, val in task_schedule.items():
+    celery_task = {
+        name: {
+            'task': val['task'],
+            'schedule': crontab(*val['cron']),
+            'args': val['args'],
+        }
+    }
+    CELERYBEAT_SCHEDULE.update(celery_task)

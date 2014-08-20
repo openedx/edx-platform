@@ -1307,3 +1307,46 @@ input[name="subject"] {
   }
 }
 
+.instructor-dashboard-wrapper-2 section.idash-section#progress_report{
+  .progress-report-container {
+    overflow: hidden;
+
+    ul {
+      margin-top: 0px;
+      margin-bottom: 0px;
+      padding-left: 5px;
+
+      li {
+        padding-right: 15px;
+        display: -moz-inline-box;
+        display: inline-block;
+        input { border-right: 1px solid #ccc; }
+        p { @include font-size(16); }
+      }
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0px;
+      border-top: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+
+      th {
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+        color: #444;
+        background-color: #ccc;
+        border-top: 1px solid #fff;
+        border-left: 1px solid #fff;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+      }
+     td {
+        padding: 10px;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+     }
+    }
+  }
+}

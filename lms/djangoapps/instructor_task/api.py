@@ -17,6 +17,7 @@ from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
                                    delete_problem_state,
                                    send_bulk_course_email,
+                                   create_pgreport_csv,
                                    calculate_grades_csv)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
@@ -214,6 +215,18 @@ def submit_calculate_grades_csv(request, course_key):
     """
     task_type = 'grade_course'
     task_class = calculate_grades_csv
+    task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_create_pgreport_csv(request, course_key):
+    """
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    task_type = 'create_pgreport_csv'
+    task_class = create_pgreport_csv
     task_input = {}
     task_key = ""
 

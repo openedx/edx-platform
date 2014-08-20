@@ -295,6 +295,34 @@ msgstr "メール配信不能"
 msgid "Your registered Email address might be wrong or denied by Spam-filter"
 msgstr "登録されたメールアドレスが間違っているか迷惑メールフィルタによって拒否されている可能性があります"
 
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Progress Report"
+msgstr "進捗レポート"
+
+##: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+#msgid "Student Progress"
+#msgstr "受講者の進捗"
+
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Current CSV: created "
+msgstr "現行のCSV：作成日時 "
+
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Download Progress Report"
+msgstr "進捗レポートのダウンロード"
+
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Generate Progress Report"
+msgstr "進捗レポートの作成"
+
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Summary Progress"
+msgstr "進捗サマリ"
+
+#: lms/templates/instructor/instructor_dashboard_2/progress_report.html
+msgid "Problem Module Progress"
+msgstr "Problemモジュールの進捗"
+
 #: lms/djangoapps/courseware/module_render.py
 msgid "Submission aborted! Maximum %d files may be submitted at once"
 msgstr "一度にアップロードできるファイルは%d個までです"
