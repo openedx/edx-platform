@@ -231,8 +231,6 @@ class ProctorModule(ProctorFields, XModule):
             #     return self.grades()
 
         # Proctor Panel requests (ALL USERS)
-        if dispatch == 'request':
-            return self.pp.request(json=False)
         if dispatch == 'status':
             return self.pp.status(json=False)
 

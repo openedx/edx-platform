@@ -134,27 +134,25 @@ setup_form('${ajax_url}/submission_history',
 <div>
     <h2>Welcome: <b>${pp.user.profile.name or pp.user}</b></h2>
 
-    <p>${name} has not been released</p>
-
-    <div id="proctor_stat_${element_id}"></div>
-
-    <p><input id="proctor_${element_id}" type="button" value="Request Access"></p>
-
+    <p>
+    Access has been requested for <b>${name}</b> but it hasn't been released
+    yet.
+    </p>
+    <p>
+    This page will automatically reload once access has been granted.
+    </p>
+    <p>
+    Please see your instructor or TA if access is not granted soon.
+    </p>
 </div>
 
 <script type="text/javascript">
 procrel = (function(){
     var el = $('#proctor_${element_id}');
-
     var skiperr = false;
-
     var set_skiperr = function(){ skiperr = true; }
-
-    var statel = $('#proctor_stat_${element_id}');
-
-    var setstat = function(status){
-        statel.html('<p><font color="green">' + status + '</font></p>');
-    }
+    var check_count = 0;
+    var interval = null;
 
     var _do_pp = function(cmd, type, gfun){
         $.ajax({ url: "${ajax_url}/" + cmd,
@@ -173,10 +171,6 @@ procrel = (function(){
         return _do_pp(cmd, 'GET', gfun);
     }
 
-    var do_pp_post = function(cmd, gfun){
-        return _do_pp(cmd, 'POST', gfun);
-    }
-
     var check_access = function(){
         do_pp_get('status', function(data){
 	    console.log(data);
@@ -191,10 +185,6 @@ procrel = (function(){
 	});
     }
 
-    var check_count = 0;
-
-    var interval = null;
-
     var periodic_check = function() {
         if (interval == null) {
             console.log("setting interval for check_access");
@@ -204,24 +194,7 @@ procrel = (function(){
         }
     }
 
-    var make_request = function(){
-        check_count = 0;
-	do_pp_post('request', function(result, status, xhr){
-            setstat(result.status);
-            periodic_check();
-        });
-    }
-
-    el.click(make_request);
-
-    return {
-            "check": check_access,
-            "make": make_request,
-            "do_pp_get": do_pp_get,
-            "do_pp_post": do_pp_post,
-            "set_skiperr": set_skiperr
-    };
-
+    periodic_check();
 }());
 </script>
 
