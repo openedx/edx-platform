@@ -4,6 +4,7 @@ import json
 import re
 import logging
 
+from dealer.git import git
 from django.conf import settings
 
 from track import views
@@ -96,11 +97,14 @@ class TrackMiddleware(object):
         * host - The "SERVER_NAME" header, which should be the name of the server running this code.
         * agent - The client browser identification string.
         * path - The path part of the requested URL.
+        * revision - The hash of the git revision currently checked out.
         """
         context = {
             'session': self.get_session_key(request),
             'user_id': self.get_user_primary_key(request),
             'username': self.get_username(request),
+            'revision': self.get_git_revision(),
+            'server_id': getattr(settings, 'EVENT_TRACKING_SERVER_ID', ''),
         }
         for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
             context[context_key] = request.META.get(header_name, '')
@@ -145,6 +149,12 @@ class TrackMiddleware(object):
         try:
             return request.user.username
         except AttributeError:
+            return ''
+
+    def get_git_revision(self):
+        try:
+            return git.revision
+        except Exception:  # pylint: disable=broad-except
             return ''
 
     def process_response(self, _request, response):
