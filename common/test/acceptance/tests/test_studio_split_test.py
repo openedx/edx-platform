@@ -187,7 +187,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @attr('shard_1')
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class SettingsMenuTest(StudioCourseTest):
     """
     Tests that Setting menu is rendered correctly in Studio
@@ -236,7 +235,6 @@ class SettingsMenuTest(StudioCourseTest):
 
 
 @attr('shard_1')
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -291,7 +289,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
     def _add_split_test_to_vertical(self, number, group_configuration_metadata=None):
         """
-        Add split test to vertical #`number`. 
+        Add split test to vertical #`number`.
 
         If `group_configuration_metadata` is not None, use it to assign group configuration to split test.
         """
