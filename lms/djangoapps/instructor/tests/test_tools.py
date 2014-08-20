@@ -62,6 +62,27 @@ class TestHandleDashboardError(unittest.TestCase):
         self.assertEqual(view(None, None), "Oh yes!")
 
 
+class TestRequireStudentIdentifier(unittest.TestCase):
+    """
+    Test require_student_from_identifier()
+    """
+    def setUp(self):
+        """
+        Fixtures
+        """
+        self.student = UserFactory.create()
+
+    def test_valid_student_id(self):
+        self.assertEqual(
+            self.student,
+            tools.require_student_from_identifier(self.student.username)
+        )
+
+    def test_invalid_student_id(self):
+        with self.assertRaises(tools.DashboardError):
+            tools.require_student_from_identifier("invalid")
+
+
 class TestParseDatetime(unittest.TestCase):
     """
     Test date parsing.
