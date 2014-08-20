@@ -1,5 +1,13 @@
 // studio - assets - fonts
 // ====================
 
-// import from google fonts - Open Sans (http://www.google.com/fonts/specimen/Open+Sans)
-@import url(//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
+// No subsetting.
+
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-Light-webfont', 300);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-LightItalic-webfont', 300, italic);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-Regular-webfont', 400);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-Italic-webfont', 400, italic);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-Semibold-webfont', 600);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-SemiboldItalic-webfont', 600, italic);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-Bold-webfont', 700);
+@include font-face('Open Sans', '../fonts/OpenSans/OpenSans-BoldItalic-webfont', 700, italic);
