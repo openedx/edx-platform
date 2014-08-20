@@ -10,6 +10,7 @@ import mock
 
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from notification_prefs import NOTIFICATION_PREF_KEY
 
 import student
 
@@ -45,6 +46,13 @@ class TestCreateAccount(TestCase):
         self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
         self.assertEqual(UserPreference.get_preference(user, LANGUAGE_KEY), lang)
+
+    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
+    def test_discussions_email_digest_pref(self):
+        response = self.client.post(self.url, self.params)
+        self.assertEqual(response.status_code, 200)
+        user = User.objects.get(username=self.username)
+        self.assertIsNotNone(UserPreference.get_preference(user, NOTIFICATION_PREF_KEY))
 
 
 @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
