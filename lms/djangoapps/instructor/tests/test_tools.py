@@ -197,7 +197,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.user = user
 
         self.extended_due = functools.partial(
-            get_extended_due, course, student=user)
+            tools.get_extended_due, course, student=user)
 
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
@@ -209,7 +209,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
         user = UserFactory.create()  # No student modules for this user
         tools.set_due_date_extension(self.course, self.week1, user, extended)
-        extended_due = functools.partial(get_extended_due, self.course, student=user)
+        extended_due = functools.partial(tools.get_extended_due, self.course, student=user)
         self.assertEqual(extended_due(self.week1), extended)
         self.assertEqual(extended_due(self.homework), extended)
 
@@ -224,8 +224,11 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
             tools.set_due_date_extension(self.course, self.week3, self.user, extended)
 
     def test_reset_due_date_extension(self):
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        tools.set_due_date_extension(self.course, self.week1, self.user, extended)
         tools.set_due_date_extension(self.course, self.week1, self.user, None)
         self.assertEqual(self.extended_due(self.week1), None)
+        self.assertEqual(self.extended_due(self.homework), None)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -339,22 +342,6 @@ class TestDataDumps(ModuleStoreTestCase):
              "Extended Due Date": "2013-12-25 00:00"},
             {"Unit": self.week2.display_name,
              "Extended Due Date": "2013-12-25 00:00"}])
-
-
-def get_extended_due(course, unit, student):
-    """
-    Get the extended due date out of a student's state for a particular unit.
-    """
-    student_module = StudentModule.objects.get(
-        student_id=student.id,
-        course_id=course.id,
-        module_state_key=unit.location
-    )
-
-    state = json.loads(student_module.state)
-    extended = state.get('extended_due', None)
-    if extended:
-        return DATE_FIELD.from_json(extended)
 
 
 def msk_from_problem_urlname(course_id, urlname, block_type='problem'):

@@ -47,7 +47,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, PaidCourseRegistration, Coupon
 from course_modes.models import CourseMode
 
-from .test_tools import msk_from_problem_urlname, get_extended_due
+from .test_tools import msk_from_problem_urlname
+from ..views.tools import get_extended_due
 
 
 @common_exceptions_400
