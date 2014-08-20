@@ -71,8 +71,8 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                             refreshed = true;
                         };
                     modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
-                    modal.runtime.notify('save', { state: 'start' });
-                    modal.runtime.notify('save', { state: 'end' });
+                    modal.editorView.notifyRuntime('save', { state: 'start' });
+                    modal.editorView.notifyRuntime('save', { state: 'end' });
                     expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeTruthy();
                 });
@@ -84,7 +84,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                             refreshed = true;
                         };
                     modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
-                    modal.runtime.notify('cancel');
+                    modal.editorView.notifyRuntime('cancel');
                     expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
                     expect(refreshed).toBeFalsy();
                 });
