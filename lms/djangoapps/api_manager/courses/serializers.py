@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 class CourseModuleCompletionSerializer(serializers.ModelSerializer):
     """ Serializer for CourseModuleCompletion model interactions """
-    user_id = serializers.Field(source='user.id')
+    user_id = serializers.Field(source='user_id')
 
     class Meta:
         """ Serializer/field specification """
