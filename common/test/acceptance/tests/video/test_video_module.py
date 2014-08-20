@@ -3,7 +3,7 @@
 """
 Acceptance tests for Video.
 """
-
+from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 from ...pages.lms.video.video import VideoPage
@@ -28,6 +28,7 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
+@attr('shard_2')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """
