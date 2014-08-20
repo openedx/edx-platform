@@ -150,7 +150,9 @@
             <%
             js_block = u"""
                 interpolate(
-                    endorsement.username ? "{user_fmt_str}" : "{anon_fmt_str}",
+                    thread.get("thread_type") == "question" ?
+                      (endorsement.username ? "{question_user_fmt_str}" : "{question_anon_fmt_str}") :
+                      (endorsement.username ? "{discussion_user_fmt_str}" : "{discussion_anon_fmt_str}"),
                     {{
                         'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
                         'user': endorser_display
@@ -159,13 +161,19 @@
                 )""".format(
                     ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
                     ## like "4 hours ago" or "about a month ago"
-                    user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
+                    question_user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
                     ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
                     ## like "4 hours ago" or "about a month ago"
-                    anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                    question_anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_user_fmt_str=escapejs(_("endorsed %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_anon_fmt_str=escapejs(_("endorsed %(time_ago)s")),
                 )
             %>
-              ${"<% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+              ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
           </p>
           <div class="post-labels">
               <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
