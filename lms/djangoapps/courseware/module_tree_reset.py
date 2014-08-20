@@ -340,8 +340,7 @@ class ProctorModuleInfo(object):
         status = self.get_student_status(student)
         failed = [self._get_od_for_assignment(student, a)
                   for a in status['assignments']
-                  if a['earned'] is None or a['possible'] is None or
-                  a['earned'] != a['possible']]
+                  if a['visited'] and a['earned'] != a['possible']]
         for f in failed:
             log.info(
                 "Student %s Assignment %s attempted '%s' but failed "
