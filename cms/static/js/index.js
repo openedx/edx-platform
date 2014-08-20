@@ -84,6 +84,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
                 ViewUtils.reload();
             }));
+            $('.action-reload').bind('click', ViewUtils.reload);
         };
 
         domReady(onReady);
