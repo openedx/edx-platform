@@ -474,7 +474,7 @@ class CoursesApiTests(TestCase):
 
     def test_courses_groups_list_get(self):
         test_uri = '{}/{}/groups'.format(self.base_courses_uri, self.test_course_id)
-        course_fail_uri = '{}/{}/groups'.format(self.base_courses_uri, '/ed/Open_DemoX/edx_demo_course')
+        course_fail_uri = '{}/{}/groups'.format(self.base_courses_uri, 'ed/Open_DemoX/edx_demo_course')
         for i in xrange(2):
             data_dict = {
                 'name': 'Alpha Group {}'.format(i), 'type': 'Programming',
@@ -1311,7 +1311,6 @@ class CoursesApiTests(TestCase):
         data = {'group_id': group_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-
         # Create another group and add it to course module
         data = {'name': 'Beta Group', 'type': 'project'}
         response = self.do_post(self.base_groups_uri, data)
@@ -1320,7 +1319,6 @@ class CoursesApiTests(TestCase):
         data = {'group_id': another_group_id}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
-
         # create a 5 new users
         for i in xrange(1, 6):
             data = {
@@ -1344,12 +1342,10 @@ class CoursesApiTests(TestCase):
                 data = {'user_id': created_user_id}
                 response = self.do_post(test_group_users_uri, data)
                 self.assertEqual(response.status_code, 201)
-
                 #enroll one user in Alpha Group and one in Beta Group created user
                 if i >= 2:
                     response = self.do_post(test_course_users_uri, data)
                     self.assertEqual(response.status_code, 201)
-
         response = self.do_get('{}?enrolled={}'.format(test_uri_users, 'True'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
