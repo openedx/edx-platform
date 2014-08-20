@@ -1,7 +1,7 @@
 .. _Rerun a Course:
 
 ###################
-Re-run a Course
+Re-running a Course
 ###################
 
 Another way to create a course in Studio is to re-run an existing course. When
@@ -96,7 +96,8 @@ To re-run a course:
 4. Supply a **Course Run** timeframe for the new course. Together, the course
    number, the organization, and the course run are used to create the URL for
    the new course. The combination of these three values must be unique for the
-   new course.
+   new course. In addition, the total number of characters used for the name,
+   organization, number, and run must be 65 or fewer.
 
 #. Click **Create Re-Run**. Your **My Courses** dashboard opens with a status
    message about the course creation process.
