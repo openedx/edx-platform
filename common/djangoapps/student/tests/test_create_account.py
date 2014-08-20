@@ -1,7 +1,6 @@
 "Tests for account creation"
 
 import ddt
-import unittest
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.conf import settings
