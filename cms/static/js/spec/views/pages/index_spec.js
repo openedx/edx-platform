@@ -48,5 +48,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 });
                 expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
+
+            it("displays an error when saving fails", function () {
+                var requests = create_sinon.requests(this);
+                $('.new-course-button').click();
+                fillInFields('DemoX', 'DM101', '2014', 'Demo course');
+                $('.new-course-save').click();
+                create_sinon.respondWithJson(requests, {
+                    ErrMsg: 'error message'
+                });
+                expect($('.wrap-error')).toHaveClass('is-shown');
+                expect($('#course_creation_error')).toContainText('error message');
+                expect($('.new-course-save')).toHaveClass('is-disabled');
+            });
         });
     });
