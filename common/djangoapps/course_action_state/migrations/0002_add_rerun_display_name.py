@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'CourseRerunState.display_name'
         db.add_column('course_action_state_coursererunstate', 'display_name',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=255),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=255, blank=True),
                       keep_default=False)
 
 
