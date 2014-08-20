@@ -70,9 +70,9 @@ def compute_stats(course_id):
 
     for problem in all_problems:
         stat = Stats()
-        smset0 = StudentModule.objects.filter(module_state_key=problem.id,
-                                              student__is_staff=False)
-        smset = smset0.exclude(student__groups__name__in=exclude_groups)
+        smset = StudentModule.objects.filter(
+            module_state_key=problem.id, student__is_staff=False
+        ).exclude(student__groups__name__in=exclude_groups)
         for sm in smset:
             stat.nassigned += 1
             ret = update_stats(sm, stat)
