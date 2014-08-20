@@ -51,19 +51,26 @@ class RandomizeModule(RandomizeFields, XModule):
         xml_attrs = self.descriptor.xml_attributes or []
         use_randrange = self._str_to_bool(xml_attrs.get('use_randrange', ''))
         no_repeats = self._str_to_bool(xml_attrs.get('no_repeats', ''))
-        self.pick_choice(use_randrange=use_randrange, no_repeats=no_repeats)
+        suspended = xml_attrs.get('suspended', '').split(',')
+        suspended = [i.strip() for i in suspended if i.strip()]
+        self.pick_choice(use_randrange=use_randrange, no_repeats=no_repeats,
+                         suspended=suspended)
 
     def _str_to_bool(self, v):
         return v.lower() == 'true'
 
-    def pick_choice(self, use_randrange=None, no_repeats=None):
-        choices = self.get_choices(no_repeats=no_repeats)
-        num_choices = len(choices)
-        if self.choice is not None and self.choice not in choices:
-            # Children changed. Reset.
-            self.choice = None
+    def pick_choice(self, use_randrange=False, no_repeats=False,
+                    suspended=None):
+        choices = self.get_choices(no_repeats=no_repeats, suspended=suspended)
+        all_choices = self.get_choices()
+        current_child = all_choices.get(self.choice)
+        if current_child and self.choice not in choices:
+            if current_child.location.name not in suspended:
+                # Children changed. Reset.
+                self.choice = None
 
         if self.choice is None:
+            num_choices = len(choices)
             # choose one based on the system seed, or randomly if that's not
             # available
             if num_choices > 0:
@@ -77,15 +84,25 @@ class RandomizeModule(RandomizeFields, XModule):
                     log.debug('using randrange for %s' % str(self.location))
                 self.choice = choice
             else:
-                log.debug('error in randomize: num_choices = %s' % num_choices)
+                # we're in a bad state - possible solution below tries to
+                # restore last failed problem from history (raise exc for now)
+                # try:
+                #     last_failed = json.loads(self.history or '[]')[-1]
+                #     self.choice = last_failed
+                #     current_child = all_choices[last_failed]
+                # except IndexError:
+                #     raise Exception('No choices left!!!')
+                raise Exception('No choices left!!!')
 
         if self.choice is not None:
-            self.child_descriptor = choices[self.choice]
+            if current_child:
+                self.child_descriptor = current_child
+            else:
+                self.child_descriptor = choices[self.choice]
             # Now get_children() should return a list with one element
-            log.debug("choice=%s in %s, children of randomize module "
-                      "(should be only 1): %s", self.choice,
-                      str(self.location), self.get_children())
-            self.child = self.get_children()[0]
+            children = self.get_children()
+            assert len(children) == 1
+            self.child = children[0]
             if no_repeats:
                 child_loc = self.child.location.url()
                 history = json.loads(self.history or '[]')
@@ -96,13 +113,14 @@ class RandomizeModule(RandomizeFields, XModule):
             self.child_descriptor = None
             self.child = None
 
-    def get_choices(self, no_repeats=None):
+    def get_choices(self, no_repeats=None, suspended=None):
         children = self.descriptor.get_children()
         if self.choice is None and no_repeats:
             history = json.loads(self.history or '[]')
             children = [c for c in children if c.location.url() not in history]
-        children = [c for c in children if not
-                    self._str_to_bool(c.xml_attributes.get('suspended', ''))]
+        if suspended:
+            children = [c for c in children if c.location.name not in
+                        suspended]
         return OrderedDict([(c.location.url(), c) for c in children])
 
     def get_choice_index(self, choice=None, choices=None):
