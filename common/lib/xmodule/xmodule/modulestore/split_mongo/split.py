@@ -2036,7 +2036,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             default_class=self.default_class,
             error_tracker=self.error_tracker,
             render_template=self.render_template,
-            resources_fs=None,
             mixins=self.xblock_mixins,
             select=self.xblock_select,
             services=self.services,

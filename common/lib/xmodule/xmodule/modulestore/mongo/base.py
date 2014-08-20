@@ -37,7 +37,7 @@ from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
-from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xblock.core import XBlock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
