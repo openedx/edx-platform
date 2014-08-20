@@ -150,6 +150,10 @@
         .user {
           @extend %t-strong;
         }
+
+        .user {
+          @extend %cont-text-wrap;
+        }
       }
 
       .wrapper-release {
@@ -225,6 +229,10 @@
         .user {
           @extend %t-strong;
         }
+
+        .user {
+          @extend %cont-text-wrap;
+        }
       }
     }
 
@@ -236,8 +244,10 @@
       .wrapper-unit-id {
 
         .unit-id-value {
+          @extend %cont-text-wrap;
           @extend %t-copy-sub1;
           display: inline-block;
+          width: 100%;
         }
 
         .tip {
@@ -264,6 +274,10 @@
           .subsection-header {
             margin-bottom: ($baseline/2);
           }
+        }
+
+        .item-title {
+          @extend %cont-text-wrap;
         }
 
         .item-title a {
