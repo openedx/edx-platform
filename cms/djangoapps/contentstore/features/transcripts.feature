@@ -17,60 +17,6 @@ Feature: CMS Transcripts
     #                   one stored on YouTube
     #     t_not_exist - this file does not exist on YouTube; it exists locally
 
-    #1
-    Scenario: Check input error messages
-        Given I have created a Video component
-        And I edit the component
-
-        #User inputs html5 links with equal extension
-        And I enter a "123.webm" source to field number 1
-        And I enter a "456.webm" source to field number 2
-        Then I see error message "file_type"
-        # Currently we are working with 2nd field. It means, that if 2nd field
-        # contain incorrect value, 1st and 3rd fields should be disabled until
-        # 2nd field will be filled by correct correct value
-        And I expect 1, 3 inputs are disabled
-        When I clear fields
-        And I expect inputs are enabled
-
-        #User input URL with incorrect format
-        And I enter a "http://link.c" source to field number 1
-        Then I see error message "url_format"
-        # Currently we are working with 1st field. It means, that if 1st field
-        # contain incorrect value, 2nd and 3rd fields should be disabled until
-        # 1st field will be filled by correct correct value
-        And I expect 2, 3 inputs are disabled
-
-        #User input URL with incorrect format
-        And I enter a "http://goo.gl/pxxZrg" source to field number 1
-        And I enter a "http://goo.gl/pxxZrg" source to field number 2
-        Then I see error message "links_duplication"
-        And I expect 1, 3 inputs are disabled
-
-        And I clear fields
-        And I expect inputs are enabled
-
-        And I enter a "http://youtu.be/t_not_exist" source to field number 1
-        Then I do not see error message
-        And I expect inputs are enabled
-
-    #2
-    Scenario: Testing interaction with test youtube server
-        Given I have created a Video component with subtitles
-        And I edit the component
-        # first part of url will be substituted by mock_youtube_server address
-        # for t__eq_exist id server will respond with transcripts
-        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
-        Then I see status message "not found on edx"
-        # t__eq_exist subs locally not presented at this moment
-        And I see button "import"
-
-        # for t_not_exist id server will respond with 404
-        And I enter a "http://youtu.be/t_not_exist" source to field number 1
-        Then I see status message "not found"
-        And I do not see button "import"
-        And I see button "disabled_download_to_edit"
-
     #3
     Scenario: Youtube id only: check "not found" and "import" states
         Given I have created a Video component with subtitles
@@ -93,66 +39,6 @@ Feature: CMS Transcripts
         And I see button "download_to_edit"
         And I see value "t__eq_exist" in the field "Default Timed Transcript"
 
-    #4
-    Scenario: Youtube id only: check "Found" state
-        Given I have created a Video component with subtitles "t_not_exist"
-        And I edit the component
-
-        And I enter a "http://youtu.be/t_not_exist" source to field number 1
-        Then I see status message "found"
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
-
-    #5
-    Scenario: Youtube id only: check "Found" state when user sets youtube_id with local and server subs and they are equal
-
-        Given I have created a Video component with subtitles "t__eq_exist"
-        And I edit the component
-
-        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
-        And I see status message "found"
-        And I see value "t__eq_exist" in the field "Default Timed Transcript"
-
-    #6
-    Scenario: Youtube id only: check "Found" state when user sets youtube_id with local and server subs and they are not  equal
-        Given I have created a Video component with subtitles "t_neq_exist"
-        And I edit the component
-
-        And I enter a "http://youtu.be/t_neq_exist" source to field number 1
-        And I see status message "replace"
-        And I see button "replace"
-        And I click transcript button "replace"
-        And I see status message "found"
-        And I see value "t_neq_exist" in the field "Default Timed Transcript"
-
-    #7
-    Scenario: html5 source only: check "Not Found" state
-        Given I have created a Video component
-        And I edit the component
-
-        And I enter a "t_not_exist.mp4" source to field number 1
-        Then I see status message "not found"
-        And I see value "" in the field "Default Timed Transcript"
-
-    #8
-    Scenario: html5 source only: check "Found" state
-        Given I have created a Video component with subtitles "t_not_exist"
-        And I edit the component
-
-        And I enter a "t_not_exist.mp4" source to field number 1
-        Then I see status message "found"
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
-
-    #9
-    Scenario: User sets youtube_id w/o server but with local subs and one html5 link w/o subs
-        Given I have created a Video component with subtitles "t_not_exist"
-        And I edit the component
-
-        And I enter a "http://youtu.be/t_not_exist" source to field number 1
-        Then I see status message "found"
-
-        And I enter a "test_video_name.mp4" source to field number 2
-        Then I see status message "found"
-        And I see value "t_not_exist" in the field "Default Timed Transcript"
 
     # Disabled 1/29/14 due to flakiness observed in master
     #10
@@ -169,26 +55,6 @@ Feature: CMS Transcripts
     #    And I enter a "t_not_exist.mp4" source to field number 2
     #    Then I see status message "found"
     #    And I see value "t__eq_exist" in the field "Default Timed Transcript"
-
-    #11
-    Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o transcripts w/o import action, then another one html5 link w/o transcripts
-        Given I have created a Video component
-        And I edit the component
-
-        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
-        Then I see status message "not found on edx"
-        And I see button "import"
-        And I see button "upload_new_timed_transcripts"
-
-        And I enter a "t_not_exist.mp4" source to field number 2
-        Then I see status message "not found on edx"
-        And I see button "import"
-        And I see button "upload_new_timed_transcripts"
-
-        And I enter a "t_not_exist.webm" source to field number 3
-        Then I see status message "not found on edx"
-        And I see button "import"
-        And I see button "upload_new_timed_transcripts"
 
     #12
     Scenario: Entering youtube (no importing), and 2 html5 sources without transcripts - "Not Found"
