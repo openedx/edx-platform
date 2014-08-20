@@ -70,10 +70,27 @@ from contentstore.utils import reverse_usage_url
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="content-primary" role="main">
+            <div class="course-status">
+                <div class="status-release">
+                    <h2 class="status-release-label">${_("Course Start Date:")}</h2>
+                    <p class="status-release-value">${course_release_date}</p>
+
+                    <ul class="status-actions">
+                      <li class="action-item action-edit">
+                        <a href="${settings_url}" class="edit-button action-button" data-tooltip="${_("Edit Start Date")}">
+                            <i class="icon-pencil"></i>
+                            <span class="action-button-text sr">${_("Edit Start Date")}</span>
+                        </a>
+                      </li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="wrapper-dnd">
                 <%
                 course_locator = context_course.location
                 %>
+                <h2 class="sr">${_("Course Outline")}</h2>
                 <article class="outline outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
                 </article>
             </div>
