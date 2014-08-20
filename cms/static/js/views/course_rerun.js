@@ -1,5 +1,5 @@
-define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"],
-    function (domReady, $, _, CreateCourseUtilsFactory) {
+define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils", "js/views/utils/view_utils"],
+    function (domReady, $, _, CreateCourseUtilsFactory, ViewUtils) {
         var CreateCourseUtils = CreateCourseUtilsFactory({
             name: '.rerun-course-name',
             org: '.rerun-course-org',
@@ -62,7 +62,7 @@ define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"
             $('#course_rerun_error').html('');
             $('wrapper-error').removeClass('is-shown').addClass('is-hidden');
             $('.rerun-course-save').off('click');
-            window.location.href = '/course/';
+            ViewUtils.redirect('/course/');
         };
 
         var onReady = function () {

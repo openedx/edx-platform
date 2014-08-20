@@ -1,6 +1,6 @@
 define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/course_rerun",
-        "js/views/utils/create_course_utils", "jquery.simulate"],
-    function ($, create_sinon, view_helpers, CourseRerunUtils, CreateCourseUtilsFactory) {
+        "js/views/utils/create_course_utils", "js/views/utils/view_utils", "jquery.simulate"],
+    function ($, create_sinon, view_helpers, CourseRerunUtils, CreateCourseUtilsFactory, ViewUtils) {
         describe("Create course rerun page", function () {
             var selectors = {
                     org: '.rerun-course-org',
@@ -66,6 +66,11 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     return element;
                 };
 
+                var type = function (input, value) {
+                    input.val(value);
+                    input.simulate("keyup", { keyCode: $.simulate.keyCode.SPACE });
+                };
+
                 it("shows an error message", function () {
                     var element = setErrorMessage(selectors.org, 'error message');
                     expect(element).toHaveClass(classes.error);
@@ -104,15 +109,55 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it("shows an error message when non URL characters are entered", function () {
                     var input = $(selectors.org);
                     expect(input.parent()).not.toHaveClass(classes.error);
-                    input.val("%")
+                    type(input, "%");
+                    expect(input.parent()).toHaveClass(classes.error);
+                });
+
+                it("does not show an error message when tabbing into a field", function () {
+                    var input = $(selectors.number);
+                    input.val('');
+                    expect(input.parent()).not.toHaveClass(classes.error);
+                    input.simulate("keyup", { keyCode: $.simulate.keyCode.TAB });
+                    expect(input.parent()).not.toHaveClass(classes.error);
+                });
+
+                it("shows an error message when a required field is empty", function () {
+                    var input = $(selectors.org);
+                    input.val('');
+                    expect(input.parent()).not.toHaveClass(classes.error);
                     input.simulate("keyup", { keyCode: $.simulate.keyCode.ENTER });
                     expect(input.parent()).toHaveClass(classes.error);
+                });
+
+                it("shows an error message when spaces are entered and unicode is allowed", function () {
+                    var input = $(selectors.org);
+                    $(selectors.allowUnicode).val('True');
+                    expect(input.parent()).not.toHaveClass(classes.error);
+                    type(input, ' ');
+                    expect(input.parent()).toHaveClass(classes.error);
+                });
+
+                it("shows an error message when total length exceeds 65 characters", function () {
+                    expect($(selectors.errorWrapper)).not.toHaveClass(classes.shown);
+                    type($(selectors.org), 'ThisIsAVeryLongNameThatWillExceedTheSixtyFiveCharacterLimit');
+                    type($(selectors.number), 'ThisIsAVeryLongNameThatWillExceedTheSixtyFiveCharacterLimit');
+                    type($(selectors.run), 'ThisIsAVeryLongNameThatWillExceedTheSixtyFiveCharacterLimit');
+                    expect($(selectors.errorWrapper)).toHaveClass(classes.shown);
+                });
+
+                describe("Name field", function () {
+                    it("does not show an error message when non URL characters are entered", function () {
+                        var input = $(selectors.name);
+                        expect(input.parent()).not.toHaveClass(classes.error);
+                        type(input, "%");
+                        expect(input.parent()).not.toHaveClass(classes.error);
+                    });
                 });
             });
 
             it("saves course reruns", function () {
                 var requests = create_sinon.requests(this);
-                window.source_course_key = 'test_course_key';
+                var redirectSpy = spyOn(ViewUtils, 'redirect')
                 fillInFields('DemoX', 'DM101', '2014', 'Demo course');
                 $(selectors.save).click();
                 create_sinon.expectJsonRequest(requests, 'POST', '/course/', {
@@ -125,6 +170,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 expect($(selectors.save)).toHaveClass(classes.disabled);
                 expect($(selectors.save)).toHaveClass(classes.processing);
                 expect($(selectors.cancel)).toHaveClass(classes.hidden);
+                create_sinon.respondWithJson(requests, {
+                    url: 'dummy_test_url'
+                });
+                expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
 
             it("displays an error when saving fails", function () {
@@ -145,6 +194,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 fillInFields('DemoX', 'DM101', '', 'Demo course');
                 $(selectors.save).click();
                 expect(requests.length).toBe(0);
+            });
+
+            it("can be canceled", function () {
+                var redirectSpy = spyOn(ViewUtils, 'redirect');
+                $(selectors.cancel).click();
+                expect(redirectSpy).toHaveBeenCalledWith('/course/');
             });
         });
     });

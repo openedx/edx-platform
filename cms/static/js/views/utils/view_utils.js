@@ -5,7 +5,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
     function ($, _, gettext, NotificationView, PromptView) {
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
-            setScrollTop, redirect, hasChangedAttributes, deleteNotificationHandler;
+            setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler;
 
         /**
          * Toggles the expanded state of the current element.
@@ -148,6 +148,13 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
         };
 
         /**
+         * Reloads the page. This is broken out as its own function for unit testing.
+         */
+        reload = function() {
+            window.location.reload();
+        };
+
+        /**
          * Returns true if a model has changes to at least one of the specified attributes.
          * @param model The model in question.
          * @param attributes The list of attributes to be compared.
@@ -178,6 +185,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'getScrollOffset': getScrollOffset,
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
+            'reload': reload,
             'hasChangedAttributes': hasChangedAttributes
         };
     });

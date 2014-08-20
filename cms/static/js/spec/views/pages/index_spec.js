@@ -1,7 +1,15 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/index"],
-    function ($, create_sinon, view_helpers, IndexUtils) {
+define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/index",
+        "js/views/utils/view_utils"],
+    function ($, create_sinon, view_helpers, IndexUtils, ViewUtils) {
         describe("Course listing page", function () {
-            var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore');
+            var mockIndexPageHTML = readFixtures('mock/mock-index-page.underscore'), fillInFields;
+
+            var fillInFields = function (org, number, run, name) {
+                $('.new-course-org').val(org);
+                $('.new-course-number').val(number);
+                $('.new-course-run').val(run);
+                $('.new-course-name').val(name);
+            };
 
             beforeEach(function () {
                 view_helpers.installMockAnalytics();
@@ -16,8 +24,29 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
             it("can dismiss notifications", function () {
                 var requests = create_sinon.requests(this);
+                var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.dismiss-button').click();
                 create_sinon.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
+                create_sinon.respondToDelete(requests);
+                expect(reloadSpy).toHaveBeenCalled();
+            });
+
+            it("saves new courses", function () {
+                var requests = create_sinon.requests(this);
+                var redirectSpy = spyOn(ViewUtils, 'redirect');
+                $('.new-course-button').click()
+                fillInFields('DemoX', 'DM101', '2014', 'Demo course');
+                $('.new-course-save').click();
+                create_sinon.expectJsonRequest(requests, 'POST', '/course/', {
+                    org: 'DemoX',
+                    number: 'DM101',
+                    run: '2014',
+                    display_name: 'Demo course'
+                });
+                create_sinon.respondWithJson(requests, {
+                    url: 'dummy_test_url'
+                });
+                expect(redirectSpy).toHaveBeenCalledWith('dummy_test_url');
             });
         });
     });

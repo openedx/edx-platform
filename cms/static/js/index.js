@@ -82,7 +82,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
         var onReady = function () {
             $('.new-course-button').bind('click', addNewCourse);
             $('.dismiss-button').bind('click', ViewUtils.deleteNotificationHandler(function () {
-                window.location.reload();
+                ViewUtils.reload();
             }));
         };
 

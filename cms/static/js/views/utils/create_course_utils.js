@@ -1,8 +1,8 @@
 /**
  * Provides utilities for validating courses during creation, for both new courses and reruns.
  */
-define(["jquery", "underscore", "gettext"],
-    function ($, _, gettext) {
+define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
+    function ($, _, gettext, ViewUtils) {
         return function (selectors, classes) {
             var validateRequiredField, validateCourseItemEncoding, validateTotalCourseItemsLength, setNewCourseFieldInErr,
                 hasInvalidRequiredFields, createCourse, validateFilledFields, configureHandlers;
@@ -84,7 +84,7 @@ define(["jquery", "underscore", "gettext"],
                     courseInfo,
                     function (data) {
                         if (data.url !== undefined) {
-                            window.location = data.url;
+                            ViewUtils.redirect(data.url);
                         } else if (data.ErrMsg !== undefined) {
                             errorHandler(data.ErrMsg);
                         }
