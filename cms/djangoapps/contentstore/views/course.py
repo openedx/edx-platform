@@ -67,6 +67,7 @@ from student import auth
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
+from xmodule.course_module import CourseFields
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
@@ -508,24 +509,28 @@ def _create_or_rerun_course(request):
 
     try:
         org = request.json.get('org')
-        number = request.json.get('number')
+        course = request.json.get('number', request.json.get('course'))
         display_name = request.json.get('display_name')
+        # force the start date for reruns and allow us to override start via the client
+        start = request.json.get('start', CourseFields.start.default)
         run = request.json.get('run')
 
         # allow/disable unicode characters in course_id according to settings
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
-            if _has_non_ascii_characters(org) or _has_non_ascii_characters(number) or _has_non_ascii_characters(run):
+            if _has_non_ascii_characters(org) or _has_non_ascii_characters(course) or _has_non_ascii_characters(run):
                 return JsonResponse(
                     {'error': _('Special characters not allowed in organization, course number, and course run.')},
                     status=400
                 )
 
-        fields = {'display_name': display_name} if display_name is not None else {}
+        fields = {'start': start}
+        if display_name is not None:
+            fields['display_name'] = display_name
 
         if 'source_course_key' in request.json:
-            return _rerun_course(request, org, number, run, fields)
+            return _rerun_course(request, org, course, run, fields)
         else:
-            return _create_new_course(request, org, number, run, fields)
+            return _create_new_course(request, org, course, run, fields)
 
     except DuplicateCourseError:
         return JsonResponse({
