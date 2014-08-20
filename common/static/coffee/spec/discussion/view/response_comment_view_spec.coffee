@@ -10,19 +10,9 @@ describe 'ResponseCommentView', ->
                 abuse_flaggers: ['123']
                 roles: ['Student']
         }
-        setFixtures """
-        <script id="response-comment-show-template" type="text/template">
-            <div id="response-comment-show-div"/>
-        </script>
-        <script id="response-comment-edit-template" type="text/template">
-            <div id="response-comment-edit-div">
-                <div class="edit-comment-body"><textarea/></div>
-                <ul class="edit-comment-form-errors"/>
-            </div>
-        </script>
-        <div id="response-comment-fixture"/>
-        """
-        @view = new ResponseCommentView({ model: @comment, el: $("#response-comment-fixture") })
+        DiscussionSpecHelper.setUnderscoreFixtures()
+
+        @view = new ResponseCommentView({ model: @comment, el: $("#fixture-element") })
         spyOn(ResponseCommentShowView.prototype, "convertMath")
         spyOn(DiscussionUtil, "makeWmdEditor")
         @view.render()

@@ -2,25 +2,8 @@ describe 'ResponseCommentShowView', ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
         # set up the container for the response to go in
-        setFixtures """
-        <ol class="responses"></ol>
-        <script id="response-comment-show-template" type="text/template">
-            <div id="comment_<%- id %>">
-            <div class="response-body"><%- body %></div>
-            <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">
-            <i class="icon"></i><span class="flag-label"></span></div>
-            <div style="display:none" class="discussion-delete-comment action-delete" data-role="comment-delete" data-tooltip="Delete Comment" role="button" aria-pressed="false" tabindex="0">
-              <i class="icon icon-remove"></i><span class="sr delete-label">Delete Comment</span></div>
-            <div style="display:none" class="discussion-edit-comment action-edit" data-tooltip="Edit Comment" role="button" tabindex="0">
-              <i class="icon icon-pencil"></i><span class="sr">Edit Comment</span></div>
-            <p class="posted-details">&ndash;posted <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
-            <% if (obj.username) { %>
-            <a href="<%- user_url %>" class="profile-link"><%- username %></a>
-            <% } else {print('anonymous');} %>
-            </p>
-            </div>
-        </script>
-        """
+        DiscussionSpecHelper.setUnderscoreFixtures()
+        appendSetFixtures('<ol class="responses"></ol>')
 
         # set up a model for a new Comment
         @comment = new Comment {
@@ -47,7 +30,6 @@ describe 'ResponseCommentShowView', ->
 
         beforeEach ->
             spyOn(@view, 'renderAttrs')
-            spyOn(@view, 'markAsStaff')
 
         it 'produces the correct HTML', ->
             @view.render()

@@ -10,7 +10,8 @@ class @DiscussionViewSpecHelper
           unread_comments_count: 0,
           comments_count: 0,
           abuse_flaggers: [],
-          body: ""
+          body: "",
+          created_at: "2014-08-18T01:02:03Z"
         }
         $.extend(thread, props)
 
@@ -28,17 +29,17 @@ class @DiscussionViewSpecHelper
             expect(button.text()).toEqual("42 votes (click to vote)")
 
     @checkRenderVote = (view, model) ->
-        view.renderVote()
+        view.render()
         DiscussionViewSpecHelper.expectVoteRendered(view, false)
         window.user.vote(model)
-        view.renderVote()
+        view.render()
         DiscussionViewSpecHelper.expectVoteRendered(view, true)
         window.user.unvote(model)
-        view.renderVote()
+        view.render()
         DiscussionViewSpecHelper.expectVoteRendered(view, false)
 
     @checkVote = (view, model, modelData, checkRendering) ->
-        view.renderVote()
+        view.render()
         if checkRendering
             DiscussionViewSpecHelper.expectVoteRendered(view, false)
 
