@@ -9,6 +9,7 @@ This document is intended for researchers and data czars at edX partner institut
 
    read_me.rst
    preface.rst
+   browsers.rst
    internal_data_formats/change_log.rst
    internal_data_formats/data_czar.rst
    internal_data_formats/credentials.rst

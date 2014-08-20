@@ -16,6 +16,7 @@ Contents:
 
     change_log
     preface.rst
+    browsers.rst
     overview.rst
     extending_platform/index
     xblocks.rst
