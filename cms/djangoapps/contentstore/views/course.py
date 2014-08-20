@@ -599,7 +599,7 @@ def _rerun_course(request, org, number, run, fields):
     with store.default_store('split'):
         destination_course_key = store.make_course_key(org, number, run)
 
-     # verify org course and run don't already exist
+    # verify org course and run don't already exist
     if store.has_course(destination_course_key, ignore_case=True):
         raise DuplicateCourseError(source_course_key, destination_course_key)
 

@@ -952,11 +952,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         In split, other than copying the assets, this is cheap as it merely creates a new version of the
         existing course.
         """
-        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
         source_index = self.get_course_index_info(source_course_id)
         if source_index is None:
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
-        return self.create_course(
+        new_course = self.create_course(
             dest_course_id.org, dest_course_id.course, dest_course_id.run,
             user_id,
             fields=fields,
@@ -965,6 +964,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             skip_auto_publish=True,
             **kwargs
         )
+        # don't copy assets until we create the course in case something's awry
+        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+        return new_course
 
     DEFAULT_ROOT_BLOCK_ID = 'course'
     def create_course(
