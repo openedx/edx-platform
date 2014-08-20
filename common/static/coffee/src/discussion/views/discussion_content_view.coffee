@@ -71,7 +71,7 @@ if Backbone?
       "click .action-answer": "toggleEndorse"
       "click .action-endorse": "toggleEndorse"
       "click .action-vote": "toggleVote"
-      "click .action-more": "showSecondaryActions"
+      "click .action-more": "toggleSecondaryActions"
       "click .action-pin": "togglePin"
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
@@ -135,19 +135,16 @@ if Backbone?
         @$(".post-label-closed").toggle(closed)
     })
 
-    showSecondaryActions: (event) =>
+    toggleSecondaryActions: (event) =>
       event.preventDefault()
       event.stopPropagation()
-      @$(".action-more").addClass("is-expanded")
-      @$(".actions-dropdown").addClass("is-expanded")
-      $("body").on("click", @hideSecondaryActions)
-
-    hideSecondaryActions: (event) =>
-      event.preventDefault()
-      event.stopPropagation()
-      @$(".action-more").removeClass("is-expanded")
-      @$(".actions-dropdown").removeClass("is-expanded")
-      $("body").off("click", @hideSecondaryActions)
+      expand = not @$(".action-more").hasClass("is-expanded")
+      @$(".action-more").toggleClass("is-expanded", expand)
+      @$(".actions-dropdown").toggleClass("is-expanded", expand)
+      if expand
+        $("body").on("click", @toggleSecondaryActions)
+      else
+        $("body").off("click", @toggleSecondaryActions)
 
     toggleFollow: (event) =>
       event.preventDefault()

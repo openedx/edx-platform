@@ -54,7 +54,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         ).fulfill()
         yield
         if self._is_element_visible(ancestor_selector + " .actions-dropdown"):
-            self._find_within(ancestor_selector + " .action-hide-more").click()
+            self._find_within(ancestor_selector + " .action-more").click()
             EmptyPromise(
                 lambda: not self._is_element_visible(ancestor_selector + " .actions-dropdown"),
                 "Secondary action menu closed"
