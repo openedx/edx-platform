@@ -33,7 +33,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
+from django.contrib.auth.models import User
+from openedx.core.djangoapps.user_api.models import UserPreference
+from notification_prefs import NOTIFICATION_PREF_KEY
+
 TEST_API_KEY = str(uuid.uuid4())
+
 
 class SecureClient(Client):
 
