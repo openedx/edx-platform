@@ -8,7 +8,7 @@ from xmodule.seq_module import SequenceDescriptor
 
 from lxml import etree
 
-from xblock.fields import Scope, String
+from xblock.fields import Scope, String, List
 from xblock.fragment import Fragment
 
 log = logging.getLogger('edx.' + __name__)
@@ -17,8 +17,7 @@ log = logging.getLogger('edx.' + __name__)
 class RandomizeFields(object):
     choice = String(help="Which random child was chosen",
                     scope=Scope.user_state)
-    history = String(help="History of choices (json)",
-                     scope=Scope.user_state)
+    history = List(help="History of randomize choices", scope=Scope.user_state)
 
 
 class RandomizeModule(RandomizeFields, XModule):
@@ -49,12 +48,12 @@ class RandomizeModule(RandomizeFields, XModule):
         # it calls get_child_descriptors() internally, but that doesn't work
         # until we've picked a choice
         xml_attrs = self.descriptor.xml_attributes or []
-        use_randrange = self._str_to_bool(xml_attrs.get('use_randrange', ''))
-        no_repeats = self._str_to_bool(xml_attrs.get('no_repeats', ''))
+        self.use_randrange = self._str_to_bool(xml_attrs.get('use_randrange', ''))
+        self.no_repeats = self._str_to_bool(xml_attrs.get('no_repeats', ''))
         suspended = xml_attrs.get('suspended', '').split(',')
-        suspended = [i.strip() for i in suspended if i.strip()]
-        self.pick_choice(use_randrange=use_randrange, no_repeats=no_repeats,
-                         suspended=suspended)
+        self.suspended = [i.strip() for i in suspended if i.strip()]
+        self.pick_choice(use_randrange=self.use_randrange,
+                         no_repeats=self.no_repeats, suspended=self.suspended)
 
     def _str_to_bool(self, v):
         return v.lower() == 'true'
@@ -89,26 +88,16 @@ class RandomizeModule(RandomizeFields, XModule):
                 # try:
                 #     last_failed = json.loads(self.history or '[]')[-1]
                 #     self.choice = last_failed
-                #     current_child = all_choices[last_failed]
                 # except IndexError:
                 #     raise Exception('No choices left!!!')
                 raise Exception('No choices left!!!')
 
         if self.choice is not None:
-            if current_child:
-                self.child_descriptor = current_child
-            else:
-                self.child_descriptor = choices[self.choice]
+            self.child_descriptor = all_choices.get(self.choice)
             # Now get_children() should return a list with one element
             children = self.get_children()
             assert len(children) == 1
             self.child = children[0]
-            if no_repeats:
-                child_loc = self.child.location.url()
-                history = json.loads(self.history or '[]')
-                if child_loc not in history:
-                    history.append(child_loc)
-                self.history = json.dumps(history)
         else:
             self.child_descriptor = None
             self.child = None
@@ -116,8 +105,8 @@ class RandomizeModule(RandomizeFields, XModule):
     def get_choices(self, no_repeats=None, suspended=None):
         children = self.descriptor.get_children()
         if self.choice is None and no_repeats:
-            history = json.loads(self.history or '[]')
-            children = [c for c in children if c.location.url() not in history]
+            children = [c for c in children if c.location.url() not in
+                        self.history]
         if suspended:
             children = [c for c in children if c.location.name not in
                         suspended]
@@ -137,6 +126,11 @@ class RandomizeModule(RandomizeFields, XModule):
         return [self.child_descriptor]
 
     def student_view(self, context):
+        if self.choice is not None:
+            child_loc = self.child.location.url()
+            if child_loc not in self.history:
+                self.history.append(child_loc)
+            self.save()
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load
             return Fragment(content=u"<div>Nothing to randomize between</div>")
