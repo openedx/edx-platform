@@ -231,6 +231,7 @@ def course_handler(request, course_key_string=None):
     else:
         return HttpResponseNotFound()
 
+
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
@@ -367,7 +368,7 @@ def course_listing(request):
             'run': course.location.run
         }
 
-    def format_unsucceeded_course_for_view(uca):
+    def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
         """
@@ -393,7 +394,7 @@ def course_listing(request):
         if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
     ]
 
-    in_process_course_actions = [format_unsucceeded_course_for_view(uca) for uca in in_process_course_actions]
+    in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
         'courses': courses,
@@ -408,6 +409,7 @@ def course_listing(request):
 
 
 def _get_rerun_link_for_item(course_key):
+    """ Returns the rerun link for the given course key. """
     return reverse_course_url('course_rerun_handler', course_key)
 
 
@@ -446,7 +448,8 @@ def course_index(request, course_key):
         'rerun_notification_id': current_action.id if current_action else None,
         'course_release_date': course_release_date,
         'settings_url': settings_url,
-        'notification_dismiss_url': reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+        'notification_dismiss_url':
+            reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
                 'action_state_id': current_action.id,
             }) if current_action else None,
     })
