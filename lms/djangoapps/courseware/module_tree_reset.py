@@ -233,10 +233,9 @@ class ProctorModuleInfo(object):
             # get title (display_name) of problem assigned, if student had
             # started a problem base this on the "choice" from the randmize
             # module state
-            try:
-                sm.choice = json.loads(sm.state)['choice']
-            except KeyError:
-                sm.choice = None
+            state = json.loads(sm.state)
+            sm.choice = state.get('choice')
+            sm.history = state.get('history')
             if sm.choice is not None:
                 try:
                     sm.problem = self.ms.get_instance(
@@ -279,13 +278,18 @@ class ProctorModuleInfo(object):
             attempted = 'position' in sm.ps_sm.state
             if not attempted and sm.score is not None and sm.score.earned:
                 attempted = True
+            visited = False
+            if sm.choice and sm.history:
+                visited = sm.choice in sm.history
 
             earned = (sm.score.earned if sm.score is not None else None)
             possible = (sm.score.possible if sm.score is not None else None)
             stat = dict(name=name, assignment=sm.rpmod.ra_ps.display_name,
                         pm_sm=sm.ps_sm.state, choice=sm.choice,
+                        history=sm.history,
                         problem=sm.problem_name,
                         attempted=attempted,
+                        visited=visited,
                         earned=earned,
                         possible=possible)
             status['assignments'].append(stat)
