@@ -18,8 +18,9 @@ any way.
    * - Course start date
      - No. Set to midnight on January 1, 2030 (UTC).
    * - All other course dates
-     - Yes. You will need to update all release dates and due dates. 
-   * - Course outline structure (sections, subsections, units) and state (published, hidden from students)
+     - Yes. You will need to update all release dates and due dates.
+   * - Course structure (sections, subsections, units) and state (published,
+       hidden)
      - Yes. 
    * - Individual problems and other components
      - Yes.
@@ -35,7 +36,8 @@ any way.
      - Yes.
    * - Student enrollment data
      - No.
-   * - Course team privileges, including admins, discussion moderators, and beta testers
+   * - Course team privileges, including admins, discussion moderators, beta
+       testers
      - No. Only your own role (as a course admin and instructor) is defined.
    * - Student answers, progress, and grading data
      - No.
@@ -57,48 +59,52 @@ Use Re-Run to Create a Course
 
 Before you re-run a course:
 
-* For a course that is on the `edge.edx.org`_ site, verify that you have
+* For a course that is hosted on the `edge.edx.org`_ site, verify that you have
   permission to create courses in Studio. See :ref:`Use Studio on Edge`.
 
-  For a course that is on the `edx.org`_ site, contact your Program Manager.
-  Your Program Manager actually creates the new course using the re-run
-  feature, and then works with you to complete the steps to :ref:`update the
-  new course<Update the New Course>`.
+  For a course that is hosted on the `edx.org`_ site, contact your Program
+  Manager. Your Program Manager will create the new course using the re- run
+  feature, and then work with you to complete the steps to :ref:`update the new
+  course<Update the New Course>`.
 
 * Verify that you are a member of the course staff for the course that you want
   to re-run.
 
-* Verify that the original course was created in Studio, not in XML.
+* Verify that the course that you want to re-run was created in edX Studio, and
+  was not created in XML.
 
 To re-run a course:
 
 #. Log in to Studio. Your dashboard lists the courses that you have access to
-   as a staff memeber.
+   as a staff member.
 
 #. Move your cursor over each row in the list of courses. The **Re-Run Course**
    and **View Live** options appear for each course.
 
-#. Locate the course you want to re-run and click **Re-Run Course**.
+  .. image:: ../Images/Rerun_link.png
+     :alt: A course liste don the dashboard with the Re-run Course and View 
+           Live options shown 
+
+3. Locate the course you want to re-run and click **Re-Run Course**. The
+   **Create a re-run of a course** page opens with values already supplied in
+   the **Course Name**, **Organization**, and **Course Number** fields.
 
   .. image:: ../Images/rerun_course_info.png
-     :alt: The course creation page for a rerun, with the course name, organization, and course number supplied
+     :alt: The course creation page for a rerun, with the course name, 
+           organization, and course number supplied
 
-.. this image ^ is from the wireframe and needs to be replaced     
+4. Supply a **Course Run** timeframe for the new course. Together, the course
+   number, the organization, and the course run are used to create the URL for
+   the new course. The combination of these three values must be unique for the
+   new course.
 
-4. Supply a **Course Run** timeframe for the new course. The course number, the
-   organization, and the course run are used to create the URL for the new
-   course. The combination of these three values must be unique for the new
-   course.
+#. Click **Create Re-Run**. Your **My Courses** dashboard opens with a status
+   message about the course creation process.
 
-.. any of the 4 values can be changed, but we are not currently supporting
-.. cross-organization use such as licensing
-
-5. Click **Create Re-Run**. The duplication process takes several minutes. You
+   Duplication of the course structure and content takes several minutes. You
    can work in other parts of Studio or in the LMS, or on other web sites,
-   while the process runs.
-
-  The new course appears on your **My Courses** dashboard in Studio when
-  configuration is complete.
+   while the process runs. The new course appears on your **My Courses**
+   dashboard in Studio when configuration is complete.
 
 .. _Update the New Course:
 
@@ -107,10 +113,16 @@ Update the New Course
 ********************************************
 
 When you create a course by re-running another course, you should carefully
-review the course settings and content. At a minimum, you will need to make
-these changes to prepare the new course for release:
+review the settings and content of the new course. To assure a quality
+experience for students, be sure to test the course thoroughly before the
+course start date. See :ref:`Testing Your Course` and
+:ref:`Beta_Testing`.
 
-* Add course staff members. See :ref:`Add Course Team Members` or
+At a minimum, you will need to make these changes to prepare the new course for
+release:
+
+* Add course staff members, including discussion admins, moderators, and
+  community TAs. See :ref:`Add Course Team Members` or
   :ref:`Course_Staffing`.
   
 * Update course-wide dates, including course and enrollment start and end
@@ -134,12 +146,10 @@ these changes to prepare the new course for release:
   post. See :ref:`Discussions`.
   
 You can use the :ref:`course checklists<Use the Course Checklist>` to work
-through the course and verify that it is ready for release.
-
-To assure a quality experience for course students, be sure to test a course
-created with the re-run option thoroughly before the course start date.
-See :ref:`Testing Your Course` and :ref:`Beta_Testing`.
+through the course and verify that it is ready for release. You can also refer
+to the :ref:`Launch` chapter for tools and ideas that help you prepare the
+course for launch.
 
 
-.. _edg.edx.org: http://edge.edx.org
+.. _edge.edx.org: http://edge.edx.org
 .. _edx.org: http://edx.org
