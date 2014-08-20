@@ -20,7 +20,7 @@ are released. All point releases are supported unless noted; occasional
 exceptions are based on specific bug fixes or feature updates.
 
 ***********************************
-The edX Learning Management System
+edX Learning Management System
 ***********************************
 
 The following table shows operating system and browser support for the edX
