@@ -38,14 +38,7 @@ FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
 ################################# CELERY ######################################
 
 # By default don't use a worker, execute tasks as if they were local functions
-
-# TODO BEWARE: UNCOMMENT THIS BEFORE MERGING INTO MASTER
 CELERY_ALWAYS_EAGER = True
-
-# TODO BEWARE: DO NOT COMMIT THE REST OF THIS SECTION INTO MASTER - FOR LOCAL TESTING ONLY
-# Test with Celery threads
-# CELERY_ALWAYS_EAGER = False
-# BROKER_URL = 'redis://'
 
 ################################ COURSE RERUNS ################################
 

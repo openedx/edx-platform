@@ -41,7 +41,6 @@ class TestCourseListing(ModuleStoreTestCase):
         for role in [CourseInstructorRole, CourseStaffRole]:
             role(self.source_course_key).add_users(self.user)
 
-
     def tearDown(self):
         """
         Reverse the setup
