@@ -757,7 +757,10 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+
 ##### Using cybersource by default #####
+
+CC_PROCESSOR_NAME = 'CyberSource'
 CC_PROCESSOR = {
     'CyberSource': {
         'SHARED_SECRET': '',
@@ -765,8 +768,15 @@ CC_PROCESSOR = {
         'SERIAL_NUMBER': '',
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
+    },
+    'CyberSource2': {
+        "PURCHASE_ENDPOINT": '',
+        "SECRET_KEY": '',
+        "ACCESS_KEY": '',
+        "PROFILE_ID": '',
     }
 }
+
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
