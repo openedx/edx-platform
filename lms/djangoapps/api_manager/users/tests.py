@@ -22,7 +22,7 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
-from projects.models import Project
+from projects.models import Project, Workgroup
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -60,6 +60,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.groups_base_uri = '/api/server/groups'
         self.org_base_uri = '/api/server/organizations/'
         self.workgroups_base_uri = '/api/server/workgroups/'
+        self.projects_base_uri = '/api/server/projects/'
         self.users_base_uri = '/api/server/users'
         self.sessions_base_uri = '/api/server/sessions'
         self.test_bogus_course_id = 'foo/bar/baz'
@@ -1251,47 +1252,46 @@ class UsersApiTests(ModuleStoreTestCase):
 
     def test_user_workgroups_list(self):
         test_workgroups_uri = self.workgroups_base_uri
-        user_id = self.user.id
-        # create anonymous user
-        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        for i in xrange(1, 12):
-            course = CourseFactory.create(
-                display_name="TEST COURSE {}".format(i),
-            )
+        project_1 = Project.objects.create(
+            course_id=unicode(self.course.id),
+            content_id=unicode(self.course_content.scope_ids.usage_id),
+        )
+        p1_workgroup_1 = Workgroup.objects.create(
+            name = 'Workgroup 1',
+            project = project_1
+        )
 
-            course_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=course.location,
-                data=self.test_course_data,
-                display_name="View_Sequence"
-            )
-
-            test_project = Project.objects.create(
-                course_id=unicode(course.id),
-                content_id=unicode(course_content.scope_ids.usage_id)
-            )
-            data = {
-                'name': 'Workgroup ' + str(i),
-                'project': test_project.id
-            }
-            response = self.do_post(test_workgroups_uri, data)
-            self.assertEqual(response.status_code, 201)
-            test_uri = '{}{}/'.format(test_workgroups_uri, str(response.data['id']))
-            users_uri = '{}users/'.format(test_uri)
-            data = {"id": user_id}
+        project_2 = Project.objects.create(
+            course_id=unicode(self.course2.id),
+            content_id=unicode(self.course2_content.scope_ids.usage_id),
+        )
+        p2_workgroup_1 = Workgroup.objects.create(
+            name = 'Workgroup 2',
+            project = project_2
+        )
+        for i in xrange(1,12):
+            test_user = UserFactory()
+            users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 1)
+            data = {"id": test_user.id}
             response = self.do_post(users_uri, data)
             self.assertEqual(response.status_code, 201)
+            if test_user.id > 6:
+                users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 2)
+                data = {"id": test_user.id}
+                response = self.do_post(users_uri, data)
+                self.assertEqual(response.status_code, 201)
 
         # test with anonymous user id
-        test_uri = '{}/{}/workgroups/?page_size=10'.format(self.users_base_uri, anonymous_id)
+        anonymous_id = anonymous_id_for_user(test_user, self.course.id)
+        test_uri = '{}/{}/workgroups/?page_size=1'.format(self.users_base_uri, anonymous_id)
         response = self.do_get(test_uri)
-        self.assertEqual(response.data['count'], 11)
-        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['num_pages'], 2)
 
         # test with course_id filter and integer user id
-        course_id = {'course_id': unicode(course.id)}
-        response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, user_id, urlencode(course_id)))
+        course_id = {'course_id': unicode(self.course.id)}
+        response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, test_user.id, urlencode(course_id)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(len(response.data['results']), 1)
