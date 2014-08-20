@@ -64,17 +64,19 @@ class ProctorPanel(object):
             data = ret.content
         return data
 
-    def request(self, json=True):
-        data = dict(uname=self.user.username, name=self.user.profile.name,
+    @property
+    def _request_data(self):
+        return dict(uname=self.user.username, name=self.user.profile.name,
                     email=self.user.email, problem=self.procset_name)
+
+    def request(self, json=True):
         return self._make_request('cmd/request/%s' % self.user.id,
-                                  method='POST', data=data, json=json)
+                                  method='POST', data=self._request_data,
+                                  json=json)
 
     def status(self, json=True):
-        params = dict(uname=self.user.username, name=self.user.profile.name,
-                      email=self.user.email, problem=self.procset_name)
-        return self._make_request('cmd/status/%s' % self.user.id, params=params,
-                                  json=json)
+        return self._make_request('cmd/status/%s' % self.user.id,
+                                  params=self._request_data, json=json)
 
     def is_released(self):
         retdata = self.status()
