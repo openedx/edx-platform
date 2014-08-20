@@ -3,7 +3,6 @@ from ..fixtures.course import CourseFixture
 from .helpers import UniqueCourseTest
 
 
-
 class StudioCourseTest(UniqueCourseTest):
     """
     Base class for all Studio course tests.

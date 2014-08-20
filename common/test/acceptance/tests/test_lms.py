@@ -270,7 +270,6 @@ class VideoTest(UniqueCourseTest):
                         XBlockFixtureDesc('video', 'Video')
         )))).install()
 
-
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
@@ -333,7 +332,6 @@ class XBlockAcidBase(UniqueCourseTest):
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.tab_nav = TabNavPage(self.browser)
 
-
     def validate_acid_block_view(self, acid_block):
         """
         Verify that the LMS view for the Acid Block is correct
@@ -344,7 +342,6 @@ class XBlockAcidBase(UniqueCourseTest):
         self.assertTrue(acid_block.scope_passed('user_state_summary'))
         self.assertTrue(acid_block.scope_passed('preferences'))
         self.assertTrue(acid_block.scope_passed('user_info'))
-
 
     def test_acid_block(self):
         """

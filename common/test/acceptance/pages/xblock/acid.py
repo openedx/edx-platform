@@ -6,6 +6,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise
 from .utils import wait_for_xblock_initialization
 
+
 class AcidView(PageObject):
     """
     A :class:`.PageObject` representing the rendered view of the :class:`.AcidBlock`.

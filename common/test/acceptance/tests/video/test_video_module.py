@@ -794,7 +794,7 @@ class Html5VideoTest(VideoBaseTest):
 
         self.assertIn(unicode_text, self.video.captions_text)
 
-        #Then I can download transcript in "srt" format that has text "好 各位同学"
+        # Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
