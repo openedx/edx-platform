@@ -60,13 +60,13 @@ def path_to_location(modulestore, usage_key):
                 # Found it!
                 path = (next_usage, path)
                 return flatten(path)
+            elif parent is None:
+                # Orphaned item.
+                return None
 
             # otherwise, add parent locations at the end
             newpath = (next_usage, path)
             queue.append((parent, newpath))
-
-        # If we're here, there is no path
-        return None
 
     if not modulestore.has_item(usage_key):
         raise ItemNotFoundError(usage_key)
