@@ -285,14 +285,14 @@ def _accessible_courses_list(request):
         return has_course_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
-    unsucceeded_course_actions = [
+    in_process_course_actions = [
         course for course in
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
         if has_course_access(request.user, course.course_key)
     ]
-    return courses, unsucceeded_course_actions
+    return courses, in_process_course_actions
 
 
 def _accessible_courses_list_from_groups(request):
@@ -300,7 +300,7 @@ def _accessible_courses_list_from_groups(request):
     List all courses available to the logged in user by reversing access group names
     """
     courses_list = {}
-    unsucceeded_course_actions = []
+    in_process_course_actions = []
 
     instructor_courses = UserBasedRole(request.user, CourseInstructorRole.ROLE).courses_with_role()
     staff_courses = UserBasedRole(request.user, CourseStaffRole.ROLE).courses_with_role()
@@ -313,7 +313,7 @@ def _accessible_courses_list_from_groups(request):
             raise AccessListFallback
         if course_key not in courses_list:
             # check for any course action state for this course
-            unsucceeded_course_actions.extend(
+            in_process_course_actions.extend(
                 CourseRerunState.objects.find_all(
                     exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED},
                     should_display=True,
@@ -330,7 +330,7 @@ def _accessible_courses_list_from_groups(request):
                 # ignore deleted or errored courses
                 courses_list[course_key] = course
 
-    return courses_list.values(), unsucceeded_course_actions
+    return courses_list.values(), in_process_course_actions
 
 
 @login_required
@@ -343,14 +343,14 @@ def course_listing(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, unsucceeded_course_actions = _accessible_courses_list(request)
+        courses, in_process_course_actions = _accessible_courses_list(request)
     else:
         try:
-            courses, unsucceeded_course_actions = _accessible_courses_list_from_groups(request)
+            courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, unsucceeded_course_actions = _accessible_courses_list(request)
+            courses, in_process_course_actions = _accessible_courses_list(request)
 
     def format_course_for_view(course):
         """
@@ -385,19 +385,19 @@ def course_listing(request):
                 }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
-    # remove any courses in courses that are also in the unsucceeded_course_actions list
-    unsucceeded_action_course_keys = [uca.course_key for uca in unsucceeded_course_actions]
+    # remove any courses in courses that are also in the in_process_course_actions list
+    in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
         format_course_for_view(c)
         for c in courses
-        if not isinstance(c, ErrorDescriptor) and (c.id not in unsucceeded_action_course_keys)
+        if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
     ]
 
-    unsucceeded_course_actions = [format_unsucceeded_course_for_view(uca) for uca in unsucceeded_course_actions]
+    in_process_course_actions = [format_unsucceeded_course_for_view(uca) for uca in in_process_course_actions]
 
     return render_to_response('index.html', {
         'courses': courses,
-        'unsucceeded_course_actions': unsucceeded_course_actions,
+        'in_process_course_actions': in_process_course_actions,
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),

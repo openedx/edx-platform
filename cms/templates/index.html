@@ -132,12 +132,12 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       % endif
 
       <!-- STATE: processing courses -->
-      %if allow_course_reruns and rerun_creator_status and len(unsucceeded_course_actions) > 0:
+      %if allow_course_reruns and rerun_creator_status and len(in_process_course_actions) > 0:
       <div class="courses courses-processing">
           <h3 class="title">Courses Being Processed</h3>
 
           <ul class="list-courses">
-            %for course_info in sorted(unsucceeded_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+            %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
             <!-- STATE: re-run is processing -->
             %if course_info['is_in_progress']:
             <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
