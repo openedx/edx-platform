@@ -95,7 +95,8 @@ class JSErrorBadContentTest(BadComponentTest):
     """
     Tests that components that throw JS errors do not break the Unit page.
     """
-    __test__ = True
+    # TODO: ENABLE TEST WITH ANDY'S PR
+    __test__ = False
 
     def get_bad_html_content(self):
         """
