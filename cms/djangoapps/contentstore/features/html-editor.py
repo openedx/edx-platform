@@ -1,6 +1,8 @@
 # disable missing docstring
 # pylint: disable=C0111
 
+from collections import OrderedDict
+
 from lettuce import world, step
 from nose.tools import assert_in, assert_false, assert_true, assert_equal  # pylint: disable=no-name-in-module
 from common import type_in_codemirror, get_codemirror_value
@@ -112,34 +114,6 @@ def verify_code_editor_text(step, text):
     )
 
 
-def use_plugin(button_class, action):
-    # Click on plugin button
-    world.css_click(button_class)
-    perform_action_in_plugin(action)
-
-
-def use_code_editor(action):
-    # Click on plugin button
-    buttons = world.css_find('div.mce-widget>button')
-
-    code_editor = [button for button in buttons if button.text == 'HTML']
-    assert_equal(1, len(code_editor))
-    code_editor[0].click()
-
-    perform_action_in_plugin(action)
-
-
-def perform_action_in_plugin(action):
-     # Wait for the plugin window to open.
-    world.wait_for_visible('.mce-window')
-
-    # Trigger the action
-    action()
-
-    # Click OK
-    world.css_click('.mce-primary')
-
-
 @step('I save the page$')
 def i_click_on_save(step):
     world.save_component()
@@ -238,3 +212,101 @@ def type_in_raw_editor(step, text):
 def select_editor(step, editor):
     world.edit_component_and_select_settings()
     world.browser.select('Editor', editor)
+
+
+@step('I click font selection dropdown')
+def click_font_dropdown(step):
+    dropdowns = [drop for drop in world.css_find('.mce-listbox') if drop.text == 'Font Family']
+    assert_equal(len(dropdowns), 1)
+    dropdowns[0].click()
+
+
+@step('I should see a list of available fonts')
+def font_selector_dropdown_is_shown(step):
+    font_panel = get_fonts_list_panel(world)
+    expected_fonts = list(CUSTOM_FONTS.keys()) + list(TINYMCE_FONTS.keys())
+    actual_fonts = [font.strip() for font in font_panel.text.split('\n')]
+    assert_equal(actual_fonts, expected_fonts)
+
+
+@step('"Default" option sets "(.*)" font family')
+def default_options_sets_expected_font_family(step, expected_font_family):
+    fonts = get_available_fonts(get_fonts_list_panel(world))
+    assert_equal(fonts.get("Default", None), expected_font_family)
+
+
+@step('all standard tinyMCE fonts should be available')
+def check_standard_tinyMCE_fonts(step):
+    fonts = get_available_fonts(get_fonts_list_panel(world))
+    for label, expected_font in TINYMCE_FONTS.items():
+        assert_equal(fonts.get(label, None), expected_font)
+
+TINYMCE_FONTS = OrderedDict([
+    ("Andale Mono", "'andale mono', times"),
+    ("Arial", "arial, helvetica, sans-serif"),
+    ("Arial Black", "'arial black', 'avant garde'"),
+    ("Book Antiqua", "'book antiqua', palatino"),
+    ("Comic Sans MS", "'comic sans ms', sans-serif"),
+    ("Courier New", "'courier new', courier"),
+    ("Georgia", "georgia, palatino"),
+    ("Helvetica", "helvetica"),
+    ("Impact", "impact, chicago"),
+    ("Symbol", "symbol"),
+    ("Tahoma", "tahoma, arial, helvetica, sans-serif"),
+    ("Terminal", "terminal, monaco"),
+    ("Times New Roman", "'times new roman', times"),
+    ("Trebuchet MS", "'trebuchet ms', geneva"),
+    ("Verdana", "verdana, geneva"),
+    # tinyMCE does not set font-family on dropdown span for these two fonts
+    ("Webdings", ""),  # webdings
+    ("Wingdings", ""),  # wingdings, 'zapf dingbats'
+])
+
+CUSTOM_FONTS = OrderedDict([
+    ('Default', "'Open Sans', Verdana, Arial, Helvetica, sans-serif"),
+])
+
+
+def use_plugin(button_class, action):
+    # Click on plugin button
+    world.css_click(button_class)
+    perform_action_in_plugin(action)
+
+
+def use_code_editor(action):
+    # Click on plugin button
+    buttons = world.css_find('div.mce-widget>button')
+
+    code_editor = [button for button in buttons if button.text == 'HTML']
+    assert_equal(1, len(code_editor))
+    code_editor[0].click()
+
+    perform_action_in_plugin(action)
+
+
+def perform_action_in_plugin(action):
+     # Wait for the plugin window to open.
+    world.wait_for_visible('.mce-window')
+
+    # Trigger the action
+    action()
+
+    # Click OK
+    world.css_click('.mce-primary')
+
+
+def get_fonts_list_panel(world):
+    menus = world.css_find('.mce-menu')
+    return menus[0]
+
+
+def get_available_fonts(font_panel):
+    font_spans = font_panel.find_by_css('.mce-text')
+    return {font_span.text: get_font_family(font_span) for font_span in font_spans}
+
+
+def get_font_family(font_span):
+    # get_attribute('style').replace('font-family: ', '').replace(';', '') is equivalent to
+    # value_of_css_property('font-family'). However, for reason unknown value_of_css_property fails tests in CI
+    # while works as expected in local development environment
+    return font_span._element.get_attribute('style').replace('font-family: ', '').replace(';', '')
