@@ -23,7 +23,7 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
         # deserialize the payload
         source_course_key = CourseKey.from_string(source_course_key_string)
         destination_course_key = CourseKey.from_string(destination_course_key_string)
-        fields = deserialize_fields(fields)
+        fields = deserialize_fields(fields) if fields else None
 
         # use the split modulestore as the store for the rerun course,
         # as the Mongo modulestore doesn't support multiple runs of the same course.

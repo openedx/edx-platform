@@ -1,8 +1,9 @@
 """
 Unit tests for cloning a course between the same and different module stores.
 """
+import json
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from contentstore.tests.utils import CourseTestCase
 from contentstore.tasks import rerun_course
 from contentstore.views.access import has_course_access
@@ -58,7 +59,8 @@ class CloneCourseTest(CourseTestCase):
         # Mark the action as initiated
         fields = {'display_name': 'rerun'}
         CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
-        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id, fields)
+        result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id,
+                                    json.dumps(fields, cls=EdxJSONEncoder))
         self.assertEqual(result.get(), "succeeded")
         self.assertTrue(has_course_access(self.user, split_course3_id), "Didn't grant access")
         rerun_state = CourseRerunState.objects.find_first(course_key=split_course3_id)
@@ -78,7 +80,8 @@ class CloneCourseTest(CourseTestCase):
             split_course4_id = CourseLocator(org="edx3", course="split3", run="rerun_fail")
             fields = {'display_name': 'total failure'}
             CourseRerunState.objects.initiated(split_course3_id, split_course4_id, self.user, fields['display_name'])
-            result = rerun_course.delay(unicode(split_course3_id), unicode(split_course4_id), self.user.id, fields)
+            result = rerun_course.delay(unicode(split_course3_id), unicode(split_course4_id), self.user.id,
+                                        json.dumps(fields, cls=EdxJSONEncoder))
             self.assertIn("exception: ", result.get())
             self.assertIsNone(self.store.get_course(split_course4_id), "Didn't delete course after error")
             CourseRerunState.objects.find_first(
