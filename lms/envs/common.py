@@ -1325,7 +1325,7 @@ INSTALLED_APPS = (
     'monitoring',
 
     # Course action state
-    'course_action_state'
+    'course_action_state',
     # edX Public API
     'public_api',
     'public_api.users',
