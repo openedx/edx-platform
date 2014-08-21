@@ -17,7 +17,7 @@ describe "ThreadResponseShowView", ->
         }
         @comment = new Comment(@commentData)
         @comment.set("thread", @thread)
-        @view = new ThreadResponseShowView({ model: @comment })
+        @view = new ThreadResponseShowView({ model: @comment, $el: $("#fixture-element") })
 
         # Avoid unnecessary boilerplate
         spyOn(ThreadResponseShowView.prototype, "convertMath")
@@ -50,7 +50,7 @@ describe "ThreadResponseShowView", ->
           "endorsement": endorsement
         })
         @view.render()
-        expect(@view.$(".posted-details").text()).toMatch(
+        expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
           "marked as answer less than a minute ago by " + endorsement.username
         )
 
@@ -66,17 +66,45 @@ describe "ThreadResponseShowView", ->
         })
         @view.render()
         expect(@view.$(".posted-details").text()).toMatch("marked as answer less than a minute ago")
-        expect(@view.$(".posted-details").text()).not.toMatch(" by ")
+        expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
+
+    it "renders endorsement correctly for an endorsed response in a discussion thread", ->
+        endorsement = {
+          "username": "test_endorser",
+          "time": new Date().toISOString()
+        }
+        @thread.set("thread_type", "discussion")
+        @comment.set({
+          "endorsed": true,
+          "endorsement": endorsement
+        })
+        @view.render()
+        expect(@view.$(".posted-details").text().replace(/\s+/g, " ")).toMatch(
+          "endorsed less than a minute ago by " + endorsement.username
+        )
+
+    it "renders anonymous endorsement correctly for an endorsed response in a discussion thread", ->
+        endorsement = {
+          "username": null,
+          "time": new Date().toISOString()
+        }
+        @thread.set("thread_type", "discussion")
+        @comment.set({
+          "endorsed": true,
+          "endorsement": endorsement
+        })
+        @view.render()
+        expect(@view.$(".posted-details").text()).toMatch("endorsed less than a minute ago")
+        expect(@view.$(".posted-details").text()).not.toMatch("\sby\s")
 
     it "re-renders correctly when endorsement changes", ->
         DiscussionUtil.loadRoles({"Moderator": [parseInt(window.user.id)]})
         @thread.set("thread_type", "question")
+        @view.render()
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
-        @view.$(".action-endorse").click()
-        expect(@view.$(".posted-details").text()).toMatch(
-          "marked as answer less than a minute ago by " + user.get("username")
-        )
-        @view.$(".action-endorse").click()
+        @view.$(".action-answer").click()
+        expect(@view.$(".posted-details").text()).toMatch("marked as answer")
+        @view.$(".action-answer").click()
         expect(@view.$(".posted-details").text()).not.toMatch("marked as answer")
 
     it "allows a moderator to mark an answer in a question thread", ->
