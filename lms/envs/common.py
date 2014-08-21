@@ -1384,8 +1384,8 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     # Country list
-    'django_countries'
-
+    'django_countries',
+    
     # edX Public API
     'public_api',
     'public_api.users',
