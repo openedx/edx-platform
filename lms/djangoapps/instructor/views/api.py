@@ -20,7 +20,7 @@ from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
@@ -589,6 +589,58 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
         return instructor_analytics.csvs.create_csv_response("e-commerce_sale_records.csv", header, datarows)
 
 
+@require_level('staff')
+@require_POST
+def sale_validation(request, course_id):
+    """
+    This method either invalidate or re validate the sale against the invoice number depending upon the event type
+    """
+    try:
+        invoice_number = request.POST["invoice_number"]
+    except KeyError:
+        return HttpResponseBadRequest("Missing required invoice_number parameter")
+    try:
+        event_type = request.POST["event_type"]
+    except KeyError:
+        return HttpResponseBadRequest("Missing required event_type parameter")
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
+    except Invoice.DoesNotExist:
+        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+
+    if event_type == "invalidate":
+        return invalidate_invoice(obj_invoice)
+    else:
+        return re_validate_invoice(obj_invoice)
+
+
+def invalidate_invoice(obj_invoice):
+    """
+    This method invalidate the sale against the invoice number
+    """
+    if not obj_invoice.is_valid:
+        return HttpResponseBadRequest(_("The sale associated with this invoice has already been invalidated."))
+    obj_invoice.is_valid = False
+    obj_invoice.save()
+    message = _('Invoice number {0} has been invalidated.').format(obj_invoice.id)
+    return HttpResponse(JsonResponse({'message': message}))
+
+
+def re_validate_invoice(obj_invoice):
+    """
+    This method re-validate the sale against the invoice number
+    """
+    if obj_invoice.is_valid:
+        return HttpResponseBadRequest(_("This invoice is already active."))
+
+    obj_invoice.is_valid = True
+    obj_invoice.save()
+    message = _('The registration codes for invoice {0} have been re-activated.').format(obj_invoice.id)
+    return HttpResponse(JsonResponse({'message': message}))
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -848,6 +900,7 @@ def generate_registration_codes(request, course_id):
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

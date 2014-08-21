@@ -1384,12 +1384,51 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.sale_invoice_1 = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
             company_contact_email='test1@test.com', tax_id='2Fwe23S', internal_reference="A",
-            company_reference='', course_id=self.course.id
+            company_reference='', course_id=self.course.id, is_valid=True
         )
 
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
             CourseEnrollment.enroll(student, self.course.id)
+
+    def test_invalidate_sale_record(self):
+        """
+        Testing the sale invalidating scenario.
+        """
+        for i in range(2):
+            course_registration_code = CourseRegistrationCode(
+                code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
+                created_by=self.instructor, invoice=self.sale_invoice_1
+            )
+            course_registration_code.save()
+
+        data = {'invoice_number': self.sale_invoice_1.id, 'event_type': "invalidate"}
+        url = reverse('sale_validation', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        self.assert_request_status_code(200, url, method="POST", data=data)
+
+        #Now try to fetch data against not existing invoice number
+        test_data_1 = {'invoice_number': 100, 'event_type': "invalidate"}
+        self.assert_request_status_code(404, url, method="POST", data=test_data_1)
+
+        # Now invalidate the same invoice number and expect an Bad request
+        response = self.assert_request_status_code(400, url, method="POST", data=data)
+        self.assertIn("The sale associated with this invoice has already been invalidated.", response.content)
+
+        # now re_validate the invoice number
+        data['event_type'] = "re_validate"
+        self.assert_request_status_code(200, url, method="POST", data=data)
+
+        # Now re_validate the same actove invoice number and expect an Bad request
+        response = self.assert_request_status_code(400, url, method="POST", data=data)
+        self.assertIn("This invoice is already active.", response.content)
+
+        test_data_2 = {'invoice_number': self.sale_invoice_1.id}
+        response = self.assert_request_status_code(400, url, method="POST", data=test_data_2)
+        self.assertIn("Missing required event_type parameter", response.content)
+
+        test_data_3 = {'event_type': "re_validate"}
+        response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
+        self.assertIn("Missing required invoice_number parameter", response.content)
 
     def test_get_ecommerce_purchase_features_csv(self):
         """

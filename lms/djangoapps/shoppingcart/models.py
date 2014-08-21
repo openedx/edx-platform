@@ -331,6 +331,7 @@ class Invoice(models.Model):
     tax_id = models.CharField(max_length=64, null=True)
     company_reference = models.CharField(max_length=255, null=True)
     internal_reference = models.CharField(max_length=255, null=True)
+    is_valid = models.BooleanField(default=True)
 
 
 class CourseRegistrationCode(models.Model):
