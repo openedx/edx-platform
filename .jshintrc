@@ -22,12 +22,12 @@
     "nonbsp"          : true,      // Warns about "non-breaking whitespace" characters.
     "nonew"           : true,      // Prohibits the use of constructor functions for side-effects.
     "plusplus"        : false,     // Prohibits the use of unary increment and decrement operators.
-    "quotmark"        : "single",  // Enforces the consistency of quotation marks used throughout your code. It accepts three values: true, "single", and "double".
+    "quotmark"        : false,     // Enforces the consistency of quotation marks used throughout your code. It accepts three values: true, "single", and "double".
     "undef"           : true,      // Prohibits the use of explicitly undeclared variables.
     "unused"          : true,      // Warns when you define and never use your variables.
     "strict"          : true,      // Requires all functions to run in ECMAScript 5's strict mode.
     "trailing"        : true,      // Makes it an error to leave a trailing whitespace in your code.
-    "maxlen"          : 80,        // Lets you set the maximum length of a line.
+    "maxlen"          : 120,       // Lets you set the maximum length of a line.
     //"maxparams"     : 4,         // Lets you set the max number of formal parameters allowed per function.
     //"maxdepth"      : 4,         // Lets you control how nested do you want your blocks to be.
     //"maxstatements" : 4,         // Lets you set the max number of statements allowed per function.
@@ -59,7 +59,7 @@
     "shadow"        : false,       // Suppresses warnings about variable shadowing i.e. declaring a variable that had been already declared somewhere in the outer scope.
     "sub"           : false,       // Suppresses warnings about using [] notation when it can be expressed in dot notation.
     "supernew"      : false,       // Suppresses warnings about "weird" constructions like new function () { ... } and new Object;.
-    "validthis"     : true,       // Suppresses warnings about possible strict violations when the code is running in strict mode and you use this in a non-constructor function.
+    "validthis"     : true,        // Suppresses warnings about possible strict violations when the code is running in strict mode and you use this in a non-constructor function.
     "noyield"       : false,       // Suppresses warnings about generator functions with no yield statement in them.
 
 
@@ -73,11 +73,11 @@
     // The rest should remain `false`. Please see explanation for the "predef" parameter below.
     "couch"         : false,       // Defines globals exposed by CouchDB.
     "dojo"          : false,       // Defines globals exposed by the Dojo Toolkit
-    "jquery"        : false,        // Defines globals exposed by the jQuery JavaScript library.
+    "jquery"        : false,       // Defines globals exposed by the jQuery JavaScript library.
     "mootools"      : false,       // Defines globals exposed by the MooTools JavaScript framework.
     "node"          : false,       // Defines globals available when your code is running inside of the Node runtime environment.
     "nonstandard"   : false,       // Defines non-standard but widely adopted globals such as escape and unescape.
-    "phantom"       : false,        // Defines globals available when your core is running inside of the PhantomJS runtime environment.
+    "phantom"       : false,       // Defines globals available when your core is running inside of the PhantomJS runtime environment.
     "prototypejs"   : false,       // Defines globals exposed by the Prototype JavaScript framework.
     "rhino"         : false,       // Defines globals available when your code is running inside of the Rhino runtime environment.
     "worker"        : false,       // Defines globals available when your code is running inside of a Web Worker.

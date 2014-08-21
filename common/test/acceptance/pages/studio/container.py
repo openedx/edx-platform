@@ -37,6 +37,10 @@ class ContainerPage(PageObject):
             return None
 
     def is_browser_on_page(self):
+        def _xblock_count(class_name, request_token):
+            return len(self.q(css='{body_selector} .xblock.{class_name}[data-request-token="{request_token}"]'.format(
+                body_selector=XBlockWrapper.BODY_SELECTOR, class_name=class_name, request_token=request_token
+            )).results)
 
         def _is_finished_loading():
             is_done = False
@@ -46,11 +50,15 @@ class ContainerPage(PageObject):
                 request_token = data_request_elements.first.attrs('data-request-token')[0]
                 # Then find the number of Studio xblock wrappers on the page with that request token.
                 num_wrappers = len(self.q(css='{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
-                # Wait until all components have been loaded.
-                # See common/static/coffee/src/xblock/core.coffee which adds the
-                # class "xblock-initialized" at the end of initializeBlock
-                num_xblocks_init = len(self.q(css='{} .xblock.xblock-initialized[data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
-                is_done = num_wrappers == num_xblocks_init
+                # Wait until all components have been loaded and marked as either initialized or failed.
+                # See:
+                #   - common/static/coffee/src/xblock/core.coffee which adds the class "xblock-initialized"
+                #     at the end of initializeBlock.
+                #   - common/static/js/views/xblock.js which adds the class "xblock-initialization-failed"
+                #     if the xblock threw an error while initializing.
+                num_initialized_xblocks = _xblock_count('xblock-initialized', request_token)
+                num_failed_xblocks = _xblock_count('xblock-initialization-failed', request_token)
+                is_done = num_wrappers == (num_initialized_xblocks + num_failed_xblocks)
             return (is_done, is_done)
 
         # First make sure that an element with the view-container class is present on the page,

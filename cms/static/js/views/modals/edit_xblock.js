@@ -65,15 +65,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
             onDisplayXBlock: function() {
                 var editorView = this.editorView,
-                    title = this.getTitle(),
-                    xblock = editorView.xblock,
-                    runtime = xblock.runtime;
+                    title = this.getTitle();
 
                 // Notify the runtime that the modal has been shown
-                if (runtime) {
-                    this.runtime = runtime;
-                    runtime.notify('modal-shown', this);
-                }
+                editorView.notifyRuntime('modal-shown', this);
 
                 // Update the modal's header
                 if (editorView.hasCustomTabs()) {
@@ -93,7 +88,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                    if (!xblock.save) {
+                    if (!editorView.xblock.save) {
                         this.disableSave();
                     }
                     this.getActionBar().show();
@@ -175,9 +170,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 BaseModal.prototype.hide.call(this);
 
                 // Notify the runtime that the modal has been hidden
-                if (this.runtime) {
-                    this.runtime.notify('modal-hidden');
-                }
+                this.editorView.notifyRuntime('modal-hidden');
             },
 
             findXBlockInfo: function(xblockWrapperElement, defaultXBlockInfo) {
