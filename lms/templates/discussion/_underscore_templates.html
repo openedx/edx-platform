@@ -79,7 +79,7 @@
                     {
                         contentType: 'post',
                         primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['report', 'pin', 'edit', 'delete', 'close']
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
                     }
                 )
             %>"""}
@@ -186,7 +186,7 @@
                     {
                         contentType: 'response',
                         primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
-                        secondaryActions: ['report', 'edit', 'delete']
+                        secondaryActions: ['edit', 'delete', 'report']
                     }
                 )
             %>"""}
@@ -217,7 +217,7 @@
             {
                 contentType: 'comment',
                 primaryActions: [],
-                secondaryActions: ['report', 'edit', 'delete']
+                secondaryActions: ['edit', 'delete', 'report']
             }
         )
     %>"""}
