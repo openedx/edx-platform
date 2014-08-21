@@ -123,6 +123,7 @@ def profile_distribution(course_id, feature):
             """ Get the count of enrolled students matching the feature value. """
             return CourseEnrollment.objects.filter(
                 course_id=course_id,
+                is_active=True,
                 **get_filter(feature, value)
             ).count()
 
@@ -141,7 +142,8 @@ def profile_distribution(course_id, feature):
     elif feature in _OPEN_CHOICE_FEATURES:
         prd.type = 'OPEN_CHOICE'
         profiles = UserProfile.objects.filter(
-            user__courseenrollment__course_id=course_id
+            user__courseenrollment__course_id=course_id,
+            user__courseenrollment__is_active=True
         )
         query_distribution = profiles.values(
             feature).annotate(Count(feature)).order_by()
