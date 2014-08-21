@@ -2,7 +2,6 @@ describe "ThreadResponseShowView", ->
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
         DiscussionSpecHelper.setUnderscoreFixtures()
-        appendSetFixtures('<div id="fixture-element"></div>')
 
         @thread = new Thread({"thread_type": "discussion"})
         @commentData = {
