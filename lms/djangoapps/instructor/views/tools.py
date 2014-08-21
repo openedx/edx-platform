@@ -90,6 +90,21 @@ def get_student_from_identifier(unique_student_identifier):
     return student
 
 
+def require_student_from_identifier(unique_student_identifier):
+    """
+    Same as get_student_from_identifier() but will raise a DashboardError if
+    the student does not exist.
+    """
+    try:
+        return get_student_from_identifier(unique_student_identifier)
+    except User.DoesNotExist:
+        raise DashboardError(
+            _("Could not find student matching identifier: {student_identifier}").format(
+                student_identifier=unique_student_identifier
+            )
+        )
+
+
 def parse_datetime(datestr):
     """
     Convert user input date string into an instance of `datetime.datetime` in
