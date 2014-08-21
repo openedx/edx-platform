@@ -77,6 +77,7 @@
                 _.template(
                     $('#forum-actions').html(),
                     {
+                        contentId: id,
                         contentType: 'post',
                         primaryActions: ['vote', 'follow'],
                         secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
@@ -184,6 +185,7 @@
                 _.template(
                     $('#forum-actions').html(),
                     {
+                        contentId: id,
                         contentType: 'response',
                         primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
                         secondaryActions: ['edit', 'delete', 'report']
@@ -215,6 +217,7 @@
         _.template(
             $('#forum-actions').html(),
             {
+                contentId: id,
                 contentType: 'comment',
                 primaryActions: [],
                 secondaryActions: ['edit', 'delete', 'report']
@@ -605,7 +608,7 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
 <%def name="secondaryAction(action_class, icon, label)">
     <script type="text/template" id="forum-action-${action_class}">
         <li class="actions-item">
-            <a href="javascript:void(0)" class="action-list-item action-${action_class}">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="button">
                 <span class="action-label">${label}</span>
                 <span class="action-icon"><i class="icon icon-${icon}"></i></span>
             </a>
@@ -621,11 +624,11 @@ ${secondaryAction("delete", "remove", _("Delete"))}
         ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
         <li class="actions-item is-visible">
             <div class="more-wrapper">
-                <a href="javascript:void(0)" class="action-button action-more" role="menu">
+                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
                     <span class="action-label">${_("More")}</span>
                     <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
                 </a>
-                <div class="actions-dropdown">
+                <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
                   <ul class="actions-dropdown-list">
                         ## TODO: what to do about a11y here?
                     ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}

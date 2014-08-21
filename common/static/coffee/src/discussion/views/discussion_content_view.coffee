@@ -67,16 +67,26 @@ if Backbone?
 
   class @DiscussionContentShowView extends DiscussionContentView
     events:
-      "click .action-follow": "toggleFollow"
-      "click .action-answer": "toggleEndorse"
-      "click .action-endorse": "toggleEndorse"
-      "click .action-vote": "toggleVote"
-      "click .action-more": "toggleSecondaryActions"
-      "click .action-pin": "togglePin"
-      "click .action-edit": "edit"
-      "click .action-delete": "_delete"
-      "click .action-report": "toggleReport"
-      "click .action-close": "toggleClose"
+      _.reduce(
+        [
+          [".action-follow", "toggleFollow"],
+          [".action-answer", "toggleEndorse"],
+          [".action-endorse", "toggleEndorse"],
+          [".action-vote", "toggleVote"],
+          [".action-more", "toggleSecondaryActions"],
+          [".action-pin", "togglePin"],
+          [".action-edit", "edit"],
+          [".action-delete", "_delete"],
+          [".action-report", "toggleReport"],
+          [".action-close", "toggleClose"],
+        ],
+        (obj, foo) =>
+          obj["click #{foo[0]}"] = foo[1]
+          obj["keydown #{foo[0]}"] = (event) -> DiscussionUtil.activateOnSpace(event, @[foo[1]])
+          obj
+        ,
+        {}
+      )
 
     updateButtonState: (selector, checked) =>
       $button = @$(selector)
@@ -140,11 +150,32 @@ if Backbone?
       event.stopPropagation()
       @secondaryActionsExpanded = !@secondaryActionsExpanded
       @$(".action-more").toggleClass("is-expanded", @secondaryActionsExpanded)
-      @$(".actions-dropdown").toggleClass("is-expanded", @secondaryActionsExpanded)
+      @$(".actions-dropdown").
+        toggleClass("is-expanded", @secondaryActionsExpanded).
+        attr("aria-expanded", @secondaryActionsExpanded)
       if @secondaryActionsExpanded
+        @$(".action-list-item:first").focus()
         $("body").on("click", @toggleSecondaryActions)
+        $("body").on("keydown", @handleSecondaryActionEscape)
+        @$(".action-list-item").on("blur", @handleSecondaryActionBlur)
       else
         $("body").off("click", @toggleSecondaryActions)
+        $("body").off("keydown", @handleSecondaryActionEscape)
+        @$(".action-list-item").off("blur", @handleSecondaryActionBlur)
+
+    handleSecondaryActionEscape: (event) =>
+      if event.keyCode == 27 # Esc
+        @toggleSecondaryActions(event)
+        @$(".action-more").focus()
+
+    handleSecondaryActionBlur: (event) =>
+      setTimeout(
+        =>
+          if @secondaryActionsExpanded && @$(".actions-dropdown :focus").length == 0
+            @toggleSecondaryActions(event)
+        ,
+        10
+      )
 
     toggleFollow: (event) =>
       event.preventDefault()

@@ -36,18 +36,17 @@
   .actions-dropdown {
     @extend %ui-no-list;
     @extend %ui-depth1;
-    @include transition(opacity .2s ease-in-out 0s);
+    display: none;
     position: absolute;
     top: 17px;
     right: 0;
-    opacity: 0.0;
     pointer-events: none;
     overflow: hidden;
     min-width: ($baseline*6.5);
     height: 0;
 
     &.is-expanded {
-      opacity: 1.0;
+      display: block;
       pointer-events: auto;
       overflow: visible;
       height: auto;
@@ -136,7 +135,7 @@
     }
 
 
-    &:hover {
+    &:hover, &:focus {
       border: 1px solid $gray-l3;
 
       .action-label {
@@ -160,7 +159,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         border: 1px solid $blue-d1;
 
         .action-label {
@@ -190,7 +189,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         border: 1px solid $green-d2;
 
         .action-label {
@@ -216,7 +215,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         border: 1px solid $blue-d2;
 
         .action-label {
@@ -242,7 +241,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         border: 1px solid $green-d2;
 
         .action-label {
@@ -293,7 +292,7 @@
       text-align: right;
       color: $gray-l1;
 
-      &:hover {
+      &:hover, &:focus {
         color: $link-color;
       }
 
@@ -322,7 +321,7 @@
         }
 
         // CASE: hover for any action
-        &:hover {
+        &:hover, &:focus {
           color: $link-color;
         }
       }
