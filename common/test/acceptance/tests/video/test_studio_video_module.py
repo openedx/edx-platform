@@ -110,6 +110,13 @@ class CMSVideoBaseTest(UniqueCourseTest):
         # The 0th entry is the unit page itself.
         self.unit_page.xblocks[1].open_advanced_tab()
 
+    def open_basic_tab(self):
+        """
+        Open components basic tab.
+        """
+        # The 0th entry is the unit page itself.
+        self.unit_page.xblocks[1].open_basic_tab()
+
     def save_unit_settings(self):
         """
         Save component settings.
