@@ -147,10 +147,17 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                     }
                 }
                 // Ensure that the children have been rendered before expanding
-                if (this.shouldRenderChildren() && !this.renderedChildren) {
+                this.ensureChildrenRendered();
+                BaseView.prototype.toggleExpandCollapse.call(this, event);
+            },
+
+            /**
+             * Verifies that the children are rendered (if they should be).
+             */
+            ensureChildrenRendered: function() {
+                if (!this.renderedChildren && this.shouldRenderChildren()) {
                     this.renderChildren();
                 }
-                BaseView.prototype.toggleExpandCollapse.call(this, event);
             },
 
             /**
