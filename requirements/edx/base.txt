@@ -33,7 +33,7 @@ django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
 djangorestframework==2.3.5
-django==1.4.12
+django==1.4.14
 feedparser==5.1.3
 firebase-token-generator==1.3.2
 fs==0.4.0
