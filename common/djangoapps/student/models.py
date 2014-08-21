@@ -701,9 +701,13 @@ class CourseEnrollment(models.Model):
         Returns the count of active enrollments in a course.
 
         'course_id' is the course_id to return enrollments
+        Direct access: don't include non-registered enrollments in counts.
         """
-        enrollment_number = CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()
-
+        enrollment_number = CourseEnrollment.objects.filter(
+            course_id=course_id,
+            is_active=1,
+            user__profile__nonregistered=0,
+        ).count()
         return enrollment_number
 
     @classmethod

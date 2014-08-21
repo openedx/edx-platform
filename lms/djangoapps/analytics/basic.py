@@ -24,10 +24,13 @@ def enrolled_students_features(course_id, features):
         {'username': 'username2', 'first_name': 'firstname2'}
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
+
+    Direct access: don't include non-registered enrollments in result.
     """
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
         courseenrollment__is_active=1,
+        profile__nonregistered=0,
     ).order_by('username').select_related('profile')
 
     def extract_student(student, features):
