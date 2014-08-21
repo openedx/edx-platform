@@ -19,7 +19,7 @@ describe 'ThreadResponseView', ->
         it 'hides "show comments" link if collapseComments is set but response has no comments', ->
             @response = new Comment { children: [] }
             @view = new ThreadResponseView({
-                model: @response, el: $("#thread-response-fixture"),
+                model: @response, el: $("#fixture-element"),
                 collapseComments: true
             })
             @view.render()
@@ -28,7 +28,7 @@ describe 'ThreadResponseView', ->
 
         it 'hides comments if collapseComments is set and shows them when "show comments" link is clicked', ->
             @view = new ThreadResponseView({
-                model: @response, el: $("#thread-response-fixture"),
+                model: @response, el: $("#fixture-element"),
                 collapseComments: true
             })
             @view.render()

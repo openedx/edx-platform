@@ -31,10 +31,6 @@ describe 'ResponseCommentShowView', ->
         beforeEach ->
             spyOn(@view, 'renderAttrs')
 
-        it 'produces the correct HTML', ->
-            @view.render()
-            expect(@view.el.innerHTML).toContain('"discussion-flag-abuse notflagged"')
-
         it 'can be flagged for abuse', ->
             @comment.flagAbuse()
             expect(@comment.get 'abuse_flaggers').toEqual ['123', '567']

@@ -10,8 +10,10 @@ class @DiscussionSpecHelper
         appendSetFixtures("""
 <div id="fixture-element"></div>
 
-# NOTE the html markup here comes from rendering lms/templates/discussion/_underscore_templates.html through a
-# browser and pasting the output.  When that file changes, this one should be regenerated alongside it.
+<!--
+NOTE the html markup here comes from rendering lms/templates/discussion/_underscore_templates.html through a
+browser and pasting the output.  When that file changes, this one should be regenerated alongside it.
+-->
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="<%- id %>">
         <div class="thread-wrapper">

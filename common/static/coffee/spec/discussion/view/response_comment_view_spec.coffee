@@ -85,8 +85,7 @@ describe 'ResponseCommentView', ->
             expect(@view._delete).toHaveBeenCalled()
             @view.showView.trigger "comment:edit", makeEventSpy()
             expect(@view.edit).toHaveBeenCalled()
-            expect(@view.$("#response-comment-show-div").length).toEqual(1)
-            expect(@view.$("#response-comment-edit-div").length).toEqual(0)
+            expect(@view.$(".edit-post-form#comment_#{@comment.id}")).not.toHaveClass("edit-post-form")
 
     describe 'renderEditView', ->
         it 'renders the edit view, removes the show view, and registers event handlers', ->
@@ -97,8 +96,7 @@ describe 'ResponseCommentView', ->
             expect(@view.update).toHaveBeenCalled()
             @view.editView.trigger "comment:cancel_edit", makeEventSpy()
             expect(@view.cancelEdit).toHaveBeenCalled()
-            expect(@view.$("#response-comment-show-div").length).toEqual(0)
-            expect(@view.$("#response-comment-edit-div").length).toEqual(1)
+            expect(@view.$(".edit-post-form#comment_#{@comment.id}")).toHaveClass("edit-post-form")
 
     describe 'edit', ->
         it 'triggers the appropriate event and switches to the edit view', ->
@@ -125,6 +123,8 @@ describe 'ResponseCommentView', ->
         describe 'update', ->
             beforeEach ->
                 @updatedBody = "updated body"
+                # Markdown code creates the editor, so we simulate that here
+                @view.$el.find(".edit-comment-body").html($("<textarea></textarea>"))
                 @view.$el.find(".edit-comment-body textarea").val(@updatedBody)
                 spyOn(@view, 'cancelEdit')
                 spyOn($, "ajax").andCallFake(
