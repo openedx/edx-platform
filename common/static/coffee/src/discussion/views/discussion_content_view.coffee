@@ -302,3 +302,5 @@ if Backbone?
           is_community_ta: DiscussionUtil.isTA(endorsement.user_id)
           is_staff: DiscussionUtil.isStaff(endorsement.user_id)
         )
+      else
+        null

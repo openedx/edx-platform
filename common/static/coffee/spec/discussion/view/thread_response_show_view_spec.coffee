@@ -154,3 +154,68 @@ describe "ThreadResponseShowView", ->
         expect(endorseButton.closest(".actions-item")).toHaveClass("is-hidden")
         endorseButton.click()
         expect(endorseButton).not.toHaveClass("is-checked")
+
+    describe "labels", ->
+
+        expectOneElement = (view, selector, visible=true) =>
+            view.render()
+            elements = view.$el.find(selector)
+            expect(elements.length).toEqual(1)
+            if visible
+                expect(elements).not.toHaveClass("is-hidden")
+            else
+                expect(elements).toHaveClass("is-hidden")
+
+        it 'displays the reported label when appropriate for a non-staff user', ->
+            DiscussionUtil.loadFlagModerator("False")
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should not be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported', false)
+
+        it 'displays the reported label when appropriate for a flag moderator', ->
+            DiscussionUtil.loadFlagModerator("True")
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should still be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported')
+
+    describe "endorser display", ->
+
+        beforeEach ->
+            @comment.set('endorsement', {
+                "username": "test_endorser",
+                "time": new Date().toISOString()
+            })
+            spyOn(DiscussionUtil, 'urlFor').andReturn('test_endorser_url')
+
+        checkUserLink = (element, is_ta, is_staff) ->
+            expect(element.find('a.username').length).toEqual(1)
+            expect(element.find('a.username').text()).toEqual('test_endorser')
+            expect(element.find('a.username').attr('href')).toEqual('test_endorser_url')
+            expect(element.find('.user-label-community-ta').length).toEqual(if is_ta then 1 else 0)
+            expect(element.find('.user-label-staff').length).toEqual(if is_staff then 1 else 0)
+
+        it "renders nothing when the response has not been endorsed", ->
+            @comment.set('endorsement', null)
+            expect(@view.getEndorserDisplay()).toBeNull()
+
+        it "renders correctly for a student-endorsed response", ->
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, false, false)
+
+        it "renders correctly for a community TA-endorsed response", ->
+            spyOn(DiscussionUtil, 'isTA').andReturn(true)
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, true, false)
+
+        it "renders correctly for a staff-endorsed response", ->
+            spyOn(DiscussionUtil, 'isStaff').andReturn(true)
+            $el = $('#fixture-element').html(@view.getEndorserDisplay())
+            checkUserLink($el, false, true)

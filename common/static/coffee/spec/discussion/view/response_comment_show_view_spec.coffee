@@ -69,3 +69,36 @@ describe 'ResponseCommentShowView', ->
             @view.bind "comment:edit", triggerTarget
             @view.edit()
             expect(triggerTarget).toHaveBeenCalled()
+
+    describe "labels", ->
+
+        expectOneElement = (view, selector, visible=true) =>
+            view.render()
+            elements = view.$el.find(selector)
+            expect(elements.length).toEqual(1)
+            if visible
+                expect(elements).not.toHaveClass("is-hidden")
+            else
+                expect(elements).toHaveClass("is-hidden")
+
+        it 'displays the reported label when appropriate for a non-staff user', ->
+            DiscussionUtil.loadFlagModerator("False")
+            @comment.set('abuse_flaggers', [])
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should not be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported', false)
+
+        it 'displays the reported label when appropriate for a flag moderator', ->
+            DiscussionUtil.loadFlagModerator("True")
+            @comment.set('abuse_flaggers', [])
+            expectOneElement(@view, '.post-label-reported', false)
+            # flagged by current user - should be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id])
+            expectOneElement(@view, '.post-label-reported')
+            # flagged by some other user but not the current one - should still be labelled
+            @comment.set('abuse_flaggers', [DiscussionUtil.getUser().id + 1])
+            expectOneElement(@view, '.post-label-reported')
