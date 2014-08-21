@@ -5,7 +5,7 @@
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
 <%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
-   <h3 class="coupon-errors" id="code-error"></h3>
+   <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
       <div class="wrap">
          <h2>Registration Codes</h2>
@@ -58,24 +58,37 @@
             %if section_data['total_amount'] is not None:
             <span>${_("Total Amount: ")}<span>$${section_data['total_amount']}</span></span>
             %endif
-            <p>${_("Click to generate a CSV file for all purchase transactions in this course")}</p>
-            <p><input type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true"></p>
+
+            <span class="csv_tip">${_("Click to generate a CSV file for all purchase transactions in this course")}
+                <input class="add blue-button"  type="button" name="list-purchase-transaction-csv" value="${_("Download All e-Commerce Purchases")}" data-endpoint="${ section_data['get_purchase_transaction_url'] }" data-csv="true">
+            </span>
          </div>
       </div><!-- end wrap -->
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
-            <p>${_("Click to generate a CSV file for all sales records in this course")}</p>
-            <p><input type="button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p>
+            <span class="csv_tip">${_("Click to generate a CSV file for all sales records in this course")}
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p></td>
+            </span>
+             <hr>
+             <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
+            <span class="invalid_sale">
+               <input type="text" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
+               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Invalidate Sale")}">
+               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Revalidate Sale")}">
+            </span>
+
          </div>
       </div><!-- end wrap -->
       %endif
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
-            <p>Click to generate a CSV file of all Coupon Codes:</p>
-            <input type="button" name="download-coupon-codes-csv" value="${_("Download coupon codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
-            <h3 class="coupon-errors" id="coupon-error"></h3>
+
+            <span class="csv_tip">${_("Click to generate a CSV file of all Coupon Codes:")}
+                <input class="add blue-button" type="button" name="download-coupon-codes-csv" value="${_("Download coupon codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
+            </span>
+
             <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
                class="add blue-button">${_("+ Add Coupon")}</a></span>
             <div class="wrapper-content wrapper">
@@ -123,8 +136,23 @@
    </div>
 </div>
 <script>
+
+function validateNumber(event) {
+    var key = window.event ? event.keyCode : event.which;
+    var BACKSPACE = 8, DELETE = 46, LEFT_ARROW = 37, RIGHT_ARROW = 39;
+    // only allowing the user to use some specific keys like Backspace, Delete
+    if($.inArray(event.keyCode, [BACKSPACE, DELETE, LEFT_ARROW, RIGHT_ARROW]) > -1){
+        return true;
+    }
+    // Disabling the all other keys except the numeric ones..
+    else if ( key < 48 || key > 57 ) {
+        return false;
+    }
+    else return true;
+};
    $(function () {
 
+       $('[id^=invoice_number]').keypress(validateNumber);
        var icons = {
            header: "ui-icon-circle-arrow-e",
            activeHeader: "ui-icon-circle-arrow-s"
@@ -137,13 +165,17 @@
                     var active = jQuery("#accordion").accordion('option', 'active');
                     $.cookie('saved_index', null);
                     $.cookie('saved_index', active);
+                    $('#error-msg').val('');
+                    $("#error-msg").fadeOut(2000 , function(){
+                        $('#error-msg').hide()
+                    });
                    },
                    animate: 400,
                    header: "> div.wrap >h2",
                    icons:icons,
                    active:isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
                    collapsible: true
-        });
+               });
 
      $('a[rel*=leanModal]').leanModal();
      $.each($("a.edit-right"), function () {
@@ -169,6 +201,33 @@
        });
 
      });
+     $('#invalidate_invoice, #re_validate_invoice').click(function (event) {
+         event.preventDefault();
+         var event_type = "re_validate"
+         if($(event.target).attr('id')=='invalidate_invoice'){
+             event_type = "invalidate"
+         }
+         if($('#invoice_number').val() == "") {
+                     $('#error-msg').attr('class','error-msgs')
+                     $('#error-msg').html("Invoice number should not be empty!").show();
+                     return
+         }
+         $.ajax({
+             type: "POST",
+             data: {invoice_number: $('#invoice_number').val(), event_type:event_type},
+             url: "${section_data['sale_validation_url']}",
+             success: function (data) {
+                 $('#error-msg').attr('class','success-msgs')
+                 $('#error-msg').html(data.message).show();
+                 $('#invoice_number').val('');
+             },
+             error: function(jqXHR, textStatus, errorThrown) {
+                 $('#error-msg').attr('class','error-msgs')
+                 $('#error-msg').html(jqXHR.responseText).show();
+             }
+         });
+     });
+
      $('a.edit-right').click(function (event) {
        $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
        $('#edit_coupon_form #coupon_form_error').text();
@@ -184,8 +243,8 @@
          data: {id: coupon_id},
          url: "${section_data['ajax_get_coupon_info']}",
          success: function (data) {
-             $('#coupon-error').val('');
-             $('#coupon-error').attr('style', 'display: none');
+             $('#error-msg').val('');
+             $('#error-msg').hide()
              $('input#edit_coupon_code').val(data.coupon_code);
              $('input#edit_coupon_discount').val(data.coupon_discount);
              $('textarea#edit_coupon_description').val(data.coupon_description);
@@ -194,7 +253,8 @@
            },
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
-           $('#coupon-error').html(data.message).show();
+           $('#error-msg').attr('class','error-msgs')
+           $('#error-msg').html(data.message).show();
          }
        });
      });
@@ -206,7 +266,7 @@
        anchor.data("disabled", "disabled");
        event.preventDefault();
        if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
-         return false;
+           return false;
        }
        $.ajax({
          type: "POST",
@@ -218,7 +278,8 @@
            },
          error: function(jqXHR, textStatus, errorThrown) {
            var data = $.parseJSON(jqXHR.responseText);
-           $('#coupon-error').html(data.message).show();
+           $('#error-msg').attr('class','error-msgs')
+           $('#error-msg').html(data.message).show();
            anchor.removeData("disabled");
          }
        });
@@ -235,6 +296,7 @@
       registration_code_error.attr('style', 'display: none');
       generate_registration_button.attr('disabled', true);
       var total_registration_codes = $('input[name="total-registration-codes"]').val();
+      var invoice_number = $('input[name="total-registration-codes"]').val();
       var contact_name = $('input[name="contact_name"]').val();
       var sale_price = $('input[name="sale_price"]').val();
       var company_name = $('input[name="company_name"]').val();
@@ -329,7 +391,7 @@
        if (!$.isNumeric(course_price)) {
          $("#set_course_button").removeAttr('disabled');
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         $('#set_price_form #course_form_error').text("${_('Please enter the numeric value for course price')}");
          return false;
        }
        if (currency == '') {
@@ -456,8 +518,8 @@
      });
    });
    var reset_input_fields = function () {
-     $('#coupon-error').val('');
-     $('#coupon-error').attr('style', 'display: none');
+     $('#error-msg').val('');
+     $('#error-msg').hide()
      $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
      $('#set_price_form #course_form_error').attr('style', 'display: none');
      $('#generate_codes #registration_code_form_error').attr('style', 'display: none');

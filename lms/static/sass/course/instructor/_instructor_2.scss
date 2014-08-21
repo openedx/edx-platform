@@ -835,10 +835,17 @@ input[name="subject"] {
     margin-bottom: 1em;
     line-height: 1.3em;
   }
-  .coupon-errors {
+  .error-msgs {
     background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
     font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
     border-bottom: 1px solid #B72667;
+    margin-bottom: 20px;
+    display: none;
+    }
+  .success-msgs {
+    background: #D0F5D5;color:#008801;text-align: center;padding: 10px 0px;
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+    border-bottom: 1px solid #008801;
     margin-bottom: 20px;
     display: none;
     }
@@ -1222,5 +1229,31 @@ input[name="subject"] {
       float: right;
     }
   }
+    span.csv_tip {
 
+    display: block;
+    line-height: 30px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 1px;
+    .add{
+      font-size: em(13);
+      float: right;
+    }
+  }
+   span.invalid_sale {
+    background: none repeat scroll 0 0 #F8F4EC;
+    color: #3C3C3C;
+    display: block;
+    line-height: 30px;
+    height: 37px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 1px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+
+    }
+  }
 }
+
