@@ -83,14 +83,16 @@ class RandomizeModule(RandomizeFields, XModule):
                     log.debug('using randrange for %s' % str(self.location))
                 self.choice = choice
             else:
-                # we're in a bad state - possible solution below tries to
-                # restore last failed problem from history (raise exc for now)
-                # try:
-                #     last_failed = json.loads(self.history or '[]')[-1]
-                #     self.choice = last_failed
-                # except IndexError:
-                #     raise Exception('No choices left!!!')
-                raise Exception('No choices left!!!')
+                # Student has seen all problems. Ideally we autogenerate a fake
+                # CapaModule problem and leave it until history gets wiped by
+                # an instructor/TA but for now we use the last seen choice from
+                # history.
+                log.error("No choices left!!! Attempting to use last "
+                          "item in history")
+                try:
+                    self.choice = self.history[-1]
+                except IndexError:
+                    log.error("Failed to load last item in history")
 
         if self.choice is not None:
             self.child_descriptor = all_choices.get(self.choice)
@@ -126,14 +128,14 @@ class RandomizeModule(RandomizeFields, XModule):
         return [self.child_descriptor]
 
     def student_view(self, context):
-        if self.choice is not None:
+        if self.child is None:
+            # raise error instead?  In fact, could complain on descriptor load
+            return Fragment(content=u"<div>Nothing to randomize between</div>")
+        else:
             child_loc = self.child.location.url()
             if child_loc not in self.history:
                 self.history.append(child_loc)
             self.save()
-        if self.child is None:
-            # raise error instead?  In fact, could complain on descriptor load
-            return Fragment(content=u"<div>Nothing to randomize between</div>")
         child_html = self.child.render('student_view', context)
         if self.system.user_is_staff:
             choices = self.get_choices().keys()
