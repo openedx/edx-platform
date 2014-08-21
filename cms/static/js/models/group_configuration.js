@@ -80,14 +80,14 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
         validate: function(attrs) {
             if (!_.str.trim(attrs.name)) {
                 return {
-                    message: gettext('Group Configuration name is required'),
+                    message: gettext('Group Configuration name is required.'),
                     attributes: {name: true}
                 };
             }
 
-            if (attrs.groups.length < 2) {
+            if (attrs.groups.length < 1) {
                 return {
-                    message: gettext('There must be at least two groups'),
+                    message: gettext('There must be at least one group.'),
                     attributes: { groups: true }
                 };
             } else {
@@ -100,7 +100,7 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 });
                 if (!_.isEmpty(invalidGroups)) {
                     return {
-                        message: gettext('All groups must have a name'),
+                        message: gettext('All groups must have a name.'),
                         attributes: { groups: invalidGroups }
                     };
                 }
