@@ -10,7 +10,6 @@ class @DiscussionSpecHelper
     # browser and pasting the output.  When that file changes, this one should be regenerated alongside it.
     @setUnderscoreFixtures = ->
         appendSetFixtures("""
-<div id="fixture-element"></div>
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="<%- id %>">
         <div class="thread-wrapper">
@@ -62,21 +61,21 @@ class @DiscussionSpecHelper
             <h1><%- title %></h1>
             <p class="posted-details">
                 <%- thread_type %> posted <span class='timeago' title='<%- created_at %>'><%- created_at %></span> by <%= author_display %>
-                <span class="post-labels">
-                    <span class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</span>
-                    <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
-                    <span class="post-label-closed"><i class="icon icon-lock"></i>Closed</span>
-                </span>
             </p>
+            <div class="post-labels">
+                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</span>
+                <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+                <span class="post-label-closed"><i class="icon icon-lock"></i>Closed</span>
+            </div>
           </div>
-          <div class="post-header-actions">
+          <div class="post-header-actions post-extended-content">
             <%=
                 _.template(
                     $('#forum-actions').html(),
                     {
                         contentType: 'post',
                         primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['report', 'pin', 'edit', 'delete', 'close']
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
                     }
                 )
             %>
@@ -85,7 +84,7 @@ class @DiscussionSpecHelper
 
       <div class="post-body"><%- body %></div>
 
-
+      
       <% if (mode == "tab" && obj.courseware_url) { %>
           <div class="post-context"><%
           var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
@@ -138,13 +137,12 @@ class @DiscussionSpecHelper
         <%= author_display %>
         <p class="posted-details">
             <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-            <span class="post-labels">
-                <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
-            </span>
-
-              <% if (thread.get('thread_type') == 'question' && obj.endorsement) { %> - <%=
+            
+              <% if (obj.endorsement) { %> - <%=
                 interpolate(
-                    endorsement.username ? "marked as answer %(time_ago)s by %(user)s" : "marked as answer %(time_ago)s",
+                    thread.get("thread_type") == "question" ?
+                      (endorsement.username ? "marked as answer %(time_ago)s by %(user)s" : "marked as answer %(time_ago)s") :
+                      (endorsement.username ? "endorsed %(time_ago)s by %(user)s" : "endorsed %(time_ago)s"),
                     {
                         'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
                         'user': endorser_display
@@ -152,6 +150,9 @@ class @DiscussionSpecHelper
                     true
                 )%><% } %>
           </p>
+          <div class="post-labels">
+              <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+          </div>
           </div>
           <div class="response-header-actions">
             <%=
@@ -160,7 +161,7 @@ class @DiscussionSpecHelper
                     {
                         contentType: 'response',
                         primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
-                        secondaryActions: ['report', 'edit', 'delete']
+                        secondaryActions: ['edit', 'delete', 'report']
                     }
                 )
             %>
@@ -191,11 +192,11 @@ class @DiscussionSpecHelper
             {
                 contentType: 'comment',
                 primaryActions: [],
-                secondaryActions: ['report', 'edit', 'delete']
+                secondaryActions: ['edit', 'delete', 'report']
             }
         )
     %>
-
+    
     <p class="posted-details">
     <%=
       interpolate(
@@ -203,10 +204,10 @@ class @DiscussionSpecHelper
         {'time_ago': '<span class="timeago" title="' + created_at + '">' + created_at + '</span>', 'author': author_display},
         true
         )%>
-      <span class="post-labels">
-        <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
-      </span>
     </p>
+    <div class="post-labels">
+      <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
+    </div>
   </div>
 </script>
 
@@ -243,7 +244,7 @@ class @DiscussionSpecHelper
         <i class="icon <%= icon_class %>"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title"><%- title %></span>
-
+        
         <%
         var labels = "";
         if (pinned) {
@@ -263,7 +264,7 @@ class @DiscussionSpecHelper
         }
         %>
       </div><div class="forum-nav-thread-wrapper-2">
-
+        
         <span class="forum-nav-thread-votes-count">+<%=
             interpolate(
                 '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
@@ -271,7 +272,7 @@ class @DiscussionSpecHelper
                 true
                 )
         %></span>
-
+        
         <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
             <%
         var fmt;
@@ -299,7 +300,7 @@ class @DiscussionSpecHelper
   <div class="discussion-article blank-slate">
     <section class="home-header">
       <span class="label">DISCUSSION HOME:</span>
-        <h1 class="home-title">edX Demonstration Course</h1>
+        <h1 class="home-title">Cohort Course</h1>
     </section>
 
      </div>
@@ -436,8 +437,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Endorse</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Endorse</span>
-                    <span class="label-checked">Endorsed</span>
-                    <span class="label-checked-focused">Unendorse</span>
+                    <span class="label-checked">Unendorse</span>
                 </span>
                 <span class="action-icon"><i class="icon icon-ok"></i></span>
             </a>
@@ -451,8 +451,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Mark as Answer</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Mark as Answer</span>
-                    <span class="label-checked">Marked as Answer</span>
-                    <span class="label-checked-focused">Unmark as Answer</span>
+                    <span class="label-checked">Unmark as Answer</span>
                 </span>
                 <span class="action-icon"><i class="icon icon-ok"></i></span>
             </a>
@@ -466,8 +465,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Follow</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Follow</span>
-                    <span class="label-checked">Following</span>
-                    <span class="label-checked-focused">Unfollow</span>
+                    <span class="label-checked">Unfollow</span>
                 </span>
                 <span class="action-icon"><i class="icon icon-star"></i></span>
             </a>
@@ -483,7 +481,6 @@ class @DiscussionSpecHelper
 
              <span class="action-label" aria-hidden="true">
                <span class="js-visual-vote-count"></span>
-               Vote
              </span>
 
             <span class="action-icon" aria-hidden="true">
@@ -502,8 +499,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Report abuse</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Report</span>
-                    <span class="label-checked">Reported</span>
-                    <span class="label-checked-focused">Unreport</span>
+                    <span class="label-checked">Unreport</span>
                 </span>
                 <span class="action-icon">
                   <i class="icon icon-flag"></i>
@@ -519,8 +515,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Pin</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Pin</span>
-                    <span class="label-checked">Pinned</span>
-                    <span class="label-checked-focused">Unpin</span>
+                    <span class="label-checked">Unpin</span>
                 </span>
                 <span class="action-icon">
                   <i class="icon icon-pushpin"></i>
@@ -536,8 +531,7 @@ class @DiscussionSpecHelper
                 <span class="sr">Close</span>
                 <span class="action-label" aria-hidden="true">
                     <span class="label-unchecked">Close</span>
-                    <span class="label-checked">Closed</span>
-                    <span class="label-checked-focused">Open</span>
+                    <span class="label-checked">Open</span>
                 </span>
                 <span class="action-icon">
                   <i class="icon icon-lock"></i>
