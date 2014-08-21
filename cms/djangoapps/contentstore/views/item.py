@@ -181,6 +181,7 @@ def xblock_handler(request, usage_key_string):
             content_type="text/plain"
         )
 
+
 # pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
@@ -449,7 +450,7 @@ def _create_item(request):
     # if we add one then we need to also add it to the policy information (i.e. metadata)
     # we should remove this once we can break this reference from the course to static tabs
     if category == 'static_tab':
-        display_name = display_name or _("Empty") # Prevent name being None
+        display_name = display_name or _("Empty")  # Prevent name being None
         course = store.get_course(dest_usage_key.course_key)
         course.tabs.append(
             StaticTab(
@@ -635,7 +636,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         return None
 
     is_xblock_unit = is_unit(xblock, parent_xblock)
-    is_unit_with_changes = is_xblock_unit and modulestore().has_changes(xblock)
+    has_changes = modulestore().has_changes(xblock)
 
     if graders is None:
         graders = CourseGradingModel.fetch(xblock.location.course_key).graders
@@ -654,7 +655,10 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
 
     # Treat DEFAULT_START_DATE as a magic number that means the release date has not been set
     release_date = get_default_time_display(xblock.start) if xblock.start != DEFAULT_START_DATE else None
-    visibility_state = _compute_visibility_state(xblock, child_info, is_unit_with_changes) if not xblock.category == 'course' else None
+    if xblock.category != 'course':
+        visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
+    else:
+        visibility_state = None
     published = modulestore().compute_publish_state(xblock) != PublishState.private
 
     xblock_info = {
@@ -664,7 +668,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
         "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
-        'studio_url': xblock_studio_url(xblock, parent_xblock),
+        "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
         "visibility_state": visibility_state,
@@ -675,6 +679,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
+        "has_changes": has_changes,
     }
     if data is not None:
         xblock_info["data"] = data
@@ -689,14 +694,13 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         xblock_info["ancestor_has_staff_lock"] = False
 
-    # Currently, 'edited_by', 'published_by', and 'release_date_from', and 'has_changes' are only used by the
+    # Currently, 'edited_by', 'published_by', and 'release_date_from' are only used by the
     # container page when rendering a unit. Since they are expensive to compute, only include them for units
     # that are not being rendered on the course outline.
     if is_xblock_unit and not course_outline:
         xblock_info["edited_by"] = safe_get_username(xblock.subtree_edited_by)
         xblock_info["published_by"] = safe_get_username(xblock.published_by)
         xblock_info["currently_visible_to_students"] = is_currently_visible_to_students(xblock)
-        xblock_info['has_changes'] = is_unit_with_changes
         if release_date:
             xblock_info["release_date_from"] = _get_release_date_from(xblock)
         if visibility_state == VisibilityState.staff_only:

@@ -77,7 +77,7 @@ class CourseOutlineItem(object):
 
     @property
     def has_staff_lock_warning(self):
-        """ Returns True iff the 'Contains staff only content' message is visible """
+        """ Returns True if the 'Contains staff only content' message is visible """
         return self.status_message == 'Contains staff only content' if self.has_status_message else False
 
     @property
@@ -148,6 +148,22 @@ class CourseOutlineItem(object):
     def policy(self):
         element = self.q(css=self._bounded_selector(".status-grading-value"))
         return element.first.text[0] if element.present else None
+
+    def publish(self):
+        """
+        Publish the unit.
+        """
+        click_css(self, self._bounded_selector('.action-publish'), require_notification=False)
+        modal = CourseOutlineModal(self)
+        EmptyPromise(lambda: modal.is_shown(), 'Modal is shown.')
+        modal.publish()
+
+    @property
+    def publish_action(self):
+        """
+        Returns the link for publishing a unit.
+        """
+        return self.q(css=self._bounded_selector('.action-publish')).first
 
 
 class CourseOutlineContainer(CourseOutlineItem):
@@ -483,7 +499,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
 
 
 class CourseOutlineModal(object):
-    MODAL_SELECTOR = ".edit-outline-item-modal"
+    MODAL_SELECTOR = ".wrapper-modal-window"
 
     def __init__(self, page):
         self.page = page
@@ -505,6 +521,10 @@ class CourseOutlineModal(object):
 
     def save(self):
         self.click(".action-save")
+        self.page.wait_for_ajax()
+
+    def publish(self):
+        self.click(".action-publish")
         self.page.wait_for_ajax()
 
     def cancel(self):
