@@ -23,6 +23,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition, Group
+from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
@@ -614,7 +615,8 @@ def _rerun_course(request, org, number, run, fields):
     CourseRerunState.objects.initiated(source_course_key, destination_course_key, request.user, fields['display_name'])
 
     # Rerun the course as a new celery task
-    rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, fields)
+    json_fields = json.dumps(fields, cls=EdxJSONEncoder)
+    rerun_course.delay(unicode(source_course_key), unicode(destination_course_key), request.user.id, json_fields)
 
     # Return course listing page
     return JsonResponse({

@@ -4,7 +4,9 @@ This file contains celery tasks for contentstore views
 
 from celery.task import task
 from django.contrib.auth.models import User
+import json
 from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseFields
 
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
@@ -18,9 +20,10 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
     Reruns a course in a new celery task.
     """
     try:
-        # deserialize the keys
+        # deserialize the payload
         source_course_key = CourseKey.from_string(source_course_key_string)
         destination_course_key = CourseKey.from_string(destination_course_key_string)
+        fields = deserialize_fields(fields)
 
         # use the split modulestore as the store for the rerun course,
         # as the Mongo modulestore doesn't support multiple runs of the same course.
@@ -53,3 +56,10 @@ def rerun_course(source_course_key_string, destination_course_key_string, user_i
             pass
 
         return "exception: " + unicode(exc)
+
+
+def deserialize_fields(json_fields):
+    fields = json.loads(json_fields)
+    for field_name, value in fields.iteritems():
+        fields[field_name] = getattr(CourseFields, field_name).from_json(value)
+    return fields
