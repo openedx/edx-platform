@@ -29,6 +29,10 @@ from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import Location
 
+from django.contrib.auth.models import User
+from user_api.models import UserPreference
+from notification_prefs import NOTIFICATION_PREF_KEY
+
 TEST_API_KEY = str(uuid.uuid4())
 
 
@@ -297,6 +301,20 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 409)
         self.assertGreater(response.data['message'], 0)
         self.assertEqual(response.data['field_conflict'], 'username or email')
+
+    @patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
+    def test_user_list_post_discussion_digest_email(self):
+        test_uri = self.users_base_uri
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        confirm_uri = self.test_server_prefix + \
+            test_uri + '/' + str(response.data['id'])
+        user = User.objects.get(id=response.data['id'])
+        self.assertIsNotNone(UserPreference.get_preference(user, NOTIFICATION_PREF_KEY))
 
     def test_user_detail_get(self):
         test_uri = self.users_base_uri

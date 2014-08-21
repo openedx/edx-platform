@@ -93,6 +93,10 @@ FEATURES = {
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
+    # Set this to True if you want the discussion digest emails enabled by default for all users.
+    # This will be set on all new account registrations.
+    'ENABLE_DISCUSSION_EMAIL_DIGEST': False,
+
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
     'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
