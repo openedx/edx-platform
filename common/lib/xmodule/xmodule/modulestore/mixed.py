@@ -393,15 +393,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         if source_modulestore == dest_modulestore:
             return source_modulestore.clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
 
-        # ensure super's only called once. The delegation above probably calls it; so, don't move
-        # the invocation above the delegation call
-        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
-
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
             split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
             split_migrator.migrate_mongo_course(
                 source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run, fields, **kwargs
             )
+            # the super handles assets and any other necessities
+            super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
 
     @strip_key
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):

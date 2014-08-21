@@ -18,7 +18,7 @@
 -e git+https://github.com/jazkarta/edx-jsme.git@813079fd5218ed275248d2a1fcae2fcbf20a0838#egg=edx-jsme
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@f0e53538be7ce90584a03cc7dd3f06bd43e12ac2#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@de7fde7f27b1f4a0bb7b6ea9041cc893021be287#egg=XBlock
 -e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.5.0#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool

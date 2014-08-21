@@ -5,6 +5,7 @@
 import copy
 import mock
 import shutil
+import lxml
 
 from datetime import timedelta
 from fs.osfs import OSFS
@@ -47,6 +48,9 @@ from student.roles import CourseCreatorRole, CourseInstructorRole
 from opaque_keys import InvalidKeyError
 from contentstore.tests.utils import get_url
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
+
+from unittest import skipIf
+
 from course_action_state.managers import CourseActionStateItemNotFoundError
 
 
@@ -1580,31 +1584,33 @@ class RerunCourseTest(ContentStoreTestCase):
             json_resp = parse_json(response)
             self.assertNotIn('ErrMsg', json_resp)
             destination_course_key = CourseKey.from_string(json_resp['destination_course_key'])
-
         return destination_course_key
 
-    def create_unsucceeded_course_action_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
-        # TODO Update this once the Rerun UI LMS-11011 is implemented.
-        return '<div class="unsucceeded-course-action" href="/course/{}"'.format(course_key)
+    def get_course_listing_elements(self, html, course_key):
+        """Returns the elements in the course listing section of html that have the given course_key"""
+        return html.cssselect('.course-item[data-course-key="{}"]'.format(unicode(course_key)))
+
+    def get_unsucceeded_course_action_elements(self, html, course_key):
+        """Returns the elements in the unsucceeded course action section that have the given course_key"""
+        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(unicode(course_key)))
 
     def assertInCourseListing(self, course_key):
         """
         Asserts that the given course key is in the accessible course listing section of the html
         and NOT in the unsucceeded course action section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertIn(course_key.run, course_listing_html.content)
-        self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 1)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
     def assertInUnsucceededCourseActions(self, course_key):
         """
         Asserts that the given course key is in the unsucceeded course action section of the html
         and NOT in the accessible course listing section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertNotIn(course_key.run, course_listing_html.content)
-        # TODO Verify the course is in the unsucceeded listing once LMS-11011 is implemented.
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 
     def test_rerun_course_success(self):
 
@@ -1615,6 +1621,7 @@ class RerunCourseTest(ContentStoreTestCase):
         rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
         expected_states = {
             'state': CourseRerunUIStateManager.State.SUCCEEDED,
+            'display_name': self.destination_course_data['display_name'],
             'source_course_key': source_course.id,
             'course_key': destination_course_key,
             'should_display': True,
@@ -1629,6 +1636,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertInCourseListing(source_course.id)
         self.assertInCourseListing(destination_course_key)
 
+    @skipIf(not settings.FEATURES.get('ALLOW_COURSE_RERUNS', False), "ALLOW_COURSE_RERUNS are not enabled")
     def test_rerun_course_fail_no_source_course(self):
         existent_course_key = CourseFactory.create().id
         non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
@@ -1646,7 +1654,7 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertInCourseListing(existent_course_key)
 
         # Verify that the failed course is NOT in the course listings
-        self.assertInUnsucceededCourseActions(non_existent_course_key)
+        self.assertInUnsucceededCourseActions(destination_course_key)
 
     def test_rerun_course_fail_duplicate_course(self):
         existent_course_key = CourseFactory.create().id

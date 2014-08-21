@@ -109,6 +109,9 @@ class CourseRerunState(CourseActionUIState):
     # Original course that is being rerun
     source_course_key = CourseKeyField(max_length=255, db_index=True)
 
+    # Display name for destination course
+    display_name = models.CharField(max_length=255, default="", blank=True)
+
     # MANAGERS
     # Override the abstract class' manager with a Rerun-specific manager that inherits from the base class' manager.
     objects = CourseRerunUIStateManager()
