@@ -423,6 +423,7 @@
 
     button[type="submit"] {
       @extend %m-btn-primary;
+      @extend %t-action2;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
