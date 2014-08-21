@@ -39,12 +39,18 @@ class ContainerPage(PageObject):
     def is_browser_on_page(self):
 
         def _is_finished_loading():
-            # Wait until all components have been loaded.
-            # See common/static/coffee/src/xblock/core.coffee which adds the
-            # class "xblock-initialized" at the end of initializeBlock
-            num_wrappers = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results)
-            num_xblocks_init = len(self.q(css='{} .xblock.xblock-initialized'.format(XBlockWrapper.BODY_SELECTOR)).results)
-            is_done = num_wrappers == num_xblocks_init
+            is_done = False
+            # Get the request token of the first xblock rendered on the page and assume it is correct.
+            data_request_elements = self.q(css='[data-request-token]')
+            if len(data_request_elements) > 0:
+                request_token = data_request_elements.first.attrs('data-request-token')[0]
+                # Then find the number of Studio xblock wrappers on the page with that request token.
+                num_wrappers = len(self.q(css='{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
+                # Wait until all components have been loaded.
+                # See common/static/coffee/src/xblock/core.coffee which adds the
+                # class "xblock-initialized" at the end of initializeBlock
+                num_xblocks_init = len(self.q(css='{} .xblock.xblock-initialized[data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
+                is_done = num_wrappers == num_xblocks_init
             return (is_done, is_done)
 
         # First make sure that an element with the view-container class is present on the page,

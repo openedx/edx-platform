@@ -5,8 +5,6 @@ displaying containers within units.
 """
 from nose.plugins.attrib import attr
 
-from ..pages.studio.overview import CourseOutlinePage
-
 from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.html_component_editor import HtmlComponentEditorView
@@ -16,87 +14,10 @@ from ..pages.lms.staff_view import StaffPage
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
-from .base_studio_test import StudioCourseTest
-
-
-@attr('shard_1')
-class ContainerBase(StudioCourseTest):
-    """
-    Base class for tests that do operations on the container page.
-    """
-    __test__ = False
-
-    def setUp(self):
-        """
-        Create a unique identifier for the course used in this test.
-        """
-        # Ensure that the superclass sets up
-        super(ContainerBase, self).setUp()
-
-        self.outline = CourseOutlinePage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-
-    def go_to_nested_container_page(self):
-        """
-        Go to the nested container page.
-        """
-        unit = self.go_to_unit_page()
-        # The 0th entry is the unit page itself.
-        container = unit.xblocks[1].go_to_container()
-        return container
-
-    def go_to_unit_page(self, section_name='Test Section', subsection_name='Test Subsection', unit_name='Test Unit'):
-        """
-        Go to the test unit page.
-
-        If make_draft is true, the unit page will be put into draft mode.
-        """
-        self.outline.visit()
-        subsection = self.outline.section(section_name).subsection(subsection_name)
-        return subsection.toggle_expand().unit(unit_name).go_to()
-
-    def verify_ordering(self, container, expected_orderings):
-        """
-        Verifies the expected ordering of xblocks on the page.
-        """
-        xblocks = container.xblocks
-        blocks_checked = set()
-        for expected_ordering in expected_orderings:
-            for xblock in xblocks:
-                parent = expected_ordering.keys()[0]
-                if xblock.name == parent:
-                    blocks_checked.add(parent)
-                    children = xblock.children
-                    expected_length = len(expected_ordering.get(parent))
-                    self.assertEqual(
-                        expected_length, len(children),
-                        "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
-                    for idx, expected in enumerate(expected_ordering.get(parent)):
-                        self.assertEqual(expected, children[idx].name)
-                        blocks_checked.add(expected)
-                    break
-        self.assertEqual(len(blocks_checked), len(xblocks))
-
-    def do_action_and_verify(self, action, expected_ordering):
-        """
-        Perform the supplied action and then verify the resulting ordering.
-        """
-        container = self.go_to_nested_container_page()
-        action(container)
-
-        self.verify_ordering(container, expected_ordering)
-
-        # Reload the page to see that the change was persisted.
-        container = self.go_to_nested_container_page()
-        self.verify_ordering(container, expected_ordering)
+from .base_studio_test import ContainerBase
 
 
 class NestedVerticalTest(ContainerBase):
-    __test__ = False
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -151,7 +72,6 @@ class DragAndDropTest(NestedVerticalTest):
     """
     Tests of reordering within the container page.
     """
-    __test__ = True
 
     def drag_and_verify(self, source, target, expected_ordering):
         self.do_action_and_verify(
@@ -232,7 +152,6 @@ class AddComponentTest(NestedVerticalTest):
     """
     Tests of adding a component to the container page.
     """
-    __test__ = True
 
     def add_and_verify(self, menu_index, expected_ordering):
         self.do_action_and_verify(
@@ -273,7 +192,6 @@ class DuplicateComponentTest(NestedVerticalTest):
     """
     Tests of duplicating a component on the container page.
     """
-    __test__ = True
 
     def duplicate_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
@@ -320,7 +238,6 @@ class DeleteComponentTest(NestedVerticalTest):
     """
     Tests of deleting a component from the container page.
     """
-    __test__ = True
 
     def delete_and_verify(self, source_index, expected_ordering):
         self.do_action_and_verify(
@@ -344,7 +261,6 @@ class EditContainerTest(NestedVerticalTest):
     """
     Tests of editing a container.
     """
-    __test__ = True
 
     def modify_display_name_and_verify(self, component):
         """
@@ -377,7 +293,6 @@ class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
     """
-    __test__ = True
 
     PUBLISHED_STATUS = "Publishing Status\nPublished (not yet released)"
     PUBLISHED_LIVE_STATUS = "Publishing Status\nPublished and Live"
