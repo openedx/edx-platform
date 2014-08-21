@@ -1,7 +1,7 @@
 """
 CMS Video
 """
-
+import time
 import os
 import requests
 from bok_choy.promise import EmptyPromise, Promise
@@ -21,6 +21,11 @@ CLASS_SELECTORS = {
     'upload_dialog': '.wrapper-modal-window-assetupload',
     'xblock': '.add-xblock-component',
     'slider_range': '.slider-range',
+    'error': '.transcripts-error-message',
+    'url_inputs': '.videolist-settings-item input.input',
+    'collapse_bar': '.videolist-extra-videos',
+    'status': '.transcripts-message-status',
+    'attach_transcript': '.file-chooser > input[type="file"]',
 }
 
 BUTTON_SELECTORS = {
@@ -32,6 +37,14 @@ BUTTON_SELECTORS = {
     'handout_clear': '.wrapper-comp-setting.file-uploader .setting-clear',
     'translations_clear': '.metadata-video-translations .setting-clear',
     'translation_add': '.wrapper-translations-settings > a',
+    'import': '.setting-import',
+    'download_to_edit': '.setting-download',
+    'disabled_download_to_edit': '.setting-download.is-disabled',
+    'upload_new_timed_transcripts': '.setting-upload',
+    'replace': '.setting-replace',
+    'choose': '.setting-choose',
+    'use_existing': '.setting-use-existing',
+    'collapse_link': '.collapse-action.collapse-setting',
 }
 
 DISPLAY_NAME = "Component Display Name"
@@ -58,6 +71,10 @@ DEFAULT_SETTINGS = [
     ['YouTube ID for 1.25x speed', '', False],
     ['YouTube ID for 1.5x speed', '', False]
 ]
+
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 
 @js_defined('window.Video', 'window.RequireJS.require', 'window.jQuery', 'window.XModule', 'window.XBlock',
@@ -267,7 +284,7 @@ class VideoComponentPage(VideoPage):
             is_verified = self._verify_setting_entry(setting,
                                                      DEFAULT_SETTINGS[counter][0],
                                                      DEFAULT_SETTINGS[counter][1])
-            if is_verified is False:
+            if not is_verified:
                 return is_verified
 
         return True
@@ -350,7 +367,7 @@ class VideoComponentPage(VideoPage):
             bool: If `field_name` has `field_value`
 
         """
-        setting = self._get_setting_entry(field_name)
+        _, setting = self._get_setting_entry(field_name)
         return self._verify_setting_entry(setting, field_name, field_value)
 
     def _get_setting_entry(self, field_name):
@@ -364,9 +381,9 @@ class VideoComponentPage(VideoPage):
             setting (WebElement): Selenium WebElement
 
         """
-        for setting in self.q(css='.wrapper-comp-setting').results:
+        for index, setting in enumerate(self.q(css='.wrapper-comp-setting').results):
             if setting.find_element_by_class_name('setting-label').get_attribute('innerHTML') == field_name:
-                return setting
+                return index, setting
 
     def translations_count(self):
         """
@@ -472,3 +489,92 @@ class VideoComponentPage(VideoPage):
         self.wait_for_captions()
         selector = '.subtitles > li:nth-child({})'
         return ' '.join([self.q(css=selector.format(i)).text[0] for i in range(1, 6)])
+
+    def set_url_field(self, url, field_number):
+        """
+        Set video url field in basic settings tab.
+
+        Arguments:
+            url (str): video url
+            field_number (int): video url field number
+
+        """
+        if self.q(css=CLASS_SELECTORS['collapse_bar']).visible is False:
+            self.click_button('collapse_link')
+
+        self.q(css=CLASS_SELECTORS['url_inputs']).nth(field_number - 1).fill(url)
+
+        time.sleep(DELAY)
+        self.wait_for_ajax()
+
+    def message(self, message_type):
+        """
+        Get video url field status/error message.
+
+        Arguments:
+            message_type(str): type(status, error) of message
+
+        Returns:
+            str: status/error message
+
+        """
+        if self.q(css=CLASS_SELECTORS[message_type]).visible:
+            return self.q(css=CLASS_SELECTORS[message_type]).text[0]
+        else:
+            return ''
+
+    def url_field_status(self, *field_numbers):
+        """
+        Get video url field status(enable/disable).
+
+        Arguments:
+            url (str): video url
+            field_numbers (tuple or None): field numbers to check status for, None means get status for all.
+                                           tuple items will be integers and must start from 1
+
+        Returns:
+            dict: field numbers as keys and field status(bool) as values, False means a field is disabled
+
+        """
+        if field_numbers:
+            index_list = [number - 1 for number in field_numbers]
+        else:
+            index_list = range(3)  # maximum three fields
+
+        statuses = {}
+        for index in index_list:
+            status = 'is-disabled' not in self.q(css=CLASS_SELECTORS['url_inputs']).nth(index).attrs('class')[0]
+            statuses[index + 1] = status
+
+        return statuses
+
+    def clear_fields(self):
+        """
+        Clear video url fields.
+        """
+        script = """
+        $('{selector}')
+            .prop('disabled', false)
+            .removeClass('is-disabled')
+            .val('')
+            .trigger('input');
+        """.format(selector=CLASS_SELECTORS['url_inputs'])
+        self.browser.execute_script(script)
+
+        time.sleep(DELAY)
+        self.wait_for_ajax()
+
+    def is_transcript_button_visible(self, button_name):
+        """
+        Check if a transcript related button is visible.
+
+        Arguments:
+            button_name (str): name of button
+            field_numbers (tuple or None): field numbers to check status for, None means get status for all.
+                                           tuple items will be integers and must start from 1
+
+        Returns:
+            bool: is button visible
+
+        """
+        return self.q(css=BUTTON_SELECTORS[button_name]).visible
