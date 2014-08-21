@@ -1,0 +1,152 @@
+###################################
+August 26, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of August
+26, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* This release further expands the recently enhanced Studio workflow for
+  publishing course content. Two more features that are designed to streamline
+  the workflow even further are now available on the **Course Outline** page.
+
+  * You can now publish all unpublished content in an entire section or
+    subsection in a single step: on the **Course Outline** page, click the
+    "Publish" icon.
+
+     .. image:: images/outline-publish-icons.png
+       :alt: The Course Outline page showing an expanded section and an
+        expanded subsection that contain a unit with unpublished content. An
+        icon at all three levels is available to publish all content within
+        that level.
+
+    The "Publish" icon is also available on the **Course Outline** page for
+    individual units.
+
+  * You can now hide all of the content in an entire section or subsection on
+    the **Course Outline** page. To ensure that students cannot see a part of
+    the course, select the "Settings" icon and in the dialog that opens select **Hide from students**. The same feature is available for units.     
+  
+  For more details, see our most recent `edX Product and Engineering
+  Newsletter`_.
+* You can now build content experiments (also known as A/B tests) entirely
+  within edX Studio. With a content experiment, you show different course
+  content to different groups of students. Research teams can compare the
+  performance of students in different groups to gain insights into the
+  relative effectiveness of your course content.
+
+* A defect in the drag and drop feature for course content on the **Course
+  Outline** page has been fixed. Dropping a unit into a collapsed subsection
+  now adds that unit without changing any existing content in that subsection.
+  (TNL-56)
+
+
+  
+
+*******************************
+edX Learning Management System
+*******************************
+
+* Course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts to find unanswered questions easily. %%%%%%%
+
+* The new user
+  interface controls will provide consistent methods for taking action on
+  posts. A set of colorful badges will also make it easier to identify posts. %%%%%%
+
+* When you click **Sent Email History** on the Email page of the Instructor
+  Dashboard, the list of sent messages now identifies the ender of each message
+  in the new **Sent By** column.
+
+
+* Bulk email now available for all courses? Instructor Dashboard , Email page. %%%%%
+
+**************************
+edX Data & Analytics
+**************************
+
+* The selection that discussion participants now make between a Question or Discussion post type is now included with the Mongo data for each post (CommentThread). Who endorsed a discussion post or marked a question as answered, and when, will be included for a response (Comment).
+
+* 
+
+
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce these upcoming changes, which will release in the
+next few weeks:
+
+* In addition to the existing Discussion post type, course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts to find unanswered questions easily.%%%%%%
+
+* A new user experience design for course discussions is coming! The new user
+  interface controls will provide consistent methods for taking action on
+  posts. A set of colorful badges will also make it easier to identify posts.%%%%
+
+* To make the process of registering faster and easier, students will soon be
+  able to register and log in to the edX.org and edX Edge web sites with a
+  Google or Facebook ID.
+
+
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  
+
+* `Creating Peer Assessments`_
+
+  Recent changes include: 
+  
+  
+       
+* `edX Research Guide`_
+
+.. Recent changes include: 
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst
