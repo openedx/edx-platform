@@ -46,6 +46,50 @@ log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
+def get_transcripts(video):
+    """
+    For the given video module, returns:
+    track_url -> subtitle download url
+    transcript_language -> default transcript language
+    sorted_languages -> dictionary of available transcript languages
+    """
+    track_url = None
+    if video.download_track:
+        if video.track:
+            track_url = video.track
+        elif video.sub or video.transcripts:
+            track_url = video.runtime.handler_url(video, 'transcript', 'download').rstrip('/?')
+
+    if not video.transcripts:
+        transcript_language = u'en'
+        languages = {'en': 'English'}
+    else:
+        if video.transcript_language in video.transcripts:
+            transcript_language = video.transcript_language
+        elif video.sub:
+            transcript_language = u'en'
+        else:
+            transcript_language = sorted(video.transcripts.keys())[0]
+
+        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+        languages = {
+            lang: native_languages.get(lang, display)
+            for lang, display in settings.ALL_LANGUAGES
+            if lang in video.transcripts
+        }
+
+        if video.sub:
+            languages['en'] = 'English'
+
+    # OrderedDict for easy testing of rendered context in tests
+    sorted_languages = sorted(languages.items(), key=itemgetter(1))
+    if 'table' in video.transcripts:
+        sorted_languages.insert(0, ('table', 'Table of Contents'))
+
+    sorted_languages = OrderedDict(sorted_languages)
+    return track_url, transcript_language, sorted_languages
+
+
 class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
     """
     XML source example:
@@ -97,9 +141,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
     js_module_name = "Video"
 
     def get_html(self):
-        track_url = None
         download_video_link = None
-        transcript_download_format = self.transcript_download_format
+        transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
         sources = filter(None, self.html5_sources)
 
         # If the user comes from China use China CDN for html5 videos.
@@ -120,40 +163,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
 
-        if self.download_track:
-            if self.track:
-                track_url = self.track
-                transcript_download_format = None
-            elif self.sub or self.transcripts:
-                track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
-
-        if not self.transcripts:
-            transcript_language = u'en'
-            languages = {'en': 'English'}
-        else:
-            if self.transcript_language in self.transcripts:
-                transcript_language = self.transcript_language
-            elif self.sub:
-                transcript_language = u'en'
-            else:
-                transcript_language = sorted(self.transcripts.keys())[0]
-
-            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-            languages = {
-                lang: native_languages.get(lang, display)
-                for lang, display in settings.ALL_LANGUAGES
-                if lang in self.transcripts
-            }
-
-            if self.sub:
-                languages['en'] = 'English'
-
-        # OrderedDict for easy testing of rendered context in tests
-        sorted_languages = sorted(languages.items(), key=itemgetter(1))
-        if 'table' in self.transcripts:
-            sorted_languages.insert(0, ('table', 'Table of Contents'))
-
-        sorted_languages = OrderedDict(sorted_languages)
+        track_url, transcript_language, sorted_languages = get_transcripts(self)
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
