@@ -12,8 +12,13 @@ import edxmako
 import logging
 import analytics
 
-log = logging.getLogger(__name__)
+# Imports required for Monkeypatching keyword substitution module
+from util import keyword_substitution
+from django.contrib.auth.models import User
+from util.date_utils import get_default_time_display
 
+log = logging.getLogger(__name__)
+kf_map = {}
 
 def run():
     """
@@ -37,6 +42,8 @@ def run():
     if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
 
+    # Monkey patch the keyword function map
+    keyword_substitution.add_keyword_function_map(get_keyword_function_map())
 
 def add_mimetypes():
     """
@@ -136,3 +143,39 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+
+
+def get_keyword_function_map():
+    """
+    Define the mapping of keywords and functions that will be used to filter
+    html, text and email strings before rendering them.
+
+    The generated map will be monkey-patched onto the keyword_substitution
+    module so that it persists along with the running server.
+
+    Each function must take: user & course as parameters
+    """
+
+    from student.models import anonymous_id_for_user
+    def user_id_sub(user, course):
+        # For compatibility with the existing anon_ids, return anon_id without course_id
+        return anonymous_id_for_user(user, None)
+
+    def user_fullname_sub(user, course=None):
+        return user.profile.name
+
+    def course_display_name_sub(user, course):
+        return course.display_name
+
+    def course_end_date_sub(user, course):
+        return get_default_time_display(course.end)
+
+    # Define keyword - function map
+    kf_map = {
+        '%%USER_ID%%': user_id_sub,
+        '%%USER_FULLNAME%%': user_fullname_sub,
+        '%%COURSE_DISPLAY_NAME%%': course_display_name_sub,
+        '%%COURSE_END_DATE%%': course_end_date_sub
+    }
+
+    return kf_map

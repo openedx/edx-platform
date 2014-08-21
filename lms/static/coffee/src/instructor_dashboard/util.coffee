@@ -300,6 +300,31 @@ class PendingInstructorTasks
       error: std_ajax_err => console.error "Error finding pending instructor tasks to display"
     ### /Pending Instructor Tasks Section ####
 
+class KeywordValidator
+
+    @keyword_regex = /%%+[^%]+%%/g
+    @keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%']
+
+    @validate_string: (string) =>
+      regex_match = string.match(@keyword_regex)
+      found_keywords = if regex_match == null then [] else regex_match
+      invalid_keywords = []
+      is_valid = true
+      keywords = @keywords
+
+      for found_keyword in found_keywords
+        do (found_keyword) ->
+          if found_keyword not in keywords
+            invalid_keywords.push found_keyword
+      
+      if invalid_keywords.length != 0
+        is_valid = false
+      
+      return {
+        is_valid: is_valid,
+        invalid_keywords: invalid_keywords
+      }
+
 # export for use
 # create parent namespaces if they do not already exist.
 # abort if underscore can not be found.
@@ -314,3 +339,4 @@ if _?
     create_email_content_table: create_email_content_table
     create_email_message_views: create_email_message_views
     PendingInstructorTasks: PendingInstructorTasks
+    KeywordValidator: KeywordValidator

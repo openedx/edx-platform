@@ -7,7 +7,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
-
+from util import keyword_substitution
 
 def run():
     """
@@ -17,6 +17,9 @@ def run():
 
     add_mimetypes()
 
+    # Supply keyword-substitution mapping for CMS
+    # Currently no substitution for CMS
+    keyword_substitution.KEYWORD_FUNCTION_MAP = {}
 
 def add_mimetypes():
     """
