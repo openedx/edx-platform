@@ -6,6 +6,7 @@ import logging
 import json
 from webob import Response
 from uuid import uuid4
+from operator import itemgetter
 
 from xmodule.progress import Progress
 from xmodule.seq_module import SequenceDescriptor
@@ -235,24 +236,41 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         Render the staff view for a split test module.
         """
         fragment = Fragment()
-        contents = []
+        active_contents = []
+        inactive_contents = []
 
-        for group_id in self.group_id_to_child:
-            child_location = self.group_id_to_child[group_id]
+        for child_location in self.children:  # pylint: disable=no-member
             child_descriptor = self.get_child_descriptor_by_location(child_location)
             child = self.system.get_module(child_descriptor)
             rendered_child = child.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_child)
+            group_name, updated_group_id = self.get_data_for_vertical(child)
 
-            contents.append({
-                'group_id': group_id,
+            if updated_group_id is None:  # inactive group
+                group_name = child.display_name
+                updated_group_id = [g_id for g_id, loc in self.group_id_to_child.items() if loc == child_location][0]
+                inactive_contents.append({
+                    'group_name': _(u'{group_name} (inactive)').format(group_name=group_name),
+                    'id': child.location.to_deprecated_string(),
+                    'content': rendered_child.content,
+                    'group_id': updated_group_id,
+                })
+                continue
+
+            active_contents.append({
+                'group_name': group_name,
                 'id': child.location.to_deprecated_string(),
-                'content': rendered_child.content
+                'content': rendered_child.content,
+                'group_id': updated_group_id,
             })
+
+        # Sort active and inactive contents by group name.
+        sorted_active_contents = sorted(active_contents, key=itemgetter('group_name'))
+        sorted_inactive_contents = sorted(inactive_contents, key=itemgetter('group_name'))
 
         # Use the new template
         fragment.add_content(self.system.render_template('split_test_staff_view.html', {
-            'items': contents,
+            'items': sorted_active_contents + sorted_inactive_contents,
         }))
         fragment.add_css('.split-test-child { display: none; }')
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_staff.js'))

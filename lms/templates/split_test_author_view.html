@@ -5,7 +5,7 @@
 split_test = context.get('split_test')
 user_partition = split_test.descriptor.get_selected_partition()
 messages = split_test.descriptor.validation_messages()
-show_link = settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and group_configuration_url is not None
+show_link = group_configuration_url is not None
 %>
 
 % if is_root and not is_configured:
