@@ -260,6 +260,10 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
             },
 
             expandElement: function (ele) {
+                // Verify all children of the element are rendered.
+                var ensureChildrenRendered = ele.data('ensureChildrenRendered');
+                if (_.isFunction(ensureChildrenRendered)) { ensureChildrenRendered(); }
+                // Update classes.
                 ele.removeClass(this.collapsedClass);
                 ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
@@ -354,7 +358,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     handleClass: null,
                     droppableClass: null,
                     parentLocationSelector: null,
-                    refresh: null
+                    refresh: null,
+                    ensureChildrenRendered: null
                 }, options);
 
                 if ($(element).data('droppable-class') !== options.droppableClass) {
@@ -362,7 +367,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                       'droppable-class': options.droppableClass,
                       'parent-location-selector': options.parentLocationSelector,
                       'child-selector': options.type,
-                      'refresh': options.refresh
+                      'refresh': options.refresh,
+                      'ensureChildrenRendered': options.ensureChildrenRendered
                     });
 
                     draggable = new Draggabilly(element, {

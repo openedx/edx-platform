@@ -192,7 +192,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.section-drag-handle',
                         droppableClass: 'ol.list-sections',
                         parentLocationSelector: 'article.outline',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-subsection")) {
@@ -201,7 +202,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.subsection-drag-handle',
                         droppableClass: 'ol.list-subsections',
                         parentLocationSelector: 'li.outline-section',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
                 else if ($(element).hasClass("outline-unit")) {
@@ -210,7 +212,8 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         handleClass: '.unit-drag-handle',
                         droppableClass: 'ol.list-units',
                         parentLocationSelector: 'li.outline-subsection',
-                        refresh: this.refreshWithCollapsedState.bind(this)
+                        refresh: this.refreshWithCollapsedState.bind(this),
+                        ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
             }
