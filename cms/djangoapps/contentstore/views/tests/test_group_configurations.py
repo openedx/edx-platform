@@ -121,13 +121,11 @@ class GroupConfigurationsBaseTestCase(object):
                     {u'name': u'Group B'},
                 ],
             },
-            # must have at least two groups
+            # must have at least one group
             {
                 u'name': u'Test name',
                 u'description': u'Test description',
-                u'groups': [
-                    {u'name': u'Group A'},
-                ],
+                u'groups': [],
             },
             # an empty json
             {},

@@ -1134,8 +1134,8 @@ class GroupConfiguration(object):
         """
         if not self.configuration.get("name"):
             raise GroupConfigurationsValidationError(_("must have name of the configuration"))
-        if len(self.configuration.get('groups', [])) < 2:
-            raise GroupConfigurationsValidationError(_("must have at least two groups"))
+        if len(self.configuration.get('groups', [])) < 1:
+            raise GroupConfigurationsValidationError(_("must have at least one group"))
 
     def generate_id(self, used_ids):
         """

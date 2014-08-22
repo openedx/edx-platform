@@ -231,3 +231,380 @@ class VideoTranscriptTest(CMSVideoBaseTest):
             self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
             self.assertTrue(self.video.is_transcript_button_visible('import'))
             self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_no_import(self):
+        """
+        Scenario: Entering youtube (no importing), and 2 html5 sources without transcripts - "Not Found"
+        Given I have created a Video component
+        urls = ['http://youtu.be/t_not_exist', 't_not_exist.mp4', 't_not_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `No Timed Transcript` is shown
+            `disabled_download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component()
+        self.edit_component()
+        urls = ['http://youtu.be/t_not_exist', 't_not_exist.mp4', 't_not_exist.webm']
+        for index, url in enumerate(urls, 1):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'No Timed Transcript')
+            self.assertTrue(self.video.is_transcript_button_visible('disabled_download_to_edit'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_with_import(self):
+        """
+        Scenario: Entering youtube with imported transcripts, and 2 html5 sources without transcripts - "Found"
+        Given I have created a Video component
+        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
+        Then I see status message "No EdX Timed Transcript"
+        And I see button "import"
+        And I click transcript button "import"
+        Then I see status message "Timed Transcript Found"
+        And I see button "upload_new_timed_transcripts"
+        urls = ['t_not_exist.mp4', 't_not_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `Timed Transcript Found` is shown
+            `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.video.set_url_field('http://youtu.be/t__eq_exist', 1)
+        self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('import'))
+        self.video.click_button('import')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        urls = ['t_not_exist.mp4', 't_not_exist.webm']
+        for index, url in enumerate(urls, 2):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+            self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_wo_transcripts(self):
+        """
+        Scenario: Entering youtube w/o transcripts - html5 w/o transcripts - html5 with transcripts
+        Given I have created a Video component with subtitles "t_neq_exist"
+        urls = ['http://youtu.be/t_not_exist', 't_not_exist.mp4']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `No Timed Transcript` is shown
+            `disabled_download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+
+        And I enter a "t_neq_exist.webm" source to field number 3
+        Then I see status message "Timed Transcript Found"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
+        self.edit_component()
+        urls = ['http://youtu.be/t_not_exist', 't_not_exist.mp4']
+        for index, url in enumerate(urls, 1):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'No Timed Transcript')
+            self.assertTrue(self.video.is_transcript_button_visible('disabled_download_to_edit'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+        self.video.set_url_field('t_neq_exist.webm', 3)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_wo_imported_transcripts(self):
+        """
+        Scenario: Entering youtube w/o imported transcripts - html5 w/o transcripts w/o import - html5 with transcripts
+        Given I have created a Video component with subtitles "t_neq_exist"
+        urls = ['http://youtu.be/t__eq_exist', 't_not_exist.mp4', 't_neq_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `No EdX Timed Transcript` is shown
+            `import` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
+        self.edit_component()
+        urls = ['http://youtu.be/t__eq_exist', 't_not_exist.mp4', 't_neq_exist.webm']
+        for index, url in enumerate(urls, 1):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
+            self.assertTrue(self.video.is_transcript_button_visible('import'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_wo_imported_transcripts2(self):
+        """
+        Scenario: Entering youtube w/o imported transcripts - html5 with transcripts - html5 w/o transcripts w/o import
+        Given I have created a Video component with subtitles "t_neq_exist"
+        urls = ['http://youtu.be/t__eq_exist', 't_neq_exist.mp4', 't_not_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `No EdX Timed Transcript` is shown
+            `import` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
+        self.edit_component()
+        urls = ['http://youtu.be/t__eq_exist', 't_neq_exist.mp4', 't_not_exist.webm']
+        for index, url in enumerate(urls, 1):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
+            self.assertTrue(self.video.is_transcript_button_visible('import'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_w_imported_transcripts(self):
+        """
+        Scenario: Entering youtube with imported transcripts - html5 with transcripts - html5 w/o transcripts
+        Given I have created a Video component with subtitles "t_neq_exist"
+        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
+        Then I see status message "No EdX Timed Transcript"
+        And I see button "import"
+        And I click transcript button "import"
+        Then I see status message "Timed Transcript Found"
+        And I see button "upload_new_timed_transcripts"
+        urls = ['t_neq_exist.mp4', 't_not_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `Timed Transcript Found` is shown
+            `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
+        self.edit_component()
+        self.video.set_url_field('http://youtu.be/t__eq_exist', 1)
+        self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('import'))
+        self.video.click_button('import')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        urls = ['t_neq_exist.mp4', 't_not_exist.webm']
+        for index, url in enumerate(urls, 2):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+            self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_youtube_w_imported_transcripts2(self):
+        """
+        Scenario: Entering youtube with imported transcripts - html5 w/o transcripts - html5 with transcripts
+        Given I have created a Video component with subtitles "t_neq_exist"
+        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
+        Then I see status message "No EdX Timed Transcript"
+        And I see button "import"
+        And I click transcript button "import"
+        Then I see status message "Timed Transcript Found"
+        And I see button "upload_new_timed_transcripts"
+        urls = ['t_not_exist.mp4', 't_neq_exist.webm']
+        for each url in urls do the following
+            Enter `url` to field number `n`
+            Status message `Timed Transcript Found` is shown
+            `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_neq_exist')
+        self.edit_component()
+        self.video.set_url_field('http://youtu.be/t__eq_exist', 1)
+        self.assertEqual(self.video.message('status'), 'No EdX Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('import'))
+        self.video.click_button('import')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        urls = ['t_not_exist.mp4', 't_neq_exist.webm']
+        for index, url in enumerate(urls, 2):
+            self.video.set_url_field(url, index)
+            self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+            self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+            self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+
+    def test_html5_with_transcripts(self):
+        """
+        Scenario: Entering html5 with transcripts - upload - youtube w/o transcripts
+        Given I have created a Video component with subtitles "t__eq_exist"
+        And I enter a "t__eq_exist.mp4" source to field number 1
+        Then I see status message "Timed Transcript Found"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I upload the transcripts file "uk_transcripts.srt"
+        Then I see status message "Timed Transcript Uploaded Successfully"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I see value "t__eq_exist" in the field "Default Timed Transcript"
+        And I enter a "http://youtu.be/t_not_exist" source to field number 2
+        Then I see status message "Timed Transcript Found"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I enter a "uk_transcripts.webm" source to field number 3
+        Then I see status message "Timed Transcript Found"
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t__eq_exist')
+        self.edit_component()
+        self.video.set_url_field('t__eq_exist.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.video.upload_transcript('uk_transcripts.srt')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Uploaded Successfully')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't__eq_exist'))
+        self.open_basic_tab()
+        self.video.set_url_field('http://youtu.be/t_not_exist', 2)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.video.set_url_field('uk_transcripts.webm', 3)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+
+    def test_two_html5_sources_w_transcripts(self):
+        """
+        Scenario: Enter 2 HTML5 sources with transcripts, they are not the same, choose
+        Given I have created a Video component with subtitles "t_not_exist"
+        And I enter a "uk_transcripts.mp4" source to field number 1
+        Then I see status message "No Timed Transcript"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I upload the transcripts file "uk_transcripts.srt"
+        Then I see status message "Timed Transcript Uploaded Successfully"
+        And I see value "uk_transcripts" in the field "Default Timed Transcript"
+        And I enter a "t_not_exist.webm" source to field number 2
+        Then I see status message "Timed Transcript Conflict"
+        `Timed Transcript from uk_transcripts.mp4` and `Timed Transcript from t_not_exist.webm` buttons are shown
+        And I click transcript button "Timed Transcript from t_not_exist.webm"
+        And I see value "uk_transcripts|t_not_exist" in the field "Default Timed Transcript"
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
+        self.edit_component()
+        self.video.set_url_field('uk_transcripts.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'No Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.video.upload_transcript('uk_transcripts.srt')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Uploaded Successfully')
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'uk_transcripts'))
+        self.open_basic_tab()
+        self.video.set_url_field('t_not_exist.webm', 2)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Conflict')
+        self.assertTrue(
+            self.video.is_transcript_button_visible('choose', button_text='Timed Transcript from uk_transcripts.mp4'))
+        self.assertTrue(self.video.is_transcript_button_visible('choose', index=1,
+                                                                button_text='Timed Transcript from t_not_exist.webm'))
+
+    def test_one_field_only(self):
+        """
+        Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save -> change it to another one HTML5
+        source w/o transcripts - click on use existing ->  change it to another one HTML5 source w/o transcripts - do
+        not click on use existing -> change it to another one HTML5 source w/o transcripts - click on use existing
+        Given I have created a Video component with subtitles "t_not_exist"
+        If i enter "t_not_exist.mp4" source to field number 1 Then I see status message "Timed Transcript Found"
+        `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I see value "t_not_exist" in the field "Default Timed Transcript"
+        And I save changes And then edit the component
+        If i enter "video_name_2.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
+        I see button "use_existing" And I click on it
+        And I see value "video_name_2" in the field "Default Timed Transcript"
+        If i enter "video_name_3.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
+        And I see button "use_existing"
+        If i enter a "video_name_4.mp4" source to field number 1 Then I see status message "Confirm Timed Transcript"
+        I see button "use_existing" And I click on it
+        And I see value "video_name_4" in the field "Default Timed Transcript"
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
+        self.edit_component()
+        self.video.set_url_field('t_not_exist.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't_not_exist'))
+        self.open_basic_tab()
+        self.save_unit_settings()
+        self.edit_component()
+        self.video.set_url_field('video_name_2.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
+        self.video.click_button('use_existing')
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_2'))
+        self.open_basic_tab()
+        self.video.set_url_field('video_name_3.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
+        self.video.set_url_field('video_name_4.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
+        self.video.click_button('use_existing')
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_4'))
+
+    def test_two_fields_only(self):
+        """
+        Scenario: Work with 2 fields: Enter HTML5 source with transcripts - save -> change it to another one HTML5
+        source w/o transcripts - do not click on use existing ->  add another one HTML5 source w/o transcripts -
+        click on use existing
+        Given I have created a Video component with subtitles "t_not_exist"
+        And I enter a "t_not_exist.mp4" source to field number 1
+        Then I see status message "Timed Transcript Found"
+       `download_to_edit` and `upload_new_timed_transcripts` buttons are shown
+        And I save changes
+        And I edit the component
+        And I enter a "video_name_2.mp4" source to field number 1
+        Then I see status message "Confirm Timed Transcript"
+        And I see button "use_existing"
+        And I enter a "video_name_3.webm" source to field number 2
+        Then I see status message "Confirm Timed Transcript"
+        And I see button "use_existing"
+        And I click transcript button "use_existing"
+        And I see value "video_name_3" in the field "Default Timed Transcript"
+        """
+        self._create_video_component(subtitles=True, subtitle_id='t_not_exist')
+        self.edit_component()
+        self.video.set_url_field('t_not_exist.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+        self.assertTrue(self.video.is_transcript_button_visible('download_to_edit'))
+        self.assertTrue(self.video.is_transcript_button_visible('upload_new_timed_transcripts'))
+        self.save_unit_settings()
+        self.edit_component()
+        self.video.set_url_field('video_name_2.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
+        self.video.set_url_field('video_name_3.webm', 2)
+        self.assertEqual(self.video.message('status'), 'Confirm Timed Transcript')
+        self.assertTrue(self.video.is_transcript_button_visible('use_existing'))
+        self.video.click_button('use_existing')
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_3'))
+
+    def test_upload_subtitles(self):
+        """
+        Scenario: File name and name of subs are different (Uploading subtitles with different file name than file)
+        Given I have created a Video component
+        And I enter a "video_name_1.mp4" source to field number 1
+        And I see status message "No Timed Transcript"
+        And I upload the transcripts file "uk_transcripts.srt"
+        Then I see status message "Timed Transcript Uploaded Successfully"
+        And I see value "video_name_1" in the field "Default Timed Transcript"
+        And I save changes
+        Then when I view the video it does show the captions
+        And I edit the component
+        Then I see status message "Timed Transcript Found"
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.video.set_url_field('video_name_1.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'No Timed Transcript')
+        self.video.upload_transcript('uk_transcripts.srt')
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Uploaded Successfully')
+        self.open_advanced_tab()
+        self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 'video_name_1'))
+        self.save_unit_settings()
+        self.video.is_captions_visible()
+        self.edit_component()
+        self.assertEqual(self.video.message('status'), 'Timed Transcript Found')
+
+    def test_video_wo_subtitles(self):
+        """
+        Video can have filled item.sub, but doesn't have subs file.
+        In this case, after changing this video by another one without subs
+        `No Timed Transcript` message should appear ( not `Confirm Timed Transcript`).
+        Scenario: Video w/o subs - another video w/o subs - Not found message
+        Given I have created a Video component
+        And I enter a "video_name_1.mp4" source to field number 1
+        Then I see status message "No Timed Transcript"
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.video.set_url_field('video_name_1.mp4', 1)
+        self.assertEqual(self.video.message('status'), 'No Timed Transcript')

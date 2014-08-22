@@ -52,7 +52,6 @@
 @import 'multicourse/media-kit';
 @import 'multicourse/about_pages';
 @import 'multicourse/press_release';
-@import 'multicourse/password_reset';
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
 @import 'multicourse/edge';

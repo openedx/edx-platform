@@ -79,7 +79,7 @@ class TestLTI(BaseTestXmodule):
             'display_name': self.item_descriptor.display_name,
             'input_fields': self.correct_headers,
             'element_class': self.item_descriptor.category,
-            'element_id': self.item_descriptor.location.html_id(),
+            'element_id': self.item_descriptor.location.block_id,
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
             'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor,

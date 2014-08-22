@@ -25,7 +25,7 @@
 
     .title {
       @extend %t-title5;
-      @extend %t-strong;
+      @extend %t-demi-strong;
       margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
       color: $black;
     }

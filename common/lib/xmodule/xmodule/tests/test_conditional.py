@@ -133,8 +133,8 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         html = modules['cond_module'].render(STUDENT_VIEW).content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
-            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
-            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
+            'element_id': 'SampleConditional',
+            'depends': 'SampleProblem',
         })
         self.assertEquals(expected, html)
 
@@ -228,8 +228,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             {
                 # Test ajax url is just usage-id / handler_name
                 'ajax_url': '{}/xmodule_handler'.format(location.to_deprecated_string()),
-                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
-                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
+                'element_id': 'condone',
+                'depends': 'choiceprob'
             }
         )
         self.assertEqual(html, html_expect)
