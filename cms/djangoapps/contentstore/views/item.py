@@ -24,7 +24,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum, PublishState, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
@@ -397,7 +397,7 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
         modulestore().publish(xblock.location, user.id)
 
     # Note that children aren't being returned until we have a use case.
-    return JsonResponse(result)
+    return JsonResponse(result, encoder=EdxJSONEncoder)
 
 
 @login_required
