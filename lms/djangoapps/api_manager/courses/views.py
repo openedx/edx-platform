@@ -5,11 +5,12 @@ import logging
 import itertools
 from lxml import etree
 from StringIO import StringIO
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum, Count
+from django.db.models import Avg, Sum, Count, Max
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
@@ -1548,12 +1549,19 @@ class CoursesLeadersList(SecureListAPIView):
             queryset = queryset.filter(module_state_key=content_key)
 
         if user_id:
-            user_points = StudentModule.objects.filter(course_id__exact=course_key,
-                                                       student__id=user_id).aggregate(points=Sum('grade'))
+            user_queryset = StudentModule.objects.filter(course_id__exact=course_key, grade__isnull=False,
+                                                         max_grade__isnull=False,
+                                                         max_grade__gt=0,
+                                                         student__id=user_id)
+            user_points = user_queryset.aggregate(points=Sum('grade'))
             user_points = user_points['points'] or 0
             user_points = round(user_points, 2)
-            users_above = queryset.values('student__id').annotate(points=Sum('grade')).\
-                filter(points__gt=user_points).exclude(student__id=user_id).count()  # excluding user to overcome
+            user_time_scored = user_queryset.aggregate(time_scored=Max('created'))
+            user_time_scored = user_time_scored['time_scored'] or datetime.now()
+            users_above = queryset.values('student__id').annotate(points=Sum('grade'))\
+                .annotate(time_scored=Max('created')).\
+                filter(Q(points__gt=user_points) | Q(points__gte=user_points, time_scored__lt=user_time_scored))\
+                .exclude(student__id=user_id).count()  # excluding user to overcome
                 #  float comparison bug
             data['position'] = users_above + 1
             data['points'] = int(round(user_points))
@@ -1567,7 +1575,8 @@ class CoursesLeadersList(SecureListAPIView):
         queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
                                                                    'student__profile__title',
                                                                    'student__profile__avatar_url')\
-            .annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
+            .annotate(points_scored=Sum('grade')).annotate(time_scored=Max('created'))\
+                       .order_by('-points_scored', 'time_scored')[:count]
         serializer = CourseLeadersSerializer(queryset, many=True)
 
         data['leaders'] = serializer.data  # pylint: disable=E1101
@@ -1608,9 +1617,14 @@ class CoursesCompletionsLeadersList(SecureAPIView):
             .exclude(user__in=exclude_users)
         total_actual_completions = queryset.filter(user__is_active=True).count()
         if user_id:
-            user_completions = queryset.filter(user__id=user_id).count()
+            user_queryset = CourseModuleCompletion.objects.filter(course_id=course_key, user__id=user_id)
+            user_completions = user_queryset.count()
+            user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
+            user_time_completed = user_time_completed['time_completed'] or datetime.now()
             completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
-                .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
+                .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
+                .filter(Q(completions__gt=user_completions) | Q(completions=user_completions,
+                                                                time_completed__lt=user_time_completed)).count()
             data['position'] = completions_above_user + 1
             completion_percentage = 0
             if total_possible_completions > 0:
@@ -1625,7 +1639,8 @@ class CoursesCompletionsLeadersList(SecureAPIView):
 
         queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
                                                                 'user__profile__avatar_url')\
-                       .annotate(completions=Count('content_id')).order_by('-completions')[:count]
+                       .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
+                       .order_by('-completions', 'time_completed')[:count]
         serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
                                                         context={'total_completions': total_possible_completions})
         data['leaders'] = serializer.data  # pylint: disable=E1101
