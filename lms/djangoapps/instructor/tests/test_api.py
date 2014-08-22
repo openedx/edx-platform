@@ -1429,6 +1429,11 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.assert_request_status_code(400, url, method="POST", data=test_data_3)
         self.assertIn("Missing required invoice_number parameter", response.content)
 
+        # submitting invalid invoice number
+        data['invoice_number'] = 'testing'
+        response = self.assert_request_status_code(400, url, method="POST", data=data)
+        self.assertIn("invoice_number must be an integer, {value} provided".format(value=data['invoice_number']), response.content)
+
     def test_get_ecommerce_purchase_features_csv(self):
         """
         Test that the response from get_purchase_transaction is in csv format.
