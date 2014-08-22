@@ -1332,6 +1332,8 @@ class TestItemCrud(SplitModuleTest):
         self.assertFalse(modulestore().has_item(deleted))
         with self.assertRaises(VersionConflictError):
             modulestore().has_item(locn_to_del)
+        with self.assertRaises(ValueError):
+            modulestore().delete_item(deleted, self.user_id)
 
         self.assertTrue(modulestore().has_item(locn_to_del.course_agnostic()))
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
