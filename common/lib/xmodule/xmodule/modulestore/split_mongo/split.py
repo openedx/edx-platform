@@ -1500,17 +1500,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         original_structure = self._lookup_course(usage_locator.course_key)['structure']
         if original_structure['root'] == usage_locator.block_id:
             raise ValueError("Cannot delete the root of a course")
+        if encode_key_for_mongo(usage_locator.block_id) not in original_structure['blocks']:
+            raise ValueError("Cannot delete a block that does not exist")
         index_entry = self._get_index_if_valid(usage_locator, force)
         new_structure = self._version_structure(original_structure, user_id)
         new_blocks = new_structure['blocks']
         new_id = new_structure['_id']
         encoded_block_id = self._get_parent_from_structure(usage_locator.block_id, original_structure)
-        parent_block = new_blocks[encoded_block_id]
-        parent_block['fields']['children'].remove(usage_locator.block_id)
-        parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-        parent_block['edit_info']['edited_by'] = user_id
-        parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
-        parent_block['edit_info']['update_version'] = new_id
+        if encoded_block_id:
+            parent_block = new_blocks[encoded_block_id]
+            parent_block['fields']['children'].remove(usage_locator.block_id)
+            parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+            parent_block['edit_info']['edited_by'] = user_id
+            parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
+            parent_block['edit_info']['update_version'] = new_id
 
         def remove_subtree(block_id):
             """
