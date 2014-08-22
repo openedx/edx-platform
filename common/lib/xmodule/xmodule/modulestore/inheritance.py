@@ -5,7 +5,7 @@ Support for inheritance of fields down an XBlock hierarchy.
 from datetime import datetime
 from pytz import UTC
 
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
 from xblock.runtime import KeyValueStore, KvsFieldData
 
 from xmodule.fields import Date, Timedelta
@@ -85,6 +85,11 @@ class InheritanceMixin(XBlockMixin):
         help=("Defines the number of times a student can try to answer this problem. "
               "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
+    )
+    suspended = List(
+        help="A list of problem url_name's to exclude from the list of "
+        "choices in the randomize XModule",
+        scope=Scope.settings
     )
     proctor_url = String(
         help="URL of proctor server",

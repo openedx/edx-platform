@@ -18,6 +18,7 @@ class RandomizeFields(object):
     choice = String(help="Which random child was chosen",
                     scope=Scope.user_state)
     history = List(help="History of randomize choices", scope=Scope.user_state)
+    suspended = List(help="Suspended problems", scope=Scope.settings)
 
 
 class RandomizeModule(RandomizeFields, XModule):
@@ -50,8 +51,6 @@ class RandomizeModule(RandomizeFields, XModule):
         xml_attrs = self.descriptor.xml_attributes or []
         self.use_randrange = self._str_to_bool(xml_attrs.get('use_randrange', ''))
         self.no_repeats = self._str_to_bool(xml_attrs.get('no_repeats', ''))
-        suspended = xml_attrs.get('suspended', '').split(',')
-        self.suspended = [i.strip() for i in suspended if i.strip()]
         self.pick_choice(use_randrange=self.use_randrange,
                          no_repeats=self.no_repeats, suspended=self.suspended)
 
