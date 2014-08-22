@@ -80,9 +80,11 @@ if Backbone?
           [".action-report", "toggleReport"],
           [".action-close", "toggleClose"],
         ],
-        (obj, foo) =>
-          obj["click #{foo[0]}"] = foo[1]
-          obj["keydown #{foo[0]}"] = (event) -> DiscussionUtil.activateOnSpace(event, @[foo[1]])
+        (obj, event) =>
+          selector = event[0]
+          funcName = event[1]
+          obj["click #{selector}"] = (event) -> @[funcName](event)
+          obj["keydown #{selector}"] = (event) -> DiscussionUtil.activateOnSpace(event, @[funcName])
           obj
         ,
         {}
