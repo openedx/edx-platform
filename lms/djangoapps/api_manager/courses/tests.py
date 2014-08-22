@@ -3,7 +3,7 @@
 Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/courses/tests.py]
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import uuid
 import mock
@@ -18,6 +18,7 @@ from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
+from courseware.models import StudentModule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
@@ -1542,12 +1543,39 @@ class CoursesApiTests(TestCase):
         # make the last user an observer to asset that its content is being filtered out from
         # the aggregates
         allow_access(self.course, self.users[USER_COUNT-1], 'observer')
+        # create another module completion to two users with same points
+        unit = ItemFactory.create(
+            parent_location=self.sub_section.location,
+            category="vertical",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"test unit",
+        )
+
+        item = ItemFactory.create(
+            parent_location=unit.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            metadata={'rerandomize': 'always'},
+            display_name=u"test problem same points"
+        )
+
+        StudentModuleFactory.create(
+            grade=2.25,
+            max_grade=4,
+            student=self.users[USER_COUNT-3],
+            course_id=self.course.id,
+            module_state_key=item.location,
+            state=json.dumps({'attempts': self.attempts}),
+            module_type='mentoring'
+        )
+        StudentModule.objects.filter(student=self.users[USER_COUNT-3]).update(created=datetime.now()-timedelta(days=1))
 
         test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 3.4)
+        self.assertEqual(response.data['leaders'][0]['username'], 'testuser2')
+        self.assertEqual(response.data['course_avg'], 3.9)
 
         test_uri = '{}/{}/metrics/proficiency/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=4')
         response = self.do_get(test_uri)
@@ -1569,9 +1597,9 @@ class CoursesApiTests(TestCase):
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 3.4)
-        self.assertEqual(response.data['position'], 2)
-        self.assertEqual(response.data['points'], 5)
+        self.assertEqual(response.data['course_avg'], 3.9)
+        self.assertEqual(response.data['position'], 1)
+        self.assertEqual(response.data['points'], 7)
 
         # Filter by user who has never accessed a course module
         test_user = UserFactory.create(username="testusernocoursemod")
@@ -1580,8 +1608,8 @@ class CoursesApiTests(TestCase):
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 3.4)
-        self.assertEqual(response.data['position'], 4)
+        self.assertEqual(response.data['course_avg'], 3.9)
+        self.assertEqual(response.data['position'], 5)
         self.assertEqual(response.data['points'], 0)
 
         # test with bogus course
@@ -1598,20 +1626,7 @@ class CoursesApiTests(TestCase):
 
     def test_courses_completions_leaders_list_get(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
-        users = []
-        for i in xrange(1, 5):
-            data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
-                'password': 'test_pass',
-                'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
-            }
-            response = self.do_post(self.base_users_uri, data)
-            self.assertEqual(response.status_code, 201)
-            users.append(response.data['id'])
-
-        # make the last user an observer to make sure that data is being filtered out
+        # Make last user as observer to make sure that data is being filtered out
         allow_access(self.course, self.users[USER_COUNT-1], 'observer')
 
         for i in xrange(1, 26):
@@ -1623,13 +1638,13 @@ class CoursesApiTests(TestCase):
                 display_name=local_content_name
             )
             if i < 3:
-                user_id = users[0]
-            elif i < 8:
-                user_id = users[1]
-            elif i < 16:
-                user_id = users[2]
+                user_id = self.users[0].id
+            elif i < 10:
+                user_id = self.users[1].id
+            elif i < 17:
+                user_id = self.users[2].id
             else:
-                user_id = users[3]
+                user_id = self.users[3].id
 
             content_id = unicode(local_content.scope_ids.usage_id)
             completions_data = {'content_id': content_id, 'user_id': user_id}
@@ -1650,12 +1665,12 @@ class CoursesApiTests(TestCase):
 
         # without count filter and user_id
         test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
-                                                                          users[3])
+                                                                          self.users[1].id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['position'], 1)
-        self.assertEqual(response.data['completions'], 38)
+        self.assertEqual(response.data['position'], 2)
+        self.assertEqual(response.data['completions'], 26)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
