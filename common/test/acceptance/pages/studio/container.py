@@ -298,6 +298,7 @@ class XBlockWrapper(PageObject):
     BODY_SELECTOR = '.studio-xblock-wrapper'
     NAME_SELECTOR = '.xblock-display-name'
     COMPONENT_BUTTONS = {
+        'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
         'save_settings': '.action-save',
     }
@@ -372,6 +373,12 @@ class XBlockWrapper(PageObject):
         Click on Advanced Tab.
         """
         self._click_button('advanced_tab')
+
+    def open_basic_tab(self):
+        """
+        Click on Basic Tab.
+        """
+        self._click_button('basic_tab')
 
     def save_settings(self):
         """
