@@ -33,6 +33,7 @@
 # hayk <hayk.saribekyan@gmail.com>, 2014
 # inessa_alaverdyan <inessalaverdyan@gmail.com>, 2014
 # NarekDshkhunyan <ndshkhunyan@gmail.com>, 2014
+# pgayane <pgayane@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -54,14 +55,15 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# emma_saroyan <Emma_Saroyan@aybschool.am>, 2014
 # inessa_alaverdyan <inessalaverdyan@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-04 09:18-0400\n"
-"PO-Revision-Date: 2014-08-04 15:11+0000\n"
-"Last-Translator: inessa_alaverdyan <inessalaverdyan@gmail.com>\n"
+"POT-Creation-Date: 2014-08-22 11:24-0400\n"
+"PO-Revision-Date: 2014-08-20 08:21+0000\n"
+"Last-Translator: emma_saroyan <Emma_Saroyan@aybschool.am>\n"
 "Language-Team: Armenian (Armenia) (http://www.transifex.com/projects/p/edx-platform/language/hy_AM/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,7 +99,25 @@ msgstr "Խնդիր"
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr ""
+msgstr "Խորացված"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
+msgstr "Բաժին"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Subsection"
+msgstr "Ենթաբաժին"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unit"
+msgstr "Միավոր"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -895,7 +915,7 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py common/lib/capa/capa/inputtypes.py
 msgid "Answer received."
-msgstr ""
+msgstr "Պատասխանը ստացվել է:"
 
 #. Translators: '<choice>' is a tag name and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1021,11 +1041,18 @@ msgstr "Սխալ մաթեմատիկական գրելաձև՝  '{student_answer}'
 msgid "You may not use complex numbers in range tolerance problems"
 msgstr "Դուք չեք կարող օգտագործել կոմպլեքս թվեր միջակայքային խնդիրների մեջ"
 
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a boundary
+#. (end limit) for a variable that is a complex number (a + bi), this message
+#. displays.
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: complex boundary."
 msgstr "Սխալ անձնակազմի պատասխանի ժամանակ` կոմպլեքս սահման:"
 
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not provide
+#. a boundary (end limit) for a variable, this message displays.
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
@@ -1039,6 +1066,7 @@ msgstr ""
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #: common/lib/capa/capa/responsetypes.py
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "or"
 msgstr "կամ"
@@ -1155,6 +1183,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: cms/templates/container.html
 msgid "Display Name"
 msgstr ""
 
@@ -1171,7 +1200,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
-msgstr ""
+msgstr "Ծանոթագրություն"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1216,6 +1245,8 @@ msgstr ""
 msgid "Amount of time after the due date that submissions will be accepted"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: lms/templates/problem.html
 msgid "Show Answer"
 msgstr "Ցույց տալ պատասխանը"
@@ -1229,7 +1260,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Always"
-msgstr ""
+msgstr "Միշտ"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
@@ -1241,11 +1272,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
-msgstr ""
+msgstr "Փակված"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Finished"
-msgstr ""
+msgstr "Ավարտված"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
@@ -1414,15 +1445,15 @@ msgstr "Սխալ: {msg}"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
-msgstr "{num_ժամ} ժամ"
+msgstr "{num_hour} ժամ"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_minute} minute"
-msgstr "{num_րոպե} րոպե"
+msgstr "{num_minute} րոպե"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_second} second"
-msgstr "{num_վայրկյան} վայրկյան"
+msgstr "{num_second} վայրկյան"
 
 #. Translators: 'rescoring' refers to the act of re-submitting a student's
 #. solution so it can get a new score.
@@ -1446,7 +1477,11 @@ msgstr "Ձեր պատասխանները պահպանվել են:"
 msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
 msgstr ""
+"Ձեր պատասխանները պահպանվել են, բայց չեն գնահատվել: Սեղմե՛ք \"Ստուգել\" դրանք"
+" գնահատելու համար:"
 
+#. Translators: A student must "make an attempt" to solve the problem on the
+#. page before they can reset it.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
 msgstr "Թարմացրե՛ք էջը և փորձ կատարե՛ք մինչև զրոյացնելը:"
@@ -1491,6 +1526,8 @@ msgstr ""
 msgid "Which step within the current task that the student is on."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py
+#: common/lib/xmodule/xmodule/peer_grading_module.py
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Graded"
 msgstr "Գնահատված"
@@ -1912,7 +1949,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Deleting Course Content"
-msgstr ""
+msgstr "Ջնջել դասընթացի պարունակությունը"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2068,6 +2105,19 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificates Display Behavior"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
+"is the default behavior, where certificates will only appear after a course "
+"has ended. 'early_with_info' will display all certificate information before"
+" a course has ended. 'early_no_info' will hide all certificate information "
+"unless a student has earned a certificate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
 msgstr ""
 
@@ -2204,7 +2254,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Text"
-msgstr ""
+msgstr "Տեքստ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/html_module.py
@@ -2226,7 +2276,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Editor"
-msgstr ""
+msgstr "Խմբագրիչ"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Visual"
@@ -2480,6 +2530,10 @@ msgstr ""
 msgid "Enter the date by which problems are due."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group ID {group_id}"
+msgstr ""
+
 #. Translators: This message will be added to the front of messages of type
 #. warning,
 #. e.g. "Warning: this component has not been configured yet".
@@ -2559,6 +2613,10 @@ msgstr ""
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment has issues that affect content visibility."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -2839,6 +2897,15 @@ msgstr ""
 msgid ""
 "Enter the configurations that govern how students are grouped for content "
 "experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video caching system"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, video caching will be used for HTML5 videos."
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -3347,26 +3414,16 @@ msgid "Percent"
 msgstr "Տոկոս"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr "Բաժին"
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Subsection"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Opened by this number of students"
 msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "subsections"
-msgstr ""
+msgstr "ենթաբաժիններ"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
-msgstr ""
+msgstr "Ուսանողների թիվը"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Percent of Students"
@@ -3398,10 +3455,6 @@ msgstr "Բարի գալուստ edX Wiki"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "Այցելե՛ք դասընթացի wiki հոդված ավելացնելու համար"
-
-#: lms/djangoapps/courseware/views.py
-msgid "Invalid course id."
-msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
@@ -3471,12 +3524,11 @@ msgstr ""
 msgid "Email Address"
 msgstr ""
 
-#: lms/djangoapps/dashboard/support.py
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Course ID"
-msgstr ""
+msgstr "Դասընթացի ID"
 
 #: lms/djangoapps/dashboard/support.py
 msgid "User not found"
@@ -3673,7 +3725,11 @@ msgid "Loaded course {course_name}<br/>Errors:"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Course Name"
 msgstr "Դասընթացի անվանումը"
 
@@ -3824,6 +3880,7 @@ msgstr "Ծննդյան տարեթիվ"
 msgid "Gender"
 msgstr "Սեռ"
 
+#: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Level of Education"
 msgstr "Կրթության մակարդակ"
@@ -3844,15 +3901,6 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "An error occurred while deleting the score."
 msgstr "Միավորը ջնջելիս սխալ է տեղի ունեցել:"
-
-#: lms/djangoapps/instructor/views/api.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Complete"
-msgstr "Ավարտված"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Incomplete"
-msgstr "Չավարտված"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -3877,6 +3925,11 @@ msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 "{0}-ի ուսանողի համար {1}-ի համար վերջնաժամկետը հաջողությամբ նշանակվեց մինչև "
 "{2}-ը"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Successfully removed invalid due date extension (unit has no due date)."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
@@ -3909,6 +3962,13 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
+msgid ""
+"The code ({code}) that you have tried to define is already in use as a "
+"registration code"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
 msgid "Please Enter the Integer Value for Coupon Discount"
 msgstr ""
 
@@ -3937,7 +3997,25 @@ msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid ""
+"To gain insights into student enrollment and participation, "
+"{link_start}visit the new dashboard for course analytics{link_end}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Please Enter the numeric value for the course price"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "CourseMode with the mode slug({mode_slug}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "CourseMode price updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -3967,6 +4045,32 @@ msgstr "Հաշվարկներ"
 msgid "Metrics"
 msgstr ""
 
+#. Translators: number sent refers to the number of emails sent
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "0 sent"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "{num_emails} sent"
+msgid_plural "{num_emails} sent"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "{num_emails} failed"
+msgid_plural "{num_emails} failed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Complete"
+msgstr "Ավարտված"
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Incomplete"
+msgstr "Չավարտված"
+
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
 msgstr "Դասընթացի սեղմ վիճակագրություն"
@@ -3981,7 +4085,7 @@ msgstr "Տվյալ էլ. հասցեով կամ օգտատիրոջ անվամբ �
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_key}"
-msgstr ""
+msgstr "{course_key}-ում անդամագրված ուսանողնորի ցուցակը:"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Summary Grades of students enrolled in {course_key}"
@@ -4061,6 +4165,7 @@ msgstr ""
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Progress page for username: {username} with email address: {email}"
 msgstr ""
+"Առաջընթացի էջն օգտագործող {username} -ի համար, որի էլ. հասցեն է` {email}"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Assignment Name"
@@ -4077,7 +4182,7 @@ msgstr "Հանձնարարության '{name}' անվանումն անվավե�
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "External email"
-msgstr ""
+msgstr "Արտաքին էլ. հասցե"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
@@ -4117,10 +4222,13 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
+"Ձեր էլ. նամակը հաջողությամբ հերթագրվել է ուղարկման համար: Մեծ դասընթանցերի "
+"համար բոլոր նամակներն ուղարկելը կարող է տևել մինչև մեկ ժամ (կամ ավելի, եթե "
+"այլ դասընթացներ միաժամանակ նամակներ են ուղարկում):"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Your email was successfully queued for sending."
-msgstr ""
+msgstr "Ձեր էլ. նամակը հաջողությամբ հերթագրվել է ուղարկման համար"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
@@ -4157,7 +4265,7 @@ msgstr "Անուն, ազգանուն"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Roles"
-msgstr ""
+msgstr "Դերեր"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of Forum {name}s in course {id}"
@@ -4221,7 +4329,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
-msgstr ""
+msgstr "edX-ի էլ. հասցե"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Enrollment of students"
@@ -4244,12 +4352,28 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student matching identifier: {student_identifier}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
 msgstr "Անհնար է մշակել ամսաթիվը:"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Couldn't find module for url: {0}"
 msgstr "Հնարավոր չէ գտնել մոդուլը  {0} հղման համար"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unit {0} has no due date to extend."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "An extended due date must be later than the original due date."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "No due date extension is set for that student and unit."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor/views/tools.py
@@ -4259,10 +4383,6 @@ msgstr "Հանձնելու հետաձգված ամսաթիվ"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Users with due date extensions for {0}"
 msgstr "Օգտագործողներ, ովքեր ունեն վերջնաժամկետի երկարաձգում {0}-ի համար"
-
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Unit"
-msgstr "Միավոր"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
@@ -4587,9 +4707,12 @@ msgstr "[Refund] Օգտագործողի կողմից հարցված փոխհատ
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "{course_id}-ի կատարման կարգը {mode} գոյություն չունի:"
 
+#. Translators: In this particular case, mode_name refers to a
+#. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
+#. by which a user could enroll in the given course.
 #: lms/djangoapps/shoppingcart/models.py
-msgid "Certificate of Achievement, {mode_name} for course {course}"
-msgstr "Հաջողության հավաստագիր {mode_name} {course} դասընթացի համար"
+msgid "{mode_name} for course {course}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -4643,7 +4766,7 @@ msgstr "Պատվերի նույնականացման համար"
 msgid "Status"
 msgstr "Կարգավիճակ"
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
 msgstr "Քանակ"
 
@@ -4655,7 +4778,9 @@ msgstr "Միավորի գին"
 msgid "Total Cost"
 msgstr "Ընդհանուր արժեք"
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "Տարրադրամ"
@@ -4779,7 +4904,15 @@ msgid "Course added to cart."
 msgstr "Դասընթացն ավելացվեց Ձեր զամբյուղին:"
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Discount does not exist against coupon '{0}'."
+msgid "Discount does not exist against code '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Oops! The code '{0}' you entered is either invalid or expired"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Code '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -4791,22 +4924,15 @@ msgid "Coupon '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' is inactive."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
 msgstr "Ձեզ չի թույլատրվում դիտել այս էջը:"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "Վճարման մշակումը չվերադարձրեց անհրաժեշտ պարամետրը` {0}:"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "Վճարման մշակումը վերադարձրեց սխալ հավաքված արժեք {0} պարամետր {1}-ի համար:"
@@ -4818,7 +4944,6 @@ msgid ""
 msgstr "Վճարման մշակումը ընդունեց պատվեր, որի համարը մեր համակարգում առկա չէ:"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -4827,7 +4952,6 @@ msgstr ""
 "ամբողջական արժեքից:"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -4850,7 +4974,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4863,7 +4986,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -5137,6 +5259,64 @@ msgstr ""
 "\n"
 "Լիազորման հարցումը բավարարվել է բանկի կողմից, բայց մերժվել է CyberSource-ի կողմից:\n"
 "Հնարավոր լուծում` փորձե՛ք վճարման այլ եղանակ:"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The payment processor did not return a required parameter: {parameter}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The payment processor returned a badly-typed value {value} for parameter "
+"{parameter}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The amount charged by the processor {charged_amount} "
+"{charged_amount_currency} is different than the total cost of the order "
+"{total_cost} {total_cost_currency}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor did not accept your payment.  The decision they"
+" returned was {decision}, and the reason was {reason}.  You were not "
+"charged. Please try a different form of payment.  Contact us with payment-"
+"related questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor sent us back a payment confirmation that had "
+"inconsistent data!  We apologize that we cannot verify whether the charge "
+"went through and take further action on your order.  The specific error "
+"message is: {msg}  Your credit card may possibly have been charged.  Contact"
+" us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Due to an error your purchase was charged for a different amount than"
+" the order total!  The specific error message is: {msg}.  Your credit card "
+"has probably been charged. Contact us with payment-specific questions at "
+"{email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor sent us back a corrupted message regarding your"
+" charge, so we are unable to validate that the message actually came from "
+"the payment processor. The specific error message is: {msg}. We apologize "
+"that we cannot verify whether the charge went through and take further "
+"action on your order. Your credit card may possibly have been charged.  "
+"Contact us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry!  Your payment could not be processed because an unexpected exception "
+"occurred.  Please contact us at {email} for assistance."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -5465,6 +5645,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #, fuzzy
 msgid "Required Information"
 msgstr ""
@@ -5522,6 +5703,8 @@ msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
 " user account at edx.org."
 msgstr ""
+"Դուք ստացել եք այս նամակը, քանի որ Ձեր հաշվի գաղտնաբառը վերականգնելու "
+"հարցում եք կատարել edx.org կայքում։"
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -5541,7 +5724,7 @@ msgstr "Շնորհակալություն մեր կայքից օգտվելու հ
 
 #: lms/templates/registration/password_reset_email.html
 msgid "The edX Team"
-msgstr ""
+msgstr "edX թիմ"
 
 #: lms/templates/wiki/article.html
 msgid "Last modified:"
@@ -5575,9 +5758,7 @@ msgstr "Ջնջել հոդվածը"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5618,8 +5799,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "Դուք հոդված եք ջնջում։ Խնդրում ենք հաստատել։"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
-#: cms/templates/container.html cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5633,14 +5813,9 @@ msgstr "Խմբագրել"
 msgid "Save changes"
 msgstr "Պահել փոփոխությունները"
 
-#: lms/templates/wiki/edit.html cms/templates/unit.html
-#, fuzzy
+#: lms/templates/wiki/edit.html
 msgid "Preview"
-msgstr ""
-"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
-"Նախադիտում\n"
-"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
-"Նախատեսք"
+msgstr "Նախադիտում"
 
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a control to allow users to exit out of this modal
@@ -5658,6 +5833,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 msgid "Close"
@@ -6113,6 +6289,10 @@ msgid "Blank"
 msgstr "դատարկ"
 
 #: cms/djangoapps/contentstore/views/course.py
+msgid "Unscheduled"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
@@ -6155,7 +6335,7 @@ msgid "must have name of the configuration"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "must have at least two groups"
+msgid "must have at least one group"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -6165,6 +6345,10 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "Դասընթացը հաջողությամբ արտահանվել է git պահոց: "
+
+#: cms/djangoapps/contentstore/views/helpers.py
+msgid "Vertical"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
@@ -6189,6 +6373,10 @@ msgstr "Համընկնում է {0} հետ"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
 msgstr " '{0}'-ի կրկնօրինակն է:"
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -6280,19 +6468,36 @@ msgstr "էջը հայտնաբերված չէ"
 msgid "close"
 msgstr "փակել"
 
-#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/container.html cms/templates/course_outline.html
+#: cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
 msgstr "Բեռնվում է...."
 
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "Նայել"
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
+msgstr "Չեղարկել"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: lms/templates/courseware/course_about.html
+msgid "Course Number"
+msgstr "Դասընթացի համարը"
 
 #: cms/templates/group_configurations.html cms/templates/manage_users.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -6305,31 +6510,20 @@ msgstr "Կարգավորումներ"
 msgid "Error:"
 msgstr "սխալ`"
 
-#: cms/templates/index.html cms/templates/settings.html
-#: lms/templates/courseware/course_about.html
-msgid "Course Number"
-msgstr "Դասընթացի համարը"
-
-#: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
-msgstr "Չեղարկել"
-
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Organization:"
 msgstr "Կառուցվածքը`"
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Number:"
 msgstr "Դասընթացի համարը`"
+
+#: cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
+msgid "Dismiss"
+msgstr "Բաց թողնել"
 
 #: cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -6354,15 +6548,6 @@ msgstr "Գաղտնաբառ"
 msgid "Admin"
 msgstr "Ադմին"
 
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr "Պահպանել"
-
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
@@ -6378,6 +6563,12 @@ msgstr "Բոլորին հասանելի օգտագործողի անուն"
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "Նախընտրած լեզուն"
+
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "Նայել"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -6435,16 +6626,18 @@ msgstr "Հաջողության հավաստագիր ( ID Verified)"
 
 #: common/templates/course_modes/choose.html
 msgid "Upgrade and work toward a verified Certificate of Achievement."
-msgstr ""
+msgstr "Թարմացրե՛ք և աշխատե՛ք վավերացված Հաջողության հավաստագրի ուղղությամբ:"
 
 #: common/templates/course_modes/choose.html
 msgid "Sign up and work toward a verified Certificate of Achievement."
-msgstr ""
+msgstr "Գրանցվե՛ք և աշխատե՛ք վավերացված հավաստագիր ձեռք բերելու ուղղությամբ:"
 
 #: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
 msgid "Select your contribution for this course (min. $"
-msgstr ""
+msgstr "Ընտրեք այս դասընթացի համար Ձեր նվիրաբերության չափը (min. $"
 
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "):"
@@ -6453,6 +6646,8 @@ msgstr "):"
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay? What if I want a free honor code certificate?"
 msgstr ""
+"Ինչո՞ւ պետք է վճարեմ։ Իսկ եթե ես ուզո՞ւմ եմ ստանալ անվճար պատվո կոդի "
+"վկայական։"
 
 #: common/templates/course_modes/choose.html
 msgid "Why do I have to pay?"
@@ -6465,27 +6660,38 @@ msgid ""
 "learning through research. While we have established a minimum fee, we ask "
 "that you contribute as much as you can."
 msgstr ""
+"Որպես ոչ առևտրային կազմակերպություն, edX-ը օգտագործում է Ձեր օգնությունը "
+"բարձր որակի կրթությունը բոլորին հասանելի դարձնելու և բարելավում ուսուցումը "
+"հետազոտության միջոցով: Չնայած մենք սահմանել ենք նվազագույն վճար, խնդրում ենք"
+" աջակցել այնքան, որքան կարող եք։"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "I'd like to pay more than the minimum.  Is my contribution tax deductible?"
 msgstr ""
+"Ուզում եմ վճարել նվազագույն վճարից ավելի։ Արդյո՞ք իմ աջակցությունը կնվազեցնի"
+" հարկերը։"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "Please check with your tax advisor to determine whether your contribution is"
 " tax deductible."
 msgstr ""
+"Խնդրում ենք հարցնել Ձեր հարկային խորհրդատուին` իմանալու համար արդյոք Ձեր "
+"աջակցությունը նվազեցնում է Ձեր հարկերը։"
 
 #: common/templates/course_modes/choose.html
 msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr ""
+msgstr "Ի՞նչ անել, եթե ես չունեմ բավական միջոցներ կամ սարքավորումներ։"
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "If you can't afford the minimum fee or don't meet the requirements, you can "
 "audit the course or elect to pursue an honor code certificate at no cost."
 msgstr ""
+"Եթե Դուք չեք կարող վճարել նվազագույն գումարը կամ չեք համապատասխանում "
+"պահանջներին, ապա կարող եք հանդես գալ որպես դասընթացի ունկնդիր կամ ընտրել "
+"պատվո կոդի վկայականը անվճար պայմաններով։"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -6493,11 +6699,15 @@ msgid ""
 "honor code certificate box and then click the 'Select Certificate' button to"
 " complete your registration."
 msgstr ""
+"Եթե Դուք ուզում եք ստանալ պատվո կոդի վկայական, խնդրում ենք նշել համապատասխան"
+" վկայականի վանդակը և սեղմել «Ընտրել վկայականը» կոճակը գրանցումն ավարտելու "
+"համար։"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Honor Code Certificate"
-msgstr ""
+msgstr "Ընտրել պատվո կոդի վկայականը"
 
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "Թարմացնել Ձեր գրանցումը"
@@ -6515,16 +6725,21 @@ msgid ""
 "To upgrade your registration and work towards a Verified Certificate of "
 "Achievement, you will need a webcam, a credit or debit card, and an ID."
 msgstr ""
+"Ձեր գրանցումը թարմացնելու և վավերացված Հաջողության հավաստագրի ուղղությամբ "
+"աշխատելու համար Ձեզ հարկավոր է տեսախցիկ, վարկային կամ դեբետային քարտ եւ "
+"նույնականացման համար/ ID/."
 
 #: common/templates/course_modes/choose.html
 msgid ""
 "To register for a Verified Certificate of Achievement option, you will need "
 "a webcam, a credit or debit card, and an ID."
 msgstr ""
+"Վավերացված Հաջողության հավաստագրի տարբերակը գրանցելու համար Ձեզ հարկավոր է "
+"տեսախցիկ, վարկային կամ դեբետային քարտ եւ նույնականացման համար/ ID/."
 
 #: common/templates/course_modes/choose.html
 msgid "What is an ID Verified Certificate?"
-msgstr ""
+msgstr "Ինչ է ID Վավերացված Հավաստագիրը?"
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -6532,7 +6747,11 @@ msgid ""
 "photo and ID and is checked throughout the course to verify that it is you "
 "who earned the passing grade."
 msgstr ""
+"ID Վավերացված Հավաստագիրը պահանջում է Ձեր լուսանկարն ու ID-ն որպես Ձեր "
+"ինքնության ապացույց, և դասընթացի ընթացքում այն անընդհատ ստուգվում է` վստահ "
+"լինելու համար, որ Դուք եք ստացել անցողիկ միավորը:"
 
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "Աուդիտ անել այս դասընթացը"
@@ -6547,9 +6766,44 @@ msgstr ""
 msgid "Select Audit"
 msgstr "Ընտրել աուդիտ"
 
+#: common/templates/course_modes/choose.html
+msgid "Now choose your course track:"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Plan to use your completed coursework for job applications, career "
+"advancement, or school applications? Upgrade to work toward a Verified "
+"Certificate of Achievement to document your accomplishment. A minimum fee "
+"applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Plan to use your completed coursework for job applications, career "
+"advancement, or school applications? Then work toward a Verified Certificate"
+" of Achievement to document your accomplishment. A minimum fee applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"You can audit this course and still have complete access to the course "
+"material. If you complete and pass the course you will automatically earn an"
+" Honor Code Certificate free of charge."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Pursue an Honor Code Certificate"
+msgstr ""
+
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
-msgstr "{պլատֆորմ_անուն}-ընդարձակ ամփոփում"
+msgstr "Ամբողջ {platform_name}-ի ամփոփում"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -6622,6 +6876,12 @@ msgid ""
 " on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
 "chance to respond to every email, we take all feedback into consideration."
 msgstr ""
+"Եթե ​​դուք ունեք ընդհանուր հարց {platform_name}ի մասին,  խնդրում ենք գրել "
+"{contact_email} հասցեին: Տեսնելու համար, թե արդյոք Ձեր հարցը արդեն "
+"պատասխանվել է, այցելեք մեր {faq_link_start} FAQ էջը {faq_link_end}: Դուք "
+"կարող եք նաեւ միանալ քննարկմանը մեր {fb_link_start} ֆեյսբուքյան էջում "
+"{fb_link_end}. Թեև մենք հնարավորություն չունենք պատասխանել յուրաքանչյուր "
+"էլեկտրոնային նամակի, այնուամենայնիվ, բոլոր կարծիքները հաշվի կառնվեն:"
 
 #: lms/templates/contact.html
 msgid "Technical Inquiries and Feedback"
@@ -6637,6 +6897,14 @@ msgid ""
 "as screenshots or other pertinent details. If you find a bug or other "
 "issues, you can reach us at the following: {bugs_email}."
 msgstr ""
+"Եթե ունեք առաջարկներ/կարծիքներ {platform_name} պլատֆորմի ցանկացած հատվածի "
+"մասին կամ հանդիպել եք պլատֆորմի հետ կապված տեխնիկական դժվարությունների (օր.`"
+" խնդիրներ էլ. հասցեների և գաղտնաբառերի հետ), կարող եք կապվել մեզ հետ "
+"{tech_email} էլ. հասցեով։ Տեխնիկական հարցերի համար խնդրում ենք համոզվել, որ "
+"օգտագործում եք Firefox կամ Chrome բրաուզերի ընթացիք տարբերակը, նամակում "
+"ընդգրկել բրաուզերի անունը և տարբերակը, ինչպես նաև էկրանի նկարներ և այլ "
+"մանրամասներ։ Եթե գտել եք որևէ սխալ, կարող եք մեզ հետ կապվել {bugs_email} "
+"հասցեով։"
 
 #: lms/templates/contact.html
 msgid "Media"
@@ -6647,6 +6915,9 @@ msgid ""
 "Please visit our {link_start}media/press page{link_end} for more "
 "information. For any media or press inquiries, please email {email}."
 msgstr ""
+"Խնդրում ենք այցելել {link_start}մեդիայի/լուրերի էջը{link_end} լրացուցիչ "
+"տեղեկությունների համար։ Մեդիայի կամ լուրերի մասին հարցերի համար խնդրում ենք "
+"էլ. նամակ ուղարկել {email} հասցեով։"
 
 #: lms/templates/contact.html
 msgid "Universities"
@@ -6657,6 +6928,8 @@ msgid ""
 "If you are a university wishing to collaborate with or if you have questions"
 " about {platform_name}, please email {email}."
 msgstr ""
+"Եթե Դուք ներկայացնում եք աջակցել ցանկացող համալսարան կամ հարցեր ունեք "
+"{platform_name}-ի մասին, խնդրում ենք էլ. նամակ ուղարկել {email} հասցեին։"
 
 #: lms/templates/course.html
 msgid "New"
@@ -6664,7 +6937,7 @@ msgstr "Նոր"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
-msgstr ""
+msgstr "Ղեկավարման վահանակ"
 
 #: lms/templates/dashboard.html lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
@@ -6697,6 +6970,9 @@ msgid ""
 "{platform_name} account. Please {link_start}log out{link_end}, then log in "
 "with your {provider_name} account."
 msgstr ""
+"Ընտրված {provider_name} հաշիվը արդեն կցված է մեկ այլ {platform_name} հաշվի։ "
+"Խնդրում ենք {link_start}դուրս գալ{link_end} և մուտք գործել Ձեր "
+"{provide_name} հաշվի միջոցով։"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -6812,6 +7088,8 @@ msgid ""
 "Enter your desired full name, as it will appear on your {platform} "
 "{cert_name_short}:"
 msgstr ""
+"Մուտքագրե՛ք Ձեր լրիվ անունը ինչպես կուզենաք, քանի որ այն կհայտնվի Ձեր "
+"{platform} {cert_name_short}-ի վրա:"
 
 #: lms/templates/dashboard.html
 #: lms/templates/verify_student/_modal_editname.html
@@ -6831,6 +7109,8 @@ msgstr ""
 "info\"></span>"
 
 #: lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6869,6 +7149,12 @@ msgid ""
 "online MOOCs are interactive and subjects include computer science, public "
 "health, and artificial intelligence."
 msgstr ""
+"{EdX}-ը շահույթ չհետապնդող պլատֆորմ է, հիմնադրված՝ {Harvard}-ի և {MIT}-ի "
+"կողմից, որոնց նպատակն է լավագույն կրթությունը հասանելի դարձնել բոլոր տարիքի "
+"ուսանողներին աշխարհի ցանկացած ծայրում, որտեղ կա ինտերնետի հասանելիություն: "
+"{EdX}-ի անվճար զանգվածային առցանց դասընթացները ինտերակտիվ են և թեմաները "
+"ներառում են համակարգչային գիտություն, հանրային առողջություն և արհեստական "
+"​​ինտելեկտ"
 
 #: lms/templates/edx_footer.html
 msgid "&copy; 2014 edX, some rights reserved."
@@ -6900,6 +7186,7 @@ msgstr "Էլ. փոստի փոփոխումը հաջողվե՜ց։"
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
 msgstr ""
+"Ձեր նոր Էլ. փոստի հասցեն կարող եք տեսնել {link_start}ցուցանակ{link_end}-ում"
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
@@ -6931,7 +7218,7 @@ msgstr "Մերժված ուսանողներ`"
 
 #: lms/templates/enroll_students.html
 msgid "Debug: "
-msgstr ""
+msgstr "Կարգաբերում,մշակում`"
 
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
@@ -6968,7 +7255,7 @@ msgstr "Հանձնած"
 
 #: lms/templates/folditchallenge.html
 msgid "Puzzle Leaderboard"
-msgstr ""
+msgstr "Գլխավորողների ցուցակ հանելուկներում"
 
 #: lms/templates/folditchallenge.html
 msgid "User"
@@ -6976,7 +7263,7 @@ msgstr "Օգտատեր"
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
-msgstr "&copy; 2014 { պլատֆորմ_անուն}, որոշ իրավունքներ պաշտպանված են"
+msgstr "&copy; 2014 {platform_name}, որոշ իրավունքներ պաշտպանված են"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
@@ -7019,6 +7306,9 @@ msgid ""
 "this course</strong>, post in the {link_start}course discussion "
 "forum{link_end}."
 msgstr ""
+"<strong>Դասախոսությունների, տնային աշխատանքների, գործիքների կամ այս "
+"դասընթացի նյութերի վերաբերյալ հարցերի համար</strong>, կատարեք գրառում "
+"{link_start} դասընթացի քննարկման ֆորումում{link_end}:"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -7026,12 +7316,17 @@ msgid ""
 "lots of helpful information in the {platform_name} "
 "{link_start}FAQ{link_end}."
 msgstr ""
+"<strong>Ունեք ընդհանուր հարցեր {platform_name}-ի մասի՞ն </strong>: Դուք "
+"կարող եք բազում օգտակար տեղեկատվություններ գտնել {platform_name} "
+"{link_start} FAQ-ում{link_end}: "
 
 #: lms/templates/help_modal.html
 msgid ""
 "Have a <strong>question about something specific</strong>? You can contact "
 "the {platform_name} general support team directly:"
 msgstr ""
+"Ունե՞ք <strong>հարց ինչ-որ հատուկ բանի մասին</strong>։ Կարող եք "
+"անմիջականորեն կապվել {platform_name}-ի ընդհանուր օգնության թիմին`"
 
 #: lms/templates/help_modal.html
 msgid "Report a problem"
@@ -7051,6 +7346,9 @@ msgid ""
 "will do our best to address your inquiry in any language, our responses will"
 " be in English."
 msgstr ""
+"Խնդրում ենք հաշվի առնել, որ {platform_name}-ի օգնության թիմն անգլախոս է։ "
+"Մենք կանենք ամեն հնարավորը պատասխանել Ձեր` ցանկացած լեզվով գրված հարցմանը, "
+"սակայն մեր պատասխանները կլինեն անգլերեն։"
 
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/provider_login.html
@@ -7070,7 +7368,7 @@ msgstr "Ներկայացրեք մանրամասները"
 
 #: lms/templates/help_modal.html
 msgid "Include error messages, steps which lead to the issue, etc"
-msgstr ""
+msgstr "Ներառե՛ք սխալների հաղորդագրությունները, խնդրի բերող քայլերը, և այլն"
 
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
@@ -7097,6 +7395,11 @@ msgid ""
 "UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
 " where most questions have already been answered."
 msgstr ""
+"Շնորհակալություն Ձեր հարցման կամ արձագանքի համար։ Մենք սովորաբար պատասխանում"
+" ենք հարցումներին մեկ աշխատանքային օրվա ընթացքում (երկուշաբթիից ուրբաթ, "
+"{open_time}-ից {close_time} համաշխարհային կոորդինացված ժամանակով)։ Մինչ այդ "
+"խնդրում ենք վերանայել մեր {link_start}մանրամասն ՀՏՀ-երը{link_end}, որտեղ "
+"հարցերի մեծ մասն արդեն պատասխանված են։"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -7116,7 +7419,7 @@ msgstr "Հանդիպած խնդրի մանրամասները"
 
 #: lms/templates/help_modal.html
 msgid "Include error messages, steps which lead to the issue, etc."
-msgstr ""
+msgstr "Ներառե՛ք սխաների հաղորդագրությունները, խնդրի բերող քայլերը, , և այլն։"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -7161,7 +7464,7 @@ msgstr "Խնդրում ենք կրկին փորձել ավելի ուշ։"
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
-msgstr ""
+msgstr "Նշում: միայն դասախոսները կարող են ծանոթագրել:"
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -7177,21 +7480,23 @@ msgstr "Բոլորի համար, ամենուրեք և միշտ"
 
 #: lms/templates/index.html
 msgid "Stay up to date with all {platform_name} has to offer!"
-msgstr ""
+msgstr "Մնացեք տեղեկացված այն ամենի հետ, ինչ առաջարկում է {platform_name}-ը!"
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
-msgstr ""
+msgstr "Էլ. հասցեն փոխելու բանալին սխալ է"
 
 #: lms/templates/invalid_email_key.html
 msgid "This e-mail key is not valid. Please check:"
-msgstr ""
+msgstr "Այս էլ. հասցեն վավերական չէ: Խնդրում ենք ստուգել:"
 
 #: lms/templates/invalid_email_key.html
 msgid ""
 "Was this key already used? Check whether the e-mail change has already "
 "happened."
 msgstr ""
+"Այս բանալին արդեն օգտագործվե՞լ է։ Ստուգե՛ք` արդյոք էլ. հասցեի փոփոխությունը "
+"արդեն տեղի է ունեցել։"
 
 #: lms/templates/invalid_email_key.html
 msgid "Did your e-mail client break the URL into two lines?"
@@ -7200,6 +7505,8 @@ msgstr ""
 #: lms/templates/invalid_email_key.html
 msgid "The keys are valid for a limited amount of time. Has the key expired?"
 msgstr ""
+"Բանալիները վավեր են սահմանափակ ժամանակի ընթացքում։ Բանալու ժամկետը լրացե՞լ "
+"է։"
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
@@ -7207,13 +7514,15 @@ msgstr "Օգնող տեղեկատվություն"
 
 #: lms/templates/login-sidebar.html lms/templates/login-sidebar.html
 msgid "Login via OpenID"
-msgstr ""
+msgstr "Մուտք գործել OpenID-ի միջոցով։"
 
 #: lms/templates/login-sidebar.html
 msgid ""
 "You can now start learning with {platform_name} by logging in with your <a "
 "rel=\"external\" href=\"http://openid.net/\">OpenID account</a>."
 msgstr ""
+"Այժմ Դուք կարող եք սկսել սովորել {platform_name}-ով` մուտք գործելով Ձեր <a "
+"rel=\"external\" href=\"http://openid.net/\">OpenID հաշվով</a>։"
 
 #: lms/templates/login-sidebar.html
 msgid "Not Enrolled?"
@@ -7225,11 +7534,13 @@ msgstr "Բաժանորդագրվե՛ք {platform_name}-ի համար այսօր:
 
 #: lms/templates/login-sidebar.html
 msgid "Looking for help in logging in or with your {platform_name} account?"
-msgstr ""
+msgstr "Օգնության կարիք ունե՞ք {platform_name} հաշիվ մուտք գործելու համար։"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
 msgstr ""
+"Այցելե՛ք մեր օգնության բաժինը հաճախ տրվող հարցերի պատասխանները տեսնելու "
+"համար։"
 
 #: lms/templates/login.html
 msgid "Log into your {platform_name} Account"
@@ -7245,7 +7556,7 @@ msgstr "Մտնել իմ դասընթացները"
 
 #: lms/templates/login.html lms/templates/register.html
 msgid "Processing your account information…"
-msgstr ""
+msgstr "Ձեր հաշվի ինֆորմացիան մշակվում է..."
 
 #: lms/templates/login.html
 msgid "Please log in"
@@ -7257,7 +7568,7 @@ msgstr "Ձեր հաշիվը և դասընթացները տեսնելու համ�
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
-msgstr ""
+msgstr "Ներողություն, {platform_name}-ի հաշիվները հիմա հասանելի չեն"
 
 #: lms/templates/login.html
 msgid "The following errors occurred while logging you in:"
@@ -7273,6 +7584,9 @@ msgid ""
 "account. Required fields are noted by <strong class=\"indicator\">bold text "
 "and an asterisk (*)</strong>."
 msgstr ""
+"Խնդրում ենք տրամադրել հետևյալ ինֆորմացիան Ձեր {platform_name}-ի հաշիվ մուտք "
+"գործելու համար։ Պարտադիր դաշտերը նշված են <strong class=\"indicator\">բոլդ "
+"տեքստով և աստղանիշով (*)</strong>"
 
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
@@ -7293,6 +7607,8 @@ msgstr "Հիշել ինձ"
 #: lms/templates/login.html
 msgid "or, if you have connected one of these providers, log in below."
 msgstr ""
+"կամ, եթե Դուք միացած եք այս մատակարարներից որևէ մեկին, ապա մուտք գործեք "
+"ստորև։"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -7300,7 +7616,7 @@ msgstr ""
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/login.html lms/templates/register.html
 msgid "Sign in with {provider_name}"
-msgstr ""
+msgstr "Մուտք {provider_name}-ի հետ"
 
 #. Translators:  "External resource" means that this learning module is hosted
 #. on a platform external to the edX LMS
@@ -7328,6 +7644,8 @@ msgstr "Նայել աղբյուրը նոր պատուհանում"
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
 msgstr ""
+"Խնդրում ենք տրամադրել launch_url։ Սեղմե՛ք «Խմբագրել», և լրացրե՛ք պարտադիր "
+"դաշտերը։"
 
 #: lms/templates/lti.html
 msgid "Feedback on your work from the grader:"
@@ -7339,7 +7657,7 @@ msgstr "Սեղմե՛ք սկսելու համար"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable or Reenable student accounts"
-msgstr ""
+msgstr "Անջատել կամ նորից ակտիվացնել ուսանողների հաշիվները"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
@@ -7359,7 +7677,7 @@ msgstr "Ուսանողներն, ում հաշիվներն արգելափակվե
 
 #: lms/templates/manage_user_standing.html
 msgid "(reload your page to refresh)"
-msgstr ""
+msgstr "(վերբեռնեք Ձեր էջը, որ թարմացվի)"
 
 #: lms/templates/manage_user_standing.html
 msgid "working..."
@@ -7372,17 +7690,24 @@ msgid ""
 "the {link_start}MathPlayer Download Page{link_end} to download the plugin "
 "for your browser."
 msgstr ""
+"Այս էջը MathJax տեխնոլոգիայի միջոցով մաթեմատիկական բանաձևեր օգտագործելու "
+"հնարավորություն է տալիս։ Այն հասանելի դարձնելու համար խորհուրդ ենք տալիս "
+"օգտագործել MathPlayer հավելվածը։ Խնդրում ենք այցելել "
+"{link_start}MathPlayer-ի ներբեռնման էջը{link_end} հավելվածը Ձեր բրաուզերի "
+"համար ներբեռնելու համար։"
 
 #: lms/templates/mathjax_accessible.html
 msgid ""
 "Your browser does not support the MathPlayer plugin. To use MathPlayer, "
 "please use Internet Explorer 6 through 9."
 msgstr ""
+"Ձեր բրաուզերը MathPlayer հավելվածը չունի։ MathPlayer-ը օգտագործելու համար, "
+"խնդրում ենք օգտագործել Internet Explorer-ի 6-ից 9 տարբերակներից մեկը։"
 
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
 msgid "There has been an error on the {platform_name} servers"
-msgstr ""
+msgstr "{platform_name} սերվերների վրա սխալ է տեղի ունեցել "
 
 #: lms/templates/module-error.html
 msgid ""
@@ -7390,10 +7715,14 @@ msgid ""
 " fix it as soon as possible. Please email us at {tech_support_email} to "
 "report any problems or downtime."
 msgstr ""
+"Ներողություն, այս մոդուլը ժամանակավորապես հասանելի չէ։ Մեր անձնակազմը "
+"աշխատում է այն ուղղել որքան հնարավոր է շուտ։ Խնդրում ենք մեզ հետ կապվել "
+"{tech_support_email} էլ. հասցեով ցանկացած խնդիրներ կամ անհասանելի պահեր "
+"տեղեկացնելու համար։"
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
-msgstr ""
+msgstr "Չմշակված տվյալներ`"
 
 #: lms/templates/name_changes.html
 msgid "Accepted"
@@ -7405,7 +7734,7 @@ msgstr "մերժված"
 
 #: lms/templates/name_changes.html
 msgid "Pending name changes"
-msgstr ""
+msgstr "Անունների փոփոխություններն ընթացքում են"
 
 #: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
 msgid "Confirm"
@@ -7421,15 +7750,15 @@ msgstr "Գլոբալ նավիգացիա"
 
 #: lms/templates/navigation.html
 msgid "Find Courses"
-msgstr "փնտրել դասընթացներ"
+msgstr "Փնտրել դասընթացներ"
 
 #: lms/templates/navigation.html
 msgid "Dashboard for:"
-msgstr ""
+msgstr "Ղեկավարման վահանակ`"
 
 #: lms/templates/navigation.html
 msgid "More options dropdown"
-msgstr ""
+msgstr "Ավելի շատ տարբերակների ցուցակ"
 
 #: lms/templates/navigation.html
 msgid "Log Out"
@@ -7437,7 +7766,7 @@ msgstr "Դուրս գալ"
 
 #: lms/templates/navigation.html
 msgid "Shopping Cart"
-msgstr ""
+msgstr "Գնումների զամբյուղը"
 
 #: lms/templates/navigation.html
 msgid "How it Works"
@@ -7466,6 +7795,8 @@ msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
 msgstr ""
+"<strong>Զգուշացում`</strong> Ձեր բրաուզերը ամբողջապես չի աջակցվում։ Մենք "
+"խորհուրդ ենք տալիս օգտագործել {chrome_link} կամ {ff_link}։"
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -7476,6 +7807,13 @@ msgstr "Դուք նոթեր չունեք"
 msgid "Reset"
 msgstr "Փոխել"
 
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
+msgstr "Պահպանել"
+
 #: lms/templates/problem.html
 msgid "Reveal Answer"
 msgstr "Ցույց տալ պատասխանը"
@@ -7483,6 +7821,8 @@ msgstr "Ցույց տալ պատասխանը"
 #: lms/templates/problem.html
 msgid "You have used {num_used} of {num_total} submissions"
 msgstr ""
+"Դուք օգտագործել եք {num_used}-ը՝ {num_total} հնարավոր փորձից\n"
+" "
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -7494,6 +7834,9 @@ msgid ""
 " collection and use of this information will be governed by their terms of "
 "service and privacy policy."
 msgstr ""
+"Ձեր օգտագործողի անունը, էլ. հասցեն և ամբողջական անունը կուղարկվեն "
+"{destination}, որտեղ այս ինֆորմացիայի հավաքումը և օգտագործումը կկարգավորվի "
+"նրանց ծառայության պայմաններին և գաղտնիության քաղաքականության համապատասխան։"
 
 #: lms/templates/provider_login.html
 msgid "Return To %s"
@@ -7509,7 +7852,7 @@ msgstr "Թարմացնել իմ {platform_name} հաշիվը"
 
 #: lms/templates/register-shib.html
 msgid "Processing your account information …"
-msgstr ""
+msgstr "Ձեր հաշվի ինֆորմացիան մշակվում է..."
 
 #: lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
@@ -7520,6 +7863,8 @@ msgstr ""
 msgid ""
 "We're sorry, {platform_name} enrollment is not available in your region"
 msgstr ""
+"Ներողություն ենք խնդրում, {platform_name}-ին գրանցումը Ձեր տարածաշրջանում "
+"հասանելի չէ"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "The following errors occurred while processing your registration:"
@@ -7530,6 +7875,8 @@ msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
 msgstr ""
+"Պարտադիր դաշտերը նշված են <strong class=\"indicator\">բոլդ տեքստով և "
+"աղտղանիշով (*)</strong>։"
 
 #: lms/templates/register-shib.html lms/templates/signup_modal.html
 msgid "Enter a public username:"
@@ -7544,6 +7891,7 @@ msgstr "օրինակ` JaneDoe"
 #: lms/templates/register.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr ""
+"Կերևա բոլոր քննարկումներում կամ ֆորումներում, որոնցում Դուք մասնակցում եք"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
@@ -7552,12 +7900,12 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Terms of Service{link_end}"
-msgstr ""
+msgstr "Ես համաձայնվում եմ {link_start}Ծառայության Պայմաններին{link_end}"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/signup_modal.html
 msgid "I agree to the {link_start}Honor Code{link_end}"
-msgstr ""
+msgstr "Ես համաձայնվում եմ {link_start}Պատվո Կոդին{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
@@ -7601,6 +7949,10 @@ msgid ""
 "mark emails from class.stanford.edu as 'not spam', since you'll want to be "
 "able to receive email from your courses."
 msgstr ""
+"Դուք կստանաք ակտիվացնելու էլ. նամակ։ Դուք պետք է սեղմեք ակտիվացման հղման վրա"
+" գործընթացը վերջացնելու համար։ Նամակը չե՞ք տեսնում։ Ստուգե՛ք Ձեր սպամի "
+"պանակը և նշե՛ք class.stanford.edu-ից ստացված նամակը որպես «ոչ սպամ», քանի որ"
+" Դուք պետք է ստանաք էլ. նամակներ Ձեր բոլոր դասընթացներից։"
 
 #: lms/templates/register-sidebar.html
 msgid ""
@@ -7612,33 +7964,35 @@ msgstr ""
 
 #: lms/templates/register-sidebar.html
 msgid "Need help in registering with {platform_name}?"
-msgstr ""
+msgstr "Օգնության կարիք ունե՞ք {platform_name}-ում գրանցվելու համար։"
 
 #: lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
-msgstr ""
+msgstr "Նայե՛ք մեր ՀՏՀ-ը հաճախ տրվող հարցերի պատասխանների համար։"
 
 #: lms/templates/register-sidebar.html
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
 msgstr ""
+"Գրանցվելուց հետո կարող եք տեսնել հարցերի մեծ մասի պատասխանները դասընթացի "
+"համար նախատեսված քննարկումների ֆորումում և ՀՏՀ-ում։"
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
-msgstr ""
+msgstr "Գրանցվել {platform_name}-ի համար"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr ""
+msgstr "Ստեղծել իմ {platform_name} հաշիվը"
 
 #: lms/templates/register.html
 msgid "Welcome!"
-msgstr ""
+msgstr "Բարի գալուստ"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
-msgstr ""
+msgstr "Գրանցվե՛ք ստորև` {platform_name}-ի Ձեր հաշիվը ստեղծելու համար։"
 
 #: lms/templates/register.html
 msgid "Register to start learning today!"
@@ -7649,32 +8003,34 @@ msgid ""
 "or create your own {platform_name} account by completing all "
 "<strong>required*</strong> fields below."
 msgstr ""
+"կամ ստեղծե՛ք Ձեր անձնական {platform_name} հաշիվը` ստորև բոլոր "
+"<strong>պարտադիր*</strong> դաշտերը լրացնելով։"
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
 msgid "You've successfully signed in with {selected_provider}."
-msgstr ""
+msgstr "Դուք հաջողությամբ մուտք գործեցիք {selected_provider}-ի միջոցով։"
 
 #: lms/templates/register.html
 msgid "Finish your account registration below to start learning."
-msgstr ""
+msgstr "Վերջացրե՛ք Ձեր հաշվի գրանցումը ստորև` սովորել սկսելու համար։"
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
-msgstr ""
+msgstr "Խնդրում ենք լրացնել հետևյալ դաշտերը` հաշիվ գրանցելու համար։"
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
-msgstr ""
+msgstr "օրինակ` Նարեկ Դշխունյան"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
-msgstr ""
+msgstr "Անհրաժեշտ է բոլոր վկայականների համար, որոնք Դուք, հնարավոր է, ստանաք։"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
-msgstr ""
+msgstr "հետագայում փոխել հնարավոր չէ"
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
@@ -7682,15 +8038,15 @@ msgstr "Բարի գալուստ  {username}"
 
 #: lms/templates/register.html
 msgid "Enter a Public Display Name:"
-msgstr ""
+msgstr "Մուտքագրեք հրապակային ցուցադրման անուն՝  "
 
 #: lms/templates/register.html
 msgid "Public Display Name"
-msgstr ""
+msgstr "Հրապարակային ցուցադրման անուն"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Extra Personal Information"
-msgstr ""
+msgstr "Լրացուցիչ անձնական ինֆորմացիա"
 
 #: lms/templates/register.html
 msgid "City"
@@ -7716,6 +8072,7 @@ msgstr "Ծննդյան տարեթիվը"
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
+"Խնդրում ենք կիսել մեզ հետ {platform_name}-ում Ձեր գրանցվելու պատճառները։"
 
 #: lms/templates/register.html
 msgid "Register"
@@ -7727,13 +8084,16 @@ msgstr "Ստեղծել իմ հաշիվը"
 
 #: lms/templates/resubscribe.html
 msgid "Re-subscribe Successful!"
-msgstr ""
+msgstr "Նորից անդամագրումը հաջողվե՜ց։"
 
 #: lms/templates/resubscribe.html
 msgid ""
 "You have re-enabled forum notification emails from {platform_name}. Click "
 "{dashboard_link_start}here{link_end} to return to your dashboard. "
 msgstr ""
+"Դուք նորից միացրել եք ֆորումի նամակային ծանուցումների ծառայությունը "
+"{platform_name}-ի համար։ Սեղմե՛ք {dashboard_link_start}այստեղ{link_end}` "
+"ղեկավարման վահանակին վերադառնալու համար։"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -7767,7 +8127,7 @@ msgstr "օրինակ՝ Ձեր անունը (հավաստագրերի համար)
 
 #: lms/templates/signup_modal.html
 msgid "<i>Welcome</i> {name}"
-msgstr ""
+msgstr "<i>Բարի գալուստ</i> {name}"
 
 #: lms/templates/signup_modal.html
 msgid "Full Name *"
@@ -7787,7 +8147,7 @@ msgstr "Փոստային հասցե"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
-msgstr ""
+msgstr "{platform_name}-ի համար գրանցվելու նպատակները"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -7798,12 +8158,12 @@ msgid "Login."
 msgstr "Մուտք:"
 
 #: lms/templates/split_test_author_view.html
-msgid "This content experiment uses group configuration '{experiment_name}'."
+msgid ""
+"This content experiment uses group configuration "
+"'{group_configuration_name}'."
 msgstr ""
-
-#: lms/templates/split_test_author_view.html
-msgid "This content experiment has issues that affect content visibility."
-msgstr ""
+"Նյութերի այս փորձն օգտագործում է '{group_configuration_name}' խմբային "
+"կոնֆիգուրացիան։"
 
 #: lms/templates/split_test_author_view.html
 msgid "Active Groups"
@@ -7817,19 +8177,19 @@ msgstr "Պասիվ խմբեր"
 #. sorted into group_id
 #: lms/templates/split_test_staff_view.html
 msgid "Group {group_id}"
-msgstr ""
+msgstr "Խումբ {group_id}"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
-msgstr ""
+msgstr "Անձնակազմի դեբագ ինֆորմացիա"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission history"
-msgstr ""
+msgstr "Ներկայացումների պատմություն"
 
 #: lms/templates/staff_problem_info.html
 msgid "{platform_name} Content Quality Assessment"
-msgstr ""
+msgstr "{platform_name}-ի պարունակության որակական գնահատում"
 
 #: lms/templates/staff_problem_info.html
 msgid "Comment"
@@ -7845,7 +8205,7 @@ msgstr "Պիտակ"
 
 #: lms/templates/staff_problem_info.html
 msgid "Optional tag (eg \"done\" or \"broken\"):"
-msgstr ""
+msgstr "Ոչ պարտադիր պիտակ (օրինակ` «արված» կամ «խախտված»)"
 
 #: lms/templates/staff_problem_info.html
 msgid "tag"
@@ -7857,26 +8217,26 @@ msgstr "Ավելացնել մեկնաբանություն"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug"
-msgstr ""
+msgstr "Անձնակազմի դեբագ"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Actions"
-msgstr ""
+msgstr "Գործողություններ"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Reset Student Attempts"
-msgstr ""
+msgstr "Զրոյացնել ուսանողի փորձերը"
 
 #: lms/templates/staff_problem_info.html
 msgid "Delete Student State"
-msgstr ""
+msgstr "Հեռացնել ուսանողի կարգավիճակը"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore Student Submission"
-msgstr ""
+msgstr "Վերագնահատել ուսանողի պատասխանը"
 
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -7884,7 +8244,7 @@ msgstr "Մոդուլ դաշտեր"
 
 #: lms/templates/staff_problem_info.html
 msgid "XML attributes"
-msgstr ""
+msgstr "XML հատկանիշներ"
 
 #: lms/templates/staff_problem_info.html
 msgid "Submission History Viewer"
@@ -7919,7 +8279,7 @@ msgstr "Հաջորդ էջ"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Sysadmin Dashboard"
-msgstr ""
+msgstr "Սիստեմային ադմինիստրատորի ղեկավարման վահանակ"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -7936,11 +8296,11 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Git Logs"
-msgstr ""
+msgstr "Git-ի լոգեր"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "User Management"
-msgstr ""
+msgstr "Օգտագործողների ղեկավարում"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Email or username"
@@ -7960,21 +8320,23 @@ msgstr "Ներբեռնել բոլոր օգտատերերի ֆայլը (csv ֆա�
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Check and repair external authentication map"
-msgstr ""
+msgstr "Ստուգե՛ք և նորոգե՛ք իսկության հաստատման արտաքին ձևը"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
 msgstr ""
+"Գնացե՛ք յուրաքանչյուր դասընթացի դասախոսի ղեկավարման վահանակը` դասընթացի "
+"ընդունելությունը կարգավորելու համար։"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
-msgstr ""
+msgstr "Ղեկավարել դասընթացի անձնակազմին և դասախոսներին"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Download staff and instructor list (csv file)"
-msgstr ""
+msgstr "Ներբեռնել անձնակազմի անդամների և դասախոսների ցուցակը (որպես csv ֆայլ)"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Administer Courses"
@@ -7984,7 +8346,7 @@ msgstr "Դասընթացներ կառավարել"
 #. courseware; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard.html
 msgid "Repo Location"
-msgstr ""
+msgstr "Repo-ի հասցեն"
 
 #. Translators: Repo is short for git repository (http://git-scm.com/about) or
 #. source of
@@ -7996,21 +8358,21 @@ msgstr ""
 #. Translators: Github is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
 msgid "Load new course from github"
-msgstr ""
+msgstr "github-ից նոր դասընթացներ բեռնել"
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
 msgid "Course ID or dir"
-msgstr ""
+msgstr "Դասընթացի ID-ն կամ dir-ը"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Delete course from site"
-msgstr ""
+msgstr "Կայքից հեռացնել դասընթացը"
 
 #. Translators: A version number appears after this string
 #: lms/templates/sysadmin_dashboard.html
 msgid "Platform Version"
-msgstr ""
+msgstr "Պլատֆորմի տարբերակ"
 
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -8029,7 +8391,7 @@ msgstr ""
 
 #: lms/templates/textannotation.html
 msgid "Source:"
-msgstr ""
+msgstr "Աղբյուր՝"
 
 #: lms/templates/tracking_log.html
 msgid "Tracking Log"
@@ -8053,7 +8415,7 @@ msgstr "տեսակ"
 
 #: lms/templates/unsubscribe.html
 msgid "Unsubscribe Successful!"
-msgstr ""
+msgstr "Բաժանորդագրումից հրաժարումը հաջողվե՜ց։"
 
 #: lms/templates/unsubscribe.html
 msgid ""
@@ -8062,6 +8424,10 @@ msgid ""
 "you did not mean to do this, click {undo_link_start}here{link_end} to re-"
 "subscribe."
 msgstr ""
+"Դուք այլևս ֆորումի ծանուցումների նամակներ {platform_name}-ից։ Սեղմե՛ք "
+"{dashboard_link_start}այստեղ{link_end} Ձեր ղեկավարման վահանակ վերադառնալու "
+"համար։ Եթե Դուք չէիք ուզում անել սա, սեղմե՛ք {undo_link_start}here{link_end}"
+" նորից բաժանորդագրվելու համար։"
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -8093,7 +8459,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "Loading video player"
-msgstr ""
+msgstr "Տեսախաղարկիչը բեռնվում է "
 
 #: lms/templates/video.html
 msgid "Play video"
@@ -8113,11 +8479,11 @@ msgstr "Սկսել"
 
 #: lms/templates/video.html
 msgid "Speeds"
-msgstr ""
+msgstr "Արագություններ"
 
 #: lms/templates/video.html
 msgid "Speed"
-msgstr ""
+msgstr "Արագություն"
 
 #: lms/templates/video.html
 msgid "Volume"
@@ -8128,6 +8494,8 @@ msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
+"Սեղմե՛ք այս կոճակին վիդեոյի ձայնը անջատելու կամ միացնելու համար, կամ սեղմե՛ք"
+" ՎԵՐԵՎ կամ ՆԵՐՔԵՎ կոճակները ձայնը բարձրացնելու կամ իջեցնելու համար։"
 
 #: lms/templates/video.html
 msgid "Fill browser"
@@ -8143,7 +8511,7 @@ msgstr "Անջատել լեգենդը"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
-msgstr ""
+msgstr "Առաջանալ տրանսկրիպտի վերջին։"
 
 #: lms/templates/video.html
 msgid ""
@@ -8190,7 +8558,7 @@ msgstr "Թաքցնել հարցը"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "New Submission"
-msgstr ""
+msgstr "Նոր պատասխան"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Next Step"
@@ -8227,7 +8595,7 @@ msgstr ""
 #. graded rubrics the user might have received
 #: lms/templates/combinedopenended/combined_open_ended_results.html
 msgid "{result_of_task} from grader {number}"
-msgstr ""
+msgstr "{result_of_task} գնահատողից {number}"
 
 #. Translators: "See full feedback" is the text of
 #. a link that allows a user to see more detailed
@@ -8309,8 +8677,8 @@ msgstr ""
 #: lms/templates/combinedopenended/openended/open_ended_combined_rubric.html
 msgid "{num} point: {explanatory_text}"
 msgid_plural "{num} points: {explanatory_text}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} միավոր. {explanatory_text}"
+msgstr[1] "{num} միավորներ. {explanatory_text}"
 
 #: lms/templates/combinedopenended/openended/open_ended_error.html
 msgid "There was an error with your submission.  Please contact course staff."
@@ -8318,7 +8686,7 @@ msgstr ""
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "Rubric"
-msgstr ""
+msgstr "Խորագիր"
 
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid ""
@@ -8329,8 +8697,8 @@ msgstr ""
 #: lms/templates/combinedopenended/openended/open_ended_rubric.html
 msgid "{num} point: {text}"
 msgid_plural "{num} points: {text}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num} միավոր. {text}"
+msgstr[1] "{num} միավորներ. {text}"
 
 #: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html
 msgid "Please enter a hint below:"
@@ -8338,11 +8706,11 @@ msgstr "Խնդրում ենք մուտքագրել ակնարկն այստեղ`"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohort groups"
-msgstr ""
+msgstr "Աջակից խմբեր"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Show cohorts"
-msgstr ""
+msgstr "Ցույց տալ աջակիցներին"
 
 #: lms/templates/course_groups/cohort_management.html
 msgid "Cohorts in the course"
@@ -8362,12 +8730,12 @@ msgstr ""
 
 #: lms/templates/courseware/accordion.html
 msgid "{chapter}, current chapter"
-msgstr ""
+msgstr "{chapter}, ընթացիկ բաժին"
 
 #: lms/templates/courseware/accordion.html
 #: lms/templates/courseware/progress.html
 msgid "due {date}"
-msgstr ""
+msgstr "մինչ {date}"
 
 #: lms/templates/courseware/course_about.html
 msgid ""
@@ -8416,7 +8784,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Share with friends and family!"
-msgstr ""
+msgstr "Կիսվե՜լ ընկերների և ընտանիքի հետ։"
 
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
@@ -8446,7 +8814,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
-msgstr ""
+msgstr "Նախապայմաններ"
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
@@ -8473,7 +8841,7 @@ msgstr "Ուսումնասիրե՛ք անվճար դասընթացներ աշխ�
 
 #: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
-msgstr ""
+msgstr "Ուսումնասիրել {university_name} համալսարանի անվճար դասընթացները։"
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -8496,7 +8864,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
-msgstr ""
+msgstr "Այս դասընթացին որևէ նյութ չի ավելացվել"
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
@@ -8511,6 +8879,8 @@ msgid ""
 "Use the arrow keys to navigate the tips or use the tab key to return to the "
 "calculator"
 msgstr ""
+"Օգտագործե՛ք սլաքների ստեղները օգնության առաջարկներով անցնելու համար կամ "
+"օգտագործե՛ք «թաբ» ստեղնը հաշվիչին վերադառնալու համար"
 
 #: lms/templates/courseware/courseware.html
 msgid "Hints"
@@ -8542,7 +8912,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "parallel resistors function"
-msgstr ""
+msgstr "զուգահեռ դիմադրությունների ֆունկցիա"
 
 #: lms/templates/courseware/courseware.html
 msgid "Functions"
@@ -8558,7 +8928,7 @@ msgstr "Էլյերի թիվը"
 
 #: lms/templates/courseware/courseware.html
 msgid "ratio of a circle's circumference to it's diameter"
-msgstr ""
+msgstr "Շրջանագծի երկարության հարաբերությունը իր տրամագծին"
 
 #: lms/templates/courseware/courseware.html
 msgid "Boltzmann constant"
@@ -8570,7 +8940,7 @@ msgstr "լույսի արագությունը"
 
 #: lms/templates/courseware/courseware.html
 msgid "Typical room temperature: 298.15 (Kelvin), same as 25C/77F"
-msgstr ""
+msgstr "Բնորոշ սենյակային ջերմաստիճան՝ 298.15 (Kelvin), նույն է ինչ 25C/77F"
 
 #: lms/templates/courseware/courseware.html
 msgid "fundamental charge"
@@ -8590,6 +8960,10 @@ msgid ""
 " fix it as soon as possible. Please email us at {link_to_support_email} to "
 "report any problems or downtime."
 msgstr ""
+"Հայցում ենք Ձեր ներողամտությունը, այս մոդուլը ժամանակավորապես անհասանելի է։ "
+"Մեր անձնակազմը փորձում է այն վերականգնել որքան հնարավոր է շուտ։ Խնդրում ենք "
+"մեզ նամակ գրել {link_to_support_email} հասցեով` ցանկացած խնդիրներ կամ "
+"անհասանելիության դեպքեր հաղորդելու համար։"
 
 #: lms/templates/courseware/grade_summary.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -8598,12 +8972,12 @@ msgstr "Գնահատականի ամփոփումը"
 
 #: lms/templates/courseware/grade_summary.html
 msgid "Not implemented yet"
-msgstr ""
+msgstr "Դեռ իրականացված չէ։"
 
 #: lms/templates/courseware/gradebook.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Gradebook"
-msgstr ""
+msgstr "Գնահատականների մատյան"
 
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
@@ -8611,7 +8985,7 @@ msgstr "Ուսանողների փնտրել"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
-msgstr ""
+msgstr "{course_number} Դասընթացի մասին ինֆորմացիա"
 
 #: lms/templates/courseware/info.html
 msgid "View Updates in Studio"
@@ -8674,7 +9048,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Enrollment"
-msgstr ""
+msgstr "Գրանցում"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "DataDump"
@@ -8727,6 +9101,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Specify a problem in the course here with its complete location:"
 msgstr ""
+"Նշե՛ք դասընթացի հետ կապված խնդիրները այստեղ իրենց ամբողջական տեղի հետ "
+"միասին`"
 
 #. Translators: A location (string of text) follows this sentence.
 #: lms/templates/courseware/instructor_dashboard.html
@@ -8741,7 +9117,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Then select an action:"
-msgstr ""
+msgstr "Այնուհետև ընտրե՛ք գործողություն`"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
@@ -8825,7 +9201,7 @@ msgstr ""
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Section:"
-msgstr ""
+msgstr "Բաժին`"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -8840,7 +9216,7 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Notify students by email"
-msgstr ""
+msgstr "Տեղեկացնել ուղանողներին էլ. նամակի միջոցով"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Auto-enroll students when they activate"
@@ -8874,7 +9250,7 @@ msgstr "Ինձ"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Staff and instructors"
-msgstr ""
+msgstr "Անձնակազմ և դասախոսներ"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -8898,6 +9274,8 @@ msgid ""
 "Please try not to email students more than once per week. Important things "
 "to consider before sending:"
 msgstr ""
+"Խնդրում ենք ուսանողներին շաբաթական մեկ անգամից շատ նամակ չուղարկել։ Կարևոր "
+"բաներ, որոնք պետք է հաշվի առնել ուղարկելուց առաջ`"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8905,6 +9283,8 @@ msgid ""
 "Have you read over the email to make sure it says everything you want to "
 "say?"
 msgstr ""
+"Կարդացե՞լ եք էլ. նամակը` վստահ լինելու համար, որ այն պարունակում է ամենը, "
+"ինչ ուզում եք ասել։"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8912,11 +9292,13 @@ msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how"
 " it's displayed, and that embedded links and images work properly?"
 msgstr ""
+"Նախօրոք ուղարկե՞լ եք նամակը ինքներդ Ձեզ` վստահ լինելու համար, որ հավանում եք"
+" նրա տեսքը, և որ ներառված հղումներն ու նկարները աշխատում են, ինչպես հարկն է։"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "CAUTION!"
-msgstr ""
+msgstr "Զգո՛ւյշ:"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
@@ -8942,11 +9324,11 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students active in the last week:"
-msgstr ""
+msgstr "Նախորդ շաբաթում ակտիվ ուսանողներ`"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Student activity day by day"
-msgstr ""
+msgstr "Ուսանողի օրական ակտիվությունը"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Day"
@@ -8954,58 +9336,62 @@ msgstr "Օր"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students"
-msgstr ""
+msgstr "Ուսանողներ"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Score distribution for problems"
-msgstr ""
+msgstr "Գնահատականների բաշխումը խնդիրների համար"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Max"
-msgstr ""
+msgstr "Մաքսիմում"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Points Earned (Num Students)"
-msgstr ""
+msgstr "Վաստակած միավորները (ուսանողների քանակը)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There is no data available to display at this time."
-msgstr ""
+msgstr "Այս պահին ցույց տալու համար տվյալներ չկան։"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Loading the latest graphs for you; depending on your class size, this may "
 "take a few minutes."
 msgstr ""
+"Ամենաթարմ գրաֆիկները բեռնվում են. սա կարող է տևել մի քանի րոպե` կախված Ձեր "
+"դասարանի չափից։"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Count of Students that Opened a Subsection"
-msgstr ""
+msgstr "Ուսանողների քանակը, ովքեր բացել են ենթաբաժինը"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade Distribution per Problem"
-msgstr ""
+msgstr "Գնահատականների բաշխումը ըստ խնդրի"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "There are no problems in this section."
-msgstr ""
+msgstr "Այս բաժնում խնդիրներ չկան։"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Students answering correctly"
-msgstr ""
+msgstr "Ճիշտ պատասխանած ուսանողներ"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Number of students"
-msgstr ""
+msgstr "Ուսանողների քանակը"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid ""
 "Student distribution per country, all courses, Sep 12 to Oct 17, 1 server "
 "(shown here as an example):"
 msgstr ""
+"Ուսանողների բաշխումը ըստ երկրի, բոլոր դասընթացները, սեպտեմբերի 12-ից "
+"հոկտեմբերի 17-ը, 1 սերվեր (ցույց է տրված որպես օրինակ)`"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9013,7 +9399,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
-msgstr ""
+msgstr "Դասախոսի ընթացիկ աշխատանքները"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Type"
@@ -9025,7 +9411,7 @@ msgstr "Առաջադրանքի միջոցները"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Id"
-msgstr ""
+msgstr "Աշխատանքի համարը"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Requester"
@@ -9033,11 +9419,11 @@ msgstr "Հայցորդ"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task State"
-msgstr ""
+msgstr "Աշխատանքի վիճակը"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Duration (sec)"
-msgstr ""
+msgstr "Տևողություն (վրկ)"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Task Progress"
@@ -9050,19 +9436,19 @@ msgstr "անհայտ "
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Course errors"
-msgstr ""
+msgstr "Դասընթացի սխալները"
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "About {course_id}"
-msgstr ""
+msgstr "{course_id}ի մասին"
 
 #: lms/templates/courseware/mktg_coming_soon.html
 msgid "Coming Soon"
-msgstr ""
+msgstr "Շուտով"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "About {course_number}"
-msgstr ""
+msgstr "{course_number}-ի մասին"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Access Courseware"
@@ -9070,19 +9456,38 @@ msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "You Are Registered"
-msgstr ""
+msgstr "Դուք գրանցված եք"
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Register for"
+msgstr "Գրանցվել"
+
+#. Translators: This is the second line on a button users can click.  The
+#. first
+#. line is "Register for COURSE_NAME"
+#. The "choose your student track" means users can select between taking the
+#. course as an auditor, as a verified student, etc
+#: lms/templates/courseware/mktg_course_about.html
+msgid "and choose your student track"
+msgstr ""
+
+#. Translators: This is the second line on a button users can click.  The
+#. first
+#. line is "Register for COURSE_NAME"
+#. 'Verification' here refers to verifying one's identity in order to receive
+#. a
+#. verified certificate.
+#: lms/templates/courseware/mktg_course_about.html
+msgid "and proceed to verification"
 msgstr ""
 
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Registration Is Closed"
-msgstr ""
+msgstr "Գրանցումը փակված է"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
-msgstr ""
+msgstr "Նորություններ -  MITx 6.002x"
 
 #: lms/templates/courseware/news.html
 msgid "Updates to Discussion Posts You Follow"
@@ -9090,11 +9495,11 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{course_number} Progress"
-msgstr ""
+msgstr "{course_number} Առաջընթաց"
 
 #: lms/templates/courseware/progress.html
 msgid "Course Progress"
-msgstr ""
+msgstr "Դասընթացի առաջընթաց"
 
 #: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
@@ -9110,7 +9515,7 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
-msgstr ""
+msgstr "Ստացել է {earned:.3n} հնարավոր {total:.3n} միավորից"
 
 #: lms/templates/courseware/progress.html
 msgid "Problem Scores: "
@@ -9133,12 +9538,16 @@ msgid ""
 "You were most recently in {section_link}.  If you're done with that, choose "
 "another section on the left."
 msgstr ""
+"Վերջին անգամ Դուք {section_link} բաժնում էիք։ Եթե Դուք այնտեղ վերջացրել եք, "
+"ընտրե՛ք այլ բաժին ձախ կողմում։"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
 "Final course details are being wrapped up at this time. Your final standing "
 "will be available shortly."
 msgstr ""
+"Դասընթացի վերջին մանրամասներն ամբողջացվում են։ Ձեր վերջնական դիրքը շուտով "
+"հասանելի կլինի։"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your final grade:"
@@ -9169,7 +9578,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Your {cert_name_short} is Generating"
-msgstr ""
+msgstr "Ձեր {cert_name_short}-ը գեներացվում է"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
@@ -9179,7 +9588,7 @@ msgstr "Այս հղումը կբացի/կնեռբեռնի PDF փաստաթուղ
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download Your {cert_name_short} (PDF)"
-msgstr ""
+msgstr "Ներբեռնեք Ձեր {cert_name_short} (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -9187,16 +9596,21 @@ msgid ""
 "{cert_name_long} was generated, we could not grant you a verified "
 "{cert_name_short}. An honor code {cert_name_short} has been granted instead."
 msgstr ""
+"Քանի որ {cert_name_long}-ը գեներացնելիս մենք չունեինք հաստատման նկարների "
+"ամբողջական խումբ, մենք չկարողացանք Ձեզ հատկացնել հաստատված "
+"{cert_name_short}։ Փոխարենը Ձեզ հատկացվեց պատվո կոդի {cert_name_short} "
+"վկայական։"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
 "This link will open/download a PDF document of your verified "
 "{cert_name_long}."
 msgstr ""
+"Այս հղումը կբացի/կներբեռնի Ձեր հաստատված {cert_name_long}-ը PDF ֆորմատով։"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Download Your ID Verified {cert_name_short} (PDF)"
-msgstr ""
+msgstr "Ներբեռնել Ձեր ID-ով հաստատված {cert_name_short} (PDF)"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid "Complete our course feedback survey"
@@ -9214,8 +9628,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
-msgstr ""
+msgstr "Ընդգրկված է որպես`"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -9241,12 +9656,20 @@ msgid "Auditing"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a professional education student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Professional Ed"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
-msgstr "Դասընթացն ավարտված է- { end_date }"
+msgstr "Դասընթացն ավարտված է- {end_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
-msgstr "Դասընթացը սկսված է - { start_date }"
+msgstr "Դասընթացը սկսված է - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course has not yet started"
@@ -9254,7 +9677,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
-msgstr "Դասընթացը սկսվում է - { start_date }"
+msgstr "Դասընթացը սկսվում է - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Document your accomplishment!"
@@ -9262,7 +9685,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
-msgstr ""
+msgstr "Մարտահրավեր նետե՛ք ինքներդ Ձեզ։"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Take this course as an ID-verified student."
@@ -9282,7 +9705,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
-msgstr ""
+msgstr "Դիտել արխիվացված դասընթացը"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/shoppingcart/receipt.html
@@ -9291,8 +9714,14 @@ msgstr "Նայել դասընթացը"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Are you sure you want to unregister from"
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from the purchased course"
 msgstr ""
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from"
+msgstr "Վստա՞հ եք, որ ուզում եք դուրս գալ գրանցումից"
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -9344,10 +9773,6 @@ msgid ""
 "us at {email}."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Dismiss"
-msgstr ""
-
 #: lms/templates/dashboard/_dashboard_reverification_sidebar.html
 msgid "Re-verification now open for:"
 msgstr ""
@@ -9362,7 +9787,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_reverification_sidebar.html
 msgid "Denied:"
-msgstr ""
+msgstr "Մերժված."
 
 #: lms/templates/dashboard/_dashboard_reverification_sidebar.html
 msgid "Approved:"
@@ -9380,7 +9805,7 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Your verification status is good for one year after submission."
-msgstr ""
+msgstr "Ձեր հաստատման վիճակն այն ուղարկելուց հետո ուժի մեջ է մեկ տարի։"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -9399,7 +9824,7 @@ msgstr ""
 
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
-msgstr ""
+msgstr "Արդյունքներ`"
 
 #: lms/templates/discussion/_blank_slate.html
 msgid ""
@@ -9409,16 +9834,16 @@ msgstr ""
 
 #: lms/templates/discussion/_blank_slate.html
 msgid "There are no posts here yet. Be the first one to post!"
-msgstr ""
+msgstr "Այստեղ դեռ գրառումներ չկան։ Եղե՛ք առաջինը։"
 
 #: lms/templates/discussion/_discussion_course_navigation.html
 #: lms/templates/discussion/_discussion_module.html
 msgid "New Post"
-msgstr ""
+msgstr "Նոր գրառում"
 
 #: lms/templates/discussion/_discussion_module.html
 msgid "Show Discussion"
-msgstr ""
+msgstr "Ցուցադրել քննարկումը"
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
@@ -9426,11 +9851,11 @@ msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
-msgstr ""
+msgstr "Զտել թեմաները"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
-msgstr ""
+msgstr "զտել թեմաները"
 
 #: lms/templates/discussion/_filter_dropdown.html
 #: lms/templates/discussion/_thread_list_template.html
@@ -9439,11 +9864,11 @@ msgstr "Բոլոր քննարկումները"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Flagged Discussions"
-msgstr ""
+msgstr "Նշված քննարկումներ"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr ""
+msgstr "Գրառումներ, որոնց ես հետևում եմ"
 
 #: lms/templates/discussion/_recent_active_posts.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -9452,7 +9877,7 @@ msgstr ""
 
 #: lms/templates/discussion/_search_bar.html
 msgid "Search posts"
-msgstr ""
+msgstr "Փնտրել գրառումները"
 
 #: lms/templates/discussion/_similar_posts.html
 msgid "Hide"
@@ -9493,7 +9918,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Add A Response"
-msgstr ""
+msgstr "Պատասխան ավելացնել"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -9505,7 +9930,7 @@ msgstr ""
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Post a response:"
-msgstr ""
+msgstr "Պատասխանել"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -9521,18 +9946,18 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow"
-msgstr ""
+msgstr "հետևել"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Follow this post"
-msgstr ""
+msgstr "Հետևել այս գրառմանը"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report Misuse"
-msgstr ""
+msgstr "Չարաշահում զեկուցել"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Pin Thread"
@@ -9542,7 +9967,7 @@ msgstr "Ամրակցել հոսքը"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "Pinned"
-msgstr ""
+msgstr "Ամրակցված"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "(this post is about %(courseware_title_linked)s)"
@@ -9550,7 +9975,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
-msgstr ""
+msgstr "Գրառումը խմբագրելիս"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Edit post title"
@@ -9625,10 +10050,12 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+"%(comments_count)s %(span_sr_open)sմեկնաբանություններ "
+"(%(unread_comments_count)s չկարդացված մեկնաբանություններ)%(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
+msgstr "%(comments_count)s %(span_sr_open)sմեկնաբանություններ %(span_close)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "DISCUSSION HOME:"
@@ -9640,7 +10067,7 @@ msgstr "ԻՆՉՊԵՍ ՕԳՏԱԳՈՐԾԵԼ EDX ՔՆՆԱՐԿՈՒՄՆԵՐԸ"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Find discussions"
-msgstr "Գտնել քննարկումներ"
+msgstr "Փնտրել քննարկումներ"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Focus in on specific topics"
@@ -9694,7 +10121,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Filter List"
-msgstr ""
+msgstr "Զտիչների ցուցակ"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Filter discussion areas"
@@ -9702,22 +10129,22 @@ msgstr "Զտել քննարկման դաշտերը"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "follow this post"
-msgstr ""
+msgstr "հետևել այս գրառմանը"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "post anonymously"
-msgstr ""
+msgstr "անանուն գրառում թողնել"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "post anonymously to classmates"
-msgstr ""
+msgstr "դասընկերների համար անանուն գրառում թողնել"
 
 #. Translators: This labels the selector for which group of students can view
 #. a
 #. post
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Make visible to:"
-msgstr ""
+msgstr "Տեսանելի դարձնել՝"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "All Groups"
@@ -9725,7 +10152,7 @@ msgstr "Բոլոր խմբերը"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "new post title"
-msgstr ""
+msgstr "նոր գրառման վերնագիր"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Enter your question or comment…"
@@ -9733,7 +10160,7 @@ msgstr "Մուտքագրե՛ք Ձեր հարցը կամ մեկնաբանությ
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add post"
-msgstr ""
+msgstr "Գրառում ավելացնել"
 
 #: lms/templates/discussion/_user_profile.html
 msgid ", "
@@ -9754,17 +10181,19 @@ msgstr[1] "%s մեկնաբանություններ"
 #: lms/templates/discussion/index.html
 #: lms/templates/discussion/user_profile.html
 msgid "Discussion - {course_number}"
-msgstr ""
+msgstr "Քննարկում - {course_number}"
 
 #: lms/templates/discussion/maintenance.html
 msgid "We're sorry"
-msgstr ""
+msgstr "Ներողություն ենք խնդրում"
 
 #: lms/templates/discussion/maintenance.html
 msgid ""
 "The forums are currently undergoing maintenance. We'll have them back up "
 "shortly!"
 msgstr ""
+"Տվյալ պահին ֆորումներում աշխատանքներ են ընթանում։ Շուտով նրանք նորից "
+"հասանելի կլինեն։"
 
 #: lms/templates/discussion/user_profile.html
 msgid "User Profile"
@@ -9778,11 +10207,11 @@ msgstr "Բացել քննարկում"
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Collapse discussion"
-msgstr ""
+msgstr "Փակել քննարկումը"
 
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 msgid "This thread has been pinned by course staff."
-msgstr ""
+msgstr "Այս թեման ամրացվել է դասընթացի աշխատակազմի կողմից։"
 
 #: lms/templates/discussion/mustache/_pagination.mustache
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -9795,13 +10224,16 @@ msgstr "Դիտել քննարկումը "
 
 #: lms/templates/discussion/mustache/_user_profile.mustache
 msgid "Active Threads"
-msgstr ""
+msgstr "Ակտիվ թեմաներ"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
 "Thank you for signing up for {platform_name}! To activate your account, "
 "please copy and paste this address into your web browser's address bar:"
 msgstr ""
+"Շնորհակալությու՜ն {platform_name}-ում գրանցվելու համար։ Ձեր հաշիվը "
+"ակտիվացնելու համար, խնդրում ենք պատճենել այս հասցեն Ձեր բրաուզերի հասցեի "
+"դաշտում։"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -9810,6 +10242,9 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the about section of the {platform_name} Courses web site."
 msgstr ""
+"Եթե Դուք չեք խնդրել սա, ոչինչ պետք չէ անել. Դուք այլևս նամակներ չեք ստանա "
+"մեզանից։ Խնդրում ենք չպատասխանել այս էլ. նամակին։ Եթե Ձեզ օգտնություն է "
+"հարկավոր, այցելե՛ք {platform_name} դասընթացների կայքի «մասին» բաժինը։"
 
 #: lms/templates/emails/activation_email.txt
 #: lms/templates/emails/email_change.txt
@@ -9818,10 +10253,13 @@ msgid ""
 " any more email from us. Please do not reply to this e-mail; if you require "
 "assistance, check the help section of the {platform_name} web site."
 msgstr ""
+"Եթե Դուք չեք խնդրել սա, ոչինչ պետք չէ անել. Դուք այլևս նամակներ չեք ստանա "
+"մեզանից։ Խնդրում ենք չպատասխանել այս էլ. նամակին։ Եթե Ձեզ օգտնություն է "
+"հարկավոր, այցելե՛ք {platform_name} կայքի «օգնություն» բաժինը։"
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Your account for {platform_name}"
-msgstr ""
+msgstr "Ձեր հաշիվը {platform_name}-ի համար"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
@@ -9835,19 +10273,25 @@ msgid ""
 "You have been invited to be a beta tester for {course_name} at {site_name} "
 "by a member of the course staff."
 msgstr ""
+"Դուք հրավիրվել եք {site_name} կայքի {course_name}-ի բետա ստուգող լինելու "
+"դասընթացի անձնակազմի անդամի կողմից։"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid "To start accessing course materials, please visit {course_url}"
 msgstr ""
+"Դասընթացի նյութերը տեսնելու համար խնդրում ենք այցելել {course_url} հասցեով"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
 msgstr ""
+"Այցելե՛ք {course_about_url} դասընթացին միանալու և բետա ստուգումը սկսելու "
+"համար։"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {site_name} to enroll in the course and begin the beta test."
 msgstr ""
+"Այցելե՛ք {site_name} դասընթաց ընդունվելու և բետա ստուգումը սկսելու համար։"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_allowedmessage.txt
@@ -9855,10 +10299,11 @@ msgstr ""
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "This email was automatically sent from {site_name} to {email_address}"
 msgstr ""
+"Այս էլ. նամակը ավտոմատ ուղարկվել է {site_name}-ից {email_address} հասցեին"
 
 #: lms/templates/emails/add_beta_tester_email_subject.txt
 msgid "You have been invited to a beta test for {course_name}"
-msgstr ""
+msgstr "Դուք հրավիրվել եք {course_name}-ը բետա ստուգում անելու"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -9866,6 +10311,9 @@ msgid ""
 "{platform_name} from {old_email} to {new_email}. If you did not make this "
 "request, please contact us at"
 msgstr ""
+"Սա հաստատում է, որ Դուք {platform_name}-ին համապատասխան էլ. հասցեն փոխել եք "
+"{old_email}-ից {new_email}։ Եթե Դուք այսպիսի հարցում չեք արել, ապա խնդրում "
+"ենք կապվել մեզ հետ հետևյալ հասցեով`"
 
 #: lms/templates/emails/confirm_email_change.txt
 msgid ""
@@ -9893,7 +10341,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "Dear student,"
-msgstr ""
+msgstr "Սիրելի ուսանող,"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -9903,7 +10351,7 @@ msgstr ""
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "To access the course visit {course_url} and login."
-msgstr ""
+msgstr "Դասընթաց մտնելու համար այցելեք {course_url}  և մուտք գործեք:"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
@@ -9922,35 +10370,41 @@ msgid ""
 "Once you have registered and activated your account, you will see "
 "{course_name} listed on your dashboard."
 msgstr ""
+"Գրանցվելուց և հաշիվը ակտիվացնելուց հետո Դուք կտեսնեք {course_name}-ը Ձեր "
+"ղեկավարման վահանակի վրա։"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid ""
 "Once you have registered and activated your account, visit "
 "{course_about_url} to join the course."
 msgstr ""
+"Գրացվելուց և Ձեր հաշիվը ակտիվացնելուց հետո, խնդրում ենք այցելել "
+"{course_about_url} դասընթացին միանալու համար։"
 
 #: lms/templates/emails/enroll_email_allowedmessage.txt
 msgid "You can then enroll in {course_name}."
-msgstr ""
+msgstr "Հետագայում կարող եք գրանցվել{course_name}:"
 
 #: lms/templates/emails/enroll_email_allowedsubject.txt
 msgid "You have been invited to register for {course_name}"
-msgstr ""
+msgstr "Դուք հրավիրվել եք գրանցվել {course_name} դասընթացին։"
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid ""
 "You have been enrolled in {course_name} at {site_name} by a member of the "
 "course staff. The course should now appear on your {site_name} dashboard."
 msgstr ""
+"{site_name} կայքի {course_name} դասընթացի անձնակազմի անդամը ընդունել է Ձեզ "
+"դասընթացում։ Դասընթացի պետք է հայտնվի Ձեր {site_name} ղեկավարման վահանակում։"
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "This email was automatically sent from {site_name} to {full_name}"
-msgstr ""
+msgstr "Նամակը ավտոմատ կերպով ուղարկվել է {site_name}-ից {full_name}-ին։"
 
 #: lms/templates/emails/enroll_email_enrolledsubject.txt
 msgid "You have been enrolled in {course_name}"
-msgstr ""
+msgstr "Դուք ընդունվել եք {course_name} դասընթաց։"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name}"
@@ -9961,42 +10415,50 @@ msgid ""
 "Your payment was successful. You will see the charge below on your next "
 "credit or debit card statement."
 msgstr ""
+"Ձեր վճարումը հաջողվեց։ Դուք ստորև բերված գումարով վճարումը կտեսնեք Ձեր "
+"կրեդիտ կամ դեբիտ քարտի հաջորդ ամփոփիչ փաստաթղթի մեջ։"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "The charge will show up on your statement under the company name "
 "{merchant_name}."
 msgstr ""
+"Վճարումը կերևա Ձեր ամփոփիչ փաստաթղթում {merchant_name} ընկերության անունով։"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "If you have billing questions, please read the FAQ ({faq_url}) or contact "
 "{billing_email}."
 msgstr ""
+"Եթե Դուք ունեք վճարման հետ կապված հարցեր, խնդրում ենք կարդալ ՀՏՀ-ը "
+"({faq_url} կամ կապվեք {billing_email} հասցեով)։"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "If you have billing questions, please contact {billing_email}."
 msgstr ""
+"Եթե ունեք վճարման հետ կապված հարցեր, խնդրում ենք կապվել {billing_email} "
+"հասցեով։"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "-The {platform_name} Team"
-msgstr ""
+msgstr "- {platform_name} թիմը"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
-msgstr ""
+msgstr "Ձեր պատվերի համարն է {order_number}"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "The items in your order are:"
-msgstr ""
+msgstr "Ձեր պատվերի միջի իրերն են`"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Quantity - Description - Price"
-msgstr ""
+msgstr "Քանակություն - Նկարագրություն - Գին"
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Total billed to credit/debit card: {currency_symbol}{total_cost}"
 msgstr ""
+"Ընդհանուր գանձված գումարը կրեդիտ/դեբիտ քարտից` {currency_symbol}{total_cost}"
 
 #: lms/templates/emails/order_confirmation_email.txt
 #: lms/templates/shoppingcart/receipt.html
@@ -10009,6 +10471,10 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the tech support at"
 msgstr ""
+"Հայցում ենք Ձեր ներողամտությունը։ Դասընթացի անձնակազմը չի հաստատել Ձեր` "
+"անունը {old_name}-ից {new_name} փոխելու հարցումը։ Եթե Ձեզ հարկավոր է "
+"լրացուցիչ օգնություն, խնդրում ենք էլ. նամակ գրել տեխնիկական օգնության թիմին "
+"հետևյալ հասցեով`"
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -10016,6 +10482,10 @@ msgid ""
 "name from {old_name} to {new_name}. If you need further assistance, please "
 "e-mail the course staff at ta@edx.org."
 msgstr ""
+"Հայցում ենք Ձեր ներողամտությունը։ Դասընթացի անձնակազմը չի հաստատել Ձեր` "
+"անունը {old_name}-ից {new_name} փոխելու հարցումը։ Եթե Ձեզ հարկավոր է "
+"լրացուցիչ օգնություն, խնդրում ենք էլ. նամակ գրել դասընթացի անձնակազմին "
+"ta@edx.org հասցեով։"
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 msgid ""
@@ -10023,15 +10493,18 @@ msgid ""
 " member of the course staff. The course will remain on your dashboard, but "
 "you will no longer be part of the beta testing group."
 msgstr ""
+"{site_name}-ի {course_name} դասընթացի անձնակազմի անդամը Ձեզ դասընթացի բետա "
+"ստուգողների ցուցակից։ Դասընթացը կմնա Ձեր ղեկավարման վահանակի վրա, բայց Դուք "
+"այլևս բետա ստուգմանը մասնակից չեք լինի։"
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid "Your other courses have not been affected."
-msgstr ""
+msgstr "Ձեր մյուս դասընթացները չեն ազդվել։"
 
 #: lms/templates/emails/remove_beta_tester_email_subject.txt
 msgid "You have been removed from a beta test for {course_name}"
-msgstr ""
+msgstr "Դուք հեռացվել եք {course_name}-ի բետա ստուգումից։"
 
 #: lms/templates/emails/unenroll_email_allowedmessage.txt
 msgid "Dear Student,"
@@ -10042,6 +10515,8 @@ msgid ""
 "You have been un-enrolled from course {course_name} by a member of the "
 "course staff. Please disregard the invitation previously sent."
 msgstr ""
+"{course_name} դասընթացի անձնակազմի անդամը Ձեզ հեռացրել է դասընթացից։ Խնդրում"
+" ենք անտեսել նախկինում ուղարկված հրավերը։"
 
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
 msgid ""
@@ -10049,14 +10524,16 @@ msgid ""
 " course staff. The course will no longer appear on your {site_name} "
 "dashboard."
 msgstr ""
+"{site_name} կայքի {course_name} դասընթացի անձնակազմի անդամը Ձեզ հեռացրել է "
+"դասընթացից։ Դասընթացի այլևս չի երևա Ձեր {site_name}-ի ղեկավարման վահանակում։"
 
 #: lms/templates/emails/unenroll_email_subject.txt
 msgid "You have been un-enrolled from {course_name}"
-msgstr ""
+msgstr "{course_name}-ի Ձեր գրանցումը չեղյալ է համարվել։"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "{course_number} Staff Grading"
-msgstr ""
+msgstr "{course_number} Անձնակազմի գնահատում"
 
 #: lms/templates/instructor/staff_grading.html
 msgid ""
@@ -10093,20 +10570,20 @@ msgstr "(Թաքցնել)"
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Student Response"
-msgstr ""
+msgstr "Ուսանողի պատասխան"
 
 #: lms/templates/instructor/staff_grading.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Written Feedback"
-msgstr ""
+msgstr "Գրավոր արձագանք"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Feedback for student (optional)"
-msgstr ""
+msgstr "Արձագանք ուսանողի համար (ոչ պարտադիր)"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Flag as inappropriate content for later review"
-msgstr ""
+msgstr "Նշել որպես անհամապատասխան նյութ հետագա վերանայման համար"
 
 #: lms/templates/instructor/staff_grading.html
 msgid "Skip"
@@ -10115,11 +10592,11 @@ msgstr "Բաց թողնել"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Add Coupon"
-msgstr ""
+msgstr "Կտրոն ավելացնել"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 msgid "Please enter Coupon detail below"
-msgstr ""
+msgstr "Խնդրում ենք ավելացնել կտրոնի մանրամասները ստորև"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10130,26 +10607,26 @@ msgstr "Կոդ"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Percentage Discount"
-msgstr ""
+msgstr "Զեղչի տոկոս"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
-msgstr ""
+msgstr "Գրանցման տեղեկություն"
 
 #. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
 #. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid ""
 "Number of enrollees (instructors, staff members, and students) by track"
-msgstr ""
+msgstr "Գրանցվածների քանակ (դասախոսներ, անձնակազմ և ուսանողներ) ըստ հոսքի"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Audit"
-msgstr ""
+msgstr "Ստուգում"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Honor"
-msgstr ""
+msgstr "Պատիվ"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -10158,7 +10635,7 @@ msgstr "Ընդհանուր"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
-msgstr ""
+msgstr "Դասընթացի հիմնական ինֆորմացիա"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Name:"
@@ -10188,7 +10665,7 @@ msgstr "Դասընթացն ավարտվե՞լ է։"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
-msgstr ""
+msgstr "Գնահատականների սահմանագծեր`"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -10198,7 +10675,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Warnings"
-msgstr ""
+msgstr "Դասընթացի նախազգուշացումներ"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -10298,12 +10775,50 @@ msgid ""
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Coupons List"
+msgid "Generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Active Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Spent Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Course Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Course Price: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Transactions"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Amount: "
 msgstr "Ընդհանուր քանակը՝"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid ""
+"Click to generate a CSV file for all purchase transactions in this course"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download All e-Commerce Purchases"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons List"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupons Information"
@@ -10318,7 +10833,7 @@ msgid "Course_id"
 msgstr "Դասընթաց_նույնականացման համար"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Discount(%)"
+msgid "Discount (%)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10340,7 +10855,16 @@ msgid "Please Enter the Coupon Discount Value Greater than 0"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Course Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Numeric value for Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Select the Currency"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -10366,6 +10890,14 @@ msgid ""
 "to individual students. Please note that the latest date is always taken; "
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Email or Username"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -10427,7 +10959,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
-msgstr ""
+msgstr "Վերականգնել վերջնաժամկետը ուսանողի համար"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Active Students"
@@ -10450,16 +10982,20 @@ msgid ""
 "The chart below displays the score distribution for each standard problem in"
 " your class, specified by the problem's url name."
 msgstr ""
+"Ստորև ներկայացված գրաֆիկը ներկայացնում է գնահատականների բաշխումը Ձեր "
+"դասընթացի յուրաքանչյուր ստանդարտ խնդրի համար, նշված խնդրի հղումով։"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid ""
 "Scores are shown without weighting applied, so if your problem contains 2 "
 "questions, it will display as having a total of 2 points."
 msgstr ""
+"Միավորները ցուցադրված են առանց կշիռների, այսինքն, եթե Ձեր խնդիրը պարունակում"
+" է երկու հարց, ապա այն ցույց կտրվի որպես 2 միավոր ունեցող խնդիր։"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Loading problem list..."
-msgstr ""
+msgstr "Խնդիրների ցուցակը բեռնվում է..."
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Gender Distribution"
@@ -10469,18 +11005,13 @@ msgstr ""
 msgid "Revert to Legacy Dashboard"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid ""
-"We've changed the look and feel of the Instructor Dashboard. During this "
-"transition time, you can still access the old Instructor Dashboard by "
-"clicking the 'Revert to Legacy Dashboard' button above."
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
 "Enter email addresses and/or usernames separated by new lines or commas."
 msgstr ""
+"Մուտքագրե՛ք էլ. հասցեները և/կամ օգտագործողի անունները առանձին տողերի վրա կամ"
+" բաժանված ստորակետներով։"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -10491,7 +11022,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Email Addresses/Usernames"
-msgstr ""
+msgstr "Էլ. հասցեներ/Օգտագործողի անուններ"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10518,7 +11049,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Notify users by email"
-msgstr ""
+msgstr "Տեղեկացնել օգտագործողներին էլ. նամակի միջոցով"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10557,7 +11088,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Add beta testers"
-msgstr ""
+msgstr "Ավելացնել բետա տեստերների"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Remove beta testers"
@@ -10766,6 +11297,18 @@ msgid "Email Task History"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "To see the content of all previously sent emails, click this button:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Sent Email History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "To read an email, click its subject."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "To see the status for all bulk email tasks ever submitted for this course, "
 "click on this button:"
@@ -10775,9 +11318,22 @@ msgstr ""
 msgid "Show Email Task History"
 msgstr ""
 
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Course Mode Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Please enter Course Mode detail below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
+msgstr ""
+
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
-msgstr ""
+msgstr "Ուսանողների գնահականների մատյան"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
@@ -10791,11 +11347,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Email or Username"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
@@ -10916,8 +11467,8 @@ msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid ""
-"Here are a list of open ended problems for this course that have been "
-"flagged by students as potentially inappropriate."
+"Here is a list of open ended problems for this course that have been flagged"
+" by students as potentially inappropriate."
 msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -10978,7 +11529,7 @@ msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
-"Here are a list of problems that need to be peer graded for this course."
+"Here is a list of problems that need to be peer graded for this course."
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
@@ -11187,11 +11738,6 @@ msgstr "Ձեր ընտրած տվյալները`"
 
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
-msgid "Unit Price"
-msgstr "Միավորի գինը"
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Price"
 msgstr "Գին"
 
@@ -11242,6 +11788,10 @@ msgstr "Քանակ"
 msgid "URL"
 msgstr "URL"
 
+#: lms/templates/shoppingcart/receipt.html
+msgid "Unit Price"
+msgstr "Միավորի գինը"
+
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
@@ -11266,6 +11816,9 @@ msgid "Registered as: "
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -11295,13 +11848,13 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Intro"
-msgstr ""
+msgstr "նախաբան"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Take Photo"
-msgstr ""
+msgstr "լուսանկարել"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
@@ -11362,7 +11915,7 @@ msgstr "Սկսվում է՝ {start_date}"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to Course"
-msgstr ""
+msgstr "Մուտք գործել դասընթաց"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
@@ -11464,7 +12017,7 @@ msgstr ""
 
 #: lms/templates/static_templates/server-error.html
 msgid "There has been a 500 error on the {platform_name} servers"
-msgstr ""
+msgstr "{platform_name} սերվերների վրա 500 սխալն է տեղի ունեցել"
 
 #: lms/templates/static_templates/server-error.html
 msgid ""
@@ -11508,7 +12061,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid "Having Technical Trouble?"
-msgstr ""
+msgstr "Ունե՞ք տեխնիկական դժվարություն"
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
@@ -11520,44 +12073,58 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
 "certificates{a_end}."
 msgstr ""
+"Խնդրում ենք {a_start} կարդացեք մեր FAQ-երը՝ հավաստագրերի մասին հաճախակի "
+"տրվող հարցերը տեսնելու համար{a_end}:"
 
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
-msgstr ""
+msgstr "Դուք գրանցվում եք .. համար"
 
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "Upgrading to:"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Re-verifying for:"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Registering as: "
+msgstr "Գրանցվել որպես`"
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Congrats! You are now registered to audit"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid "Change your mind?"
-msgstr ""
+msgstr "Փոխեցի՞ք Ձեր միտքը"
 
 #: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/photo_verification.html
@@ -11572,9 +12139,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
-msgstr ""
+msgstr "Տեխնիկական պահանջներ"
 
+#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -11663,7 +12232,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take photo"
-msgstr ""
+msgstr "լուսանկարել"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -11679,7 +12248,7 @@ msgstr "Լավ է երևում"
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Tips on taking a successful photo"
-msgstr ""
+msgstr "Հաջողված լուսանկար անելու հուշումներ"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -11691,7 +12260,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Be sure your entire face is inside the frame"
-msgstr ""
+msgstr "Համոզվեք, որ Ձեր ամբողջ դեմքը շրջանակի ներսում է"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -11735,7 +12304,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Common Questions"
-msgstr "Հաճախակի հարցեր"
+msgstr "Հաճախակի տրվող հարցեր"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -11757,7 +12326,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "What do you do with this picture?"
-msgstr ""
+msgstr "Ի՞նչ եք անում այս նկարի հետ"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -11782,7 +12351,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Edit your name"
-msgstr ""
+msgstr "Խմբագրել Ձեր անունը"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid ""
@@ -11997,7 +12566,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Ensure that you can see your photo and read your name"
-msgstr ""
+msgstr "Համոզվե՛ք, որ կարող եք տեսնել Ձեր նկարը և կարդալ անունը"
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
@@ -12157,7 +12726,7 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
-msgstr ""
+msgstr "Ի՞նչ անել, եթե իմ տեսախցիկը չի աշխատում:"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 2: Take ID Photo"
@@ -12173,6 +12742,18 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Please confirm your contribution for this course (min. $"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "Your Course Total"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "To complete your registration, you will need to pay:"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "Before proceeding, please confirm that your details match"
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
@@ -12268,7 +12849,7 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Identification"
-msgstr ""
+msgstr "Նույնականացում"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "A photo identification document"
@@ -12319,11 +12900,11 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Go to Step 1: Take my Photo"
-msgstr ""
+msgstr "Գնալ քայլ 1: Վերցնել իմ նկարը"
 
 #: lms/templates/verify_student/verified.html
 msgid "ID Verification"
-msgstr ""
+msgstr "ID ստուգում"
 
 #: lms/templates/verify_student/verified.html
 msgid "You've Been Verified Previously"
@@ -12334,6 +12915,10 @@ msgid ""
 "We've already verified your identity (through the photos of you and your ID "
 "you provided earlier). You can proceed to make your secure payment and "
 "complete registration."
+msgstr ""
+
+#: lms/templates/verify_student/verified.html
+msgid "Your Course Total is $ "
 msgstr ""
 
 #: lms/templates/verify_student/verified.html
@@ -12449,16 +13034,16 @@ msgid "Files &amp; Uploads"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/edit-tabs.html cms/templates/overview.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Content"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/course_info.html cms/templates/edit-tabs.html
-#: cms/templates/group_configurations.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/textbooks.html
+#: cms/templates/course_info.html cms/templates/course_outline.html
+#: cms/templates/edit-tabs.html cms/templates/group_configurations.html
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/textbooks.html cms/templates/ux/reference/container.html
 msgid "Page Actions"
 msgstr ""
 
@@ -12499,8 +13084,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/overview.html
-#: cms/templates/settings_graders.html
+#: cms/templates/group_configurations.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr ""
 
@@ -12557,9 +13141,7 @@ msgstr ""
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr ""
@@ -12572,39 +13154,17 @@ msgstr ""
 msgid "Delete this component"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/edit-tabs.html
+#: cms/templates/edit-tabs.html cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
-msgid "Container"
+msgid "View Live Version"
 msgstr ""
 
-#: cms/templates/container.html cms/templates/container.html
-msgid "Publishing Status"
-msgstr ""
-
-#: cms/templates/container.html
-msgid "Published"
-msgstr ""
-
-#: cms/templates/container.html
-msgid ""
-"To make changes to the content of this page, you need to edit unit "
-"{unit_link} as a draft."
-msgstr ""
-
-#: cms/templates/container.html
-msgid "Draft"
-msgstr ""
-
-#: cms/templates/container.html
-msgid ""
-"You can edit the content of this page, and your changes will be published "
-"with unit {unit_link}."
+#: cms/templates/container.html cms/templates/ux/reference/container.html
+msgid "Preview Changes"
 msgstr ""
 
 #: cms/templates/container.html
@@ -12615,9 +13175,210 @@ msgid ""
 "existing content."
 msgstr ""
 
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
-msgid "This block contains multiple components."
+#: cms/templates/container.html
+msgid "Unit Location"
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Location ID"
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"Use this ID when you create links to this unit from other course content. "
+"You enter the ID in the URL field."
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Location in Course Outline"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "Create a Course Rerun of:"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create a re-run of a course"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "You are creating a re-run from:"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Provide identifying information for this re-run of the course. The original "
+"course is not affected in any way by a re-run."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Note: Together, the organization, course number, and course run must "
+"uniquely identify this new course instance."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Required Information to Create a re-run of a course"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. Introduction to Computer Science"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The public display name for the new course. (This name is often the same as "
+"the original course name.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Organization"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. UniversityX or OrganizationX"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The name of the organization sponsoring the new course. (This name is often "
+"the same as the original organization name.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Note: No spaces or special characters are allowed."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. CS101"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The unique number that identifies the new course within the organization.  "
+"(This number is often the same as the original course number.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Course Run"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. 2014_T1"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The term in which the new course will run. (This value is often different "
+"than the original course run value.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create Re-run"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "When will my course re-run start?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "The new course is set to start on January 1, 2030 at midnight (UTC)."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "What transfers from the original course?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid ""
+"The new course has the same course outline and content as the original "
+"course. All problems, videos, announcements, and other files are duplicated "
+"to the new course."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "What does not transfer from the original course?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid ""
+"You are the only member of the new course's staff. No students are enrolled "
+"in the course, and there is no student data. There is no content in the "
+"discussion topics or wiki."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "Learn more about Course Re-runs"
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -12635,6 +13396,114 @@ msgid ""
 "respond to student questions. You add or edit updates in HTML."
 msgstr ""
 
+#: cms/templates/course_outline.html cms/templates/course_outline.html
+#: cms/templates/course_outline.html
+msgid "Course Outline"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course was created as a re-run. Some manual configuration is needed."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Be sure to review and reset all dates (the Course Start Date has been "
+"changed to a future date); set up the course team; review course updates and"
+" other assets for dated material; and seed the discussions and wiki."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Dimiss"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Click to add a new section"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "New Section"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Collapse All Sections"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Expand All Sections"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Click to open the courseware in the LMS in a new tab"
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/index.html
+msgid "View Live"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Course Start Date:"
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/course_outline.html
+msgid "Edit Start Date"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Creating your course organization"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "You add sections, subsections, and units directly in the outline."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Create a section, then add subsections and units. Open a unit to add course "
+"components."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Reorganizing your course"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Drag sections, subsections, and units to new locations in the outline."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Setting release dates and grading policies"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Select the Configure icon for a section or subsection to set its release "
+"date. When you configure a subsection, you can also set the grading policy "
+"and due date."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Changing the content students see"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To publish draft content, select the Publish icon for a section, subsection,"
+" or unit."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To hide content from students, select the Configure icon for a section, "
+"subsection, or unit, then select {em_start}Hide from students{em_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr ""
+
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
@@ -12644,12 +13513,6 @@ msgstr ""
 
 #: cms/templates/edit-tabs.html
 msgid "New Page"
-msgstr ""
-
-#: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
-#: cms/templates/index.html cms/templates/overview.html
-#: cms/templates/unit.html
-msgid "View Live"
 msgstr ""
 
 #: cms/templates/edit-tabs.html
@@ -12733,76 +13596,6 @@ msgstr ""
 #: cms/templates/edit-tabs.html cms/templates/howitworks.html
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid "close modal"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "CMS Subsection"
-msgstr ""
-
-#: cms/templates/edit_subsection.html cms/templates/unit.html
-msgid "Display Name:"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Units:"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Subsection Settings"
-msgstr ""
-
-#: cms/templates/edit_subsection.html cms/templates/overview.html
-msgid "Release Day"
-msgstr ""
-
-#: cms/templates/edit_subsection.html cms/templates/overview.html
-msgid "Release Time"
-msgstr ""
-
-#: cms/templates/edit_subsection.html cms/templates/edit_subsection.html
-#: cms/templates/overview.html
-msgid "Coordinated Universal Time"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "UTC"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid ""
-"The date above differs from the release date of {name}, which is unset."
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "The date above differs from the release date of {name} - {start_time}"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Sync to {name}."
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Graded as:"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Set a due date"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Due Day"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Due Time"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Remove due date"
-msgstr ""
-
-#: cms/templates/edit_subsection.html
-msgid "Preview Drafts"
 msgstr ""
 
 #: cms/templates/error.html
@@ -13035,10 +13828,6 @@ msgid ""
 "You can delete a group configuration only if it is not in use in an "
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
-msgstr ""
-
-#: cms/templates/group_configurations.html cms/templates/textbooks.html
-msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -13461,6 +14250,7 @@ msgid "You currently aren't associated with any Studio Courses."
 msgstr ""
 
 #: cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Please correct the highlighted fields below."
 msgstr ""
 
@@ -13473,21 +14263,9 @@ msgid "Required Information to Create a New Course"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "e.g. Introduction to Computer Science"
-msgstr ""
-
-#: cms/templates/index.html
 msgid ""
 "The public display name for your course. This cannot be changed, but you can"
 " set a different display name in Advanced Settings later."
-msgstr ""
-
-#: cms/templates/index.html cms/templates/settings.html
-msgid "Organization"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
 
 #: cms/templates/index.html
@@ -13507,10 +14285,6 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "e.g. CS101"
-msgstr ""
-
-#: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization."
 msgstr ""
@@ -13521,14 +14295,6 @@ msgid ""
 "are allowed and it cannot be changed."
 msgstr ""
 
-#: cms/templates/index.html cms/templates/settings.html
-msgid "Course Run"
-msgstr ""
-
-#: cms/templates/index.html
-msgid "e.g. 2014_T1"
-msgstr ""
-
 #: cms/templates/index.html
 msgid "The term in which your course will run."
 msgstr ""
@@ -13537,8 +14303,26 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"The new course will be added to your course list in 5-10 minutes. Return to "
+"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
+"the course list. The new course will need some manual configuration."
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"A system error occurred while your course was being processed. Please go to "
+"the original course to try the re-run again, or contact your PM for "
+"assistance."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Re-run Course"
 msgstr ""
 
 #: cms/templates/index.html
@@ -13826,119 +14610,6 @@ msgid ""
 "Admin, then ask that user to remove you from the Course Team list."
 msgstr ""
 
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Course Outline"
-msgstr ""
-
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html
-msgid "Expand/collapse this section"
-msgstr ""
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "New Section Name"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Add a new section name"
-msgstr ""
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Delete this section"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Drag to re-order"
-msgstr ""
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "New Subsection"
-msgstr ""
-
-#: cms/templates/overview.html cms/templates/widgets/units.html
-msgid "New Unit"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "You haven't added any sections to your course outline yet."
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Add your first section"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Collapse All Sections"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "New Section"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "This section is not scheduled for release"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Schedule"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Release date:"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Edit section release date"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Delete section"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Drag to reorder section"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Expand/collapse this subsection"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Delete this subsection"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Delete subsection"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid ""
-"You can create new sections and subsections, set the release date for "
-"sections, and create new units in existing subsections.  You can set the "
-"assignment type for subsections that are to be graded, and you can open a "
-"subsection for further editing."
-msgstr ""
-
-#: cms/templates/overview.html
-msgid ""
-"In addition, you can drag and drop sections, subsections, and units to "
-"reorganize your course."
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Section Release Date"
-msgstr ""
-
-#: cms/templates/overview.html
-msgid ""
-"On the date set below, this section - {name} - will be released to students."
-" Any units marked private will only be visible to admins."
-msgstr ""
-
-#: cms/templates/overview.html
-msgid "Form Actions"
-msgstr ""
-
 #: cms/templates/register.html
 msgid "Sign Up for edX Studio"
 msgstr ""
@@ -14042,6 +14713,17 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "Enroll in {course_display_name}"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"The course \"{course_display_name}\", provided by {platform_name}, is open "
+"for enrollment. Please navigate to this course at {link_for_about_page} to "
+"enroll."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -14343,15 +15025,13 @@ msgid ""
 "worth."
 msgstr ""
 
-#: cms/templates/studio_vertical_wrapper.html
-#: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr ""
 
-#: cms/templates/studio_vertical_wrapper.html
-msgid "No Actions"
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
 msgstr ""
 
 #: cms/templates/textbooks.html
@@ -14383,74 +15063,6 @@ msgid ""
 "If your textbook doesn't have individual chapters, you can upload the entire"
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
-msgstr ""
-
-#: cms/templates/unit.html cms/templates/ux/reference/unit.html
-msgid "Individual Unit"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "You are editing a draft."
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "This unit was originally published on {date}."
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "View the Live Version"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Unit Settings"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Visibility:"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Public"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Private"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid ""
-"This unit has been published. To make changes, you must {link_start}edit a "
-"draft{link_end}."
-msgstr ""
-
-#: cms/templates/unit.html
-msgid ""
-"This is a draft of the published unit. To update the live version, you must "
-"{link_start}replace it with this draft{link_end}."
-msgstr ""
-
-#: cms/templates/unit.html
-msgid ""
-"This unit is scheduled to be released to <strong>students</strong> on "
-"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid ""
-"This unit is scheduled to be released to <strong>students</strong> with the "
-"subsection {link_start}{name}{link_end}"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Delete Draft"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Unit Location"
-msgstr ""
-
-#: cms/templates/unit.html
-msgid "Unit Identifier:"
 msgstr ""
 
 #: cms/templates/emails/activation_email.txt
@@ -14514,6 +15126,88 @@ msgstr ""
 msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+msgid "View Published Version"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Publishing Status"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+msgid "Draft (Never published)"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Published"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Draft (Unpublished changes)"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create a Course Rerun of HarvardX SW12.2x T2_2014"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"A course already has that organization, course number, and course run. "
+"Change one or more of these values to give the new course a unique URL."
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Cancel and Return to Dashboard"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Processing Re-run Request"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Sed "
+"posuere consectetur est at lobortis. Maecenas faucibus mollis interdum."
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+msgid "Publish [section name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+msgid "Publish all unpublished changes for this section?"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "The following will be published:"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "Publish [subsection name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "Publish all unpublished changes for this subsection?"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-unit.html
+msgid "Publish [unit name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-unit.html
+msgid "Publish all unpublished changes for this unit?"
 msgstr ""
 
 #: cms/templates/widgets/footer.html
@@ -14665,22 +15359,6 @@ msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
-msgstr ""
-
-#: cms/templates/widgets/units.html
-msgid "Delete this unit"
-msgstr ""
-
-#: cms/templates/widgets/units.html
-msgid "Delete unit"
-msgstr ""
-
-#: cms/templates/widgets/units.html
-msgid "Drag to sort"
-msgstr ""
-
-#: cms/templates/widgets/units.html
-msgid "Drag to reorder unit"
 msgstr ""
 
 # empty
