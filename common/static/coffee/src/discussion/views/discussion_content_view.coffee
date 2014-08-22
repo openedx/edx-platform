@@ -156,7 +156,8 @@ if Backbone?
         toggleClass("is-expanded", @secondaryActionsExpanded).
         attr("aria-expanded", @secondaryActionsExpanded)
       if @secondaryActionsExpanded
-        @$(".action-list-item:first").focus()
+        if event.type == "keydown"
+          @$(".action-list-item:first").focus()
         $("body").on("click", @toggleSecondaryActions)
         $("body").on("keydown", @handleSecondaryActionEscape)
         @$(".action-list-item").on("blur", @handleSecondaryActionBlur)
