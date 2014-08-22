@@ -226,11 +226,8 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                 ele.removeClass(this.validDropClass);
 
                 // If the drag succeeded, rearrange the DOM and send the result.
-                if (destination && this.pointerInBounds(pointer, ele)) {
-                    // Make sure we don't drop into a collapsed element
-                    if (this.dragState.parentList) {
-                        this.expandElement(this.dragState.parentList);
-                    }
+                // For now, don't allow drag-and-dropping into collapsed elements
+                if (destination && this.pointerInBounds(pointer, ele) && !this.dragState.parentList) {
                     var method = this.dragState.attachMethod;
                     destination[method](ele);
                     this.handleReorder(ele);
