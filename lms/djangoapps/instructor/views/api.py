@@ -599,6 +599,14 @@ def sale_validation(request, course_id):
     except KeyError:
         return HttpResponseBadRequest("Missing required invoice_number parameter")
     try:
+        invoice_number = int(invoice_number)
+    except ValueError:
+        return HttpResponseBadRequest(
+            "invoice_number must be an integer, {value} provided".format(
+                value=invoice_number
+            )
+        )
+    try:
         event_type = request.POST["event_type"]
     except KeyError:
         return HttpResponseBadRequest("Missing required event_type parameter")

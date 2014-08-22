@@ -73,7 +73,7 @@
              <hr>
              <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
             <span class="invalid_sale">
-               <input type="text" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
+               <input type="number" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
                <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Invalidate Sale")}">
                <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Revalidate Sale")}">
             </span>
@@ -137,22 +137,7 @@
 </div>
 <script>
 
-function validateNumber(event) {
-    var key = window.event ? event.keyCode : event.which;
-    var BACKSPACE = 8, DELETE = 46, LEFT_ARROW = 37, RIGHT_ARROW = 39;
-    // only allowing the user to use some specific keys like Backspace, Delete
-    if($.inArray(event.keyCode, [BACKSPACE, DELETE, LEFT_ARROW, RIGHT_ARROW]) > -1){
-        return true;
-    }
-    // Disabling the all other keys except the numeric ones..
-    else if ( key < 48 || key > 57 ) {
-        return false;
-    }
-    else return true;
-};
    $(function () {
-
-       $('[id^=invoice_number]').keypress(validateNumber);
        var icons = {
            header: "ui-icon-circle-arrow-e",
            activeHeader: "ui-icon-circle-arrow-s"
