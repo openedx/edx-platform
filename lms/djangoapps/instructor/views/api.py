@@ -600,6 +600,14 @@ def sale_validation(request, course_id):
     except KeyError:
         return HttpResponseBadRequest("Missing required invoice_number parameter")
     try:
+        invoice_number = int(invoice_number)
+    except ValueError:
+        return HttpResponseBadRequest(
+            "invoice_number must be an integer, {value} provided".format(
+                value=invoice_number
+            )
+        )
+    try:
         event_type = request.POST["event_type"]
     except KeyError:
         return HttpResponseBadRequest("Missing required event_type parameter")
@@ -625,7 +633,7 @@ def invalidate_invoice(obj_invoice):
     obj_invoice.is_valid = False
     obj_invoice.save()
     message = _('Invoice number {0} has been invalidated.').format(obj_invoice.id)
-    return HttpResponse(JsonResponse({'message': message}))
+    return JsonResponse({'message': message})
 
 
 def re_validate_invoice(obj_invoice):
@@ -638,7 +646,7 @@ def re_validate_invoice(obj_invoice):
     obj_invoice.is_valid = True
     obj_invoice.save()
     message = _('The registration codes for invoice {0} have been re-activated.').format(obj_invoice.id)
-    return HttpResponse(JsonResponse({'message': message}))
+    return JsonResponse({'message': message})
 
 
 @ensure_csrf_cookie
