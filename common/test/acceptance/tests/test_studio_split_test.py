@@ -7,6 +7,7 @@ import os
 import math
 from unittest import skip, skipUnless
 from nose.plugins.attrib import attr
+from selenium.webdriver.support.ui import Select
 
 from xmodule.partitions.partitions import Group, UserPartition
 from bok_choy.promise import Promise, EmptyPromise
@@ -17,8 +18,9 @@ from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.container import ContainerPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.utils import add_advanced_component
+from ..pages.studio.utils import add_advanced_component, click_css
 from ..pages.xblock.utils import wait_for_xblock_initialization
+from ..pages.lms.courseware import CoursewarePage
 
 from .base_studio_test import StudioCourseTest
 
@@ -187,7 +189,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @attr('shard_1')
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class SettingsMenuTest(StudioCourseTest):
     """
     Tests that Setting menu is rendered correctly in Studio
@@ -236,7 +237,6 @@ class SettingsMenuTest(StudioCourseTest):
 
 
 @attr('shard_1')
-@skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -291,7 +291,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
     def _add_split_test_to_vertical(self, number, group_configuration_metadata=None):
         """
-        Add split test to vertical #`number`. 
+        Add split test to vertical #`number`.
 
         If `group_configuration_metadata` is not None, use it to assign group configuration to split test.
         """
@@ -319,6 +319,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         Creates a Group Configuration containing a list of groups.
         Optionally creates a Content Experiment and associates it with previous Group Configuration.
+
+        Returns group configuration or (group configuration, experiment xblock)
         """
         # Create a new group configurations
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
@@ -332,15 +334,39 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         if associate_experiment:
             # Assign newly created group configuration to experiment
             vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
-            self.course_fixture.create_xblock(
-                vertical.locator,
-                XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
-            )
+            split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+            self.course_fixture.create_xblock(vertical.locator, split_test)
 
         # Go to the Group Configuration Page
         self.page.visit()
         config = self.page.group_configurations[0]
+
+        if associate_experiment:
+            return config, split_test
         return config
+
+    def publish_unit_in_LMS_and_view(self, courseware_page):
+        """
+        Given course outline page, publish first unit and view it in LMS
+        """
+        self.outline_page.visit()
+        self.outline_page.expand_all_subsections()
+        section = self.outline_page.section_at(0)
+        unit = section.subsection_at(0).unit_at(0).go_to()
+
+        # I publish and view in LMS and it is rendered correctly
+        unit.publish_action.click()
+        unit.view_published_version()
+        self.assertEqual(len(self.browser.window_handles), 2)
+        courseware_page.wait_for_page()
+
+    def get_select_options(self, page, selector):
+        """
+        Get list of options of dropdown that is specified by selector on a given page.
+        """
+        select_element = page.q(css=selector)
+        self.assertTrue(select_element.is_present())
+        return [option.text for option in Select(select_element[0]).options]
 
     def test_no_group_configurations_added(self):
         """
@@ -614,12 +640,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Given I have a course without group configurations
         And I create new group configuration with 2 default groups
         When I set only description and try to save
-        Then I see error message "Group Configuration name is required"
+        Then I see error message "Group Configuration name is required."
         When I set a name
         And I delete the name of one of the groups and try to save
         Then I see error message "All groups must have a name"
         When I delete the group without name and try to save
-        Then I see error message "Please add at least two groups"
+        Then I see error message "Please add at least two groups."
         When I add new group and try to save
         Then I see the group configuration is saved successfully
         """
@@ -638,14 +664,13 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config = self.page.group_configurations[0]
         config.description = "Description of the group configuration."
 
-        try_to_save_and_verify_error_message("Group Configuration name is required")
+        try_to_save_and_verify_error_message("Group Configuration name is required.")
 
         # Set required field
         config.name = "Name of the Group Configuration"
         config.groups[1].name = ''
-        try_to_save_and_verify_error_message("All groups must have a name")
+        try_to_save_and_verify_error_message("All groups must have a name.")
         config.groups[1].remove()
-        try_to_save_and_verify_error_message("There must be at least two groups")
         config.add_group()
 
         # Save the configuration
@@ -860,7 +885,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
 
         # Create group configuration and associated experiment
-        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+        config, _ = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
 
         # Display details view
         config.toggle()
@@ -898,7 +923,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
 
         # Create group configuration and associated experiment
-        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+        config, _ = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
 
         # Display details view
         config.toggle()
@@ -948,7 +973,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
 
         # Create a group configuration with an associated experiment and display edit view
-        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+        config, _ = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
         config.edit()
         # Check that warning icon and message are present
         self.assertTrue(config.edit_warning_icon_is_present)
@@ -957,3 +982,60 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.",
             config.edit_warning_message_text
         )
+
+    def publish_unit_and_verify_groups_in_LMS(self, courseware_page, group_names):
+        """
+        Publish first unit in LMS and verify that Courseware page has given Groups
+        """
+        self.publish_unit_in_LMS_and_view(courseware_page)
+        self.assertEqual(u'split_test', courseware_page.xblock_component_type())
+        self.assertTrue(courseware_page.q(css=".split-test-select").is_present())
+        rendered_group_names = self.get_select_options(page=courseware_page, selector=".split-test-select")
+        self.assertListEqual(group_names, rendered_group_names)
+
+    def test_split_test_LMS_staff_view(self):
+        """
+        Scenario: Ensure that split test is correctly rendered in LMS staff mode as it is
+                  and after inactive group removal.
+
+        Given I have a course with group configurations and split test that assigned to first group configuration
+        Then I publish split test and view it in LMS in staff view
+        And it is rendered correctly
+        Then I go to group configuration and delete group
+        Then I publish split test and view it in LMS in staff view
+        And it is rendered correctly
+        Then I go to split test and delete inactive vertical
+        Then I publish unit and view unit in LMS in staff view
+        And it is rendered correctly
+        """
+
+        config, split_test = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+        container = ContainerPage(self.browser, split_test.locator)
+
+        # render in LMS correctly
+        courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.publish_unit_and_verify_groups_in_LMS(courseware_page, [u'Group A', u'Group B', u'Group C'])
+
+        # I go to group configuration and delete group
+        self.page.visit()
+        self.page.q(css='.group-toggle').first.click()
+        config.edit()
+        config.groups[2].remove()
+        config.save()
+        self.page.q(css='.group-toggle').first.click()
+        self._assert_fields(config, name="Name", description="Description", groups=["Group A", "Group B"])
+        self.browser.close()
+        self.browser.switch_to_window(self.browser.window_handles[0])
+
+        # render in LMS to see how inactive vertical is rendered
+        self.publish_unit_and_verify_groups_in_LMS(courseware_page, [u'Group A', u'Group B', u'Group ID 2 (inactive)'])
+
+        self.browser.close()
+        self.browser.switch_to_window(self.browser.window_handles[0])
+
+        # I go to split test and delete inactive vertical
+        container.visit()
+        container.delete(0)
+
+        # render in LMS again
+        self.publish_unit_and_verify_groups_in_LMS(courseware_page, [u'Group A', u'Group B'])

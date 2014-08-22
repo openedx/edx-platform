@@ -180,7 +180,6 @@ class GetItem(ItemTest):
         self.assertIn('Zooming', html)
 
 
-    @skipUnless(os.environ.get('FEATURE_GROUP_CONFIGURATIONS'), 'Tests Group Configurations feature')
     def test_split_test_edited(self):
         """
         Test that rename of a group changes display name of child vertical.
@@ -194,7 +193,7 @@ class GetItem(ItemTest):
         resp = self.create_xblock(category='split_test', parent_usage_key=root_usage_key)
         split_test_usage_key = self.response_usage_key(resp)
         self.client.ajax_post(
-            reverse_usage_url("xblock_handler", split_test_usage_key), 
+            reverse_usage_url("xblock_handler", split_test_usage_key),
             data={'metadata': {'user_partition_id': str(0)}}
         )
         html, __ = self._get_container_preview(split_test_usage_key)

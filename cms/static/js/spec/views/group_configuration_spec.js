@@ -381,7 +381,7 @@ define([
             this.view.$('form').submit();
             // See error message
             expect(this.view.$(SELECTORS.errorMessage)).toContainText(
-                'Group Configuration name is required'
+                'Group Configuration name is required.'
             );
             // No request
             expect(requests.length).toBe(0);
