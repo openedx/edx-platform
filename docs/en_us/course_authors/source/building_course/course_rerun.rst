@@ -38,7 +38,7 @@ any way.
      - No.
    * - Course team privileges, including admins, discussion moderators, beta
        testers
-     - No. Only your own role (as a course admin and instructor) is defined.
+     - No. Only the user who created the new course has access to it.
    * - Student answers, progress, and grading data
      - No.
    * - Certificates
@@ -67,12 +67,11 @@ Before you re-run a course:
   feature, and then work with you to complete the steps to :ref:`update the new
   course<Update the New Course>`.
 
+* Verify that the course that you want to re-run is in edX Studio.
+
 * Verify that you are a member of the course staff for the course that you want
   to re-run.
-
-* Verify that the course that you want to re-run was created in edX Studio, and
-  was not created in XML.
-
+  
 To re-run a course:
 
 #. Log in to Studio. Your dashboard lists the courses that you have access to

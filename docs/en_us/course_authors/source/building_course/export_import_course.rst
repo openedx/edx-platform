@@ -22,7 +22,8 @@ There are several reasons you may want to export your course:
 * To create a backup copy of your course, which you can import if you want to
   revert the course back to a previous state
 * To share with another instructor for another class
- 
+* To create a copy of your course that you can later import into another course
+  instance and customize 
  
 When you export your course, Studio creates a **.tar.gz** file that includes
 the following course data:
@@ -47,7 +48,8 @@ To export a course:
 #. From the **Tools** menu, select **Export**.
 #. Click **Export Course Content**.
 
-When the export completes you can then access the .tar.gz file on your computer.
+When the export completes you can then access the .tar.gz file on your
+computer.
 
 
 .. _Import a Course:
@@ -79,9 +81,9 @@ sure that your course is completely editable, ensure that all of your material
 is embedded in a unit.
  
 The import process has five stages. During the first two stages, you must stay
-on the Course Import page. You can leave this page after the Unpacking stage has
-completed. We recommend, however, that you don't make important changes to your
-course until the import operation has completed.
+on the Course Import page. You can leave this page after the Unpacking stage
+has completed. We recommend, however, that you don't make important changes to
+your course until the import operation has completed.
  
 To import a course:
  
