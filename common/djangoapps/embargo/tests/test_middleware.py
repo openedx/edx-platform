@@ -64,6 +64,8 @@ class EmbargoMiddlewareTests(TestCase):
             '3.0.0.0': 'SY',
             '4.0.0.0': 'SD',
             '5.0.0.0': 'AQ',  # Antartica
+            '2001:250::': 'CN',
+            '2001:1340::': 'CU',
         }
         return ip_dict.get(ip_addr, 'US')
 
@@ -91,6 +93,32 @@ class EmbargoMiddlewareTests(TestCase):
 
         # Accessing a regular page from a non-embargoed IP should succeed
         response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
+        self.assertEqual(response.status_code, 200)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_countries_ipv6(self):
+        # Accessing an embargoed page from a blocked IP should cause a redirect
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='2001:1340::', REMOTE_ADDR='2001:1340::')
+        self.assertEqual(response.status_code, 302)
+        # Following the redirect should give us the embargo page
+        response = self.client.get(
+            self.embargoed_page,
+            HTTP_X_FORWARDED_FOR='2001:1340::',
+            REMOTE_ADDR='2001:1340::',
+            follow=True
+        )
+        self.assertIn(self.embargo_text, response.content)
+
+        # Accessing a regular page from a blocked IP should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='2001:1340::', REMOTE_ADDR='2001:1340::')
+        self.assertEqual(response.status_code, 200)
+
+        # Accessing an embargoed page from a non-embargoed IP should succeed
+        response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='2001:250::', REMOTE_ADDR='2001:250::')
+        self.assertEqual(response.status_code, 200)
+
+        # Accessing a regular page from a non-embargoed IP should succeed
+        response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='2001:250::', REMOTE_ADDR='2001:250::')
         self.assertEqual(response.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

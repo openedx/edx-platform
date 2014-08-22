@@ -1,6 +1,7 @@
 import pymongo
 from uuid import uuid4
 import ddt
+import itertools
 from importlib import import_module
 from collections import namedtuple
 import unittest
@@ -8,23 +9,26 @@ import datetime
 from pytz import UTC
 
 from xmodule.tests import DATA_DIR
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum, PublishState
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import DuplicateCourseError, NoPathToItem
+
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 @ddt.ddt
@@ -33,8 +37,8 @@ class TestMixedModuleStore(unittest.TestCase):
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
     """
-    HOST = 'localhost'
-    PORT = 27017
+    HOST = MONGO_HOST
+    PORT = MONGO_PORT_NUM
     DB = 'test_mongo_%s' % uuid4().hex[:5]
     COLLECTION = 'modulestore'
     FS_ROOT = DATA_DIR
@@ -53,6 +57,7 @@ class TestMixedModuleStore(unittest.TestCase):
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
+        'port': PORT,
         'db': DB,
         'collection': COLLECTION,
     }
@@ -90,7 +95,7 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         AssertEqual replacement for CourseLocator
         """
-        if loc1.version_agnostic() != loc2.version_agnostic():
+        if loc1.for_branch(None) != loc2.for_branch(None):
             self.fail(self._formatMessage(msg, u"{} != {}".format(unicode(loc1), unicode(loc2))))
 
     def setUp(self):
@@ -124,13 +129,13 @@ class TestMixedModuleStore(unittest.TestCase):
         # create course
         self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
         if isinstance(self.course.id, CourseLocator):
-            self.course_locations[self.MONGO_COURSEID] = self.course.location.version_agnostic()
+            self.course_locations[self.MONGO_COURSEID] = self.course.location
         else:
             self.assertEqual(self.course.id, course_key)
 
         # create chapter
         chapter = self.store.create_child(self.user_id, self.course.location, 'chapter', block_id='Overview')
-        self.writable_chapter_location = chapter.location.version_agnostic()
+        self.writable_chapter_location = chapter.location
 
     def _create_block_hierarchy(self):
         """
@@ -175,13 +180,13 @@ class TestMixedModuleStore(unittest.TestCase):
 
         def create_sub_tree(parent, block_info):
             block = self.store.create_child(
-                self.user_id, parent.location.version_agnostic(),
+                self.user_id, parent.location,
                 block_info.category, block_id=block_info.display_name,
                 fields={'display_name': block_info.display_name},
             )
             for tree in block_info.sub_tree:
                 create_sub_tree(block, tree)
-            setattr(self, block_info.field_name, block.location.version_agnostic())
+            setattr(self, block_info.field_name, block.location)
 
         for tree in trees:
             create_sub_tree(self.course, tree)
@@ -191,6 +196,10 @@ class TestMixedModuleStore(unittest.TestCase):
         Get the course key for the given course string
         """
         return self.course_locations[string].course_key
+
+    def _initialize_mixed(self):
+        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
+        self.addCleanup(self.store.close_all_connections)
 
     def initdb(self, default):
         """
@@ -203,8 +212,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 if index > 0:
                     store_configs[index], store_configs[0] = store_configs[0], store_configs[index]
                 break
-        self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
-        self.addCleanup(self.store.close_all_connections)
+        self._initialize_mixed()
 
         # convert to CourseKeys
         self.course_locations = {
@@ -216,12 +224,9 @@ class TestMixedModuleStore(unittest.TestCase):
             course_id: course_key.make_usage_key('course', course_key.run)
             for course_id, course_key in self.course_locations.iteritems()  # pylint: disable=maybe-no-member
         }
-        if default == 'split':
-            self.fake_location = CourseLocator(
-                'foo', 'bar', 'slowly', branch=ModuleStoreEnum.BranchName.draft
-            ).make_usage_key('vertical', 'baz')
-        else:
-            self.fake_location = Location('foo', 'bar', 'slowly', 'vertical', 'baz')
+
+        self.fake_location = self.course_locations[self.MONGO_COURSEID].course_key.make_usage_key('vertical', 'fake')
+
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
@@ -247,6 +252,23 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.store.get_modulestore_type(
             SlashSeparatedCourseKey('foo', 'bar', '2012_Fall')), mongo_ms_type
         )
+
+    @ddt.data(*itertools.product(
+        (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
+        (True, False)
+    ))
+    @ddt.unpack
+    def test_duplicate_course_error(self, default_ms, reset_mixed_mappings):
+        """
+        Make sure we get back the store type we expect for given mappings
+        """
+        self._initialize_mixed()
+        with self.store.default_store(default_ms):
+            self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+            if reset_mixed_mappings:
+                self.store.mappings = {}
+            with self.assertRaises(DuplicateCourseError):
+                self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
 
     # split has one lookup for the course and then one for the course items
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
@@ -308,7 +330,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         course_locn = self.course_locations[self.XML_COURSEID1]
         # NOTE: use get_course if you just want the course. get_items is expensive
-        modules = self.store.get_items(course_locn.course_key, category='course')
+        modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'course'})
         self.assertEqual(len(modules), 1)
         self.assertEqual(modules[0].location, course_locn)
 
@@ -316,7 +338,7 @@ class TestMixedModuleStore(unittest.TestCase):
         course_locn = self.course_locations[self.MONGO_COURSEID]
         with check_mongo_calls(mongo_store, max_find, max_send):
             # NOTE: use get_course if you just want the course. get_items is expensive
-            modules = self.store.get_items(course_locn.course_key, category='problem')
+            modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'problem'})
         self.assertEqual(len(modules), 6)
 
         # verify that an error is raised when the revision is not valid
@@ -330,7 +352,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # split: 3 to get the course structure & the course definition (show_calculator is scope content)
     #  before the change. 1 during change to refetch the definition. 3 afterward (b/c it calls get_item to return the "new" object).
     #  2 sends to update index & structure (calculator is a setting field)
-    @ddt.data(('draft', 7, 5), ('split', 7, 2))
+    @ddt.data(('draft', 7, 5), ('split', 6, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
@@ -368,7 +390,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # Create dummy direct only xblocks
         chapter = self.store.create_item(
             self.user_id,
-            test_course.id.version_agnostic(),
+            test_course.id,
             'chapter',
             block_id='vertical_container'
         )
@@ -389,7 +411,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # Create a dummy component to test against
         xblock = self.store.create_item(
             self.user_id,
-            test_course.id.version_agnostic(),
+            test_course.id,
             'vertical',
             block_id='test_vertical'
         )
@@ -451,7 +473,6 @@ class TestMixedModuleStore(unittest.TestCase):
         )
 
         # verify pre delete state (just to verify that the test is valid)
-        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == ModuleStoreEnum.BranchName.draft)
         if hasattr(private_vert.location, 'version_guid'):
             # change to the HEAD version
             vert_loc = private_vert.location.for_version(private_leaf.location.version_guid)
@@ -504,7 +525,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
 
-        self.store.publish(private_vert.location.version_agnostic(), self.user_id)
+        self.store.publish(private_vert.location, self.user_id)
         private_leaf.display_name = 'change me'
         private_leaf = self.store.update_item(private_leaf, self.user_id)
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
@@ -512,7 +533,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with check_mongo_calls(mongo_store, max_find, max_send):
             self.store.delete_item(private_leaf.location, self.user_id)
 
-    @ddt.data(('draft', 3, 0), ('split', 6, 0))
+    @ddt.data(('draft', 2, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_courses(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -520,15 +541,18 @@ class TestMixedModuleStore(unittest.TestCase):
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
             courses = self.store.get_courses()
-        course_ids = [
-            course.location.version_agnostic()
-            if hasattr(course.location, 'version_agnostic') else course.location
-            for course in courses
-        ]
+        course_ids = [course.location for course in courses]
         self.assertEqual(len(courses), 3, "Not 3 courses: {}".format(course_ids))
         self.assertIn(self.course_locations[self.MONGO_COURSEID], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID1], course_ids)
         self.assertIn(self.course_locations[self.XML_COURSEID2], course_ids)
+
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            draft_courses = self.store.get_courses(remove_branch=True)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            published_courses = self.store.get_courses(remove_branch=True)
+        self.assertEquals([c.id for c in draft_courses], [c.id for c in published_courses])
+
 
     def test_xml_get_courses(self):
         """
@@ -604,7 +628,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
 
         # publish the course
-        self.course = self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.course = self.store.publish(self.course.location, self.user_id)
 
         # make drafts of verticals
         self.store.convert_to_draft(self.vertical_x1a, self.user_id)
@@ -630,7 +654,7 @@ class TestMixedModuleStore(unittest.TestCase):
         ])
 
         # publish the course again
-        self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.store.publish(self.course.location, self.user_id)
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
@@ -675,20 +699,22 @@ class TestMixedModuleStore(unittest.TestCase):
         Make sure that path_to_location works
         """
         self.initdb(default_ms)
-        self._create_block_hierarchy()
 
         course_key = self.course_locations[self.MONGO_COURSEID].course_key
-        should_work = (
-            (self.problem_x1a_2,
-             (course_key, u"Chapter_x", u"Sequential_x1", '1')),
-            (self.chapter_x,
-             (course_key, "Chapter_x", None, None)),
-        )
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self._create_block_hierarchy()
 
-        mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
-        for location, expected in should_work:
-            with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
-                self.assertEqual(path_to_location(self.store, location), expected)
+            should_work = (
+                (self.problem_x1a_2,
+                 (course_key, u"Chapter_x", u"Sequential_x1", '1')),
+                (self.chapter_x,
+                 (course_key, "Chapter_x", None, None)),
+            )
+
+            mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
+            for location, expected in should_work:
+                with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
+                    self.assertEqual(path_to_location(self.store, location), expected)
 
         not_found = (
             course_key.make_usage_key('video', 'WelcomeX'),
@@ -697,6 +723,18 @@ class TestMixedModuleStore(unittest.TestCase):
         for location in not_found:
             with self.assertRaises(ItemNotFoundError):
                 path_to_location(self.store, location)
+
+        # Orphaned items should not be found.
+        orphan = course_key.make_usage_key('chapter', 'OrphanChapter')
+        self.store.create_item(
+            self.user_id,
+            orphan.course_key,
+            orphan.block_type,
+            block_id=orphan.block_id
+        )
+
+        with self.assertRaises(NoPathToItem):
+            path_to_location(self.store, orphan)
 
     def test_xml_path_to_location(self):
         """
@@ -832,7 +870,6 @@ class TestMixedModuleStore(unittest.TestCase):
         # detached items (not considered as orphans)
         detached_locations = [
             course_id.make_usage_key('static_tab', 'StaticTab'),
-            course_id.make_usage_key('about', 'overview'),
             course_id.make_usage_key('course_info', 'updates'),
         ]
 
@@ -870,7 +907,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         block = self.store.create_item(
             self.user_id,
-            self.course.location.version_agnostic().course_key,
+            self.course.location.course_key,
             'problem'
         )
         self.assertEqual(self.user_id, block.edited_by)
@@ -881,7 +918,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.initdb(default_ms)
         block = self.store.create_item(
             self.user_id,
-            self.course.location.version_agnostic().course_key,
+            self.course.location.course_key,
             'problem'
         )
         self.assertEqual(self.user_id, block.subtree_edited_by)
@@ -926,7 +963,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self._create_block_hierarchy()
 
         # publish
-        self.store.publish(self.course.location.version_agnostic(), self.user_id)
+        self.store.publish(self.course.location, self.user_id)
         published_xblock = self.store.get_item(
             self.vertical_x1a,
             revision=ModuleStoreEnum.RevisionOption.published_only
@@ -962,7 +999,7 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # start off as Private
         item = self.store.create_child(self.user_id, self.writable_chapter_location, 'problem', 'test_compute_publish_state')
-        item_location = item.location.version_agnostic()
+        item_location = item.location
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
             self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
@@ -1012,13 +1049,13 @@ class TestMixedModuleStore(unittest.TestCase):
         test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
         self.assertEqual(self.store.compute_publish_state(test_course), PublishState.public)
 
-        test_course_key = test_course.id.version_agnostic()
+        test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
         chapter = self.store.create_item(self.user_id, test_course_key, 'chapter', 'Overview')
         self.assertEqual(self.store.compute_publish_state(chapter), PublishState.public)
 
-        chapter_location = chapter.location.version_agnostic()
+        chapter_location = chapter.location
 
         # test create_child of direct-only category to make sure we are autopublishing
         sequential = self.store.create_child(self.user_id, chapter_location, 'sequential', 'Sequence')
@@ -1189,6 +1226,59 @@ class TestMixedModuleStore(unittest.TestCase):
             # there should be no published problems with the old name
             assertNumProblems(problem_original_name, 0)
 
+    def verify_default_store(self, store_type):
+        # verify default_store property
+        self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
+
+        # verify internal helper method
+        store = self.store._get_modulestore_for_courseid()
+        self.assertEquals(store.get_modulestore_type(), store_type)
+
+        # verify store used for creating a course
+        try:
+            course = self.store.create_course("org", "course{}".format(uuid4().hex[:3]), "run", self.user_id)
+            self.assertEquals(course.system.modulestore.get_modulestore_type(), store_type)
+        except NotImplementedError:
+            self.assertEquals(store_type, ModuleStoreEnum.Type.xml)
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.xml)
+    def test_default_store(self, default_ms):
+        """
+        Test the default store context manager
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(default_ms):
+            self.verify_default_store(default_ms)
+
+    def test_default_store_nested(self):
+        """
+        Test the default store context manager, nested within one another
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
+            with self.store.default_store(ModuleStoreEnum.Type.split):
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+                with self.store.default_store(ModuleStoreEnum.Type.xml):
+                    self.verify_default_store(ModuleStoreEnum.Type.xml)
+                self.verify_default_store(ModuleStoreEnum.Type.split)
+            self.verify_default_store(ModuleStoreEnum.Type.mongo)
+
+    def test_default_store_fake(self):
+        """
+        Test the default store context manager, asking for a fake store
+        """
+        # initialize the mixed modulestore
+        self._initialize_mixed()
+
+        fake_store = "fake"
+        with self.assertRaisesRegexp(Exception, "Cannot find store of type {}".format(fake_store)):
+            with self.store.default_store(fake_store):
+                pass  # pragma: no cover
 
 #=============================================================================================================
 # General utils for not using django settings

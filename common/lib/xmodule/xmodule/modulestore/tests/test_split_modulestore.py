@@ -9,7 +9,6 @@ from path import path
 import re
 import random
 
-from xblock.fields import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import (
@@ -23,6 +22,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -37,8 +37,9 @@ class SplitModuleTest(unittest.TestCase):
     '''
     # Snippets of what would be in the django settings envs file
     DOC_STORE_CONFIG = {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'test_xmodule',
+        'port': MONGO_PORT_NUM,
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
     modulestore_options = {
@@ -268,7 +269,7 @@ class SplitModuleTest(unittest.TestCase):
                         "category": "problem",
                         "fields": {
                             "display_name": "Problem 3.1",
-                            "graceperiod": "4 hours 0 minutes 0 seconds"
+                            "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
                         },
                     },
                     {
@@ -486,7 +487,7 @@ class SplitModuleTest(unittest.TestCase):
                         parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
-                        course.runtime, spec['category'], spec['fields'], block_id, parent_xblock=parent
+                        course.runtime, course.id, spec['category'], block_id, spec['fields'], parent_xblock=parent
                     )
                     new_ele_dict[spec['id']] = child
                 course = split_store.persist_xblock_dag(course, revision['user_id'])
@@ -895,18 +896,18 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(matches), 6)
         matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, category='chapter')
+        matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
         self.assertEqual(len(matches), 3)
-        matches = modulestore().get_items(locator, category='garbage')
+        matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
-            category='chapter',
+            qualifiers={'category': 'chapter'},
             settings={'display_name': re.compile(r'Hera')},
         )
         self.assertEqual(len(matches), 2)
 
-        matches = modulestore().get_items(locator, children='chapter2')
+        matches = modulestore().get_items(locator, qualifiers={'children': 'chapter2'})
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].location.block_id, 'head12345')
 
@@ -1324,19 +1325,21 @@ class TestItemCrud(SplitModuleTest):
         reusable_location = course.id.version_agnostic().for_branch(BRANCH_NAME_DRAFT)
 
         # delete a leaf
-        problems = modulestore().get_items(reusable_location, category='problem')
+        problems = modulestore().get_items(reusable_location, qualifiers={'category': 'problem'})
         locn_to_del = problems[0].location
         new_course_loc = modulestore().delete_item(locn_to_del, self.user_id)
         deleted = locn_to_del.version_agnostic()
         self.assertFalse(modulestore().has_item(deleted))
         with self.assertRaises(VersionConflictError):
             modulestore().has_item(locn_to_del)
+        with self.assertRaises(ValueError):
+            modulestore().delete_item(deleted, self.user_id)
 
         self.assertTrue(modulestore().has_item(locn_to_del.course_agnostic()))
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
 
         # delete a subtree
-        nodes = modulestore().get_items(reusable_location, category='chapter')
+        nodes = modulestore().get_items(reusable_location, qualifiers={'category': 'chapter'})
         new_course_loc = modulestore().delete_item(nodes[0].location, self.user_id)
         # check subtree
 

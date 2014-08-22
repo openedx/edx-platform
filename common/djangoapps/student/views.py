@@ -582,7 +582,7 @@ def try_change_enrollment(request):
 
 
 @require_POST
-def change_enrollment(request):
+def change_enrollment(request, auto_register=False):
     """
     Modify the enrollment status for the logged-in user.
 
@@ -598,6 +598,24 @@ def change_enrollment(request):
     happens. This function should only be called from an AJAX request or
     as a post-login/registration helper, so the error messages in the responses
     should never actually be user-visible.
+    The original version of the change enrollment handler,
+    which does NOT perform auto-registration.
+
+    TODO (ECOM-16): We created a second variation of this handler that performs
+    auto-registration for an AB-test.  Depending on the results of that test,
+    we should make the winning implementation the default.
+
+    Args:
+        request (`Request`): The Django request object
+
+    Keyword Args:
+        auto_register (boolean): If True, auto-register the user
+            for a default course mode when they first enroll
+            before sending them to the "choose your track" page
+
+    Returns:
+        Response
+
     """
     user = request.user
 
@@ -635,24 +653,79 @@ def change_enrollment(request):
                 _("Student is already enrolled")
             )
 
-        # If this course is available in multiple modes, redirect them to a page
-        # where they can choose which mode they want.
-        available_modes = CourseMode.modes_for_course(course_id)
-        if len(available_modes) > 1:
-            return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-            )
+        # We use this flag to determine which condition of an AB-test
+        # for auto-registration we're currently in.
+        # (We have two URLs that both point to this view, but vary the
+        # value of `auto_register`)
+        # In the auto-registration case, we automatically register the student
+        # as "honor" before allowing them to choose a track.
+        # TODO (ECOM-16): Once the auto-registration AB-test is complete, delete
+        # one of these two conditions and remove the `auto_register` flag.
+        if auto_register:
+            # TODO (ECOM-16): This stores a flag in the session so downstream
+            # views will recognize that the user is in the "auto-registration"
+            # experimental condition.  We can remove this once the AB test completes.
+            request.session['auto_register'] = True
 
-        current_mode = available_modes[0]
-        # only automatically enroll people if the only mode is 'honor'
-        if current_mode.slug != 'honor':
-            return HttpResponse(
-                reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
-            )
+            available_modes = CourseMode.modes_for_course_dict(course_id)
 
-        CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+            # Handle professional ed as a special case.
+            # If professional ed is included in the list of available modes,
+            # then do NOT automatically enroll the student (we want them to pay first!)
+            # By convention, professional ed should be the *only* available course mode,
+            # if it's included at all -- anything else is a misconfiguration.  But if someone
+            # messes up and adds an additional course mode, we err on the side of NOT
+            # accidentally giving away free courses.
+            if "professional" not in available_modes:
+                # Enroll the user using the default mode (honor)
+                # We're assuming that users of the course enrollment table
+                # will NOT try to look up the course enrollment model
+                # by its slug.  If they do, it's possible (based on the state of the database)
+                # for no such model to exist, even though we've set the enrollment type
+                # to "honor".
+                CourseEnrollment.enroll(user, course.id)
 
-        return HttpResponse()
+            # If we have more than one course mode or professional ed is enabled,
+            # then send the user to the choose your track page.
+            # (In the case of professional ed, this will redirect to a page that
+            # funnels users directly into the verification / payment flow)
+            if len(available_modes) > 1 or "professional" in available_modes:
+                return HttpResponse(
+                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+                )
+
+            # Otherwise, there is only one mode available (the default)
+            return HttpResponse()
+
+        # If auto-registration is disabled, do NOT register the student
+        # before sending them to the "choose your track" page.
+        # This is the control for the auto-registration AB-test.
+        else:
+            # TODO (ECOM-16): If the user is NOT in the experimental condition,
+            # make sure their session reflects this.  We can remove this
+            # once the AB test completes.
+            if 'auto_register' in request.session:
+                del request.session['auto_register']
+
+            # If this course is available in multiple modes, redirect them to a page
+            # where they can choose which mode they want.
+            available_modes = CourseMode.modes_for_course(course_id)
+            if len(available_modes) > 1:
+                return HttpResponse(
+                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+                )
+
+            current_mode = available_modes[0]
+            # only automatically enroll people if the only mode is 'honor'
+            if current_mode.slug != 'honor':
+                return HttpResponse(
+                    reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
+                )
+
+            CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+
+            return HttpResponse()
+
 
     elif action == "add_to_cart":
         # Pass the request handling to shoppingcart.views

@@ -190,7 +190,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         items = self.store.get_items(
             course_id,
-            category='vertical',
+            qualifiers={'category': 'vertical'},
             revision=ModuleStoreEnum.RevisionOption.published_only
         )
         self.check_verticals(items)
@@ -247,16 +247,24 @@ class CourseTestCase(ModuleStoreTestCase):
         course1_items = self.store.get_items(course1_id)
         course2_items = self.store.get_items(course2_id)
         self.assertGreater(len(course1_items), 0)  # ensure it found content instead of [] == []
-        self.assertEqual(len(course1_items), len(course2_items))
+        if len(course1_items) != len(course2_items):
+            course1_block_ids = set([item.location.block_id for item in course1_items])
+            course2_block_ids = set([item.location.block_id for item in course2_items])
+            raise AssertionError(
+                u"Course1 extra blocks: {}; course2 extra blocks: {}".format(
+                    course1_block_ids - course2_block_ids, course2_block_ids - course1_block_ids
+                )
+            )
 
         for course1_item in course1_items:
-            course2_item_location = course1_item.location.map_into_course(course2_id)
-            if course1_item.location.category == 'course':
+            course1_item_loc = course1_item.location
+            course2_item_loc = course2_id.make_usage_key(course1_item_loc.block_type, course1_item_loc.block_id)
+            if course1_item_loc.block_type == 'course':
                 # mongo uses the run as the name, split uses 'course'
                 store = self.store._get_modulestore_for_courseid(course2_id)  # pylint: disable=protected-access
-                new_name = 'course' if isinstance(store, SplitMongoModuleStore) else course2_item_location.run
-                course2_item_location = course2_item_location.replace(name=new_name)
-            course2_item = self.store.get_item(course2_item_location)
+                new_name = 'course' if isinstance(store, SplitMongoModuleStore) else course2_item_loc.run
+                course2_item_loc = course2_item_loc.replace(name=new_name)
+            course2_item = self.store.get_item(course2_item_loc)
 
             try:
                 # compare published state
@@ -271,7 +279,7 @@ class CourseTestCase(ModuleStoreTestCase):
                     c1_state,
                     c2_state,
                     "Publish states not equal: course item {} in state {} != course item {} in state {}".format(
-                        course1_item.location, c1_state, course2_item.location, c2_state
+                        course1_item_loc, c1_state, course2_item.location, c2_state
                     )
                 )
 
@@ -289,11 +297,9 @@ class CourseTestCase(ModuleStoreTestCase):
                 expected_children = []
                 for course1_item_child in course1_item.children:
                     expected_children.append(
-                        course1_item_child.map_into_course(course2_id)
+                        course2_id.make_usage_key(course1_item_child.block_type, course1_item_child.block_id)
                     )
-                # also process course2_children just in case they have version guids
-                course2_children = [child.version_agnostic() for child in course2_item.children]
-                self.assertEqual(expected_children, course2_children)
+                self.assertEqual(expected_children, course2_item.children)
 
         # compare assets
         content_store = self.store.contentstore

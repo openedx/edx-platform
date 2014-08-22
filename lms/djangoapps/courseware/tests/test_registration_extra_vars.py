@@ -7,8 +7,73 @@ from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from mock import patch
+from bs4 import BeautifulSoup
+from django.utils import translation
 
+class TestSortedCountryList(TestCase):
+    """
+    Test that country list is always sorted alphabetically
+    """
+    def setUp(self):
+        super(TestSortedCountryList, self).setUp()
+        self.url = reverse('register_user')
 
+    def find_option_by_code(self, options, code):
+        for index, option in enumerate(options):
+            if option.attrs['value'] == code:
+                return (index, option)
+
+    @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
+    def test_country_sorting_english(self):
+        """
+        Test that country list is always sorted alphabetically in English
+        """
+        response = self.client.get(self.url)
+        soup = BeautifulSoup(response.content)
+        country = soup.find(id="country")
+        options = country.findAll("option")
+        (af_index, af_option) = self.find_option_by_code(options, 'AF')
+        self.assertEqual(
+            af_option.text,
+            u'Afghanistan',
+        )
+        (us_index, us_option) = self.find_option_by_code(options, 'US')
+        self.assertEqual(
+            us_option.text,
+            u'United States',
+        )
+        # testing that the Afghan entry is always before the US entry
+        self.assertLess(af_index, us_index)
+        # testing two option elements to be in alphabetical order
+        self.assertLess(options[1].text, options[10].text)
+
+    @patch.dict(settings.REGISTRATION_EXTRA_FIELDS, {'country': 'required'})
+    def test_country_sorting_french (self):
+        """
+        Test that country list is always sorted alphabetically in French
+        """
+        user_language = 'fr'
+        with translation.override(user_language):
+            self.client.cookies['django_language'] = user_language
+            response = self.client.get(self.url)
+            soup = BeautifulSoup(response.content)
+            country = soup.find(id="country")
+            options = country.findAll("option")
+            (af_index, af_option) = self.find_option_by_code(options, 'AF')
+            self.assertEqual(
+                af_option.text,
+                u'Afghanistan',
+            )
+            (us_index, us_option) = self.find_option_by_code(options, 'US')
+            self.assertEqual(
+                us_option.text,
+                u'États-Unis',
+            )
+            # testing that the Afghan entry is always before the US entry
+            self.assertLess(af_index, us_index)
+            # testing two option elements to be in alphabetical order
+            self.assertLess(options[1].text, options[10].text)
+        
 class TestExtraRegistrationVariables(TestCase):
     """
     Test that extra registration variables are properly checked according to settings

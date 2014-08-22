@@ -180,7 +180,7 @@ if settings.WIKI_ENABLED:
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_ID_PATTERN), include(wiki_pattern())),
     )
 
 if settings.COURSEWARE_ENABLED:
@@ -223,6 +223,17 @@ if settings.COURSEWARE_ENABLED:
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
+
+        # Used for an AB-test of auto-registration
+        # TODO (ECOM-16): Based on the AB-test, update the default behavior and change
+        # this URL to point to the original view.  Eventually, this URL
+        # should be removed, but not the AB test completes.
+        url(
+            r'^change_enrollment_autoreg$',
+            'student.views.change_enrollment',
+            {'auto_register': True},
+            name="change_enrollment_autoreg",
+        ),
 
         #About the course
         url(r'^courses/{}/about$'.format(settings.COURSE_ID_PATTERN),

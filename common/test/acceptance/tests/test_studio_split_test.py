@@ -149,11 +149,11 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'Configuration 0,1,2')
-        self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
+        self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['Group ID 0', 'Group ID 1'])
 
         # Reload the page to make sure the groups were persisted.
         container = self.go_to_nested_container_page()
-        self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['alpha', 'beta'])
+        self.verify_groups(container, ['Group 0', 'Group 1', 'Group 2'], ['Group ID 0', 'Group ID 1'])
 
     @skip("This fails periodically where it fails to trigger the add missing groups action.Dis")
     def test_missing_group(self):
@@ -289,6 +289,20 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Collapse the configuration
         config.toggle()
 
+    def _add_split_test_to_vertical(self, number, group_configuration_metadata=None):
+        """
+        Add split test to vertical #`number`. 
+
+        If `group_configuration_metadata` is not None, use it to assign group configuration to split test.
+        """
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[number]
+        if group_configuration_metadata:
+            split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata=group_configuration_metadata)
+        else:
+            split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment')
+        self.course_fixture.create_xblock(vertical.locator, split_test)
+        return split_test
+
     def populate_course_fixture(self, course_fixture):
         course_fixture.add_advanced_settings({
             u"advanced_modules": {"value": ["split_test"]},
@@ -301,6 +315,33 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             )
         )
 
+    def create_group_configuration_experiment(self, groups, associate_experiment):
+        """
+        Creates a Group Configuration containing a list of groups.
+        Optionally creates a Content Experiment and associates it with previous Group Configuration.
+        """
+        # Create a new group configurations
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, "Name", "Description.", groups).to_json(),
+                ],
+            },
+        })
+
+        if associate_experiment:
+            # Assign newly created group configuration to experiment
+            vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+            self.course_fixture.create_xblock(
+                vertical.locator,
+                XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata={'user_partition_id': 0})
+            )
+
+        # Go to the Group Configuration Page
+        self.page.visit()
+        config = self.page.group_configurations[0]
+        return config
+
     def test_no_group_configurations_added(self):
         """
         Scenario: Ensure that message telling me to create a new group configuration is
@@ -311,11 +352,10 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And "Create new Group Configuration" button is available
         """
         self.page.visit()
-        css = ".wrapper-content .no-group-configurations-content"
-        self.assertTrue(self.page.q(css=css).present)
+        self.assertTrue(self.page.no_group_configuration_message_is_present)
         self.assertIn(
             "You haven't created any group configurations yet.",
-            self.page.q(css=css).text[0]
+            self.page.no_group_configuration_message_text
         )
 
     def test_group_configurations_have_correct_data(self):
@@ -427,16 +467,6 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And I add new advanced module "Content Experiment"
         When I assign created group configuration to the module
         Then I see the module has correct groups
-        And I go to the Group Configuration page in Studio
-        And I edit the name of the group configuration, add new group and remove old one
-        And I go to the unit page in Studio
-        And I edit the unit
-        Then I see the group configuration name is changed in `Group Configuration` dropdown
-        And the group configuration name is changed on container page
-        And I see the module has 2 active groups and one inactive
-        And I see "Add missing groups" link exists
-        When I click on "Add missing groups" link
-        The I see the module has 3 active groups and one inactive
         """
         self.page.visit()
         # Create new group configuration
@@ -449,18 +479,48 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        unit = self.go_to_unit_page()
-        add_advanced_component(unit, 0, 'split_test')
-        container = self.go_to_nested_container_page()
+        split_test = self._add_split_test_to_vertical(number=0)
+
+        container = ContainerPage(self.browser, split_test.locator)
+        container.visit()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         component_editor.set_select_value_and_save('Group Configuration', 'New Group Configuration Name')
         self.verify_groups(container, ['Group A', 'Group B', 'New group'], [])
 
+    def test_container_page_active_verticals_names_are_synced(self):
+        """
+        Scenario: Ensure that the Content Experiment display synced vertical names and correct groups.
+        Given I have a course with group configuration
+        And I go to the Group Configuration page in Studio
+        And I edit the name of the group configuration, add new group and remove old one
+        And I change the name for the group "New group" to "Second Group"
+        And I go to the Container page in Studio
+        And I edit the Content Experiment
+        Then I see the group configuration name is changed in `Group Configuration` dropdown
+        And the group configuration name is changed on container page
+        And I see the module has 2 active groups and one inactive
+        And I see "Add missing groups" link exists
+        When I click on "Add missing groups" link
+        The I see the module has 3 active groups and one inactive
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    UserPartition(0, 'Name of the Group Configuration', 'Description of the group configuration.', [Group("0", 'Group A'), Group("1", 'Group B'), Group("2", 'Group C')]).to_json(),
+                ],
+            },
+        })
+
+        # Add split test to vertical and assign newly created group configuration to it
+        split_test = self._add_split_test_to_vertical(number=0, group_configuration_metadata={'user_partition_id': 0})
+
         self.page.visit()
         config = self.page.group_configurations[0]
         config.edit()
         config.name = "Second Group Configuration Name"
+        # `Group C` -> `Second Group`
+        config.groups[2].name = "Second Group"
         # Add new group
         config.add_group()  # Group D
         # Remove Group A
@@ -468,7 +528,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Save the configuration
         config.save()
 
-        container = self.go_to_nested_container_page()
+        container = ContainerPage(self.browser, split_test.locator)
+        container.visit()
         container.edit()
         component_editor = ComponentEditorView(self.browser, container.locator)
         self.assertEqual(
@@ -481,12 +542,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             container.get_xblock_information_message()
         )
         self.verify_groups(
-            container, ['Group B', 'New group'], ['Group A'],
+            container, ['Group B', 'Second Group'], ['Group ID 0'],
             verify_missing_groups_not_present=False
         )
         # Click the add button and verify that the groups were added on the page
         container.add_missing_groups()
-        self.verify_groups(container, ['Group B', 'New group', 'Group D'], ['Group A'])
+        self.verify_groups(container, ['Group B', 'Second Group', 'Group D'], ['Group ID 0'])
 
     def test_can_cancel_creation_of_group_configuration(self):
         """
@@ -563,7 +624,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see the group configuration is saved successfully
         """
         def try_to_save_and_verify_error_message(message):
-             # Try to save
+            # Try to save
             config.save()
             # Verify that configuration is still in editing mode
             self.assertEqual(config.mode, 'edit')
@@ -783,4 +844,116 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertEqual(
             group_configuration_link_name,
             self.page.group_configurations[1].name
+        )
+
+    def test_details_error_validation_message(self):
+        """
+        Scenario: When a Content Experiment uses a Group Configuration, ensure
+        that an error validation message appears if necessary.
+
+        Given I have a course with a Group Configuration containing two Groups
+        And a Content Experiment is assigned to that Group Configuration
+        When I go to the Group Configuration Page
+        Then I do not see a error icon and message in the Group Configuration details view.
+        When I add a Group
+        Then I see an error icon and message in the Group Configuration details view
+        """
+
+        # Create group configuration and associated experiment
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+
+        # Display details view
+        config.toggle()
+        # Check that error icon and message are not present
+        self.assertFalse(config.details_error_icon_is_present)
+        self.assertFalse(config.details_message_is_present)
+
+        # Add a group
+        config.toggle()
+        config.edit()
+        config.add_group()
+        config.save()
+
+        # Display details view
+        config.toggle()
+        # Check that error icon and message are present
+        self.assertTrue(config.details_error_icon_is_present)
+        self.assertTrue(config.details_message_is_present)
+        self.assertIn(
+            "This content experiment has issues that affect content visibility.",
+            config.details_message_text
+        )
+
+    def test_details_warning_validation_message(self):
+        """
+        Scenario: When a Content Experiment uses a Group Configuration, ensure
+        that a warning validation message appears if necessary.
+
+        Given I have a course with a Group Configuration containing three Groups
+        And a Content Experiment is assigned to that Group Configuration
+        When I go to the Group Configuration Page
+        Then I do not see a warning icon and message in the Group Configuration details view.
+        When I remove a Group
+        Then I see a warning icon and message in the Group Configuration details view
+        """
+
+        # Create group configuration and associated experiment
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+
+        # Display details view
+        config.toggle()
+        # Check that warning icon and message are not present
+        self.assertFalse(config.details_warning_icon_is_present)
+        self.assertFalse(config.details_message_is_present)
+
+        # Remove a group
+        config.toggle()
+        config.edit()
+        config.groups[2].remove()
+        config.save()
+
+        # Display details view
+        config.toggle()
+        # Check that warning icon and message are present
+        self.assertTrue(config.details_warning_icon_is_present)
+        self.assertTrue(config.details_message_is_present)
+        self.assertIn(
+            "This content experiment has issues that affect content visibility.",
+            config.details_message_text
+        )
+
+    def test_edit_warning_message_empty_usage(self):
+        """
+        Scenario: When a Group Configuration is not used, ensure that there are no warning icon and message.
+
+        Given I have a course with a Group Configuration containing two Groups
+        When I edit the Group Configuration
+        Then I do not see a warning icon and message
+        """
+
+        # Create a group configuration with no associated experiment and display edit view
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], False)
+        config.edit()
+        # Check that warning icon and message are not present
+        self.assertFalse(config.edit_warning_icon_is_present)
+        self.assertFalse(config.edit_warning_message_is_present)
+
+    def test_edit_warning_message_non_empty_usage(self):
+        """
+        Scenario: When a Group Configuration is used, ensure that there are a warning icon and message.
+
+        Given I have a course with a Group Configuration containing two Groups
+        When I edit the Group Configuration
+        Then I see a warning icon and message
+        """
+
+        # Create a group configuration with an associated experiment and display edit view
+        config = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B")], True)
+        config.edit()
+        # Check that warning icon and message are present
+        self.assertTrue(config.edit_warning_icon_is_present)
+        self.assertTrue(config.edit_warning_message_is_present)
+        self.assertIn(
+            "This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.",
+            config.edit_warning_message_text
         )

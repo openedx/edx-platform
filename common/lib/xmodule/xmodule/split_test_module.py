@@ -24,6 +24,8 @@ log = logging.getLogger('edx.' + __name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
+DEFAULT_GROUP_NAME =  _(u'Group ID {group_id}')
+
 
 class ValidationMessageType(object):
     """
@@ -299,8 +301,16 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         for active_child_descriptor in children:
             active_child = self.system.get_module(active_child_descriptor)
             rendered_child = active_child.render(StudioEditableModule.get_preview_view_name(active_child), context)
+            if active_child.category == 'vertical':
+                group_name, group_id  = self.get_data_for_vertical(active_child)
+                if group_name:
+                    rendered_child.content = rendered_child.content.replace(
+                        DEFAULT_GROUP_NAME.format(group_id=group_id),
+                        group_name
+                    )
             fragment.add_frag_resources(rendered_child)
             html = html + rendered_child.content
+
         return html
 
     def student_view(self, context):
@@ -342,6 +352,19 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         progresses = [child.get_progress() for child in children]
         progress = reduce(Progress.add_counts, progresses, None)
         return progress
+
+    def get_data_for_vertical(self, vertical):
+        """
+        Return name and id of a group corresponding to `vertical`.
+        """
+        user_partition = self.descriptor.get_selected_partition()
+        if user_partition:
+            for group in user_partition.groups:
+                group_id = unicode(group.id)
+                child_location = self.group_id_to_child.get(group_id, None)
+                if child_location == vertical.location:
+                    return (group.name, group.id)
+        return (None, None)
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
@@ -595,7 +618,7 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             "editor_saved should only be called when a mutable modulestore is available"
         modulestore = self.system.modulestore
         dest_usage_key = self.location.replace(category="vertical", name=uuid4().hex)
-        metadata = {'display_name': group.name}
+        metadata = {'display_name': DEFAULT_GROUP_NAME.format(group_id=group.id)}
         modulestore.create_item(
             user_id,
             self.location.course_key,
@@ -607,3 +630,19 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[unicode(group.id)] = dest_usage_key
+
+    @property
+    def general_validation_message(self):
+        """
+        Message for either error or warning validation message/s.
+
+        Returns message and type. Priority given to error type message.
+        """
+        validation_messages = self.validation_messages()
+        if validation_messages:
+            has_error = any(message.message_type == ValidationMessageType.error for message in validation_messages)
+            return {
+                'message': _(u"This content experiment has issues that affect content visibility."),
+                'type': ValidationMessageType.error if has_error else ValidationMessageType.warning,
+            }
+        return None

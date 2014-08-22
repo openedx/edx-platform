@@ -27,6 +27,7 @@
 # louyihua <supermouselyh@hotmail.com>, 2014
 # Jianfei Wang <me@thinxer.com>, 2013
 # 沈世奇 <vicapple22@gmail.com>, 2013
+# wenheping <wenheping@gmail.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013-2014
 # wuqiong <wuqiong417@gmail.com>, 2014
 # 熊冬升 <xdsnet@gmail.com>, 2013
@@ -45,6 +46,7 @@
 # 
 # Translators:
 # 肖寒 <bookman@vip.163.com>, 2013
+# Changyue Wang <peterwang.dut@gmail.com>, 2014
 # focusheart <focusheart@gmail.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
@@ -131,8 +133,10 @@
 # AdiaCheng <75707teen@gmail.com>, 2014
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 肖寒 <bookman@vip.163.com>, 2013
+# Changyue Wang <peterwang.dut@gmail.com>, 2014
 # Yufei Xue <cmouse@163.com>, 2013
 # focusheart <focusheart@gmail.com>, 2014
+# natop <golfeng@gmail.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # 李莉 <happylily0516@foxmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
@@ -185,8 +189,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-04 09:18-0400\n"
-"PO-Revision-Date: 2014-07-22 14:02+0000\n"
+"POT-Creation-Date: 2014-08-22 11:24-0400\n"
+"PO-Revision-Date: 2014-08-14 21:21+0000\n"
 "Last-Translator: wuqiong <wuqiong417@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -222,6 +226,24 @@ msgstr "问题"
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
 msgstr ""
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: cms/templates/course_outline.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+msgid "Section"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+msgid "Subsection"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/helpers.py
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unit"
+msgstr "单元"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -1125,11 +1147,18 @@ msgstr "无效的数学表达式: '{student_answer}'"
 msgid "You may not use complex numbers in range tolerance problems"
 msgstr "范围公差类型的问题不可以使用复数"
 
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a boundary
+#. (end limit) for a variable that is a complex number (a + bi), this message
+#. displays.
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: complex boundary."
 msgstr "工作人员对此问题的解答存在问题：复杂边界。"
 
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not provide
+#. a boundary (end limit) for a variable, this message displays.
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
@@ -1143,6 +1172,7 @@ msgstr "错误"
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #: common/lib/capa/capa/responsetypes.py
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "or"
 msgstr "或者"
@@ -1254,6 +1284,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: cms/templates/container.html
 msgid "Display Name"
 msgstr ""
 
@@ -1544,6 +1575,8 @@ msgid ""
 "Your answers have been saved but not graded. Click 'Check' to grade them."
 msgstr "你的答案已经保存但尚未得分，点击检查看分数"
 
+#. Translators: A student must "make an attempt" to solve the problem on the
+#. page before they can reset it.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
 msgstr "在重置之前请刷新页面并做一次尝试回答。"
@@ -2152,6 +2185,19 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Certificates Display Behavior"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
+"is the default behavior, where certificates will only appear after a course "
+"has ended. 'early_with_info' will display all certificate information before"
+" a course has ended. 'early_no_info' will hide all certificate information "
+"unless a student has earned a certificate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
 msgstr ""
 
@@ -2564,6 +2610,10 @@ msgstr ""
 msgid "Enter the date by which problems are due."
 msgstr ""
 
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group ID {group_id}"
+msgstr ""
+
 #. Translators: This message will be added to the front of messages of type
 #. warning,
 #. e.g. "Warning: this component has not been configured yet".
@@ -2638,6 +2688,10 @@ msgstr ""
 msgid ""
 "The experiment has an inactive group. Move content into active groups, then "
 "delete the inactive group."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment has issues that affect content visibility."
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -2914,6 +2968,15 @@ msgstr ""
 msgid ""
 "Enter the configurations that govern how students are grouped for content "
 "experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video caching system"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, video caching will be used for HTML5 videos."
 msgstr ""
 
 #. Translators: "Self" is used to denote an openended response that is self-
@@ -3409,16 +3472,6 @@ msgid "Percent"
 msgstr "百分比"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-msgid "Section"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-msgid "Subsection"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Opened by this number of students"
 msgstr ""
 
@@ -3459,10 +3512,6 @@ msgstr "欢迎访问edX Wiki"
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
 msgstr "浏览课程维基添加课程标题"
-
-#: lms/djangoapps/courseware/views.py
-msgid "Invalid course id."
-msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
@@ -3720,7 +3769,11 @@ msgid "Loaded course {course_name}<br/>Errors:"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
-#: cms/templates/index.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Course Name"
 msgstr "课程名称"
 
@@ -3889,15 +3942,6 @@ msgid "An error occurred while deleting the score."
 msgstr "删除该分数时出错。"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Complete"
-msgstr "已完成"
-
-#: lms/djangoapps/instructor/views/api.py
-msgid "Incomplete"
-msgstr "未完成"
-
-#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
@@ -3913,6 +3957,11 @@ msgstr "一个成绩报告生成任务已在处理中。可在'主讲教师待�
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr "成功修改了学生{0}的截止日期从{1}变为{2}"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Successfully removed invalid due date extension (unit has no due date)."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
@@ -3940,6 +3989,13 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid ""
+"The code ({code}) that you have tried to define is already in use as a "
+"registration code"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -3972,7 +4028,25 @@ msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid ""
+"To gain insights into student enrollment and participation, "
+"{link_start}visit the new dashboard for course analytics{link_end}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "Please Enter the numeric value for the course price"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "CourseMode with the mode slug({mode_slug}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+msgid "CourseMode price updated successfully"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -4000,6 +4074,30 @@ msgstr "分析"
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Metrics"
 msgstr "度量"
+
+#. Translators: number sent refers to the number of emails sent
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "0 sent"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "{num_emails} sent"
+msgid_plural "{num_emails} sent"
+msgstr[0] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "{num_emails} failed"
+msgid_plural "{num_emails} failed"
+msgstr[0] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Complete"
+msgstr "已完成"
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Incomplete"
+msgstr "未完成"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Course Statistics At A Glance"
@@ -4274,12 +4372,28 @@ msgid ""
 msgstr "寻找针对课程\"{course}\"，模块\"{problem}\"的后台任务失败。"
 
 #: lms/djangoapps/instructor/views/tools.py
+msgid "Could not find student matching identifier: {student_identifier}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
 msgstr "不能解析日期"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Couldn't find module for url: {0}"
 msgstr "不能为url {0} 找到合适的模块"
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "Unit {0} has no due date to extend."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "An extended due date must be later than the original due date."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py
+msgid "No due date extension is set for that student and unit."
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 #: lms/djangoapps/instructor/views/tools.py
@@ -4289,10 +4403,6 @@ msgstr "扩展截止日期"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Users with due date extensions for {0}"
 msgstr "拥有到期扩展{0}的用户"
-
-#: lms/djangoapps/instructor/views/tools.py
-msgid "Unit"
-msgstr "单元"
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
@@ -4598,9 +4708,12 @@ msgstr "[Refund] 用户申请退款"
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "{course_id}不存在 {mode}模式"
 
+#. Translators: In this particular case, mode_name refers to a
+#. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
+#. by which a user could enroll in the given course.
 #: lms/djangoapps/shoppingcart/models.py
-msgid "Certificate of Achievement, {mode_name} for course {course}"
-msgstr "获得了课程{course}的{mode_name}成绩证书"
+msgid "{mode_name} for course {course}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -4651,7 +4764,7 @@ msgstr "订单ID"
 msgid "Status"
 msgstr "状态"
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
 msgstr "数量"
 
@@ -4663,7 +4776,9 @@ msgstr "单位价格"
 msgid "Total Cost"
 msgstr "总价格"
 
-#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "货币"
@@ -4786,7 +4901,15 @@ msgid "Course added to cart."
 msgstr "课程添加到购物车。"
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Discount does not exist against coupon '{0}'."
+msgid "Discount does not exist against code '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Oops! The code '{0}' you entered is either invalid or expired"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Code '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -4798,22 +4921,15 @@ msgid "Coupon '{0}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' is inactive."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
 msgid "You do not have permission to view this page."
 msgstr "你没有访问此页面的权限。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr "付款处理器没有返回所需的参数：{0}"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr "对于参数 {1} ，付款处理器返回一个错误类型值 {0} 。"
 
@@ -4824,14 +4940,12 @@ msgid ""
 msgstr "付款处理器接受了一个号码不在我们系统中的订单。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr "付款处理器收取的总金额 {0} {1} 与订单总金额 {2} {3} 不一致。"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -4854,7 +4968,6 @@ msgstr ""
 "            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -4875,7 +4988,6 @@ msgstr ""
 "                "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -5176,6 +5288,64 @@ msgstr ""
 "            授权请求已被发卡行通过但被CyberSouce拒绝。'\n"
 "            可能的解决办法：尝试其他支付形式\n"
 "            "
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid "The payment processor did not return a required parameter: {parameter}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The payment processor returned a badly-typed value {value} for parameter "
+"{parameter}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"The amount charged by the processor {charged_amount} "
+"{charged_amount_currency} is different than the total cost of the order "
+"{total_cost} {total_cost_currency}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor did not accept your payment.  The decision they"
+" returned was {decision}, and the reason was {reason}.  You were not "
+"charged. Please try a different form of payment.  Contact us with payment-"
+"related questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor sent us back a payment confirmation that had "
+"inconsistent data!  We apologize that we cannot verify whether the charge "
+"went through and take further action on your order.  The specific error "
+"message is: {msg}  Your credit card may possibly have been charged.  Contact"
+" us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Due to an error your purchase was charged for a different amount than"
+" the order total!  The specific error message is: {msg}.  Your credit card "
+"has probably been charged. Contact us with payment-specific questions at "
+"{email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry! Our payment processor sent us back a corrupted message regarding your"
+" charge, so we are unable to validate that the message actually came from "
+"the payment processor. The specific error message is: {msg}. We apologize "
+"that we cannot verify whether the charge went through and take further "
+"action on your order. Your credit card may possibly have been charged.  "
+"Contact us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
+"Sorry!  Your payment could not be processed because an unexpected exception "
+"occurred.  Please contact us at {email} for assistance."
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
@@ -5483,6 +5653,7 @@ msgstr ""
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #, fuzzy
 msgid "Required Information"
 msgstr ""
@@ -5591,9 +5762,7 @@ msgstr "删除文章"
 
 #: lms/templates/wiki/delete.html
 #: lms/templates/wiki/plugins/attachments/index.html
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5630,8 +5799,7 @@ msgid "You are deleting an article. Please confirm."
 msgstr "您正试图删除文章。请确认！"
 
 #: lms/templates/wiki/edit.html cms/templates/component.html
-#: cms/templates/container.html cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -5645,7 +5813,7 @@ msgstr "编辑"
 msgid "Save changes"
 msgstr "保存修改"
 
-#: lms/templates/wiki/edit.html cms/templates/unit.html
+#: lms/templates/wiki/edit.html
 msgid "Preview"
 msgstr "预览"
 
@@ -5665,6 +5833,7 @@ msgstr "预览"
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
 #: lms/templates/modal/_modal-settings-language.html
 #: lms/templates/modal/accessible_confirm.html
 msgid "Close"
@@ -6086,6 +6255,10 @@ msgid "Blank"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
+msgid "Unscheduled"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
 msgid ""
 "Special characters not allowed in organization, course number, and course "
 "run."
@@ -6123,7 +6296,7 @@ msgid "must have name of the configuration"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-msgid "must have at least two groups"
+msgid "must have at least one group"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -6133,6 +6306,10 @@ msgstr ""
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr "课程成功被导出到Git源"
+
+#: cms/djangoapps/contentstore/views/helpers.py
+msgid "Vertical"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
@@ -6157,6 +6334,10 @@ msgstr "'{0}'副本"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
 msgstr "'{0}'副本"
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
@@ -6246,19 +6427,36 @@ msgstr "页面无法找到"
 msgid "close"
 msgstr "关闭"
 
-#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/container.html cms/templates/course_outline.html
+#: cms/templates/group_configurations.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Loading..."
 msgstr "载入中..."
 
-#. Translators: this is a verb describing the action of viewing more details
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
-#: lms/templates/wiki/includes/article_menu.html
-msgid "View"
-msgstr "阅览"
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Cancel"
+msgstr "取消"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: lms/templates/courseware/course_about.html
+msgid "Course Number"
+msgstr "课程代码"
 
 #: cms/templates/group_configurations.html cms/templates/manage_users.html
 #: cms/templates/settings.html cms/templates/settings_advanced.html
@@ -6271,31 +6469,20 @@ msgstr "设置"
 msgid "Error:"
 msgstr "错误："
 
-#: cms/templates/index.html cms/templates/settings.html
-#: lms/templates/courseware/course_about.html
-msgid "Course Number"
-msgstr "课程代码"
-
-#: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Cancel"
-msgstr "取消"
-
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Organization:"
 msgstr "组织："
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course Number:"
 msgstr "课程代码："
+
+#: cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
+msgid "Dismiss"
+msgstr "解散"
 
 #: cms/templates/index.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -6320,15 +6507,6 @@ msgstr "密码"
 msgid "Admin"
 msgstr "管理员"
 
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: lms/templates/problem.html lms/templates/word_cloud.html
-#: lms/templates/combinedopenended/openended/open_ended.html
-#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
-#: lms/templates/verify_student/face_upload.html
-msgid "Save"
-msgstr "保存"
-
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
@@ -6344,6 +6522,12 @@ msgstr "公开用户名"
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "Preferred Language"
 msgstr "常用语言"
+
+#. Translators: this is a verb describing the action of viewing more details
+#: cms/templates/studio_xblock_wrapper.html
+#: lms/templates/wiki/includes/article_menu.html
+msgid "View"
+msgstr "阅览"
 
 #: cms/templates/registration/activation_complete.html
 #: lms/templates/registration/activation_complete.html
@@ -6407,9 +6591,11 @@ msgid "Sign up and work toward a verified Certificate of Achievement."
 msgstr "注册并完成身份认证证书。"
 
 #: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
 msgid "Select your contribution for this course (min. $"
 msgstr "选择课程捐款 (最少 $"
 
+#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "):"
@@ -6465,6 +6651,7 @@ msgid "Select Honor Code Certificate"
 msgstr "选择诚信准则证书"
 
 #: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "更新您的登记"
 
@@ -6500,6 +6687,7 @@ msgid ""
 msgstr "身份认证证书通过获取您身份、头像和ID的相关证据并在课程学习过程中检查核对以确认是您本人通过自身努力完成课程学习，通过课程考核。"
 
 #: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
 msgid "Audit This Course"
 msgstr "旁听这门课程"
 
@@ -6510,6 +6698,41 @@ msgstr "免费登入来审计这门课程，并且拥有自己的学习记录。
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
 msgstr "选择审计"
+
+#: common/templates/course_modes/choose.html
+msgid "Now choose your course track:"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+#: common/templates/course_modes/choose.html
+msgid "Pursue a Verified Certificate"
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Plan to use your completed coursework for job applications, career "
+"advancement, or school applications? Upgrade to work toward a Verified "
+"Certificate of Achievement to document your accomplishment. A minimum fee "
+"applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"Plan to use your completed coursework for job applications, career "
+"advancement, or school applications? Then work toward a Verified Certificate"
+" of Achievement to document your accomplishment. A minimum fee applies."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid ""
+"You can audit this course and still have complete access to the course "
+"material. If you complete and pass the course you will automatically earn an"
+" Honor Code Certificate free of charge."
+msgstr ""
+
+#: common/templates/course_modes/choose.html
+msgid "Pursue an Honor Code Certificate"
+msgstr ""
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
@@ -6793,6 +7016,8 @@ msgstr ""
 "info\"></span>"
 
 #: lms/templates/dashboard.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -7448,6 +7673,13 @@ msgstr "您没有任何笔记。"
 msgid "Reset"
 msgstr "重置"
 
+#: lms/templates/problem.html lms/templates/word_cloud.html
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/verify_student/face_upload.html
+msgid "Save"
+msgstr "保存"
+
 #: lms/templates/problem.html
 msgid "Reveal Answer"
 msgstr "揭示答案"
@@ -7772,11 +8004,9 @@ msgid "Login."
 msgstr "登录"
 
 #: lms/templates/split_test_author_view.html
-msgid "This content experiment uses group configuration '{experiment_name}'."
-msgstr ""
-
-#: lms/templates/split_test_author_view.html
-msgid "This content experiment has issues that affect content visibility."
+msgid ""
+"This content experiment uses group configuration "
+"'{group_configuration_name}'."
 msgstr ""
 
 #: lms/templates/split_test_author_view.html
@@ -9062,6 +9292,25 @@ msgstr "您已经注册。"
 msgid "Register for"
 msgstr "注册"
 
+#. Translators: This is the second line on a button users can click.  The
+#. first
+#. line is "Register for COURSE_NAME"
+#. The "choose your student track" means users can select between taking the
+#. course as an auditor, as a verified student, etc
+#: lms/templates/courseware/mktg_course_about.html
+msgid "and choose your student track"
+msgstr ""
+
+#. Translators: This is the second line on a button users can click.  The
+#. first
+#. line is "Register for COURSE_NAME"
+#. 'Verification' here refers to verifying one's identity in order to receive
+#. a
+#. verified certificate.
+#: lms/templates/courseware/mktg_course_about.html
+msgid "and proceed to verification"
+msgstr ""
+
 #: lms/templates/courseware/mktg_course_about.html
 msgid "Registration Is Closed"
 msgstr "注册已经截止。"
@@ -9204,6 +9453,7 @@ msgstr "作为一名已认证的学生，你已成功注册。"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "登记为："
 
@@ -9229,6 +9479,14 @@ msgstr "你正在旁听这门课程"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Auditing"
 msgstr "旁听"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You're enrolled as a professional education student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Professional Ed"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -9280,6 +9538,12 @@ msgstr "查看存档的课程"
 #: lms/templates/shoppingcart/receipt.html
 msgid "View Course"
 msgstr "查看课程"
+
+#. Translators: The course's name will be added to the end of this sentence.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Are you sure you want to unregister from the purchased course"
+msgstr ""
 
 #. Translators: The course's name will be added to the end of this sentence.
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -9335,10 +9599,6 @@ msgid ""
 " for a Verified Certificate.  If you think this is in error, please contact "
 "us at {email}."
 msgstr "您重新验证{course_name}课程失败，您不再享有该课程认证证书。如果您对此有质疑，请通过邮件{email}联系我们。"
-
-#: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
-msgid "Dismiss"
-msgstr "解散"
 
 #: lms/templates/dashboard/_dashboard_reverification_sidebar.html
 msgid "Re-verification now open for:"
@@ -10315,11 +10575,49 @@ msgid ""
 msgstr "<b>注意</b>：为了确保学生数据的安全，您不能保存或邮寄这些链接以便将来直接访问，因为这些链接5分钟之后会失效。"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Coupons List"
+msgid "Generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Active Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Spent Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Course Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Course Price: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Transactions"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Amount: "
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid ""
+"Click to generate a CSV file for all purchase transactions in this course"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download All e-Commerce Purchases"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Coupons List"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10335,7 +10633,7 @@ msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Discount(%)"
+msgid "Discount (%)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -10357,7 +10655,16 @@ msgid "Please Enter the Coupon Discount Value Greater than 0"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Course Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Numeric value for Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Select the Currency"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -10384,6 +10691,14 @@ msgid ""
 "you cannot use this tool to make an assignment due earlier for a particular "
 "student."
 msgstr "现在，您可以将一些特殊的单元小节单独授权给个别的学生，但请注意在最后的日期之前，另外你不能使用这个工具来给一个特别的学生提前布置任务。"
+
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/extensions.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student Email or Username"
+msgstr "学生e-mail或者用户名"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -10485,13 +10800,6 @@ msgstr "性别分布"
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
 msgstr "回归传统界面"
-
-#: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
-msgid ""
-"We've changed the look and feel of the Instructor Dashboard. During this "
-"transition time, you can still access the old Instructor Dashboard by "
-"clicking the 'Revert to Legacy Dashboard' button above."
-msgstr "我们已经改变教师面板界面外观。值此更改时期，您依然可以通过点击'回归传统界面'按钮以访问旧教师面板界面。"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
@@ -10788,6 +11096,18 @@ msgid "Email Task History"
 msgstr "邮件任务历史"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "To see the content of all previously sent emails, click this button:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Sent Email History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "To read an email, click its subject."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
 "To see the status for all bulk email tasks ever submitted for this course, "
 "click on this button:"
@@ -10796,6 +11116,19 @@ msgstr "若要查看本课程所有已提交批量邮件任务的状态，点击
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Email Task History"
 msgstr "显示邮件任务历史"
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Course Mode Price"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Please enter Course Mode detail below"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"
@@ -10814,11 +11147,6 @@ msgstr "查看成绩单"
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student-specific grade inspection"
 msgstr "特定学生分数检查和调整"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Email or Username"
-msgstr "学生e-mail或者用户名"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
@@ -10939,9 +11267,9 @@ msgstr "标记的开放性问题"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid ""
-"Here are a list of open ended problems for this course that have been "
-"flagged by students as potentially inappropriate."
-msgstr "以下是这门课程的开放性问题列表，学生认为这些问题可能不恰当。"
+"Here is a list of open ended problems for this course that have been flagged"
+" by students as potentially inappropriate."
+msgstr ""
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "No flagged problems exist."
@@ -11009,8 +11337,8 @@ msgstr "同伴互评"
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid ""
-"Here are a list of problems that need to be peer graded for this course."
-msgstr "以下是这门课程中需要进行同伴互评的问题列表。"
+"Here is a list of problems that need to be peer graded for this course."
+msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Due date"
@@ -11221,11 +11549,6 @@ msgstr "您选择的项目："
 
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
-msgid "Unit Price"
-msgstr "单价"
-
-#: lms/templates/shoppingcart/list.html
-#: lms/templates/shoppingcart/receipt.html
 msgid "Price"
 msgstr "价格"
 
@@ -11276,6 +11599,10 @@ msgstr "数量"
 msgid "URL"
 msgstr ""
 
+#: lms/templates/shoppingcart/receipt.html
+msgid "Unit Price"
+msgstr "单价"
+
 #. Translators: Please keep the "<del>" and "</del>" tags around your
 #. translation of the word "this" in your translation.
 #: lms/templates/shoppingcart/receipt.html
@@ -11300,6 +11627,9 @@ msgid "Registered as: "
 msgstr "注册为:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
@@ -11557,10 +11887,12 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
 msgstr "有疑问？"
 
 #: lms/templates/verify_student/_reverification_support.html
+#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
@@ -11568,28 +11900,38 @@ msgid ""
 msgstr "请阅读 {a_start}我们FAQs中关于认证的问题与评论{a_end}."
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "You are upgrading your registration for"
 msgstr "更新您的注册信息于"
 
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "You are re-verifying for"
 msgstr "您正在重新审核"
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "You are registering for"
 msgstr "你注册到"
 
+#: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "Upgrading to:"
 msgstr "升级成："
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Re-verifying for:"
 msgstr "重审中"
 
 #: lms/templates/verify_student/_verification_header.html
+#: lms/templates/verify_student/_verification_header.html
 msgid "Registering as: "
 msgstr "注册为:"
+
+#: lms/templates/verify_student/_verification_header.html
+msgid "Congrats! You are now registered to audit"
+msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -11609,9 +11951,11 @@ msgid ""
 msgstr "你可以一直 {a_start}免费访问课程 {a_end} 而不进行认证。"
 
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/_verification_support.html
 msgid "Technical Requirements"
 msgstr "技术要求"
 
+#: lms/templates/verify_student/_verification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
@@ -12218,6 +12562,18 @@ msgid "Please confirm your contribution for this course (min. $"
 msgstr "请确认您对本课程的捐助(最小$"
 
 #: lms/templates/verify_student/photo_verification.html
+msgid "Your Course Total"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "To complete your registration, you will need to pay:"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid "Before proceeding, please confirm that your details match"
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Once you verify your details match the requirements, you can move on to step"
 " 4, payment on our secure server."
@@ -12381,6 +12737,10 @@ msgid ""
 msgstr "我已经验证你的身份(通过你的照片以及你提供的其他身份材料)。你可以进行安全支付以完成注册。"
 
 #: lms/templates/verify_student/verified.html
+msgid "Your Course Total is $ "
+msgstr ""
+
+#: lms/templates/verify_student/verified.html
 msgid "You have decided to pay $ "
 msgstr "你已经决定支付$"
 
@@ -12493,16 +12853,16 @@ msgid "Files &amp; Uploads"
 msgstr "文件&amp;上传"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
-#: cms/templates/edit-tabs.html cms/templates/overview.html
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
 #: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Content"
 msgstr "内容"
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/course_info.html cms/templates/edit-tabs.html
-#: cms/templates/group_configurations.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/overview.html
-#: cms/templates/textbooks.html
+#: cms/templates/course_info.html cms/templates/course_outline.html
+#: cms/templates/edit-tabs.html cms/templates/group_configurations.html
+#: cms/templates/index.html cms/templates/manage_users.html
+#: cms/templates/textbooks.html cms/templates/ux/reference/container.html
 msgid "Page Actions"
 msgstr "页面操作"
 
@@ -12544,8 +12904,7 @@ msgid ""
 msgstr "你可以通过设定外部URL的值来引用你课程外的文件或者图像。请不要将外部URL值作为课程内部链接值直接使用。"
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/overview.html
-#: cms/templates/settings_graders.html
+#: cms/templates/group_configurations.html cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr "我在这个页面能做什么？"
 
@@ -12602,9 +12961,7 @@ msgstr "您所做的课程检查表的修改将会自动保存，其它成员也
 msgid "Studio checklists"
 msgstr ""
 
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Duplicate"
 msgstr "复制"
@@ -12617,40 +12974,18 @@ msgstr "复制该组件"
 msgid "Delete this component"
 msgstr "删除此组件"
 
-#: cms/templates/component.html cms/templates/container_xblock_component.html
-#: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/studio_xblock_wrapper.html
+#: cms/templates/component.html cms/templates/edit-tabs.html
+#: cms/templates/edit-tabs.html cms/templates/studio_xblock_wrapper.html
 msgid "Drag to reorder"
 msgstr ""
 
 #: cms/templates/container.html
-msgid "Container"
-msgstr "容器"
+msgid "View Live Version"
+msgstr ""
 
-#: cms/templates/container.html cms/templates/container.html
-msgid "Publishing Status"
-msgstr "发布状态"
-
-#: cms/templates/container.html
-msgid "Published"
-msgstr "已经发布"
-
-#: cms/templates/container.html
-msgid ""
-"To make changes to the content of this page, you need to edit unit "
-"{unit_link} as a draft."
-msgstr "为了修改本页面的内容，您需要以草稿形式来编辑{unit_link}单元。"
-
-#: cms/templates/container.html
-msgid "Draft"
-msgstr "草稿"
-
-#: cms/templates/container.html
-msgid ""
-"You can edit the content of this page, and your changes will be published "
-"with unit {unit_link}."
-msgstr "您可以编辑该页面的内容，变更的内容将在{unit_link}单元发布。"
+#: cms/templates/container.html cms/templates/ux/reference/container.html
+msgid "Preview Changes"
+msgstr ""
 
 #: cms/templates/container.html
 msgid ""
@@ -12660,9 +12995,210 @@ msgid ""
 "existing content."
 msgstr "您可以在这个页面上浏览、编辑包含其它组件的课程组件。针对实验板块，这有助于您确认实验组配置的正确性，也便于您修改已经存在的页面内容。"
 
-#: cms/templates/container_xblock_component.html
-#: cms/templates/studio_xblock_wrapper.html
-msgid "This block contains multiple components."
+#: cms/templates/container.html
+msgid "Unit Location"
+msgstr "单元位置"
+
+#: cms/templates/container.html
+msgid "Location ID"
+msgstr ""
+
+#: cms/templates/container.html
+msgid ""
+"Use this ID when you create links to this unit from other course content. "
+"You enter the ID in the URL field."
+msgstr ""
+
+#: cms/templates/container.html
+msgid "Location in Course Outline"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "Create a Course Rerun of:"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create a re-run of a course"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "You are creating a re-run from:"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Provide identifying information for this re-run of the course. The original "
+"course is not affected in any way by a re-run."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Note: Together, the organization, course number, and course run must "
+"uniquely identify this new course instance."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Required Information to Create a re-run of a course"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. Introduction to Computer Science"
+msgstr "例如，计算机科学导论"
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The public display name for the new course. (This name is often the same as "
+"the original course name.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Organization"
+msgstr "组织"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. UniversityX or OrganizationX"
+msgstr "例如：UniversityX 或 OrganizationX"
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The name of the organization sponsoring the new course. (This name is often "
+"the same as the original organization name.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Note: No spaces or special characters are allowed."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. CS101"
+msgstr "例如： CS101"
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The unique number that identifies the new course within the organization.  "
+"(This number is often the same as the original course number.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/settings.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Course Run"
+msgstr "开课时间"
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "e.g. 2014_T1"
+msgstr "例如：2014_T1"
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"The term in which the new course will run. (This value is often different "
+"than the original course run value.)"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create Re-run"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "When will my course re-run start?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "The new course is set to start on January 1, 2030 at midnight (UTC)."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "What transfers from the original course?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid ""
+"The new course has the same course outline and content as the original "
+"course. All problems, videos, announcements, and other files are duplicated "
+"to the new course."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "What does not transfer from the original course?"
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid ""
+"You are the only member of the new course's staff. No students are enrolled "
+"in the course, and there is no student data. There is no content in the "
+"discussion topics or wiki."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html
+msgid "Learn more about Course Re-runs"
 msgstr ""
 
 #: cms/templates/course_info.html cms/templates/course_info.html
@@ -12680,6 +13216,114 @@ msgid ""
 "respond to student questions. You add or edit updates in HTML."
 msgstr "使用课程更新来通知学生重要的日期或者考试，高亮显示论坛中的特别讨论，发布进度变更，以及回复学生问题。你可以用HTML来编辑更新。"
 
+#: cms/templates/course_outline.html cms/templates/course_outline.html
+#: cms/templates/course_outline.html
+msgid "Course Outline"
+msgstr "课程大纲"
+
+#: cms/templates/course_outline.html
+msgid ""
+"This course was created as a re-run. Some manual configuration is needed."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Be sure to review and reset all dates (the Course Start Date has been "
+"changed to a future date); set up the course team; review course updates and"
+" other assets for dated material; and seed the discussions and wiki."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Dimiss"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Click to add a new section"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "New Section"
+msgstr "添加新章节"
+
+#: cms/templates/course_outline.html
+msgid "Collapse All Sections"
+msgstr "折叠所有章节"
+
+#: cms/templates/course_outline.html
+msgid "Expand All Sections"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Click to open the courseware in the LMS in a new tab"
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/edit-tabs.html
+#: cms/templates/index.html
+msgid "View Live"
+msgstr "在线查看"
+
+#: cms/templates/course_outline.html
+msgid "Course Start Date:"
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/course_outline.html
+msgid "Edit Start Date"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Creating your course organization"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "You add sections, subsections, and units directly in the outline."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Create a section, then add subsections and units. Open a unit to add course "
+"components."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Reorganizing your course"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Drag sections, subsections, and units to new locations in the outline."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Setting release dates and grading policies"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"Select the Configure icon for a section or subsection to set its release "
+"date. When you configure a subsection, you can also set the grading policy "
+"and due date."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Changing the content students see"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To publish draft content, select the Publish icon for a section, subsection,"
+" or unit."
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid ""
+"To hide content from students, select the Configure icon for a section, "
+"subsection, or unit, then select {em_start}Hide from students{em_end}."
+msgstr ""
+
+#: cms/templates/course_outline.html cms/templates/group_configurations.html
+#: cms/templates/textbooks.html
+msgid "Learn More"
+msgstr ""
+
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
 #: cms/templates/edit-tabs.html cms/templates/edit-tabs.html
@@ -12690,12 +13334,6 @@ msgstr "页面"
 #: cms/templates/edit-tabs.html
 msgid "New Page"
 msgstr "新的页面"
-
-#: cms/templates/edit-tabs.html cms/templates/edit_subsection.html
-#: cms/templates/index.html cms/templates/overview.html
-#: cms/templates/unit.html
-msgid "View Live"
-msgstr "在线查看"
 
 #: cms/templates/edit-tabs.html
 msgid ""
@@ -12779,76 +13417,6 @@ msgstr "课程页面链接位于课程主页上方的导航条。首先是缺省
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid "close modal"
 msgstr "相似的模型"
-
-#: cms/templates/edit_subsection.html
-msgid "CMS Subsection"
-msgstr "CMS小节"
-
-#: cms/templates/edit_subsection.html cms/templates/unit.html
-msgid "Display Name:"
-msgstr "显示名称："
-
-#: cms/templates/edit_subsection.html
-msgid "Units:"
-msgstr "单元："
-
-#: cms/templates/edit_subsection.html
-msgid "Subsection Settings"
-msgstr "小节设置"
-
-#: cms/templates/edit_subsection.html cms/templates/overview.html
-msgid "Release Day"
-msgstr "发布日期"
-
-#: cms/templates/edit_subsection.html cms/templates/overview.html
-msgid "Release Time"
-msgstr "发布时间"
-
-#: cms/templates/edit_subsection.html cms/templates/edit_subsection.html
-#: cms/templates/overview.html
-msgid "Coordinated Universal Time"
-msgstr "世界标准时间"
-
-#: cms/templates/edit_subsection.html
-msgid "UTC"
-msgstr "国际标准时间"
-
-#: cms/templates/edit_subsection.html
-msgid ""
-"The date above differs from the release date of {name}, which is unset."
-msgstr "上述日期与尚未设定的{name}的发布日期不同。"
-
-#: cms/templates/edit_subsection.html
-msgid "The date above differs from the release date of {name} - {start_time}"
-msgstr "以上日期与{name} 的发布日期- {start_time}不一致"
-
-#: cms/templates/edit_subsection.html
-msgid "Sync to {name}."
-msgstr "同步至{name}。"
-
-#: cms/templates/edit_subsection.html
-msgid "Graded as:"
-msgstr "当前评分方式："
-
-#: cms/templates/edit_subsection.html
-msgid "Set a due date"
-msgstr "设置一个截止日期"
-
-#: cms/templates/edit_subsection.html
-msgid "Due Day"
-msgstr "截止日期"
-
-#: cms/templates/edit_subsection.html
-msgid "Due Time"
-msgstr "截止时间"
-
-#: cms/templates/edit_subsection.html
-msgid "Remove due date"
-msgstr "移除截止日期"
-
-#: cms/templates/edit_subsection.html
-msgid "Preview Drafts"
-msgstr "预览草稿"
 
 #: cms/templates/error.html
 msgid "Internal Server Error"
@@ -13084,10 +13652,6 @@ msgid ""
 "You can delete a group configuration only if it is not in use in an "
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
-msgstr ""
-
-#: cms/templates/group_configurations.html cms/templates/textbooks.html
-msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -13518,6 +14082,7 @@ msgid "You currently aren't associated with any Studio Courses."
 msgstr "您当前与Studio中的任何课程均无关联。"
 
 #: cms/templates/index.html
+#: cms/templates/ux/reference/course-create-rerun.html
 msgid "Please correct the highlighted fields below."
 msgstr "请改正下面高亮的字段。"
 
@@ -13530,22 +14095,10 @@ msgid "Required Information to Create a New Course"
 msgstr "创建一个新课程的必要信息"
 
 #: cms/templates/index.html
-msgid "e.g. Introduction to Computer Science"
-msgstr "例如，计算机科学导论"
-
-#: cms/templates/index.html
 msgid ""
 "The public display name for your course. This cannot be changed, but you can"
 " set a different display name in Advanced Settings later."
 msgstr ""
-
-#: cms/templates/index.html cms/templates/settings.html
-msgid "Organization"
-msgstr "组织"
-
-#: cms/templates/index.html
-msgid "e.g. UniversityX or OrganizationX"
-msgstr "例如：UniversityX 或 OrganizationX"
 
 #: cms/templates/index.html
 msgid "The name of the organization sponsoring the course."
@@ -13564,10 +14117,6 @@ msgid ""
 msgstr "这将不能被更改，但是您可以稍后在高级设置中设置不同的显示名称。"
 
 #: cms/templates/index.html
-msgid "e.g. CS101"
-msgstr "例如： CS101"
-
-#: cms/templates/index.html
 msgid ""
 "The unique number that identifies your course within your organization."
 msgstr "这个编号用来标记该课程在组织内的唯一性。"
@@ -13578,14 +14127,6 @@ msgid ""
 "are allowed and it cannot be changed."
 msgstr "注意：这是课程URL的一部分，请勿使用空格或特殊字符，一旦设定不可更改。"
 
-#: cms/templates/index.html cms/templates/settings.html
-msgid "Course Run"
-msgstr "开课时间"
-
-#: cms/templates/index.html
-msgid "e.g. 2014_T1"
-msgstr "例如：2014_T1"
-
 #: cms/templates/index.html
 msgid "The term in which your course will run."
 msgstr " 您课程开设的学期。"
@@ -13594,9 +14135,27 @@ msgstr " 您课程开设的学期。"
 msgid "Create"
 msgstr "创建"
 
-#: cms/templates/index.html
+#: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 msgid "Course Run:"
 msgstr "开课时间"
+
+#: cms/templates/index.html
+msgid ""
+"The new course will be added to your course list in 5-10 minutes. Return to "
+"this page or <a href=\"#\" class=\"action-reload\">refresh it</a> to update "
+"the course list. The new course will need some manual configuration."
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"A system error occurred while your course was being processed. Please go to "
+"the original course to try the re-run again, or contact your PM for "
+"assistance."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Re-run Course"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "Are you staff on an existing Studio course?"
@@ -13890,119 +14449,6 @@ msgid ""
 "Admin, then ask that user to remove you from the Course Team list."
 msgstr "每门课程必须有一名管理员。如果您当前是管理员，且期望移交管理员身份，您可以赋予其他用户管理员权限，并请求他们将你从课程团队列表中删除。"
 
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Course Outline"
-msgstr "课程大纲"
-
-#: cms/templates/overview.html cms/templates/overview.html
-#: cms/templates/overview.html
-msgid "Expand/collapse this section"
-msgstr "展开/折叠本章节"
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "New Section Name"
-msgstr "新章节的名字"
-
-#: cms/templates/overview.html
-msgid "Add a new section name"
-msgstr "增加新章节的名字"
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "Delete this section"
-msgstr "删除该章节 "
-
-#: cms/templates/overview.html
-msgid "Drag to re-order"
-msgstr "拖动以重排序"
-
-#: cms/templates/overview.html cms/templates/overview.html
-msgid "New Subsection"
-msgstr "添加新的小节"
-
-#: cms/templates/overview.html cms/templates/widgets/units.html
-msgid "New Unit"
-msgstr "新的单元"
-
-#: cms/templates/overview.html
-msgid "You haven't added any sections to your course outline yet."
-msgstr "您还未在课程大纲中添加任何章节"
-
-#: cms/templates/overview.html
-msgid "Add your first section"
-msgstr "添加您的第一个章节"
-
-#: cms/templates/overview.html
-msgid "Collapse All Sections"
-msgstr "折叠所有章节"
-
-#: cms/templates/overview.html
-msgid "New Section"
-msgstr "添加新章节"
-
-#: cms/templates/overview.html
-msgid "This section is not scheduled for release"
-msgstr "该章节尚未制定发布计划"
-
-#: cms/templates/overview.html
-msgid "Schedule"
-msgstr "时间表"
-
-#: cms/templates/overview.html
-msgid "Release date:"
-msgstr "发布日期："
-
-#: cms/templates/overview.html
-msgid "Edit section release date"
-msgstr "编辑章节发布日期"
-
-#: cms/templates/overview.html
-msgid "Delete section"
-msgstr "删除章节"
-
-#: cms/templates/overview.html
-msgid "Drag to reorder section"
-msgstr "拖动以重排序章节"
-
-#: cms/templates/overview.html
-msgid "Expand/collapse this subsection"
-msgstr "展开/折叠本小节"
-
-#: cms/templates/overview.html
-msgid "Delete this subsection"
-msgstr "删除该小节"
-
-#: cms/templates/overview.html
-msgid "Delete subsection"
-msgstr "删除小节"
-
-#: cms/templates/overview.html
-msgid ""
-"You can create new sections and subsections, set the release date for "
-"sections, and create new units in existing subsections.  You can set the "
-"assignment type for subsections that are to be graded, and you can open a "
-"subsection for further editing."
-msgstr "您可以创建新章节和小节，设置章节发布日期，在小节中创建新单元。您可以设置小节中的作业类型以供计分，也可以打开小节作进一步编辑。"
-
-#: cms/templates/overview.html
-msgid ""
-"In addition, you can drag and drop sections, subsections, and units to "
-"reorganize your course."
-msgstr "此外，您可以拖动章节，小节和单元来重新组织您的课程。"
-
-#: cms/templates/overview.html
-msgid "Section Release Date"
-msgstr "章节发布日期"
-
-#: cms/templates/overview.html
-msgid ""
-"On the date set below, this section - {name} - will be released to students."
-" Any units marked private will only be visible to admins."
-msgstr "章节-{name}-将于以下设定日期向学生发布。任何标为私密的单元将仅对管理员可见。"
-
-#: cms/templates/overview.html
-msgid "Form Actions"
-msgstr "表格操作"
-
 #: cms/templates/register.html
 msgid "Sign Up for edX Studio"
 msgstr "注册edX Studio"
@@ -14109,6 +14555,17 @@ msgstr "课程总结页面"
 #: cms/templates/settings.html
 msgid "(for student enrollment and access)"
 msgstr "(用于学生注册和访问)"
+
+#: cms/templates/settings.html
+msgid "Enroll in {course_display_name}"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"The course \"{course_display_name}\", provided by {platform_name}, is open "
+"for enrollment. Please navigate to this course at {link_for_about_page} to "
+"enroll."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Send a note to students via email"
@@ -14412,16 +14869,14 @@ msgid ""
 "worth."
 msgstr "你也可以创建作业类型，比如家庭作业、实验、测验、以及考试，并且指定每个作业是否计入最终的成绩及其评价分值。"
 
-#: cms/templates/studio_vertical_wrapper.html
-#: cms/templates/studio_vertical_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Expand or Collapse"
 msgstr "展开或折叠"
 
-#: cms/templates/studio_vertical_wrapper.html
-msgid "No Actions"
-msgstr "无操作"
+#: cms/templates/studio_xblock_wrapper.html
+msgid "This block contains multiple components."
+msgstr ""
 
 #: cms/templates/textbooks.html
 msgid "You have unsaved changes. Do you really want to leave this page?"
@@ -14453,76 +14908,6 @@ msgid ""
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
 msgstr "如果您的教材没有独立的章节，您可以上传整个文本作为一个章节，并在章节名称字段中输入您所选择的名称。"
-
-#: cms/templates/unit.html cms/templates/ux/reference/unit.html
-msgid "Individual Unit"
-msgstr "独立单元"
-
-#: cms/templates/unit.html
-msgid "You are editing a draft."
-msgstr "您正在编辑草稿。"
-
-#: cms/templates/unit.html
-msgid "This unit was originally published on {date}."
-msgstr "本单元原定发布时间{date}。"
-
-#: cms/templates/unit.html
-msgid "View the Live Version"
-msgstr "观看在线版本"
-
-#: cms/templates/unit.html
-msgid "Unit Settings"
-msgstr "单元设置"
-
-#: cms/templates/unit.html
-msgid "Visibility:"
-msgstr "可见性："
-
-#: cms/templates/unit.html
-msgid "Public"
-msgstr "公开"
-
-#: cms/templates/unit.html
-msgid "Private"
-msgstr "私密"
-
-#: cms/templates/unit.html
-msgid ""
-"This unit has been published. To make changes, you must {link_start}edit a "
-"draft{link_end}."
-msgstr "本单元已经发布。如需修改，请点击{link_start}编辑草稿{link_end}进行修改。"
-
-#: cms/templates/unit.html
-msgid ""
-"This is a draft of the published unit. To update the live version, you must "
-"{link_start}replace it with this draft{link_end}."
-msgstr "这是已发布单元的编辑稿。您必须点击{link_start}使用本草稿进行替换{link_end}来更新在线版本。"
-
-#: cms/templates/unit.html
-msgid ""
-"This unit is scheduled to be released to <strong>students</strong> on "
-"<strong>{date}</strong> with the subsection {link_start}{name}{link_end}"
-msgstr ""
-"本单元将 连同小节{link_start}{name}{link_end}一起，在 <strong>{date}</strong>发布给 "
-"<strong>学生</strong>"
-
-#: cms/templates/unit.html
-msgid ""
-"This unit is scheduled to be released to <strong>students</strong> with the "
-"subsection {link_start}{name}{link_end}"
-msgstr "本单元将 连同小节{link_start}{name}{link_end}一起，发布给 <strong>学生</strong>"
-
-#: cms/templates/unit.html
-msgid "Delete Draft"
-msgstr "删除草稿"
-
-#: cms/templates/unit.html
-msgid "Unit Location"
-msgstr "单元位置"
-
-#: cms/templates/unit.html
-msgid "Unit Identifier:"
-msgstr "单元标识符："
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -14586,6 +14971,88 @@ msgid ""
 "An activation link has been sent to {email}, along with instructions for "
 "activating your account."
 msgstr "我们已发送一封电子邮件至{email}，里面包含一个激活账号的链接，以及激活账号的操作说明。"
+
+#: cms/templates/ux/reference/container.html
+msgid "View Published Version"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Publishing Status"
+msgstr "发布状态"
+
+#: cms/templates/ux/reference/container.html
+msgid "Draft (Never published)"
+msgstr ""
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Published"
+msgstr "已经发布"
+
+#: cms/templates/ux/reference/container.html
+#: cms/templates/ux/reference/container.html
+msgid "Draft (Unpublished changes)"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Create a Course Rerun of HarvardX SW12.2x T2_2014"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"A course already has that organization, course number, and course run. "
+"Change one or more of these values to give the new course a unique URL."
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Cancel and Return to Dashboard"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid "Processing Re-run Request"
+msgstr ""
+
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+#: cms/templates/ux/reference/course-create-rerun.html
+msgid ""
+"Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Sed "
+"posuere consectetur est at lobortis. Maecenas faucibus mollis interdum."
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+msgid "Publish [section name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+msgid "Publish all unpublished changes for this section?"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-section.html
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "The following will be published:"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "Publish [subsection name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-subsection.html
+msgid "Publish all unpublished changes for this subsection?"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-unit.html
+msgid "Publish [unit name]"
+msgstr ""
+
+#: cms/templates/ux/reference/modal_bulkpublish-unit.html
+msgid "Publish all unpublished changes for this unit?"
+msgstr ""
 
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."
@@ -14737,22 +15204,6 @@ msgstr ""
 #: cms/templates/widgets/tabs-aggregator.html
 msgid "name"
 msgstr "名称"
-
-#: cms/templates/widgets/units.html
-msgid "Delete this unit"
-msgstr "删除本单元"
-
-#: cms/templates/widgets/units.html
-msgid "Delete unit"
-msgstr "删除单元"
-
-#: cms/templates/widgets/units.html
-msgid "Drag to sort"
-msgstr "拖动以排序"
-
-#: cms/templates/widgets/units.html
-msgid "Drag to reorder unit"
-msgstr "拖动以重排序单元"
 
 # empty
 msgid "This is a key string."

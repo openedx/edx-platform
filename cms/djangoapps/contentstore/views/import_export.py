@@ -214,7 +214,7 @@ def import_handler(request, course_key_string):
 
                     logging.debug('found course.xml at {0}'.format(dirpath))
 
-                    _module_store, course_items = import_from_xml(
+                    course_items = import_from_xml(
                         modulestore(),
                         request.user.id,
                         settings.GITHUB_REPO_ROOT,

@@ -383,8 +383,8 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         CourseFixture(**self.course_info).install()
         # The following line creates a user enrolled in our course, whose
         # threads will be viewed, but not the one who will view the page.
-        # It isn't necessary to log them in, but using the AutoAuthPage 
-        # saves a lot of code.   
+        # It isn't necessary to log them in, but using the AutoAuthPage
+        # saves a lot of code.
         self.profiled_user_id = AutoAuthPage(
             self.browser,
             username=self.PROFILED_USERNAME,
@@ -414,7 +414,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         all_pages = range(1, total_pages + 1)
 
         def _check_page():
-            # ensure the page being displayed as "current" is the expected one 
+            # ensure the page being displayed as "current" is the expected one
             self.assertEqual(page.get_current_page(), current_page)
             # ensure the expected threads are being shown in the right order
             threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]

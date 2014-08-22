@@ -3,7 +3,7 @@ from factory.containers import CyclicDefinitionError
 from uuid import uuid4
 
 from xmodule.modulestore import prefer_xmodules, ModuleStoreEnum
-from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 from opaque_keys.edx.keys import UsageKey
 from xblock.core import XBlock
 from xmodule.tabs import StaticTab
@@ -55,20 +55,14 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
-        location = Location(org, number, run, 'course', name)
-
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             # Write the data to the mongo datastore
-            new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
-
-            # The rest of kwargs become attributes on the course:
-            for k, v in kwargs.iteritems():
-                setattr(new_course, k, v)
-
-            # Save the attributes we just set
-            new_course.save()
-            # Update the data in the mongo datastore
-            store.update_item(new_course, user_id)
+            kwargs.update(kwargs.get('metadata', {}))
+            course_key = SlashSeparatedCourseKey(org, number, run)
+            # TODO - We really should call create_course here.  However, since create_course verifies there are no
+            # duplicates, this breaks several tests that do not clean up properly in between tests.
+            new_course = store.create_xblock(None, course_key, 'course', block_id=run, fields=kwargs)
+            store.update_item(new_course, user_id, allow_not_found=True)
             return new_course
 
 

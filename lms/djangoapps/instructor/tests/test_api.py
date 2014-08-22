@@ -47,7 +47,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, PaidCourseRegistration, Coupon
 from course_modes.models import CourseMode
 
-from .test_tools import msk_from_problem_urlname, get_extended_due
+from .test_tools import msk_from_problem_urlname
+from ..views.tools import get_extended_due
 
 
 @common_exceptions_400
@@ -1980,22 +1981,27 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         """
         patch.stopall()
 
-    def setup_fake_email_info(self, num_emails):
+    def setup_fake_email_info(self, num_emails, with_failures=False):
         """ Initialize the specified number of fake emails """
         for email_id in range(num_emails):
             num_sent = random.randint(1, 15401)
-            self.tasks[email_id] = FakeContentTask(email_id, num_sent, 'expected')
+            if with_failures:
+                failed = random.randint(1, 15401)
+            else:
+                failed = 0
+
+            self.tasks[email_id] = FakeContentTask(email_id, num_sent, failed, 'expected')
             self.emails[email_id] = FakeEmail(email_id)
-            self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent)
+            self.emails_info[email_id] = FakeEmailInfo(self.emails[email_id], num_sent, failed)
 
     def get_matching_mock_email(self, **kwargs):
         """ Returns the matching mock emails for the given id """
         email_id = kwargs.get('id', 0)
         return self.emails[email_id]
 
-    def get_email_content_response(self, num_emails, task_history_request):
+    def get_email_content_response(self, num_emails, task_history_request, with_failures=False):
         """ Calls the list_email_content endpoint and returns the repsonse """
-        self.setup_fake_email_info(num_emails)
+        self.setup_fake_email_info(num_emails, with_failures)
         task_history_request.return_value = self.tasks.values()
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
         with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
@@ -2003,6 +2009,19 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
             response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
         return response
+
+    def check_emails_sent(self, num_emails, task_history_request, with_failures=False):
+        """ Tests sending emails with or without failures """
+        response = self.get_email_content_response(num_emails, task_history_request, with_failures)
+        self.assertTrue(task_history_request.called)
+        expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
+        actual_email_info = json.loads(response.content)['emails']
+
+        self.assertEqual(len(actual_email_info), num_emails)
+        for exp_email, act_email in zip(expected_email_info, actual_email_info):
+            self.assertDictEqual(exp_email, act_email)
+
+        self.assertEqual(expected_email_info, actual_email_info)
 
     def test_content_list_one_email(self, task_history_request):
         """ Test listing of bulk emails when email list has one email """
@@ -2030,20 +2049,11 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
 
     def test_content_list_email_content_many(self, task_history_request):
         """ Test listing of bulk emails sent large amount of emails """
-        response = self.get_email_content_response(50, task_history_request)
-        self.assertTrue(task_history_request.called)
-        expected_email_info = [email_info.to_dict() for email_info in self.emails_info.values()]
-        actual_email_info = json.loads(response.content)['emails']
-
-        self.assertEqual(len(actual_email_info), 50)
-        for exp_email, act_email in zip(expected_email_info, actual_email_info):
-            self.assertDictEqual(exp_email, act_email)
-
-        self.assertEqual(actual_email_info, expected_email_info)
+        self.check_emails_sent(50, task_history_request)
 
     def test_list_email_content_error(self, task_history_request):
         """ Test handling of error retrieving email """
-        invalid_task = FakeContentTask(0, 0, 'test')
+        invalid_task = FakeContentTask(0, 0, 0, 'test')
         invalid_task.make_invalid_input()
         task_history_request.return_value = [invalid_task]
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -2054,8 +2064,35 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
         returned_email_info = json.loads(response.content)['emails']
         self.assertEqual(len(returned_email_info), 1)
         returned_info = returned_email_info[0]
-        for info in ['created', 'sent_to', 'email', 'number_sent']:
+        for info in ['created', 'sent_to', 'email', 'number_sent', 'requester']:
             self.assertEqual(returned_info[info], None)
+
+    def test_list_email_with_failure(self, task_history_request):
+        """ Test the handling of email task that had failures """
+        self.check_emails_sent(1, task_history_request, True)
+
+    def test_list_many_emails_with_failures(self, task_history_request):
+        """ Test the handling of many emails with failures """
+        self.check_emails_sent(50, task_history_request, True)
+
+    def test_list_email_with_no_successes(self, task_history_request):
+        task_info = FakeContentTask(0, 0, 10, 'expected')
+        email = FakeEmail(0)
+        email_info = FakeEmailInfo(email, 0, 10)
+        task_history_request.return_value = [task_info]
+        url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+            mock_email_info.return_value = email
+            response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(task_history_request.called)
+        returned_info_list = json.loads(response.content)['emails']
+
+        self.assertEqual(len(returned_info_list), 1)
+        returned_info = returned_info_list[0]
+        expected_info = email_info.to_dict()
+        self.assertDictEqual(expected_info, returned_info)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -2183,11 +2220,13 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Fixtures.
         """
+        super(TestDueDateExtensions, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due)
         week2 = ItemFactory.create(due=due)
-        week3 = ItemFactory.create(due=due)
+        week3 = ItemFactory.create()  # No due date
         course.children = [week1.location.to_deprecated_string(), week2.location.to_deprecated_string(),
                            week3.location.to_deprecated_string()]
 
@@ -2247,6 +2286,7 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.week1 = week1
         self.homework = homework
         self.week2 = week2
+        self.week3 = week3
         self.user1 = user1
         self.user2 = user2
 
@@ -2264,6 +2304,32 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
                          get_extended_due(self.course, self.week1, self.user1))
 
+    def test_change_to_invalid_due_date(self):
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+            'due_datetime': '01/01/2009 00:00'
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
+
+    def test_change_nonexistent_due_date(self):
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week3.location.to_deprecated_string(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week3, self.user1)
+        )
+
     def test_reset_date(self):
         self.test_change_due_date()
         url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -2272,8 +2338,38 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'url': self.week1.location.to_deprecated_string(),
         })
         self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(None,
-                         get_extended_due(self.course, self.week1, self.user1))
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
+
+    def test_reset_nonexistent_extension(self):
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 400, response.content)
+
+    def test_reset_extension_to_deleted_date(self):
+        """
+        Test that we can delete a due date extension after deleting the normal
+        due date, without causing an error.
+        """
+        self.test_change_due_date()
+        self.week1.due = None
+        self.week1 = self.store.update_item(self.week1, self.user1.id)
+        # Now, week1's normal due date is deleted but the extension still exists.
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
 
     def test_show_unit_extensions(self):
         self.test_change_due_date()

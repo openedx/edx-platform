@@ -92,7 +92,7 @@
       }
 
       .file-name {
-        font-weight: bold;
+        @extend %t-strong;
       }
     }
 
@@ -137,7 +137,7 @@
 
         *[class^="icon-"] {
           @include transition(opacity $tmg-f1 ease-in-out 0);
-          @include font-size(22);
+          @extend %t-icon4;
           position: absolute;
           top: ($baseline/2);
           left: $baseline;
@@ -151,7 +151,7 @@
 
         .title {
           @extend %t-title5;
-          font-weight: 600;
+          @extend %t-strong;
         }
 
         .copy {

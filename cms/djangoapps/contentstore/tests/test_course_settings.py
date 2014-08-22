@@ -413,7 +413,7 @@ class CourseGradingTest(CourseTestCase):
         Populate the course, grab a section, get the url for the assignment type access
         """
         self.populate_course()
-        sections = modulestore().get_items(self.course.id, category="sequential")
+        sections = modulestore().get_items(self.course.id, qualifiers={'category': "sequential"})
         # see if test makes sense
         self.assertGreater(len(sections), 0, "No sections found")
         section = sections[0]  # just take the first one

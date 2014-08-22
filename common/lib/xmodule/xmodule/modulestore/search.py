@@ -60,13 +60,13 @@ def path_to_location(modulestore, usage_key):
                 # Found it!
                 path = (next_usage, path)
                 return flatten(path)
+            elif parent is None:
+                # Orphaned item.
+                return None
 
             # otherwise, add parent locations at the end
             newpath = (next_usage, path)
             queue.append((parent, newpath))
-
-        # If we're here, there is no path
-        return None
 
     if not modulestore.has_item(usage_key):
         raise ItemNotFoundError(usage_key)
@@ -95,10 +95,10 @@ def path_to_location(modulestore, usage_key):
             category = path[path_index].block_type
             if category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_item(path[path_index])
-                child_locs = [c.location.version_agnostic() for c in section_desc.get_children()]
+                child_locs = [c.location.block_id for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.
-                position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
+                position_list.append(str(child_locs.index(path[path_index + 1].block_id) + 1))
         position = "_".join(position_list)
 
     return (course_id, chapter, section, position)

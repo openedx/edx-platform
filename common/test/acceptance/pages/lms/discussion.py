@@ -204,6 +204,7 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         self.browser.refresh()
 
+
 class DiscussionTabSingleThreadPage(CoursePage):
     def __init__(self, browser, course_id, thread_id):
         super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
@@ -257,6 +258,7 @@ class InlineDiscussionPage(PageObject):
 
     def element_exists(self, selector):
         return self.q(css=self._discussion_selector + " " + selector).present
+
 
 class InlineDiscussionThreadPage(DiscussionThreadPage):
     def __init__(self, browser, thread_id):
@@ -387,4 +389,3 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             lambda: _match_messages(text).results == [],
             "waiting for dismissed alerts to disappear"
         ).fulfill()
-

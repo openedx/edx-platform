@@ -58,7 +58,7 @@ class Command(BaseCommand):
         discussion_items = _get_discussion_items(course)
 
         # now query all discussion items via get_items() and compare with the tree-traversal
-        queried_discussion_items = store.get_items(course_key=course_key, category='discussion',)
+        queried_discussion_items = store.get_items(course_key=course_key, qualifiers={'category': 'discussion'})
 
         for item in queried_discussion_items:
             if item.location not in discussion_items:

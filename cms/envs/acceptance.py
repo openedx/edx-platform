@@ -18,6 +18,9 @@ DEBUG = True
 import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
 
+# set root logger level
+logging.getLogger().setLevel(logging.ERROR)
+
 import os
 
 

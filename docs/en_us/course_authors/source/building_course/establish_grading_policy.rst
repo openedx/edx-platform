@@ -13,9 +13,12 @@ Establishing a grading policy takes several steps. You must:
 #. :ref:`Set the Grade Range`
 #. :ref:`Set the Grace Period`
 #. :ref:`Configure the Assignment Types`
-#. :ref:`Set the Assignment Type for Graded Subsections`
+#. :ref:`Graded Subsections`
 #. :ref:`The Student View of Grades`
 
+.. important:: Any changes to the course grading policy, to graded 
+ subsections, or to graded components after a course begins will affect the
+ student experience in the course and analysis of its data. 
 
 .. _Set the Grade Range:
 
@@ -40,27 +43,27 @@ You use the grade range control to change these settings:
 
 * To add a grade in the range, click the **+** icon.
 
-  A new grade is added to the range between the existing grades. For example, if
-  you add a grade in the default setting, the grade range changes to **F** (0 to
-  50), **B** (50 to 75), and **A** (75 to 100):
+  A new grade is added to the range between the existing grades. For example,
+  if you add a grade in the default setting, the grade range changes to **F**
+  (0 to 50), **B** (50 to 75), and **A** (75 to 100):
 
   .. image:: ../Images/grade_range_b.png
     :alt: Image of an altered Grade Range control
 
-* To change the score range, hover the mouse over the line dividing two grades,
-  click and drag the line left or right.
+* To change the score range, move the cursor over the line dividing two grades
+  and then click and drag the line left or right.
 
   You can see the range numbers of the two grades adjacent to the line change.
   Release the mouse button when the line is where you want it.
   
-* To change the name of the grade, double-click the current name of the grade to
-  select it, and then start typing the name of the new grade. For example, if
-  the original name of the grade is "Pass", you can double-click "Pass" and then
-  type "Excellent" to replace the name.
+* To change the name of the grade, double-click the current name of the grade
+  to select it, and then start typing the name of the new grade. For example,
+  if the original name of the grade is "Pass", you can double-click "Pass" and
+  then type "Excellent" to replace the name.
 
   You cannot change **F** or **Fail**. 
 
-* To remove a grade, hover the mouse over the grade. 
+* To remove a grade, move the cursor so that it is over the grade. 
 
   A **remove** link appears above the grade. Click the link.
   
@@ -99,8 +102,8 @@ In the Grading page, under **Grading Rules & Policies**, enter a value in the
 Configure the Assignment Types
 ******************************
 
-You must create assignment types for your course and determine the weight of the
-student's total grade for each assignment type.
+You must create assignment types for your course and determine the weight of
+the student's total grade for each assignment type.
 
 For example, you may have:
 
@@ -128,19 +131,18 @@ You configure the following fields for each assignment type:
     
 * **Assignment Type Name:** 
   
-  The general category of the assignment. This name will be visible to students.
+  The general category of the assignment. This name will be visible to
+  students.
  
   .. note:: All assignments of a particular type count the same toward the
    weight of that category. As a result, a homework assignment that contains
    10 problems is worth the same percentage of a student's grade as a homework
    assignment that contains 20 problems.
   
-  
 * **Abbreviation:** 
   
   This is the short name that appears next to an assignment on a student's
-  **Progress** tab.
-      
+  **Progress** tab.  
 
 * **Weight of Total Grade:** 
   
@@ -151,43 +153,43 @@ You configure the following fields for each assignment type:
   
   .. note:: Do not include the percent sign (%) in this field.
   
-  
-  
 * **Total Number:** 
   
   The number of assignments of this type that you plan to include in your
   course.
-  
-  
   
 * **Number of Droppable**
   
   The number of assignments of this type that the grader will drop. The grader
   will drop the lowest-scored assignments first.
 
-
-.. _Set the Assignment Type for Graded Subsections:
+.. _Graded Subsections:
 
 **********************************************
-Set the Assignment Type for Graded Subsections
+Graded Subsections
 **********************************************
-After you configure assignment types, as you are organizing your course, you set
-the assignment type for subsections that contain problems that are to be graded.
+
+After you configure assignment types, as you are organizing your course, you
+set the assignment type for subsections that contain problems that are to be
+graded.
 
 Each subsection that contains problems to be graded can include only one
-assignment type. See :ref:`subsections` for more information.
+assignment type. 
 
-.. note:: You can only set assignment types and due dates at the subsection
- level. You cannot set assignment types or due dates for entire sections or
- for individual units within subsections. Additionally, you can designate a
- subsection as one, and only one, of the assignment types you configured.
+.. note:: 
+ You can only set assignment types and due dates at the subsection level. You
+ cannot set assignment types or due dates for entire sections or for individual
+ units within subsections. Additionally, you can designate a subsection as one,
+ and only one, of the assignment types you configured.
   
-See :ref:`subsections` for general instructions on configuring a subsection. See
-:ref:`Set the Grading Policy` for instructions on designating a subsection as a
-graded assignment.
+See :ref:`Developing Course Subsections` for general instructions on
+configuring a subsection.
+
+See :ref:`Set the Assignment Type and Due Date for a Subsection` for
+instructions on designating a subsection as a graded assignment.
 
 Within a graded subsection, you create problems of the type designated for that
-subsection. You cannotß not mix problems of different assignment types in the
+subsection. You cannot not mix problems of different assignment types in the
 same subsection.
 
 For example, if you want to create a homework assignment and a lab for a
@@ -195,97 +197,34 @@ specific topic, create two subsections. Set one subsection as the Homework
 assignment type and the other as the Lab assignment type. Both subsections can
 contain other content as well as the actual homework or lab problems.
 
-.. note:: You can create problems in Studio without specifying that the
- subsection is an assignment type. However, such problems do not count toward
- a student's grade.
+.. note:: 
+ You can create problems in Studio without specifying that the subsection is an
+ assignment type. However, such problems do not count toward a student's grade.
 
-See :ref:`Working with Problem Components` for instructions on creating problems. 
-
-.. _Set the Grading Policy:
-
-=======================
-Set the Grading Policy
-=======================
-
-You can designate a subsection as one of the assignment types that you specified
-in the grading policy.
-
-You set the grading policy for the subsection from two places:
-
-* The course outline 
-* The subsection page
-
-From the course outline, click the checkmark next to the subsection.  Then
-select a grading policy from the popup menu:
-
-    .. image:: ../Images/course_outline_set_grade.png
-       :alt: Image of the assignment type for a subsection
-
-From the subsection page, click the text next to the **Graded as** label, then
-select a grading policy from the popup menu:
-
-    .. image:: ../Images/subsection_set_grade.png
-       :alt: Image of the assignment type on the subsection page
-
-See :ref:`Establish a Grading Policy` for more information.
-
-
-==================
-Set the Due Date
-==================
-
-For subsections that contain graded problems, you can set a due date. Students
-must complete the problems in the subsection before the due date to get credit.
-All problems in a subsection have the same due date.
-
-#. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time
-   fields appear.
-#. Place the cursor in the Due Date field, and pick a day from the popup
-   calendar.
-#. Place the cursor in the Due Time field and pick a time.
-
-.. note:: When you set a due date, keep in mind that students will be in
- different time zones. By default, the time zone appears as UTC, not the
- student's local time. If you tell your students an assignment is due at 5:00
- PM, make sure to specify that the time is 5:00 PM UTC and point them to a
- time converter.
-
-You can also :ref:`Set the Grace Period` for your assignments to cover any
-misunderstandings about time. For example, some classes have set a grace period
-of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
-
-Students see the due date in the course accordion under the subsection title.
-For example:
-
-.. image::  ../Images/Subsection_due_date.png
-  :alt: Image of subsection due dates in the course accordion
-
-There are several problems in this subsection, all due November 3, 2013 at 23:30
-UTC.
-
-
-
+See :ref:`Working with Problem Components` for instructions on creating
+problems.
 
 .. _The Student View of Grades:
 
 **************************
 The Student View of Grades
 **************************
-Once a grading policy is in place, students can view both their problem scores
+
+After a grading policy is in place, students can view both their problem scores
 and the percent completed and current grade in the **Progress** tab for the
 course.
   
   .. image:: ../Images/Progress_tab.png
     :alt: Image of the student Progress tab
 
-Each item in the X axis of the chart is for a graded subsection. Graded problems
-in units are not broken out in the chart; the score from each problem in the
-subsection is added to that vertical bar.
+Each item in the X axis of the chart is for a graded subsection. Graded
+problems in units are not broken out in the chart; the score from each problem
+in the subsection is added to that vertical bar.
 
 Graded subsections are grouped in the chart by assignment type rather than
 listed in chronological order. For example, all homework exercises are grouped
 together, followed by labs, then exams.
 
-.. note:: The **x** for an assignment in the Progress tab indicates that the
- assignment grade is currently dropped. You configure how many assignments are
- dropped when you :ref:`Configure the Assignment Types`.
+.. note:: The **x** for an assignment in the Progress tab indicates that the 
+ grade for that assignment is currently dropped. You configure how many
+ assignments are dropped when you :ref:`Configure the Assignment Types`.

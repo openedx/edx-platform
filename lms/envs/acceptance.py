@@ -19,6 +19,9 @@ SITE_NAME = 'localhost:{}'.format(LETTUCE_SERVER_PORT)
 import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
 
+# set root logger level
+logging.getLogger().setLevel(logging.ERROR)
+
 import os
 from random import choice
 import string
@@ -113,20 +116,6 @@ FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 # Don't actually send any requests to Software Secure for student identity
 # verification.
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-
-# Configure the payment processor to use the fake processing page
-# Since both the fake payment page and the shoppingcart app are using
-# the same settings, we can generate this randomly and guarantee
-# that they are using the same secret.
-RANDOM_SHARED_SECRET = ''.join(
-    choice(string.letters + string.digits + string.punctuation)
-    for x in range(250)
-)
-
-CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
-CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
-CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files

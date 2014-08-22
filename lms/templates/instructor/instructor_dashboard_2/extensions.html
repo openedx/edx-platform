@@ -12,7 +12,7 @@
   <p>
     ${_("Specify the {platform_name} email address or username of a student "
         "here:").format(platform_name=settings.PLATFORM_NAME)}
-    <input type="text" name="student">
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
   </p>
   <p>
     ${_("Choose the graded unit:")}
@@ -39,7 +39,7 @@
   </p>
 </div>
 <hr/>
-<div id="view-extensions">
+<div id="view-granted-extensions">
   <h2>${_("Viewing granted extensions")}</h2>
   <p>
     ${_("Here you can see what extensions have been granted on particular "
@@ -67,7 +67,7 @@
   <p>
     ${_("Specify the {platform_name} email address or username of a student "
         "here:").format(platform_name=settings.PLATFORM_NAME)}
-    <input type="text" name="student">
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
     <input type="button" name="show-student-extensions" 
            value="${_("List date extensions for student")}"
            data-endpoint="${section_data['show_student_extensions_url']}">
@@ -90,7 +90,7 @@
   <p>
     ${_("Specify the {platform_name} email address or username of a student "
         "here:").format(platform_name=settings.PLATFORM_NAME)}
-    <input type="text" name="student">
+    <input type="text" name="student" placeholder="${_("Student Email or Username")}">
   </p>
   <p>
     ${_("Choose the graded unit:")}

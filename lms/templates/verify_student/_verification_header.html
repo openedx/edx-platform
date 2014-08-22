@@ -1,5 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
+## TODO (ECOM-16): This is part of an AB-test of auto-registration.
+## Once the test completes, we can make the winning configuration the default
+## and remove this flag.
+%if not autoreg:
+<!-- /experiment-control -->
 <header class="page-header">
   <h2 class="title">
     %if upgrade:
@@ -31,3 +36,35 @@
     </span>
   </h2>
 </header>
+
+%else:
+<!-- /experiment-variant-A -->
+<header class="page-header exp-variant-A">
+  <h2 class="title">
+    <span class="wrapper-sts">
+      %if upgrade:
+        <span class="sts-label">${_("You are upgrading your registration for")}</span>
+      %elif reverify:
+        <span class="sts-label">${_("You are re-verifying for")}</span>
+      %elif modes_dict and "professional" in modes_dict:
+        <span class="sts-label">${_("You are registering for")}</span>
+      %else:
+        <span class="sts-label">${_("Congrats! You are now registered to audit")}</span>
+      %endif
+        <span class="sts-course-org">${course_org}'s</span>
+        <span class="sts-course-number">${course_num}</span>
+        <span class="sts-course-name">${course_name}.</span>
+    </span>
+    <span class="sts-track">
+      <span class="sts-track-value">
+        %if upgrade:
+          <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+        %elif reverify:
+          <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
+        %else:
+          <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+        %endif
+    </span>
+  </h2>
+</header>
+%endif

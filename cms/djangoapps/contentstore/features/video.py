@@ -138,7 +138,7 @@ def xml_only_video(step):
     course = world.scenario_dict['COURSE']
     store = modulestore()
 
-    parent_location = store.get_items(course.id, category='vertical')[0].location
+    parent_location = store.get_items(course.id, qualifiers={'category': 'vertical'})[0].location
 
     youtube_id = 'ABCDEFG'
     world.scenario_dict['YOUTUBE_ID'] = youtube_id

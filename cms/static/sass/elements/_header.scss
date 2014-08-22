@@ -52,9 +52,9 @@
 
     > ol > .nav-item {
       @extend %t-action3;
+      @extend %t-strong;
       display: inline-block;
       vertical-align: middle;
-      font-weight: 600;
 
       &:last-child {
         margin-right: 0;
@@ -149,12 +149,12 @@
 
     .course-title {
       @extend %t-action2;
+      @extend %t-strong;
       display: block;
       width: 100%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      font-weight: 600;
     }
 
     // entire link
@@ -309,19 +309,19 @@
       }
 
       .action-signup {
-        @include blue-button;
-        @include font-size(14);
+        @include blue-button();
+        @extend %t-action3;
+        @extend %t-strong;
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
-        font-weight: 600;
       }
 
       .action-signin {
-        @include white-button;
-        @include font-size(14);
+        @include white-button();
+        @extend %t-action3;
+        @extend %t-strong;
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
-        font-weight: 600;
       }
     }
   }

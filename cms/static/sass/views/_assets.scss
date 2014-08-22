@@ -35,7 +35,7 @@
     color: $gray;
 
     .new-button {
-      @include font-size(14);
+      @extend %t-action3;
       margin-left: $baseline;
 
       [class^="icon-"] {
@@ -60,7 +60,7 @@
       .count-current-shown,
       .count-total,
       .sort-order {
-        font-weight: 700;
+        @extend %t-strong;
       }
     }
 
@@ -125,12 +125,12 @@
       .page-number-input,
       .total-pages {
         @extend %t-copy-base;
+        @extend %t-strong;
         width: ($baseline*2.5);
         margin: 0 ($baseline*0.75);
         padding: ($baseline/4);
         text-align: center;
         color: $gray;
-        font-weight: 600;
       }
 
       .current-page {
@@ -141,9 +141,9 @@
 
       .page-divider {
         @extend %t-title4;
+        @extend %t-regular;
         vertical-align: middle;
         color: $gray-l2;
-        font-weight: 400;
       }
 
 
@@ -207,8 +207,8 @@
 
 
         .current-sort {
+          @extend %t-strong;
           border-bottom: 1px solid $gray-l3;
-          font-weight: 700;
         }
 
         // CASE: embed column
@@ -404,9 +404,9 @@
 
     .title {
       @extend %t-title3;
+      @extend %t-light;
       float: none;
       margin: ($baseline*2) 0 ($baseline*1.5);
-      font-weight: 300;
     }
 
     .file-input {
@@ -414,9 +414,9 @@
     }
 
     .choose-file-button {
-      @include blue-button;
+      @include blue-button();
+      @extend %t-action2;
       padding: 10px 82px 12px;
-      font-size: 17px;
     }
 
     .progress-bar {
@@ -471,9 +471,9 @@
       margin: ($baseline*1.5) 0 ($baseline*4);
 
       label {
+        @extend %t-strong;
         display: block;
         margin-bottom: ($baseline/2);
-        font-weight: 700;
       }
     }
 

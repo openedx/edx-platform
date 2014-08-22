@@ -57,7 +57,7 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(course.id, category='discussion')
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):

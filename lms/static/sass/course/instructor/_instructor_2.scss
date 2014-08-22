@@ -224,6 +224,18 @@ section.instructor-dashboard-content-2 {
     .basic-data {
       padding: 6px;
     }
+
+    .running-tasks-section {
+      display: none;
+    }
+
+    .no-pending-tasks-message {
+      display: none;
+      p {
+        color: #a2a2a2;
+        font-style: italic;
+      }
+    }
   }
 }
 

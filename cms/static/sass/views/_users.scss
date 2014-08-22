@@ -101,9 +101,9 @@
         color: $white;
 
         .msg-you {
+          @extend %t-strong;
           margin-left: ($baseline/5);
           text-transform: none;
-          font-weight: 500;
           color: $pink-l3;
         }
 
@@ -131,11 +131,11 @@
         }
 
         .user-username {
-          @extend %t-title4;
           @include transition(color $tmg-f2 ease-in-out 0s);
+          @extend %t-title4;
+          @extend %t-strong;
           margin: 0 ($baseline/2) ($baseline/10) 0;
           color: $gray-d4;
-          font-weight: 600;
         }
 
         .user-email {
@@ -186,20 +186,20 @@
 
           &.add-admin-role {
             @include blue-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
           }
 
           &.remove-admin-role {
             @include grey-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
           }
         }
 

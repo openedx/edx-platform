@@ -178,11 +178,10 @@ class TestLTIModuleListing(ModuleStoreTestCase):
 
     def test_lti_rest_bad_course(self):
         """Tests what happens when the lti listing rest endpoint gets a bad course_id"""
-        bad_ids = [u"sf", u"dne/dne/dne", u"fo/ey/\u5305"]
-        request = mock.Mock()
-        request.method = 'GET'
+        bad_ids = [u"sf", u"dne/dne/dne", u"fo/ey/\\u5305"]
         for bad_course_id in bad_ids:
-            response = get_course_lti_endpoints(request, bad_course_id)
+            lti_rest_endpoints_url = 'courses/{}/lti_rest_endpoints/'.format(bad_course_id)
+            response = self.client.get(lti_rest_endpoints_url)
             self.assertEqual(404, response.status_code)
 
     def test_lti_rest_listing(self):

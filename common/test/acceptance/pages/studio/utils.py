@@ -69,6 +69,7 @@ def add_discussion(page, menu_index=0):
     menu_index specifies which instance of the menus should be used (based on vertical
     placement within the page).
     """
+    page.wait_for_component_menu()
     click_css(page, 'a>span.large-discussion-icon', menu_index)
 
 
@@ -80,6 +81,7 @@ def add_advanced_component(page, menu_index, name):
     placement within the page).
     """
     # Click on the Advanced icon.
+    page.wait_for_component_menu()
     click_css(page, 'a>span.large-advanced-icon', menu_index, require_notification=False)
 
     # This does an animation to hide the first level of buttons
