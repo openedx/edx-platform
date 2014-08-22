@@ -211,7 +211,7 @@ def require_level(level):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-@require_query_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
+@require_post_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
 def students_update_enrollment(request, course_id):
     """
     Enroll or unenroll students by email.
@@ -250,12 +250,11 @@ def students_update_enrollment(request, course_id):
     }
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-    action = request.GET.get('action')
-    identifiers_raw = request.GET.get('identifiers')
+    action = request.POST.get('action')
+    identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
-    email_students = request.GET.get('email_students') in ['true', 'True', True]
+    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
+    email_students = request.POST.get('email_students') in ['true', 'True', True]
 
     email_params = {}
     if email_students:
@@ -326,7 +325,7 @@ def students_update_enrollment(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
-@require_query_params(
+@require_post_params(
     identifiers="stringified list of emails and/or usernames",
     action="add or remove",
 )
@@ -340,11 +339,11 @@ def bulk_beta_modify_access(request, course_id):
     - action is one of ['add', 'remove']
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    action = request.GET.get('action')
-    identifiers_raw = request.GET.get('identifiers')
+    action = request.POST.get('action')
+    identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    email_students = request.GET.get('email_students') in ['true', 'True', True]
-    auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
+    email_students = request.POST.get('email_students') in ['true', 'True', True]
+    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
     results = []
     rolename = 'beta'
     course = get_course_by_id(course_id)

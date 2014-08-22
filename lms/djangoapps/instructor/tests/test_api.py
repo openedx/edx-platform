@@ -166,7 +166,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
         msg: message to display if assertion fails.
         """
         url = reverse(endpoint, kwargs={'course_id': self.course.id.to_deprecated_string()})
-        if endpoint in ['send_email']:
+        if endpoint in ['send_email', 'students_update_enrollment', 'bulk_beta_modify_access']:
             response = self.client.post(url, args)
         else:
             response = self.client.get(url, args)
@@ -310,19 +310,19 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def test_missing_params(self):
         """ Test missing all query parameters. """
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_bad_action(self):
         """ Test with an invalid action. """
         action = 'robot-not-an-action'
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': action})
+        response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
     def test_invalid_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': 'percivaloctavius@', 'action': 'enroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': 'percivaloctavius@', 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -342,7 +342,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_invalid_username(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': 'percivaloctavius', 'action': 'enroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': 'percivaloctavius', 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -362,7 +362,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_enroll_with_username(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'enroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'enroll', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -393,7 +393,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_enroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False})
         print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
@@ -435,7 +435,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
 
         print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
@@ -493,7 +493,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -520,7 +520,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -539,7 +539,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
@@ -562,7 +562,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_unenroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': False})
         print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
@@ -601,7 +601,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_unenroll_with_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll', 'email_students': True})
         print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
@@ -652,7 +652,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_unenroll_with_email_allowed_student(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
         print "type(self.allowed_email): {}".format(type(self.allowed_email))
         self.assertEqual(response.status_code, 200)
 
@@ -703,7 +703,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -731,7 +731,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Try with marketing site enabled
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
-            response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+            response = self.client.post(url, {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -748,7 +748,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
@@ -810,14 +810,14 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     def test_missing_params(self):
         """ Test missing all query parameters. """
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, 400)
 
     def test_bad_action(self):
         """ Test with an invalid action. """
         action = 'robot-not-an-action'
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': action})
+        response = self.client.post(url, {'identifiers': self.beta_tester.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
     def add_notenrolled(self, response, identifier):
@@ -853,25 +853,25 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_add_notenrolled_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False})
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_email_autoenroll(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': False, 'auto_enroll': True})
         self.add_notenrolled(response, self.notenrolled_student.email)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False})
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertFalse(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
     def test_add_notenrolled_username_autoenroll(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.username, 'action': 'add', 'email_students': False, 'auto_enroll': True})
         self.add_notenrolled(response, self.notenrolled_student.username)
         self.assertTrue(CourseEnrollment.is_enrolled(self.notenrolled_student, self.course.id))
 
@@ -880,7 +880,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
@@ -925,7 +925,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
         params = {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True, 'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
-        response = self.client.get(url, params, **environ)
+        response = self.client.post(url, params, **environ)
         self.assertEqual(response.status_code, 200)
 
         self.assertTrue(CourseBetaTesterRole(self.course.id).has_user(self.notenrolled_student))
@@ -969,7 +969,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     def test_add_notenrolled_email_mktgsite(self):
         # Try with marketing site enabled
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'add', 'email_students': True})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -986,7 +986,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     def test_enroll_with_email_not_registered(self):
         # User doesn't exist
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.notregistered_email, 'action': 'add', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.notregistered_email, 'action': 'add', 'email_students': True})
         self.assertEqual(response.status_code, 200)
         # test the response data
         expected = {
@@ -1007,7 +1007,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_remove_without_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': False})
+        response = self.client.post(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': False})
         self.assertEqual(response.status_code, 200)
 
         # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
@@ -1035,7 +1035,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def test_remove_with_email(self):
         url = reverse('bulk_beta_modify_access', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': True})
+        response = self.client.post(url, {'identifiers': self.beta_tester.email, 'action': 'remove', 'email_students': True})
         self.assertEqual(response.status_code, 200)
 
         # Works around a caching bug which supposedly can't happen in prod. The instance here is not ==
