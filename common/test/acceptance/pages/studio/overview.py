@@ -474,6 +474,19 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         return self.q(css='.outline .no-content').is_present()
 
     @property
+    def has_rerun_notification(self):
+        """
+        Returns true iff the rerun notification is present on the page.
+        """
+        return self.q(css='.wrapper-alert.is-shown').is_present()
+
+    def dismiss_rerun_notification(self):
+        """
+        Clicks the dismiss button in the rerun notification.
+        """
+        self.q(css='.dismiss-button').click()
+
+    @property
     def expand_collapse_link_state(self):
         """
         Returns the current state of the expand/collapse link

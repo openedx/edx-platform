@@ -8,7 +8,7 @@ class StudioCourseTest(UniqueCourseTest):
     Base class for all Studio course tests.
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False):
         """
         Install a course with no content using a fixture.
         """
@@ -22,7 +22,7 @@ class StudioCourseTest(UniqueCourseTest):
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
         self.user = self.course_fixture.user
-        self.log_in(self.user)
+        self.log_in(self.user, is_staff)
 
     def populate_course_fixture(self, course_fixture):
         """
