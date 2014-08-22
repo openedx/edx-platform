@@ -717,7 +717,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # TODO: LMS-11220: Document why draft send count is 5
     # TODO: LMS-11220: Document why draft find count is 18
     # TODO: LMS-11220: Document why split find count is 16
-    @ddt.data(('draft', [18, 5], 0), ('split', [16, 6], 0))
+    @ddt.data(('draft', [19, 5], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
@@ -736,7 +736,6 @@ class TestMixedModuleStore(unittest.TestCase):
                  (course_key, "Chapter_x", None, None)),
             )
 
-            mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
             for location, expected in should_work:
                 with check_mongo_calls(num_finds.pop(0), num_sends):
                     self.assertEqual(path_to_location(self.store, location), expected)

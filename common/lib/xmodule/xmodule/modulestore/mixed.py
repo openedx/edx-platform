@@ -651,5 +651,8 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         If course_id is None, the default store is used.
         """
         store = self._get_modulestore_for_courseid(course_id)
-        with store.bulk_write_operations(course_id):
+        if hasattr(store, 'bulk_write_operations'):
+            with store.bulk_write_operations(course_id):
+                yield
+        else:
             yield

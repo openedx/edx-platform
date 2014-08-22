@@ -326,14 +326,15 @@ class TestTOC(ModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
+        self.toy_course = self.store.get_course(self.toy_loc, depth=2)
         with check_mongo_calls(num_finds, num_sends):
-            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.toy_loc, self.request.user, self.toy_course, depth=2)
+                self.toy_loc, self.request.user, self.toy_course, depth=2
+            )
 
 
     # TODO: LMS-11220: Document why split find count is 21
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 21, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 5, 0))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, num_finds, num_sends):
         with self.store.default_store(default_ms):
@@ -361,7 +362,7 @@ class TestTOC(ModuleStoreTestCase):
             self.assertIn(toc_section, actual)
 
     # TODO: LMS-11220: Document why split find count is 21
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0), (ModuleStoreEnum.Type.split, 21, 0))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 5, 0))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, num_finds, num_sends):
         with self.store.default_store(default_ms):
