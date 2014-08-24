@@ -111,6 +111,7 @@ if Backbone?
 
 
       toggleTopicDropdown: (event) ->
+          event.preventDefault()
           event.stopPropagation()
           if @menuOpen
               @hideTopicDropdown()
