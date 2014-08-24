@@ -9,7 +9,7 @@ from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
-from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 
 from edxmako import lookup_template
 import pystache_custom as pystache
