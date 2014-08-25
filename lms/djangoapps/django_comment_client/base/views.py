@@ -50,6 +50,7 @@ from django_comment_client.utils import (
     get_group_id_for_comments_service,
     discussion_category_id_access,
     get_cached_discussion_id_map,
+    add_thread_group_name,
 )
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from eventtracking import tracker
@@ -312,7 +313,8 @@ def create_thread(request, course_id, commentable_id):
     _update_user_engagement_score(course_key, request.user.id)
 
     add_courseware_context([data], course, user)
-
+    add_thread_group_name(data, course_key)
+    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:

@@ -307,6 +307,16 @@ def get_cohort_by_id(course_key, cohort_id):
     )
 
 
+def get_cohorted_threads_privacy(course_key):
+    """
+    Given a course key, return the cohorted threads privacy setting.
+
+    Raises:
+       Http404 if the course doesn't exist.
+    """
+    return courses.get_course_by_id(course_key).cohorted_threads_privacy
+
+
 def add_cohort(course_key, name, assignment_type):
     """
     Add a cohort to a course.  Raises ValueError if a cohort of the same name already
