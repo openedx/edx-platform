@@ -35,8 +35,9 @@ window.rewriteStaticLinks = function(content, from, to) {
     }
     // change all relative urls only which may be embedded inside other tags in content.
     // handle http and https
-    // note: add other protocols here
-    var regex = new RegExp("(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?"+from, 'g');
+    // escape all regex interpretable chars
+    fromRe = from.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    var regex = new RegExp("(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}([-a-zA-Z0-9@:%_\+.~#?&//=]*))?"+fromRe, 'g');
     return content.replace(regex, replacer);
 };
 
