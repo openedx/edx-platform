@@ -46,7 +46,8 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource
+    create_comments_service_user, PasswordHistory, UserSignupSource,
+    anonymous_id_for_user
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -90,6 +91,9 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
+
+import analytics
+from eventtracking import tracker
 
 
 log = logging.getLogger("edx.student")
@@ -379,6 +383,10 @@ def register_user(request, extra_context=None):
         'selected_provider': '',
         'username': '',
     }
+
+    # We save this so, later on, we can determine what course motivated a user's signup
+    # if they actually complete the registration process
+    request.session['registration_course_id'] = context['course_id']
 
     if extra_context is not None:
         context.update(extra_context)
@@ -936,6 +944,31 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     if LoginFailures.is_feature_enabled():
         LoginFailures.clear_lockout_counter(user)
 
+    # Track the user's sign in
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        tracking_context = tracker.get_tracker().resolve_context()
+        analytics.identify(anonymous_id_for_user(user, None), {
+            'email': email,
+            'username': username,
+        })
+
+        # If the user entered the flow via a specific course page, we track that
+        registration_course_id = request.session.get('registration_course_id')
+        analytics.track(
+            user.id,
+            "edx.bi.user.account.authenticated",
+            {
+                'category': "conversion",
+                'label': registration_course_id
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id') 
+                }
+            }
+        )
+        request.session['registration_course_id'] = None
+
     if user is not None and user.is_active:
         try:
             # We do not log here, because we have a handler registered
@@ -1383,6 +1416,33 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     (user, profile, registration) = ret
 
     dog_stats_api.increment("common.student.account_created")
+
+    email = post_vars['email']
+
+    # Track the user's registration
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        tracking_context = tracker.get_tracker().resolve_context()
+        analytics.identify(anonymous_id_for_user(user, None), {
+            email: email,
+            username: username,
+        })
+
+        registration_course_id = request.session.get('registration_course_id')
+        analytics.track(
+            user.id,
+            "edx.bi.user.account.registered", 
+            {
+                "category": "conversion",
+                "label": registration_course_id
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id') 
+                }
+            }
+        )
+        request.session['registration_course_id'] = None
+
     create_comments_service_user(user)
 
     context = {
