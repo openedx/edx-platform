@@ -105,7 +105,9 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, group_name=None, commentable_id=None):
+def make_mock_thread_data(
+        course, text, thread_id, num_children, include_children, group_id=None, group_name=None, commentable_id=None
+):
     thread_data = {
         "id": thread_id,
         "type": "thread",
@@ -122,6 +124,9 @@ def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, 
     if group_id is not None:
         thread_data['group_name'] = group_name
     if num_children is not None:
+        thread_data['group_id'] = group_id
+        thread_data['group_name'] = group_name
+    if include_children:
         thread_data["children"] = [{
             "id": "dummy_comment_id_{}".format(i),
             "type": "comment",
@@ -150,14 +155,17 @@ def make_mock_request_impl(
                         thread_id=thread_id,
                         num_children=None,
                         group_id=group_id,
-                        commentable_id=commentable_id
+                        commentable_id=commentable_id,
+                        include_children=False
                     )
                 ]
             }
         elif thread_id and url.endswith(thread_id):
-            data = make_mock_thread_data(
-                course=course, text=text, thread_id=thread_id, num_children=num_thread_responses, group_id=group_id
-            )
+            data = {
+                "collection": [make_mock_thread_data(course=course, text=text, thread_id=thread_id,
+                                                     num_children=num_thread_responses, include_children=False,
+                                                     group_id=group_id)]
+            }
         elif "/users/" in url:
             data = {
                 "default_sort_key": "date",
@@ -228,7 +236,9 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+            strip_none(make_mock_thread_data(
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=False
+            ))
         )
         mock_request.assert_called_with(
             "get",
@@ -408,7 +418,8 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
                 thread_id=self.mock_thread_id,
                 num_children=1,
                 group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name
+                group_name=self.student_cohort.name,
+                include_children=False,
             )
         )
 
@@ -987,6 +998,74 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
         expected_courseware_title = 'Chapter / Discussion1'
         self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
+
+
+@patch('requests.request')
+class SingleCohortedThreadTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.student_cohort = CourseUserGroup.objects.create(
+            name="student_cohort",
+            course_id=self.course.id,
+            group_type=CourseUserGroup.COHORT
+        )
+
+    def _create_mock_cohorted_thread(self, mock_request):
+        self.mock_text = "dummy content"
+        self.mock_thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            self.mock_text, self.mock_thread_id,
+            group_id=self.student_cohort.id
+        )
+
+    def test_ajax(self, mock_request):
+        self._create_mock_cohorted_thread(mock_request)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            self.mock_thread_id
+        )
+
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(
+            response_data["content"],
+            make_mock_thread_data(
+                self.course,
+                self.mock_text, self.mock_thread_id, 1, True,
+                group_id=self.student_cohort.id,
+                group_name=self.student_cohort.name,
+            )
+        )
+
+    def test_html(self, mock_request):
+        self._create_mock_cohorted_thread(mock_request)
+
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        mako_middleware_process_request(request)
+        response = views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            self.mock_thread_id
+        )
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        html = response.content
+
+        # Verify that the group name is correctly included in the HTML
+        self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
 
 
 @patch('requests.request')
