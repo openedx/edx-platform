@@ -42,6 +42,7 @@ edX Studio
   
   For more details, see our most recent `edX Product and Engineering
   Newsletter`_.
+
 * You can now build content experiments (also known as A/B tests) entirely
   within edX Studio. With a content experiment, you show different course
   content to different groups of students. Research teams can compare the
@@ -60,17 +61,10 @@ edX Studio
 edX Learning Management System
 *******************************
 
-* Course discussions will
-  soon include a new Question post type. Students and course teams will also be
-  able to filter posts to find unanswered questions easily. %%%%%%%
-
-* The new user
-  interface controls will provide consistent methods for taking action on
-  posts. A set of colorful badges will also make it easier to identify posts. %%%%%%
 
 * When you click **Sent Email History** on the Email page of the Instructor
-  Dashboard, the list of sent messages now identifies the ender of each message
-  in the new **Sent By** column.
+  Dashboard, the list of messages now identifies the sender of each message in
+  the new **Sent By** column.
 
 
 * Bulk email now available for all courses? Instructor Dashboard , Email page. %%%%%
@@ -78,8 +72,6 @@ edX Learning Management System
 **************************
 edX Data & Analytics
 **************************
-
-* The selection that discussion participants now make between a Question or Discussion post type is now included with the Mongo data for each post (CommentThread). Who endorsed a discussion post or marked a question as answered, and when, will be included for a response (Comment).
 
 * 
 
@@ -94,21 +86,29 @@ next few weeks:
 
 * In addition to the existing Discussion post type, course discussions will
   soon include a new Question post type. Students and course teams will also be
-  able to filter posts to find unanswered questions easily.%%%%%%
+  able to filter posts to find unanswered questions easily.
 
 * A new user experience design for course discussions is coming! The new user
   interface controls will provide consistent methods for taking action on
-  posts. A set of colorful badges will also make it easier to identify posts.%%%%
+  posts. A set of colorful badges will also make it easier to identify posts.
 
 * To make the process of registering faster and easier, students will soon be
-  able to register and log in to the edX.org and edX Edge web sites with a
-  Google or Facebook ID.
+  able to both register and log in to the edX.org and edX Edge web sites with
+  their existing Google or Facebook IDs.
 
 
 
 **************************
 edX Documentation
 **************************
+
+Some of you have had problems with bookmarks and existing links to the edX
+`Building and Running an edX Course`_ guide. These were the result of a
+reorganization that we made as part of pur preparations to expand the
+documentation set. A redirect is now in place for this guide in its new
+location, at http://edx.readthedocs.org/projects/edx-partner-course-
+staff/en/latest/. And, you can always find the complete documentation set at
+`docs.edx.org`_.
 
 The following documentation is available:
 
@@ -124,13 +124,17 @@ The following documentation is available:
 
 * `Creating Peer Assessments`_
 
-  Recent changes include: 
+.. Recent changes include: 
   
   
        
 * `edX Research Guide`_
 
-.. Recent changes include: 
+   Recent changes include: 
+
+   * Removed chapters on "Course Grading" and "XML format of drag and drop
+     input". These topics are covered in the `Building and Running an edX
+     Course`_  guide.
 
 * `edX Developer's Guide`_
 

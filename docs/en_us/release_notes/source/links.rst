@@ -16,6 +16,8 @@
 
 .. _edX Status: http://status.edx.org/
 
+.. _docs.edx.org: http://docs.edx.org
+
 .. _edX roadmap: https://openedx.atlassian.net/wiki/display/PROD/Product+Roadmap
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
