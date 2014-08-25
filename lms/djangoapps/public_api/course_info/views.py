@@ -14,8 +14,8 @@ from rest_framework.views import APIView
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from courseware.courses import get_course_about_section
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from student.models import CourseEnrollment, User
 
@@ -49,7 +49,8 @@ class CourseUpdatesList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
+        # This parsing is horrible. Find out how we're supposed to do this properly.
+        course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course_updates_module = get_course_info_module(request, course_id, 'updates')
         return Response(reversed(course_updates_module.items))
 
@@ -61,7 +62,7 @@ class CourseHandoutsList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
+        course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course_handouts_module = get_course_info_module(request, course_id, 'handouts')
         return Response({'handouts_html': course_handouts_module.data})
 
@@ -71,7 +72,7 @@ class CourseAboutDetail(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
+        course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course = modulestore().get_course(course_id)
         # There are other fields, but they don't seem to be in use.
         # see courses.py:get_course_about_section
