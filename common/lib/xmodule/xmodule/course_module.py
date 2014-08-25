@@ -586,7 +586,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self.set_grading_policy(self.grading_policy)
 
         if self.discussion_topics == {}:
-            self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
+            self.discussion_topics = {_('General'): {'id': unicode(self.id)}}
 
         if not getattr(self, "tabs", []):
             CourseTabList.initialize_default(self)

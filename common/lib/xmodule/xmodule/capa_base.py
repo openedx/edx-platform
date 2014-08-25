@@ -311,7 +311,7 @@ class CapaMixin(CapaFields):
 
         return LoncapaProblem(
             problem_text=text,
-            id=self.location.html_id(),
+            problem_id=self.location,
             state=state,
             seed=self.seed,
             capa_system=capa_system,
