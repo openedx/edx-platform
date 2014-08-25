@@ -30,10 +30,10 @@ from ..fixtures.discussion import (
 )
 
 
-class DiscussionResponsePaginationTestMixin(object):
+class DiscussionTestMixin(object):
     """
-    A mixin containing tests for response pagination for use by both inline
-    discussion and the discussion tab
+    A mixin containing test methods and helper methods for use by both inline
+    discussion tests and discussion tab tests.
     """
 
     def setup_thread(self, num_responses, **thread_kwargs):
@@ -50,6 +50,26 @@ class DiscussionResponsePaginationTestMixin(object):
             thread_fixture.addResponse(Response(id=str(i), body=str(i)))
         thread_fixture.push()
         self.setup_thread_page(thread_id)
+
+    def setup_cohorts(self):
+        """
+        Sets up the course to use cohorting, and installs a default "Mock Cohort" cohort.
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"cohort_config": {
+                    "auto_cohort_groups": [
+                        "Mock Cohort"
+                    ],
+                    "auto_cohort": True,
+                    "cohorted_discussions": [
+                        "mock-thread-id"
+                    ],
+                    "cohorted": True
+                },
+                },
+            })
+
 
     def assert_response_display_correct(self, response_total, displayed_responses):
         """
@@ -124,9 +144,23 @@ class DiscussionResponsePaginationTestMixin(object):
         self.setup_thread(5, closed=True)
         self.assertFalse(self.thread_page.has_add_response_button())
 
+    def test_non_cohort_visibility_label(self):
+        self.setup_thread(1)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post visible to everyone.")
+
+    def test_cohort_visibility_label(self):
+        self.setup_cohorts()
+        self.setup_thread(1, group_id=1)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post visible only to Mock Cohort.")
+
+    def test_obsolete_cohort_visibility_label(self):
+        self.setup_cohorts()
+        self.setup_thread(1, group_id=999)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post no longer visible to students.")
+
 
 @attr('shard_1')
-class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionTestMixin):
     """
     Tests for the discussion page displaying a single thread
     """
@@ -136,7 +170,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
 
         # Create a course to register for
-        CourseFixture(**self.course_info).install()
+        self.course_fixture = CourseFixture(**self.course_info).install()
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
@@ -280,7 +314,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
 
 
 @attr('shard_1')
-class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class InlineDiscussionTest(UniqueCourseTest, DiscussionTestMixin):
     """
     Tests for inline discussions
     """
@@ -288,7 +322,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        self.course_fix = CourseFixture(**self.course_info).add_children(
+        self.course_fixture = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit").add_children(
@@ -338,7 +372,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def test_discussion_blackout_period(self):
         now = datetime.datetime.now(UTC)
-        self.course_fix.add_advanced_settings(
+        self.course_fixture.add_advanced_settings(
             {
                 u"discussion_blackouts": {
                     "value": [
@@ -350,7 +384,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
                 }
             }
         )
-        self.course_fix._add_advanced_settings()
+        self.course_fixture._add_advanced_settings()
         self.browser.refresh()
         thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)

@@ -519,7 +519,8 @@ describe "DiscussionThreadListView", ->
 
         it "should get all discussions", ->
           testSelectionRequest(
-            (params) -> expect(params.url.path()).toEqual(DiscussionUtil.urlFor("threads")),
+            (params) -> expect(params.url.path()).toEqual(DiscussionUtil.urlFor("threads"))
+            ,
             "All"
           )
 
