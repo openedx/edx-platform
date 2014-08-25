@@ -510,12 +510,18 @@ def dashboard(request):
         language_options.sort()
 
     # try to get the prefered language for the user
-    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
-    if cur_lang_code:
+    cur_pref_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    # try and get the current language of the user
+    cur_lang_code = get_language()
+    if cur_pref_lang_code and cur_pref_lang_code in settings.LANGUAGE_DICT:
         # if the user has a preference, get the name from the code
+        current_language = settings.LANGUAGE_DICT[cur_pref_lang_code]
+    elif cur_lang_code in settings.LANGUAGE_DICT:
+        # if the user's browser is showing a particular language,
+        # use that as the current language
         current_language = settings.LANGUAGE_DICT[cur_lang_code]
     else:
-        # if the user doesn't have a preference, use the default language
+        # otherwise, use the default language
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     context = {
