@@ -193,6 +193,7 @@ def make_mock_request_impl(
                         text=text,
                         thread_id=thread_id,
                         num_children=None,
+                        include_children=False,
                         group_id=group_id,
                         commentable_id=commentable_id,
                     )
@@ -204,6 +205,7 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
+                include_children=False,
                 group_id=group_id,
                 commentable_id=commentable_id
             )

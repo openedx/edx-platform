@@ -24,6 +24,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohorts,
     is_commentable_cohorted,
     get_cohorted_commentables,
+    get_cohorted_threads_privacy,
 )
 from courseware.tabs import EnrolledTab
 from courseware.access import has_access
@@ -39,6 +40,8 @@ from django_comment_client.utils import (
     get_group_id_for_comments_service,
     is_commentable_cohorted
 )
+
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
@@ -100,6 +103,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
+        'commentable_id': discussion_id,
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -128,6 +132,24 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
     #did the user request a group
+
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
+
+    group_id = request.GET.get('group_id')
+
+    if group_id == "all":
+        group_id = None
+
+    if not group_id:
+        if not has_permission(request.user, "see_all_cohorts", course.id):
+            group_id = get_cohort_id(request.user, course.id)
+            if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+                default_query_params['exclude_groups'] = True
+
+    if group_id:
+        default_query_params["group_id"] = group_id
+
+    #so by default, a moderator sees all items, and a student sees his cohort
 
     query_params = merge_dict(
         default_query_params,
@@ -307,6 +329,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
+
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
@@ -347,6 +370,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 user_info=user_info
             )
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
+        content = utils.safe_content(thread.to_dict(), course_key, is_staff)
+        add_thread_group_name(content, course_key)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course, request.user)
         return utils.JsonResponse({
@@ -359,12 +384,14 @@ def single_thread(request, course_key, discussion_id, thread_id):
             threads, query_params = get_threads(request, course)
         except ValueError:
             return HttpResponseBadRequest("Invalid group_id")
+        threads, query_params = get_threads(request, course_key)
         threads.append(thread.to_dict())
 
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context(threads, course, request.user)
 
         for thread in threads:
+            add_thread_group_name(thread, course_key)
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False
