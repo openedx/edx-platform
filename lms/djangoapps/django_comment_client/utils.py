@@ -6,6 +6,7 @@ from collections import defaultdict
 import logging
 from datetime import datetime
 
+from course_groups.cohorts import get_cohort_by_id
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -16,7 +17,6 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 
 from edxmako import lookup_template
 import pystache_custom as pystache
-
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
@@ -400,7 +400,7 @@ def safe_content(content, course_id, is_staff=False):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
+        'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
         'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
         'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
         'endorsement',
@@ -440,6 +440,14 @@ def safe_content(content, course_id, is_staff=False):
             content[child_content_key] = safe_children
 
     return content
+
+
+def add_thread_group_name(thread_info, course_key):
+    """
+    Augment the specified thread info to include the group name if a group id is present.
+    """
+    if thread_info.get('group_id') is not None:
+        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
 
 
 def format_filename(filename):

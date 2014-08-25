@@ -18,7 +18,7 @@ from course_groups.cohorts import (is_course_cohorted, get_cohort_id, get_cohort
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
-from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
@@ -54,7 +54,7 @@ def make_course_settings(course):
     return obj
 
 @newrelic.agent.function_trace()
-def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAGE):
+def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
     if something goes wrong.
@@ -66,7 +66,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'sort_order': 'desc',
         'text': '',
         'commentable_id': discussion_id,
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': course_key.to_deprecated_string(),
         'user_id': request.user.id,
     }
 
@@ -86,7 +86,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     #is user a moderator
     #did the user request a group
 
-    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
 
@@ -248,11 +248,11 @@ def forum_form_discussion(request, course_id):
 @require_GET
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_id)
-    course_settings = make_course_settings(course)
+    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course_settings = make_course_settings(course, include_category_map=True)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -274,8 +274,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
-            annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        content = utils.safe_content(thread.to_dict(), course_id, is_staff)
+            annotated_content_info = utils.get_annotated_content_infos(course_key, thread, request.user, user_info=user_info)
+        content = utils.safe_content(thread.to_dict(), course_key, is_staff)
+        add_thread_group_name(content, course_key)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
@@ -284,27 +285,26 @@ def single_thread(request, course_id, discussion_id, thread_id):
         })
 
     else:
-        threads, query_params = get_threads(request, course_id)
+        threads, query_params = get_threads(request, course_key)
         threads.append(thread.to_dict())
 
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+            add_thread_group_name(thread, course_key)
 
             #patch for backward compatibility with comments service
             if not "pinned" in thread:
                 thread["pinned"] = False
 
-        threads = [utils.safe_content(thread, course_id, is_staff) for thread in threads]
+        threads = [utils.safe_content(thread, course_key, is_staff) for thread in threads]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-            user_cohort = get_cohort_id(request.user, course_id)
+            user_cohort = get_cohort_id(request.user, course_key)
 
         context = {
             'discussion_id': discussion_id,
@@ -317,10 +317,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': _attr_safe_json(threads),
-            'roles': _attr_safe_json(utils.get_role_ids(course_id)),
-            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_key),
             'thread_pages': query_params['num_pages'],
-            'is_course_cohorted': is_course_cohorted(course_id),
+            'is_course_cohorted': is_course_cohorted(course_key),
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'cohorts': course_settings["cohorts"],
             'user_cohort': user_cohort,
