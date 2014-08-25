@@ -20,17 +20,22 @@ with tarfile.open(output_filename, "w:gz") as tar:
 
 tar.close()
 
-file_dest = os.environ['HOME'] + '/results/' + os.environ['TDDIUM_SESSION_ID'] + '/session/reports.tar.gz'
+session_path = os.environ['HOME'] + '/results/' + os.environ['TDDIUM_SESSION_ID'] + '/session/'
+file_dest = session_path + 'reports.tar.gz'
 
 # if the tar file is not empty, copy it to the proper place
 if count > 0:
     shutil.copyfile(output_filename, file_dest)
-    print "done copying file"
+    print 'done copying file'
 
-# TODO: fold the remaining bash script into the Python script
-# finding if there is any screenshots
-# print "checking for screenshots"
-# for (path, dirs, files) in os.walk('test_root/log'):
-#    print files
+# finding if there is any screenshot or log file
+print 'attaching failed screenshots and logs (if any)'
+for (path, dirs, files) in os.walk('test_root/log'):
+    for filename in files:
+        if filename.find('png') != -1 or filename.find('log') != -1:
+            filepath = path + filename
+            print 'copying file:', filepath
+            destpath = session_path + filename
+            shutil.copyfile(filepath, destpath)
 
-print "TDDIUM_SESSION_ID:", os.environ['TDDIUM_SESSION_ID']
+print 'TDDIUM_SESSION_ID:', os.environ['TDDIUM_SESSION_ID']
