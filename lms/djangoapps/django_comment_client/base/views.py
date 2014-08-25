@@ -18,12 +18,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from util.file import store_uploaded_file
-from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
 from edx_notifications.lib.publisher import (
     publish_notification_to_user,
     get_notification_type
 )
 from edx_notifications.data import NotificationMessage
+from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
 from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
 import django_comment_client.settings as cc_settings
 from django_comment_common.signals import (
@@ -48,7 +48,8 @@ from django_comment_client.utils import (
     get_cached_discussion_id_map,
     get_group_id_for_comments_service,
     is_comment_too_deep,
-    prepare_content
+    prepare_content,
+    add_thread_group_name,
 )
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from eventtracking import tracker
@@ -318,7 +319,8 @@ def create_thread(request, course_id, commentable_id):
     _update_user_engagement_score(course_key, request.user.id)
 
     add_courseware_context([data], course, user)
-
+    add_thread_group_name(data, course_key)
+    add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:

@@ -9,27 +9,33 @@ from sets import Set
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
 from django.utils.translation import get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_http_methods
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
 from web_fragments.fragment import Fragment
 
-import django_comment_client.utils as utils
-import lms.lib.comment_client as cc
-from courseware.access import has_access
+from django.views.decorators.http import require_GET, require_http_methods
+import newrelic.agent
+
 from courseware.courses import get_course_with_access
 from courseware.views.views import CourseTabView
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_id,
+    is_commentable_cohorted,
+    get_cohorted_commentables,
+    get_cohorted_threads_privacy,
+)
+from courseware.access import has_access
+
+from django_comment_client.permissions import has_permission, get_team
 from django_comment_client.constants import TYPE_ENTRY
-from django_comment_client.permissions import get_team, has_permission
 from django_comment_client.utils import (
     add_courseware_context,
     available_division_schemes,
@@ -42,6 +48,10 @@ from django_comment_client.utils import (
     merge_dict,
     strip_none
 )
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
+import django_comment_client.utils as utils
+import lms.lib.comment_client as cc
+
 from django_comment_common.utils import ThreadContext, get_course_discussion_settings, set_course_discussion_settings
 from lms.djangoapps.courseware.views.views import check_and_get_upgrade_link, get_cosmetic_verified_display_price
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
@@ -49,12 +59,13 @@ from student.models import CourseEnrollment
 from util.json_request import JsonResponse, expect_json
 from xmodule.modulestore.django import modulestore
 
+from opaque_keys.edx.keys import CourseKey
+
 log = logging.getLogger("edx.discussions")
 try:
     import newrelic.agent
 except ImportError:
     newrelic = None  # pylint: disable=invalid-name
-
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -116,6 +127,7 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
         'sort_key': 'activity',
         'text': '',
         'course_id': unicode(course.id),
+        'commentable_id': discussion_id,
         'user_id': request.user.id,
         'context': ThreadContext.COURSE,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
@@ -142,6 +154,24 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
     #did the user request a group
+
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
+
+    group_id = request.GET.get('group_id')
+
+    if group_id == "all":
+        group_id = None
+
+    if not group_id:
+        if not has_permission(request.user, "see_all_cohorts", course.id):
+            group_id = get_cohort_id(request.user, course.id)
+            if not group_id and get_cohorted_threads_privacy(course.id) == 'cohort-only':
+                default_query_params['exclude_groups'] = True
+
+    if group_id:
+        default_query_params["group_id"] = group_id
+
+    #so by default, a moderator sees all items, and a student sees his cohort
 
     query_params = merge_dict(
         default_query_params,
@@ -304,7 +334,8 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 user_info=user_info
             )
 
-        content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
+        content = utils.safe_content(thread.to_dict(), course_key, is_staff)
+        add_thread_group_name(content, course_key)
         with newrelic_function_trace("add_courseware_context"):
             add_courseware_context([content], course, request.user)
 
@@ -407,6 +438,7 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         threads = [thread.to_dict()]
 
         for thread in threads:
+            add_thread_group_name(thread, course_key)
             # patch for backward compatibility with comments service
             if "pinned" not in thread:
                 thread["pinned"] = False

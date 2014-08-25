@@ -1,34 +1,36 @@
 import json
 import logging
+import string
 from collections import defaultdict
 from datetime import datetime
 
+import pystache_custom as pystache
 import pytz
+from courseware import courses
+from courseware.access import has_access
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils.timezone import UTC
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import i4xEncoder
-
-import pystache_custom as pystache
-from courseware import courses
-from courseware.access import has_access
 from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
-from django_comment_client.permissions import check_permissions_by_view, get_team, has_permission
+from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from django_comment_common.models import FORUM_ROLE_STUDENT, CourseDiscussionSettings, Role
 from django_comment_common.utils import get_course_discussion_settings
 from edxmako import lookup_template
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import i4xEncoder
 from request_cache.middleware import request_cached
 from student.roles import GlobalStaff
 from xmodule.modulestore.django import modulestore
 from xmodule.partitions.partitions import ENROLLMENT_TRACK_PARTITION_ID
 from xmodule.partitions.partitions_service import PartitionService
+
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted, \
+    get_cohort_by_id
 
 log = logging.getLogger(__name__)
 
@@ -783,6 +785,32 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         # Never pass a group_id to the comments service for a non-divided
         # commentable
         return None
+
+
+def add_thread_group_name(thread_info, course_key):
+    """
+    Augment the specified thread info to include the group name if a group id is present.
+    """
+    if thread_info.get('group_id') is not None:
+        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
+
+
+def format_filename(filename):
+    """Take a string and return a valid filename constructed from the string.
+    Uses a whitelist approach: any characters not present in valid_chars are
+    removed. Also spaces are replaced with underscores.
+
+    Note: this method may produce invalid filenames such as ``, `.` or `..`
+    When I use this method I prepend a date string like '2009_01_15_19_46_32_'
+    and append a file extension like '.txt', so I avoid the potential of using
+    an invalid filename.
+
+    https://gist.github.com/seanh/93666
+    """
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    filename = ''.join(c for c in filename if c in valid_chars)
+    filename = filename.replace(' ', '_')
+    return filename
 
 
 def get_group_id_for_user(user, course_discussion_settings):

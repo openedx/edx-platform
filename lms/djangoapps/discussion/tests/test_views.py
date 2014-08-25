@@ -8,17 +8,12 @@ from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 from django.utils import translation
-from mock import ANY, Mock, call, patch
-from nose.tools import assert_true
 
-from course_modes.models import CourseMode
-from course_modes.tests.factories import CourseModeFactory
-from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
-    CohortedTopicGroupIdTestMixin,
     GroupIdAssertionMixin,
-    NonCohortedTopicGroupIdTestMixin
+    CohortedTopicGroupIdTestMixin,
+    NonCohortedTopicGroupIdTestMixin,
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import (
@@ -32,24 +27,32 @@ from django_comment_common.models import CourseDiscussionSettings, ForumsConfig
 from django_comment_common.utils import ThreadContext
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
 from lms.djangoapps.discussion import views
-from lms.djangoapps.discussion.views import course_discussions_settings_handler
-from lms.djangoapps.teams.tests.factories import CourseTeamFactory
-from lms.lib.comment_client.utils import CommentClientPaginatedResult
-from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
-from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from openedx.features.enterprise_support.tests.mixins.enterprise import EnterpriseTestConsentRequired
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE,
     ModuleStoreTestCase,
-    SharedModuleStoreTestCase
+    SharedModuleStoreTestCase,
+    TEST_DATA_MONGO_MODULESTORE,
 )
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
+
+from nose.tools import assert_true
+from mock import patch, Mock, ANY, call
+
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts
+from openedx.core.djangoapps.course_groups.tests.test_views import CohortViewsTestCase
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
+from lms.djangoapps.discussion.views import course_discussions_settings_handler
+from lms.lib.comment_client.utils import CommentClientPaginatedResult
+from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
+
 
 log = logging.getLogger(__name__)
 
@@ -131,6 +134,7 @@ def make_mock_thread_data(
         text,
         thread_id,
         num_children,
+        include_children,
         group_id=None,
         group_name=None,
         commentable_id=None,
@@ -158,6 +162,9 @@ def make_mock_thread_data(
     if is_commentable_divided is not None:
         thread_data['is_commentable_divided'] = is_commentable_divided
     if num_children is not None:
+        thread_data['group_id'] = group_id
+        thread_data['group_name'] = group_name
+    if include_children:
         thread_data["children"] = [{
             "id": "dummy_comment_id_{}".format(i),
             "type": "comment",
@@ -185,6 +192,7 @@ def make_mock_request_impl(
                         text=text,
                         thread_id=thread_id,
                         num_children=None,
+                        include_children=False,
                         group_id=group_id,
                         commentable_id=commentable_id,
                     )
@@ -196,6 +204,7 @@ def make_mock_request_impl(
                 text=text,
                 thread_id=thread_id,
                 num_children=num_thread_responses,
+                include_children=False,
                 group_id=group_id,
                 commentable_id=commentable_id
             )
@@ -272,7 +281,9 @@ class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
+            strip_none(make_mock_thread_data(
+                course=self.course, text=text, thread_id=thread_id, num_children=1, include_children=False
+            ))
         )
         mock_request.assert_called_with(
             "get",
@@ -475,6 +486,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
                 group_id=self.student_cohort.id,
                 group_name=self.student_cohort.name,
                 is_commentable_divided=True,
+                include_children=False,
             )
         )
 
@@ -1127,6 +1139,74 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         response = self.send_request(mock_request)
         self.assertEqual(mock_request.call_args[1]['params']['context'], ThreadContext.STANDALONE)
         self.verify_response(response)
+
+
+@patch('requests.request')
+class SingleCohortedThreadTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.student_cohort = CourseUserGroup.objects.create(
+            name="student_cohort",
+            course_id=self.course.id,
+            group_type=CourseUserGroup.COHORT
+        )
+
+    def _create_mock_cohorted_thread(self, mock_request):
+        self.mock_text = "dummy content"
+        self.mock_thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(
+            self.mock_text, self.mock_thread_id,
+            group_id=self.student_cohort.id
+        )
+
+    def test_ajax(self, mock_request):
+        self._create_mock_cohorted_thread(mock_request)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            self.mock_thread_id
+        )
+
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(
+            response_data["content"],
+            make_mock_thread_data(
+                self.course,
+                self.mock_text, self.mock_thread_id, 1, True,
+                group_id=self.student_cohort.id,
+                group_name=self.student_cohort.name,
+            )
+        )
+
+    def test_html(self, mock_request):
+        self._create_mock_cohorted_thread(mock_request)
+
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        mako_middleware_process_request(request)
+        response = views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            self.mock_thread_id
+        )
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        html = response.content
+
+        # Verify that the group name is correctly included in the HTML
+        self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
 
 
 @patch('requests.request', autospec=True)
