@@ -1,9 +1,10 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 <%! from django.utils.translation import ugettext as _ %>
+${_("Thank you for signing up for {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
 
-${_("Thank you for signing up for {platform_name}! To activate "
-"your account, please copy and paste this address into your web "
-"browser's address bar:").format(platform_name=settings.PLATFORM_NAME)}
+${_("To get started, please activate your account by clicking on the link below"
+      " (you may also copy and paste the link into your browser's address"
+      " bar).").format(platform_name=settings.PLATFORM_NAME)}
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -11,15 +12,40 @@ ${_("Thank you for signing up for {platform_name}! To activate "
   http://${ site }/activate/${ key }
 % endif
 
-## Temporary hack until we develop a better way to adjust language
-% if stanford_theme_enabled():
-  ${_("If you didn't request this, you don't need to do anything; you won't "
+% if settings.PLATFORM_NAME == "edX":
+${_("Activation ensures that you can register for {platform_name} courses and"
+      " access the courseware."
+      " If you require assistance, please use our web form at"
+      " {contact_us} or email {info_address}.").format(
+             platform_name=settings.PLATFORM_NAME,
+             contact_us=settings.MKTG_URL_LINK_MAP['CONTACT'],
+             info_address=settings.CONTACT_EMAIL
+      )}
+
+${_("We hope you enjoy learning with {platform_name}!").format(
+        platform_name=settings.PLATFORM_NAME
+)}
+
+${_("The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
+
+${_("This email was automatically sent by {site_name} because someone "
+      "attempted to create an {platform_name} account using this email address. If you "
+      "did not attempt to create this account and do not activate the account, "
+      "you will no longer receive emails from {platform_name}.").format(
+        platform_name=settings.PLATFORM_NAME,
+	site_name=settings.SITE_NAME
+)}
+
+% elif stanford_theme_enabled():  ## Temporary hack until we develop a better way to adjust language
+${_("If you didn't request this, you don't need to do anything; you won't "
       "receive any more email from us. Please do not reply to this e-mail; "
       "if you require assistance, check the about section of the "
       "{platform_name} Courses web site.").format(platform_name=settings.PLATFORM_NAME)}
+
 % else:
-  ${_("If you didn't request this, you don't need to do anything; you won't "
+${_("If you didn't request this, you don't need to do anything; you won't "
       "receive any more email from us. Please do not reply to this e-mail; "
       "if you require assistance, check the help section of the "
-      "{platform_name} web site.").format(platform_name=settings.PLATFORM_NAME)}
+      "{platform_name} website.").format(platform_name=settings.PLATFORM_NAME)}
+
 % endif
