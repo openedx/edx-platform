@@ -14,7 +14,10 @@ from courseware.courses import course_image_url, get_course_about_section
       <header class="course-preview">
         <hgroup>
 ##          <h2><span class="course-number">${course.display_number_with_default | h}</span><br/> ${get_course_about_section(course, 'title')}</h2>
-          <h2><span class="course-number">${course.id.to_deprecated_string() | h}</span><br/> ${get_course_about_section(course, 'title')}</h2>
+          <h2>
+            <span class="course-number">${course.id.to_deprecated_string() | h}</span>
+            ## <br/> ${get_course_about_section(course, 'title')}
+          </h2>
           <span class="start-date">${course.start_date_text}</span>
         </hgroup>
         <div class="info-link">&#x2794;</div>
