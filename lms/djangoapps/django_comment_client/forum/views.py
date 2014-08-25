@@ -16,6 +16,7 @@ from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_comment
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
+from django_comment_client.base.views import add_thread_group_info
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
 import django_comment_client.utils as utils
@@ -87,7 +88,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     #is user a moderator
     #did the user request a group
 
-    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
 
@@ -126,17 +127,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #now add the group name if the thread has a group id
     for thread in threads:
-
-        if thread.get('group_id'):
-            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
-            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
-        else:
-            thread['group_name'] = ""
-            thread['group_string'] = "This post visible to everyone."
-
-        #patch for backward compatibility to comments service
-        if not 'pinned' in thread:
-            thread['pinned'] = False
+        add_thread_group_info(thread, course_id)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -282,12 +273,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
-
-            #patch for backward compatibility with comments service
-            if not "pinned" in thread:
-                thread["pinned"] = False
+            add_thread_group_info(thread, course_id)
 
         threads = [utils.safe_content(thread, course_id, is_staff) for thread in threads]
 
@@ -320,6 +306,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'course_settings': _attr_safe_json(course_settings)
         }
         return render_to_response('discussion/index.html', context)
+
 
 @require_GET
 @login_required

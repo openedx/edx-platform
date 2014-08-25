@@ -5,6 +5,7 @@ import random
 import time
 import urlparse
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -18,7 +19,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
+from course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -134,11 +135,32 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
     data = thread.to_dict()
+    add_thread_group_info(data, course_id)
     add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:
         return JsonResponse(safe_content(data, course_key))
+
+
+def add_thread_group_info(thread, course_id):
+    """
+    Adds group information to the specified thread for the given course.
+    """
+    if thread.get('group_id'):
+        try:
+            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+            thread['group_string'] = _("This post visible only to {group_name}.").format(group_name=thread['group_name'])
+        except ObjectDoesNotExist as e:
+            thread['group_name'] = "Unknown Cohort"
+            thread['group_string'] = _("This post no longer visible to students.")
+    else:
+        thread['group_name'] = ""
+        thread['group_string'] = _("This post visible to everyone.")
+
+    #patch for backward compatibility to comments service
+    if not 'pinned' in thread:
+        thread['pinned'] = False
 
 
 @require_POST

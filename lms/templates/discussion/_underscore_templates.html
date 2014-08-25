@@ -46,10 +46,7 @@
 <script aria-hidden="true" type="text/template" id="thread-show-template">
   <div class="discussion-post">
       <header>
-      ${"<% if (obj.group_id) { %>"}
-      <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}
-
+          <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
           <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
