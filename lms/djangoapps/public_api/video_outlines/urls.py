@@ -10,7 +10,10 @@ from django.conf import settings
 from .views import VideoSummaryList
 
 urlpatterns = patterns('public_api.video_outlines.views',
-    url(r'^{}'.format(settings.COURSE_ID_PATTERN), VideoSummaryList.as_view(), name='video-summary-list'),
+#    url(r'^{}'.format(settings.COURSE_ID_PATTERN), VideoSummaryList.as_view(), name='video-summary-list'),
+
+    url(r'^(?P<course_id>[^/]*)$', VideoSummaryList.as_view(), name='video-summary-list'),
+
 #    url(
 #        r'^(?P<username>\w+)/course_enrollments/$',
 #        UserCourseEnrollmentsList.as_view(),

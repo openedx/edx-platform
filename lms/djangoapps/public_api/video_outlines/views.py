@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 from xmodule.modulestore.django import modulestore
 from xmodule.video_module.video_module import get_transcripts
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 from student.models import CourseEnrollment, User
 from courseware.module_render import get_module_system_for_user
@@ -87,7 +87,10 @@ def video_summary(video_module, request):
     track_url, transcript_language, sorted_languages = get_transcripts(video_module)
 
     trans_url = video_module.runtime.handler_url(video_module, 'transcript', 'translation').rstrip('/?')
-    transcripts = {lang: request.build_absolute_uri(trans_url + '/' + lang) for lang in sorted_languages}
+    transcripts = {
+        lang: request.build_absolute_uri(trans_url + '/' + lang)
+        for lang in sorted_languages
+    }
     # this will be in a different format, so should it be included?
     # if track_url:
     #     transcripts["download"] = request.build_absolute_uri(track_url)
@@ -109,7 +112,7 @@ class VideoSummaryList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id'])
+        course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course = modulestore().get_course(course_id)
         system = get_module_system_for_user(
             request.user,
@@ -120,7 +123,9 @@ class VideoSummaryList(generics.ListAPIView):
             None,
             'video_api')[0]
         system.export_fs = None
-        video_outline = BlockOutline(course, {"video": video_summary}, request, system)
+        video_outline = BlockOutline(
+            course, {"video": video_summary}, request, system
+        )
 
         return Response(video_outline)
 
