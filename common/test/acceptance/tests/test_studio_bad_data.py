@@ -1,6 +1,7 @@
 from nose.plugins.attrib import attr
 from .base_studio_test import ContainerBase
 from ..fixtures.course import XBlockFixtureDesc
+from ..pages.studio.utils import verify_ordering
 
 
 @attr('shard_1')
@@ -38,7 +39,7 @@ class BadComponentTest(ContainerBase):
         displaying the components on the unit page.
         """
         unit = self.go_to_unit_page()
-        self.verify_ordering(unit, [{"": ["Unit HTML", "Unit Problem"]}])
+        verify_ordering(self, unit, [{"": ["Unit HTML", "Unit Problem"]}])
 
 
 @attr('shard_1')

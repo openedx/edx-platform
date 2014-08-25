@@ -12,7 +12,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from .course_page import CoursePage
 from .container import ContainerPage
-from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt, wait_for_notification
+from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt
 
 
 class CourseOutlineItem(object):
@@ -256,6 +256,9 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
     """
     A page object that will be used as a child of :class:`CourseOutlineContainer`.
     """
+    url = None
+    BODY_SELECTOR = '.outline-item'
+
     def __init__(self, browser, locator):
         super(CourseOutlineChild, self).__init__(browser)
         self.locator = locator
@@ -270,6 +273,39 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         click_css(self, self._bounded_selector('.delete-button'), require_notification=False)
         confirm_prompt(self, cancel)
 
+    def _bounded_selector(self, selector):
+        """
+        Return `selector`, but limited to this particular `CourseOutlineChild` context
+        """
+        return '{}[data-locator="{}"] {}'.format(
+            self.BODY_SELECTOR,
+            self.locator,
+            selector
+        )
+
+    @property
+    def name(self):
+        titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
+        if titles:
+            return titles[0]
+        else:
+            return None
+
+    @property
+    def children(self):
+        """
+        Will return any first-generation descendant items of this item.
+        """
+        descendants = self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
+            lambda el: CourseOutlineChild(self.browser, el.get_attribute('data-locator'))).results
+
+        # Now remove any non-direct descendants.
+        grandkids = []
+        for descendant in descendants:
+            grandkids.extend(descendant.children)
+
+        grand_locators = [grandkid.locator for grandkid in grandkids]
+        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
 
 class CourseOutlineUnit(CourseOutlineChild):
     """
@@ -289,8 +325,11 @@ class CourseOutlineUnit(CourseOutlineChild):
     def is_browser_on_page(self):
         return self.q(css=self.BODY_SELECTOR).present
 
+    def children(self):
+        return self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
+            lambda el: CourseOutlineUnit(self.browser, el.get_attribute('data-locator'))).results
 
-class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
+class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
     """
     :class`.PageObject` that wraps a subsection block on the Studio Course Outline page.
     """
@@ -326,7 +365,7 @@ class CourseOutlineSubsection(CourseOutlineChild, CourseOutlineContainer):
         self.q(css=self._bounded_selector(self.ADD_BUTTON_SELECTOR)).click()
 
 
-class CourseOutlineSection(CourseOutlineChild, CourseOutlineContainer):
+class CourseOutlineSection(CourseOutlineContainer, CourseOutlineChild):
     """
     :class`.PageObject` that wraps a section block on the Studio Course Outline page.
     """
@@ -512,85 +551,12 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
                     subsection.toggle_expand()
 
     @property
-    def outline_items(self):
+    def xblocks(self):
         """
         Return a list of xblocks loaded on the outline page.
         """
-        return self._get_outline_items()
+        return self.children(CourseOutlineChild)
 
-    def _get_outline_items(self, prefix=""):
-        return self.q(css=prefix + OutlineWrapper.BODY_SELECTOR).map(
-            lambda el: OutlineWrapper(self.browser, el.get_attribute('data-locator'))).results
-
-    def drag(self, source_index, target_index):
-        """
-        Gets the drag handle with index source_index (relative to the vertical layout of the page)
-        and drags it to the location of the drag handle with target_index.
-
-        This should drag the element with the source_index drag handle BEFORE the
-        one with the target_index drag handle.
-        """
-        draggables = self.q(css='.drag-handle')
-        source = draggables[source_index]
-        target = draggables[target_index]
-        action = ActionChains(self.browser)
-        # When dragging before the target element, must take into account that the placeholder
-        # will appear in the place where the target used to be.
-        placeholder_height = 40
-        action.click_and_hold(source).move_to_element_with_offset(
-            target, 0, placeholder_height
-        ).release().perform()
-        wait_for_notification(self)
-
-
-class OutlineWrapper(PageObject):
-    """
-    A PageObject representing a wrapper around course outline items shown on the Course Outline page.
-    """
-    url = None
-    BODY_SELECTOR = '.outline-item'
-    NAME_SELECTOR = '.item-title'
-
-    def __init__(self, browser, locator):
-        super(OutlineWrapper, self).__init__(browser)
-        self.locator = locator
-
-    def is_browser_on_page(self):
-        return self.q(css='{}[data-locator="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
-
-    def _bounded_selector(self, selector):
-        """
-        Return `selector`, but limited to this particular `CourseOutlineChild` context
-        """
-        return '{}[data-locator="{}"] {}'.format(
-            self.BODY_SELECTOR,
-            self.locator,
-            selector
-        )
-
-    @property
-    def name(self):
-        titles = self.q(css=self._bounded_selector(self.NAME_SELECTOR)).text
-        if titles:
-            return titles[0]
-        else:
-            return None
-
-    @property
-    def children(self):
-        """
-        Will return any first-generation descendant items of this item.
-        """
-        descendants = self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
-            lambda el: OutlineWrapper(self.browser, el.get_attribute('data-locator'))).results
-
-        # Now remove any non-direct descendants.
-        grandkids = []
-        for descendant in descendants:
-            grandkids.extend(descendant.children)
-
-        grand_locators = [grandkid.locator for grandkid in grandkids]
-        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
 
 class CourseOutlineModal(object):
     MODAL_SELECTOR = ".wrapper-modal-window"

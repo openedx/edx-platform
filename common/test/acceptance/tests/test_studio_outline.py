@@ -9,7 +9,7 @@ from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from ..pages.studio.utils import add_discussion
+from ..pages.studio.utils import add_discussion, drag, verify_ordering
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.staff_view import StaffPage
@@ -49,36 +49,9 @@ class CourseOutlineTest(StudioCourseTest):
                         XBlockFixtureDesc('html', 'Test HTML Component'),
                         XBlockFixtureDesc('discussion', 'Test Discussion Component')
                     )
-                ),
-                XBlockFixtureDesc('sequential', "DropS").add_children(
-                    XBlockFixtureDesc('vertical', "DropV").add_children(
-                        XBlockFixtureDesc('problem', 'Drop Problem 1', data=load_data_str('multiple_choice.xml')),
-                    )
                 )
             )
         )
-
-    def verify_ordering(self, outline_page, expected_orderings):
-        """
-        Verifies the expected ordering of xblocks on the page.
-        """
-        xblocks = outline_page.outline_items
-        blocks_checked = set()
-        for expected_ordering in expected_orderings:
-            for xblock in xblocks:
-                parent = expected_ordering.keys()[0]
-                if xblock.name == parent:
-                    blocks_checked.add(parent)
-                    children = xblock.children
-                    expected_length = len(expected_ordering.get(parent))
-                    self.assertEqual(
-                        expected_length, len(children),
-                        "Number of children incorrect for group {0}. Expected {1} but got {2}.".format(parent, expected_length, len(children)))
-                    for idx, expected in enumerate(expected_ordering.get(parent)):
-                        self.assertEqual(expected, children[idx].name)
-                        blocks_checked.add(expected)
-                    break
-        self.assertEqual(len(blocks_checked), len(xblocks))
 
     def do_action_and_verify(self, outline_page, action, expected_ordering):
         """
@@ -88,12 +61,12 @@ class CourseOutlineTest(StudioCourseTest):
             outline_page = self.course_outline_page.visit()
 
         action(outline_page)
-        self.verify_ordering(outline_page, expected_ordering)
+        verify_ordering(self, outline_page, expected_ordering)
 
         # Reload the page and expand all subsections to see that the change was persisted.
-        course_outline_page = self.course_outline_page.visit()
-        course_outline_page.q(css='.outline-item.outline-subsection.is-collapsed .ui-toggle-expansion').click()
-        self.verify_ordering(course_outline_page, expected_ordering)
+        outline_page = self.course_outline_page.visit()
+        outline_page.q(css='.outline-item.outline-subsection.is-collapsed .ui-toggle-expansion').click()
+        verify_ordering(self, outline_page, expected_ordering)
 
 
 @attr('shard_2')
@@ -132,7 +105,7 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
     def drag_and_verify(self, source, target, expected_ordering, outline_page=None):
         self.do_action_and_verify(
             outline_page,
-            lambda (outline): outline.drag(source, target),
+            lambda (outline): drag(outline, source, target),
             expected_ordering
         )
 
