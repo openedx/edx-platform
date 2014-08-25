@@ -311,7 +311,7 @@ class CapaMixin(CapaFields):
 
         return LoncapaProblem(
             problem_text=text,
-            id=self.location.html_id(),
+            problem_id=self.location,
             state=state,
             seed=self.seed,
             capa_system=capa_system,
@@ -389,7 +389,7 @@ class CapaMixin(CapaFields):
         """
         progress = self.get_progress()
         return self.runtime.render_template('problem_ajax.html', {
-            'element_id': self.location.html_id(),
+            'element_id': self.location.block_id,
             'id': self.location.to_deprecated_string(),
             'ajax_url': self.runtime.ajax_url,
             'progress_status': Progress.to_js_status_str(progress),
@@ -632,7 +632,7 @@ class CapaMixin(CapaFields):
 
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.runtime.ajax_url
+                id=self.location.block_id, ajax_url=self.runtime.ajax_url
             ) + html + "</div>"
 
         # Now do all the substitutions which the LMS module_render normally does, but
@@ -971,8 +971,8 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-             # pylint: disable=maybe-no-member
-             # pylint is unable to verify that .total_seconds() exists
+            # pylint: disable=maybe-no-member
+            # pylint is unable to verify that .total_seconds() exists
             if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
                 remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
@@ -1188,7 +1188,7 @@ class CapaMixin(CapaFields):
                 log.warning('Input id %s is not mapped to an input type.', input_id)
 
             answer_response = None
-            for response, responder in self.lcp.responders.iteritems():
+            for responder in self.lcp.responders.itervalues():
                 if input_id in responder.answer_ids:
                     answer_response = responder
 

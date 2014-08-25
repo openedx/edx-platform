@@ -162,7 +162,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'display_name': self.display_name_with_default,
             'end': self.end_time.total_seconds(),
             'handout': self.handout,
-            'id': self.location.html_id(),
+            'id': self.location.block_id,
             'show_captions': json.dumps(self.show_captions),
             'download_video_link': download_video_link,
             'sources': json.dumps(sources),

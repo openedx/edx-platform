@@ -138,11 +138,13 @@ class ConditionalModule(ConditionalFields, XModule):
 
     def get_html(self):
         # Calculate html ids of dependencies
-        self.required_html_ids = [descriptor.location.html_id() for
-                                  descriptor in self.descriptor.get_required_module_descriptors()]
+        self.required_html_ids = [
+            descriptor.location.block_id for
+            descriptor in self.descriptor.get_required_module_descriptors()
+        ]
 
         return self.system.render_template('conditional_ajax.html', {
-            'element_id': self.location.html_id(),
+            'element_id': self.location.block_id,
             'ajax_url': self.system.ajax_url,
             'depends': ';'.join(self.required_html_ids)
         })

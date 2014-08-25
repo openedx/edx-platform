@@ -114,14 +114,14 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
 
-    def __init__(self, problem_text, id, capa_system, state=None, seed=None):
+    def __init__(self, problem_text, problem_id, capa_system, state=None, seed=None):
         """
         Initializes capa Problem.
 
         Arguments:
 
             problem_text (string): xml defining the problem.
-            id (string): identifier for this problem, often a filename (no spaces).
+            problem_id (UsageKey): identifier for this problem
             capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
                 rendering, user context, and other resources.
             state (dict): containing the following keys:
@@ -136,7 +136,7 @@ class LoncapaProblem(object):
 
         ## Initialize class variables from state
         self.do_reset()
-        self.problem_id = id
+        self.problem_id = problem_id
         self.capa_system = capa_system
 
         state = state or {}
@@ -653,7 +653,7 @@ class LoncapaProblem(object):
                     random_seed=self.seed,
                     python_path=python_path,
                     cache=self.capa_system.cache,
-                    slug=self.problem_id,
+                    slug=unicode(self.problem_id),
                     unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
@@ -778,7 +778,7 @@ class LoncapaProblem(object):
         response_id = 1
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
-            response_id_str = self.problem_id + "_" + str(response_id)
+            response_id_str = self.problem_id.block_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
             response_id += 1
@@ -794,7 +794,7 @@ class LoncapaProblem(object):
             for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
-                entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
+                entry.attrib['id'] = u"%s_%i_%i" % (self.problem_id.block_id, response_id, answer_id)
                 answer_id = answer_id + 1
 
             # instantiate capa Response
@@ -819,5 +819,5 @@ class LoncapaProblem(object):
         # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
         solution_id = 1
         for solution in tree.findall('.//solution'):
-            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
+            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id.block_id, solution_id)
             solution_id += 1

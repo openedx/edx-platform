@@ -20,7 +20,6 @@ from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
 from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
-from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
 
 from pytz import UTC

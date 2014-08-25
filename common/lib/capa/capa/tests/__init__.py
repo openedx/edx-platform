@@ -5,6 +5,7 @@ import os
 import os.path
 
 import fs.osfs
+from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
@@ -56,7 +57,10 @@ def test_capa_system():
 
 def new_loncapa_problem(xml, capa_system=None, seed=723):
     """Construct a `LoncapaProblem` suitable for unit tests."""
-    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system())
+    return LoncapaProblem(
+        xml, problem_id=BlockUsageLocator(CourseLocator('org', 'course', 'run'), 'problem', '1'),
+        seed=seed, capa_system=capa_system or test_capa_system()
+    )
 
 
 def load_fixture(relpath):
