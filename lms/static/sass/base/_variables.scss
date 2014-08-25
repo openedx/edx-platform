@@ -33,6 +33,17 @@ $very-light-text: #fff;
 
 // ====================
 
+// TIMING - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
+
+// ====================
+
 // COLORS - utility
 $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 

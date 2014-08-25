@@ -3,78 +3,88 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
-<div class="edx-footer">
-    <footer id="footer" class="clearfix region-footer" role="contentinfo">
-        <div class="region-footer-columns region-container container">
-            <div class="region-container-inner">
-                <!-- regions: Footer first and Footer second -->
-                <div class="region region-footer-first">
-                    <div class="region-inner clearfix">
-                        <div class="region-container-inner">
-                            <div id="block-block-4" class="block block-block block-disclosure copy-detail no-title">
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<div class="wrapper wrapper-footer edx-footer edx-footer-new">
+  <footer id="footer-global" class="footer-global" role="contentinfo">
 
-                                <p>
-                                    <img alt="edX" src="${static.url('images/header-logo.png')}">${_(
-                                    "{EdX} offers interactive online classes and MOOCs from the world's best universities. "
-                                    "Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and many other universities. "
-                                    "Topics include biology, business, chemistry, computer science, economics, finance, "
-                                    "electronics, engineering, food and nutrition, history, humanities, law, literature, "
-                                    "math, medicine, music, philosophy, physics, science, statistics and more. {EdX} is a "
-                                    "non-profit online initiative created by founding partners {Harvard} and {MIT}."
-                                    ).format(
-                                    EdX="EdX", Harvard="Harvard", MIT="MIT", HarvardX="HarvardX", MITx="MITx",
-                                    BerkeleyX="BerkeleyX", UTx="UTx"
-                                    )}
-                                </p>
+    <div class="footer-about">
+      <h2 class="sr footer-about-title">${_("About edX")}</h2>
 
-                                ## Translators: The © symbol appears directly before this line.
-                                <p class="copyright">© ${_("2014 edX, except where noted, all rights reserved.")}</p>
+      <div class="footer-about-logo">
+        <img alt="edX logo" src="${static.url('images/header-logo.png')}">
+      </div>
 
+      <div class="footer-about-copy">
+        <p>
+          ${_(
+            "{EdX} offers interactive online classes and MOOCs from the world's best universities. "
+            "Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and many other universities. "
+            "Topics include biology, business, chemistry, computer science, economics, finance, "
+            "electronics, engineering, food and nutrition, history, humanities, law, literature, "
+            "math, medicine, music, philosophy, physics, science, statistics and more. {EdX} is a "
+            "non-profit online initiative created by founding partners {Harvard} and {MIT}."
+            ).format(
+            EdX="EdX", Harvard="Harvard", MIT="MIT", HarvardX="HarvardX", MITx="MITx",
+            BerkeleyX="BerkeleyX", UTx="UTx"
+          )}
+        </p>
+      </div>
 
-                                <ul class="menu">
-                                    <li><a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a></li>
-                                    <li><a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="region region-footer-second">
-                    <div class="region-inner clearfix">
-                        <div class="region-container-inner">
-                            <nav id="block-menu-block-7" class="block block-menu-block" role="navigation">
-                                <h2 class="block-title">${_("About & Company Info")}</h2>
+      <div class="footer-about-copyright">
+        <p>${_("&copy; 2014 edX, some rights reserved.")}</p>
+      </div>
 
-                                <div class="menu-block-wrapper menu-block-7 menu-name-menu-about-company-in-footer parent-mlid-0 menu-level-1">
-                                    <ul class="menu clearfix">
-                                        <li><a href="${marketing_link('ABOUT')}">${_("About")}</a></li>
-                                        <li><a href="${marketing_link('NEWS')}">${_("News")}</a></li>
-                                        <li><a href="${marketing_link('CONTACT')}">${_("Contact")}</a></li>
-                                        <li><span>-</span></li>
-                                        <li><a href="${marketing_link('FAQ')}">${_("FAQ")}</a></li>
-                                        <li><a href="${marketing_link('BLOG')}">${_("edX Blog")}</a></li>
-                                        <li><span>-</span></li>
-                                        <li><a href="${marketing_link('DONATE')}" class="edx-bold">${_("Donate to edX")}</a></li>
-                                        <li><a href="${marketing_link('JOBS')}" class="edx-bold">${_("Jobs at edX")}</a></li>
-                                    </ul>
-                                </div>
+      <div class="footer-about-links">
+        <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
+        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span> <span class="note">${_("(Revised 4/16/2014)")}</span></a>
+      </div>
+    </div>
 
-                            </nav>
-                            <section id="block-menu-menu-social-menu" class="block block-menu nav block-menu-social" role="navigation">
-                                <h2 class="block-title">${_("Follow Us")}</h2>
+    <div class="footer-nav">
+      <h2 class="footer-nav-title">${_("About & Company Info")}</h2>
 
-                                <ul class="menu clearfix">
-                                    <li><a href="${settings.PLATFORM_TWITTER_URL}" title="Twitter"><i class="icon-twitter"></i>${_("Twitter")}</a></li>
-                                    <li><a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="Facebook"><i class="icon-facebook"></i>${_("Facebook")}</a></li>
-                                    <li><a href="${settings.PLATFORM_MEETUP_URL}" title="Meetup"><i class="icon-calendar"></i>${_("Meetup")}</a></li>
-                                    <li><a href="${settings.PLATFORM_LINKEDIN_URL}" title="LinkedIn"><i class="icon-linkedin"></i>${_("LinkedIn")}</a></li>
-                                    <li><a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="Google+"><i class="icon-google-plus"></i>${_("Google+")}</a></li>
-                                </ul>
-                            </section>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+      <div class="footer-nav-links">
+        <a href="${marketing_link('ABOUT')}"><span class="copy">${_("About")}</span></a>
+        <a href="${marketing_link('NEWS')}"><span class="copy">${_("News")}</span></a>
+        <a href="${marketing_link('CONTACT')}"><span class="copy">${_("Contact")}</span></a>
+      </div>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('FAQ')}"><span class="copy">${_("FAQ")}</span></a>
+        <a href="${marketing_link('BLOG')}"><span class="copy">${_("edX Blog")}</span></a>
+      </div>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('DONATE')}" class="has-emphasis"><span class="copy">${_("Donate to edX")}</span></a>
+        <a href="${marketing_link('JOBS')}" class="has-emphasis"><span class="copy">${_("Jobs at edX")}</span></a>
+      </div>
+    </div>
+
+    <div class="footer-follow">
+      <h2 class="footer-follow-title">${_("Follow Us")}</h2>
+
+      <div class="footer-follow-links">
+        <a href="${settings.PLATFORM_TWITTER_URL}" title="Twitter">
+          <i class="icon icon-twitter"></i>
+          <span class="copy">${_("Twitter")}</span>
+        </a>
+        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="Facebook">
+          <i class="icon icon-facebook-sign"></i>
+          <span class="copy">${_("Facebook")}</span>
+        </a>
+        <a href="${settings.PLATFORM_MEETUP_URL}" title="Meetup">
+          <i class="icon icon-calendar"></i>
+          <span class="copy">${_("Meetup")}</span>
+        </a>
+        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="LinkedIn">
+          <i class="icon icon-linkedin-sign"></i>
+          <span class="copy">${_("LinkedIn")}</span>
+        </a>
+        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="Google+">
+          <i class="icon icon-google-plus-sign"></i>
+          <span class="copy">${_("Google+")}</span>
+        </a>
+      </div>
+    </div>
+  </footer>
 </div>
