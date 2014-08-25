@@ -75,29 +75,25 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         else:
             block_id = usage_key
 
-        if isinstance(usage_key, BlockUsageLocator):
-            # trust the passed in key to know the caller's expectations of which fields are filled in.
-            # particularly useful for strip_keys so may go away when we're version aware
-            course_key = usage_key.course_key
-        else:
-            course_info = course_entry_override or self.course_entry
-            course_key = CourseLocator(
-                version_guid=course_info['structure']['_id'],
-                org=course_info.get('org'),
-                course=course_info.get('course'),
-                run=course_info.get('run'),
-                branch=course_info.get('branch'),
-            )
         json_data = self.module_data.get(block_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
+            course_info = course_entry_override or self.course_entry
+            course_key = CourseLocator(
+                course_info.get('org'), course_info.get('course'), course_info.get('run'), course_info.get('branch'),
+                course_info['structure']['_id']
+            )
             self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
             json_data = self.module_data.get(block_id)
             if json_data is None:
                 raise ItemNotFoundError(block_id)
 
         class_ = self.load_block_type(json_data.get('category'))
-        new_item = self.xblock_from_json(class_, course_key, block_id, json_data, course_entry_override, **kwargs)
+        new_item = self.xblock_from_json(class_, block_id, json_data, course_entry_override, **kwargs)
+        if isinstance(usage_key, BlockUsageLocator):
+            # trust the passed in key to know the caller's expectations of which fields are filled in.
+            # particularly useful for strip_keys so may go away when we're version aware
+            new_item.location = usage_key
         return new_item
 
     # xblock's runtime does not always pass enough contextual information to figure out
@@ -111,7 +107,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
-    def xblock_from_json(self, class_, course_key, block_id, json_data, course_entry_override=None, **kwargs):
+    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None, **kwargs):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
@@ -128,8 +124,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         if block_id is None:
             block_id = LocalId()
 
+        block_course_key = CourseLocator(
+            version_guid=course_entry_override['structure']['_id'],
+            org=course_entry_override.get('org'),
+            course=course_entry_override.get('course'),
+            run=course_entry_override.get('run'),
+            branch=course_entry_override.get('branch'),
+        )
         block_locator = BlockUsageLocator(
-            course_key,
+            block_course_key,
             block_type=json_data.get('category'),
             block_id=block_id,
         )
