@@ -2,6 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 import json
 import logging
+import string
 from django.conf import settings
 
 import pytz
@@ -29,6 +30,11 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
+from xmodule.modulestore.django import modulestore
+from django.utils.timezone import UTC
+from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey
+import json
 
 log = logging.getLogger(__name__)
 
@@ -772,6 +778,31 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         # commentable
         return None
 
+
+def add_thread_group_name(thread_info, course_key):
+    """
+    Augment the specified thread info to include the group name if a group id is present.
+    """
+    if thread_info.get('group_id') is not None:
+        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
+
+
+def format_filename(filename):
+    """Take a string and return a valid filename constructed from the string.
+    Uses a whitelist approach: any characters not present in valid_chars are
+    removed. Also spaces are replaced with underscores.
+
+    Note: this method may produce invalid filenames such as ``, `.` or `..`
+    When I use this method I prepend a date string like '2009_01_15_19_46_32_'
+    and append a file extension like '.txt', so I avoid the potential of using
+    an invalid filename.
+
+    https://gist.github.com/seanh/93666
+    """
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    filename = ''.join(c for c in filename if c in valid_chars)
+    filename = filename.replace(' ', '_')
+    return filename
 
 def is_comment_too_deep(parent):
     """
