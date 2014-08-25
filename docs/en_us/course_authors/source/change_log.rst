@@ -12,6 +12,14 @@ August, 2014
 
    * - Date
      - Change
+   * - 08/22/14
+     - Added warnings about the effects of changing the course grading policy,
+       graded subsections, or graded components after the course begins.
+   * - 08/20/14
+     - Added :ref:`Browsers` to the :ref:`Getting Started Index` section.
+   * - 08/18/14
+     - Expanded the :ref:`Example Messages to Students` in the :ref:`Launch`
+       chapter.
    * - 08/12/14
      - Updated documentation to address the new publishing workflow and user
        interface. 

@@ -9,13 +9,14 @@ textarea.text {
   @include box-sizing(border-box);
   @include linear-gradient($gray-l5, $white);
   @extend %t-copy-sub2;
+  @extend %t-demi-strong;
   padding: 6px 8px 8px;
   border: 1px solid $gray-l2;
   border-radius: 2px;
   background-color: $gray-l5;
   box-shadow: inset 0 1px 2px $shadow-l1;
   font-family: 'Open Sans', sans-serif;
-  color: $baseFontColor;
+  color: $color-copy-emphasized;
   outline: 0;
 
   &::-webkit-input-placeholder,
@@ -59,6 +60,46 @@ textarea.text {
 // forms - additional UI
 form {
 
+  // CASE: cosmetic checkbox input
+  .checkbox-cosmetic {
+
+    .input-checkbox-checked, .input-checkbox-unchecked, .label {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .input-checkbox-checked, .input-checkbox-unchecked {
+      width: $baseline;
+    }
+
+    .input-checkbox {
+      @extend %cont-text-sr;
+
+      // CASE: unchecked
+      ~ label .input-checkbox-checked {
+        display: none;
+      }
+
+      ~ label .input-checkbox-unchecked {
+        display: inline-block;
+      }
+
+      // CASE: checked
+      &:checked {
+
+        ~ label .input-checkbox-checked {
+          display: inline-block;
+        }
+
+        ~ label .input-checkbox-unchecked {
+          display: none;
+        }
+      }
+
+    }
+  }
+
+  // CASE: file input
   input[type=file] {
     @extend %t-copy-sub1;
   }
@@ -97,28 +138,10 @@ form {
   }
 }
 
-// ELEM: form wrapper
-.wrapper-create-element {
-  height: 0;
-  margin-bottom: $baseline;
-  opacity: 0.0;
-  pointer-events: none;
-  overflow: hidden;
-
-  &.animate {
-    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
-  }
-
-  &.is-shown {
-    height: auto; // define a specific height for the animating version of this UI to work properly
-    opacity: 1.0;
-    pointer-events: auto;
-  }
-}
-
 // ELEM: form
 // form styling for creating a new content item (course, user, textbook)
-form[class^="create-"] {
+// TODO: refactor this into a placeholder to extend.
+.form-create {
   @extend %ui-window;
 
   .title {
@@ -213,10 +236,17 @@ form[class^="create-"] {
 
       .tip {
         @extend %t-copy-sub2;
-        @include transition(color, 0.15s, ease-in-out);
+        @include transition(color 0.15s ease-in-out);
+
+
         display: block;
         margin-top: ($baseline/4);
         color: $gray-l3;
+      }
+
+      .tip-note {
+        display: block;
+        margin-top: ($baseline/4);
       }
 
       .tip-error {
@@ -325,7 +355,6 @@ form[class^="create-"] {
   }
 }
 
-
 // form - inline xblock name edit on unit, container, outline
 
 // TOOD: abstract this out into a Sass placeholder
@@ -359,6 +388,25 @@ form[class^="create-"] {
     .incontext-editor-form {
       display: inline-block;
     }
+  }
+}
+
+// ELEM: form wrapper
+.wrapper-create-element {
+  height: 0;
+  margin-bottom: $baseline;
+  opacity: 0.0;
+  pointer-events: none;
+  overflow: hidden;
+
+  &.animate {
+    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
+  }
+
+  &.is-shown {
+    height: auto; // define a specific height for the animating version of this UI to work properly
+    opacity: 1.0;
+    pointer-events: auto;
   }
 }
 

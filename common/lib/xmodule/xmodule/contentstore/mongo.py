@@ -25,7 +25,7 @@ class MongoContentStore(ContentStore):
 
         :param collection: ignores but provided for consistency w/ other doc_store_config patterns
         """
-        logging.debug('Using MongoDB for static content serving at host={0} db={1}'.format(host, db))
+        logging.debug('Using MongoDB for static content serving at host={0} port={1} db={2}'.format(host, port, db))
         _db = pymongo.database.Database(
             pymongo.MongoClient(
                 host=host,
@@ -66,7 +66,7 @@ class MongoContentStore(ContentStore):
         self.delete(content_id)  # delete is a noop if the entry doesn't exist; so, don't waste time checking
 
         thumbnail_location = content.thumbnail_location.to_deprecated_list_repr() if content.thumbnail_location else None
-        with self.fs.new_file(_id=content_id, filename=content.get_url_path(), content_type=content.content_type,
+        with self.fs.new_file(_id=content_id, filename=unicode(content.location), content_type=content.content_type,
                               displayname=content.name, content_son=content_son,
                               thumbnail_location=thumbnail_location,
                               import_path=content.import_path,

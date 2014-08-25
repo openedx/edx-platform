@@ -11,7 +11,6 @@ and then for each combination of modulestores, performing the sequence:
     4) Compare all modules in the source and destination modulestores to make sure that they line up
 
 """
-
 import ddt
 import itertools
 import random
@@ -28,9 +27,12 @@ from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+
 
 COMMON_DOCSTORE_CONFIG = {
-    'host': 'localhost'
+    'host': MONGO_HOST,
+    'port': MONGO_PORT_NUM,
 }
 
 
@@ -221,7 +223,7 @@ class MongoContentstoreBuilder(object):
 
 MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
-    VersioningModulestoreBuilder(),
+#     VersioningModulestoreBuilder(),  # FIXME LMS-11227
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
@@ -229,6 +231,8 @@ CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
     'toy',
     'manual-testing-complete',
+    'split_test_module',
+    'split_test_module_draft',
 )
 
 

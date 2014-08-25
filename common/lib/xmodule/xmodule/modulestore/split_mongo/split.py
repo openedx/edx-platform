@@ -955,11 +955,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         In split, other than copying the assets, this is cheap as it merely creates a new version of the
         existing course.
         """
-        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
         source_index = self.get_course_index_info(source_course_id)
         if source_index is None:
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
-        return self.create_course(
+        new_course = self.create_course(
             dest_course_id.org, dest_course_id.course, dest_course_id.run,
             user_id,
             fields=fields,
@@ -968,6 +967,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             skip_auto_publish=True,
             **kwargs
         )
+        # don't copy assets until we create the course in case something's awry
+        super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
+        return new_course
 
     DEFAULT_ROOT_BLOCK_ID = 'course'
     def create_course(
@@ -1501,17 +1503,20 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         original_structure = self._lookup_course(usage_locator.course_key)['structure']
         if original_structure['root'] == usage_locator.block_id:
             raise ValueError("Cannot delete the root of a course")
+        if encode_key_for_mongo(usage_locator.block_id) not in original_structure['blocks']:
+            raise ValueError("Cannot delete a block that does not exist")
         index_entry = self._get_index_if_valid(usage_locator, force)
         new_structure = self._version_structure(original_structure, user_id)
         new_blocks = new_structure['blocks']
         new_id = new_structure['_id']
         encoded_block_id = self._get_parent_from_structure(usage_locator.block_id, original_structure)
-        parent_block = new_blocks[encoded_block_id]
-        parent_block['fields']['children'].remove(usage_locator.block_id)
-        parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
-        parent_block['edit_info']['edited_by'] = user_id
-        parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
-        parent_block['edit_info']['update_version'] = new_id
+        if encoded_block_id:
+            parent_block = new_blocks[encoded_block_id]
+            parent_block['fields']['children'].remove(usage_locator.block_id)
+            parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+            parent_block['edit_info']['edited_by'] = user_id
+            parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
+            parent_block['edit_info']['update_version'] = new_id
 
         def remove_subtree(block_id):
             """
@@ -1797,7 +1802,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         xblock_class = self.mixologist.mix(xblock_class)
 
         for field_name, value in fields.iteritems():
-            if value:
+            if value is not None:
                 if isinstance(xblock_class.fields[field_name], Reference):
                     fields[field_name] = value.block_id
                 elif isinstance(xblock_class.fields[field_name], ReferenceList):

@@ -309,6 +309,16 @@ class @DiscussionUtil
         minLength++
       return text.substr(0, minLength) + gettext('…')
 
+  @abbreviateHTML: (html, minLength) ->
+    # Abbreviates the html to at least minLength characters, stopping at word boundaries
+    truncated_text = jQuery.truncate(html, {length: minLength, noBreaks: true, ellipsis: gettext('…')})
+    $result = $("<div>" + truncated_text + "</div>")
+    imagesToReplace = $result.find("img:not(:first)")
+    if imagesToReplace.length > 0
+        $result.append("<p><em>Some images in this post have been omitted</em></p>")
+    imagesToReplace.replaceWith("<em>image omitted</em>")
+    $result.html()
+
   @getPaginationParams: (curPage, numPages, pageUrlFunc) =>
     delta = 2
     minPage = Math.max(curPage - delta, 1)

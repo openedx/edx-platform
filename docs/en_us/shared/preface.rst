@@ -1,5 +1,7 @@
 .. _Preface:
 
+.. Doc team! Be sure that when you make any changes to this file that you also make them to the mirrored file in the edx-analytics-dashboard/docs repository. - Alison 19 Aug 14
+
 ############
 Preface
 ############
@@ -68,9 +70,9 @@ Email
 
 To receive and share information by email, course team members can:
 
-* Sign up to receive monthly newsletters_. 
+* Sign up to receive monthly newsletters_.
 
-* Sign up to receive release_ notes for every release. 
+* Sign up to receive release_ notes for every release.
 
 * Join the `openedx-studio`_ Google group to ask questions and participate in
   discussions with peers at other edX partner organizations and edX staffers.
@@ -97,18 +99,18 @@ educational investigators, and others for educational research.
 Documentation
 -------------
 
-The `edX Research Guide`_ is available on the docs.edx.org web page. 
+The `edX Research Guide`_ is available on the docs.edx.org web page.
 
 This guide opens in your web browser, with a **Search docs** field and links to
 that guide's contents on the left side of each page. To open or save a PDF
 version, click **v: latest** at the lower left of the page, and then click
 **PDF**.
 
-Email 
+Email
 -------
 
-To receive and share information by email, researchers can join the 
-`openedx-analytics`_ Google group to ask questions and participate in 
+To receive and share information by email, researchers can join the
+`openedx-analytics`_ Google group to ask questions and participate in
 discussions with peers at other edX partner organizations and edX staffers.
 
 Wiki
@@ -149,7 +151,7 @@ GitHub
 
 There are two main edX repositories on GitHub.
 
-* The `edx/edx-platform`_ repo contains the code for the edX platform. 
+* The `edx/edx-platform`_ repo contains the code for the edX platform.
 
 * The `edx/configuration`_ repo contains scripts to set up and operate the edX
   platform.
@@ -165,8 +167,8 @@ To receive and share information by email, developers can join these Google
 groups to ask questions and participate in discussions with peers and edX
 staffers.
 
-* For conversations about the code in Open edX, join `edx-code`_.  
-* For conversations about running Open edX, join `openedx-ops`_. 
+* For conversations about the code in Open edX, join `edx-code`_.
+* For conversations about running Open edX, join `openedx-ops`_.
 * For conversations about globalization and translation, join `openedx-translation`_.
 
 Additional Google groups are occasionally formed for individual projects.
@@ -218,14 +220,14 @@ From edX
 
 To help you get started with the edX learning experience, edX offers a course
 (of course!). You can find the edX Demo_ course on the edX web site. EdX also
-maintains a list of frequently_ asked questions and answers. 
+maintains a list of frequently_ asked questions and answers.
 
 If you still have questions or suggestions, you can get help from the edX
 support team: click **Contact** at the bottom of any edX web page or send an
 email message to info@edx.org.
 
 For opportunities to meet others who are interested in edX courses, check the
-edX Global Community meetup_ group. 
+edX Global Community meetup_ group.
 
 
 
@@ -233,13 +235,13 @@ edX Global Community meetup_ group.
 .. _edX Course Staff Release Notes: http://edx.readthedocs.org/projects/edx-release-notes/en/latest/
 .. _Creating a Peer Assessment: http://edx.readthedocs.org/projects/edx-open-response-assessments/en/latest/
 .. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
-.. _newsletters: http://edx.us5.list-manage.com/subscribe?u=1822a33c054dc20e223ca40e2&id=aba723f1aa 
+.. _newsletters: http://edx.us5.list-manage.com/subscribe?u=1822a33c054dc20e223ca40e2&id=aba723f1aa
 .. _release: http://edx.us5.list-manage2.com/subscribe?u=1822a33c054dc20e223ca40e2&id=83e46bd293
 .. _openedx-studio: http://groups.google.com/forum/#!forum/openedx-studio
-.. _Twitter:  http://twitter.com/edXstatus/status/475026709256101888
+.. _Twitter:  http://twitter.com/edXstatus
 .. _edX Status: http://status.edx.org/
 .. _Open edX Product: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+edX+Product+Home
-.. _Open edX Public Product Roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/Open+edX+Public+Product+Roadmap
+.. _Open edX Public Product Roadmap: https://openedx.atlassian.net/wiki/display/PROD/Product+Roadmap
 .. _edX Author Support: http://help.edge.edx.org/home
 .. _openedx-analytics: http://groups.google.com/forum/#!forum/openedx-analytics
 .. _Open edX Analytics: http://edx-wiki.atlassian.net/wiki/display/OA/Open+edX+Analytics+Home

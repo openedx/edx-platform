@@ -315,3 +315,111 @@ class ReleaseDateSourceTest(CourseTestCase):
         """Tests a sequential's release date being set by itself"""
         self._update_release_dates(self.date_one, self.date_two, self.date_two)
         self._verify_release_date_source(self.sequential, self.sequential)
+
+
+class StaffLockTest(CourseTestCase):
+    """Base class for testing staff lock functions."""
+
+    def setUp(self):
+        super(StaffLockTest, self).setUp()
+
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
+        self.sequential = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+        self.orphan = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+
+        # Read again so that children lists are accurate
+        self.chapter = self.store.get_item(self.chapter.location)
+        self.sequential = self.store.get_item(self.sequential.location)
+        self.vertical = self.store.get_item(self.vertical.location)
+
+        # Orphan the orphaned xblock
+        self.sequential.children = [self.vertical.location]
+        self.sequential = self.store.update_item(self.sequential, ModuleStoreEnum.UserID.test)
+
+    def _set_staff_lock(self, xblock, is_locked):
+        """If is_locked is True, xblock is staff locked. Otherwise, the xblock staff lock field is removed."""
+        field = xblock.fields['visible_to_staff_only']
+        if is_locked:
+            field.write_to(xblock, True)
+        else:
+            field.delete_from(xblock)
+        return self.store.update_item(xblock, ModuleStoreEnum.UserID.test)
+
+    def _update_staff_locks(self, chapter_locked, sequential_locked, vertical_locked):
+        """
+        Sets the staff lock on the chapter, sequential, and vertical
+        If the corresponding argument is False, then the field is deleted from the xblock
+        """
+        self.chapter = self._set_staff_lock(self.chapter, chapter_locked)
+        self.sequential = self._set_staff_lock(self.sequential, sequential_locked)
+        self.vertical = self._set_staff_lock(self.vertical, vertical_locked)
+
+
+class StaffLockSourceTest(StaffLockTest):
+    """Tests for finding the source of an xblock's staff lock."""
+
+    def _verify_staff_lock_source(self, item, expected_source):
+        """Helper to verify that the staff lock source of a given item matches the expected source"""
+        source = utils.find_staff_lock_source(item)
+        self.assertEqual(source.location, expected_source.location)
+        self.assertTrue(source.visible_to_staff_only)
+
+    def test_chapter_source_for_vertical(self):
+        """Tests a vertical's staff lock being set by its chapter"""
+        self._update_staff_locks(True, False, False)
+        self._verify_staff_lock_source(self.vertical, self.chapter)
+
+    def test_sequential_source_for_vertical(self):
+        """Tests a vertical's staff lock being set by its sequential"""
+        self._update_staff_locks(True, True, False)
+        self._verify_staff_lock_source(self.vertical, self.sequential)
+        self._update_staff_locks(False, True, False)
+        self._verify_staff_lock_source(self.vertical, self.sequential)
+
+    def test_vertical_source_for_vertical(self):
+        """Tests a vertical's staff lock being set by itself"""
+        self._update_staff_locks(True, True, True)
+        self._verify_staff_lock_source(self.vertical, self.vertical)
+        self._update_staff_locks(False, True, True)
+        self._verify_staff_lock_source(self.vertical, self.vertical)
+        self._update_staff_locks(False, False, True)
+        self._verify_staff_lock_source(self.vertical, self.vertical)
+
+    def test_orphan_has_no_source(self):
+        """Tests that a orphaned xblock has no staff lock source"""
+        self.assertIsNone(utils.find_staff_lock_source(self.orphan))
+
+    def test_no_source_for_vertical(self):
+        """Tests a vertical with no staff lock set anywhere"""
+        self._update_staff_locks(False, False, False)
+        self.assertIsNone(utils.find_staff_lock_source(self.vertical))
+
+
+class InheritedStaffLockTest(StaffLockTest):
+    """Tests for determining if an xblock inherits a staff lock."""
+
+    def test_no_inheritance(self):
+        """Tests that a locked or unlocked vertical with no locked ancestors does not have an inherited lock"""
+        self._update_staff_locks(False, False, False)
+        self.assertFalse(utils.ancestor_has_staff_lock(self.vertical))
+        self._update_staff_locks(False, False, True)
+        self.assertFalse(utils.ancestor_has_staff_lock(self.vertical))
+
+    def test_inheritance_in_locked_section(self):
+        """Tests that a locked or unlocked vertical in a locked section has an inherited lock"""
+        self._update_staff_locks(True, False, False)
+        self.assertTrue(utils.ancestor_has_staff_lock(self.vertical))
+        self._update_staff_locks(True, False, True)
+        self.assertTrue(utils.ancestor_has_staff_lock(self.vertical))
+
+    def test_inheritance_in_locked_subsection(self):
+        """Tests that a locked or unlocked vertical in a locked subsection has an inherited lock"""
+        self._update_staff_locks(False, True, False)
+        self.assertTrue(utils.ancestor_has_staff_lock(self.vertical))
+        self._update_staff_locks(False, True, True)
+        self.assertTrue(utils.ancestor_has_staff_lock(self.vertical))
+
+    def test_no_inheritance_for_orphan(self):
+        """Tests that an orphaned xblock does not inherit staff lock"""
+        self.assertFalse(utils.ancestor_has_staff_lock(self.orphan))

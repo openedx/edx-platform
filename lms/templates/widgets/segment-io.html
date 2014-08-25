@@ -32,23 +32,27 @@
   if (url.indexOf("/register") > -1) {
     // Registration page viewed
     analytics.track("edx.bi.page.register.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else if (url.indexOf("/login") > -1) {
     // Login page viewed
     analytics.track("edx.bi.page.login.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else if (url.indexOf("/dashboard") > -1) {
     // Dashboard viewed
     analytics.track("edx.bi.page.dashboard.viewed", {
-      category: "pageview"
+      category: "pageview",
+      noninteraction: 1
     });
   } else {
     // This event serves as a catch-all, firing when any other page is viewed
     analytics.track("edx.bi.page.other.viewed", {
       category: "pageview",
-      url: location.host + location.pathname + location.search
+      url: location.host + location.pathname + location.search,
+      noninteraction: 1
     });
   }
 

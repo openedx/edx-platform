@@ -2,7 +2,6 @@
 """
 Modulestore configuration for test cases.
 """
-
 from uuid import uuid4
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -13,38 +12,48 @@ import datetime
 import pytz
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
-def mixed_store_config(data_dir, mappings):
+def mixed_store_config(data_dir, mappings, include_xml=True):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo- and XML-backed courses.
 
-    `data_dir` is the directory from which to load XML-backed courses.
-    `mappings` is a dictionary mapping course IDs to modulestores, for example:
+    Args:
+        data_dir (string): the directory from which to load XML-backed courses.
+        mappings (string): a dictionary mapping course IDs to modulestores, for example:
 
-        {
-            'MITx/2.01x/2013_Spring': 'xml',
-            'edx/999/2013_Spring': 'default'
-        }
+            {
+                'MITx/2.01x/2013_Spring': 'xml',
+                'edx/999/2013_Spring': 'default'
+            }
 
-    where 'xml' and 'default' are the two options provided by this configuration,
-    mapping (respectively) to XML-backed and Mongo-backed modulestores..
+        where 'xml' and 'default' are the two options provided by this configuration,
+        mapping (respectively) to XML-backed and Mongo-backed modulestores..
+
+    Keyword Args:
+
+        include_xml (boolean): If True, include an XML modulestore in the configuration.
+            Note that this will require importing multiple XML courses from disk,
+            so unless your tests really needs XML course fixtures or is explicitly
+            testing mixed modulestore, set this to False.
+
     """
-    draft_mongo_config = draft_mongo_store_config(data_dir)
-    xml_config = xml_store_config(data_dir)
-    split_mongo = split_mongo_store_config(data_dir)
+    stores = [
+        draft_mongo_store_config(data_dir)['default'],
+        split_mongo_store_config(data_dir)['default']
+    ]
+
+    if include_xml:
+        stores.append(xml_store_config(data_dir)['default'])
 
     store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': mappings,
-                'stores': [
-                    draft_mongo_config['default'],
-                    split_mongo['default'],
-                    xml_config['default'],
-                ]
+                'stores': stores,
             }
         }
     }
@@ -67,7 +76,8 @@ def draft_mongo_store_config(data_dir):
             'NAME': 'draft',
             'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'DOC_STORE_CONFIG': {
-                'host': 'localhost',
+                'host': MONGO_HOST,
+                'port': MONGO_PORT_NUM,
                 'db': 'test_xmodule',
                 'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
@@ -93,7 +103,8 @@ def split_mongo_store_config(data_dir):
             'NAME': 'draft',
             'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
             'DOC_STORE_CONFIG': {
-                'host': 'localhost',
+                'host': MONGO_HOST,
+                'port': MONGO_PORT_NUM,
                 'db': 'test_xmodule',
                 'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
@@ -229,6 +240,8 @@ class ModuleStoreTestCase(TestCase):
         if hasattr(module_store, '_drop_database'):
             module_store._drop_database()  # pylint: disable=protected-access
         _CONTENTSTORE.clear()
+        if hasattr(module_store, 'close_connections'):
+            module_store.close_connections()
 
     @classmethod
     def setUpClass(cls):

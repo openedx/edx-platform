@@ -7,6 +7,7 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  import urllib
 %>
 
 <%block name="header_extras">
@@ -93,13 +94,26 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
+              <%
+                link_for_about_page = ("https:" if is_secure else "http:") + lms_link_for_about_page
+              %>
+              <p><a class="link-courseURL" rel="external" href="${link_for_about_page}">${link_for_about_page}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
+                <%
+                  email_subject = urllib.quote(_("Enroll in {course_display_name}").format(
+                      course_display_name = context_course.display_name_with_default
+                  ).encode("utf-8"))
+                  email_body = urllib.quote(_('The course "{course_display_name}", provided by {platform_name}, is open for enrollment. Please navigate to this course at {link_for_about_page} to enroll.').format(
+                      course_display_name = context_course.display_name_with_default,
+                      platform_name = settings.PLATFORM_NAME,
+                      link_for_about_page = link_for_about_page
+                  ).encode("utf-8"))
+                %>
                 <a title="${_('Send a note to students via email')}"
-                    href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${lms_link_for_about_page}%20to%20enroll." class="action action-primary">
+                    href="mailto:someone@domain.com?Subject=${email_subject}&body=${email_body}" class="action action-primary">
                     <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
@@ -316,7 +330,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
-          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
           % endif
           </ul>

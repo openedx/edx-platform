@@ -1,4 +1,6 @@
-<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="MockDescriptor" tabindex="0">
+<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime"
+     data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
+     data-type="MockDescriptor" tabindex="0">
     <div class="wrapper-comp-editor is-active" id="editor-tab" data-base-asset-url="/c4x/AndyA/ABT101/asset/">
     </div>
     <section class="sequence-edit">
@@ -24,7 +26,8 @@
 
         </script>
 
-        <div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='{&#34;display_name&#34;: {&#34;default_value&#34;: null, &#34;explicitly_set&#34;: true, &#34;display_name&#34;: &#34;Display Name&#34;, &#34;help&#34;: &#34;This name appears in the horizontal navigation at the top of the page.&#34;, &#34;type&#34;: &#34;Generic&#34;, &#34;value&#34;: &#34;Poll Question&#34;, &#34;field_name&#34;: &#34;display_name&#34;, &#34;options&#34;: []}, &#34;due&#34;: {&#34;default_value&#34;: null, &#34;explicitly_set&#34;: false, &#34;display_name&#34;: &#34;due&#34;, &#34;help&#34;: &#34;Date that this problem is due by&#34;, &#34;type&#34;: &#34;Generic&#34;, &#34;value&#34;: null, &#34;field_name&#34;: &#34;due&#34;, &#34;options&#34;: []}}'/>
+        <div class="wrapper-comp-settings metadata_edit" id="settings-tab"
+             data-metadata='{&#34;display_name&#34;: {&#34;default_value&#34;: null, &#34;explicitly_set&#34;: true, &#34;display_name&#34;: &#34;Display Name&#34;, &#34;help&#34;: &#34;This name appears in the horizontal navigation at the top of the page.&#34;, &#34;type&#34;: &#34;Generic&#34;, &#34;value&#34;: &#34;Poll Question&#34;, &#34;field_name&#34;: &#34;display_name&#34;, &#34;options&#34;: []}, &#34;due&#34;: {&#34;default_value&#34;: null, &#34;explicitly_set&#34;: false, &#34;display_name&#34;: &#34;due&#34;, &#34;help&#34;: &#34;Date that this problem is due by&#34;, &#34;type&#34;: &#34;Generic&#34;, &#34;value&#34;: null, &#34;field_name&#34;: &#34;due&#34;, &#34;options&#34;: []}}'/>
         <textarea data-metadata-name="custom_field">Custom Value</textarea>
     </section>
 </div>

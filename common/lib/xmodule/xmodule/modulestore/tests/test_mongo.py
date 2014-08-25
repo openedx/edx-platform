@@ -36,12 +36,12 @@ from xmodule.exceptions import NotFoundError
 from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
-
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 log = logging.getLogger(__name__)
 
-HOST = 'localhost'
-PORT = 27017
+HOST = MONGO_HOST
+PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
@@ -91,12 +91,13 @@ class TestMongoModuleStore(unittest.TestCase):
         # connect to the db
         doc_store_config = {
             'host': HOST,
+            'port': PORT,
             'db': DB,
             'collection': COLLECTION,
         }
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
-        content_store = MongoContentStore(HOST, DB)
+        content_store = MongoContentStore(HOST, DB, port=PORT)
         #
         # Also test draft store imports
         #
@@ -148,7 +149,7 @@ class TestMongoModuleStore(unittest.TestCase):
     def test_mongo_modulestore_type(self):
         store = DraftModuleStore(
             None,
-            {'host': HOST, 'db': DB, 'collection': COLLECTION},
+            {'host': HOST, 'db': DB, 'port': PORT, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
         assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
@@ -156,7 +157,7 @@ class TestMongoModuleStore(unittest.TestCase):
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.draft_store.get_courses()
-        assert_equals(len(courses), 5)
+        assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
         for course_key in [
 
@@ -831,6 +832,55 @@ class TestMongoModuleStore(unittest.TestCase):
         self.assertEqual(component.published_date, published_date)
         self.assertEqual(component.published_by, published_by)
 
+    def test_export_course_with_peer_component(self):
+        """
+        Test export course when link_to_location is given in peer grading interface settings.
+        """
+
+        name = "export_peer_component"
+
+        locations = self._create_test_tree(name)
+
+        # Insert the test block directly into the module store
+        problem_location = Location('edX', 'tree{}'.format(name), name, 'combinedopenended', 'test_peer_problem')
+
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations["child"],
+            problem_location.block_type,
+            block_id=problem_location.block_id
+        )
+
+        interface_location = Location('edX', 'tree{}'.format(name), name, 'peergrading', 'test_peer_interface')
+
+        self.draft_store.create_child(
+            self.dummy_user,
+            locations["child"],
+            interface_location.block_type,
+            block_id=interface_location.block_id
+        )
+
+        self.draft_store._update_single_item(
+            as_draft(interface_location),
+            {
+                'definition.data': {},
+                'metadata': {
+                    'link_to_location': unicode(problem_location),
+                    'use_for_single_location': True,
+                },
+            },
+        )
+
+        component = self.draft_store.get_item(interface_location)
+        self.assertEqual(unicode(component.link_to_location), unicode(problem_location))
+
+        root_dir = path(mkdtemp())
+
+        # export_to_xml should work.
+        try:
+            export_to_xml(self.draft_store, self.content_store, interface_location.course_key, root_dir, 'test_export')
+        finally:
+            shutil.rmtree(root_dir)
 
 
 class TestMongoKeyValueStore(object):

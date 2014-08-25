@@ -63,7 +63,7 @@ def get_logo_url():
     university = microsite.get_value('university')
 
     if university is None:
-        return '{static_url}images/header-logo.png'.format(
+        return '{static_url}images/logo-edX-77x36.png'.format(
             static_url=settings.STATIC_URL
         )
 

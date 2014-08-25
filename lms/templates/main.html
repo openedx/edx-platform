@@ -20,6 +20,9 @@
 <%def name="theme_enabled()">
   <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
 </%def>
+<%def name="is_microsite()">
+  <% return microsite.is_request_in_microsite() %>
+</%def>
 
 <%def name="stanford_theme_enabled()">
   <%
@@ -61,7 +64,7 @@
   <%block name="headextra"/>
 
 <%
-  if theme_enabled():
+  if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
     google_analytics_file = 'theme-google-analytics.html'
@@ -71,7 +74,13 @@
 
   else:
     header_extra_file = None
-    header_file = microsite.get_template_path('navigation.html')
+
+    if settings.FEATURES.get("ENABLE_NEW_EDX_HEADER", False):
+        header_file = microsite.get_template_path('navigation.html')
+    else:
+        header_file = microsite.get_template_path('original_navigation.html')
+
+
     google_analytics_file = microsite.get_template_path('google_analytics.html')
 
     if getattr(settings, 'SITE_NAME', '').endswith('edx.org'):

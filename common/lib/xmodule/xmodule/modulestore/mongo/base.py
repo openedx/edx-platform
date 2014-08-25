@@ -229,7 +229,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                     # Convert the serialized fields values in self.cached_metadata
                     # to python values
-                    metadata_to_inherit = self.cached_metadata.get(non_draft_loc.to_deprecated_string(), {})
+                    metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
                     inherit_metadata(module, metadata_to_inherit)
 
                 edit_info = json_data.get('edit_info')
@@ -238,10 +238,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if not edit_info:
                     module.edited_by = module.edited_on = module.subtree_edited_on = \
                         module.subtree_edited_by = module.published_date = None
+                    raw_metadata = json_data.get('metadata', {})
                     # published_date was previously stored as a list of time components instead of a datetime
-                    if metadata.get('published_date'):
-                        module.published_date = datetime(*metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
-                    module.published_by = metadata.get('published_by')
+                    if raw_metadata.get('published_date'):
+                        module.published_date = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                    module.published_by = raw_metadata.get('published_by')
                 # otherwise restore the stored editing information
                 else:
                     module.edited_by = edit_info.get('edited_by')
@@ -267,7 +268,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         """
         Convert a single serialized UsageKey string in a ReferenceField into a UsageKey.
         """
-        key = Location.from_deprecated_string(ref_string)
+        key = Location.from_string(ref_string)
         return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
 
     def __setattr__(self, name, value):
@@ -280,22 +281,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         :param course_key: a CourseKey object for the given course
         :param jsonfields: a dict of the jsonified version of the fields
         """
+        result = {}
         for field_name, value in jsonfields.iteritems():
-            if value:
-                field = class_.fields.get(field_name)
-                if field is None:
-                    continue
-                elif isinstance(field, Reference):
-                    jsonfields[field_name] = self._convert_reference_to_key(value)
-                elif isinstance(field, ReferenceList):
-                    jsonfields[field_name] = [
-                        self._convert_reference_to_key(ele) for ele in value
-                    ]
-                elif isinstance(field, ReferenceValueDict):
-                    for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, basestring)
-                        value[key] = self._convert_reference_to_key(subvalue)
-        return jsonfields
+            field = class_.fields.get(field_name)
+            if field is None:
+                continue
+            elif value is None:
+                result[field_name] = value
+            elif isinstance(field, Reference):
+                result[field_name] = self._convert_reference_to_key(value)
+            elif isinstance(field, ReferenceList):
+                result[field_name] = [
+                    self._convert_reference_to_key(ele) for ele in value
+                ]
+            elif isinstance(field, ReferenceValueDict):
+                result[field_name] = {
+                    key: self._convert_reference_to_key(subvalue) for key, subvalue in value.iteritems()
+                }
+            else:
+                result[field_name] = value
+        return result
 
     def lookup_item(self, location):
         """
@@ -522,7 +527,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             # manually pick it apart b/c the db has tag and we want as_published revision regardless
             location = as_published(Location._from_deprecated_son(result['_id'], course_id.run))
 
-            location_url = location.to_deprecated_string()
+            location_url = unicode(location)
             if location_url in results_by_url:
                 # found either draft or live to complement the other revision
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
@@ -1133,14 +1138,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
           therefore propagate subtree edit info up the tree
         """
         try:
-            definition_data = self._convert_reference_fields_to_strings(
-                xblock,
-                xblock.get_explicitly_set_fields_by_scope()
-            )
+            definition_data = self._serialize_scope(xblock, Scope.content)
             now = datetime.now(UTC)
             payload = {
                 'definition.data': definition_data,
-                'metadata': self._convert_reference_fields_to_strings(xblock, own_metadata(xblock)),
+                'metadata': self._serialize_scope(xblock, Scope.settings),
                 'edit_info.edited_on': now,
                 'edit_info.edited_by': user_id,
                 'edit_info.subtree_edited_on': now,
@@ -1152,7 +1154,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 payload['edit_info.published_by'] = user_id
 
             if xblock.has_children:
-                children = self._convert_reference_fields_to_strings(xblock, {'children': xblock.children})
+                children = self._serialize_scope(xblock, Scope.children)
                 payload.update({'definition.children': children['children']})
             self._update_single_item(xblock.scope_ids.usage_id, payload)
 
@@ -1193,25 +1195,27 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         return xblock
 
-    def _convert_reference_fields_to_strings(self, xblock, jsonfields):
+    def _serialize_scope(self, xblock, scope):
         """
         Find all fields of type reference and convert the payload from UsageKeys to deprecated strings
         :param xblock: the XBlock class
         :param jsonfields: a dict of the jsonified version of the fields
         """
-        assert isinstance(jsonfields, dict)
-        for field_name, value in jsonfields.iteritems():
-            if value:
-                if isinstance(xblock.fields[field_name], Reference):
-                    jsonfields[field_name] = value.to_deprecated_string()
-                elif isinstance(xblock.fields[field_name], ReferenceList):
+        jsonfields = {}
+        for field_name, field in xblock.fields.iteritems():
+            if (field.scope == scope and field.is_set_on(xblock)):
+                if isinstance(field, Reference):
+                    jsonfields[field_name] = unicode(field.read_from(xblock))
+                elif isinstance(field, ReferenceList):
                     jsonfields[field_name] = [
-                        ele.to_deprecated_string() for ele in value
+                        unicode(ele) for ele in field.read_from(xblock)
                     ]
-                elif isinstance(xblock.fields[field_name], ReferenceValueDict):
-                    for key, subvalue in value.iteritems():
-                        assert isinstance(subvalue, UsageKey)
-                        value[key] = subvalue.to_deprecated_string()
+                elif isinstance(field, ReferenceValueDict):
+                    jsonfields[field_name] = {
+                        key: unicode(subvalue) for key, subvalue in field.read_from(xblock).iteritems()
+                    }
+                else:
+                    jsonfields[field_name] = field.read_json(xblock)
         return jsonfields
 
     def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):
@@ -1225,7 +1229,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # create a query with tag, org, course, and the children field set to the given location
         query = self._course_key_to_son(location.course_key)
-        query['definition.children'] = location.to_deprecated_string()
+        query['definition.children'] = unicode(location)
 
         # if only looking for the PUBLISHED parent, set the revision in the query to None
         if revision == ModuleStoreEnum.RevisionOption.published_only:
@@ -1300,7 +1304,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             if item['_id']['category'] != 'course':
                 # It would be nice to change this method to return UsageKeys instead of the deprecated string.
                 item_locs.add(
-                    as_published(Location._from_deprecated_son(item['_id'], course_key.run)).to_deprecated_string()
+                    unicode(as_published(Location._from_deprecated_son(item['_id'], course_key.run)))
                 )
             all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
         item_locs -= all_reachable

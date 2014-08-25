@@ -37,14 +37,28 @@ class ContainerPage(PageObject):
             return None
 
     def is_browser_on_page(self):
+        def _xblock_count(class_name, request_token):
+            return len(self.q(css='{body_selector} .xblock.{class_name}[data-request-token="{request_token}"]'.format(
+                body_selector=XBlockWrapper.BODY_SELECTOR, class_name=class_name, request_token=request_token
+            )).results)
 
         def _is_finished_loading():
-            # Wait until all components have been loaded.
-            # See common/static/coffee/src/xblock/core.coffee which adds the
-            # class "xblock-initialized" at the end of initializeBlock
-            num_wrappers = len(self.q(css=XBlockWrapper.BODY_SELECTOR).results)
-            num_xblocks_init = len(self.q(css='{} .xblock.xblock-initialized'.format(XBlockWrapper.BODY_SELECTOR)).results)
-            is_done = num_wrappers == num_xblocks_init
+            is_done = False
+            # Get the request token of the first xblock rendered on the page and assume it is correct.
+            data_request_elements = self.q(css='[data-request-token]')
+            if len(data_request_elements) > 0:
+                request_token = data_request_elements.first.attrs('data-request-token')[0]
+                # Then find the number of Studio xblock wrappers on the page with that request token.
+                num_wrappers = len(self.q(css='{} [data-request-token="{}"]'.format(XBlockWrapper.BODY_SELECTOR, request_token)).results)
+                # Wait until all components have been loaded and marked as either initialized or failed.
+                # See:
+                #   - common/static/coffee/src/xblock/core.coffee which adds the class "xblock-initialized"
+                #     at the end of initializeBlock.
+                #   - common/static/js/views/xblock.js which adds the class "xblock-initialization-failed"
+                #     if the xblock threw an error while initializing.
+                num_initialized_xblocks = _xblock_count('xblock-initialized', request_token)
+                num_failed_xblocks = _xblock_count('xblock-initialization-failed', request_token)
+                is_done = num_wrappers == (num_initialized_xblocks + num_failed_xblocks)
             return (is_done, is_done)
 
         # First make sure that an element with the view-container class is present on the page,
@@ -133,6 +147,12 @@ class ContainerPage(PageObject):
         warning_text = warnings.first.text[0]
         return warning_text == "Caution: The last published version of this unit is live. By publishing changes you will change the student experience."
 
+    def shows_inherited_staff_lock(self, parent_type=None, parent_name=None):
+        """
+        Returns True if the unit inherits staff lock from a section or subsection.
+        """
+        return self.q(css='.bit-publishing .wrapper-visibility .copy .inherited-from').visible
+
     @property
     def publish_action(self):
         """
@@ -153,7 +173,7 @@ class ContainerPage(PageObject):
         """ Returns True if staff lock is currently enabled, False otherwise """
         return 'icon-check' in self.q(css='a.action-staff-lock>i').attrs('class')
 
-    def toggle_staff_lock(self):
+    def toggle_staff_lock(self, inherits_staff_lock=False):
         """
         Toggles "hide from students" which enables or disables a staff-only lock.
 
@@ -164,7 +184,8 @@ class ContainerPage(PageObject):
             self.q(css='a.action-staff-lock').first.click()
         else:
             click_css(self, 'a.action-staff-lock', 0, require_notification=False)
-            confirm_prompt(self)
+            if not inherits_staff_lock:
+                confirm_prompt(self)
         self.wait_for_ajax()
         return not was_locked_initially
 
@@ -277,6 +298,7 @@ class XBlockWrapper(PageObject):
     BODY_SELECTOR = '.studio-xblock-wrapper'
     NAME_SELECTOR = '.xblock-display-name'
     COMPONENT_BUTTONS = {
+        'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
         'save_settings': '.action-save',
     }
@@ -351,6 +373,12 @@ class XBlockWrapper(PageObject):
         Click on Advanced Tab.
         """
         self._click_button('advanced_tab')
+
+    def open_basic_tab(self):
+        """
+        Click on Basic Tab.
+        """
+        self._click_button('basic_tab')
 
     def save_settings(self):
         """

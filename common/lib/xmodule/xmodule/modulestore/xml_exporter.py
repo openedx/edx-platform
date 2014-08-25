@@ -4,7 +4,7 @@ Methods for exporting course data to XML
 
 import logging
 import lxml.etree
-from xblock.fields import Scope
+from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore import EdxJSONEncoder, ModuleStoreEnum
@@ -16,6 +16,7 @@ import os
 from path import path
 import shutil
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
+from opaque_keys.edx.locator import CourseLocator
 
 DRAFT_DIR = "drafts"
 PUBLISHED_DIR = "published"
@@ -36,8 +37,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
     `course_dir`: The name of the directory inside `root_dir` to write the course content to
     """
 
-    course = modulestore.get_course(course_key)
-
+    course = modulestore.get_course(course_key, depth=None)  # None means infinite
     fsm = OSFS(root_dir)
     export_fs = course.runtime.export_fs = fsm.makeopendir(course_dir)
 
@@ -45,6 +45,10 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
 
     # export only the published content
     with modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+        # change all of the references inside the course to use the xml expected key type w/o version & branch
+        xml_centric_course_key = CourseLocator(course_key.org, course_key.course, course_key.run, deprecated=True)
+        adapt_references(course, xml_centric_course_key, export_fs)
+
         course.add_xml_to_node(root)
 
     with export_fs.open('course.xml', 'w') as course_xml:
@@ -79,16 +83,16 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                     course_image_file.write(course_image.data)
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_key, 'static_tab', 'tabs', '.html')
+    export_extra_content(export_fs, modulestore, xml_centric_course_key, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_key, 'custom_tag_template', 'custom_tags')
+    export_extra_content(export_fs, modulestore, xml_centric_course_key, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_key, 'course_info', 'info', '.html')
+    export_extra_content(export_fs, modulestore, xml_centric_course_key, 'course_info', 'info', '.html')
 
     # export the 'about' data (e.g. overview, etc.)
-    export_extra_content(export_fs, modulestore, course_key, 'about', 'about', '.html')
+    export_extra_content(export_fs, modulestore, xml_centric_course_key, 'about', 'about', '.html')
 
     # export the grading policy
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
@@ -100,33 +104,67 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
         policy = {'course/' + course.location.name: own_metadata(course)}
         course_policy.write(dumps(policy, cls=EdxJSONEncoder))
 
-    # NOTE: this code assumes that verticals are the top most draftable container
-    # should we change the application, then this assumption will no longer be valid
-    # NOTE: we need to explicitly implement the logic for setting the vertical's parent
-    # and index here since the XML modulestore cannot load draft modules
-    draft_verticals = modulestore.get_items(
-        course_key,
-        qualifiers={'category': 'vertical'},
-        revision=ModuleStoreEnum.RevisionOption.draft_only
-    )
-    if len(draft_verticals) > 0:
-        draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
-        for draft_vertical in draft_verticals:
-            parent_loc = modulestore.get_parent_location(
-                draft_vertical.location,
-                revision=ModuleStoreEnum.RevisionOption.draft_preferred
+    #### DRAFTS ####
+    # xml backed courses don't support drafts!
+    if course.runtime.modulestore.get_modulestore_type() != ModuleStoreEnum.Type.xml:
+        # NOTE: this code assumes that verticals are the top most draftable container
+        # should we change the application, then this assumption will no longer be valid
+        # NOTE: we need to explicitly implement the logic for setting the vertical's parent
+        # and index here since the XML modulestore cannot load draft modules
+        with modulestore.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+            draft_verticals = modulestore.get_items(
+                course_key,
+                qualifiers={'category': 'vertical'},
+                revision=ModuleStoreEnum.RevisionOption.draft_only
             )
-            # Don't try to export orphaned items.
-            if parent_loc is not None:
-                logging.debug('parent_loc = {0}'.format(parent_loc))
-                if parent_loc.category in DIRECT_ONLY_CATEGORIES:
-                    draft_vertical.xml_attributes['parent_sequential_url'] = parent_loc.to_deprecated_string()
-                    sequential = modulestore.get_item(parent_loc)
-                    index = sequential.children.index(draft_vertical.location)
-                    draft_vertical.xml_attributes['index_in_children_list'] = str(index)
-                draft_vertical.runtime.export_fs = draft_course_dir
-                node = lxml.etree.Element('unknown')
-                draft_vertical.add_xml_to_node(node)
+
+            if len(draft_verticals) > 0:
+                draft_course_dir = export_fs.makeopendir(DRAFT_DIR)
+                for draft_vertical in draft_verticals:
+                    parent_loc = modulestore.get_parent_location(
+                        draft_vertical.location,
+                        revision=ModuleStoreEnum.RevisionOption.draft_preferred
+                    )
+                    # Don't try to export orphaned items.
+                    if parent_loc is not None:
+                        logging.debug('parent_loc = {0}'.format(parent_loc))
+                        if parent_loc.category in DIRECT_ONLY_CATEGORIES:
+                            draft_vertical.xml_attributes['parent_sequential_url'] = parent_loc.to_deprecated_string()
+                            sequential = modulestore.get_item(parent_loc)
+                            index = sequential.children.index(draft_vertical.location)
+                            draft_vertical.xml_attributes['index_in_children_list'] = str(index)
+                        draft_vertical.runtime.export_fs = draft_course_dir
+                        adapt_references(draft_vertical, xml_centric_course_key, draft_course_dir)
+                        node = lxml.etree.Element('unknown')
+                        draft_vertical.add_xml_to_node(node)
+
+
+def adapt_references(subtree, destination_course_key, export_fs):
+    """
+    Map every reference in the subtree into destination_course_key and set it back into the xblock fields
+    """
+    subtree.runtime.export_fs = export_fs  # ensure everything knows where it's going!
+    for field_name, field in subtree.fields.iteritems():
+        if field.is_set_on(subtree):
+            if isinstance(field, Reference):
+                value = field.read_from(subtree)
+                if value is not None:
+                    field.write_to(subtree, field.read_from(subtree).map_into_course(destination_course_key))
+            elif field_name == 'children':
+                # don't change the children field but do recurse over the children
+                [adapt_references(child, destination_course_key, export_fs) for child in subtree.get_children()]
+            elif isinstance(field, ReferenceList):
+                field.write_to(
+                    subtree,
+                    [ele.map_into_course(destination_course_key) for ele in field.read_from(subtree)]
+                )
+            elif isinstance(field, ReferenceValueDict):
+                field.write_to(
+                    subtree, {
+                        key: ele.map_into_course(destination_course_key) for key, ele in field.read_from(subtree).iteritems()
+                    }
+                )
+
 
 
 def _export_field_content(xblock_item, item_dir):
@@ -149,6 +187,7 @@ def export_extra_content(export_fs, modulestore, course_key, category_type, dirn
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)
         for item in items:
+            adapt_references(item, course_key, export_fs)
             with item_dir.open(item.location.name + file_suffix, 'w') as item_file:
                 item_file.write(item.data.encode('utf8'))
 

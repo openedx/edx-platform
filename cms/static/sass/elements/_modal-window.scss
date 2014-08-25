@@ -25,7 +25,7 @@
 
     .title {
       @extend %t-title5;
-      @extend %t-strong;
+      @extend %t-demi-strong;
       margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
       color: $black;
     }
@@ -54,7 +54,7 @@
 
     // sections within a modal
     .modal-section {
-      margin-bottom: ($baseline/2);
+      margin-bottom: ($baseline*0.75);
 
       &:last-child {
         margin-bottom: 0;
@@ -234,8 +234,11 @@
     }
   }
 
-  // edit outline item settings
-  .edit-outline-item-modal {
+  // outline: edit item settings
+  .wrapper-modal-window-bulkpublish-section,
+  .wrapper-modal-window-bulkpublish-subsection,
+  .wrapper-modal-window-bulkpublish-unit,
+  .course-outline-modal {
 
     .list-fields {
 
@@ -244,12 +247,6 @@
         vertical-align: top;
         margin-right: ($baseline/2);
         margin-bottom: ($baseline/4);
-
-
-        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
-        label, input, textarea {
-          display: block;
-        }
 
         label {
           @extend %t-copy-sub1;
@@ -288,6 +285,27 @@
         .due-time {
           width: ($baseline*7);
         }
+
+        .tip {
+          @extend %t-copy-sub1;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l2;
+        }
+
+        .tip-warning {
+          color: $gray-d2;
+        }
+      }
+
+      // CASE: type-based input
+      .field-text {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
       }
 
       // CASE: select input
@@ -305,13 +323,50 @@
         .input {
           width: 100%;
         }
+
+        // CASE: checkbox input
+        .field-checkbox {
+
+          .label, label {
+            margin-bottom: 0;
+          }
+        }
       }
     }
 
+
+
+    // UI: grading section
     .edit-settings-grading {
 
       .grading-type {
         margin-bottom: $baseline;
+      }
+    }
+
+    // UI: staff lock section
+    .edit-staff-lock {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
       }
     }
   }

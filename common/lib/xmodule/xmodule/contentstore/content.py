@@ -5,6 +5,8 @@ XASSET_SRCREF_PREFIX = 'xasset:'
 
 XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 
+STREAM_DATA_CHUNK_SIZE = 1024
+
 import os
 import logging
 import StringIO
@@ -62,9 +64,6 @@ class StaticContent(object):
     def get_id(self):
         return self.location
 
-    def get_url_path(self):
-        return self.location.to_deprecated_string()
-
     @property
     def data(self):
         return self._data
@@ -106,7 +105,9 @@ class StaticContent(object):
         assert(isinstance(course_key, CourseKey))
         placeholder_id = uuid.uuid4().hex
         # create a dummy asset location with a fake but unique name. strip off the name, and return it
-        url_path = unicode(course_key.make_asset_key('asset', placeholder_id).for_branch(None))
+        url_path = StaticContent.serialize_asset_key_with_slash(
+            course_key.make_asset_key('asset', placeholder_id).for_branch(None)
+        )
         return url_path.replace(placeholder_id, '')
 
     @staticmethod
@@ -131,7 +132,7 @@ class StaticContent(object):
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
         loc = StaticContent.compute_location(course_id, orig_path)
-        loc_url = loc.to_deprecated_string()
+        loc_url = StaticContent.serialize_asset_key_with_slash(loc)
 
         # parse the query params for "^/static/" and replace with the location url
         orig_query = parse_qsl(query)
@@ -142,7 +143,7 @@ class StaticContent(object):
                     course_id,
                     query_value[len('/static/'):],
                 )
-                new_query_url = new_query.to_deprecated_string()
+                new_query_url = StaticContent.serialize_asset_key_with_slash(new_query)
                 new_query_list.append((query_name, new_query_url))
             else:
                 new_query_list.append((query_name, query_value))
@@ -152,6 +153,17 @@ class StaticContent(object):
 
     def stream_data(self):
         yield self._data
+
+    @staticmethod
+    def serialize_asset_key_with_slash(asset_key):
+        """
+        Legacy code expects the serialized asset key to start w/ a slash; so, do that in one place
+        :param asset_key:
+        """
+        url = unicode(asset_key)
+        if not url.startswith('/'):
+            url = '/' + url  # TODO - re-address this once LMS-11198 is tackled.
+        return url
 
 
 class StaticContentStream(StaticContent):
@@ -164,9 +176,24 @@ class StaticContentStream(StaticContent):
 
     def stream_data(self):
         while True:
-            chunk = self._stream.read(1024)
+            chunk = self._stream.read(STREAM_DATA_CHUNK_SIZE)
             if len(chunk) == 0:
                 break
+            yield chunk
+
+    def stream_data_in_range(self, first_byte, last_byte):
+        """
+        Stream the data between first_byte and last_byte (included)
+        """
+        self._stream.seek(first_byte)
+        position = first_byte
+        while True:
+            if last_byte < position + STREAM_DATA_CHUNK_SIZE - 1:
+                chunk = self._stream.read(last_byte - position + 1)
+                yield chunk
+                break
+            chunk = self._stream.read(STREAM_DATA_CHUNK_SIZE)
+            position += STREAM_DATA_CHUNK_SIZE
             yield chunk
 
     def close(self):

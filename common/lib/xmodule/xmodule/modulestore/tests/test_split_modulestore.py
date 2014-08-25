@@ -22,6 +22,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -36,8 +37,9 @@ class SplitModuleTest(unittest.TestCase):
     '''
     # Snippets of what would be in the django settings envs file
     DOC_STORE_CONFIG = {
-        'host': 'localhost',
+        'host': MONGO_HOST,
         'db': 'test_xmodule',
+        'port': MONGO_PORT_NUM,
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
     modulestore_options = {
@@ -1330,6 +1332,8 @@ class TestItemCrud(SplitModuleTest):
         self.assertFalse(modulestore().has_item(deleted))
         with self.assertRaises(VersionConflictError):
             modulestore().has_item(locn_to_del)
+        with self.assertRaises(ValueError):
+            modulestore().delete_item(deleted, self.user_id)
 
         self.assertTrue(modulestore().has_item(locn_to_del.course_agnostic()))
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)

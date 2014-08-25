@@ -38,7 +38,14 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_markup, wrap_xblock
+from xmodule_modifiers import (
+    replace_course_urls,
+    replace_jump_to_id_urls,
+    replace_static_urls,
+    add_staff_markup,
+    wrap_xblock,
+    request_token
+)
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
@@ -219,16 +226,26 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
 
     user_location = getattr(request, 'session', {}).get('country_code')
 
-    return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
-                                              track_function, xqueue_callback_url_prefix,
-                                              position, wrap_xmodule_display, grade_bucket_type,
-                                              static_asset_path, user_location)
+    return get_module_for_descriptor_internal(
+        user=user,
+        descriptor=descriptor,
+        field_data_cache=field_data_cache,
+        course_id=course_id,
+        track_function=track_function,
+        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+        position=position,
+        wrap_xmodule_display=wrap_xmodule_display,
+        grade_bucket_type=grade_bucket_type,
+        static_asset_path=static_asset_path,
+        user_location=user_location,
+        request_token=request_token(request),
+    )
 
 
 def get_module_system_for_user(user, field_data_cache,
                                # Arguments preceding this comment have user binding, those following don't
                                descriptor, course_id, track_function, xqueue_callback_url_prefix,
-                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
+                               request_token, position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                static_asset_path='', user_location=None):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
@@ -244,6 +261,7 @@ def get_module_system_for_user(user, field_data_cache,
 
     Arguments:
         see arguments for get_module()
+        request_token (str): A token unique to the request use by xblock initialization
 
     Returns:
         (LmsModuleSystem, KvsFieldData):  (module system, student_data) bound to, primarily, the user and descriptor
@@ -308,10 +326,20 @@ def get_module_system_for_user(user, field_data_cache,
         """
         # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
         # inner_get_module, not the parent's callback.  Add it as an argument....
-        return get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,
-                                                  track_function, make_xqueue_callback,
-                                                  position, wrap_xmodule_display, grade_bucket_type,
-                                                  static_asset_path, user_location)
+        return get_module_for_descriptor_internal(
+            user=user,
+            descriptor=descriptor,
+            field_data_cache=field_data_cache,
+            course_id=course_id,
+            track_function=track_function,
+            xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+            position=position,
+            wrap_xmodule_display=wrap_xmodule_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token,
+        )
 
     def handle_grade_event(block, event_type, event):
         user_id = event.get('user_id', user.id)
@@ -378,9 +406,18 @@ def get_module_system_for_user(user, field_data_cache,
         )
 
         (inner_system, inner_student_data) = get_module_system_for_user(
-            real_user, field_data_cache_real_user,  # These have implicit user bindings, rest of args considered not to
-            module.descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-            grade_bucket_type, static_asset_path, user_location
+            user=real_user,
+            field_data_cache=field_data_cache_real_user,  # These have implicit user bindings, rest of args considered not to
+            descriptor=module.descriptor,
+            course_id=course_id,
+            track_function=track_function,
+            xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+            position=position,
+            wrap_xmodule_display=wrap_xmodule_display,
+            grade_bucket_type=grade_bucket_type,
+            static_asset_path=static_asset_path,
+            user_location=user_location,
+            request_token=request_token
         )
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
         module.descriptor.bind_for_student(
@@ -403,9 +440,11 @@ def get_module_system_for_user(user, field_data_cache,
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
         block_wrappers.append(partial(
-            wrap_xblock, 'LmsRuntime',
+            wrap_xblock,
+            'LmsRuntime',
             extra_data={'course-id': course_id.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            request_token=request_token,
         ))
 
     # TODO (cpennington): When modules are shared between courses, the static
@@ -533,13 +572,16 @@ def get_module_system_for_user(user, field_data_cache,
 
 
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
-                                       track_function, xqueue_callback_url_prefix,
+                                       track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                                        static_asset_path='', user_location=None):
     """
     Actually implement get_module, without requiring a request.
 
     See get_module() docstring for further details.
+
+    Arguments:
+        request_token (str): A unique token for this request, used to isolate xblock rendering
     """
 
     # Do not check access when it's a noauth request.
@@ -549,9 +591,18 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             return None
 
     (system, student_data) = get_module_system_for_user(
-        user, field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
-        descriptor, course_id, track_function, xqueue_callback_url_prefix, position, wrap_xmodule_display,
-        grade_bucket_type, static_asset_path, user_location
+        user=user,
+        field_data_cache=field_data_cache,  # These have implicit user bindings, the rest of args are considered not to
+        descriptor=descriptor,
+        course_id=course_id,
+        track_function=track_function,
+        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+        position=position,
+        wrap_xmodule_display=wrap_xmodule_display,
+        grade_bucket_type=grade_bucket_type,
+        static_asset_path=static_asset_path,
+        user_location=user_location,
+        request_token=request_token
     )
 
     descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access

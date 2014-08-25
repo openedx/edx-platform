@@ -497,18 +497,21 @@
       &:first-child {
         border-top: 0;
       }
-    }
 
-    &:hover {
-      opacity: 1.0;
-    }
 
-    &.is-set {
-      opacity: 1.0;
-      background-color: $white;
 
-      .setting-input {
-        color: $blue-l1;
+      // STATE: hover & focus
+      &:hover, &:focus {
+        opacity: 1.0;
+      }
+
+      &.is-set {
+        opacity: 1.0;
+        background-color: $white;
+
+        .setting-input {
+          color: $blue-l1;
+        }
       }
     }
 

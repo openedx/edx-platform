@@ -66,6 +66,7 @@ from .tools import (
     dump_module_extensions,
     find_unit,
     get_student_from_identifier,
+    require_student_from_identifier,
     handle_dashboard_error,
     parse_datetime,
     set_due_date_extension,
@@ -1392,7 +1393,7 @@ def change_due_date(request, course_id):
     Grants a due date extension to a student for a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = get_student_from_identifier(request.GET.get('student'))
+    student = require_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     due_date = parse_datetime(request.GET.get('due_datetime'))
     set_due_date_extension(course, unit, student, due_date)
@@ -1413,14 +1414,20 @@ def reset_due_date(request, course_id):
     Rescinds a due date extension for a student on a particular unit.
     """
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
-    student = get_student_from_identifier(request.GET.get('student'))
+    student = require_student_from_identifier(request.GET.get('student'))
     unit = find_unit(course, request.GET.get('url'))
     set_due_date_extension(course, unit, student, None)
+    if not getattr(unit, "due", None):
+        # It's possible the normal due date was deleted after an extension was granted:
+        return JsonResponse(
+            _("Successfully removed invalid due date extension (unit has no due date).")
+        )
 
+    original_due_date_str = unit.due.strftime('%Y-%m-%d %H:%M')
     return JsonResponse(_(
         'Successfully reset due date for student {0} for {1} '
         'to {2}').format(student.profile.name, _display_unit(unit),
-                         unit.due.strftime('%Y-%m-%d %H:%M')))
+                         original_due_date_str))
 
 
 @handle_dashboard_error
@@ -1447,7 +1454,7 @@ def show_student_extensions(request, course_id):
     Shows all of the due date extensions granted to a particular student in a
     particular course.
     """
-    student = get_student_from_identifier(request.GET.get('student'))
+    student = require_student_from_identifier(request.GET.get('student'))
     course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(course_id))
     return JsonResponse(dump_student_extensions(course, student))
 

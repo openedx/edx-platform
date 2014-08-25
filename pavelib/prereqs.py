@@ -102,9 +102,11 @@ def ruby_prereqs_installation():
 
 def node_prereqs_installation():
     """
-    Installs Node prerequisites
+    Configures npm and installs Node prerequisites
     """
-    sh("npm config set registry {}".format(NPM_REGISTRY))
+    sh("test `npm config get registry` = \"{reg}\" || "
+       "(echo setting registry; npm config set registry"
+       " {reg})".format(reg=NPM_REGISTRY))
     sh('npm install')
 
 

@@ -10,6 +10,7 @@ bleach==1.4
 html5lib==0.999
 boto==2.13.3
 celery==3.0.19
+cssselect==0.9.1
 dealer==0.2.3
 distribute>=0.6.28, <0.7
 django-babel-underscore==0.1.0

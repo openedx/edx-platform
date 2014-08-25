@@ -165,6 +165,7 @@ DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 # Enable URL that shows information about the status of variuous services
 FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ALLOW_COURSE_RERUNS'] = True
 
 ############################# SEGMENT-IO ##################################
 

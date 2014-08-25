@@ -148,7 +148,7 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
-          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
           % endif
           </ul>

@@ -15,17 +15,20 @@ from xmodule.exceptions import InvalidVersionError
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import DuplicateCourseError
+from xmodule.modulestore.exceptions import DuplicateCourseError, NoPathToItem
+
 if not settings.configured:
     settings.configure()
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
 @ddt.ddt
@@ -34,8 +37,8 @@ class TestMixedModuleStore(unittest.TestCase):
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
     """
-    HOST = 'localhost'
-    PORT = 27017
+    HOST = MONGO_HOST
+    PORT = MONGO_PORT_NUM
     DB = 'test_mongo_%s' % uuid4().hex[:5]
     COLLECTION = 'modulestore'
     FS_ROOT = DATA_DIR
@@ -54,6 +57,7 @@ class TestMixedModuleStore(unittest.TestCase):
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
+        'port': PORT,
         'db': DB,
         'collection': COLLECTION,
     }
@@ -469,7 +473,6 @@ class TestMixedModuleStore(unittest.TestCase):
         )
 
         # verify pre delete state (just to verify that the test is valid)
-        self.assertTrue(hasattr(private_vert, 'is_draft') or private_vert.location.branch == ModuleStoreEnum.BranchName.draft)
         if hasattr(private_vert.location, 'version_guid'):
             # change to the HEAD version
             vert_loc = private_vert.location.for_version(private_leaf.location.version_guid)
@@ -696,20 +699,22 @@ class TestMixedModuleStore(unittest.TestCase):
         Make sure that path_to_location works
         """
         self.initdb(default_ms)
-        self._create_block_hierarchy()
 
         course_key = self.course_locations[self.MONGO_COURSEID].course_key
-        should_work = (
-            (self.problem_x1a_2,
-             (course_key, u"Chapter_x", u"Sequential_x1", '1')),
-            (self.chapter_x,
-             (course_key, "Chapter_x", None, None)),
-        )
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            self._create_block_hierarchy()
 
-        mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
-        for location, expected in should_work:
-            with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
-                self.assertEqual(path_to_location(self.store, location), expected)
+            should_work = (
+                (self.problem_x1a_2,
+                 (course_key, u"Chapter_x", u"Sequential_x1", '1')),
+                (self.chapter_x,
+                 (course_key, "Chapter_x", None, None)),
+            )
+
+            mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
+            for location, expected in should_work:
+                with check_mongo_calls(mongo_store, num_finds.pop(0), num_sends):
+                    self.assertEqual(path_to_location(self.store, location), expected)
 
         not_found = (
             course_key.make_usage_key('video', 'WelcomeX'),
@@ -718,6 +723,18 @@ class TestMixedModuleStore(unittest.TestCase):
         for location in not_found:
             with self.assertRaises(ItemNotFoundError):
                 path_to_location(self.store, location)
+
+        # Orphaned items should not be found.
+        orphan = course_key.make_usage_key('chapter', 'OrphanChapter')
+        self.store.create_item(
+            self.user_id,
+            orphan.course_key,
+            orphan.block_type,
+            block_id=orphan.block_id
+        )
+
+        with self.assertRaises(NoPathToItem):
+            path_to_location(self.store, orphan)
 
     def test_xml_path_to_location(self):
         """

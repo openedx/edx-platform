@@ -264,6 +264,11 @@ FEATURES = {
     # Default to false here b/c dev environments won't have the api, will override in aws.py
     'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
 
+    # TODO: ECOM-136
+    # Enables the new navigation template and styles. This should be enabled
+    # when the styles appropriately match the edX.org website.
+    'ENABLE_NEW_EDX_HEADER': False,
+
 }
 
 # Ignore static asset files on import which match this pattern
@@ -410,8 +415,12 @@ LMS_MIGRATION_ALLOWED_IPS = []
 
 # These are standard regexes for pulling out info like course_ids, usage_ids, etc.
 # They are used so that URLs with deprecated-format strings still work.
-COURSE_ID_PATTERN = r'(?P<course_id>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
-COURSE_KEY_PATTERN = r'(?P<course_key_string>(?:[^/]+/[^/]+/[^/]+)|(?:[^/]+))'
+# Note: these intentionally greedily grab all chars up to the next slash including any pluses
+# DHM: I really wanted to ensure the separators were the same (+ or /) but all patts I tried had
+# too many inadvertent side effects :-(
+COURSE_KEY_PATTERN = r'(?P<course_key_string>[^/+]+(/|\+)[^/+]+(/|\+)[^/]+)'
+COURSE_ID_PATTERN = COURSE_KEY_PATTERN.replace('course_key_string', 'course_id')
+
 USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
@@ -753,7 +762,10 @@ EMBARGO_SITE_REDIRECT_URL = None
 
 ##### shoppingcart Payment #####
 PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+
 ##### Using cybersource by default #####
+
+CC_PROCESSOR_NAME = 'CyberSource'
 CC_PROCESSOR = {
     'CyberSource': {
         'SHARED_SECRET': '',
@@ -761,8 +773,15 @@ CC_PROCESSOR = {
         'SERIAL_NUMBER': '',
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
+    },
+    'CyberSource2': {
+        "PURCHASE_ENDPOINT": '',
+        "SECRET_KEY": '',
+        "ACCESS_KEY": '',
+        "PROFILE_ID": '',
     }
 }
+
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
@@ -1344,6 +1363,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # Country list
+    'django_countries'
 )
 
 ######################### MARKETING SITE ###############################

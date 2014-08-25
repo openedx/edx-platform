@@ -50,6 +50,7 @@ class LegacyFieldMappingProcessorTestCase(TestCase):
             'course_id': sentinel.course_id,
             'org_id': sentinel.org_id,
             'event_type': sentinel.event_type,
+            'client_id': sentinel.client_id,
         }
         with django_tracker.context('test', context):
             django_tracker.emit(sentinel.name, data)

@@ -37,6 +37,7 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 FEATURES['IS_EDX_DOMAIN'] = True  # Is this an edX-owned domain? (used on instructor dashboard)
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
@@ -289,7 +290,12 @@ if SEGMENT_IO_LMS_KEY:
 CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
 CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = os.environ.get('CYBERSOURCE_MERCHANT_ID', '')
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = os.environ.get('CYBERSOURCE_SERIAL_NUMBER', '')
-CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_PURCHASE_ENDPOINT', '')
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
+
+CC_PROCESSOR['CyberSource2']['SECRET_KEY'] = os.environ.get('CYBERSOURCE_SECRET_KEY', '')
+CC_PROCESSOR['CyberSource2']['ACCESS_KEY'] = os.environ.get('CYBERSOURCE_ACCESS_KEY', '')
+CC_PROCESSOR['CyberSource2']['PROFILE_ID'] = os.environ.get('CYBERSOURCE_PROFILE_ID', '')
+CC_PROCESSOR['CyberSource2']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 ########################## USER API ##########################
 EDX_API_KEY = None

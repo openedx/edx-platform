@@ -3,7 +3,7 @@
 """
 Acceptance tests for Video.
 """
-
+from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 from ...pages.lms.video.video import VideoPage
@@ -28,6 +28,7 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
+@attr('shard_2')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """
@@ -793,7 +794,7 @@ class Html5VideoTest(VideoBaseTest):
 
         self.assertIn(unicode_text, self.video.captions_text)
 
-        #Then I can download transcript in "srt" format that has text "好 各位同学"
+        # Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 

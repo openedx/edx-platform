@@ -1,0 +1,35 @@
+<form>
+<h3 class="modal-section-title"><%= gettext('Student Visibility') %></h3>
+<div class="modal-section-content staff-lock">
+    <ul class="list-fields list-input">
+        <li class="field field-checkbox checkbox-cosmetic">
+            <input type="checkbox" id="staff_lock" name="staff_lock" class="input input-checkbox" />
+            <label for="staff_lock" class="label">
+              <i class="icon-check input-checkbox-checked"></i>
+              <i class="icon-check-empty input-checkbox-unchecked"></i>
+              <%= gettext('Hide from students') %>
+            </label>
+
+            <% if (hasExplicitStaffLock && !ancestorLocked) { %>
+                <p class="tip tip-warning">
+                  <% if (xblockInfo.isVertical()) { %>
+                    <%= gettext('If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students.') %>
+                  <% } else { %>
+                    <% var message = gettext('If you make this %(xblockType)s visible to students, students will be able to see its content after the release date has passed and you have published the unit(s).'); %>
+                    <%= interpolate(message, { xblockType: xblockType }, true) %>
+                  <% } %>
+                </p>
+
+                <p class="tip tip-warning">
+                  <% if (xblockInfo.isChapter()) { %>
+                    <%= gettext('Any subsections or units that are explicitly hidden from students will remain hidden after you clear this option for the section.') %>
+                  <% } %>
+                  <% if (xblockInfo.isSequential()) { %>
+                    <%= gettext('Any units that are explicitly hidden from students will remain hidden after you clear this option for the subsection.') %>
+                  <% } %>
+                </p>
+            <% } %>
+        </li>
+    </ul>
+</div>
+</form>

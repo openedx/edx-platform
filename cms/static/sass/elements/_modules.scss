@@ -198,7 +198,7 @@
     a {
       @include clearfix();
       @include transition(none);
-      @extend %t-strong;
+      @extend %t-demi-strong;
       display: block;
       border: 0px;
       padding: 7px $baseline;
@@ -263,7 +263,6 @@
 
 // outline UI
 // --------------------
-
 // outline: utilities
 $outline-indent-width: $baseline;
 
@@ -294,82 +293,20 @@ $outline-indent-width: $baseline;
 }
 
 
-// UI: section
-%outline-section {
-  @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
-  border-left: 1px solid $color-draft;
-  margin-bottom: $baseline;
-  padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+%outline-item-status {
+  @extend %t-copy-sub2;
+  @extend %t-strong;
+  color: $color-copy-base;
 
-  // STATE: is-collapsed
-  &.is-collapsed {
-    border-left-width: ($baseline/4);
-    padding-left: $baseline;
-
-    // CASE: is ready to be live
-    &.is-ready {
-      border-left-color: $color-ready;
-    }
-
-    // CASE: is live
-    &.is-live {
-      border-left-color: $color-live;
-    }
-
-    // CASE: has staff-only content
-    &.is-staff-only {
-      border-left-color: $color-staff-only;
-    }
-
-    // CASE: has unpublished content
-    &.has-warnings {
-      border-left-color: $color-warning;
-    }
-
-    // CASE: has errors
-    &.has-errors {
-      border-left-color: $color-error;
-    }
+  .icon {
+    @extend %t-icon5;
+    margin-right: ($baseline/4);
   }
 }
 
-// UI: subsection
-%outline-subsection {
-  @include transition(border-left-color $tmg-f2 linear 0s);
-  margin-bottom: ($baseline/2);
-  border: 1px solid $gray-l4;
-  border-left: ($baseline/4) solid $color-draft;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
-
-  // CASE: is ready to be live
-  &.is-ready {
-    border-left-color: $color-ready;
-  }
-
-  // CASE: is live
-  &.is-live {
-    border-left-color: $color-live;
-  }
-
-  // CASE: is presented for staff only
-  &.is-staff-only {
-    border-left-color: $color-staff-only;
-  }
-
-  // CASE: has unpublished content
-  &.has-warnings {
-    border-left-color: $color-warning;
-  }
-
-  // CASE: has errors
-  &.has-errors {
-    border-left-color: $color-error;
-  }
-}
-
-%outline-item {
+// outline UI - complex
+// --------------------
+%outline-complex-item {
 
   // UI: item title
   .item-title {
@@ -424,154 +361,326 @@ $outline-indent-width: $baseline;
   }
 }
 
-%outline-item-status {
-  @extend %t-copy-sub2;
-  @extend %t-strong;
-  color: $color-copy-base;
 
-  .icon {
-    @extend %t-icon5;
-    margin-right: ($baseline/4);
-  }
-}
-
-// outline: sections
-.outline-section {
-  @extend %ui-window;
-  @extend %outline-item;
-  @extend %outline-section;
-
-  // header - title
-  .section-title {
-    @extend %t-title5;
-    @extend %t-strong;
-    color: $color-heading-base;
-  }
-
-  // status
-  .section-status {
-    @extend %outline-item-status;
-  }
-
-  // status - release
-  .status-release {
-    @include transition(opacity $tmg-f2 ease-in-out 0s);
-    opacity: 0.65;
-  }
-
-  // status - grading
-  .status-grading {
-    @include transition(opacity $tmg-f2 ease-in-out 0s);
-    opacity: 0.65;
-  }
-
-  .status-grading-value {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .status-grading-date {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: ($baseline/4);
-  }
-
-  // status - message
-  .status-message {
-    margin-top: ($baseline/2);
-    border-top: 1px solid $gray-l4;
-    padding-top: ($baseline/4);
-
-    .icon {
-      margin-right: ($baseline/4);
-    }
-  }
-
-  .status-message-copy {
-    display: inline-block;
-    color: $color-heading-base;
-  }
-
-  // STATE: hover/active
-  &:hover, &:active {
-
-    // status - release
-    > .section-status .status-release {
-      opacity: 1.0;
-    }
-  }
-}
-
-// outline: subsections
-.outline-subsection {
-  @extend %outline-item;
-  @extend %outline-subsection;
+// outline UI - simple
+// --------------------
+%outline-simple-item {
   border: 1px solid $gray-l4;
-  border-left: ($baseline/4) solid $color-draft;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  padding: ($baseline*0.75);
 
-  // STATE: hover/active
-  &:hover, &:active {
-    box-shadow: 0 1px 1px $shadow-l2;
+  // CASE: last-child in UI
+  &:last-child {
+    margin-bottom: 0;
   }
 
-  // STATE: is-collapsed
-  &.is-collapsed {
+  .item-title a {
+      color: $color-heading-base;
 
+    &:hover {
+      color: $blue;
+    }
   }
+}
 
-  // header - title
-  .subsection-title {
-    @extend %t-title6;
-    color: $color-heading-base;
-  }
 
-  // status
-  .subsection-status {
-    @extend %outline-item-status;
-  }
+// CASE: complex outline
+.outline-complex {
 
-  // STATE: hover/active
-  &:hover, &:active {
+  // outline: sections
+  .outline-section {
+    @include transition(border-left-width $tmg-f2 linear 0s, border-left-color $tmg-f2 linear 0s, padding-left $tmg-f2 linear 0s);
+    @extend %ui-window;
+    @extend %outline-complex-item;
+    border-left: 1px solid $color-draft;
+    margin-bottom: $baseline;
+    padding: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+      border-left-width: ($baseline/4);
+      padding-left: $baseline;
+
+      // CASE: is ready to be live
+      &.is-ready {
+        border-left-color: $color-ready;
+      }
+
+      // CASE: is live
+      &.is-live {
+        border-left-color: $color-live;
+      }
+
+      // CASE: has staff-only content
+      &.is-staff-only {
+        border-left-color: $color-staff-only;
+      }
+
+      // CASE: has unpublished content
+      &.has-warnings {
+        border-left-color: $color-warning;
+      }
+
+      // CASE: has errors
+      &.has-errors {
+        border-left-color: $color-error;
+      }
+    }
+
+    // header - title
+    .section-title {
+      @extend %t-title5;
+      @extend %t-strong;
+      color: $color-heading-base;
+    }
+
+    // status
+    .section-status {
+      @extend %outline-item-status;
+    }
 
     // status - release
-    > .subsection-status .status-release {
-      opacity: 1.0;
+    .status-release {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: 0.65;
+    }
+
+    // status - message
+    .status-message {
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/4);
+
+      .icon {
+        margin-right: ($baseline/4);
+      }
+    }
+
+    .status-message-copy {
+      display: inline-block;
+      color: $color-heading-base;
+    }
+
+    // STATE: hover/active
+    &:hover, &:active {
+
+      // status - release
+      > .section-status .status-release {
+        opacity: 1.0;
+      }
+    }
+  }
+
+  // outline: subsections
+  .outline-subsection {
+    @include transition(border-left-color $tmg-f2 linear 0s);
+    @extend %outline-complex-item;
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    border-left: ($baseline/4) solid $color-draft;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: ($baseline*0.75);
+
+
+    // CASE: is ready to be live
+    &.is-ready {
+      border-left-color: $color-ready;
+    }
+
+    // CASE: is live
+    &.is-live {
+      border-left-color: $color-live;
+    }
+
+    // CASE: is presented for staff only
+    &.is-staff-only {
+      border-left-color: $color-staff-only;
+    }
+
+    // CASE: has unpublished content
+    &.has-warnings {
+      border-left-color: $color-warning;
+    }
+
+    // CASE: has errors
+    &.has-errors {
+      border-left-color: $color-error;
+    }
+
+    // STATE: hover/active
+    &:hover, &:active {
+      box-shadow: 0 1px 1px $shadow-l2;
+    }
+
+    // STATE: is-collapsed
+    &.is-collapsed {
+
+    }
+
+    // header - title
+    .subsection-title {
+      @extend %t-title6;
+      color: $color-heading-base;
+    }
+
+    // status
+    .subsection-status {
+      @extend %outline-item-status;
+    }
+
+    // STATE: hover/active
+    &:hover, &:active {
+
+      // status - release
+      > .subsection-status .status-release {
+        opacity: 1.0;
+      }
+
+      // status - grading
+      > .subsection-status .status-grading {
+        opacity: 1.0;
+      }
     }
 
     // status - grading
-    > .subsection-status .status-grading {
-      opacity: 1.0;
+    .status-grading {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: 0.65;
+    }
+
+    .status-grading-value {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+  }
+
+  // outline: units
+  .outline-unit {
+    @extend %outline-complex-item;
+    margin-bottom: ($baseline/2);
+    border: 1px solid $gray-l4;
+    padding: ($baseline/4) ($baseline/2);
+
+    // header - title
+    .unit-title {
+      @extend %t-title7;
+      color: $color-heading-base;
+    }
+
+    .unit-status {
+      @extend %outline-item-status;
+    }
+
+    // STATE: hover/active
+    &:hover, &:active {
+      box-shadow: 0 1px 1px $shadow-l2;
+
+      // status - release
+      .unit-status .status-release {
+        opacity: 1.0;
+      }
     }
   }
 }
 
-// outline: units
-.outline-unit {
-  @extend %outline-item;
-  margin-bottom: ($baseline/2);
-  border: 1px solid $gray-l4;
-  padding: ($baseline/4) ($baseline/2);
+// CASE: simple outline
+.outline-simple {
 
-  // header - title
-  .unit-title {
-    @extend %t-title7;
-    color: $color-heading-base;
-  }
+  // outline: sections
+  .outline-section {
+    @extend %outline-simple-item;
+    margin-bottom: $baseline;
+    padding: ($baseline/2);
 
-  .unit-status {
-    @extend %outline-item-status;
-  }
+    // header - title
+    .section-title {
+      @extend %t-title5;
+      @extend %t-strong;
+      color: $color-heading-base;
+    }
 
-  // STATE: hover/active
-  &:hover, &:active {
-    box-shadow: 0 1px 1px $shadow-l2;
+    // status
+    .section-status {
+      @extend %outline-item-status;
+    }
 
     // status - release
-    .unit-status .status-release {
-      opacity: 1.0;
+    .status-release {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: 0.65;
+    }
+
+    // status - grading
+    .status-grading {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
+      opacity: 0.65;
+    }
+
+    .status-grading-value {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .status-grading-date {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: ($baseline/4);
+    }
+
+    // status - message
+    .status-message {
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/4);
+
+      .icon {
+        margin-right: ($baseline/4);
+      }
+    }
+
+    .status-message-copy {
+      display: inline-block;
+      color: $color-heading-base;
+    }
+  }
+
+  // outline: subsections
+  .outline-subsection {
+    @extend %outline-simple-item;
+    margin-bottom: ($baseline/2);
+    padding: ($baseline/2);
+
+    // header - title
+    .subsection-title {
+      @extend %t-title6;
+      color: $color-heading-base;
+    }
+
+    // status
+    .subsection-status {
+      @extend %outline-item-status;
+    }
+  }
+
+  // outline: units
+  .outline-unit {
+    @extend %outline-simple-item;
+    margin-bottom: ($baseline/4);
+    padding: ($baseline/4) ($baseline/2);
+
+    // header - title
+    .unit-title {
+      @extend %t-title7;
+      color: $color-heading-base;
+    }
+
+    .unit-status {
+      @extend %outline-item-status;
     }
   }
 }

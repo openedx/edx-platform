@@ -7,7 +7,6 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
-from util.testing import UrlResetMixin
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.split_test_module import ValidationMessage, ValidationMessageType
@@ -121,13 +120,11 @@ class GroupConfigurationsBaseTestCase(object):
                     {u'name': u'Group B'},
                 ],
             },
-            # must have at least two groups
+            # must have at least one group
             {
                 u'name': u'Test name',
                 u'description': u'Test description',
-                u'groups': [
-                    {u'name': u'Group A'},
-                ],
+                u'groups': [],
             },
             # an empty json
             {},
@@ -167,11 +164,10 @@ class GroupConfigurationsBaseTestCase(object):
 
 
 # pylint: disable=no-member
-class GroupConfigurationsListHandlerTestCase(UrlResetMixin, CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_list_handler.
     """
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         """
         Set up GroupConfigurationsListHandlerTestCase.
@@ -263,14 +259,13 @@ class GroupConfigurationsListHandlerTestCase(UrlResetMixin, CourseTestCase, Grou
 
 
 # pylint: disable=no-member
-class GroupConfigurationsDetailHandlerTestCase(UrlResetMixin, CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
+class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfigurationsBaseTestCase, HelperMethods):
     """
     Test cases for group_configurations_detail_handler.
     """
 
     ID = 0
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         """
         Set up GroupConfigurationsDetailHandlerTestCase.
@@ -422,12 +417,11 @@ class GroupConfigurationsDetailHandlerTestCase(UrlResetMixin, CourseTestCase, Gr
 
 
 # pylint: disable=no-member
-class GroupConfigurationsUsageInfoTestCase(UrlResetMixin, CourseTestCase, HelperMethods):
+class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations.
     """
 
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         super(GroupConfigurationsUsageInfoTestCase, self).setUp()
 
@@ -544,7 +538,6 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     """
     Tests for validation in Group Configurations.
     """
-    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_GROUP_CONFIGURATIONS": True})
     def setUp(self):
         super(GroupConfigurationsValidationTestCase, self).setUp()
 
