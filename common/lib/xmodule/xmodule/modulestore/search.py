@@ -95,10 +95,12 @@ def path_to_location(modulestore, usage_key):
             category = path[path_index].block_type
             if category == 'sequential' or category == 'videosequence':
                 section_desc = modulestore.get_item(path[path_index])
-                child_locs = [c.location.block_id for c in section_desc.get_children()]
+                # this calls get_children rather than just children b/c old mongo includes private children
+                # in children but not in get_children
+                child_locs = [c.location for c in section_desc.get_children()]
                 # positions are 1-indexed, and should be strings to be consistent with
                 # url parsing.
-                position_list.append(str(child_locs.index(path[path_index + 1].block_id) + 1))
+                position_list.append(str(child_locs.index(path[path_index + 1]) + 1))
         position = "_".join(position_list)
 
     return (course_id, chapter, section, position)
