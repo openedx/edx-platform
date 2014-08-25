@@ -86,7 +86,7 @@ def video_summary(video_module, request):
     video_url = video_module.html5_sources[0] if video_module.html5_sources else video_module.source
     track_url, transcript_language, sorted_languages = get_transcripts(video_module)
 
-    trans_url = video_module.runtime.handler_url(video_module, 'transcript', 'translation').rstrip('/?')
+    trans_url = video_module.runtime.handler_url(video_module, 'transcript', 'translation') # .rstrip('/?')
     transcripts = {
         lang: request.build_absolute_uri(trans_url + '/' + lang)
         for lang in sorted_languages
