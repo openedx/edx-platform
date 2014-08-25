@@ -1,6 +1,5 @@
-//---------------------------------
-// edX.org specific footer styles.
-//---------------------------------
+// edX theme: LMS Footer
+// ====================
 
 .region-footer {
   border: 1px solid #f1f1f1;
@@ -186,120 +185,8 @@
   }
 }
 
-/*
- * Smarthphone Portrait
- */
-
-@media only screen and ( min-width: $bp-s-min ) {
-  .region-footer {
-    background: none;
-    background-color: #fcfcfc;
-  }
-  .region-footer-columns {
-    .region-footer-first {
-      width: 100% ;
-      float: none ;
-    }
-    .region-footer-second {
-      width: 100% ;
-      float: none ;
-      nav{
-        width: 100%;
-        padding-left: 0px;
-        padding-right: 0px;
-        border-left: none;
-        border-right: none;
-        margin-top: 30px;
-      }
-      section.block-menu-social{
-        width: 100%;
-        padding: 0px;
-        margin-top: 30px;
-      }
-    }
-  ul.menu li a.fa{
-    line-height: 42px;
-  }
-  }
-}
-
-
-/*
- * Smartphone Landscape and up
- */
-@media only screen and ( min-width: $bp-m-min ) {
-   .region-footer {
-    background: #fcfcfc url("../images/footer-seal.png") -310px 20px no-repeat;
-  }
-  .region-footer-columns {
-    .region-footer-first {
-      width: 50% ;
-      float: left ;
-    }
-    .region-footer-second {
-      width: 50% ;
-      float: left ;
-      nav{
-         width: 43%;
-         padding-right: 20px;
-         padding-left: 25px;
-         border-left: 1px solid #e6e6e6;
-         border-right: 1px solid #e6e6e6;
-         margin-top: 15px;
-         float: left;
-      }
-      section.block-menu-social{
-        width: 33%;
-        padding: 0px 15px 15px 20px;
-        margin-top: 15px;
-        float: left !important;
-      }
-    }
-  }
-}
-
-
-/*
- * Tablet and up
- */
-@media only screen and ( min-width: $bp-l-min ) {
-  .region-footer-columns {
-    .region-footer-second {
-      nav{
-        width: 45%;
-      }
-      section.block-menu-social{
-        width: 35%;
-      }
-    }
-    ul.menu li a.fa{
-      line-height: 36px;
-    }
-  }
-}
-
-
-/*
- * Desktops/laptops and up
- */
-@media only screen and ( min-width: $bp-xl-min ) {
-   > .region-container-inner{margin:auto !important;}
-  .region-footer-columns {
-    .region-footer-second {
-      nav{
-        width: 43%;
-      }
-      section.block-menu-social{
-        width: 42%;
-      }
-    }
-  }
-}
-
-//-----------------------------------------
-// Open Source edX Footer Styling
-//-----------------------------------------
-
+// LMS: footer
+// ====================
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 rgba(0,0,0, 0.1);
   border-top: 1px solid tint($m-gray,50%);
