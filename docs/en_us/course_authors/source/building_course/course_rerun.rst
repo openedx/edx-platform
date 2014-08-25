@@ -90,13 +90,15 @@ To re-run a course:
      :alt: The course creation page for a rerun, with the course name, 
            organization, and course number supplied
 
-4. Supply a **Course Run** timeframe for the new course. Together, the course
-   number, the organization, and the course run are used to create the URL for
-   the new course. The combination of these three values must be unique for the
-   new course. In addition, the total number of characters used for the name,
-   organization, number, and run must be 65 or fewer.
+4. Supply a **Course Run** to indicate when the new course will be offered. 
+   
+   Together, the course number, the organization, and the course run are used
+   to create the URL for the new course. The combination of these three values
+   must be unique for the new course. In addition, the total number of
+   characters used for the name, organization, number, and run must be 65 or
+   fewer.
 
-#. Click **Create Re-Run**. Your **My Courses** dashboard opens with a status
+5. Click **Create Re-Run**. Your **My Courses** dashboard opens with a status
    message about the course creation process.
 
    Duplication of the course structure and content takes several minutes. You
@@ -135,13 +137,26 @@ release:
 * Delete or edit posts on the **Course Updates** page in Studio. See :ref:`Add
   a Course Update`.
 
+* Review the files on the **Files & Uploads** page. To update a file that
+  contains references to course-related dates, you will need to:
+  
+  #. Locate the source file.
+  #. Change course-related dates in the file.
+  #. Upload the revised version of the file.
+  
+  .. note:: If you use the same file name when you upload a revised file, 
+   links to that file in course components and course handouts will continue to
+   work correctly. If you rename a file and then upload it, you must also
+   update all links to the original file name. See :ref:`Add Course Handouts`
+   or :ref:`Add a Link to a File`.
+
 * Review the staff biographies and other information on the course summary
   page and make needed updates. See :ref:`The Course Summary Page`.
 
-* Add initial wiki articles.
-
 * Create initial posts for discussion topics and an "introduce yourself"
   post. See :ref:`Discussions`.
+
+* Add initial wiki articles.
   
 You can use the :ref:`course checklists<Use the Course Checklist>` to work
 through the course and verify that it is ready for release. You can also refer

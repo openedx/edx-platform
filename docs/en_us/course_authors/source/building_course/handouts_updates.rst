@@ -10,7 +10,9 @@ Student's see the course updates and handouts in the **Course Info** tab in your
 course:
 
 .. image:: ../Images/course_info.png
- :alt: Image of the Course Info page.
+ :alt: Image of the Course Info page, with a Course Updates & News section on
+       the left side with a dated post and a frame titled "Course Handouts" 
+       with links to files on the right side.
 
 .. _Add a Course Update:
 
@@ -39,12 +41,12 @@ Add Course Handouts
 You can add course handouts that are visible to students on the **Course Info**
 page. To add an uploaded file to the course handouts, you will need its URL.
 
-.. note::  You must :ref:`Add Files to a Course` before you can add them as
- course handouts.
+.. note::  You must :ref:`add files to a course<Add Files to a Course>` before
+ you can add them as course handouts.
 
 #. From the **Content** menu, select **Updates**. 
 #. In the **Course Handouts** panel, click **Edit**.
-#. Edit the HTML to add links to the files you uploaded. See :ref:`Add a Link in
-   an HTML Component` for more information.
+#. Edit the HTML to add links to the files you uploaded. See :ref:`Add a Link
+   in an HTML Component` for more information.
 #. Click **Save**.
 
