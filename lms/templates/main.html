@@ -85,9 +85,9 @@
 
     if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
         if settings.FEATURES.get('ENABLE_NEW_EDX_FOOTER', False):
-            footer_file = microsite.get_template_path('edx_footer.html')
+            footer_file = microsite.get_template_path('footer-edx-new.html')
         else:
-            footer_file = microsite.get_template_path('original_edx_footer.html')
+            footer_file = microsite.get_template_path('footer-edx.html')
     else:
       footer_file = microsite.get_template_path('footer.html')
 
