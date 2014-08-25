@@ -62,15 +62,13 @@ Before you re-run a course:
 * For a course that is hosted on the `edge.edx.org`_ site, verify that you have
   permission to create courses in Studio. See :ref:`Use Studio on Edge`.
 
-  For a course that is hosted on the `edx.org`_ site, contact your Program
+* For a course that is hosted on the `edx.org`_ site, contact your Program
   Manager. Your Program Manager will create the new course using the re- run
   feature, and then work with you to complete the steps to :ref:`update the new
   course<Update the New Course>`.
 
-* Verify that the course that you want to re-run is in edX Studio.
-
-* Verify that you are a member of the course staff for the course that you want
-  to re-run.
+To re-run a course, you must have course creation privileges in Studio and you
+must be a member of the course team for the course you want to re-run.
   
 To re-run a course:
 
@@ -81,7 +79,7 @@ To re-run a course:
    and **View Live** options appear for each course.
 
   .. image:: ../Images/Rerun_link.png
-     :alt: A course liste don the dashboard with the Re-run Course and View 
+     :alt: A course listed on the dashboard with the Re-run Course and View 
            Live options shown 
 
 3. Locate the course you want to re-run and click **Re-Run Course**. The
