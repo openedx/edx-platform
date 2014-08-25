@@ -29,6 +29,6 @@
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@459aff7b63db8f2c5decd1755706c1a64fb4ebb1#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2014-08-08T13.47#egg=edx-ora2
--e git+https://github.com/edx/opaque-keys.git@7152bcd9be8afb4accee9aa5d9d3c67d575f3e4e#egg=opaque-keys
+-e git+https://github.com/edx/opaque-keys.git@454bd984d9539550c6290020e92ee2d6094038d0#egg=opaque-keys
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@0d7847f9dfa2281640527b4dc51f5854f950f9b7#egg=i18n-tools

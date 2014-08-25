@@ -423,37 +423,36 @@ def course_index(request, course_key):
     """
     # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
-    with modulestore().bulk_write_operations(course_key):
-        course_module = _get_course_module(course_key, request.user, depth=None)
-        lms_link = get_lms_link_for_item(course_module.location)
-        sections = course_module.get_children()
-        course_structure = _course_outline_json(request, course_module)
-        locator_to_show = request.REQUEST.get('show', None)
-        course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
-        settings_url = reverse_course_url('settings_handler', course_key)
+    course_module = _get_course_module(course_key, request.user, depth=None)
+    lms_link = get_lms_link_for_item(course_module.location)
+    sections = course_module.get_children()
+    course_structure = _course_outline_json(request, course_module)
+    locator_to_show = request.REQUEST.get('show', None)
+    course_release_date = get_default_time_display(course_module.start) if course_module.start != DEFAULT_START_DATE else _("Unscheduled")
+    settings_url = reverse_course_url('settings_handler', course_key)
 
-        try:
-            current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
-        except (ItemNotFoundError, CourseActionStateItemNotFoundError):
-            current_action = None
+    try:
+        current_action = CourseRerunState.objects.find_first(course_key=course_key, should_display=True)
+    except (ItemNotFoundError, CourseActionStateItemNotFoundError):
+        current_action = None
 
-        return render_to_response('course_outline.html', {
-            'context_course': course_module,
-            'lms_link': lms_link,
-            'sections': sections,
-            'course_structure': course_structure,
-            'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
-            'course_graders': json.dumps(
-                CourseGradingModel.fetch(course_key).graders
-            ),
-            'rerun_notification_id': current_action.id if current_action else None,
-            'course_release_date': course_release_date,
-            'settings_url': settings_url,
-            'notification_dismiss_url':
-                reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
-                    'action_state_id': current_action.id,
-                }) if current_action else None,
-        })
+    return render_to_response('course_outline.html', {
+        'context_course': course_module,
+        'lms_link': lms_link,
+        'sections': sections,
+        'course_structure': course_structure,
+        'initial_state': course_outline_initial_state(locator_to_show, course_structure) if locator_to_show else None,
+        'course_graders': json.dumps(
+            CourseGradingModel.fetch(course_key).graders
+        ),
+        'rerun_notification_id': current_action.id if current_action else None,
+        'course_release_date': course_release_date,
+        'settings_url': settings_url,
+        'notification_dismiss_url':
+            reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+                'action_state_id': current_action.id,
+            }) if current_action else None,
+    })
 
 
 def course_outline_initial_state(locator_to_show, course_structure):
