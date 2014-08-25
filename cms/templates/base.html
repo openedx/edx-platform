@@ -1,4 +1,4 @@
-﻿## -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
@@ -39,12 +39,6 @@
 
     <script type="text/javascript">
     window.baseUrl = "${settings.STATIC_URL}";
-    // Internet Explorer does not have built-in property 'window.location.origin',
-    // we need to create one here as some vendor code such as TinyMCE uses this.
-    if (!window.location.origin) {
-        window.location.origin = window.location.protocol + "//" + window.location.hostname
-                               + (window.location.port ? ':' + window.location.port : '');
-    }
     var require = {
         baseUrl: baseUrl,
         waitSeconds: 60,
@@ -86,6 +80,29 @@
             "accessibility": "js/src/accessibility_tools",
             "draggabilly": "js/vendor/draggabilly.pkgd",
             "URI": "js/vendor/URI.min",
+            "ieshim": "js/src/ie_shim",
+            "tooltip_manager": "js/src/tooltip_manager",
+            
+            // Files needed for Annotations feature
+            "annotator": "js/vendor/ova/annotator-full",
+            "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
+            "video.dev": "js/vendor/ova/video.dev",
+            "vjs.youtube": 'js/vendor/ova/vjs.youtube',
+            "rangeslider": 'js/vendor/ova/rangeslider',
+            "share-annotator": 'js/vendor/ova/share-annotator',
+            "richText-annotator": 'js/vendor/ova/richText-annotator',
+            "reply-annotator": 'js/vendor/ova/reply-annotator',
+            "grouping-annotator": 'js/vendor/ova/grouping-annotator',
+            "tags-annotator": 'js/vendor/ova/tags-annotator',
+            "diacritic-annotator": 'js/vendor/ova/diacritic-annotator',
+            "flagging-annotator": 'js/vendor/ova/flagging-annotator',
+            "jquery-Watch": 'js/vendor/ova/jquery-Watch',
+            "openseadragon": 'js/vendor/ova/openseadragon',
+            "osda": 'js/vendor/ova/OpenSeaDragonAnnotation',
+            "ova": 'js/vendor/ova/ova',
+            "catch": 'js/vendor/ova/catch/js/catch',
+            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            // end of Annotation tool files
 
             // externally hosted files
             "tender": [
@@ -218,6 +235,12 @@
             "URI": {
                 exports: "URI"
             },
+            "tooltip_manager": {
+                deps: ["jquery", "underscore"]
+            },
+            "jquery.immediateDescendents": {
+                deps: ["jquery"]
+            },
             "xblock/core": {
                 exports: "XBlock",
                 deps: ["jquery", "jquery.immediateDescendents"]
@@ -233,13 +256,60 @@
             "coffee/src/logger": {
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
-            }
+            },
+
+            // the following are all needed for annotation tools
+            "video.dev": {
+                exports:"videojs"
+            },
+            "vjs.youtube": {
+                deps: ["video.dev"]
+            },
+            "rangeslider": {
+                deps: ["video.dev"]
+            },
+            "annotator": {
+                exports: "Annotator"
+            },
+            "annotator-harvardx":{
+                deps: ["annotator"]
+            },
+            "share-annotator": {
+                deps: ["annotator"]
+            },
+            "richText-annotator": {
+                deps: ["annotator", "tinymce"]
+            },
+            "reply-annotator": {
+                deps: ["annotator"]
+            },
+            "tags-annotator": {
+                deps: ["annotator"]
+            },
+            "diacritic-annotator": {
+                deps: ["annotator"]
+            },
+            "flagging-annotator": {
+                deps: ["annotator"]
+            },
+            "grouping-annotator": {
+                deps: ["annotator"]
+            },
+            "ova":{
+                exports: "ova",
+                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "jquery-Watch", "catch", "handlebars", "URI"]
+            },
+            "osda":{
+                exports: "osda",
+                deps: ["annotator", "annotator-harvardx", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "grouping-annotator", "diacritic-annotator", "openseadragon", "jquery-Watch", "catch", "handlebars", "URI"]
+            },
+            // end of annotation tool files
         },
         // load jquery and gettext automatically
         deps: ["jquery", "gettext"],
         callback: function() {
             // load other scripts on every page, after jquery loads
-            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility", "ieshim", "tooltip_manager"]);
             // we need "datepair" because it dynamically modifies the page
             // when it is loaded -- yuck!
         }
@@ -254,18 +324,18 @@
 
 
     % if context_course:
-      <script type="text/javascript">
-  require(['js/models/course'], function(Course) {
-    window.course = new Course({
-      id: "${context_course.id}",
-      name: "${context_course.display_name_with_default | h}",
-      url_name: "${context_course.location.name | h}",
-      org: "${context_course.location.org | h}",
-      num: "${context_course.location.course | h}",
-      revision: "${context_course.location.revision | h}"
-    });
-  });
-      </script>
+        <script type="text/javascript">
+        require(['js/models/course'], function(Course) {
+            window.course = new Course({
+                id: "${context_course.id}",
+                name: "${context_course.display_name_with_default | h}",
+                url_name: "${context_course.location.name | h}",
+                org: "${context_course.location.org | h}",
+                num: "${context_course.location.course | h}",
+                revision: "${context_course.location.revision | h}"
+            });
+        });
+        </script>
     % endif
 
     <!-- view -->

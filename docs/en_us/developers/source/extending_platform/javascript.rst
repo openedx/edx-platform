@@ -294,6 +294,9 @@ The following table describes the attributes of the ``jsinput`` element.
      - The function in your JavaScript application that saves the state of the
        objects.
      - ``JSObject.setState``
+   * - initial_state
+     - A JSON string representing the initial state, if any, of the objects.
+     - '{"selectedObjects":{"cube":true,"cylinder":false}}'
    * - width
      - The width of the IFrame in which your JavaScript application will be
        displayed, in pixels.

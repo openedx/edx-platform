@@ -233,9 +233,9 @@ When you add beta testers, note the following.
   cannot enroll themselves in your course. However, you can enroll the beta
   testers prior to the **Enrollment Start Date**.
 
-* If you add the beta testers after the defined start of the beta test, and they
-  are enrolled in the course, they see your course on their dashboards when they
-  log in.
+* If you add the beta testers after the defined start of the beta test, and
+  they are enrolled in the course, they see your course on their **Current
+  Courses** dashboards when they log in.
 
 * If you add beta testers before the test starts, or if they are not enrolled,
   they do not see your course on their dashboards. You can enroll the beta
@@ -258,9 +258,7 @@ To add multiple beta testers:
 
 #. View the live version of your course.
 
-#. Click **Instructor**, and then click **Try New Beta Dashboard**.
-
-#. Click **Membership**. 
+#. Click **Instructor**, and then click **Membership**. 
 
 #. In the **Batch Beta Tester Addition** section of the page, enter one or more
    addresses or usernames separated by commas or line feeds (the Enter key). You
@@ -293,9 +291,7 @@ To add a single beta tester:
 
 #. View the live version of your course.
 
-#. Click **Instructor** then **Try New Beta Dashboard**.
-
-#. Click **Membership**.
+#. Click **Instructor** then **Membership**.
 
 #. In the **Administration List Management** section, use the drop-down list to
    select **Beta Testers**.

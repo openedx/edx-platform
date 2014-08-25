@@ -16,6 +16,7 @@ locales:
     - da  # Danish
     - de_DE  # German (Germany)
     - el  # Greek
+    - en_GB  # English (United Kingdom)
     # Don't pull these until we figure out why pages randomly display in these locales,
     # when the user's browser is in English and the user is not logged in.
 #    - en@lolcat  # LOLCAT English
@@ -64,6 +65,7 @@ locales:
     - si  # Sinhala
     - sk  # Slovak
     - sl  # Slovenian
+    - sq  # Albanian
     - sr  # Serbian
     - ta  # Tamil
     - te  # Telugu

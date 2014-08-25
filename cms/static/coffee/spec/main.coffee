@@ -202,10 +202,8 @@ define([
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
 
-    "coffee/spec/views/section_spec",
     "coffee/spec/views/course_info_spec", "coffee/spec/views/feedback_spec",
     "coffee/spec/views/metadata_edit_spec", "coffee/spec/views/module_edit_spec",
-    "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
 
     "js/spec/video/transcripts/utils_spec", "js/spec/video/transcripts/editor_spec",
@@ -214,28 +212,30 @@ define([
 
     "js/spec/models/component_template_spec",
     "js/spec/models/explicit_url_spec",
-    "js/spec/models/group_configuration_spec",
+    "js/spec/models/xblock_info_spec",
 
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
     "js/spec/utils/module_spec",
 
-    "js/spec/views/baseview_spec",
     "js/spec/views/paging_spec",
     "js/spec/views/assets_spec",
-
+    "js/spec/views/baseview_spec",
     "js/spec/views/container_spec",
-    "js/spec/views/unit_spec",
+    "js/spec/views/group_configuration_spec",
+    "js/spec/views/paging_spec",
+    "js/spec/views/unit_outline_spec",
     "js/spec/views/xblock_spec",
     "js/spec/views/xblock_editor_spec",
+    "js/spec/views/xblock_string_field_editor_spec",
 
     "js/spec/views/pages/container_spec",
+    "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
+    "js/spec/views/pages/course_outline_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
-
-    "js/spec/views/group_configuration_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",
 

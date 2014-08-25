@@ -13,6 +13,7 @@ from fs.osfs import OSFS
 from importlib import import_module
 from lxml import etree
 from path import path
+from contextlib import contextmanager
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
@@ -408,9 +409,6 @@ class XMLModuleStore(ModuleStoreReadBase):
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
-
-        # The XML Module Store is a read-only store and only handles published content
-        self.branch_setting_func = lambda: ModuleStoreEnum.RevisionOption.published_only
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -815,7 +813,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         :return: list of course locations
         """
         courses = self.get_courses()
-        return [course.location for course in courses if (course.wiki_slug == wiki_slug)]
+        return [course.location.course_key for course in courses if (course.wiki_slug == wiki_slug)]
 
     def heartbeat(self):
         """
@@ -826,3 +824,11 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return {ModuleStoreEnum.Type.xml: True}
 
+    @contextmanager
+    def branch_setting(self, branch_setting, course_id=None):  # pylint: disable=unused-argument
+        """
+        A context manager for temporarily setting the branch value for the store to the given branch_setting.
+        """
+        if branch_setting != ModuleStoreEnum.Branch.published_only:
+            raise ValueError(u"Cannot set branch setting to {} on a ReadOnly store".format(branch_setting))
+        yield

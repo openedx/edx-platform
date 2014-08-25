@@ -115,3 +115,11 @@ Before beginning the installation, ensure that you have your local computer's ad
    
    Your password is needed so that NFS can be set up to allow users to access
    code directories directly from your computer.
+
+**********************************************
+Browser Login To Your New edX Production Stack
+**********************************************
+
+#. Go to preview.localhost in your browser, which is an alias entry for 192.168.33.10 that was created in your /etc/hosts file.
+
+   When prompted, enter **edx** for both username and password.

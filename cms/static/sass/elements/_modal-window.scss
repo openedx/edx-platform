@@ -5,6 +5,7 @@
 [class*="view-"] {
 
   // basic modal content
+  // ------------------------
   .modal-window  {
     @extend %ui-depth3;
     @include box-sizing(border-box);
@@ -51,6 +52,40 @@
       }
     }
 
+    // sections within a modal
+    .modal-section {
+      margin-bottom: ($baseline/2);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .modal-section-title {
+      @extend %t-title6;
+      margin: 0 0 ($baseline/2) 0;
+      border-bottom: 1px solid $gray-l4;
+      padding-bottom: ($baseline/4);
+      color: $gray-d2;
+    }
+
+    .modal-section-content {
+
+      .list-fields, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .list-actions {
+        @extend %actions-list;
+        margin-left: ($baseline/4);
+
+        .action-button {
+          @extend %t-icon4;
+        }
+      }
+    }
+
     // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
     .modal-chin,
     .xblock-actions,
@@ -86,6 +121,7 @@
 
 
   // small modals - quick editors and dialogs
+  // ------------------------
   .modal-sm {
     width: 30%;
     min-width: ($baseline*15);
@@ -96,6 +132,7 @@
   }
 
   // medium modals - forms and interactives
+  // ------------------------
   .modal-med {
     width: 40%;
     min-width: ($baseline*18);
@@ -106,10 +143,15 @@
   }
 
   // large modals - component editors and interactives
+  // ------------------------
   .modal-lg {
     width: 70%;
     min-width: ($baseline*27.5);
     height: auto;
+
+    .modal-content {
+      padding: $baseline;
+    }
 
     &.modal-editor {
 
@@ -162,6 +204,7 @@
 
 
   // specific modal overrides
+  // ------------------------
 
   // upload modal
   .assetupload-modal {
@@ -187,6 +230,88 @@
           height: auto;
           max-height: none;
         }
+      }
+    }
+  }
+
+  // edit outline item settings
+  .edit-outline-item-modal {
+
+    .list-fields {
+
+      .field {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: ($baseline/2);
+        margin-bottom: ($baseline/4);
+
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
+
+        label {
+          @extend %t-copy-sub1;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
+          font-weight: 600;
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: short length
+          &.short {
+            width: 25%;
+          }
+        }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          margin-right: ($baseline/2);
+        }
+
+        .input {
+          width: 100%;
+        }
+      }
+    }
+
+    .edit-settings-grading {
+
+      .grading-type {
+        margin-bottom: $baseline;
       }
     }
   }

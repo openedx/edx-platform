@@ -7,13 +7,13 @@ developers and the rest of the Open edX community to discuss your ideas. There
 might well be someone else already working on the same change you want to make,
 and it’s much better to collaborate than to submit incompatible pull requests.
 You can `send an email to the mailing list`_, `chat on the IRC channel`_, or
-open an issue on our Github issue tracker. (We prefer email or IRC rather than
-Github issues.) The earlier you start the conversation, the easier it will be to
-make sure that everyone’s on the right track -- before you spend a lot of time
-and effort making a pull request.
+`open an issue in our JIRA issue tracker`_. The earlier you start the
+conversation, the easier it will be to make sure that everyone’s on the right
+track -- before you spend a lot of time and effort making a pull request.
 
 .. _send an email to the mailing list: https://groups.google.com/forum/#!forum/edx-code
 .. _chat on the IRC channel: http://webchat.freenode.net?channels=edx-code
+.. _open an issue in our JIRA issue tracker: https://openedx.atlassian.net
 
 It’s also sometimes useful to submit a pull request even before the code is
 working properly, to make it easier to collect early feedback. To indicate to

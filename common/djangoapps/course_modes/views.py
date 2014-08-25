@@ -41,12 +41,24 @@ class ChooseModeView(View):
         request.session['attempting_upgrade'] = upgrade
 
         # Inactive users always need to re-register
-        # verified users do not need to register or upgrade
+        # verified and professional users do not need to register or upgrade
         # registered users who are not trying to upgrade do not need to re-register
-        if is_active and (upgrade is False or enrollment_mode == 'verified'):
+        if is_active and (upgrade is False or enrollment_mode == 'verified' or enrollment_mode == 'professional'):
             return redirect(reverse('dashboard'))
 
         modes = CourseMode.modes_for_course_dict(course_key)
+
+        # We assume that, if 'professional' is one of the modes, it is the *only* mode.
+        # If we offer more modes alongside 'professional' in the future, this will need to route
+        # to the usual "choose your track" page.
+        if "professional" in modes:
+            return redirect(
+                reverse(
+                    'verify_student_show_requirements',
+                    kwargs={'course_id': course_key.to_deprecated_string()}
+                )
+            )
+
         donation_for_course = request.session.get("donation_for_course", {})
         chosen_price = donation_for_course.get(course_key, None)
 
@@ -60,6 +72,7 @@ class ChooseModeView(View):
             "chosen_price": chosen_price,
             "error": error,
             "upgrade": upgrade,
+            "can_audit": "audit" in modes,
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -69,6 +82,8 @@ class ChooseModeView(View):
             ]
             context["currency"] = modes["verified"].currency.upper()
             context["min_price"] = modes["verified"].min_price
+            context["verified_name"] = modes["verified"].name
+            context["verified_description"] = modes["verified"].description
 
         return render_to_response("course_modes/choose.html", context)
 
@@ -118,11 +133,6 @@ class ChooseModeView(View):
             donation_for_course = request.session.get("donation_for_course", {})
             donation_for_course[course_key] = amount_value
             request.session["donation_for_course"] = donation_for_course
-            if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
-                return redirect(
-                    reverse('verify_student_verified',
-                            kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade)
-                )
 
             return redirect(
                 reverse('verify_student_show_requirements',

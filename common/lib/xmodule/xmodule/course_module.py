@@ -8,8 +8,6 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
-from opaque_keys.edx.locations import Location
-from opaque_keys.edx.locator import UsageKey
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
@@ -17,7 +15,6 @@ import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
-from opaque_keys.edx.locator import CourseLocator
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -25,6 +22,7 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
+DEFAULT_START_DATE = datetime(2030, 1, 1, tzinfo=UTC())
 
 class StringOrDate(Date):
     def from_json(self, value):
@@ -174,7 +172,7 @@ class CourseFields(object):
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible",
-                 default=datetime(2030, 1, 1, tzinfo=UTC()),
+                 default=DEFAULT_START_DATE,
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(
@@ -223,8 +221,8 @@ class CourseFields(object):
         scope=Scope.settings
     )
     display_name = String(
-        help=_("Enter the name of the course as it should appear in the edX.org course list."), 
-        default="Empty", 
+        help=_("Enter the name of the course as it should appear in the edX.org course list."),
+        default="Empty",
         display_name=_("Course Display Name"),
         scope=Scope.settings
     )
@@ -505,7 +503,15 @@ class CourseFields(object):
         display_name=_("Certificates Downloadable Before End"),
         help=_("Enter true or false. If true, students can download certificates before the course ends, if they've met certificate requirements."),
         scope=Scope.settings,
-        default=False
+        default=False,
+        deprecated=True
+    )
+
+    certificates_display_behavior = String(
+        display_name=_("Certificates Display Behavior"),
+        help=_("Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' is the default behavior, where certificates will only appear after a course has ended. 'early_with_info' will display all certificate information before a course has ended. 'early_no_info' will hide all certificate information unless a student has earned a certificate."),
+        scope=Scope.settings,
+        default="end"
     )
     course_image = String(
         display_name=_("Course About Page Image"),
@@ -606,10 +612,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
-            if isinstance(self.location, UsageKey):
-                self.wiki_slug = self.location.course
-            elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.id.offering or self.display_name
+            self.wiki_slug = self.location.course
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),
@@ -767,7 +770,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         Return True if it is acceptable to show the student a certificate download link
         """
-        return self.certificates_show_before_end or self.has_ended()
+        show_early = self.certificates_display_behavior in ('early_with_info', 'early_no_info') or self.certificates_show_before_end
+        return show_early or self.has_ended()
 
     def has_started(self):
         return datetime.now(UTC()) > self.start

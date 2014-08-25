@@ -1,14 +1,17 @@
 define([
     'backbone', 'coffee/src/main', 'js/models/group_configuration',
-    'js/models/group', 'js/collections/group'
+    'js/models/group', 'js/collections/group', 'squire'
 ], function(
-    Backbone, main, GroupConfigurationModel, GroupModel, GroupCollection
+    Backbone, main, GroupConfigurationModel, GroupModel, GroupCollection, Squire
 ) {
     'use strict';
     beforeEach(function() {
       this.addMatchers({
         toBeInstanceOf: function(expected) {
           return this.actual instanceof expected;
+        },
+        toBeEmpty: function() {
+            return this.actual.length === 0;
         }
       });
     });
@@ -32,11 +35,16 @@ define([
                 expect(this.model.get('showGroups')).toBeFalsy();
             });
 
-            it('should be empty by default', function() {
+            it('should have a collection with 2 groups by default', function() {
                 var groups = this.model.get('groups');
 
                 expect(groups).toBeInstanceOf(GroupCollection);
-                expect(this.model.isEmpty()).toBeTruthy();
+                expect(groups.at(0).get('name')).toBe('Group A');
+                expect(groups.at(1).get('name')).toBe('Group B');
+            });
+
+            it('should have an empty usage by default', function() {
+                expect(this.model.get('usage')).toBeEmpty();
             });
 
             it('should be able to reset itself', function() {
@@ -72,8 +80,6 @@ define([
                     return deepAttributes(obj.attributes);
                 } else if (obj instanceof Backbone.Collection) {
                     return obj.map(deepAttributes);
-                } else if (_.isArray(obj)) {
-                    return _.map(obj, deepAttributes);
                 } else if (_.isObject(obj)) {
                     var attributes = {};
 
@@ -114,14 +120,19 @@ define([
                         'groups': [
                             {
                                 'version': 1,
+                                'order': 0,
                                 'name': 'Group 1'
                             }, {
                                 'version': 1,
+                                'order': 1,
                                 'name': 'Group 2'
                             }
-                        ]
+                        ],
+                        'usage': []
                     },
-                    model = new GroupConfigurationModel(serverModelSpec);
+                    model = new GroupConfigurationModel(
+                        serverModelSpec, { parse: true }
+                    );
 
                 expect(deepAttributes(model)).toEqual(clientModelSpec);
                 expect(model.toJSON()).toEqual(serverModelSpec);
@@ -145,11 +156,12 @@ define([
 
     describe('GroupModel', function() {
         beforeEach(function() {
-            this.model = new GroupModel();
+            this.collection = new GroupCollection([{}]);
+            this.model = this.collection.at(0);
         });
 
         describe('Basic', function() {
-            it('should have a name by default', function() {
+            it('should have an empty name by default', function() {
                 expect(this.model.get('name')).toEqual('');
             });
 
@@ -166,9 +178,40 @@ define([
             });
 
             it('can pass validation', function() {
-                var model = new GroupModel({ name: 'a' });
+                var model = new GroupConfigurationModel({ name: 'foo' });
 
                 expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires at least two groups', function() {
+                var group1 = new GroupModel({ name: 'Group A' }),
+                    group2 = new GroupModel({ name: 'Group B' }),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                model.get('groups').reset([group1]);
+                expect(model.isValid()).toBeFalsy();
+
+                model.get('groups').add(group2);
+                expect(model.isValid()).toBeTruthy();
+            });
+
+            it('requires a valid group', function() {
+                var group = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                model.get('groups').reset([group]);
+
+                expect(model.isValid()).toBeFalsy();
+            });
+
+            it('requires all groups to be valid', function() {
+                var group1 = new GroupModel({ name: 'Group A' }),
+                    group2 = new GroupModel(),
+                    model = new GroupConfigurationModel({ name: 'foo' });
+
+                model.get('groups').reset([group1, group2]);
+
+                expect(model.isValid()).toBeFalsy();
             });
         });
     });
@@ -183,15 +226,94 @@ define([
         });
 
         it('is empty if all groups are empty', function() {
-            this.collection.add([{}, {}, {}]);
+            this.collection.add([{ name: '' }, { name: '' }, { name: '' }]);
 
             expect(this.collection.isEmpty()).toBeTruthy();
         });
 
         it('is not empty if a group is not empty', function() {
-            this.collection.add([{}, { name: 'full' }, {} ]);
+            this.collection.add([
+                { name: '' }, { name: 'full' }, { name: '' }
+            ]);
 
             expect(this.collection.isEmpty()).toBeFalsy();
+        });
+
+        describe('getGroupId', function () {
+            var collection, injector, mockGettext, initializeGroupModel;
+
+            mockGettext = function (returnedValue) {
+                var injector = new Squire();
+
+                injector.mock('gettext', function () {
+                    return function () { return returnedValue; };
+                });
+
+                return injector;
+            };
+
+            initializeGroupModel = function (dict, that) {
+                runs(function() {
+                    injector = mockGettext(dict);
+                    injector.require(['js/collections/group'],
+                    function(GroupCollection) {
+                        collection = new GroupCollection();
+                    });
+                });
+
+                waitsFor(function() {
+                    return collection;
+                }, 'GroupModel was not instantiated', 500);
+
+                that.after(function () {
+                    collection = null;
+                    injector.clean();
+                    injector.remove();
+                });
+            };
+
+            it('returns correct ids', function () {
+                var collection = new GroupCollection();
+
+                expect(collection.getGroupId(0)).toBe('A');
+                expect(collection.getGroupId(1)).toBe('B');
+                expect(collection.getGroupId(25)).toBe('Z');
+                expect(collection.getGroupId(702)).toBe('AAA');
+                expect(collection.getGroupId(704)).toBe('AAC');
+                expect(collection.getGroupId(475253)).toBe('ZZZZ');
+                expect(collection.getGroupId(475254)).toBe('AAAAA');
+                expect(collection.getGroupId(475279)).toBe('AAAAZ');
+            });
+
+            it('just 1 character in the dictionary', function () {
+                initializeGroupModel('1', this);
+                runs(function() {
+                    expect(collection.getGroupId(0)).toBe('1');
+                    expect(collection.getGroupId(1)).toBe('11');
+                    expect(collection.getGroupId(5)).toBe('111111');
+                });
+            });
+
+            it('allow to use unicode characters in the dict', function () {
+                initializeGroupModel('ö诶úeœ', this);
+                runs(function() {
+                    expect(collection.getGroupId(0)).toBe('ö');
+                    expect(collection.getGroupId(1)).toBe('诶');
+                    expect(collection.getGroupId(5)).toBe('öö');
+                    expect(collection.getGroupId(29)).toBe('œœ');
+                    expect(collection.getGroupId(30)).toBe('ööö');
+                    expect(collection.getGroupId(43)).toBe('öúe');
+                });
+            });
+
+            it('return initial value if dictionary is empty', function () {
+                initializeGroupModel('', this);
+                runs(function() {
+                    expect(collection.getGroupId(0)).toBe('0');
+                    expect(collection.getGroupId(5)).toBe('5');
+                    expect(collection.getGroupId(30)).toBe('30');
+                });
+            });
         });
     });
 });

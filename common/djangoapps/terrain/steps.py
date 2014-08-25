@@ -81,7 +81,9 @@ def click_the_link_with_the_text_group1(step, linktext):
 
 @step('I should see that the path is "([^"]*)"$')
 def i_should_see_that_the_path_is(step, path):
-    assert world.url_equals(path)
+    assert world.url_equals(path), (
+        "path should be {!r} but is {!r}".format(path, world.browser.url)
+    )
 
 
 @step(u'the page title should be "([^"]*)"$')

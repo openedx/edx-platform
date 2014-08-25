@@ -326,6 +326,43 @@ form[class^="create-"] {
   }
 }
 
+
+// form - inline xblock name edit on unit, container, outline
+
+// TOOD: abstract this out into a Sass placeholder
+.incontext-editor.is-editable {
+
+  .incontext-editor-value,
+  .incontext-editor-action-wrapper {
+    @extend %cont-truncated;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 80%;
+  }
+
+  .incontext-editor-open-action {
+    @extend %ui-btn-non-blue;
+    @extend %t-copy-base;
+    padding-top: ($baseline/10);
+  }
+
+  .incontext-editor-form {
+    display: none;
+  }
+
+  &.is-editing {
+
+    .incontext-editor-value,
+    .incontext-editor-action-wrapper {
+      display: none;
+    }
+
+    .incontext-editor-form {
+      display: inline-block;
+    }
+  }
+}
+
 // ====================
 
 // forms - grandfathered

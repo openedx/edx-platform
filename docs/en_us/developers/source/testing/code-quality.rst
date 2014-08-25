@@ -20,8 +20,8 @@ edx-platform codebase and run::
 
     $ paver run_quality
 
-Note: The rake commands ``rake quality``, ``rake pep8``, and ``rake pylint`` are now deprecated
-to ``paver run_quality``, ``paver run_pep8``, and ``paver run_pylint`` respectively.
+You can also use the `paver run_pep8`` and ``paver run_pylint`` commands to run just pep8 or
+pylint.
 
 This will print a report of the quality violations that your branch has made.
 

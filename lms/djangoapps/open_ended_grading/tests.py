@@ -3,6 +3,7 @@ Tests for open ended grading interfaces
 
 ./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
+from django.test import RequestFactory
 
 import json
 import logging
@@ -24,11 +25,12 @@ from xmodule.open_ended_grading_classes import peer_grading_service, controller_
 from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
-from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
 from student.roles import CourseStaffRole
 from edxmako.shortcuts import render_to_string
+from edxmako.tests import mako_middleware_process_request
 from student.models import unique_id_for_user
 
 from open_ended_grading import staff_grading_service, views, utils
@@ -133,8 +135,8 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # both get and post should return 404
         for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
             url = reverse(view_name, kwargs={'course_id': self.course_id.to_deprecated_string()})
-            check_for_get_code(self, 404, url)
-            check_for_post_code(self, 404, url)
+            self.assert_request_status_code(404, url, method="GET")
+            self.assert_request_status_code(404, url, method="POST")
 
     def test_get_next(self):
         self.login(self.instructor, self.password)
@@ -142,7 +144,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id.to_deprecated_string()})
         data = {'location': self.location_string}
 
-        response = check_for_post_code(self, 200, url, data)
+        response = self.assert_request_status_code(200, url, method="POST", data=data)
 
         content = json.loads(response.content)
 
@@ -171,7 +173,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if skip:
             data.update({'skipped': True})
 
-        response = check_for_post_code(self, 200, url, data)
+        response = self.assert_request_status_code(200, url, method="POST", data=data)
         content = json.loads(response.content)
         self.assertTrue(content['success'], str(content))
         self.assertEquals(content['submission_id'], self.mock_service.cnt)
@@ -188,7 +190,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id.to_deprecated_string()})
         data = {}
 
-        response = check_for_post_code(self, 200, url, data)
+        response = self.assert_request_status_code(200, url, method="POST", data=data)
         content = json.loads(response.content)
 
         self.assertTrue(content['success'])
@@ -237,7 +239,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
             (staff_grading_service.MAX_ALLOWED_FEEDBACK_LENGTH / len(feedback_fragment) + 1)
         )
 
-        response = check_for_post_code(self, 200, url, data)
+        response = self.assert_request_status_code(200, url, method="POST", data=data)
         content = json.loads(response.content)
 
         # Should not succeed.
@@ -471,7 +473,12 @@ class TestPanel(ModuleStoreTestCase):
         Ensure that the problem list from the grading controller server can be rendered properly locally
         @return:
         """
-        request = Mock(user=self.user)
+        request = RequestFactory().get(
+            reverse("open_ended_problems", kwargs={'course_id': self.course_key})
+        )
+        request.user = self.user
+
+        mako_middleware_process_request(request)
         response = views.student_problem_list(request, self.course.id.to_deprecated_string())
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 

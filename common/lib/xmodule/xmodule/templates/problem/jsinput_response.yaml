@@ -5,6 +5,7 @@ metadata:
 data: |
       <problem display_name="webGLDemo">
       <script type="loncapa/python">
+      <![CDATA[
       import json
       def vglcfn(e, ans):
         '''
@@ -22,6 +23,7 @@ data: |
         selectedObjects = state["selectedObjects"]
         return selectedObjects["cylinder"] and not selectedObjects["cube"]
         '''
+      ]]>
       </script>
       <p>
       The shapes below can be selected (yellow) or unselected (cyan).
@@ -36,6 +38,7 @@ data: |
         <jsinput gradefn="WebGLDemo.getGrade"
           get_statefn="WebGLDemo.getState"
           set_statefn="WebGLDemo.setState"
+          initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
           width="400"
           height="400"
           html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"

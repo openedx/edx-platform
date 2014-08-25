@@ -12,6 +12,7 @@ from edxmako.shortcuts import render_to_response
 
 from track import tracker
 from track import contexts
+from track import shim
 from track.models import TrackingLog
 from eventtracking import tracker as eventtracker
 
@@ -59,6 +60,10 @@ def user_track(request):
             "context": context,
         }
 
+    # Some duplicated fields are passed into event-tracking via the context by track.middleware.
+    # Remove them from the event here since they are captured elsewhere.
+    shim.remove_shim_context(event)
+
     log_event(event)
 
     return HttpResponse('success')
@@ -91,6 +96,10 @@ def server_track(request, event_type, event, page=None):
         "host": _get_request_header(request, 'SERVER_NAME'),
         "context": eventtracker.get_tracker().resolve_context(),
     }
+
+    # Some duplicated fields are passed into event-tracking via the context by track.middleware.
+    # Remove them from the event here since they are captured elsewhere.
+    shim.remove_shim_context(event)
 
     log_event(event)
 

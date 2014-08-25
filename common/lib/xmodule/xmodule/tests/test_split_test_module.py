@@ -160,7 +160,8 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
     Unit tests for how split test interacts with Studio.
     """
 
-    def test_render_author_view(self):
+    @patch('xmodule.split_test_module.SplitTestDescriptor.group_configuration_url', return_value='http://example.com')
+    def test_render_author_view(self, group_configuration_url):
         """
         Test the rendering of the Studio author view.
         """
@@ -170,7 +171,6 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
             Context for rendering the studio "author_view".
             """
             return {
-                'container_view': True,
                 'reorderable_items': set(),
                 'root_xblock': root_xblock,
             }
@@ -196,6 +196,22 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         html = self.module_system.render(self.split_test_module, AUTHOR_VIEW, context).content
         self.assertIn('HTML FOR GROUP 0', html)
         self.assertIn('HTML FOR GROUP 1', html)
+
+    def test_group_configuration_url(self):
+        """
+        Test creation of correct Group Configuration URL.
+        """
+        mocked_course = Mock(advanced_modules=['split_test'])
+        mocked_modulestore = Mock()
+        mocked_modulestore.get_course.return_value = mocked_course
+        self.split_test_module.system.modulestore = mocked_modulestore
+
+        self.split_test_module.user_partitions = [
+            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+        ]
+
+        expected_url = '/group_configurations/edX/xml_test_course/101#0'
+        self.assertEqual(expected_url, self.split_test_module.group_configuration_url)
 
     def test_editable_settings(self):
         """

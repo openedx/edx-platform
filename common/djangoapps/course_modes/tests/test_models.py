@@ -50,7 +50,7 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate')
         modes = CourseMode.modes_for_course(self.course_key)
-        mode = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', None)
+        mode = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', None, None)
         self.assertEqual([mode], modes)
 
         modes_dict = CourseMode.modes_for_course_dict(self.course_key)
@@ -62,8 +62,8 @@ class CourseModeModelTest(TestCase):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None)
+        mode2 = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', None, None)
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
@@ -82,9 +82,9 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(0, CourseMode.min_course_price_for_currency(self.course_key, 'usd'))
 
         # create some modes
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None)
-        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None)
-        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 10, '', 'usd', None, None)
+        mode2 = Mode(u'verified', u'Verified Certificate', 20, '', 'usd', None, None)
+        mode3 = Mode(u'honor', u'Honor Code Certificate', 80, '', 'cny', None, None)
         set_modes = [mode1, mode2, mode3]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices, mode.currency)
@@ -99,7 +99,7 @@ class CourseModeModelTest(TestCase):
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
 
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None)
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None)
         self.create_mode(mode1.slug, mode1.name, mode1.min_price, mode1.suggested_prices)
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([mode1], modes)
@@ -107,9 +107,23 @@ class CourseModeModelTest(TestCase):
         expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=1)
         expired_mode.expiration_datetime = expiration_datetime
         expired_mode.save()
-        expired_mode_value = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', expiration_datetime)
+        expired_mode_value = Mode(u'verified', u'Verified Certificate', 0, '', 'usd', expiration_datetime, None)
         modes = CourseMode.modes_for_course(self.course_key)
         self.assertEqual([expired_mode_value, mode1], modes)
 
         modes = CourseMode.modes_for_course(SlashSeparatedCourseKey('TestOrg', 'TestCourse', 'TestRun'))
         self.assertEqual([CourseMode.DEFAULT_MODE], modes)
+
+    def test_verified_mode_for_course(self):
+        self.create_mode('verified', 'Verified Certificate')
+
+        mode = CourseMode.verified_mode_for_course(self.course_key)
+
+        self.assertEqual(mode.slug, 'verified')
+
+        # verify that the professional mode is preferred
+        self.create_mode('professional', 'Professional Education Verified Certificate')
+
+        mode = CourseMode.verified_mode_for_course(self.course_key)
+
+        self.assertEqual(mode.slug, 'professional')

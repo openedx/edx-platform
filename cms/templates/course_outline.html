@@ -1,0 +1,95 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "outline" %></%def>
+<%!
+import json
+import logging
+from util.date_utils import get_default_time_display
+from django.utils.translation import ugettext as _
+from contentstore.utils import reverse_usage_url
+%>
+<%block name="title">${_("Course Outline")}</%block>
+<%block name="bodyclass">is-signedin course view-outline</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="jsextra">
+<script type="text/javascript">
+    require(["domReady!", "jquery", "js/views/pages/course_outline", "js/models/xblock_outline_info"],
+            function(doc, $, CourseOutlinePage, XBlockOutlineInfo) {
+                var courseXBlock = new XBlockOutlineInfo(${json.dumps(course_structure) | n}, { parse: true });
+                var view = new CourseOutlinePage({
+                    el: $('#content'),
+                    model: courseXBlock,
+                    initialState: ${json.dumps(initial_state) | n}
+                });
+                view.render();
+            });
+</script>
+</%block>
+
+<%block name="header_extras">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'edit-outline-item-modal']:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+            <small class="subtitle">${_("Content")}</small>
+            <span class="sr">&gt; </span>${_("Course Outline")}
+        </h1>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
+                        <i class="icon-plus"></i>${_('New Section')}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
+                        <span class="collapse-all"><i class="icon-arrow-up"></i> <span class="label">${_("Collapse All Sections")}</span></span>
+                        <span class="expand-all"><i class="icon-arrow-down"></i> <span class="label">${_("Expand All Sections")}</span></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="${lms_link}" rel="external" class="button view-button view-live-button"
+                       title="${_('Click to open the courseware in the LMS in a new tab')}">${_("View Live")}</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main">
+            <div class="wrapper-dnd">
+                <%
+                course_locator = context_course.location
+                %>
+                <article class="outline outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
+                </article>
+            </div>
+            <div class="ui-loading">
+                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+            </div>
+        </article>
+        <aside class="content-supplementary" role="complimentary">
+            <div class="bit">
+                <h3 class="title-3">${_("What can I do on this page?")}</h3>
+                <p>${_("You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.")}</p>
+
+                <p>${_("In addition, you can drag and drop sections, subsections, and units to reorganize your course.")}</p>
+            </div>
+        </aside>
+    </section>
+</div>
+<footer></footer>
+</%block>

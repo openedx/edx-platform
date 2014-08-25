@@ -9,49 +9,16 @@ from student.models import Registration
 from django.test import TestCase
 
 
-def check_for_get_code(self, code, url):
-    """
-    Check that we got the expected code when accessing url via GET.
-    Returns the HTTP response.
-
-    `self` is a class that subclasses TestCase.
-
-    `code` is a status code for HTTP responses.
-
-    `url` is a url pattern for which we have to test the response.
-    """
-    resp = self.client.get(url)
-    self.assertEqual(resp.status_code, code,
-                     "got code %d for url '%s'. Expected code %d"
-                     % (resp.status_code, url, code))
-    return resp
-
-
-def check_for_post_code(self, code, url, data={}):
-    """
-    Check that we got the expected code when accessing url via POST.
-    Returns the HTTP response.
-    `self` is a class that subclasses TestCase.
-
-    `code` is a status code for HTTP responses.
-
-    `url` is a url pattern for which we want to test the response.
-    """
-    resp = self.client.post(url, data)
-    self.assertEqual(resp.status_code, code,
-                     "got code %d for url '%s'. Expected code %d"
-                     % (resp.status_code, url, code))
-    return resp
-
-
 def get_request_for_user(user):
     """Create a request object for user."""
 
     request = RequestFactory()
     request.user = user
+    request.COOKIES = {}
     request.META = {}
     request.is_secure = lambda: True
     request.get_host = lambda: "edx.org"
+    request.method = 'GET'
     return request
 
 
@@ -75,6 +42,19 @@ class LoginEnrollmentTestCase(TestCase):
         self.activate_user(self.email)
         self.login(self.email, self.password)
 
+    def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
+        make_request = getattr(self.client, method.lower())
+        response = make_request(url, **kwargs)
+        self.assertEqual(
+            response.status_code, status_code,
+            "{method} request to {url} returned status code {actual}, "
+            "expected status code {expected}".format(
+                method=method, url=url,
+                actual=response.status_code, expected=status_code
+            )
+        )
+        return response
+
     # ============ User creation and login ==============
 
     def login(self, email, password):
@@ -93,20 +73,22 @@ class LoginEnrollmentTestCase(TestCase):
         as expected.
         """
         # should redirect
-        check_for_get_code(self, 302, reverse('logout'))
+        self.assert_request_status_code(302, reverse('logout'))
 
     def create_account(self, username, email, password):
         """
         Create the account and check that it worked.
         """
-        resp = check_for_post_code(self, 200, reverse('create_account'), {
+        url = reverse('create_account')
+        request_data = {
             'username': username,
             'email': email,
             'password': password,
             'name': 'username',
             'terms_of_service': 'true',
             'honor_code': 'true',
-        })
+        }
+        resp = self.assert_request_status_code(200, url, method="POST", data=request_data)
         data = json.loads(resp.content)
         self.assertEqual(data['success'], True)
         # Check both that the user is created, and inactive
@@ -121,7 +103,8 @@ class LoginEnrollmentTestCase(TestCase):
         """
         activation_key = Registration.objects.get(user__email=email).activation_key
         # and now we try to activate
-        check_for_get_code(self, 200, reverse('activate', kwargs={'key': activation_key}))
+        url = reverse('activate', kwargs={'key': activation_key})
+        self.assert_request_status_code(200, url)
         # Now make sure that the user is now actually activated
         self.assertTrue(User.objects.get(email=email).is_active)
 
@@ -147,7 +130,9 @@ class LoginEnrollmentTestCase(TestCase):
         Unenroll the currently logged-in user, and check that it worked.
         `course` is an instance of CourseDescriptor.
         """
-        check_for_post_code(self, 200, reverse('change_enrollment'), {
+        url = reverse('change_enrollment')
+        request_data = {
             'enrollment_action': 'unenroll',
-            'course_id': course.id.to_deprecated_string()
-        })
+            'course_id': course.id.to_deprecated_string(),
+        }
+        self.assert_request_status_code(200, url, method="POST", data=request_data)

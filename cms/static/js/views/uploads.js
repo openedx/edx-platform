@@ -9,7 +9,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'assetupload',
                 modalSize: 'med',
-                successMessageTimeout: 2000 // 2 seconds
+                successMessageTimeout: 2000, // 2 seconds
+                viewSpecificClasses: 'confirm'
             }),
 
             initialize: function() {

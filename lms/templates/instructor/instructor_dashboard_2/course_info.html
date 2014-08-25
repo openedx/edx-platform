@@ -3,10 +3,24 @@
 
 <div class="enrollment-wrapper">
   <h2>${_("Enrollment Information")}</h2>
-  <span class="tip">${_("Total number of enrollees (instructors, staff members, and students)")}</span>
+  ## Translators: 'track' refers to the enrollment type ('honor', 'verified', or 'audit')
+  <span class="tip">${_("Number of enrollees (instructors, staff members, and students) by track")}</span>
   <br/><br/>
-  <span style="color: green;"><b>${ section_data['enrollment_count'] }</b></span>
-
+  <% modes = section_data['enrollment_count'] %>
+  <table>
+    <tr>
+      <td>${_("Verified")}</td><td>${modes['verified']}</td>
+    </tr>
+    <tr>
+      <td>${_("Audit")}</td><td>${modes['audit']}</td>
+    </tr>
+    <tr>
+      <td>${_("Honor")}</td><td>${modes['honor']}</td>
+    </tr>
+    <tr style="color:green;border-top:1px solid #000">
+      <td style="padding-top:10px;"><b>${_("Total")}</b></td><td style="padding-top:10px;"><b>${modes['total']}</b></td>
+    </tr>
+  </table>
 </div>
 <hr>
 

@@ -2,23 +2,37 @@
 
     <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
         <header class="mast has-actions has-navigation">
-            <h1 class="page-header">
+            <div class="page-header">
                 <small class="navigation navigation-parents subtitle">
-                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-link navigation-parent">Unit 1</a>
-                    <a href="#" class="navigation-link navigation-current">Test Container</a>
+                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
                 </small>
-                <span class="page-header-title">Test Container</span>
-            </h1>
+                <div class="wrapper-xblock-field is-editable" data-field="display_name">
+                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
+                </div>
+            </div>
 
             <nav class="nav-actions">
                 <h3 class="sr">Page Actions</h3>
                 <ul>
-                    <li class="action-item action-edit nav-item">
-                        <a href="#" class="button edit-button action-button">
-                            <i class="icon-pencil"></i>
-                            <span class="action-button-text">${_("Edit")}</span>
-                        </a>
-                    </li>
+                    % if is_unit_page:
+                        <li class="action-item action-view nav-item">
+                            <a href="${published_preview_link}" class="button button-view action-button is-disabled">
+                                <span class="action-button-text">${_("View Live Version")}</span>
+                            </a>
+                        </li>
+                        <li class="action-item action-preview nav-item">
+                            <a href="${draft_preview_link}" class="button button-preview action-button is-disabled">
+                                <span class="action-button-text">${_("Preview Changes")}</span>
+                            </a>
+                        </li>
+                    % else:
+                        <li class="action-item action-edit nav-item">
+                            <a href="#" class="button edit-button action-button">
+                                <i class="icon-pencil"></i>
+                                <span class="action-button-text">${_("Edit")}</span>
+                            </a>
+                        </li>
+                % endif
                 </ul>
             </nav>
         </header>
@@ -29,17 +43,32 @@
             <section class="content-area">
 
                 <article class="content-primary window">
+                    <div class="container-message wrapper-message"></div>
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
-                    <div class="no-container-content is-hidden">
-                        <p>This page has no content yet.</p>
-                    </div>
                     <div class="ui-loading is-hidden">
                         <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">Loading...</span></p>
                     </div>
                 </article>
                 <aside class="content-supplementary" role="complimentary">
+                    <div id="publish-unit" class="window"></div>
+                    <div id="publish-history"></div>
                 </aside>
+                <div class="unit-location">
+                        <h4 class="header">${_("Unit Location")}</h4>
+                        <div class="wrapper-unit-id content-bit">
+                            <h5 class="title">Unit Location ID</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
+                            </p>
+                        </div>
+                        <div class="wrapper-unit-tree-location bar-mod-content">
+                            <h5 class="title">Location in Course Outline</h5>
+                            <div class="wrapper-unit-overview">
+                            </div>
+                        </div>
+                    </div>
             </section>
         </div>
     </div>

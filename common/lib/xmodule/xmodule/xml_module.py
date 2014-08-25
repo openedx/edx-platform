@@ -381,7 +381,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         for key, value in self.xml_attributes.items():
             if key not in self.metadata_to_strip:
-                xml_object.set(key, value)
+                xml_object.set(key, serialize_field(value))
 
         if self.export_to_file():
             # Write the definition to a file

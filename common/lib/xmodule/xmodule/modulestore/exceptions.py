@@ -85,3 +85,6 @@ class InvalidBranchSetting(Exception):
         super(InvalidBranchSetting, self).__init__()
         self.expected_setting = expected_setting
         self.actual_setting = actual_setting
+
+    def __unicode__(self, *args, **kwargs):
+        return u"Invalid branch: expected {} but got {}".format(self.expected_setting, self.actual_setting)

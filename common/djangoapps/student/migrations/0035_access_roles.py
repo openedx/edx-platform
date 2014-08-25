@@ -97,7 +97,7 @@ class Migration(DataMigration):
                         if correct_course_key is None:
                             hold.setdefault(course_id_string, []).append(group)
                         else:
-                            _migrate_users(correct_course_key, role, course_key.org)
+                            _migrate_users(correct_course_key, role, correct_course_key.org)
 
         # see if any in hold were missed above
         for held_auth_scope, groups in hold.iteritems():

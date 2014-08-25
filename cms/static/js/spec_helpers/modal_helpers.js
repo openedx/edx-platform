@@ -3,13 +3,8 @@
  */
 define(["jquery", "js/spec_helpers/view_helpers"],
     function($, view_helpers) {
-        var installModalTemplates,
-            getModalElement,
-            isShowingModal,
-            hideModalIfShowing,
-            pressModalButton,
-            cancelModal,
-            cancelModalIfShowing;
+        var installModalTemplates, getModalElement, getModalTitle, isShowingModal, hideModalIfShowing,
+            pressModalButton, cancelModal, cancelModalIfShowing;
 
         installModalTemplates = function(append) {
             view_helpers.installViewTemplates(append);

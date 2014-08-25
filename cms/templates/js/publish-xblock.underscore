@@ -1,0 +1,98 @@
+<%
+var title = gettext("Draft (Never published)");
+if (visibilityState === 'staff_only') {
+    title = gettext("Visible to Staff Only");
+} else if (visibilityState === 'live') {
+    title = gettext("Published and Live");
+} else if (published && !hasChanges) {
+    title = gettext("Published (not yet released)");
+} else if (published && hasChanges) {
+    title = gettext("Draft (Unpublished changes)");
+}
+
+var releaseLabel = gettext("Release:");
+if (visibilityState === 'live') {
+    releaseLabel = gettext("Released:");
+} else if (visibilityState === 'ready') {
+    releaseLabel = gettext("Scheduled:");
+}
+
+var visibleToStaffOnly = visibilityState === 'staff_only';
+%>
+<div class="bit-publishing <%= visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
+    <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
+        <%= title %>
+    </h3>
+
+    <div class="wrapper-last-draft bar-mod-content">
+        <p class="copy meta">
+            <% if (hasChanges && editedOn && editedBy) {
+                var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
+                <%= interpolate(message, {
+                    last_saved_date: '<span class="date">' + editedOn + '</span>',
+                    edit_username: '<span class="user">' + editedBy + '</span>' }, true) %>
+            <% } else if (publishedOn && publishedBy) {
+                var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
+                <%= interpolate(message, {
+                    last_published_date: '<span class="date">' + publishedOn + '</span>',
+                    publish_username: '<span class="user">' + publishedBy + '</span>' }, true) %>
+            <% } else { %>
+                <%= gettext("Previously published") %>
+            <% } %>
+        </p>
+    </div>
+
+    <div class="wrapper-release bar-mod-content">
+        <h5 class="title"><%= releaseLabel %></h5>
+        <p class="copy">
+            <% if (releaseDate) { %>
+                <% var message = gettext("%(release_date)s with %(section_or_subsection)s") %>
+                <%= interpolate(message, {
+                    release_date: '<span class="release-date">' + releaseDate + '</span>',
+                    section_or_subsection: '<span class="release-with">' + releaseDateFrom + '</span>' }, true) %>
+            <% } else { %>
+                <%= gettext("Unscheduled") %>
+            <% } %>
+        </p>
+    </div>
+
+    <div class="wrapper-visibility bar-mod-content">
+        <h5 class="title">
+            <% if (released && published && !hasChanges) { %>
+                <%= gettext("Is Visible To:") %>
+            <% } else { %>
+                <%= gettext("Will Be Visible To:") %>
+            <% } %>
+        </h5>
+        <% if (visibleToStaffOnly) { %>
+            <p class="copy"><%= gettext("Staff Only") %></p>
+        <% } else { %>
+            <p class="copy"><%= gettext("Staff and Students") %></p>
+        <% } %>
+        <p class="action-inline">
+            <a href="" class="action-staff-lock" role="button" aria-pressed="<%= visibleToStaffOnly %>">
+                <% if (visibleToStaffOnly) { %>
+                    <i class="icon-check"></i>
+                <% } else { %>
+                    <i class="icon-check-empty"></i>
+                <% } %>
+                <%= gettext('Hide from students') %>
+            </a>
+        </p>
+    </div>
+
+    <div class="wrapper-pub-actions bar-mod-actions">
+        <ul class="action-list">
+            <li class="action-item">
+                <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
+                   href=""><%= gettext("Publish") %>
+                </a>
+            </li>
+            <li class="action-item">
+                <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
+                   href=""><%= gettext("Discard Changes") %>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

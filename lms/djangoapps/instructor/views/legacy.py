@@ -663,7 +663,7 @@ def instructor_dashboard(request, course_id):
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
         try:
-            module_state_key = course_key.make_usage_key(block_type='problem', name=problem_to_dump)
+            module_state_key = course_key.make_usage_key_from_deprecated_string(problem_to_dump)
             smdat = StudentModule.objects.filter(
                 course_id=course_key,
                 module_state_key=module_state_key
