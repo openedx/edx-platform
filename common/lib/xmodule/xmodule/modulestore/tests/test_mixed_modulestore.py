@@ -1280,7 +1280,7 @@ def load_function(path):
 
 
 # pylint: disable=unused-argument
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None):
+def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None, fs_service=None):
     """
     This will return a new instance of a modulestore given an engine and options
     """
