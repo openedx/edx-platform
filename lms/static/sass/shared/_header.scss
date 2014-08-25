@@ -318,22 +318,26 @@ header.global {
 }
 
 
+// edX theme: Global Header
+// ====================
+
+// CASE: marketing/course discovery
 header.global-new {
+  @extend %ui-depth1;
+  position: relative;
+  height: ($baseline*3.75);
+  width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
   background: $header-bg;
-  height: 75px;
-  position: relative;
-  width: 100%;
-  z-index: 10;
 
   nav {
-    @include clearfix;
-    height: 40px;
-    margin: 0 auto;
-    padding: 18px 10px 0px;
+    @include clearfix();
     max-width: grid-width(12);
     min-width: 760px;
+    height: ($baseline*2);
+    margin: 0 auto;
+    padding: 18px ($baseline/2) 0;
   }
 
   h1.logo {
