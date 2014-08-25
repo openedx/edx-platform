@@ -1,6 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
+
+<%namespace name='static' file='../static_content.html'/>
+
 ## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
@@ -44,64 +47,11 @@
     </article>
 </script>
 
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      ${"<% if (obj.group_id) { %>"}
-      <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}
-
-          <div class="post-header-content">
-
-            <h1>${'<%- title %>'}</h1>
-            <p class="posted-details">
-                ## This part is incredibly gross but necessary to combine i18n in
-                ## mako with logic in underscore.
-                ## Translators: post_type describes the kind of post this is
-                ## (e.g. "question" or "discussion"); time_ago is how much time
-                ## has passed since the post was created (e.g. "4 hours ago")
-                ${_("{post_type} posted {time_ago} by {author}").format(
-                    post_type="<%- thread_type %>",
-                    time_ago="<span class='timeago' title='<%- created_at %>'><%- created_at %></span>",
-                    author="<%= author_display %>"
-                )}
-            </p>
-            <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>${_("Pinned")}</span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i>${_("Closed")}</span>
-            </div>
-          </div>
-          <div class="post-header-actions post-extended-content">
-            ${"""<%=
-                _.template(
-                    $('#forum-actions').html(),
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                    }
-                )
-            %>"""}
-          </div>
-      </header>
-
-      <div class="post-body">${'<%- body %>'}</div>
-
-      <%  js_block = u"""
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('{}', {{'courseware_title_linked': courseware_link}}, true));
-          """.format(
-                  ## Translators: 'courseware_title_linked' is a placeholder for the title of the courseware unit referenced by this discussion thread.
-                  escapejs(_("(this post is about %(courseware_title_linked)s)"))
-              )
-      %>
-      ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
-          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
-      ${'<% } %>'}
-  </div>
+% for template_name in ['thread-show']:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="js/discussion/${template_name}.underscore" />
 </script>
+% endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
   <div class="discussion-post edit-post-form">

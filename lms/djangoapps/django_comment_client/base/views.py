@@ -27,8 +27,8 @@ from django_comment_client.utils import (
     get_ability,
     JsonError,
     JsonResponse,
-    safe_content
-)
+    safe_content,
+    add_thread_group_name)
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
 
@@ -139,6 +139,7 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
     data = thread.to_dict()
+    add_thread_group_name(data, course_key)
     add_courseware_context([data], course)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
