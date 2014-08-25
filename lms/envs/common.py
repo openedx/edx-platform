@@ -41,8 +41,14 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
-PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
+
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
+PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
+PLATFORM_TWITTER_URL = "https://twitter.com/YourPlatformTwitterAccount"
+PLATFORM_MEETUP_URL = "http://www.meetup.com/YourMeetup"
+PLATFORM_LINKEDIN_URL = "http://www.linkedin.com/company/YourPlatform"
+PLATFORM_GOOGLE_PLUS_URL = "https://plus.google.com/YourGooglePlusAccount/"
+
 
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
@@ -263,6 +269,10 @@ FEATURES = {
     # Analytics Data API (for active student count)
     # Default to false here b/c dev environments won't have the api, will override in aws.py
     'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+
+    # TODO: ECOM-136 remove this feature flag when new styles are available on main site.for
+    # Enable the new edX footer to be rendered. Defaults to false.
+    'ENABLE_NEW_EDX_FOOTER': False,
 
     # TODO: ECOM-136
     # Enables the new navigation template and styles. This should be enabled
@@ -1381,7 +1391,10 @@ MKTG_URL_LINK_MAP = {
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
     'JOBS': 'jobs',
+    'NEWS': 'news',
     'PRESS': 'press',
+    'BLOG': 'edx-blog',
+    'DONATE': 'donate',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',

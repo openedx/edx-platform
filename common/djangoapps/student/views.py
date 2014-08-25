@@ -148,10 +148,6 @@ def embargo(_request):
     return render_to_response("static_templates/embargo.html")
 
 
-def press(request):
-    return render_to_response('static_templates/press.html')
-
-
 def process_survey_link(survey_link, user):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
