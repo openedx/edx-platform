@@ -9,6 +9,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.split_mongo import encode_key_for_mongo
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
+from fs.osfs import OSFS
 
 log = logging.getLogger(__name__)
 
@@ -34,9 +35,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
+        # needed by capa_problem (as runtime.filestore via this.resources_fs)
+        if 'course' in course_entry:
+            root = modulestore.fs_root / course_entry['org'] / course_entry['course'] / course_entry['run']
+        else:
+            root = modulestore.fs_root / course_entry['structure']['_id']
+        root.makedirs_p()  # create directory if it doesn't exist
+
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
             load_item=self._load_item,
+            resources_fs = OSFS(root),
             **kwargs
         )
         self.modulestore = modulestore
