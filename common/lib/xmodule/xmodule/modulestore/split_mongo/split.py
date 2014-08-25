@@ -1255,7 +1255,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     if field_name in fields:
                         json_data['_inherited_settings'][field_name] = fields[field_name]
 
-        new_block = runtime.xblock_from_json(xblock_class, block_id, json_data, **kwargs)
+        new_block = runtime.xblock_from_json(xblock_class, course_key, block_id, json_data, **kwargs)
         for field_name, value in fields.iteritems():
             setattr(new_block, field_name, value)
 
