@@ -1124,9 +1124,15 @@ CatchAnnotation.prototype = {
         // checks to make sure that Grouping is redone when switching tags in text annotations
         if (this.options.media === 'text') {
             if (this.current_tab ==='public') {
-                this.annotator.plugins.Grouping.useGrouping = 0;
+                // this is to check if user is is MyNotes instead of the annotation component
+                if (typeof this.annotator.plugins.Grouping !== 'undefined') {
+                    this.annotator.plugins.Grouping.useGrouping = 0;
+                }
             } else {
-                this.annotator.plugins.Grouping.useGrouping = 1;
+                // this is to check if user is is MyNotes instead of the annotation component
+                if (typeof this.annotator.plugins.Grouping !== 'undefined'){
+                    this.annotator.plugins.Grouping.useGrouping = 1;
+                }
             }
             this.annotator.publish("changedTabsInCatch");
         }
@@ -1156,7 +1162,10 @@ CatchAnnotation.prototype = {
         var searchtype = searchtype || "";
         var searchInput = searchInput || ""; 
         this.clean = true;
-        this._clearAnnotator();
+
+        // the following cannot run in notes for there are no highlights
+        if($("#notesHolder").length === 0)
+            this._clearAnnotator();
         
         var annotator = this.annotator;
         var loadFromSearch = annotator.plugins.Store.options.loadFromSearch;
