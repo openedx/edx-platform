@@ -17,7 +17,8 @@ class AcceptanceTest(TestSuite):
         super(AcceptanceTest, self).__init__(*args, **kwargs)
         self.report_dir = Env.REPORT_DIR / 'acceptance'
         self.fasttest = kwargs.get('fasttest', False)
-        self.system = kwargs.get('system', None)
+        self.system = kwargs.get('system')
+        self.default_store = kwargs.get('default_store')
         self.extra_args = kwargs.get('extra_args', '')
 
     def __enter__(self):
@@ -35,9 +36,10 @@ class AcceptanceTest(TestSuite):
         report_file = self.report_dir /  "{}.xml".format(self.system)
         report_args = "--with-xunit --xunit-file {}".format(report_file)
 
-        cmd = ( 
-            "./manage.py {system} --settings acceptance harvest --traceback "
+        cmd = (
+            "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
             "--debug-mode --verbosity {verbosity} {report_args} {extra_args}".format(
+                default_store=self.default_store,
                 system=self.system,
                 verbosity=self.verbosity,
                 report_args=report_args,
@@ -65,24 +67,31 @@ class AcceptanceTestSuite(TestSuite):
         self.root = 'acceptance'
         self.db = Env.REPO_ROOT / 'test_root/db/test_edx.db'
         self.db_cache = Env.REPO_ROOT / 'common/test/db_cache/lettuce.db'
-        self.system = kwargs.get('system', None)
         self.fasttest = kwargs.get('fasttest', False)
 
-        if self.system:
-            self.subsuites = [
-                AcceptanceTest('{} acceptance'.format(self.system), **kwargs),
-            ]
+        if kwargs.get('system'):
+            systems = [kwargs['system']]
         else:
-            kwargs['system'] = 'lms'
-            lms = AcceptanceTest('lms acceptance', **kwargs)
-            kwargs['system'] = 'cms'
-            cms = AcceptanceTest('cms acceptance', **kwargs)
-            self.subsuites = [lms, cms]
+            systems = ['lms', 'cms']
+
+        if kwargs.get('default_store'):
+            stores = [kwargs['default_store']]
+        else:
+            # TODO fix Acceptance tests with Split (LMS-11300)
+            # stores = ['split', 'draft']
+            stores = ['draft']
+
+        self.subsuites = []
+        for system in systems:
+            for default_store in stores:
+                kwargs['system'] = system
+                kwargs['default_store'] = default_store
+                self.subsuites.append(AcceptanceTest('{} acceptance using {}'.format(system, default_store), **kwargs))
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()
-        test_utils.clean_test_files() 
-        
+        test_utils.clean_test_files()
+
         if not self.fasttest:
             self._setup_acceptance_db()
 
@@ -104,7 +113,7 @@ class AcceptanceTestSuite(TestSuite):
         if self.db.isfile():
             # Since we are using SQLLite, we can reset the database by deleting it on disk.
             self.db.remove()
-    
+
         if self.db_cache.isfile():
             # To speed up migrations, we check for a cached database file and start from that.
             # The cached database file should be checked into the repo
