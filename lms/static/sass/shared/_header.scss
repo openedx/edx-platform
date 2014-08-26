@@ -597,7 +597,11 @@ header.global-new {
           margin-top: -22px;
 
           &:hover, &:focus, &:active {
-            border-bottom-color: $courseware-button-border-color;
+            border-color: $courseware-navigation-color;
+          }
+
+          .view-login &:hover, &:focus, &:active {
+            border-color: $courseware-button-border-color;
           }
         }
       }
@@ -609,6 +613,11 @@ header.global-new {
   text-decoration: none;
   color: $courseware-hover-color;
   border-bottom-color: $courseware-border-bottom-color;
+}
+
+.view-login header.global-new .cta-login {
+  text-decoration: none;
+  color: $courseware-hover-color;
 }
 
 // marketing site design syncing
