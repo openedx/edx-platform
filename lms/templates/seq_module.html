@@ -1,6 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.masquerade import is_masquerading_as_student
+%>
+
+<% admin_view = user.is_staff and not is_masquerading_as_student(request.user) %>
 
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
+  % if admin_view:
   <nav class="sequence-nav">
     <ul class="sequence-nav-buttons">
       <li class="prev"><a role="button" href="#">${_('Previous')}</a></li>
@@ -35,6 +41,7 @@
       <li class="next"><a role="button" href="#">${_("Next")}</a></li>
     </ul>
   </nav>
+  % endif
 
   % for idx, item in enumerate(items):
   <div id="seq_contents_${idx}"
@@ -56,9 +63,11 @@
 
 
 
+% if admin_view:
 <script type="text/javascript">
   var sequenceNav;
   $(document).ready(function() {
     sequenceNav = new SequenceNav($('.sequence-nav'));
   });
 </script>
+% endif
