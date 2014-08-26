@@ -42,7 +42,26 @@ if Backbone?
     removeComment: (comment) ->
       thread = @get('thread')
       comments_count = parseInt(thread.get('comments_count'))
-      thread.set('comments_count', comments_count - 1 - comment.getCommentsCount())
+      @responsesRequest = DiscussionUtil.safeAjax
+        url: DiscussionUtil.urlFor('retrieve_single_thread', thread.get("commentable_id"), thread.id)
+        success: (data, textStatus, xhr) =>
+          thread.set("comments_count", data.content.comments_count)
+        error: (xhr) =>
+          if xhr.status == 404
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("The thread you selected has been deleted. Please select another thread.")
+            )
+          else if firstLoad
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading responses. Please reload the page.")
+            )
+          else
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading more responses. Please try again.")
+            )
       @trigger "comment:remove"
 
     resetComments: (children) ->
