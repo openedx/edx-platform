@@ -19,19 +19,16 @@ an email message when we update the edX Course Staff Release Notes.
 edX Studio
 ***************************************
 
-* This release further expands the recently enhanced Studio workflow for
-  publishing course content. Two more features that are designed to streamline
-  the workflow even further are now available on the **Course Outline** page.
+* This release further expands the recently redesigned Studio publishing
+  process. These features are available on the **Course Outline** page.
 
   * You can now publish all unpublished content in an entire section or
     subsection in a single step: on the **Course Outline** page, click the
     "Publish" icon.
 
      .. image:: images/outline-publish-icons.png
-       :alt: The Course Outline page showing an expanded section and an
-        expanded subsection that contain a unit with unpublished content. An
-        icon at all three levels is available to publish all content within
-        that level.
+       :alt: The Course Outline page showing an expanded section and subsection
+           with a unit that contains unpublished content.
 
     The "Publish" icon is also available for 
     individual units on the **Course Outline** page.
@@ -54,19 +51,18 @@ edX Studio
   Outline** page has been fixed. Dropping a unit into a collapsed subsection
   now adds the unit without changing any existing content in that subsection.
   (TNL-56)
-  
 
 *******************************
 edX Learning Management System
 *******************************
 
 * When you click **Sent Email History** on the Instructor Dashboard **Email**
-  page, the list of messages now identifies the sender of each message in a new
-  **Sent By** column.  
+  page, a new **Sent By** column in the list of messages identifies the sender
+  of each message.
   
-* The Instructor Dashboard no longer displays instructions on how to access an
-  older version. The **Revert to Legacy Dashboard** button is still available
-  to provide access if needed.
+* The Instructor Dashboard no longer displays instructions for accessing the
+  older version of the dashboard. However, users can still select **Revert to
+  Legacy Dashboard** to access the older version.
   
 * The computations for demographic distributions that are reported on the
   **Analytics** page of the Instructor Dashboard have been updated. The level
@@ -91,13 +87,13 @@ next few weeks:
   soon include a new Question post type. Students and course teams will also be
   able to filter posts to find unanswered questions easily.
   
-* A new user experience design for course discussions is coming! The new user
-  interface controls will provide consistent methods for taking action on
-  posts. A set of colorful badges will also make it easier to identify posts.
+* A new design for course discussions is coming! New controls will provide
+  consistent ways to take action on posts. Additionally, a set of colorful
+  badges will make identifying posts easier.
   
 * To make the process of registering faster and easier, students will soon be
   able to both register and log in to the edX.org and edX Edge web sites with
-  their existing Google or Facebook IDs.
+  their existing Google or Facebook accounts.
 
 **************************
 edX Documentation
@@ -121,17 +117,18 @@ The following documentation is available:
 
   Recent changes include: 
 
-  * The chapter on "Developing Your Course" has been updated to include the new
+  * The `Developing Your Course`_ chapter has been updated to include the new
     capabilities for publishing and hiding multiple units on the **Course
     Outline** page.
 
-  * A new chapter on "Creating Content Experiments" is now available.
+  * A new `Add Content Experiments to Your Course`_ chapter is now available.
 
   * An additional sample email message for students, announcing a new run of a
-    course, is now available in the "Course Launching Activities" section.
+    course, is now available. See `New Course Run Announcement`_.
 
   * Messages about the effect of changes to the grading policy, graded
-    subsections, or graded components in a live course are now included.
+    subsections, or graded components in a live course are now included in
+    relevant sections throughout the guide.
 
 * `Creating Peer Assessments`_
 
@@ -139,10 +136,10 @@ The following documentation is available:
 
    Recent changes include: 
 
-   * The "Tracking Logs" chapter now includes a section on open response
+   * The `Tracking Logs`_ chapter now includes a section on open response
      assessment events.
 
-   * Chapters on "Course Grading" and "XML format of drag and drop input" were
+   * The "Course Grading" and "XML format of drag and drop input" chapters were
      removed. These topics are covered in the `Building and Running an edX
      Course`_  guide.
 
