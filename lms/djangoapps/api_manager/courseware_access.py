@@ -57,7 +57,7 @@ def get_course_leaf_nodes(course_key, detached_categories):
     nodes = []
     verticals = modulestore().get_items(course_key, category='vertical')
     for vertical in verticals:
-        nodes.extend([unit.location for unit in vertical.get_children()
+        nodes.extend([unit for unit in vertical.children
                       if getattr(unit, 'category') not in detached_categories])
     return nodes
 
