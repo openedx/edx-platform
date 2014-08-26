@@ -24,19 +24,19 @@ set -e
 #
 #   `SHARD` is a number (1, 2, or 3) indicating which subset of the tests
 #       to build.  Currently, "lms-acceptance" and "bok-choy" each have two
-#       shards (1 and 2), "cms-acceptance" has three shards (1, 2, and 3), 
-#       and all the other test suites have one shard.  
-# 
-#       For the "bok-choy", the tests are put into shard groups using the nose 
-#       'attr' decorator (e.g. "@attr('shard_1')").  Currently, anything with 
+#       shards (1 and 2), "cms-acceptance" has three shards (1, 2, and 3),
+#       and all the other test suites have one shard.
+#
+#       For the "bok-choy", the tests are put into shard groups using the nose
+#       'attr' decorator (e.g. "@attr('shard_1')").  Currently, anything with
 #       the 'shard_1' attribute will run in the first shard.  All other bok-choy
 #       tests will run in shard 2.
-# 
-#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they 
+#
+#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they
 #       are decorated with "@shard_{}" (e.g. @shard_1 for the first shard).
 #       The lettuce tests must have a shard specified to be run in jenkins,
 #       as there is no shard that runs unspecified tests.
-# 
+#
 #
 #   Jenkins configuration:
 #
@@ -93,6 +93,13 @@ fi
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
 
+# If the environment variable 'SHARD' is not set, default to 'all'.
+# This could happen if you are trying to use this script from
+# jenkins and do not define 'SHARD' in your multi-config project.
+# Note that you will still need to pass a value for 'TEST_SUITE'
+# or else no tests will be executed.
+SHARD=${SHARD:="all"}
+
 case "$TEST_SUITE" in
 
     "quality")
@@ -117,24 +124,74 @@ END
         ;;
 
     "lms-acceptance")
-        paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
+        case "$SHARD" in
+
+            "all")
+                paver test_acceptance -s lms --extra_args="-v 3"
+                ;;
+
+            *)
+                paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
+                ;;
+        esac
         ;;
 
     "cms-acceptance")
-        paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
+        case "$SHARD" in
+
+            "all")
+                paver test_acceptance -s cms --extra_args="-v 3"
+                ;;
+
+            *)
+                paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
+                ;;
+        esac
         ;;
 
     "bok-choy")
         case "$SHARD" in
+
+            "all")
+                paver test_bokchoy
+                paver bokchoy_coverage
+                ;;
+
             "1")
                 paver test_bokchoy --extra_args="-a shard_1"
+                paver bokchoy_coverage
                 ;;
 
             "2")
-                paver test_bokchoy --extra_args="-a '!shard_1'"
-               ;;
+                paver test_bokchoy --extra_args="-a 'shard_2'"
+                paver bokchoy_coverage
+                ;;
+
+            "3")
+                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False"
+                paver bokchoy_coverage
+                ;;
+
+            # Default case because if we later define another bok-choy shard on Jenkins
+            # (e.g. Shard 4) in the multi-config project and expand this file
+            # with an additional case condition, old branches without that commit
+            # would not execute any tests on the worker assigned to that shard
+            # and thus their build would fail.
+            # This way they will just report 1 test executed and passed.
+            *)
+                # Need to create an empty test result so the post-build
+                # action doesn't fail the build.
+                # May be unnecessary if we changed the "Skip if there are no test files"
+                # option to True in the jenkins job definitions.
+                mkdir -p reports
+                cat > reports/bok_choy/xunit.xml <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
+<testcase classname="acceptance.tests" name="shard_placeholder" time="0.001"></testcase>
+</testsuite>
+END
+                ;;
         esac
-        paver bokchoy_coverage
         ;;
 
 esac
