@@ -28,6 +28,7 @@ class BokChoyTestSuite(TestSuite):
         self.cache = Env.BOK_CHOY_CACHE
         self.fasttest = kwargs.get('fasttest', False)
         self.test_spec = kwargs.get('test_spec', None)
+        self.default_store = kwargs.get('default_store')
         self.verbosity = kwargs.get('verbosity', 2)
         self.extra_args = kwargs.get('extra_args', '')
         self.ptests = kwargs.get('ptests', False)
@@ -64,17 +65,26 @@ class BokChoyTestSuite(TestSuite):
         self.cache.flush_all()
 
         sh(
-            "./manage.py lms --settings bok_choy loaddata --traceback"
-            " common/test/db_fixtures/*.json"
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py lms --settings bok_choy loaddata --traceback"
+            " common/test/db_fixtures/*.json".format(
+                default_store=self.default_store,
+            )
         )
 
         if self.imports_dir:
-            sh("./manage.py cms --settings=bok_choy import {}".format(self.imports_dir))
+            sh(
+                "DEFAULT_STORE={default_store}"
+                " ./manage.py cms --settings=bok_choy import {import_dir}".format(
+                    default_store=self.default_store,
+                    import_dir=self.imports_dir
+                )
+            )
 
         # Ensure the test servers are available
         msg = colorize('green', "Starting test servers...")
         print(msg)
-        bokchoy_utils.start_servers()
+        bokchoy_utils.start_servers(self.default_store)
 
         msg = colorize('green', "Waiting for servers to start...")
         print(msg)
@@ -101,6 +111,7 @@ class BokChoyTestSuite(TestSuite):
         # Construct the nosetests command, specifying where to save
         # screenshots and XUnit XML reports
         cmd = [
+            "DEFAULT_STORE={}".format(self.default_store),
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
             "HAR_DIR='{}'".format(self.har_dir),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),

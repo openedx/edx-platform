@@ -106,7 +106,7 @@ FEATURES = {
     'ADVANCED_SECURITY': False,
 
     # Modulestore to use for new courses
-    'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+    'DEFAULT_STORE_FOR_NEW_COURSE': None,
 }
 ENABLE_JASMINE = False
 
