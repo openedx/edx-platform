@@ -5,90 +5,82 @@
 <script type="text/javascript">
 
 function setup_debug(element_id, edit_link, staff_context){
-	$('#' + element_id + '_trig').leanModal(); 
-	$('#' + element_id + '_xqa_log').leanModal();		
-	$('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
+    $('#' + element_id + '_trig').leanModal(); 
+    $('#' + element_id + '_xqa_log').leanModal();        
+    $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
 
-	$("#" + element_id + "_history_trig").leanModal();
-	
-	$('#' + element_id + '_history_form').submit(
-		function () {
-			var username = $("#" + element_id + "_history_student_username").val();
-			var location = $("#" + element_id + "_history_location").val();
+    $("#" + element_id + "_history_trig").leanModal();
+    
+    $('#' + element_id + '_history_form').submit(
+        function () {
+            var username = $("#" + element_id + "_history_student_username").val();
+            var location = $("#" + element_id + "_history_location").val();
 
-			// This is a ridiculous way to get the course_id, but I'm not sure
-			// how to do it sensibly from within the staff debug code. 
-			// staff_problem_info.html is rendered through a wrapper to get_html
-			// that's injected by the code that adds the histogram -- it's all 
-			// kinda bizarre, and it remains awkward to simply ask "what course
-			// is this problem being shown in the context of."
-			var path_parts = window.location.pathname.split('/');
-			var course_id = path_parts[2] + "/" + path_parts[3] + "/" + path_parts[4];
-			$("#" + element_id + "_history_text").load('/courses/' + course_id + 
-				"/submission_history/" + username + "/" + location);
-			return false;
-		}
-	);
+            $("#" + element_id + "_history_text").load('/courses/' + "${unicode(course.id)}" + 
+                "/submission_history/" + username + "/" + location);
+            return false;
+        }
+    );
 }
 
 function sendlog(element_id, edit_link, staff_context){
 
-	var xqaLog = {
-			authkey: staff_context.xqa_key,
-			location: staff_context.location,
-			category : staff_context.category,
-			'username' : staff_context.user.username,
-			'return' : 'query',
-			format : 'html',
-			email : staff_context.user.email,
-			tag:$('#' + element_id + '_xqa_tag').val(),
-			entry: $('#' + element_id + '_xqa_entry').val()
-		};
-			
-	$.ajax({
-		url: '${xqa_server}/log',
-		type: 'GET',
-		contentType: 'application/json',
-		data: JSON.stringify(xqaLog),
-		crossDomain: true,
-		dataType: 'jsonp',
-		beforeSend: function (xhr) { 
-			xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
-		timeout : 1000,
-		success: function(result) {
-				$('#' + element_id + '_xqa_log_data').html(result);
-		},
-		error: function() {
-			alert('Error: cannot connect to XQA server');
-			console.log('error!');
-		}
-	});
-	return false;
+    var xqaLog = {
+            authkey: staff_context.xqa_key,
+            location: staff_context.location,
+            category : staff_context.category,
+            'username' : staff_context.user.username,
+            'return' : 'query',
+            format : 'html',
+            email : staff_context.user.email,
+            tag:$('#' + element_id + '_xqa_tag').val(),
+            entry: $('#' + element_id + '_xqa_entry').val()
+        };
+            
+    $.ajax({
+        url: '${xqa_server}/log',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaLog),
+        crossDomain: true,
+        dataType: 'jsonp',
+        beforeSend: function (xhr) { 
+            xhr.setRequestHeader ("Authorization", "Basic eHFhOmFnYXJ3YWw="); },
+        timeout : 1000,
+        success: function(result) {
+                $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server');
+            console.log('error!');
+        }
+    });
+    return false;
 };
 
 function getlog(element_id, staff_context){
 
-	var xqaQuery = {
-		authkey: staff_context.xqa_key,
-		location: staff_context.location,
-		format: 'html'
-	};
+    var xqaQuery = {
+        authkey: staff_context.xqa_key,
+        location: staff_context.location,
+        format: 'html'
+    };
 
-	$.ajax({
-		url: '${xqa_server}/query',
-		type: 'GET',
-		contentType: 'application/json',
-		data: JSON.stringify(xqaQuery),
-		crossDomain: true,
-		dataType: 'jsonp',
-		timeout : 1000,
-		success: function(result) {
-			$('#' + element_id + '_xqa_log_data').html(result);
-		},
-		error: function() {
-			alert('Error: cannot connect to XQA server');
-		}
-	});
+    $.ajax({
+        url: '${xqa_server}/query',
+        type: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(xqaQuery),
+        crossDomain: true,
+        dataType: 'jsonp',
+        timeout : 1000,
+        success: function(result) {
+            $('#' + element_id + '_xqa_log_data').html(result);
+        },
+        error: function() {
+            alert('Error: cannot connect to XQA server');
+        }
+    });
 
 
 };

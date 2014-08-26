@@ -3,9 +3,8 @@ Acceptance tests for Studio related to the split_test module.
 """
 
 import json
-import os
 import math
-from unittest import skip, skipUnless
+from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
@@ -18,7 +17,7 @@ from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.container import ContainerPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.utils import add_advanced_component, click_css
+from ..pages.studio.utils import add_advanced_component
 from ..pages.xblock.utils import wait_for_xblock_initialization
 from ..pages.lms.courseware import CoursewarePage
 
@@ -175,7 +174,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container = self.go_to_nested_container_page()
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
-    @skip("Disabling as this fails intermittently. STUD-2003")
     def test_delete_inactive_group(self):
         """
         Test deleting an inactive group.
@@ -644,9 +642,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         When I set a name
         And I delete the name of one of the groups and try to save
         Then I see error message "All groups must have a name"
-        When I delete the group without name and try to save
-        Then I see error message "Please add at least two groups."
-        When I add new group and try to save
+        When I delete all the groups and try to save
+        Then I see error message "There must be at least one group."
+        When I add a group and try to save
         Then I see the group configuration is saved successfully
         """
         def try_to_save_and_verify_error_message(message):
@@ -670,7 +668,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.name = "Name of the Group Configuration"
         config.groups[1].name = ''
         try_to_save_and_verify_error_message("All groups must have a name.")
-        config.groups[1].remove()
+        config.groups[0].remove()
+        config.groups[0].remove()
+        try_to_save_and_verify_error_message("There must be at least one group.")
         config.add_group()
 
         # Save the configuration
@@ -680,7 +680,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             config,
             name="Name of the Group Configuration",
             description="Description of the group configuration.",
-            groups=["Group A", "Group B"]
+            groups=["Group A"]
         )
 
     def test_group_configuration_empty_usage(self):
