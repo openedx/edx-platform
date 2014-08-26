@@ -42,6 +42,24 @@ For asynchronous conversation, we have several mailing lists on Google Groups:
 .. _openedx-analytics: https://groups.google.com/forum/#!forum/openedx-analytics
 .. _edx-code: https://groups.google.com/forum/#!forum/edx-code
 
+Byte-sized Tasks & Bugs
+-----------------------
+
+If you are contributing for the first time and want a gentle introduction, 
+or if you aren't sure what to work on, have a look at the list of
+`byte-sized bugs and tasks`_ in the tracker. These tasks are selected for their
+small size, and usually don't require a broad knowledge of the edX platform.
+It makes them good candidates for a first task, allowing you to focus on getting
+familiar with the development environment and the contribution process.
+
+.. _byte-sized bugs and tasks: https://openedx.atlassian.net/issues/?jql=labels%3Dbyte-sized%20and%20status%3D%22In%20Backlog%22
+
+Once you have identified a bug or task, `create an account on the tracker`_ and
+then comment on the ticket to indicate that you are working on it. Don't hesitate
+to ask clarifying questions on the ticket as needed, too, if anything is unclear.
+
+.. _create an account on the tracker: https://openedx.atlassian.net/admin/users/sign-up
+
 Step 1: Sign a Contribution Agreement
 =====================================
 
@@ -124,9 +142,9 @@ one of them will merge it for you. Your code will end up on the edX production
 servers in the next release, which usually which happens every week. Congrats!
 
 
-===========================
+############################
 Expectations We Have of You
-===========================
+############################
 
 By opening up a pull request, we expect the following things:
 
@@ -144,9 +162,9 @@ By opening up a pull request, we expect the following things:
 4. If you do not respond to comments on your pull request within 7 days, we
    will close it. You are welcome to re-open it when you are ready to engage.
 
-=========================
+############################
 Expections You Have of Us
-=========================
+############################
 
 1. Within a week of opening up a pull request, one of our community managers
    will triage it, starting the documented contribution process. (Please
