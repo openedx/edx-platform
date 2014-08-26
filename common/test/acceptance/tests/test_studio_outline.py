@@ -9,7 +9,7 @@ from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from ..pages.studio.utils import add_discussion
+from ..pages.studio.utils import add_discussion, drag, verify_ordering
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.staff_view import StaffPage
@@ -52,6 +52,76 @@ class CourseOutlineTest(StudioCourseTest):
                 )
             )
         )
+
+    def do_action_and_verify(self, outline_page, action, expected_ordering):
+        """
+        Perform the supplied action and then verify the resulting ordering.
+        """
+        if outline_page is None:
+            outline_page = self.course_outline_page.visit()
+
+        action(outline_page)
+        verify_ordering(self, outline_page, expected_ordering)
+
+        # Reload the page and expand all subsections to see that the change was persisted.
+        outline_page = self.course_outline_page.visit()
+        outline_page.q(css='.outline-item.outline-subsection.is-collapsed .ui-toggle-expansion').click()
+        verify_ordering(self, outline_page, expected_ordering)
+
+
+@attr('shard_2')
+class CourseOutlineDragAndDropTest(CourseOutlineTest):
+    """
+    Tests of drag and drop within the outline page.
+    """
+    __test__ = True
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Create a course with one section, two subsections, and four units
+        """
+        # with collapsed outline
+        self.chap_1_handle = 0
+        self.chap_1_seq_1_handle = 1
+
+        # with first sequential expanded
+        self.seq_1_vert_1_handle = 2
+        self.seq_1_vert_2_handle = 3
+        self.chap_1_seq_2_handle = 4
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', "1").add_children(
+                XBlockFixtureDesc('sequential', '1.1').add_children(
+                    XBlockFixtureDesc('vertical', '1.1.1'),
+                    XBlockFixtureDesc('vertical', '1.1.2')
+                ),
+                XBlockFixtureDesc('sequential', '1.2').add_children(
+                    XBlockFixtureDesc('vertical', '1.2.1'),
+                    XBlockFixtureDesc('vertical', '1.2.2')
+                )
+            )
+        )
+
+    def drag_and_verify(self, source, target, expected_ordering, outline_page=None):
+        self.do_action_and_verify(
+            outline_page,
+            lambda (outline): drag(outline, source, target),
+            expected_ordering
+        )
+
+    def test_drop_unit_in_collapsed_subsection(self):
+        """
+        Drag vertical "1.1.2" from subsection "1.1" into collapsed subsection "1.2" which already
+        have its own verticals.
+        """
+        course_outline_page = self.course_outline_page.visit()
+        # expand first subsection
+        course_outline_page.q(css='.outline-item.outline-subsection.is-collapsed .ui-toggle-expansion').first.click()
+
+        expected_ordering = [{"1": ["1.1", "1.2"]},
+                             {"1.1": ["1.1.1"]},
+                             {"1.2": ["1.1.2", "1.2.1", "1.2.2"]}]
+        self.drag_and_verify(self.seq_1_vert_2_handle, self.chap_1_seq_2_handle, expected_ordering, course_outline_page)
 
 
 @attr('shard_2')

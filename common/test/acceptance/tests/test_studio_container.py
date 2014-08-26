@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 from ..fixtures.course import XBlockFixtureDesc
 from ..pages.studio.component_editor import ComponentEditorView
 from ..pages.studio.html_component_editor import HtmlComponentEditorView
-from ..pages.studio.utils import add_discussion
+from ..pages.studio.utils import add_discussion, drag
 from ..pages.lms.courseware import CoursewarePage
 from ..pages.lms.staff_view import StaffPage
 
@@ -75,7 +75,7 @@ class DragAndDropTest(NestedVerticalTest):
 
     def drag_and_verify(self, source, target, expected_ordering):
         self.do_action_and_verify(
-            lambda (container): container.drag(source, target),
+            lambda (container): drag(container, source, target, 40),
             expected_ordering
         )
 
@@ -133,9 +133,9 @@ class DragAndDropTest(NestedVerticalTest):
 
             first_handle = self.group_a_item_1_handle
             # Drag newly added video component to top.
-            container.drag(first_handle + 3, first_handle)
+            drag(container, first_handle + 3, first_handle, 40)
             # Drag duplicated component to top.
-            container.drag(first_handle + 2, first_handle)
+            drag(container, first_handle + 2, first_handle, 40)
 
         duplicate_label = self.duplicate_label.format(self.group_a_item_1)
 

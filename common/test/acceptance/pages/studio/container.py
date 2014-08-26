@@ -6,9 +6,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from . import BASE_URL
 
-from selenium.webdriver.common.action_chains import ActionChains
-
-from utils import click_css, wait_for_notification, confirm_prompt
+from utils import click_css, confirm_prompt
 
 
 class ContainerPage(PageObject):
@@ -219,26 +217,6 @@ class ContainerPage(PageObject):
     def _get_xblocks(self, prefix=""):
         return self.q(css=prefix + XBlockWrapper.BODY_SELECTOR).map(
             lambda el: XBlockWrapper(self.browser, el.get_attribute('data-locator'))).results
-
-    def drag(self, source_index, target_index):
-        """
-        Gets the drag handle with index source_index (relative to the vertical layout of the page)
-        and drags it to the location of the drag handle with target_index.
-
-        This should drag the element with the source_index drag handle BEFORE the
-        one with the target_index drag handle.
-        """
-        draggables = self.q(css='.drag-handle')
-        source = draggables[source_index]
-        target = draggables[target_index]
-        action = ActionChains(self.browser)
-        # When dragging before the target element, must take into account that the placeholder
-        # will appear in the place where the target used to be.
-        placeholder_height = 40
-        action.click_and_hold(source).move_to_element_with_offset(
-            target, 0, placeholder_height
-        ).release().perform()
-        wait_for_notification(self)
 
     def duplicate(self, source_index):
         """
