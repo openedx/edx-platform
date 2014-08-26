@@ -1,12 +1,15 @@
 """
 Module containts utils specific for video_module but not for transcripts.
 """
+import time
 import json
 import logging
 import urllib
 import requests
+from urlparse import urlparse
 
 from requests.exceptions import RequestException
+from boto.s3.connection import S3Connection
 
 log = logging.getLogger(__name__)
 
@@ -68,3 +71,22 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
         return cdn_content['sources'][0]
     else:
         return None
+
+def get_s3_transient_url(video_url, aws_access_key, aws_secret_key, expires_in=10):
+    """
+    Get S3 transient video url.
+    """
+    conn = S3Connection(aws_access_key, aws_secret_key)
+    video_name = video_url.split('/')[-1]
+
+    # Get bucket name from video_url.
+    # Valid patterns for constructing S3 URLs:
+    # http(s)://<bucket>.s3.amazonaws.com/<object>
+    # http(s)://s3.amazonaws.com/<bucket>/<object>
+    url = urlparse(video_url)
+    if url.netloc.startswith('s3'):
+        bucket_name = url.path.split('/')[1]
+    else:
+        bucket_name = url.netloc.split('.')[0]
+
+    return conn.generate_url(expires_in, 'GET', bucket_name, video_name)

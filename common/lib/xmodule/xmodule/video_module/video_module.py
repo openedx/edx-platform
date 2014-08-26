@@ -36,7 +36,7 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
-from .video_utils import create_youtube_string, get_video_from_cdn
+from .video_utils import create_youtube_string, get_video_from_cdn, get_s3_transient_url
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -111,6 +111,14 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
+                if new_url:
+                    sources[index] = new_url
+
+        for index, source_url in enumerate(sources):
+            if (getattr(self, 'aws_access_key', False) and
+                getattr(self, 'aws_secret_key', False) and
+                'amazonaws.com' in source_url):
+                new_url = get_s3_transient_url(source_url, self.aws_access_key, self.aws_secret_key)
                 if new_url:
                     sources[index] = new_url
 
