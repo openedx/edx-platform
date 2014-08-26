@@ -113,10 +113,6 @@ class BulkWriteRecord(object):
         self.structures = {}
         self.structures_in_db = set()
 
-        # This stores the set of branches for whom version_structure
-        # has been called
-        self.dirty_branches = set()
-
     @property
     def active(self):
         """
@@ -143,13 +139,37 @@ class BulkWriteRecord(object):
         """
         return self._active_count == 1
 
+    # TODO: This needs to track which branches have actually been modified/versioned,
+    # so that copying one branch to another doesn't update the original branch.
+    @property
+    def dirty_branches(self):
+        """
+        Return a list of which branch version ids differ from what was stored
+        in the database at the beginning of this bulk operation.
+        """
+        # If no course index has been set, then no branches have changed
+        if self.index is None:
+            return []
+
+        # If there was no index in the database to start with, then all branches
+        # are dirty by definition
+        if self.initial_index is None:
+            return self.index.get('versions', {}).keys()
+
+        # Return branches whose ids differ between self.index and self.initial_index
+        return [
+            branch
+            for branch, _id
+            in self.index.get('versions', {}).items()
+            if self.initial_index.get('versions', {}).get(branch) != _id
+        ]
+
     def structure_for_branch(self, branch):
         return self.structures.get(self.index.get('versions', {}).get(branch))
 
     def set_structure_for_branch(self, branch, structure):
         self.index.get('versions', {})[branch] = structure['_id']
         self.structures[structure['_id']] = structure
-        self.dirty_branches.add(branch)
 
     def __repr__(self):
         return u"BulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
