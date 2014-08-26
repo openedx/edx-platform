@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student Views
 """
@@ -67,6 +68,8 @@ from courseware.access import has_access
 from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
+from student.validators import validate_cedula
+from cities.models import City
 import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
@@ -271,6 +274,7 @@ def _cert_info(user, course, cert_status):
     }
 
     default_status = 'processing'
+    #default_status = 'ready'
 
     default_info = {'status': default_status,
                     'show_disabled_download_button': False,
@@ -1163,16 +1167,34 @@ def _do_create_account(post_vars, extended_profile=None):
     password_history_entry.create(user)
 
     registration.register(user)
+    city = City.objects.get(id=post_vars['city_id'])
 
     profile = UserProfile(user=user)
     profile.name = post_vars['name']
     profile.level_of_education = post_vars.get('level_of_education')
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
-    profile.city = post_vars.get('city')
+#    profile.city = post_vars.get('city')
     profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
+    profile.cedula = post_vars.get('cedula')
+    profile.city = city
 
+    city = City.objects.get(id=post_vars['city_id'])
+    profile.city = city
+
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = "ID Incorrecto"
+            js['field'] = 'cedula'
+            js['sucess'] = False
+            return JsonResponse(js, status=400)
+
+    profile.cedula = post_vars['cedula']
+        
     # add any extended profile information in the denormalized 'meta' field in the profile
     if extended_profile:
         profile.meta = json.dumps(extended_profile)
@@ -1305,6 +1327,16 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
             js['field'] = field_name
             return JsonResponse(js, status=400)
+    
+    city = City.objects.get(id=post_vars['city_id'])
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
+        try:
+            validate_cedula(post_vars['cedula'])
+        except ValidationError:
+            js['value'] = _("A valid ID is required.").format(field=a)
+            js['field'] = 'cedula'
+            return HttpResponse(json.dumps(js))        
 
         max_length = 75
         if field_name == 'username':
@@ -2015,3 +2047,18 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    Verificar informacion academica de estudiante
+    """
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
+    return JsonResponse(data)

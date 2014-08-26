@@ -2,9 +2,10 @@
 <%! from microsite_configuration import microsite %>
 
 <%inherit file="main.html" />
-
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
+
+<%include file="autocomplete.html"/>
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
@@ -193,6 +194,44 @@
           </li>
 
           % endif
+
+          <li class="field required text" id="field-username">
+            <label for="username">${_('Public Username')}</label>
+            <input id="username" type="text" name="username" value="${username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
+          </li>
+          <li class="field-group">
+            <div class="field required select" id="type-id">
+              <label for="type_id">${_("TYPE ID")}</label>
+              <select id="type-id" name="type_id">
+                <option value="cedula">CEDULA</option>
+                <option value="pasaporte">PASAPORTE</option>
+              </select>
+            </div>
+          </li>
+          <li class="field-group">
+            <div class="field required text" id="field-cedula">
+              <label for="cedula-label">Cedula / Pasaporte</label>
+              <input id="cedula" type="text" name="cedula" value="" placeholder="Ejemplo: 0102030405" required aria-required="true" aria-describedby="cedula-tip"/>
+              <span class="tip tip-input" id="cedula-tip">No ingrese caracteres especiales.</span>
+            </div>
+            <div class="field text" id="field-senescyt">
+              <label for="senescyt">Registro Senescyt</label>
+              <input id="number_senescyt" type="text" name="senescyt" value="" readonly aria-describedby="senescyt-tip"/>
+              <span class="tip tip-input" id="senescyt-tip">Si tiene título de tercer nivel o superior.</span>
+            </div>
+          </li>
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="${name}" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+          </li>
+          <li class="field required text" id="field-city">
+            <label for="city">${_('City')}</label>
+            <input id="city" type="text" name="city" value="" placeholder="${_('example: Quito, Pichincha, Ecuador')}" required aria-required="true" aria-describedby="city-tip"/>
+            <span class="tip tip-input" id="city-tip">Debe <strong>seleccionar</strong>su ciudad de la lista que se desplega<strong>cuando digite un texto.</strong></span>
+            <input type="hidden" name="city_id" value="" id="city_id"/>
+          </li>
         </ol>
 
         % else:

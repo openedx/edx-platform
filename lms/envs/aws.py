@@ -42,7 +42,8 @@ TEMPLATE_DEBUG = False
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = ''#'storages.backends.s3boto.S3BotoStorage'
+MEDIA_ROOT = '/edx/var/edxapp/uploads'
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
@@ -439,3 +440,7 @@ OPTIMIZELY_PROJECT_ID = AUTH_TOKENS.get('OPTIMIZELY_PROJECT_ID', OPTIMIZELY_PROJ
 
 #### Course Registration Code length ####
 REGISTRATION_CODE_LENGTH = ENV_TOKENS.get('REGISTRATION_CODE_LENGTH', 8)
+
+import newrelic.agent
+newrelic.agent.initialize('/var/tmp/newrelic-cms.ini')
+

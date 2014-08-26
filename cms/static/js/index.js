@@ -32,6 +32,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             var org = $newCourseForm.find('.new-course-org').val();
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
+            var level_of_education = $newCourseForm.find('#new-course-education').val()
 
             course_info = {
                 org: org,
@@ -54,7 +55,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             $('.wrapper-create-course').removeClass('is-shown');
             // Clear out existing fields and errors
             _.each(
-                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+                ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run', '#new-course-education'],
                 function (field) {
                     $(field).val('');
                 }

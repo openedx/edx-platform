@@ -51,8 +51,12 @@ CONTENTSTORE = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "edx.db",
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'edx',
+        'USER': 'vagrant',
+        'PASSWORD': 'vagrant',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
     }
 }
 
@@ -140,13 +144,13 @@ INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar.panels.sql.SQLDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
 
     #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
     #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
@@ -176,10 +180,20 @@ SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
     FEATURES['SEGMENT_IO'] = True
 
+CERT_QUEUE = 'certificates'
 
+XQUEUE_INTERFACE = {
+    "url": "http://127.0.0.1:3032",
+    "django_auth": {
+        "username": "lms",
+        "password": "abcd"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
     from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
+CERT_QUEUE = "certificates"

@@ -68,7 +68,7 @@ FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False,
+    'ENABLE_CREATOR_GROUP': True,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
@@ -145,7 +145,7 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-EDX_ROOT_URL = ''
+EDX_ROOT_URL = 'beta.iaen.edu.ec'
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
 LOGIN_URL = EDX_ROOT_URL + '/signin'
@@ -271,7 +271,7 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8001"
+SITE_NAME = "upex.edu.ec"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 
@@ -303,9 +303,8 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es-419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True
@@ -565,6 +564,9 @@ INSTALLED_APPS = (
     # Monitoring signals
     'monitoring',
 
+    # Cities UPEx
+    'cities',
+
     # Course action state
     'course_action_state',
 
@@ -661,6 +663,19 @@ for app_name in OPTIONAL_APPS:
 ### ADVANCED_SECURITY_CONFIG
 # Empty by default
 ADVANCED_SECURITY_CONFIG = {}
+
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70
+
+RAVEN_CONFIG = {
+    'dsn': 'https://59734eda618a43afa2179d781549edeb:311de1f2e01247f284f3f72fbcd5844f@sentry.upex.edu.ec/3',
+}
+
+INSTALLED_APPS = INSTALLED_APPS + (
+    'raven.contrib.django.raven_compat',
+)
+
+
 
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'

@@ -533,9 +533,8 @@ define([
         var clickDeleteItem;
 
         beforeEach(function() {
-            view_helpers.installTemplates([
-                'group-configuration-edit', 'group-configuration-details'
-            ], true);
+            view_helpers.installTemplate('group-configuration-edit', true);
+            view_helpers.installTemplate('group-configuration-details');
             this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection([ this.model ]);
             this.collection.url = '/group_configurations';

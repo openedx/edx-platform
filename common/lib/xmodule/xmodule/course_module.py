@@ -157,6 +157,106 @@ class TextbookList(List):
                 continue
         return json_data
 
+class Syllabus(object):
+    def __init__(self, title, topic):
+
+        self.title = title
+        self.topic = topic
+
+    @lazy
+    def start_page(self):
+        return int(self.table_of_contents[0].attrib['page'])
+
+    @lazy
+    def end_page(self):
+        # The last page should be the last element in the table of contents,
+        # but it may be nested. So recurse all the way down the last element
+        last_el = self.table_of_contents[-1]
+        while last_el.getchildren():
+            last_el = last_el[-1]
+
+        return int(last_el.attrib['page'])
+
+    @lazy
+    def table_of_contents(self):
+        """
+        Accesses the syllabus table of contents (default name "toc.xml") at the URL self.book_url
+
+        Returns XML tree representation of the table of contents
+        """
+        toc_url = self.topic + 'toc.xml'
+
+        # cdodge: I've added this caching of TOC because in Mongo-backed instances (but not Filesystem stores)
+        # course modules have a very short lifespan and are constantly being created and torn down.
+        # Since this module in the __init__() method does a synchronous call to AWS to get the TOC
+        # this is causing a big performance problem. So let's be a bit smarter about this and cache
+        # each fetch and store in-mem for 10 minutes.
+        # NOTE: I have to get this onto sandbox ASAP as we're having runtime failures. I'd like to swing back and
+        # rewrite to use the traditional Django in-memory cache.
+        try:
+            # see if we already fetched this
+            if toc_url in _cached_toc:
+                (table_of_contents, timestamp) = _cached_toc[toc_url]
+                age = datetime.now(UTC) - timestamp
+                # expire every 10 minutes
+                if age.seconds < 600:
+                    return table_of_contents
+        except Exception as err:
+            pass
+
+        # Get the table of contents from S3
+        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        try:
+            r = requests.get(toc_url)
+        except Exception as err:
+            msg = 'Error %s: Unable to retrieve textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
+
+        # TOC is XML. Parse it
+        try:
+            table_of_contents = etree.fromstring(r.text)
+        except Exception as err:
+            msg = 'Error %s: Unable to parse XML for textbook table of contents at %s' % (err, toc_url)
+            log.error(msg)
+            raise Exception(msg)
+
+        return table_of_contents
+
+    def __eq__(self, other):
+        return (self.title == other.title and
+                self.topic == other.topic)
+
+    def __ne__(self, other):
+        return not self == other
+
+class SyllabusList(List):
+    def from_json(self, values):
+        syllabuses = []
+        for title, topic  in values:
+            try:
+                syllabuses.append(Syllabus(title, topic))
+            except:
+                # If we can't get to S3 (e.g. on a train with no internet), don't break
+                # the rest of the courseware.
+                log.exception("Couldn't load syllabus ({0}, {1})".format(title, topic))
+                continue
+
+        return syllabuses
+
+    def to_json(self, values):
+        json_data = []
+        for val in values:
+            if isinstance(val, Syllabus):
+                json_data.append((val.title, val.topic))
+            elif isinstance(val, tuple):
+                json_data.append(val)
+            elif isinstance(val , dict):
+                json_data.append(val)
+            else:
+                continue
+        return json_data
+
 
 class CourseFields(object):
     lti_passports = List(
@@ -167,6 +267,8 @@ class CourseFields(object):
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
 
+    syllabuses = SyllabusList(help="List of pairs of (title, topic) for syllabus used in this course",
+                             default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
@@ -670,9 +772,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
+        syllabuses = []
         for textbook in xml_object.findall("textbook"):
             textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
+
+        for syllabus in xml_object.findall("syllabus"):
+            syllabuses.append((syllabus.get('title'), syllabus.get('topic')))
+            xml_object.remove(syllabus)
 
         # Load the wiki tag if it exists
         wiki_slug = None
@@ -684,6 +791,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         definition, children = super(CourseDescriptor, cls).definition_from_xml(xml_object, system)
 
         definition['textbooks'] = textbooks
+        definition['syllabuses'] = syllabuses
         definition['wiki_slug'] = wiki_slug
 
         return definition, children
@@ -703,6 +811,14 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             wiki_xml_object = etree.Element('wiki')
             wiki_xml_object.set('slug', self.wiki_slug)
             xml_object.append(wiki_xml_object)
+
+        if len(self.syllabuses) > 0:
+            syllabus_xml_object = etree.Element('syllabus')
+            for syllabus in self.syllabus:
+                syllabus_xml_object.set('title', syllabus.title)
+                syllabus_xml_object.set('topic', syllabus.topic)
+
+            xml_object.append(syllabus_xml_object)    
 
         return xml_object
 

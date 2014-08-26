@@ -128,6 +128,9 @@ selenium==2.39.0
 splinter==0.5.4
 testtools==0.9.34
 
+#sentry
+raven==3.5.2
+
 # Used for Segment.io analytics
 analytics-python==0.4.4
 
@@ -140,3 +143,7 @@ git+https://github.com/mitocw/django-cas.git
 edx-submissions==0.0.6
 
 -e git+https://github.com/pmitros/django-pyfs.git@514607d78535fd80bfd23184cd292ee5799b500d#egg=djpyfs
+
+#suds WS
+git+https://github.com/ovnicraft/suds.git
+

@@ -120,15 +120,12 @@ define([
                         'groups': [
                             {
                                 'version': 1,
-                                'order': 0,
                                 'name': 'Group 1'
                             }, {
                                 'version': 1,
-                                'order': 1,
                                 'name': 'Group 2'
                             }
-                        ],
-                        'usage': []
+                        ]
                     },
                     model = new GroupConfigurationModel(
                         serverModelSpec, { parse: true }
