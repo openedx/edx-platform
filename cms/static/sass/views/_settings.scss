@@ -899,4 +899,40 @@
   .content-supplementary {
     width: flex-grid(3, 12);
   }
+  
+  .wrapper-modal-window {
+    
+    .validation-error-modal-content {
+      
+      .error-header {
+        p {
+          strong {
+            color: $error-red;
+          }
+        }
+      }
+      
+      hr {
+        margin: 25px 0;
+      }
+      
+      .error-list {
+        .error-item {
+          .error-item-title {
+            color: $error-red;
+          }
+          
+          .error-item-message {
+            width:100%;
+            border: none;
+            resize: none;
+          
+            &:focus {
+              outline: 0;
+            }
+          }
+        }
+      }  
+    }
+  }
 }
