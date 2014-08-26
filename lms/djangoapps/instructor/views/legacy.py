@@ -51,7 +51,7 @@ from django_comment_common.models import (
 )
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
-from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course
+from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course, add_block_ids
 from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,
@@ -921,7 +921,9 @@ def instructor_dashboard(request, course_id):
         if res.status_code == codes.OK:
             # WARNING: do not use req.json because the preloaded json doesn't
             # preserve the order of the original record (hence OrderedDict).
-            return json.loads(res.content, object_pairs_hook=OrderedDict)
+            payload = json.loads(res.content, object_pairs_hook=OrderedDict)
+            add_block_ids(payload)
+            return payload
         else:
             log.error("Error fetching %s, code: %s, msg: %s",
                       url, res.status_code, res.content)

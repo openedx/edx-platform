@@ -14,6 +14,7 @@ from courseware.models import StudentModule
 from xmodule.fields import Date
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.keys import UsageKey
 
 from bulk_email.models import CourseAuthorization
 
@@ -309,3 +310,13 @@ def dump_student_extensions(course, student):
         "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
+
+
+def add_block_ids(payload):
+    """
+    rather than manually parsing block_ids from module_ids on the client, pass the block_ids explicitly in the payload
+    """
+    if 'data' in payload:
+        for ele in payload['data']:
+            if 'module_id' in ele:
+                ele['block_id'] = UsageKey.from_string(ele['module_id']).block_id

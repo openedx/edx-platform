@@ -77,6 +77,7 @@ from .tools import (
     set_due_date_extension,
     strip_if_string,
     bulk_email_is_enabled_for_course,
+    add_block_ids,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
@@ -1545,8 +1546,11 @@ def proxy_legacy_analytics(request, course_id):
         return HttpResponse("Error requesting from analytics server.", status=500)
 
     if res.status_code is 200:
+        payload = json.loads(res.content)
+        add_block_ids(payload)
+        content = json.dumps(payload)
         # return the successful request content
-        return HttpResponse(res.content, content_type="application/json")
+        return HttpResponse(content, content_type="application/json")
     elif res.status_code is 404:
         # forward the 404 and content
         return HttpResponse(res.content, content_type="application/json", status=404)
