@@ -39,6 +39,7 @@ update_module_store_settings(
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
     },
+    default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 
 # Configure the LMS to use our stub XQueue implementation

@@ -34,6 +34,7 @@ def convert_module_store_setting_if_needed(module_store_setting):
     if module_store_setting is None:
         return None
 
+    # Convert to Mixed, if needed
     if module_store_setting['default']['ENGINE'] != 'xmodule.modulestore.mixed.MixedModuleStore':
         warnings.warn("Direct access to a modulestore is deprecated. Please use MixedModuleStore.", DeprecationWarning)
 
@@ -54,7 +55,8 @@ def convert_module_store_setting_if_needed(module_store_setting):
         )
         module_store_setting = new_module_store_setting
 
-    elif isinstance(module_store_setting['default']['OPTIONS']['stores'], dict):
+    # Convert from dict, if needed
+    elif isinstance(get_mixed_stores(module_store_setting), dict):
         warnings.warn(
             "Using a dict for the Stores option in the MixedModuleStore is deprecated.  Please use a list instead.",
             DeprecationWarning
@@ -62,13 +64,13 @@ def convert_module_store_setting_if_needed(module_store_setting):
 
         # convert old-style (unordered) dict to (an ordered) list
         module_store_setting['default']['OPTIONS']['stores'] = convert_old_stores_into_list(
-            module_store_setting['default']['OPTIONS']['stores']
+            get_mixed_stores(module_store_setting)
         )
+        assert isinstance(get_mixed_stores(module_store_setting), list)
 
-        assert isinstance(module_store_setting['default']['OPTIONS']['stores'], list)
-
+    # Add Split, if needed
     # If Split is not defined but the DraftMongoModuleStore is configured, add Split as a copy of Draft
-    mixed_stores = module_store_setting['default']['OPTIONS']['stores']
+    mixed_stores = get_mixed_stores(module_store_setting)
     is_split_defined = any((store['ENGINE'].endswith('.DraftVersioningModuleStore')) for store in mixed_stores)
     if not is_split_defined:
         # find first setting of mongo store
@@ -95,10 +97,14 @@ def update_module_store_settings(
         doc_store_settings=None,
         module_store_options=None,
         xml_store_options=None,
+        default_store=None,
 ):
     """
     Updates the settings for each store defined in the given module_store_setting settings
     with the given doc store configuration and options, overwriting existing keys.
+
+    If default_store is specified, the given default store is moved to the top of the
+    list of stores.
     """
     for store in module_store_setting['default']['OPTIONS']['stores']:
         if store['NAME'] == 'xml':
@@ -106,3 +112,20 @@ def update_module_store_settings(
         else:
             module_store_options and store['OPTIONS'].update(module_store_options)
             doc_store_settings and store['DOC_STORE_CONFIG'].update(doc_store_settings)
+
+    if default_store:
+        mixed_stores = get_mixed_stores(module_store_setting)
+        for store in mixed_stores:
+            if store['NAME'] == default_store:
+                # move the found store to the top of the list
+                mixed_stores.remove(store)
+                mixed_stores.insert(0, store)
+                return
+        raise Exception("Could not find setting for requested default store: {}".format(default_store))
+
+
+def get_mixed_stores(mixed_setting):
+    """
+    Helper for accessing stores in a configuration setting for the Mixed modulestore.
+    """
+    return mixed_setting["default"]["OPTIONS"]["stores"]
