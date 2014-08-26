@@ -33,8 +33,6 @@ The following sections of this document do not specifically pertain to researche
    :maxdepth: 2
 
    course_data_formats/course_xml.rst
-   course_data_formats/grading.rst
-   course_data_formats/drag_and_drop/drag_and_drop_input.rst
    course_data_formats/graphical_slider_tool/graphical_slider_tool.rst
    course_data_formats/symbolic_response.rst
 
