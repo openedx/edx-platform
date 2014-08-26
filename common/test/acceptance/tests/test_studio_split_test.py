@@ -3,9 +3,8 @@ Acceptance tests for Studio related to the split_test module.
 """
 
 import json
-import os
 import math
-from unittest import skip, skipUnless
+from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
@@ -18,7 +17,7 @@ from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
 from ..pages.studio.settings_advanced import AdvancedSettingsPage
 from ..pages.studio.container import ContainerPage
 from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.utils import add_advanced_component, click_css
+from ..pages.studio.utils import add_advanced_component
 from ..pages.xblock.utils import wait_for_xblock_initialization
 from ..pages.lms.courseware import CoursewarePage
 
@@ -175,7 +174,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
         container = self.go_to_nested_container_page()
         self.verify_groups(container, ['alpha', 'gamma'], ['beta'])
 
-    @skip("Disabling as this fails intermittently. STUD-2003")
     def test_delete_inactive_group(self):
         """
         Test deleting an inactive group.
