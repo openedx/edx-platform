@@ -1610,14 +1610,18 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        total_possible_completions = len(get_course_leaf_nodes(course_key,
-                                                               ['discussion-course', 'group-project']))
+        detached_categories = ['discussion-course', 'group-project', 'discussion-forum']
+        total_possible_completions = len(get_course_leaf_nodes(course_key, detached_categories))
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        cat_list = [Q(content_id__contains=item.strip()) for item in detached_categories]
+        cat_list = reduce(lambda a, b: a | b, cat_list)
+
         queryset = CourseModuleCompletion.objects.filter(course_id=course_key)\
-            .exclude(user__in=exclude_users)
+            .exclude(user__in=exclude_users).exclude(cat_list)
         total_actual_completions = queryset.filter(user__is_active=True).count()
         if user_id:
-            user_queryset = CourseModuleCompletion.objects.filter(course_id=course_key, user__id=user_id)
+            user_queryset = CourseModuleCompletion.objects.filter(course_id=course_key, user__id=user_id)\
+                .exclude(cat_list)
             user_completions = user_queryset.count()
             user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
             user_time_completed = user_time_completed['time_completed'] or datetime.now()
