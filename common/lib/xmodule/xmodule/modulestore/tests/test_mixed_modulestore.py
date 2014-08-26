@@ -9,7 +9,7 @@ import datetime
 from pytz import UTC
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import InvalidVersionError
 
@@ -988,11 +988,11 @@ class TestMixedModuleStore(unittest.TestCase):
         )
         self.assertIsNotNone(draft_xblock)
 
-    @ddt.data(('draft', 1, 0), ('split', 4, 0))
+    @ddt.data(('draft', 1, 0), ('split', 2, 0))
     @ddt.unpack
-    def test_compute_publish_state(self, default_ms, max_find, max_send):
+    def test_has_published_version(self, default_ms, max_find, max_send):
         """
-        Test the compute_publish_state method
+        Test the has_published_version method
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
@@ -1002,37 +1002,33 @@ class TestMixedModuleStore(unittest.TestCase):
         item_location = item.location
         mongo_store = self.store._get_modulestore_for_courseid(self._course_key_from_string(self.MONGO_COURSEID))
         with check_mongo_calls(mongo_store, max_find, max_send):
-            self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+            self.assertFalse(self.store.has_published_version(item))
 
         # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+        self.assertTrue(self.store.has_published_version(item))
 
         # Public -> Private
         self.store.unpublish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.private)
+        self.assertFalse(self.store.has_published_version(item))
 
         # Private -> Public
         self.store.publish(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.public)
+        self.assertTrue(self.store.has_published_version(item))
 
         # Public -> Draft with NO changes
-        # Note: This is where Split and Mongo differ
         self.store.convert_to_draft(item_location, self.user_id)
         item = self.store.get_item(item_location)
-        self.assertEquals(
-            self.store.compute_publish_state(item),
-            PublishState.draft if default_ms == 'draft' else PublishState.public
-        )
+        self.assertTrue(self.store.has_published_version(item))
 
         # Draft WITH changes
         item.display_name = 'new name'
         item = self.store.update_item(item, self.user_id)
         self.assertTrue(self.store.has_changes(item))
-        self.assertEquals(self.store.compute_publish_state(item), PublishState.draft)
+        self.assertTrue(self.store.has_published_version(item))
 
     @ddt.data('draft', 'split')
     def test_auto_publish(self, default_ms):
@@ -1047,47 +1043,47 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # test create_course to make sure we are autopublishing
         test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
-        self.assertEqual(self.store.compute_publish_state(test_course), PublishState.public)
+        self.assertTrue(self.store.has_published_version(test_course))
 
         test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
         chapter = self.store.create_item(self.user_id, test_course_key, 'chapter', 'Overview')
-        self.assertEqual(self.store.compute_publish_state(chapter), PublishState.public)
+        self.assertTrue(self.store.has_published_version(chapter))
 
         chapter_location = chapter.location
 
         # test create_child of direct-only category to make sure we are autopublishing
         sequential = self.store.create_child(self.user_id, chapter_location, 'sequential', 'Sequence')
-        self.assertEqual(self.store.compute_publish_state(sequential), PublishState.public)
+        self.assertTrue(self.store.has_published_version(sequential))
 
         # test update_item of direct-only category to make sure we are autopublishing
         sequential.display_name = 'sequential1'
         sequential = self.store.update_item(sequential, self.user_id)
-        self.assertEqual(self.store.compute_publish_state(sequential), PublishState.public)
+        self.assertTrue(self.store.has_published_version(sequential))
 
         # test delete_item of direct-only category to make sure we are autopublishing
         self.store.delete_item(sequential.location, self.user_id, revision=ModuleStoreEnum.RevisionOption.all)
         chapter = self.store.get_item(chapter.location.for_branch(None))
-        self.assertEqual(self.store.compute_publish_state(chapter), PublishState.public)
+        self.assertTrue(self.store.has_published_version(chapter))
 
         # test create_child of NOT direct-only category to make sure we aren't autopublishing
         problem_child = self.store.create_child(self.user_id, chapter_location, 'problem', 'Problem_Child')
-        self.assertEqual(self.store.compute_publish_state(problem_child), PublishState.private)
+        self.assertFalse(self.store.has_published_version(problem_child))
 
         # test create_item of NOT direct-only category to make sure we aren't autopublishing
         problem_item = self.store.create_item(self.user_id, test_course_key, 'problem', 'Problem_Item')
-        self.assertEqual(self.store.compute_publish_state(problem_item), PublishState.private)
+        self.assertFalse(self.store.has_published_version(problem_item))
 
         # test update_item of NOT direct-only category to make sure we aren't autopublishing
         problem_item.display_name = 'Problem_Item1'
         problem_item = self.store.update_item(problem_item, self.user_id)
-        self.assertEqual(self.store.compute_publish_state(problem_item), PublishState.private)
+        self.assertFalse(self.store.has_published_version(problem_item))
 
         # test delete_item of NOT direct-only category to make sure we aren't autopublishing
         self.store.delete_item(problem_child.location, self.user_id)
         chapter = self.store.get_item(chapter.location.for_branch(None))
-        self.assertEqual(self.store.compute_publish_state(chapter), PublishState.public)
+        self.assertTrue(self.store.has_published_version(chapter))
 
     @ddt.data('draft', 'split')
     def test_get_courses_for_wiki_shared(self, default_ms):

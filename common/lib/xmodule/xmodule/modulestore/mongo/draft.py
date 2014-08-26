@@ -11,7 +11,7 @@ import logging
 
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError, DuplicateCourseError
 from xmodule.modulestore.mongo.base import (
     MongoModuleStore, MongoRevisionKey, as_draft, as_published,
@@ -591,13 +591,13 @@ class DraftModuleStore(MongoModuleStore):
 
     def has_changes(self, xblock):
         """
-        Check if the xblock or its children have been changed since the last publish.
+        Check if the subtree rooted at xblock has any drafts and thus may possibly have changes
         :param xblock: xblock to check
-        :return: True if the draft and published versions differ
+        :return: True if there are any drafts anywhere in the subtree under xblock (a weaker
+            condition than for other stores)
         """
-
         # don't check children if this block has changes (is not public)
-        if self.compute_publish_state(xblock) != PublishState.public:
+        if getattr(xblock, 'is_draft', False):
             return True
         # if this block doesn't have changes, then check its children
         elif xblock.has_children:
@@ -771,25 +771,18 @@ class DraftModuleStore(MongoModuleStore):
 
         return queried_children
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns whether this xblock is draft, public, or private.
-
-        Returns:
-            PublishState.draft - content is in the process of being edited, but still has a previous
-                version deployed to LMS
-            PublishState.public - content is locked and deployed to LMS
-            PublishState.private - content is editable and not deployed to LMS
+        Returns True if this xblock has an existing published version regardless of whether the
+        published version is up to date.
         """
         if getattr(xblock, 'is_draft', False):
             published_xblock_location = as_published(xblock.location)
             try:
                 xblock.runtime.lookup_item(published_xblock_location)
             except ItemNotFoundError:
-                return PublishState.private
-            return PublishState.draft
-        else:
-            return PublishState.public
+                return False
+        return True
 
     def _verify_branch_setting(self, expected_branch_setting):
         """

@@ -24,7 +24,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import ModuleStoreEnum, PublishState, EdxJSONEncoder
+from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
@@ -387,8 +387,7 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
     # then this item should be republished. This is used by staff locking to ensure that changing the draft
     # value of the staff lock will also update the published version, but only at the unit level.
     if publish == 'republish' and xblock.category not in DIRECT_ONLY_CATEGORIES:
-        published = modulestore().compute_publish_state(xblock) != PublishState.private
-        if published:
+        if modulestore().has_published_version(xblock):
             publish = 'make_public'
 
     # Make public after updating the xblock, in case the caller asked for both an update and a publish.
@@ -659,7 +658,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
         visibility_state = None
-    published = modulestore().compute_publish_state(xblock) != PublishState.private
+    published = modulestore().has_published_version(xblock)
 
     xblock_info = {
         "id": unicode(xblock.location),

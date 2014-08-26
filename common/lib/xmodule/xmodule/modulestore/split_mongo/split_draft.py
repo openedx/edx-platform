@@ -3,7 +3,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
 from split import SplitMongoModuleStore, EXCLUDE_ALL
-from xmodule.modulestore import ModuleStoreEnum, PublishState
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
@@ -302,27 +302,11 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         block_locator = self._map_revision_to_branch(block_locator)
         return super(DraftVersioningModuleStore, self).get_block_generations(block_locator)
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns whether this xblock is draft, public, or private.
-
-        Returns:
-            PublishState.draft - published exists and is different from draft
-            PublishState.public - published exists and is the same as draft
-            PublishState.private - no published version exists
+        Returns whether this xblock has a published version (whether it's up to date or not).
         """
-        draft_head = self._get_head(xblock, ModuleStoreEnum.BranchName.draft)
-        published_head = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
-
-        if not published_head:
-            # published version does not exist
-            return PublishState.private
-        elif self._get_version(draft_head) == self._get_version(published_head):
-            # published and draft versions are equal
-            return PublishState.public
-        else:
-            # published and draft versions differ
-            return PublishState.draft
+        return self._get_head(xblock, ModuleStoreEnum.BranchName.published) is not None
 
     def convert_to_draft(self, location, user_id):
         """
