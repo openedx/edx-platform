@@ -156,7 +156,10 @@ class UsersApiTests(ModuleStoreTestCase):
                 'username': 'test_user{}'.format(i),
                 'password': self.test_password,
                 'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
+                'last_name': 'Doe{}'.format(i),
+                'avatar_url': 'http://avatar.com/{}.jpg'.format(i),
+                'city': 'Boston',
+                'title': "The King",
             }
 
             response = self.do_post(test_uri, data)
@@ -210,6 +213,15 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get('{}?email={}'.format(test_uri, 'john@example.com'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 0)
+        # add some additional fields and filter the response to only these fields
+        response = self.do_get('{}?email=test2@example.com&fields=avatar_url,city,title'.format(test_uri))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['avatar_url'], 'http://avatar.com/2.jpg')
+        self.assertEqual(response.data['results'][0]['city'], 'Boston')
+        self.assertEqual(response.data['results'][0]['title'], 'The King')
+        if 'id' in response.data['results'][0]:
+            self.fail("Dynamic field filtering error in UserSerializer")
 
     def test_user_list_get_with_org_filter(self):
         test_uri = self.users_base_uri
