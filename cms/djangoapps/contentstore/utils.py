@@ -303,7 +303,7 @@ class BulkSettingsUtil():
             settings_dict[setting_type] = value
 
         if category == 'vertical':
-            settings_dict['ispublic'] = compute_publish_state(child)
+            settings_dict['ispublic'] = modulestore().compute_publish_state(child)
 
         return settings_dict
 
@@ -316,22 +316,17 @@ class BulkSettingsUtil():
             - Chapters: Course url
             - Problems: Unit url
         """
-    
+        handler = category
+
         if category == "chapter":
-            return reverse('contentstore.views.course_handler',
-                            kwargs={'course_key_string': unicode(parent.id)})
-
-        elif category == "sequential":
-            return reverse('contentstore.views.subsection_handler',
-                            kwargs={'usage_key_string': unicode(child.location)})
-
-        elif category == "unit":
-            return reverse('contentstore.views.unit_handler',
-                            kwargs={'usage_key_string': unicode(child.location)})
-
+            usage_key_string = unicode(parent.id)
+        elif category == "sequential" or category == "unit":
+            usage_key_string = unicode(child.location)
         else:
-            return reverse('contentstore.views.unit_handler',
-                            kwargs={'usage_key_string': unicode(parent.location)})
+            usage_key_string = unicode(parent.location)
+            handler = 'unit'
+
+        return reverse('component_handler', kwargs={'usage_key_string': usage_key_string, 'handler': handler})
 
     @classmethod
     def get_bulksettings_metadata(cls, course):
