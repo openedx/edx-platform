@@ -55,7 +55,7 @@ class SplitMigrator(object):
             new_run = source_course_key.run
 
         new_course_key = CourseLocator(new_org, new_course, new_run, branch=ModuleStoreEnum.BranchName.published)
-        with self.split_modulestore.bulk_write_operations(new_course_key):
+        with self.split_modulestore.bulk_operations(new_course_key):
             new_fields = self._get_fields_translate_references(original_course, new_course_key, None)
             if fields:
                 new_fields.update(fields)
@@ -73,7 +73,7 @@ class SplitMigrator(object):
 
         # TODO: This should be merged back into the above transaction, but can't be until split.py
         # is refactored to have more coherent access patterns
-        with self.split_modulestore.bulk_write_operations(new_course_key):
+        with self.split_modulestore.bulk_operations(new_course_key):
 
             # create a new version for the drafts
             self._add_draft_modules_to_course(new_course.location, source_course_key, user_id, **kwargs)
@@ -84,7 +84,7 @@ class SplitMigrator(object):
         """
         Copy all of the modules from the 'direct' version of the course to the new split course.
         """
-        course_version_locator = new_course.id.replace(version_guid=None)
+        course_version_locator = new_course.id.version_agnostic()
 
         # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)

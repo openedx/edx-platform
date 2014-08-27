@@ -23,7 +23,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             super(TestPublish, self)._create_course(split=False)  # 2 inserts (course and overview)
 
         # with bulk will delay all inheritance computations which won't be added into the mongo_calls
-        with self.draft_mongo.bulk_write_operations(self.old_course_key):
+        with self.draft_mongo.bulk_operations(self.old_course_key):
             # finds: 1 for parent to add child
             # sends: 1 for insert, 1 for parent (add child)
             with check_mongo_calls(1, 2):

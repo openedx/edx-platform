@@ -36,10 +36,10 @@ class TestBulkWriteMixinPreviousTransaction(TestBulkWriteMixin):
     """
     def setUp(self):
         super(TestBulkWriteMixinPreviousTransaction, self).setUp()
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.bulk.insert_course_index(self.course_key, MagicMock('prev-index-entry'))
         self.bulk.update_structure(self.course_key, {'this': 'is', 'the': 'previous structure', '_id': ObjectId()})
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.clear_cache.reset_mock()
 
@@ -83,47 +83,47 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
         self.assertCacheNotCleared()
 
     def test_out_of_order_end(self):
-        # Calling _end_bulk_write_operation without a corresponding _begin...
+        # Calling _end_bulk_operation without a corresponding _begin...
         # is a noop
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
 
     def test_write_new_index_on_close(self):
         self.conn.get_course_index.return_value = None
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.insert_course_index(self.course_key, self.index_entry)
         self.assertConnCalls()
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.conn.insert_course_index.assert_called_once_with(self.index_entry)
 
     def test_write_updated_index_on_close(self):
         old_index = {'this': 'is', 'an': 'old index'}
         self.conn.get_course_index.return_value = old_index
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.insert_course_index(self.course_key, self.index_entry)
         self.assertConnCalls()
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.conn.update_course_index.assert_called_once_with(self.index_entry, from_index=old_index)
 
     def test_write_structure_on_close(self):
         self.conn.get_course_index.return_value = None
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key, self.structure)
         self.assertConnCalls()
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(call.upsert_structure(self.structure))
 
     def test_write_multiple_structures_on_close(self):
         self.conn.get_course_index.return_value = None
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
         other_structure = {'another': 'structure', '_id': ObjectId()}
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.assertConnCalls()
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
             [call.upsert_structure(self.structure), call.upsert_structure(other_structure)],
             self.conn.mock_calls
@@ -132,12 +132,12 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     def test_write_index_and_structure_on_close(self):
         original_index = {'versions': {}}
         self.conn.get_course_index.return_value = copy.deepcopy(original_index)
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key, self.structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {self.course_key.branch: self.structure['_id']}})
         self.assertConnCalls()
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.assertConnCalls(
             call.upsert_structure(self.structure),
             call.update_course_index(
@@ -149,13 +149,13 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     def test_write_index_and_multiple_structures_on_close(self):
         original_index = {'versions': {'a': ObjectId(), 'b': ObjectId()}}
         self.conn.get_course_index.return_value = copy.deepcopy(original_index)
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
         other_structure = {'another': 'structure', '_id': ObjectId()}
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.assertItemsEqual(
             [
                 call.upsert_structure(self.structure),
@@ -251,7 +251,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         db_indexes = [Mock(name='from_db')]
         for n, index in enumerate(matching + unmatching):
             course_key = CourseLocator('org', 'course', 'run{}'.format(n))
-            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk._begin_bulk_operation(course_key)
             self.bulk.insert_course_index(course_key, index)
 
         expected = matching + db_indexes
@@ -283,7 +283,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         db_structures = [db_structure(_id) for _id in db_ids if _id not in active_ids]
         for n, _id in enumerate(active_ids):
             course_key = CourseLocator('org', 'course', 'run{}'.format(n))
-            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk._begin_bulk_operation(course_key)
             self.bulk.update_structure(course_key, active_structure(_id))
 
         self.conn.find_structures_by_id.return_value = db_structures
@@ -332,7 +332,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         active_structures = []
         for n, _id in enumerate(active_ids):
             course_key = CourseLocator('org', 'course', 'run{}'.format(n))
-            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk._begin_bulk_operation(course_key)
             structure = active_structure(_id)
             self.bulk.update_structure(course_key, structure)
             active_structures.append(structure)
@@ -392,7 +392,7 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
 
         for n, structure in enumerate(active_match + active_unmatch):
             course_key = CourseLocator('org', 'course', 'run{}'.format(n))
-            self.bulk._begin_bulk_write_operation(course_key)
+            self.bulk._begin_bulk_operation(course_key)
             self.bulk.update_structure(course_key, structure)
 
         self.conn.find_ancestor_structures.return_value = db_match + db_unmatch
@@ -407,7 +407,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
     """
     def setUp(self):
         super(TestBulkWriteMixinOpen, self).setUp()
-        self.bulk._begin_bulk_write_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)
 
     @ddt.data('deadbeef1234' * 2, u'deadbeef1234' * 2, ObjectId())
     def test_read_structure_without_write_from_db(self, version_guid):
@@ -512,7 +512,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         index_copy = copy.deepcopy(index)
         index_copy['versions']['draft'] = index['versions']['published']
         self.bulk.update_course_index(self.course_key, index_copy)
-        self.bulk._end_bulk_write_operation(self.course_key)
+        self.bulk._end_bulk_operation(self.course_key)
         self.conn.upsert_structure.assert_called_once_with(published_structure)
         self.conn.update_course_index.assert_called_once_with(index_copy, from_index=self.conn.get_course_index.return_value)
         self.conn.get_course_index.assert_called_once_with(self.course_key)

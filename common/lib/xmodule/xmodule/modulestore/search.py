@@ -68,8 +68,7 @@ def path_to_location(modulestore, usage_key):
             newpath = (next_usage, path)
             queue.append((parent, newpath))
 
-    # doesn't write but does multiple reads. bulk_write minimizes reads too
-    with modulestore.bulk_write_operations(usage_key.course_key):
+    with modulestore.bulk_operations(usage_key.course_key):
         if not modulestore.has_item(usage_key):
             raise ItemNotFoundError(usage_key)
 

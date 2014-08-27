@@ -206,7 +206,7 @@ def import_from_xml(
                 )
                 continue
 
-        with store.bulk_write_operations(dest_course_id):
+        with store.bulk_operations(dest_course_id):
             source_course = xml_module_store.get_course(course_key)
             # STEP 1: find and import course module
             course, course_data_path = _import_course_module(

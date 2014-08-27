@@ -183,14 +183,14 @@ class BulkWriteRecord(object):
 
 class BulkWriteMixin(object):
     """
-    This implements the :meth:`bulk_write_operations` modulestore semantics for the :class:`SplitMongoModuleStore`.
+    This implements the :meth:`bulk_operations` modulestore semantics for the :class:`SplitMongoModuleStore`.
 
-    In particular, it implements :meth:`_begin_bulk_write_operation` and
-    :meth:`_end_bulk_write_operation` to provide the external interface, and then exposes a set of methods
+    In particular, it implements :meth:`_begin_bulk_operation` and
+    :meth:`_end_bulk_operation` to provide the external interface, and then exposes a set of methods
     for interacting with course_indexes and structures that can be used by :class:`SplitMongoModuleStore`.
 
     Internally, this mixin records the set of all active bulk operations (keyed on the active course),
-    and only writes those values to ``self.mongo_connection`` when :meth:`_end_bulk_write_operation` is called.
+    and only writes those values to ``self.mongo_connection`` when :meth:`_end_bulk_operation` is called.
     If a bulk write operation isn't active, then the changes are immediately written to the underlying
     mongo_connection.
     """
@@ -247,7 +247,7 @@ class BulkWriteMixin(object):
         else:
             del self._active_bulk_writes.records[course_key.replace(org=None, course=None, run=None, branch=None)]
 
-    def _begin_bulk_write_operation(self, course_key):
+    def _begin_bulk_operation(self, course_key):
         """
         Begin a bulk write operation on course_key.
         """
@@ -263,7 +263,7 @@ class BulkWriteMixin(object):
             # Ensure that any edits to the index don't pollute the initial_index
             bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
 
-    def _end_bulk_write_operation(self, course_key):
+    def _end_bulk_operation(self, course_key):
         """
         End the active bulk write operation on course_key.
         """
@@ -581,7 +581,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             depth: how deep below these to prefetch
             lazy: whether to fetch definitions or use placeholders
         '''
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
@@ -1209,7 +1209,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
         the new version_guid from the locator in the returned object!
         """
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             # split handles all the fields in one dict not separated by scope
             fields = fields or {}
             fields.update(kwargs.pop('metadata', {}) or {})
@@ -1295,7 +1295,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             fields (dict): A dictionary specifying initial values for some or all fields
                 in the newly created block
         """
-        with self.bulk_write_operations(parent_usage_key.course_key):
+        with self.bulk_operations(parent_usage_key.course_key):
             xblock = self.create_item(
                 user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
                 **kwargs)
@@ -1471,7 +1471,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             draft_structure = self._lookup_course(draft_version)['structure']
 
         locator = locator.replace(version_guid=new_id)
-        with self.bulk_write_operations(locator):
+        with self.bulk_operations(locator):
             self.update_structure(locator, draft_structure)
             index_entry = {
                 '_id': ObjectId(),
@@ -1520,7 +1520,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         """
         Broke out guts of update_item for short-circuited internal use only
         """
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             if allow_not_found and isinstance(block_id, (LocalId, NoneType)):
                 fields = {}
                 for subfields in partitioned_fields.itervalues():
@@ -1660,7 +1660,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         """
         # find course_index entry if applicable and structures entry
         course_key = xblock.location.course_key
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             index_entry = self._get_index_if_valid(course_key, force)
             structure = self._lookup_course(course_key)['structure']
             new_structure = self.version_structure(course_key, structure, user_id)
@@ -1794,8 +1794,8 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
                 subtree but the ancestors up to and including the course root are not published.
         """
         # get the destination's index, and source and destination structures.
-        with self.bulk_write_operations(source_course):
-            with self.bulk_write_operations(destination_course):
+        with self.bulk_operations(source_course):
+            with self.bulk_operations(destination_course):
                 source_structure = self._lookup_course(source_course)['structure']
                 index_entry = self.get_course_index(destination_course)
                 if index_entry is None:
@@ -1871,7 +1871,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
             # The supplied UsageKey is of the wrong type, so it can't possibly be stored in this modulestore.
             raise ItemNotFoundError(usage_locator)
 
-        with self.bulk_write_operations(usage_locator.course_key):
+        with self.bulk_operations(usage_locator.course_key):
             original_structure = self._lookup_course(usage_locator.course_key)['structure']
             if original_structure['root'] == usage_locator.block_id:
                 raise ValueError("Cannot delete the root of a course")

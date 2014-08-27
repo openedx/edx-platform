@@ -31,7 +31,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Returns: a CourseDescriptor
         """
         master_branch = kwargs.pop('master_branch', ModuleStoreEnum.BranchName.draft)
-        with self.bulk_write_operations(CourseLocator(org, course, run)):
+        with self.bulk_operations(CourseLocator(org, course, run)):
             item = super(DraftVersioningModuleStore, self).create_course(
                 org, course, run, user_id, master_branch=master_branch, **kwargs
             )
@@ -89,7 +89,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         descriptor.location = self._map_revision_to_branch(descriptor.location)
-        with self.bulk_write_operations(descriptor.location.course_key):
+        with self.bulk_operations(descriptor.location.course_key):
             item = super(DraftVersioningModuleStore, self).update_item(
                 descriptor,
                 user_id,
@@ -109,7 +109,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         See :py:meth `ModuleStoreDraftAndPublished.create_item`
         """
         course_key = self._map_revision_to_branch(course_key)
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             item = super(DraftVersioningModuleStore, self).create_item(
                 user_id, course_key, block_type, block_id=block_id,
                 definition_locator=definition_locator, fields=fields,
@@ -124,7 +124,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             fields=None, **kwargs
     ):
         parent_usage_key = self._map_revision_to_branch(parent_usage_key)
-        with self.bulk_write_operations(parent_usage_key.course_key):
+        with self.bulk_operations(parent_usage_key.course_key):
             item = super(DraftVersioningModuleStore, self).create_child(
                 user_id, parent_usage_key, block_type, block_id=block_id,
                 fields=fields, **kwargs
@@ -146,7 +146,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                     currently only provided by contentstore.views.item.orphan_handler
                 Otherwise, raises a ValueError.
         """
-        with self.bulk_write_operations(location.course_key):
+        with self.bulk_operations(location.course_key):
             if revision == ModuleStoreEnum.RevisionOption.published_only:
                 branches_to_delete = [ModuleStoreEnum.BranchName.published]
             elif revision == ModuleStoreEnum.RevisionOption.all:
@@ -274,7 +274,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Deletes the published version of the item.
         Returns the newly unpublished item.
         """
-        with self.bulk_write_operations(location.course_key):
+        with self.bulk_operations(location.course_key):
             self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
             return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)
 
@@ -357,7 +357,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         """
         Split-based modulestores need to import published blocks to both branches
         """
-        with self.bulk_write_operations(course_key):
+        with self.bulk_operations(course_key):
             # hardcode course root block id
             if block_type == 'course':
                 block_id = self.DEFAULT_ROOT_BLOCK_ID

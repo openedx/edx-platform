@@ -1106,14 +1106,14 @@ class TestItemCrud(SplitModuleTest):
         chapter = modulestore().get_item(chapter_locator)
         self.assertIn(problem_locator, version_agnostic(chapter.children))
 
-    def test_create_bulk_write_operations(self):
+    def test_create_bulk_operations(self):
         """
-        Test create_item using bulk_write_operations
+        Test create_item using bulk_operations
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
         course_key = CourseLocator('test_org', 'test_transaction', 'test_run')
-        with modulestore().bulk_write_operations(course_key):
+        with modulestore().bulk_operations(course_key):
             new_course = modulestore().create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
             new_course_locator = new_course.id
             index_history_info = modulestore().get_course_history_info(new_course.location.course_key)
@@ -1147,7 +1147,7 @@ class TestItemCrud(SplitModuleTest):
                 )
 
         # start a new transaction
-        with modulestore().bulk_write_operations(course_key):
+        with modulestore().bulk_operations(course_key):
             new_ele = modulestore().create_child(
                 user, new_course.location, 'chapter',
                 fields={'display_name': 'chapter 2'},

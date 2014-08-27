@@ -127,7 +127,7 @@ class TestMixedModuleStore(unittest.TestCase):
         Create a course w/ one item in the persistence store using the given course & item location.
         """
         # create course
-        with self.store.bulk_write_operations(course_key):
+        with self.store.bulk_operations(course_key):
             self.course = self.store.create_course(course_key.org, course_key.course, course_key.run, self.user_id)
             if isinstance(self.course.id, CourseLocator):
                 self.course_locations[self.MONGO_COURSEID] = self.course.location
@@ -189,7 +189,7 @@ class TestMixedModuleStore(unittest.TestCase):
                 create_sub_tree(block, tree)
             setattr(self, block_info.field_name, block.location)
 
-        with self.store.bulk_write_operations(self.course.id):
+        with self.store.bulk_operations(self.course.id):
             for tree in trees:
                 create_sub_tree(self.course, tree)
 

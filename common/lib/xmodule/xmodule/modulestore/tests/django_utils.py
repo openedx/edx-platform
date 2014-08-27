@@ -287,7 +287,7 @@ class ModuleStoreTestCase(TestCase):
             course_loc: the CourseKey for the created course
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-#             with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#             with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
                 course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
                 self.course_loc = course.location
 
@@ -314,7 +314,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Create an equivalent to the toy xml course
         """
-#        with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#        with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
         self.toy_loc = self.create_sample_course(
             org, course, run, TOY_BLOCK_INFO_TREE,
             {

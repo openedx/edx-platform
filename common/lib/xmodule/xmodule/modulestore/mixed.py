@@ -645,14 +645,11 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             yield
 
     @contextmanager
-    def bulk_write_operations(self, course_id):
+    def bulk_operations(self, course_id):
         """
-        A context manager for notifying the store of bulk write events.
+        A context manager for notifying the store of bulk operations.
         If course_id is None, the default store is used.
         """
         store = self._get_modulestore_for_courseid(course_id)
-        if hasattr(store, 'bulk_write_operations'):
-            with store.bulk_write_operations(course_id):
-                yield
-        else:
+        with store.bulk_operations(course_id):
             yield

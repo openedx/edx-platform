@@ -110,7 +110,7 @@ class FieldDataCache(object):
 
             return descriptors
 
-        with modulestore().bulk_write_operations(descriptor.location.course_key):
+        with modulestore().bulk_operations(descriptor.location.course_key):
             descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 
         return FieldDataCache(descriptors, course_id, user, select_for_update)
