@@ -29,7 +29,7 @@ class SessionsList(SecureAPIView):
     """
     **Use Case**
 
-        SessionsList creates a new session with the edX LMS. 
+        SessionsList creates a new session with the edX LMS.
 
     **Example Request**
 
@@ -137,7 +137,7 @@ class SessionsDetail(SecureAPIView):
         * token: A unique token value for the session.
         * expires: The number of seconds until the session expires.
         * user_id: The unique user identifier.
-        * uri: The URI to use to get details about the session.     
+        * uri: The URI to use to get details about the session.
     """
 
     def get(self, request, session_id):
@@ -162,11 +162,13 @@ class SessionsDetail(SecureAPIView):
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, session_id):
-        response_data = {}
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(session_id)
+        if session is None or not SESSION_KEY in session:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
         user_id = session[SESSION_KEY]
-        AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
         session.flush()
-        logout(request)
-        return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+        if request.user is not None and not request.user.is_anonymous():
+            logout(request)
+        AUDIT_LOG.info(u"API::User session terminated for user-id - {0}".format(user_id))
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
