@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-<nav class="discussion-{{discussiontype}}-paginator discussion-paginator local">
+<nav class="discussion-{{discussiontype}}-paginator discussion-paginator">
     <ol>
         {{#previous}}
         <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">&lt; ${_("Previous")}</a></li>

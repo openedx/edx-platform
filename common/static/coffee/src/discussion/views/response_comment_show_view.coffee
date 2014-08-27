@@ -30,7 +30,6 @@ if Backbone?
       params = @model.toJSON()
 
       @$el.html(@template(params))
-      @initLocal()
       @delegateEvents()
       @renderAttrs()
       @renderFlagged()

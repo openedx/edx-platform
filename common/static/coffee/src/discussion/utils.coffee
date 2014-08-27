@@ -41,6 +41,9 @@ class @DiscussionUtil
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
 
+  @isPrivilegedUser: (user_id) ->
+    @isStaff(user_id) || @isTA(user_id)
+
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
       Content.getContent(id).updateInfo(info)
@@ -167,7 +170,7 @@ class @DiscussionUtil
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
       makeErrorElem = (message) ->
-        $("<li>").addClass("new-post-form-error").html(message)
+        $("<li>").addClass("post-error").html(message)
       errorsField.empty().show()
       if xhr.status == 400
         response = JSON.parse(xhr.responseText)

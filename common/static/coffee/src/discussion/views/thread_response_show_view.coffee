@@ -12,12 +12,20 @@ if Backbone?
         "keydown .discussion-flag-abuse":
           (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
+    attrRenderer: $.extend({}, DiscussionContentView.prototype.attrRenderer, {
+      endorsed: (endorsed) ->
+        $endorseButton = @$(".action-endorse")
+        $endorseButton.toggleClass("is-clickable", @model.canBeEndorsed())
+        $endorseButton.toggleClass("is-endorsed", endorsed)
+        $endorseButton.toggle(endorsed || @model.canBeEndorsed())
+    })
+
     $: (selector) ->
         @$el.find(selector)
 
     initialize: ->
         super()
-        @model.on "change", @updateModelDetails
+        @listenTo(@model, "change", @render)
 
     renderTemplate: ->
         @template = _.template($("#thread-response-show-template").html())
@@ -29,7 +37,7 @@ if Backbone?
       @renderVote()
       @renderAttrs()
       @renderFlagged()
-      @$el.find(".posted-details").timeago()
+      @$el.find(".posted-details .timeago").timeago()
       @convertMath()
       @markAsStaff()
       @
@@ -55,13 +63,21 @@ if Backbone?
 
     toggleEndorse: (event) ->
       event.preventDefault()
-      if not @model.can('can_endorse')
+      if not @model.canBeEndorsed()
         return
       $elem = $(event.target)
       url = @model.urlFor('endorse')
       endorsed = @model.get('endorsed')
-      data = { endorsed: not endorsed }
-      @model.set('endorsed', not endorsed)
+      new_endorsed = not endorsed
+      data = { endorsed: new_endorsed }
+      endorsement = {
+        "username": window.user.get("username"),
+        "time": new Date().toISOString()
+      }
+      @model.set(
+        "endorsed": new_endorsed
+        "endorsement": if new_endorsed then endorsement else null
+      )
       @trigger "comment:endorse", not endorsed
       DiscussionUtil.safeAjax
         $elem: $elem
@@ -86,7 +102,3 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
-        
-    updateModelDetails: =>
-      @renderVote()
-      @renderFlagged()

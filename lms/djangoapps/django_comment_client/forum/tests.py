@@ -195,6 +195,26 @@ class SingleThreadTestCase(ModuleStoreTestCase):
             timeout=ANY
         )
 
+    def test_html(self, mock_request):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        mako_middleware_process_request(request)
+        response = views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+
+        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        html = response.content
+        self.assertRegexpMatches(html, r'This post visible to everyone.')
+
     def test_skip_limit(self, mock_request):
         text = "dummy content"
         thread_id = "test_thread_id"

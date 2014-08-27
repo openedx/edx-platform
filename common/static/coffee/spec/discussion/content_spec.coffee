@@ -41,11 +41,11 @@ describe 'All Content', ->
 
         it 'can update info', ->
             @content.updateInfo {
-                                ability: 'can_endorse',
+                                ability: {'can_edit': true},
                                 voted: true,
                                 subscribed: true
                                 }
-            expect(@content.get 'ability').toEqual 'can_endorse'
+            expect(@content.get 'ability').toEqual {'can_edit': true}
             expect(@content.get 'voted').toEqual true
             expect(@content.get 'subscribed').toEqual true
 
@@ -77,3 +77,39 @@ describe 'All Content', ->
             myComments = new Comments
             myComments.add @comment1
             expect(myComments.find('123')).toBe @comment1
+
+        it 'can be endorsed', ->
+
+            DiscussionUtil.loadRoles(
+              {"Moderator": [111], "Administrator": [222], "Community TA": [333]}
+            )
+            @discussionThread = new Thread({id: 1, thread_type: "discussion", user_id: 99})
+            @discussionResponse = new Comment({id: 1, thread: @discussionThread})
+            @questionThread = new Thread({id: 1, thread_type: "question", user_id: 99})
+            @questionResponse = new Comment({id: 1, thread: @questionThread})
+
+            # mod
+            window.user = new DiscussionUser({id: 111})
+            expect(@discussionResponse.canBeEndorsed()).toBe(true)
+            expect(@questionResponse.canBeEndorsed()).toBe(true)
+
+            # admin
+            window.user = new DiscussionUser({id: 222})
+            expect(@discussionResponse.canBeEndorsed()).toBe(true)
+            expect(@questionResponse.canBeEndorsed()).toBe(true)
+
+            # TA
+            window.user = new DiscussionUser({id: 333})
+            expect(@discussionResponse.canBeEndorsed()).toBe(true)
+            expect(@questionResponse.canBeEndorsed()).toBe(true)
+
+            # thread author
+            window.user = new DiscussionUser({id: 99})
+            expect(@discussionResponse.canBeEndorsed()).toBe(false)
+            expect(@questionResponse.canBeEndorsed()).toBe(true)
+
+            # anyone else
+            window.user = new DiscussionUser({id: 999})
+            expect(@discussionResponse.canBeEndorsed()).toBe(false)
+            expect(@questionResponse.canBeEndorsed()).toBe(false)
+

@@ -16,6 +16,7 @@ from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_comment
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
+from django_comment_client.base.views import add_thread_group_info
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context)
 import django_comment_client.utils as utils
@@ -87,7 +88,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
     #is user a moderator
     #did the user request a group
 
-    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
 
     group_id = request.GET.get('group_id')
 
@@ -103,27 +104,30 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
 
     #so by default, a moderator sees all items, and a student sees his cohort
 
-    query_params = merge_dict(default_query_params,
-                              strip_none(extract(request.GET,
-                                                 ['page', 'sort_key',
-                                                  'sort_order', 'text',
-                                                  'commentable_ids', 'flagged'])))
+    query_params = merge_dict(
+        default_query_params,
+        strip_none(
+            extract(
+                request.GET,
+                [
+                    'page',
+                    'sort_key',
+                    'sort_order',
+                    'text',
+                    'commentable_ids',
+                    'flagged',
+                    'unread',
+                    'unanswered',
+                ]
+            )
+        )
+    )
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
     #now add the group name if the thread has a group id
     for thread in threads:
-
-        if thread.get('group_id'):
-            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
-            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
-        else:
-            thread['group_name'] = ""
-            thread['group_string'] = "This post visible to everyone."
-
-        #patch for backward compatibility to comments service
-        if not 'pinned' in thread:
-            thread['pinned'] = False
+        add_thread_group_info(thread, course_id)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
@@ -150,7 +154,7 @@ def inline_discussion(request, course_id, discussion_id):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
     return utils.JsonResponse({
-        'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+        'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
@@ -173,7 +177,7 @@ def forum_form_discussion(request, course_id):
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
-        threads = [utils.safe_content(thread, is_staff) for thread in unsafethreads]
+        threads = [utils.safe_content(thread, course_id, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
@@ -253,7 +257,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        content = utils.safe_content(thread.to_dict(), is_staff)
+        content = utils.safe_content(thread.to_dict(), course_id, is_staff)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
@@ -269,14 +273,9 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            if thread.get('group_id') and not thread.get('group_name'):
-                thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+            add_thread_group_info(thread, course_id)
 
-            #patch for backward compatibility with comments service
-            if not "pinned" in thread:
-                thread["pinned"] = False
-
-        threads = [utils.safe_content(thread, is_staff) for thread in threads]
+        threads = [utils.safe_content(thread, course_id, is_staff) for thread in threads]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
@@ -308,6 +307,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         }
         return render_to_response('discussion/index.html', context)
 
+
 @require_GET
 @login_required
 def user_profile(request, course_id, user_id):
@@ -335,7 +335,7 @@ def user_profile(request, course_id, user_id):
         if request.is_ajax():
             is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
-                'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
@@ -368,12 +368,29 @@ def followed_threads(request, course_id, user_id):
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 
-        query_params = {
-            'page': request.GET.get('page', 1),
+        default_query_params = {
+            'page': 1,
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
-            'sort_key': request.GET.get('sort_key', 'date'),
-            'sort_order': request.GET.get('sort_order', 'desc'),
+            'sort_key': 'date',
+            'sort_order': 'desc',
         }
+
+        query_params = merge_dict(
+            default_query_params,
+            strip_none(
+                extract(
+                    request.GET,
+                    [
+                        'page',
+                        'sort_key',
+                        'sort_order',
+                        'flagged',
+                        'unread',
+                        'unanswered',
+                    ]
+                )
+            )
+        )
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
         query_params['page'] = page
@@ -386,7 +403,7 @@ def followed_threads(request, course_id, user_id):
             is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
-                'discussion_data': [utils.safe_content(thread, is_staff) for thread in threads],
+                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
             })

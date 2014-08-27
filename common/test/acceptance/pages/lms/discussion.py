@@ -39,6 +39,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         query = self._find_within(selector)
         return query.present and query.visible
 
+    def get_group_visibility_label(self):
+        """
+        Returns the group visibility label shown for the thread.
+        """
+        return self._get_element_text(".group-visibility-label")
+
     def get_response_total_text(self):
         """Returns the response count text, or None if not present"""
         return self._get_element_text(".response-count")
@@ -93,6 +99,18 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         EmptyPromise(
             lambda: self.is_response_editor_visible(response_id),
             "Response edit started"
+        ).fulfill()
+
+    def is_show_comments_visible(self, response_id):
+        """Returns true if the "show comments" link is visible for a response"""
+        return self._is_element_visible(".response_{} .action-show-comments".format(response_id))
+
+    def show_comments(self, response_id):
+        """Click the "show comments" link for a response"""
+        self._find_within(".response_{} .action-show-comments".format(response_id)).first.click()
+        EmptyPromise(
+            lambda: self._is_element_visible(".response_{} .comments".format(response_id)),
+            "Comments shown"
         ).fulfill()
 
     def is_add_comment_visible(self, response_id):
@@ -269,7 +287,7 @@ class InlineDiscussionThreadPage(DiscussionThreadPage):
 
     def expand(self):
         """Clicks the link to expand the thread"""
-        self._find_within(".expand-post").first.click()
+        self._find_within(".forum-thread-expand").first.click()
         EmptyPromise(
             lambda: bool(self.get_response_total_text()),
             "Thread expanded"
