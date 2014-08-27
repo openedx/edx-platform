@@ -151,3 +151,8 @@ class SessionsApiTests(TestCase):
         self.assertEqual(response.status_code, 204)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
+
+    def test_session_detail_delete_invalid_session(self):
+        test_uri = self.base_sessions_uri + "214viouadblah124324blahblah"
+        response = self.do_delete(test_uri)
+        self.assertEqual(response.status_code, 204)
