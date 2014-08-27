@@ -20,7 +20,7 @@ class ECommerce
     @$active_registration_codes_form = @$section.find("form#active_registration_codes")
     @$spent_registration_codes_form = @$section.find("form#spent_registration_codes")
 
-    @$error-msg = @$section.find('#error-msg')
+    @$error_msg = @$section.find('#error-msg')
     
     # attach click handlers
     # this handler binds to both the download
@@ -40,15 +40,15 @@ class ECommerce
       location.href = url
 
     @$download_registration_codes_form.submit (e) =>
-      @$error-msg.attr('style', 'display: none')
+      @$error_msg.attr('style', 'display: none')
       return true
 
     @$active_registration_codes_form.submit (e) =>
-      @$error-msg.attr('style', 'display: none')
+      @$error_msg.attr('style', 'display: none')
       return true
 
     @$spent_registration_codes_form.submit (e) =>
-      @$error-msg.attr('style', 'display: none')
+      @$error_msg.attr('style', 'display: none')
       return true
 
   # handler for when the section title is clicked.
@@ -62,7 +62,7 @@ class ECommerce
   onExit: -> @clear_display()
 
   clear_display: ->
-    @$error-msg.attr('style', 'display: none')
+    @$error_msg.attr('style', 'display: none')
     @$download_company_name.val('')
     @$active_company_name.val('')
     @$spent_company_name.val('')

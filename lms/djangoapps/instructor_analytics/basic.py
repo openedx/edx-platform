@@ -15,8 +15,8 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
-SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_email', 'company_contact_name', 'tax_id',
-                 'company_reference', 'internal_reference')
+SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_email', 'company_contact_name',
+                 'purchase_order_number', 'company_reference', 'internal_reference')
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')

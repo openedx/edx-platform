@@ -568,7 +568,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     query_features = [
         'company_name', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
-        'tax_id', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
+        'purchase_order_number', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
         'codes', 'course_id'
     ]
 
@@ -839,17 +839,22 @@ def generate_registration_codes(request, course_id):
 
     # covert the course registration code number into integer
     try:
-        course_code_number = int(request.POST['total-registration-codes'])
+        course_code_number = int(request.POST['total_registration_codes'])
     except ValueError:
-        course_code_number = int(float(request.POST['total-registration-codes']))
+        course_code_number = int(float(request.POST['total_registration_codes']))
 
     company_name = request.POST['company_name']
-
     sale_price = request.POST['sale_price']
     contact_name = request.POST['contact_name']
     contact_email = request.POST['contact_email']
-    company_tax_id = request.POST['tax']
-    reference = request.POST['reference']
+    address_line_1 = request.POST['address_line_1']
+    address_line_2 = request.POST['address_line_2']
+    address_line_3 = request.POST['address_line_3']
+    city = request.POST['city']
+    state = request.POST['state']
+    zip_code = request.POST['zip']
+    country = request.POST['country']
+    company_reference = request.POST['company_reference']
     internal_reference = request.POST['internal_reference']
     recipient_list = [contact_email]
     if request.POST.get('invoice', False):
@@ -859,8 +864,9 @@ def generate_registration_codes(request, course_id):
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price, company_name=company_name, company_contact_name=contact_name,
-        course_id=course_id, company_contact_email=contact_email, tax_id=company_tax_id,
-        company_reference=reference, internal_reference=internal_reference
+        course_id=course_id, company_contact_email=contact_email, address_line_1=address_line_1,
+        address_line_2=address_line_2, address_line_3=address_line_3, city=city, state=state,
+        zip=zip_code, country=country, company_reference=company_reference, internal_reference=internal_reference
     )
     for _ in range(course_code_number):  # pylint: disable=W0621
         save_registration_codes(request, course_id, course_registration_codes, sale_invoice)
