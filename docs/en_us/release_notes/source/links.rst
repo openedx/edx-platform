@@ -16,6 +16,8 @@
 
 .. _edX Status: http://status.edx.org/
 
+.. _docs.edx.org: http://docs.edx.org
+
 .. _edX roadmap: https://openedx.atlassian.net/wiki/display/PROD/Product+Roadmap
 
 .. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
@@ -187,6 +189,9 @@
 
 .. _Developing Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/developing_course/index.html
 
+.. _New Course Run Announcement: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/releasing_course/course_launching.html#new-course-run-announcement
+
+.. _Add Content Experiments to Your Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/content_experiments/content_experiments_add.html
 
 .. Peer Assessments
 
