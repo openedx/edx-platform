@@ -1700,7 +1700,8 @@ class CoursesSocialMetrics(SecureListAPIView):
             for user_id in exclude_users:
                 if str(user_id) in data:
                     del data[str(user_id)]
-
+            total_enrollments = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
+            data = {'total_enrollments': total_enrollments, 'users': data}
             http_status = status.HTTP_200_OK
         except CommentClientRequestError, e:
             data = {
