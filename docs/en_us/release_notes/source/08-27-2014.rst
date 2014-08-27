@@ -42,7 +42,7 @@ edX Studio
   Newsletter`_.
 
 * You can now build content experiments (also known as A/B tests or split
-  tests) entirely within edX Studio. With a content experiment, you show
+  tests) entirely within edX Studio.  With a content experiment, you show
   different course content to different groups of students. Research teams can
   compare the performance of students in different groups to gain insights into
   the relative effectiveness of course content.
