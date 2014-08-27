@@ -79,6 +79,7 @@ import track.views
 from dogapi import dog_stats_api
 
 from util.json_request import JsonResponse
+from util.request import retry_on_exception
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from microsite_configuration import microsite
@@ -584,6 +585,7 @@ def try_change_enrollment(request):
 
 
 @require_POST
+@retry_on_exception()
 def change_enrollment(request, auto_register=False):
     """
     Modify the enrollment status for the logged-in user.
@@ -1751,6 +1753,7 @@ def reactivation_email_for_user(user):
 
 
 @ensure_csrf_cookie
+@retry_on_exception()
 def change_email_request(request):
     """ AJAX call from the profile page. User wants a new e-mail.
     """
