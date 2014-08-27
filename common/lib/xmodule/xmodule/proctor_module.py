@@ -3,6 +3,7 @@ import json
 import logging
 import urlparse
 import requests
+import traceback
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -225,8 +226,8 @@ class ProctorModule(ProctorFields, XModule):
                 username = data.get("username")
                 return self.submission_history(username)
 
-            #if dispatch == 'status':
-                #return self.status()
+            # if dispatch == 'status':
+            #     return self.status()
             # if dispatch == 'grades':
             #     return self.grades()
 
@@ -249,18 +250,18 @@ class ProctorModule(ProctorFields, XModule):
             pminfo.get_assignments_attempted_and_failed(
                 username, reset=True, wipe_randomize_history=wipe_history)
             return self.status(username)
-        except Exception as exc:
-            return json.dumps({"error": str(exc)})
+        except Exception:
+            return json.dumps({"error": traceback.format_exc()})
 
     def status(self, username):
         try:
             student = self.pp.user
             pminfo = module_tree_reset.ProctorModuleInfo(self.runtime.course_id)
             status = pminfo.get_student_status(username)
-        except Exception as err:
+        except Exception:
             log.exception("Failed to get status for %s" % student)
             status = {'msg': 'Error getting grades for %s' % student,
-                      'error': True, 'errstr': str(err)}
+                      'error': True, 'errstr': traceback.format_exc()}
         return json.dumps(status)
 
     def submission_history(self, username):
@@ -280,10 +281,10 @@ class ProctorModule(ProctorFields, XModule):
                                    grade=e.grade,
                                    max_grade=e.max_grade,
                                    answers=state['student_answers']))
-        except Exception as err:
+        except Exception:
             log.exception("Failed to get status for %s" % username)
             status = {'msg': 'Error getting grades for %s' % username,
-                      'error': True, 'errstr': str(err)}
+                      'error': True, 'errstr': traceback.format_exc()}
         return json.dumps(status)
 
     # TODO: investigate whether this is needed or not
