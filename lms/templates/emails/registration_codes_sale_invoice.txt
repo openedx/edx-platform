@@ -14,8 +14,8 @@ ${_("{company_name}").format(company_name=invoice.company_name)}
 
 ${_("{purchaser_name}").format(purchaser_name=invoice.company_contact_name)}
 
-% if invoice.tax_id:
-${_("Tax ID: {tax_id}").format(tax_id=invoice.tax_id)}
+% if invoice.purchase_order_number:
+${_("Purchase Order Number: {purchase_order_number}").format(purchase_order_number=invoice.purchase_order_number)}
 %endif
 
 ${_("---------------------------------")}

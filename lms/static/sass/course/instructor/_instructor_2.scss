@@ -960,7 +960,10 @@ input[name="subject"] {
       }
     }
   }
-
+  section#registration_code_generation_modal {
+      margin-left: -442px;
+      width: 930px;
+    }
   // coupon edit and add modals
   #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
@@ -1037,23 +1040,46 @@ input[name="subject"] {
           content: "*";
           margin-left: 5px;
         }
+        min-height: 120px;
       }
-      li:nth-child(even) {
-        margin-left: 30px !important;
+      li.address_fields {
+        min-height: 45px !important;
       }
-      li:nth-child(7) {
-        width: 100%;
+      li#generate-registration-modal-field-city, li#generate-registration-modal-field-state,
+      li#generate-registration-modal-field-zipcode{
+        width: 205px;
+      }
+      li#generate-registration-modal-field-country {
+        width: 204px;
+        margin-left: 15px !important;
+        margin-bottom: 20px;
+      }
+      li:nth-child(even){
         margin-left: 0px !important;
       }
-      li:nth-child(8){
-        margin-left: 0px !important;
+      li:nth-child(3n+2) {
+        margin-left: 15px !important;
+      }
+      li:nth-child(3n) {
+        margin-left: 15px !important;
       }
       li:last-child{
-        margin-left: 30px !important;
+        label {
+          float: right;
+          margin-top: -5px;
+          right: 27px;
+        }
+        min-height: 5px;
+        margin-left: 0px !important;
         input[type='checkbox'] {
           width: auto;
           height: auto;
         }
+      }
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-total-price,
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
+        margin-left: 0px !important;
+        margin-right: 15px !important;
       }
     }
     li#set-course-mode-modal-field-price{
@@ -1069,6 +1095,12 @@ input[name="subject"] {
         width: 100%;
       }
     }
+    #registration-content form .field.text input {
+          background: #fff;
+          margin-bottom: 0;
+          height: 40px;
+          border-radius: 3px;
+        }
     #coupon-content, #course-content, #registration-content {
       padding: 20px;
       header {
@@ -1127,6 +1159,19 @@ input[name="subject"] {
           padding: 10px 15px;
         }
       }
+    }
+    #registration-content form .group-form {
+
+    }
+    #registration-content form {
+      .field {
+        margin: 0;
+      }
+    .group-form {
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0px;
+    }
     }
   }
 
@@ -1221,7 +1266,7 @@ input[name="subject"] {
     display: block;
     line-height: 30px;
     margin-bottom: 6px;
-    padding: 10px 15px 10px 1px;
+    padding: 10px 15px 10px 20px;
     .add{
       @include button(simple, $blue);
       @extend .button-reset;
