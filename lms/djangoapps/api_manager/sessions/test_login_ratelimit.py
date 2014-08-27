@@ -16,6 +16,7 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 from student.tests.factories import UserFactory
+from student.models import UserProfile
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -34,6 +35,9 @@ class SessionApiRateLimitingProtectionTest(TestCase):
         self.user = UserFactory.build(username='test', email='test@edx.org')
         self.user.set_password('test_password')
         self.user.save()
+        profile = UserProfile(user=self.user)
+        profile.city = 'Boston'
+        profile.save()
 
         # Create the test client
         self.client = Client()
