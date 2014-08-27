@@ -10,6 +10,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
+def get_modulestore():
+    return modulestore('direct')
+
+
 def get_course(request, user, course_id, depth=0, load_content=False):
     """
     Utility method to obtain course components
@@ -55,7 +59,7 @@ def get_course_leaf_nodes(course_key, detached_categories):
     Get count of the leaf nodes with ability to exclude some categories
     """
     nodes = []
-    verticals = modulestore().get_items(course_key, category='vertical')
+    verticals = get_modulestore().get_items(course_key, category='vertical')
     for vertical in verticals:
         nodes.extend([unit for unit in vertical.children
                       if getattr(unit, 'category') not in detached_categories])
@@ -96,7 +100,7 @@ def course_exists(request, user, course_id):
     course_key = get_course_key(course_id)
     if not course_key:
         return False
-    if not modulestore().has_course(course_key):
+    if not get_modulestore().has_course(course_key):
         return False
     return True
 
@@ -114,7 +118,7 @@ def get_course_child_key(content_id):
 
 def get_course_child_descriptor(child_key):
     try:
-        content_descriptor = modulestore().get_item(child_key)
+        content_descriptor = get_modulestore().get_item(child_key)
     except ItemNotFoundError:
         content_descriptor = None
     return content_descriptor
