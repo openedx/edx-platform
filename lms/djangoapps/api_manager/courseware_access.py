@@ -11,7 +11,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 def get_modulestore():
-    return modulestore('direct')
+    return modulestore()
 
 
 def get_course(request, user, course_id, depth=0, load_content=False):
