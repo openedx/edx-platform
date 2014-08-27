@@ -30,8 +30,8 @@ edX Studio
        :alt: The Course Outline page showing an expanded section and subsection
            with a unit that contains unpublished content.
 
-    The "Publish" icon is also available for 
-    individual units on the **Course Outline** page.
+    The "Publish" icon is also available for individual units on the **Course
+    Outline** page.
 
   * You can now hide all of the content in an entire section or subsection on
     the **Course Outline** page. To ensure that students cannot see a part of
@@ -66,9 +66,9 @@ edX Learning Management System
   
 * The computations for demographic distributions that are reported on the
   **Analytics** page of the Instructor Dashboard have been updated. The level
-  of education and gender distributions now include currently enrolled students
-  only. Previously, these distributions were computed for all students who were
-  ever enrolled in the course. (LMS-11228)
+  of education and gender distributions are now computed for currently enrolled
+  students only. Previously, these distributions were computed for all students
+  who were ever enrolled in the course. (LMS-11228)
 
 .. * Bulk email now available for all courses? Instructor Dashboard, Email page
 
@@ -80,8 +80,8 @@ edX Learning Management System
 Coming Soon
 **************************
 
-We're pleased to announce these changes, which will be released in the
-next few weeks:
+We're pleased to announce these changes, which will be released in the next few
+weeks:
 
 * In addition to the existing Discussion post type, course discussions will
   soon include a new Question post type. Students and course teams will also be
@@ -99,8 +99,8 @@ next few weeks:
 edX Documentation
 **************************
 
-All guides now include a section that lists browsers supported for
-use with the edX platform.
+All guides now include a section that lists browsers supported for use with the
+edX platform.
 
 The following documentation is available:
 
@@ -136,8 +136,8 @@ The following documentation is available:
 
    Recent changes include: 
 
-   * The `Tracking Logs`_ chapter now includes a section on open response
-     assessment events.
+   * The `Tracking Logs`_ chapter now includes a section that describes open
+     response assessment events.
 
    * The "Course Grading" and "XML format of drag and drop input" chapters were
      removed. These topics are covered in the `Building and Running an edX
