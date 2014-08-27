@@ -783,7 +783,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
     def test_update_published_info(self):
         """
-        Tests that published_date and published_by are set correctly
+        Tests that published_on and published_by are set correctly
         """
         location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
         create_user = 123
@@ -803,7 +803,7 @@ class TestMongoModuleStore(unittest.TestCase):
         updated_component = self.draft_store.get_item(location)
 
         # Verify the time order and that publish_user caused publication
-        self.assertLessEqual(old_time, updated_component.published_date)
+        self.assertLessEqual(old_time, updated_component.published_on)
         self.assertEqual(updated_component.published_by, publish_user)
 
     def test_migrate_published_info(self):
@@ -829,7 +829,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Retrieve the block and verify its fields
         component = self.draft_store.get_item(location)
-        self.assertEqual(component.published_date, published_date)
+        self.assertEqual(component.published_on, published_date)
         self.assertEqual(component.published_by, published_by)
 
     def test_export_course_with_peer_component(self):
