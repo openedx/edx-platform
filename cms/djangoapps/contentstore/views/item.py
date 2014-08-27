@@ -666,7 +666,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
-        "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
+        "published_on": get_default_time_display(xblock.published_on) if xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,

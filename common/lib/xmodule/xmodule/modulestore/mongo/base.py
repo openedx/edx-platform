@@ -235,14 +235,14 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
                 edit_info = json_data.get('edit_info')
 
-                # migrate published_by and published_date if edit_info isn't present
+                # migrate published_by and published_on if edit_info isn't present
                 if not edit_info:
                     module.edited_by = module.edited_on = module.subtree_edited_on = \
-                        module.subtree_edited_by = module.published_date = None
+                        module.subtree_edited_by = module.published_on = None
                     raw_metadata = json_data.get('metadata', {})
-                    # published_date was previously stored as a list of time components instead of a datetime
+                    # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module.published_date = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                        module.published_on = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
                     module.published_by = raw_metadata.get('published_by')
                 # otherwise restore the stored editing information
                 else:
@@ -250,7 +250,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     module.edited_on = edit_info.get('edited_on')
                     module.subtree_edited_on = edit_info.get('subtree_edited_on')
                     module.subtree_edited_by = edit_info.get('subtree_edited_by')
-                    module.published_date = edit_info.get('published_date')
+                    module.published_on = edit_info.get('published_date')
                     module.published_by = edit_info.get('published_by')
 
                 # decache any computed pending field settings
@@ -1185,12 +1185,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             xblock.edited_by = user_id
             xblock.subtree_edited_on = now
             xblock.subtree_edited_by = user_id
-            if not hasattr(xblock, 'published_date'):
-                xblock.published_date = None
+            if not hasattr(xblock, 'published_on'):
+                xblock.published_on = None
             if not hasattr(xblock, 'published_by'):
                 xblock.published_by = None
             if isPublish:
-                xblock.published_date = now
+                xblock.published_on = now
                 xblock.published_by = user_id
 
             # recompute (and update) the metadata inheritance tree which is cached
