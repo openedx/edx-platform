@@ -18,10 +18,11 @@ front-end validation will not pass.
                   one stored on YouTube
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
-
+from nose.plugins.attrib import attr
 from .test_studio_video_module import CMSVideoBaseTest
 
 
+@attr('shard_2')
 class VideoTranscriptTest(CMSVideoBaseTest):
     """
     CMS Video Transcript Test Class

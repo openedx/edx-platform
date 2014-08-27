@@ -4,7 +4,6 @@ Acceptance tests for Studio.
 
 from unittest import skip
 from bok_choy.web_app_test import WebAppTest
-from nose.plugins.attrib import attr
 
 from ..pages.studio.asset_index import AssetIndexPage
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -28,7 +27,6 @@ from ..fixtures.course import XBlockFixtureDesc
 from .base_studio_test import StudioCourseTest
 
 
-@attr('shard_1')
 class LoggedOutTest(WebAppTest):
     """
     Smoke test for pages in Studio that are visible when logged out.
@@ -48,7 +46,6 @@ class LoggedOutTest(WebAppTest):
             page.visit()
 
 
-@attr('shard_1')
 class LoggedInPagesTest(WebAppTest):
     """
     Tests that verify the pages in Studio that you can get to when logged
@@ -68,7 +65,6 @@ class LoggedInPagesTest(WebAppTest):
         self.dashboard_page.visit()
 
 
-@attr('shard_1')
 class CoursePagesTest(StudioCourseTest):
     """
     Tests that verify the pages in Studio that you can get to when logged
@@ -113,7 +109,6 @@ class CoursePagesTest(StudioCourseTest):
             page.visit()
 
 
-@attr('shard_1')
 class DiscussionPreviewTest(StudioCourseTest):
     """
     Tests that Inline Discussions are rendered with a custom preview in Studio

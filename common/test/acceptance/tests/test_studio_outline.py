@@ -1,8 +1,6 @@
 """
 Acceptance tests for studio related to the outline page.
 """
-from nose.plugins.attrib import attr
-
 from datetime import datetime, timedelta
 import itertools
 from pytz import UTC
@@ -69,7 +67,6 @@ class CourseOutlineTest(StudioCourseTest):
         verify_ordering(self, outline_page, expected_ordering)
 
 
-@attr('shard_2')
 class CourseOutlineDragAndDropTest(CourseOutlineTest):
     """
     Tests of drag and drop within the outline page.
@@ -124,7 +121,6 @@ class CourseOutlineDragAndDropTest(CourseOutlineTest):
         self.drag_and_verify(self.seq_1_vert_2_handle, self.chap_1_seq_2_handle, expected_ordering, course_outline_page)
 
 
-@attr('shard_2')
 class WarningMessagesTest(CourseOutlineTest):
     """
     Feature: Warning messages on sections, subsections, and units
@@ -329,7 +325,6 @@ class WarningMessagesTest(CourseOutlineTest):
             unit.toggle_staff_lock()
 
 
-@attr('shard_2')
 class EditingSectionsTest(CourseOutlineTest):
     """
     Feature: Editing Release date, Due date and grading type.
@@ -477,7 +472,6 @@ class EditingSectionsTest(CourseOutlineTest):
         self.assertIn(release_text, self.course_outline_page.section_at(0).subsection_at(0).release_date)
 
 
-@attr('shard_2')
 class StaffLockTest(CourseOutlineTest):
     """
     Feature: Sections, subsections, and units can be locked and unlocked from the course outline.
@@ -859,7 +853,6 @@ class StaffLockTest(CourseOutlineTest):
         self._remove_staff_lock_and_verify_warning(subsection, False)
 
 
-@attr('shard_2')
 class EditNamesTest(CourseOutlineTest):
     """
     Feature: Click-to-edit section/subsection names
@@ -975,7 +968,6 @@ class EditNamesTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr('shard_2')
 class CreateSectionsTest(CourseOutlineTest):
     """
     Feature: Create new sections/subsections/units
@@ -1049,7 +1041,6 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
-@attr('shard_2')
 class DeleteContentTest(CourseOutlineTest):
     """
     Feature: Deleting sections/subsections/units
@@ -1161,7 +1152,6 @@ class DeleteContentTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.has_no_content_message)
 
 
-@attr('shard_2')
 class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
     """
     Feature: Courses with multiple sections can expand and collapse all sections.
@@ -1293,7 +1283,6 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.verify_all_sections(collapsed=False)
 
 
-@attr('shard_2')
 class ExpandCollapseSingleSectionTest(CourseOutlineTest):
     """
     Feature: Courses with a single section can expand and collapse all sections.
@@ -1333,7 +1322,6 @@ class ExpandCollapseSingleSectionTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).subsection_at(1).is_collapsed)
 
 
-@attr('shard_2')
 class ExpandCollapseEmptyTest(CourseOutlineTest):
     """
     Feature: Courses with no sections initially can expand and collapse all sections after addition.
@@ -1371,7 +1359,6 @@ class ExpandCollapseEmptyTest(CourseOutlineTest):
         self.assertFalse(self.course_outline_page.section_at(0).is_collapsed)
 
 
-@attr('shard_2')
 class DefaultStatesEmptyTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with an empty course
@@ -1396,7 +1383,6 @@ class DefaultStatesEmptyTest(CourseOutlineTest):
         self.assertTrue(self.course_outline_page.bottom_add_section_button.is_present())
 
 
-@attr('shard_2')
 class DefaultStatesContentTest(CourseOutlineTest):
     """
     Feature: Misc course outline default states/actions when starting with a course with content
@@ -1421,7 +1407,6 @@ class DefaultStatesContentTest(CourseOutlineTest):
         self.assertEqual(courseware.xblock_component_type(2), 'discussion')
 
 
-@attr('shard_2')
 class UnitNavigationTest(CourseOutlineTest):
     """
     Feature: Navigate to units
@@ -1442,7 +1427,6 @@ class UnitNavigationTest(CourseOutlineTest):
         self.assertTrue(unit.is_browser_on_page)
 
 
-@attr('shard_1')
 class PublishSectionTest(CourseOutlineTest):
     """
     Feature: Publish sections.

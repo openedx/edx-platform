@@ -12,7 +12,6 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 
 
-@attr('shard_2')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class CMSVideoBaseTest(UniqueCourseTest):
     """
@@ -125,6 +124,7 @@ class CMSVideoBaseTest(UniqueCourseTest):
         self.unit_page.xblocks[1].save_settings()
 
 
+@attr('shard_2')
 class CMSVideoTest(CMSVideoBaseTest):
     """
     CMS Video Test Class
