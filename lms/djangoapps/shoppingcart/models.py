@@ -328,9 +328,16 @@ class Invoice(models.Model):
     total_amount = models.FloatField()
     company_contact_name = models.CharField(max_length=255)
     company_contact_email = models.CharField(max_length=255)
-    tax_id = models.CharField(max_length=64, null=True)
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, null=True)
+    address_line_3 = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    state = models.CharField(max_length=255, null=True)
+    zip = models.CharField(max_length=15, null=True)
+    country = models.CharField(max_length=64, null=True)
     company_reference = models.CharField(max_length=255, null=True)
     internal_reference = models.CharField(max_length=255, null=True)
+    purchase_order_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
 
 

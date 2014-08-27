@@ -66,14 +66,14 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
 
         query_features = [
             'company_name', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
-            'tax_id', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
+            'purchase_order_number', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
             'codes', 'course_id'
         ]
 
         #create invoice
         sale_invoice = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='Testw_1',
-            company_contact_email='test2@test.com', tax_id='2Fwe23S', internal_reference="ABC",
+            company_contact_email='test2@test.com', purchase_order_number='2Fwe23S', internal_reference="ABC",
             company_reference='', course_id=self.course.id
         )
         for i in range(5):
@@ -92,7 +92,7 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
             self.assertEqual(sale_record['company_name'], sale_invoice.company_name)
             self.assertEqual(sale_record['internal_reference'], sale_invoice.internal_reference)
             self.assertEqual(sale_record['company_reference'], sale_invoice.company_reference)
-            self.assertEqual(sale_record['tax_id'], sale_invoice.tax_id)
+            self.assertEqual(sale_record['purchase_order_number'], sale_invoice.purchase_order_number)
             self.assertEqual(sale_record['invoice_number'], sale_invoice.id)
             self.assertEqual(sale_record['created_by'], self.instructor)
             self.assertEqual(sale_record['total_used_codes'], 0)
@@ -113,9 +113,10 @@ class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total-registration-codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
-            'contact_name': 'Test123', 'contact_email': 'test@123.com',
-            'tax': '123A23F', 'reference': '', 'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
+            'contact_name': 'Test123', 'contact_email': 'test@123.com', 'address_line_1': 'Portland Street',
+            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'purchase_order_number': '123A23F', 'company_reference': '', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
