@@ -393,5 +393,6 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         Get the published branch and find when it was published if it was. Cache the results in the xblock
         """
         published_block = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
-        setattr(xblock, '_published_by', published_block['edit_info']['edited_by'])
-        setattr(xblock, '_published_on', published_block['edit_info']['edited_on'])
+        if published_block is not None:
+            setattr(xblock, '_published_by', published_block['edit_info']['edited_by'])
+            setattr(xblock, '_published_on', published_block['edit_info']['edited_on'])
