@@ -19,6 +19,8 @@ Subsection tasks:
 * `Change a Subsection Name`_
 * `Set a Subsection Release Date`_
 * `Set the Assignment Type and Due Date for a Subsection`_
+* `Publish all Units in a Subsection`_
+* `Hide a Subsection from Students`_
 * `Delete a Subsection`_
 
 
@@ -240,7 +242,7 @@ To set the subsection release date:
 
 #. Enter the release date and time for the section:
 
-   .. image:: ../Images/subsection-settings.png
+   .. image:: ../Images/subsection-settings-release.png
     :alt: The subsection release date settings
 
 #. Click **Save**.
@@ -278,6 +280,62 @@ To set the assignment type and due date for a subsection:
 #. Click **Save**.
 
 For more information, see :ref:`Establish a Grading Policy`.
+
+.. _Publish all Units in a Subsection:
+
+**********************************
+Publish all Units in a Subsection
+**********************************
+
+To publish all new and changed units in a subsection, click the publish icon in
+the box for the subsection:
+
+.. image:: ../Images/outline-publish-icon-subsection.png
+ :alt: Publishing icon for a subsection
+
+.. note:: 
+ The publish icon only appears when there is new or changed content within the
+ subsection.
+
+See :ref:`Unit Publishing Status` for information about statuses and visibility
+to students.
+
+.. _Hide a Subsection from Students:
+
+********************************
+Hide a Subsection from Students
+********************************
+
+You can hide all content in a subsection from students, regardless of the
+status of units within the section.
+
+To hide a subsection from students:
+
+#. Click the Settings icon in the subsection box:
+   
+   .. image:: ../Images/subsections-settings-icon.png
+    :alt: The subsection settings icon circled
+
+   The **Settings** dialog box opens.
+
+#. Check **Hide from students**.
+
+   .. image:: ../Images/subsection-settings-hidden.png
+    :alt: The subsection hide from students setting
+
+#. Click **Save**.
+
+Now, no content in the subsection is visible to students.
+
+To make the subection visible to students, repeat these steps and clear the
+**Hide from students** checkbox.
+
+.. warning::
+ When you clear the **Hide from students** checkbox for a subsection, not all
+ content in the subsection is necessarily made visible to students. If you
+ explicitly set a unit to be hidden from students, it remains hidden from
+ students. Unpublished units remain unpublished, and changes to published units
+ remain unpublished.
 
 .. _Delete a Subsection:
 
