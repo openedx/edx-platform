@@ -36,8 +36,7 @@ from student.roles import CourseFinanceAdminRole
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from analyticsclient.client import Client
-from analyticsclient.exceptions import ClientError
+from analyticsclient.client import Client, ClientError
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
