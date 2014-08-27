@@ -1526,8 +1526,9 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.data.keys()), 2)
-        self.assertIn('1', response.data)
-        self.assertIn('2', response.data)
+        users = response.data['users']
+        self.assertTrue(users.get('1'))
+        self.assertTrue(users.get('2'))
 
         # make the first user an observer to asset that its content is being filtered out from
         # the aggregates
@@ -1536,8 +1537,9 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.data.keys()), 1)
-        self.assertNotIn('1', response.data)
-        self.assertIn('2', response.data)
+        users = response.data['users']
+        self.assertFalse(users.get('1'))
+        self.assertTrue(users.get('2'))
 
     def test_courses_leaders_list_get(self):
         # make the last user an observer to asset that its content is being filtered out from

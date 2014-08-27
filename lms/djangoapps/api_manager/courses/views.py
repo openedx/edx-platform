@@ -28,7 +28,7 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 
 from xmodule.modulestore.django import modulestore
 
-from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, course_exists
+from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, course_exists, get_modulestore
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -525,8 +525,7 @@ class CoursesList(SecureListAPIView):
     serializer_class = CourseSerializer
 
     def get_queryset(self):
-        store = modulestore()
-        course_descriptors = store.get_courses()
+        course_descriptors = get_modulestore().get_courses()
         return course_descriptors
 
 
