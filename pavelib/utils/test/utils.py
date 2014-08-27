@@ -4,6 +4,7 @@ Helper functions for test tasks
 from paver.easy import sh, task
 from pavelib.utils.envs import Env
 import os
+import subprocess
 
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
@@ -53,3 +54,23 @@ def clean_mongo():
         port=MONGO_PORT_NUM,
         repo_root=Env.REPO_ROOT,
     ))
+
+def check_firefox_and_selenium_versions():
+    """
+    Check that the pairing of firefox and selenium version is a known compatible one.
+    """
+    firefox_ver = subprocess.check_output("firefox --version", shell=True).strip()
+    print firefox_ver
+
+    selenium_ver = subprocess.check_output( "pip freeze | grep selenium==", shell=True).strip()
+    print selenium_ver
+
+    compatible_versions = [
+        ("Mozilla Firefox 28.0", "selenium==2.42.1"),
+        ("Mozilla Firefox 29.0", "selenium==2.42.1"),
+        ("Mozilla Firefox 25.0", "selenium==2.39.0"),
+    ]
+
+    if (firefox_ver, selenium_ver) not in compatible_versions:
+        raise Exception('Browser and selenium versions not compatible. Please use {}.'.format(compatible_versions[0]))
+
