@@ -1,11 +1,13 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-# edX translation file.
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
 # 
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
-# edX translation file.
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
@@ -26,8 +28,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 12:00-0400\n"
-"PO-Revision-Date: 2014-08-22 16:02:07.802910\n"
+"POT-Creation-Date: 2014-08-27 17:10+0000\n"
+"PO-Revision-Date: 2014-08-27 17:13:12.251493\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -52,8 +54,8 @@ msgstr "ÖK Ⱡ'#"
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
-#: cms/static/js/views/modals/base_modal.js
+#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/validation.js cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -62,6 +64,7 @@ msgstr "ÖK Ⱡ'#"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
 #: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
@@ -76,16 +79,15 @@ msgstr "Thïs lïnk wïll öpén ïn ä néw ßröwsér wïndöw/täß Ⱡ'σя�
 
 #: cms/static/js/views/asset.js
 #: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course_grade_policy.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/group-configuration-edit.underscore
+#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -107,6 +109,7 @@ msgstr "Nämé Ⱡ'σяєм#"
 #: cms/static/js/views/modals/base_modal.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
@@ -665,6 +668,7 @@ msgstr "Édït HTML #"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/mock/mock-container-page.underscore
@@ -2334,34 +2338,6 @@ msgstr "Çlösé Çälçülätör Ⱡ'σ#"
 msgid "Post body"
 msgstr "Pöst ßödý #"
 
-#. Translators: "Distribution" refers to a grade distribution. This error
-#. message appears when there is an error getting the data on grade
-#. distribution.;
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching distribution."
-msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
-
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Loading..."
@@ -2391,6 +2367,22 @@ msgstr ""
 "Lïnks äré générätéd ön démänd änd éxpïré wïthïn 5 mïnütés düé tö thé "
 "sénsïtïvé nätüré öf stüdént ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "Ûnäväïläßlé métrïç dïspläý. Ⱡ'σяєм#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "Érrör fétçhïng grädé dïstrïßütïöns. Ⱡ'σяєм ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "Läst Ûpdätéd: <%= timestamp %> Ⱡ'σ#"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> stüdénts sçöréd. Ⱡ'σя#"
+
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
 msgstr "Ûsérnämé #"
@@ -2411,12 +2403,6 @@ msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
-
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3195,14 +3181,6 @@ msgid "Group name is required"
 msgstr "Gröüp nämé ïs réqüïréd Ⱡ'σяє#"
 
 #: cms/static/js/models/group_configuration.js
-msgid "Group A"
-msgstr "Gröüp À #"
-
-#: cms/static/js/models/group_configuration.js
-msgid "Group B"
-msgstr "Gröüp B #"
-
-#: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
 msgstr "Gröüp Çönfïgürätïön nämé ïs réqüïréd. Ⱡ'σяєм ιρѕ#"
 
@@ -3347,7 +3325,7 @@ msgstr "Ûplöäd ä néw PDF tö “<%= name %>” Ⱡ'σяєм#"
 msgid "Please select a PDF file to upload."
 msgstr "Pléäsé séléçt ä PDF fïlé tö üplöäd. Ⱡ'σяєм ιρ#"
 
-#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/edit_syllabus.js cms/static/js/views/edit_textbook.js
 #: cms/static/js/views/group_configuration_edit.js
 #: cms/static/js/views/overview_assignment_grader.js
 msgid "Saving"
@@ -3398,7 +3376,7 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕ#"
 
 #: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
 msgid "Deleting"
 msgstr "Délétïng #"
 
@@ -3478,9 +3456,18 @@ msgstr "Ýöür çhängé çöüld nöt ßé sävéd Ⱡ'σяєм #"
 msgid "Return and resolve this issue"
 msgstr "Rétürn änd résölvé thïs ïssüé Ⱡ'σяєм #"
 
-#: cms/static/js/views/show_textbook.js
+#: cms/static/js/views/show_syllabus.js cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
 msgstr "Délété “<%= name %>”? Ⱡ'#"
+
+#: cms/static/js/views/show_syllabus.js
+msgid ""
+"Deleting a syllabus cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr ""
+"Délétïng ä sýlläßüs çännöt ßé ündöné änd önçé délétéd äný référénçé tö ït ïn"
+" ýöür çöürséwäré's nävïgätïön wïll älsö ßé rémövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
@@ -4005,10 +3992,41 @@ msgstr "Ûplöäd PDF Ⱡ#"
 msgid "delete chapter"
 msgstr "délété çhäptér Ⱡ'#"
 
+#: cms/templates/js/edit-syllabus.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "error.message"
 msgstr "érrör.méssägé Ⱡ'#"
+
+#: cms/templates/js/edit-syllabus.underscore
+msgid "Syllabus information"
+msgstr "Sýlläßüs ïnförmätïön Ⱡ'σя#"
+
+#: cms/templates/js/edit-syllabus.underscore
+msgid "Syllabus Name"
+msgstr "Sýlläßüs Nämé Ⱡ'#"
+
+#: cms/templates/js/edit-syllabus.underscore
+#: cms/templates/js/edit-textbook.underscore
+msgid "Introduction to Cookie Baking"
+msgstr "Ìntrödüçtïön tö Çöökïé Bäkïng Ⱡ'σяєм #"
+
+#: cms/templates/js/edit-syllabus.underscore
+#: cms/templates/js/edit-textbook.underscore
+msgid ""
+"provide the title/name of the text book as you would like your students to "
+"see it"
+msgstr ""
+"prövïdé thé tïtlé/nämé öf thé téxt ßöök äs ýöü wöüld lïké ýöür stüdénts tö "
+"séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/js/edit-syllabus.underscore
+msgid "Topic(s) information"
+msgstr "Töpïç(s) ïnförmätïön Ⱡ'σя#"
+
+#: cms/templates/js/edit-syllabus.underscore
+msgid "Add a Topic"
+msgstr "Àdd ä Töpïç Ⱡ#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook information"
@@ -4019,24 +4037,45 @@ msgid "Textbook Name"
 msgstr "Téxtßöök Nämé Ⱡ'#"
 
 #: cms/templates/js/edit-textbook.underscore
-msgid "Introduction to Cookie Baking"
-msgstr "Ìntrödüçtïön tö Çöökïé Bäkïng Ⱡ'σяєм #"
-
-#: cms/templates/js/edit-textbook.underscore
-msgid ""
-"provide the title/name of the text book as you would like your students to "
-"see it"
-msgstr ""
-"prövïdé thé tïtlé/nämé öf thé téxt ßöök äs ýöü wöüld lïké ýöür stüdénts tö "
-"séé ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: cms/templates/js/edit-textbook.underscore
 msgid "Chapter information"
 msgstr "Çhäptér ïnförmätïön Ⱡ'σя#"
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Add a Chapter"
 msgstr "Àdd ä Çhäptér Ⱡ'#"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "Topic Name"
+msgstr "Töpïç Nämé Ⱡ#"
+
+#: cms/templates/js/edit-topic.underscore
+#: cms/templates/js/edit-topic.underscore
+msgid "Topic %s"
+msgstr "Töpïç %s #"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "provide the title/name of the topic that will be used in navigating"
+msgstr ""
+"prövïdé thé tïtlé/nämé öf thé töpïç thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "String Description"
+msgstr "Strïng Désçrïptïön Ⱡ'σ#"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "provide the description of the topic that will be used in navigating"
+msgstr ""
+"prövïdé thé désçrïptïön öf thé töpïç thät wïll ßé üséd ïn nävïgätïng Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "Description %s"
+msgstr "Désçrïptïön %s Ⱡ'#"
+
+#: cms/templates/js/edit-topic.underscore
+msgid "delete string"
+msgstr "délété strïng Ⱡ'#"
 
 #: cms/templates/js/grading-editor.underscore
 msgid "Grading"
@@ -4049,11 +4088,6 @@ msgstr "Grädé äs: #"
 #: cms/templates/js/group-configuration-details.underscore
 msgid "ID"
 msgstr "ÌD Ⱡ'#"
-
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-edit.underscore
-msgid "Cannot delete when in use by an experiment"
-msgstr "Çännöt délété whén ïn üsé ßý än éxpérïmént Ⱡ'σяєм ιρѕυ#"
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
@@ -4121,6 +4155,10 @@ msgstr ""
 msgid "Create"
 msgstr "Çréäté Ⱡ'σяєм ιρѕ#"
 
+#: cms/templates/js/group-configuration-edit.underscore
+msgid "Cannot delete when in use by an experiment"
+msgstr "Çännöt délété whén ïn üsé ßý än éxpérïmént Ⱡ'σяєм ιρѕυ#"
+
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
 msgstr "délété gröüp Ⱡ#"
@@ -4155,6 +4193,14 @@ msgstr "Ýöü hävén't çréätéd äný gröüp çönfïgürätïöns ýét. 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "Add your first Group Configuration"
 msgstr "Àdd ýöür fïrst Gröüp Çönfïgürätïön Ⱡ'σяєм ιρ#"
+
+#: cms/templates/js/no-syllabuses.underscore
+msgid "You haven't added any syllabus to this course yet."
+msgstr "Ýöü hävén't äddéd äný sýlläßüs tö thïs çöürsé ýét. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/no-syllabuses.underscore
+msgid "Add your first syllabus"
+msgstr "Àdd ýöür fïrst sýlläßüs Ⱡ'σяє#"
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
@@ -4265,6 +4311,7 @@ msgstr "Réléäsé Tïmé ïn ÛTÇ: Ⱡ'σя#"
 msgid "Clear Release Date/Time"
 msgstr "Çléär Réléäsé Däté/Tïmé Ⱡ'σяє#"
 
+#: cms/templates/js/show-syllabus.underscore
 #: cms/templates/js/show-textbook.underscore
 msgid "View Live"
 msgstr "Vïéw Lïvé #"

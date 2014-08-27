@@ -1,5 +1,4 @@
-# edX translation file
-# This English source file is machine-generated. Do not check it into github.
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # EdX Team <info@edx.org>, 2014.
@@ -7,150 +6,58 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
-"Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2014-01-06 18:55+0000\n"
-"PO-Revision-Date: 2014-01-06 18:58:17.248679\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-08-27 17:10+0000\n"
+"PO-Revision-Date: 2014-08-27 17:13:11.279601\n"
 "Last-Translator: \n"
-"Language-Team: translation team <translation_team@edx.org>\n"
+"Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 
-#: cms/djangoapps/contentstore/utils.py:25
+#. Translators: "Open Ended Panel" appears on a tab that, when clicked, opens
+#. up a panel that
+#. displays information about open-ended problems that a user has submitted or
+#. needs to grade
+#: cms/djangoapps/contentstore/utils.py:28
+#: common/lib/xmodule/xmodule/tabs.py:633
 msgid "Open Ended Panel"
 msgstr ""
 
-#: cms/djangoapps/contentstore/utils.py:26
-msgid "My Notes"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/assets.py:172
-msgid "Upload completed"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py:226
-msgid ""
-"Unable to create course '{name}'.\n"
-"\n"
-"{err}"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py:238
-msgid ""
-"There is already a course defined with the same organization, course number,"
-" and course run. Please change either organization or course number to be "
-"unique."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py:244
-#: cms/djangoapps/contentstore/views/course.py:248
-#: cms/djangoapps/contentstore/views/course.py:270
-#: cms/djangoapps/contentstore/views/course.py:273
-msgid ""
-"Please change either the organization or course number so that it is unique."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/course.py:266
-msgid ""
-"There is already a course defined with the same organization and course "
-"number. Please change at least one field to be unique."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/import_export.py:81
-msgid "We only support uploading a .tar.gz file."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/import_export.py:118
-msgid "File upload corrupted. Please try again"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/import_export.py:206
-msgid "Could not find the course.xml file in the package."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/tabs.py:38
-msgid "Courseware"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/tabs.py:39
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:105
-msgid "Course Info"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/tabs.py:40
+#. Translators: "Discussion" is the title of the course forum page
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: cms/djangoapps/contentstore/views/component.py:243
+#: common/lib/xmodule/xmodule/tabs.py:360
+#: common/lib/xmodule/xmodule/tabs.py:424
 msgid "Discussion"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/tabs.py:41
-msgid "Wiki"
+#: cms/djangoapps/contentstore/views/component.py:245
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+msgid "Problem"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/tabs.py:42
-msgid "Syllabus"
+#: cms/djangoapps/contentstore/views/component.py:297
+#: common/lib/xmodule/xmodule/video_module/video_module.py:204
+msgid "Advanced"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/tabs.py:43
-msgid "Progress"
+#: cms/djangoapps/contentstore/views/helpers.py:130
+#: lms/djangoapps/class_dashboard/dashboard_data.py:558
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+msgid "Section"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/user.py:104
-msgid "Insufficient permissions"
+#: cms/djangoapps/contentstore/views/helpers.py:132
+#: lms/djangoapps/class_dashboard/dashboard_data.py:558
+msgid "Subsection"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/user.py:112
-msgid "Could not find user by email address '{email}'."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/user.py:138
-msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/user.py:156
-#: cms/djangoapps/contentstore/views/user.py:190
-msgid "You may not remove the last instructor from a course"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/user.py:170
-msgid "`role` is required"
-msgstr ""
-
-#: cms/djangoapps/contentstore/views/user.py:176
-msgid "Only instructors may create other instructors"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:33
-msgid "unrequested"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:34
-msgid "pending"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:35
-msgid "granted"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:36
-msgid "denied"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:39
-msgid "Studio user"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:41
-msgid "The date when state was last updated"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:43
-msgid "Current course creator state"
-msgstr ""
-
-#: cms/djangoapps/course_creators/models.py:44
-msgid ""
-"Optional notes about this user (for example, why course creation access was "
-"denied)"
+#: cms/djangoapps/contentstore/views/helpers.py:134
+#: lms/djangoapps/instructor/views/tools.py:288
+msgid "Unit"
 msgstr ""
 
 #: common/djangoapps/cities/models.py:24 common/djangoapps/cities/models.py:40
@@ -173,25 +80,41 @@ msgstr ""
 msgid "Cities"
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py:43
+#: common/djangoapps/course_modes/models.py:59
 msgid "Honor Code Certificate"
 msgstr ""
 
-#: common/djangoapps/course_modes/views.py:81
-#: common/djangoapps/student/views.py:448
+#: common/djangoapps/course_modes/views.py:133
+#: common/djangoapps/student/views.py:648
 msgid "Enrollment is closed"
 msgstr ""
 
-#: common/djangoapps/course_modes/views.py:90
+#: common/djangoapps/course_modes/views.py:142
 msgid "Enrollment mode not supported"
 msgstr ""
 
-#: common/djangoapps/course_modes/views.py:106
+#: common/djangoapps/course_modes/views.py:158
 msgid "Invalid amount selected."
 msgstr ""
 
-#: common/djangoapps/course_modes/views.py:111
+#: common/djangoapps/course_modes/views.py:163
 msgid "No selected price or selected price is too low."
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py:15
+msgid "Administrator"
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py:16
+msgid "Moderator"
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py:17
+msgid "Community TA"
+msgstr ""
+
+#: common/djangoapps/django_comment_common/models.py:18
+msgid "Student"
 msgstr ""
 
 #: common/djangoapps/student/middleware.py:26
@@ -204,225 +127,3119 @@ msgstr ""
 msgid "Disabled Account"
 msgstr ""
 
-#: common/djangoapps/student/models.py:191
+#: common/djangoapps/student/models.py:217
 msgid "Male"
 msgstr ""
 
-#: common/djangoapps/student/models.py:191
+#: common/djangoapps/student/models.py:218
 msgid "Female"
 msgstr ""
 
-#: common/djangoapps/student/models.py:191
-#: common/djangoapps/student/models.py:209
+#. Translators: 'Other' refers to the student's gender
+#. Translators: 'Other' refers to the student's level of education
+#: common/djangoapps/student/models.py:220
+#: common/djangoapps/student/models.py:241
 msgid "Other"
 msgstr ""
 
-#: common/djangoapps/student/models.py:201
+#: common/djangoapps/student/models.py:231
 msgid "Doctorate"
 msgstr ""
 
-#: common/djangoapps/student/models.py:202
+#: common/djangoapps/student/models.py:232
 msgid "Master's or professional degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:203
+#: common/djangoapps/student/models.py:233
 msgid "Bachelor's degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:204
+#: common/djangoapps/student/models.py:234
 msgid "Associate's degree"
 msgstr ""
 
-#: common/djangoapps/student/models.py:205
+#: common/djangoapps/student/models.py:235
 msgid "Secondary/high school"
 msgstr ""
 
-#: common/djangoapps/student/models.py:206
+#: common/djangoapps/student/models.py:236
 msgid "Junior secondary/junior high/middle school"
 msgstr ""
 
-#: common/djangoapps/student/models.py:207
+#: common/djangoapps/student/models.py:237
 msgid "Elementary/primary school"
 msgstr ""
 
-#: common/djangoapps/student/models.py:208
+#. Translators: 'None' refers to the student's level of education
+#: common/djangoapps/student/models.py:239
 msgid "None"
 msgstr ""
 
 #: common/djangoapps/student/validators.py:12
-#: common/djangoapps/student/views.py:1322
-#: common/djangoapps/student/views.py:1332
+#: common/djangoapps/student/views.py:1987
+#: common/djangoapps/student/views.py:2000
 msgid "Invalid ID"
 msgstr ""
 
-#: common/djangoapps/student/views.py:432
+#: common/djangoapps/student/views.py:630
 msgid "Course id not specified"
 msgstr ""
 
-#: common/djangoapps/student/views.py:445
+#: common/djangoapps/student/views.py:645
 msgid "Course id is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:471
-msgid "Your level of education is not accepted for this course."
+#: common/djangoapps/student/views.py:654
+msgid "Course is full"
 msgstr ""
 
-#: common/djangoapps/student/views.py:491
+#: common/djangoapps/student/views.py:659
+msgid "Student is already enrolled"
+msgstr ""
+
+#: common/djangoapps/student/views.py:751
 msgid "You are not enrolled in this course"
 msgstr ""
 
-#: common/djangoapps/student/views.py:502
+#: common/djangoapps/student/views.py:755
 msgid "Enrollment action is invalid"
 msgstr ""
 
-#: common/djangoapps/student/views.py:558
+#. Translators: provider_name is the name of an external, third-party user
+#. authentication service (like
+#. Google or LinkedIn).
+#: common/djangoapps/student/views.py:851
+msgid ""
+"There is no {platform_name} account associated with your {provider_name} "
+"account. Please use your {platform_name} credentials or pick another "
+"provider."
+msgstr ""
+
+#: common/djangoapps/student/views.py:860
 msgid "There was an error receiving your login information. Please email us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:589
+#: common/djangoapps/student/views.py:894
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr ""
+
+#: common/djangoapps/student/views.py:901
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again. Please click the \"Forgot "
+"Password\" link on this page to reset your password before logging in again."
+msgstr ""
+
+#: common/djangoapps/student/views.py:918
 msgid "Too many failed login attempts. Try again later."
 msgstr ""
 
-#: common/djangoapps/student/views.py:596
+#: common/djangoapps/student/views.py:936
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: common/djangoapps/student/views.py:643
+#: common/djangoapps/student/views.py:995
 msgid ""
 "This account has not been activated. We have sent another activation "
 "message. Please check your e-mail for the activation instructions."
 msgstr ""
 
-#: common/djangoapps/student/views.py:708
+#: common/djangoapps/student/views.py:1064
 msgid "Please enter a username"
 msgstr ""
 
-#: common/djangoapps/student/views.py:713
+#: common/djangoapps/student/views.py:1069
 msgid "Please choose an option"
 msgstr ""
 
-#: common/djangoapps/student/views.py:720
+#: common/djangoapps/student/views.py:1076
 msgid "User with username {} does not exist"
 msgstr ""
 
-#: common/djangoapps/student/views.py:728
+#: common/djangoapps/student/views.py:1084
 msgid "Successfully disabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:732
+#: common/djangoapps/student/views.py:1088
 msgid "Successfully reenabled {}'s account"
 msgstr ""
 
-#: common/djangoapps/student/views.py:735
+#: common/djangoapps/student/views.py:1091
 msgid "Unexpected account status"
 msgstr ""
 
-#: common/djangoapps/student/views.py:780
+#: common/djangoapps/student/views.py:1159
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:785
+#: common/djangoapps/student/views.py:1164
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:849
+#: common/djangoapps/student/views.py:1268
 msgid "Error (401 {field}). E-mail us."
 msgstr ""
 
-#: common/djangoapps/student/views.py:854
+#: common/djangoapps/student/views.py:1274
 msgid "To enroll, you must follow the honor code."
 msgstr ""
 
-#: common/djangoapps/student/views.py:866
+#: common/djangoapps/student/views.py:1290
 msgid "You must accept the terms of service."
 msgstr ""
 
-#: common/djangoapps/student/views.py:882
-msgid "Username must be minimum of two characters long."
+#: common/djangoapps/student/views.py:1314
+msgid "Username must be minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:883
-msgid "A properly formatted e-mail is required."
+#: common/djangoapps/student/views.py:1315
+msgid "A properly formatted e-mail is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:884
-msgid "Your legal name must be a minimum of two characters long."
+#: common/djangoapps/student/views.py:1316
+msgid "Your legal name must be a minimum of two characters long"
 msgstr ""
 
-#: common/djangoapps/student/views.py:885
-msgid "A valid password is required."
+#: common/djangoapps/student/views.py:1317
+msgid "A valid password is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:886
-msgid "Accepting Terms of Service is required."
+#: common/djangoapps/student/views.py:1318
+msgid "Accepting Terms of Service is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:887
-msgid "Agreeing to the Honor Code is required."
+#: common/djangoapps/student/views.py:1319
+msgid "Agreeing to the Honor Code is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:888
-msgid "A valid City is required."
+#: common/djangoapps/student/views.py:1320
+msgid "A level of education is required"
 msgstr ""
 
-#: common/djangoapps/student/views.py:899
+#: common/djangoapps/student/views.py:1321
+msgid "Your gender is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1322
+msgid "Your year of birth is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1323
+msgid "Your mailing address is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1324
+msgid "A description of your goals is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1325
+msgid "A city is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1326
+msgid "A country is required"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1332
+msgid "You are missing one or more required fields"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1343
 msgid "A valid ID is required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:906
+#: common/djangoapps/student/views.py:1353
+msgid "Username cannot be more than {0} characters long"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1354
+msgid "Email cannot be more than {0} characters long"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1363
 msgid "Valid e-mail is required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:913
+#: common/djangoapps/student/views.py:1370
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
 msgstr ""
 
-#: common/djangoapps/student/views.py:945
+#: common/djangoapps/student/views.py:1384
+#: common/djangoapps/student/views.py:1695
+msgid "Password: "
+msgstr ""
+
+#: common/djangoapps/student/views.py:1404
+msgid "Username and password fields cannot match"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1447
 msgid "Could not send activation e-mail."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1087
+#: common/djangoapps/student/views.py:1634
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1135
+#: common/djangoapps/student/views.py:1704
+msgid ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct password before reusing a previous password."
+msgid_plural ""
+"You are re-using a password that you have used recently. You must have {num}"
+" distinct passwords before reusing a previous password."
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/student/views.py:1713
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"day must elapse between password resets."
+msgid_plural ""
+"You are resetting passwords too frequently. Due to security policies, {num} "
+"days must elapse between password resets."
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/djangoapps/student/views.py:1724
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: common/djangoapps/student/views.py:1761
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1148
+#: common/djangoapps/student/views.py:1779
 msgid "Unable to send reactivation email"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1165
+#: common/djangoapps/student/views.py:1798
 msgid "Invalid password"
 msgstr ""
 
-#: common/djangoapps/student/views.py:1172
+#: common/djangoapps/student/views.py:1807
 msgid "Valid e-mail address required."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1177
+#: common/djangoapps/student/views.py:1814
 msgid "An account with this e-mail already exists."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1193
+#: common/djangoapps/student/views.py:1832
 msgid "Old email is the same as the new email."
 msgstr ""
 
-#: common/djangoapps/student/views.py:1287
+#: common/djangoapps/student/views.py:1856
+msgid "Unable to send email activation link. Please try again later."
+msgstr ""
+
+#: common/djangoapps/student/views.py:1944
 msgid "Name required"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py:362
+#. Translators: the translation for "LONG_DATE_FORMAT" must be a format
+#. string for formatting dates in a long form.  For example, the
+#. American English form is "%A, %B %d %Y".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:118
+msgid "LONG_DATE_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "DATE_TIME_FORMAT" must be a format
+#. string for formatting dates with times.  For example, the American
+#. English form is "%b %d, %Y at %H:%M".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:126
+msgid "DATE_TIME_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "SHORT_DATE_FORMAT" must be a
+#. format string for formatting dates in a brief form.  For example,
+#. the American English form is "%b %d %Y".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:160
+msgid "SHORT_DATE_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "TIME_FORMAT" must be a format
+#. string for formatting times.  For example, the American English
+#. form is "%H:%M:%S". See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:172
+msgid "TIME_FORMAT"
+msgstr ""
+
+#. Translators: This is an AM/PM indicator for displaying times.  It is
+#. used for the %p directive in date-time formats. See http://strftime.org
+#. for details.
+#: common/djangoapps/util/date_utils.py:200
+msgctxt "am/pm indicator"
+msgid "AM"
+msgstr ""
+
+#. Translators: This is an AM/PM indicator for displaying times.  It is
+#. used for the %p directive in date-time formats. See http://strftime.org
+#. for details.
+#: common/djangoapps/util/date_utils.py:204
+msgctxt "am/pm indicator"
+msgid "PM"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Monday Februrary 10, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:211
+msgctxt "weekday name"
+msgid "Monday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:215
+msgctxt "weekday name"
+msgid "Tuesday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:219
+msgctxt "weekday name"
+msgid "Wednesday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:223
+msgctxt "weekday name"
+msgid "Thursday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Friday Februrary 14, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:227
+msgctxt "weekday name"
+msgid "Friday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:231
+msgctxt "weekday name"
+msgid "Saturday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:235
+msgctxt "weekday name"
+msgid "Sunday"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:242
+msgctxt "abbreviated weekday name"
+msgid "Mon"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:246
+msgctxt "abbreviated weekday name"
+msgid "Tue"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:250
+msgctxt "abbreviated weekday name"
+msgid "Wed"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:254
+msgctxt "abbreviated weekday name"
+msgid "Thu"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:258
+msgctxt "abbreviated weekday name"
+msgid "Fri"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:262
+msgctxt "abbreviated weekday name"
+msgid "Sat"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:266
+msgctxt "abbreviated weekday name"
+msgid "Sun"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jan 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:273
+msgctxt "abbreviated month name"
+msgid "Jan"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Feb 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:277
+msgctxt "abbreviated month name"
+msgid "Feb"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Mar 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:281
+msgctxt "abbreviated month name"
+msgid "Mar"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Apr 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:285
+msgctxt "abbreviated month name"
+msgid "Apr"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "May 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:289
+msgctxt "abbreviated month name"
+msgid "May"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jun 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:293
+msgctxt "abbreviated month name"
+msgid "Jun"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jul 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:297
+msgctxt "abbreviated month name"
+msgid "Jul"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Aug 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:301
+msgctxt "abbreviated month name"
+msgid "Aug"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Sep 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:305
+msgctxt "abbreviated month name"
+msgid "Sep"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Oct 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:309
+msgctxt "abbreviated month name"
+msgid "Oct"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Nov 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:313
+msgctxt "abbreviated month name"
+msgid "Nov"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Dec 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:317
+msgctxt "abbreviated month name"
+msgid "Dec"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "January 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:324
+msgctxt "month name"
+msgid "January"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "February 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:328
+msgctxt "month name"
+msgid "February"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "March 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:332
+msgctxt "month name"
+msgid "March"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "April 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:336
+msgctxt "month name"
+msgid "April"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "May 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:340
+msgctxt "month name"
+msgid "May"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "June 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:344
+msgctxt "month name"
+msgid "June"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "July 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:348
+msgctxt "month name"
+msgid "July"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "August 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:352
+msgctxt "month name"
+msgid "August"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "September 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:356
+msgctxt "month name"
+msgid "September"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "October 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:360
+msgctxt "month name"
+msgid "October"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "November 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:364
+msgctxt "month name"
+msgid "November"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "December 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py:368
+msgctxt "month name"
+msgid "December"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:23
+msgid "Invalid Length ({0})"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:30
+msgid "must be {0} characters or more"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:32
+msgid "must be {0} characters or less"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:39
+msgid "Must be more complex ({0})"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:65
+msgid "must contain {0} or more uppercase characters"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:67
+msgid "must contain {0} or more lowercase characters"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:69
+msgid "must contain {0} or more digits"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:71
+msgid "must contain {0} or more punctuation characters"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:73
+msgid "must contain {0} or more non ascii characters"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:75
+msgid "must contain {0} or more unique words"
+msgstr ""
+
+#: common/djangoapps/util/password_policy_validators.py:92
+msgid "Too similar to a restricted dictionary word."
+msgstr ""
+
+#: common/lib/capa/capa/capa_problem.py:385
+msgid "Cannot rescore problems with possible file submissions"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:86
+msgid "correct"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:87
+msgid "incorrect"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:88
+msgid "incomplete"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:89 common/lib/capa/capa/inputtypes.py:90
+msgid "unanswered"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:91
+msgid "processing"
+msgstr ""
+
+#. Translators: 'ChoiceGroup' is an input type and should not be translated.
+#: common/lib/capa/capa/inputtypes.py:452
+msgid "ChoiceGroup: unexpected tag {tag_name}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:463
+#: common/lib/capa/capa/inputtypes.py:1688
+msgid "Answer received."
+msgstr ""
+
+#. Translators: '<choice>' is a tag name and should not be translated.
+#: common/lib/capa/capa/inputtypes.py:489
+msgid "Expected a <choice> tag; got {given_tag} instead"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:707
+msgid ""
+"Your files have been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:779
+msgid ""
+"Your answer has been submitted. As soon as your submission is graded, this "
+"message will be replaced with the grader's feedback."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:811
+msgid ""
+"Submitted. As soon as a response is returned, this message will be replaced "
+"by that feedback."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:838
+msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:931
+msgid "Cannot connect to the queue"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:1166
+#: common/lib/capa/capa/inputtypes.py:1249
+msgid "No formula specified."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:1172
+msgid "Couldn't parse formula: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:1177
+#: common/lib/capa/capa/inputtypes.py:1267
+msgid "Error while rendering preview"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:1260
+msgid "Sorry, couldn't parse formula"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py:1668
+msgid "{input_type}: unexpected tag {tag_name}"
+msgstr ""
+
+#. Translators: a "tag" is an XML element, such as "<b>" in HTML
+#: common/lib/capa/capa/inputtypes.py:1752
+msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:314
+msgid "Error {err} in evaluating hint function {hintfn}."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:315
+msgid "(Source code line unavailable)"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:316
+msgid "See XML source line {sourcenum}."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:548
+msgid "Execution of unsafe Javascript code is not allowed."
+msgstr ""
+
+#. Translators: 'unmask_name' is a method name and should not be translated.
+#: common/lib/capa/capa/responsetypes.py:839
+msgid "unmask_name called on response that is not masked"
+msgstr ""
+
+#. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
+#. be translated.
+#: common/lib/capa/capa/responsetypes.py:869
+msgid "Do not use shuffle and answer-pool at the same time"
+msgstr ""
+
+#. Translators: 'answer-pool' is an attribute name and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py:952
+msgid "answer-pool value should be an integer"
+msgstr ""
+
+#. Translators: 'Choicegroup' is an input type and should not be translated.
+#: common/lib/capa/capa/responsetypes.py:1019
+msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1139
+#: common/lib/capa/capa/responsetypes.py:1171
+msgid "There was a problem with the staff answer to this problem."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1184
+msgid "Could not interpret '{student_answer}' as a number."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1193
+msgid "You may not use variables ({bad_variables}) in numerical problems."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1202
+msgid "factorial function evaluated outside its domain:'{student_answer}'"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1209
+msgid "Invalid math syntax: '{student_answer}'"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1216
+msgid "You may not use complex numbers in range tolerance problems"
+msgstr ""
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. provided a boundary
+#. (end limit) for a variable that is a complex number (a + bi), this message
+#. displays.
+#: common/lib/capa/capa/responsetypes.py:1223
+msgid ""
+"There was a problem with the staff answer to this problem: complex boundary."
+msgstr ""
+
+#. Translators: This is an error message for a math problem. If the instructor
+#. did not provide
+#. a boundary (end limit) for a variable, this message displays.
+#: common/lib/capa/capa/responsetypes.py:1227
+msgid ""
+"There was a problem with the staff answer to this problem: empty boundary."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1386
+msgid "error"
+msgstr ""
+
+#. Translators: Separator used in StringResponse to display multiple answers.
+#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+#: common/lib/capa/capa/responsetypes.py:1414
+msgid "or"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1521
+msgid "error getting student answer from {student_answers}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1543
+msgid "No answer entered!"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1686
+msgid "CustomResponse: check function returned an invalid dictionary!"
+msgstr ""
+
+#. Translators: 'SymbolicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py:1796
+msgid "An error occurred with SymbolicResponse. The error was: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1891
+msgid "No answer provided."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1910
+msgid "Error: No grader has been set up for this problem."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:1970
+msgid ""
+"Unable to deliver your submission to grader (Reason: {error_msg}). Please "
+"try again later."
+msgstr ""
+
+#. Translators: 'grader' refers to the edX automatic code grader.
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/capa/capa/responsetypes.py:2000
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:321
+msgid "Invalid grader reply. Please contact the course staff."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2333
+msgid "Invalid input: {bad_input} not permitted in answer."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2348
+msgid ""
+"factorial function not permitted in answer for this problem. Provided answer"
+" was: {bad_input}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2355
+msgid "Invalid input: Could not parse '{bad_input}' as a formula."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2363
+msgid "Invalid input: Could not parse '{bad_input}' as a formula"
+msgstr ""
+
+#. Translators: 'SchematicResponse' is a problem type and should not be
+#. translated.
+#: common/lib/capa/capa/responsetypes.py:2506
+msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2571
+msgid "error grading {image_input_id} (input={user_input})"
+msgstr ""
+
+#. Translators: {sr_coords} are the coordinates of a rectangle
+#: common/lib/capa/capa/responsetypes.py:2592
+msgid "Error in problem specification! Cannot parse rectangle in {sr_coords}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:2840
+msgid "Answer not provided for {input_type}"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:3087
+msgid "The Staff answer could not be interpreted as a number."
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py:3101
+msgid "Could not interpret '{given_answer}' as a number."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/annotatable_module.py:18
+#: common/lib/xmodule/xmodule/imageannotation_module.py:22
+#: common/lib/xmodule/xmodule/textannotation_module.py:20
+#: common/lib/xmodule/xmodule/videoannotation_module.py:22
+msgid "XML data for the annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/annotatable_module.py:38
+#: common/lib/xmodule/xmodule/capa_base.py:92
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:196
+#: common/lib/xmodule/xmodule/discussion_module.py:16
+#: common/lib/xmodule/xmodule/html_module.py:28
+#: common/lib/xmodule/xmodule/html_module.py:274
+#: common/lib/xmodule/xmodule/imageannotation_module.py:45
+#: common/lib/xmodule/xmodule/lti_module.py:109
+#: common/lib/xmodule/xmodule/peer_grading_module.py:78
+#: common/lib/xmodule/xmodule/split_test_module.py:98
+#: common/lib/xmodule/xmodule/textannotation_module.py:35
+#: common/lib/xmodule/xmodule/videoannotation_module.py:34
+#: common/lib/xmodule/xmodule/word_cloud_module.py:38
+msgid "Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/annotatable_module.py:39
+#: common/lib/xmodule/xmodule/discussion_module.py:17
+#: common/lib/xmodule/xmodule/html_module.py:240
+#: common/lib/xmodule/xmodule/imageannotation_module.py:46
+#: common/lib/xmodule/xmodule/peer_grading_module.py:79
+#: common/lib/xmodule/xmodule/textannotation_module.py:36
+#: common/lib/xmodule/xmodule/videoannotation_module.py:35
+#: common/lib/xmodule/xmodule/word_cloud_module.py:39
+msgid "Display name for this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/annotatable_module.py:41
+msgid "Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:93
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:197
+#: common/lib/xmodule/xmodule/html_module.py:29
+#: common/lib/xmodule/xmodule/html_module.py:275
+msgid "This name appears in the horizontal navigation at the top of the page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:100
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:229
+msgid "Number of attempts taken by the student on this problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:104
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:239
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:129
+msgid "Maximum Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:105
+msgid ""
+"Defines the number of times a student can try to answer this problem. If the"
+" value is not set, infinite attempts are allowed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:109
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:258
+msgid "Date that this problem is due by"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:111
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:262
+#: common/lib/xmodule/xmodule/peer_grading_module.py:56
+msgid ""
+"Date that this problem is due by for a particular student. This can be set "
+"by an instructor, and will override the global due date if it is set to a "
+"date that is later than the global due date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:119
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:270
+msgid "Amount of time after the due date that submissions will be accepted"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:123
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:94
+msgid "Show Answer"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:124
+msgid ""
+"Defines when to show the answer to the problem. A default value can be set "
+"in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:129
+#: common/lib/xmodule/xmodule/capa_base.py:151
+msgid "Always"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:130
+msgid "Answered"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:131
+msgid "Attempted"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:132
+msgid "Closed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:133
+msgid "Finished"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:134
+msgid "Correct or Past Due"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:135
+msgid "Past Due"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:136
+#: common/lib/xmodule/xmodule/capa_base.py:153
+msgid "Never"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:139
+msgid "Whether to force the save button to appear on the page"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:144
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:100
+msgid "Randomization"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:145
+msgid ""
+"Defines how often inputs are randomized when a student loads the problem. "
+"This setting only applies to problems that can have randomly generated "
+"numeric values. A default value can be set in Advanced Settings."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:152
+msgid "On Reset"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:154
+msgid "Per Student"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:157
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:278
+#: common/lib/xmodule/xmodule/discussion_module.py:22
+msgid "XML data for the problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:158
+msgid "Dictionary with the correctness of current student answers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:160
+msgid "Dictionary for maintaining the state of inputtypes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:161
+msgid "Dictionary with the current student responses"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:162
+msgid "Whether the student has answered the problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:163
+msgid "Random seed for this student"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:164
+msgid "Last submission time"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:166
+msgid "Timer Between Attempts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:167
+msgid ""
+"Seconds a student must wait between submissions for a problem with multiple "
+"attempts."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:171
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:282
+#: common/lib/xmodule/xmodule/peer_grading_module.py:72
+msgid "Problem Weight"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:172
+msgid ""
+"Defines the number of points each problem is worth. If the value is not set,"
+" each response field in the problem is worth one point."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:177
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:325
+msgid "Markdown source of this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:179
+msgid ""
+"Source code for LaTeX and Word problems. This feature is not well-supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:183
+msgid "String customization substitutions for particular locations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:189
+#: common/lib/xmodule/xmodule/html_module.py:38
+msgid "Enable LaTeX templates?"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:410
 msgid "Check"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_module.py:363
+#: common/lib/xmodule/xmodule/capa_base.py:411
 msgid "Final Check"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/video_module.py:312
-msgid "A YouTube URL or a link to a file hosted anywhere on the web."
+#: common/lib/xmodule/xmodule/capa_base.py:442
+msgid "Checking..."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:563
+msgid "Warning: The problem has been reset to its initial state!"
+msgstr ""
+
+#. Translators: Following this message, there will be a bulleted list of
+#. items.
+#: common/lib/xmodule/xmodule/capa_base.py:567
+msgid ""
+"The problem's state was corrupted by an invalid submission. The submission "
+"consisted of:"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:574
+msgid "If this error persists, please contact the course staff."
+msgstr ""
+
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
+#: common/lib/xmodule/xmodule/capa_base.py:951
+#: common/lib/xmodule/xmodule/capa_base.py:1330
+#: common/lib/xmodule/xmodule/capa_base.py:1379
+msgid "Problem is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:959
+msgid "Problem must be reset before it can be checked again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:968
+msgid "You must wait at least {wait} seconds between submissions."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:978
+msgid ""
+"You must wait at least {wait_secs} between submissions. {remaining_secs} "
+"remaining."
+msgstr ""
+
+#. Translators: {msg} will be replaced with a problem's error message.
+#: common/lib/xmodule/xmodule/capa_base.py:1010
+msgid "Error: {msg}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1129
+msgid "{num_hour} hour"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1134
+msgid "{num_minute} minute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1140
+msgid "{num_second} second"
+msgstr ""
+
+#. Translators: 'rescoring' refers to the act of re-submitting a student's
+#. solution so it can get a new score.
+#: common/lib/xmodule/xmodule/capa_base.py:1250
+msgid "Problem's definition does not support rescoring."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1255
+msgid "Problem must be answered before it can be graded again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1340
+msgid "Problem needs to be reset prior to save."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1348
+msgid "Your answers have been saved."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py:1350
+msgid ""
+"Your answers have been saved but not graded. Click 'Check' to grade them."
+msgstr ""
+
+#. Translators: A student must "make an attempt" to solve the problem on the
+#. page before they can reset it.
+#: common/lib/xmodule/xmodule/capa_base.py:1388
+msgid "Refresh the page and make an attempt before resetting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:72
+msgid ""
+"We're sorry, there was an error with processing your request. Please try "
+"reloading your page and trying again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_module.py:77
+msgid ""
+"The state of this problem has changed since you loaded this page. Please "
+"refresh your page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:198
+msgid "Open Response Assessment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:202
+msgid "Current task that the student is on."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:207
+msgid ""
+"A list of lists of state dictionaries for student states that are saved. "
+"This field is only populated if the instructor changes tasks after the "
+"module is created and students have attempted it (for example, if a self "
+"assessed problem is changed to self and peer assessed)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:214
+msgid "List of state dictionaries of each task within this module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:218
+msgid "Which step within the current task that the student is on."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:223
+#: common/lib/xmodule/xmodule/peer_grading_module.py:47
+msgid "Graded"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:224
+msgid ""
+"Defines whether the student gets credit for this problem. Credit is based on"
+" peer grades of this problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:234
+msgid "If the problem is ready to be reset or not."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:240
+msgid "The number of times the student can try to answer this problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:246
+msgid "Allow File Uploads"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:247
+msgid "Whether or not the student can submit files as a response."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:252
+msgid "Disable Quality Filter"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:253
+msgid ""
+"If False, the Quality Filter is enabled and submissions with poor spelling, "
+"short length, or poor grammar will not be peer reviewed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:274
+msgid "Current version number"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:283
+#: common/lib/xmodule/xmodule/peer_grading_module.py:73
+msgid ""
+"Defines the number of points each problem is worth. If the value is not set,"
+" each problem is worth one point."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:289
+msgid "Minimum Peer Grading Calibrations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:290
+msgid ""
+"The minimum number of calibration essays each student will need to complete "
+"for peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:296
+msgid "Maximum Peer Grading Calibrations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:297
+msgid ""
+"The maximum number of calibration essays each student will need to complete "
+"for peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:303
+msgid "Peer Graders per Response"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:304
+msgid "The number of peers who will grade each submission."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:310
+msgid "Required Peer Grading"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:311
+msgid ""
+"The number of other students each student making a submission will have to "
+"grade."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:317
+msgid "Allow \"overgrading\" of peer submissions"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/combined_open_ended_module.py:318
+msgid ""
+"EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already"
+" have the requisite number of graders, but ONLY WHEN all submissions they "
+"are eligible to grade already have enough graders.  This is intended for use"
+" when settings for `Required Peer Grading` > `Peer Graders per Response`"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:263
+msgid "LTI Passports"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:264
+msgid ""
+"Enter the passports for course LTI tools in the following format: "
+"\"id\":\"client_key:client_secret\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:280
+msgid "Course Advertised Start Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:281
+msgid ""
+"Enter the date you want to advertise as the course start date, if this date "
+"is different from the set start date. To advertise the set start date, enter"
+" null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:319
+msgid "Show Calculator"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:320
+msgid ""
+"Enter true or false. When true, students can see the calculator in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:325
+msgid ""
+"Enter the name of the course as it should appear in the edX.org course list."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:327
+msgid "Course Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:331
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:60
+msgid "Course Editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:332
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:61
+msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:338
+msgid "Show Chat Widget"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:339
+msgid ""
+"Enter true or false. When true, students can see the chat widget in the "
+"course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:345
+msgid "Course Survey URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:346
+msgid ""
+"Enter the URL for the end-of-course survey. If your course does not have a "
+"survey, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:350
+msgid "Discussion Blackout Dates"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:351
+msgid ""
+"Enter pairs of dates between which students cannot post to discussion "
+"forums, formatted as \"YYYY-MM-DD-YYYY-MM-DD\". To specify times as well as "
+"dates, format the pairs as \"YYYY-MM-DDTHH:MM-YYYY-MM-DDTHH:MM\" (be sure to"
+" include the \"T\" between the date and time)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:355
+msgid "Discussion Topic Mapping"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:356
+msgid ""
+"Enter discussion categories in the following format: \"CategoryName\": "
+"{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
+"example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
+"UniversityX-MUS101-course-2014_T1\"}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:360
+msgid "Discussion Sorting Alphabetical"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:362
+msgid ""
+"Enter true or false. If true, discussion categories and subcategories are "
+"sorted alphabetically. If false, they are sorted chronologically."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:365
+msgid "Course Announcement Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:366
+msgid "Enter the date to announce your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:370
+msgid "Cohort Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:371
+msgid "Cohorts are not currently supported by edX."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:375
+msgid "Course Is New"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:376
+msgid ""
+"Enter true or false. If true, the course appears in the list of new courses "
+"on edx.org, and a New! badge temporarily appears next to the course image."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:380
+msgid "Course Not Graded"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:381
+msgid "Enter true or false. If true, the course will not be graded."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:386
+msgid "Disable Progress Graph"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:387
+msgid "Enter true or false. If true, students cannot view the progress graph."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:392
+msgid "PDF Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:393
+msgid "List of dictionaries containing pdf_textbook configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:396
+msgid "HTML Textbooks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:397
+msgid ""
+"For HTML textbooks that appear as separate tabs in the courseware, enter the"
+" name of the tab (usually the name of the book) as well as the URLs and "
+"titles of all the chapters in the book."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:401
+msgid "Remote Gradebook"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:402
+msgid ""
+"Enter the remote gradebook mapping. Only use this setting when "
+"REMOTE_GRADEBOOK_URL has been specified."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:406
+msgid "Allow Anonymous Discussion Posts"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:407
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to all users."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:411
+msgid "Allow Anonymous Discussion Posts to Peers"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:412
+msgid ""
+"Enter true or false. If true, students can create discussion posts that are "
+"anonymous to other students. This setting does not make posts anonymous to "
+"course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:416
+msgid "Advanced Module List"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:417
+msgid "Enter the names of the advanced components to use in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:423
+msgid "Getting Started With Studio"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:424
+msgid "Add Course Team Members"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:425
+msgid ""
+"Grant your collaborators permission to edit your course so you can work "
+"together."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:428
+msgid "Edit Course Team"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:430
+msgid "Set Important Dates for Your Course"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:431
+msgid ""
+"Establish your course's student enrollment and launch dates on the Schedule "
+"and Details page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:434
+msgid "Edit Course Details &amp; Schedule"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:436
+msgid "Draft Your Course's Grading Policy"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:437
+msgid ""
+"Set up your assignment types and grading policy even if you haven't created "
+"all your assignments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:440
+msgid "Edit Grading Settings"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:442
+msgid "Explore the Other Studio Checklists"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:443
+msgid ""
+"Discover other available course authoring tools, and find help when you need"
+" it."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:448
+msgid "Draft a Rough Course Outline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:449
+msgid "Create Your First Section and Subsection"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:450
+msgid "Use your course outline to build your first Section and Subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:453
+#: common/lib/xmodule/xmodule/course_module.py:459
+#: common/lib/xmodule/xmodule/course_module.py:465
+#: common/lib/xmodule/xmodule/course_module.py:471
+#: common/lib/xmodule/xmodule/course_module.py:477
+#: common/lib/xmodule/xmodule/course_module.py:483
+#: common/lib/xmodule/xmodule/course_module.py:489
+msgid "Edit Course Outline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:455
+msgid "Set Section Release Dates"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:456
+msgid ""
+"Specify the release dates for each Section in your course. Sections become "
+"visible to students on their release dates."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:461
+msgid "Designate a Subsection as Graded"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:462
+msgid ""
+"Set a Subsection to be graded as a specific assignment type. Assignments "
+"within graded Subsections count toward a student's final grade."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:467
+msgid "Reordering Course Content"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:468
+msgid "Use drag and drop to reorder the content in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:473
+msgid "Renaming Sections"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:474
+msgid "Rename Sections by clicking the Section name from the Course Outline."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:479
+msgid "Deleting Course Content"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:480
+msgid ""
+"Delete Sections, Subsections, or Units you don't need anymore. Be careful, "
+"as there is no Undo function."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:485
+msgid "Add an Instructor-Only Section to Your Outline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:486
+msgid ""
+"Some course authors find using a section for unsorted, in-progress work "
+"useful. To do this, create a section and set the release date to the distant"
+" future."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:491
+msgid "Explore edX's Support Tools"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:492
+msgid "Explore the Studio Help Forum"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:493
+msgid ""
+"Access the Studio Help forum from the menu that appears when you click your "
+"user name in the top right corner of Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:496
+msgid "Visit Studio Help"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:498
+msgid "Enroll in edX 101"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:499
+msgid "Register for edX 101, edX's primer for course creation."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:502
+msgid "Register for edX 101"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:504
+msgid "Download the Studio Documentation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:505
+msgid "Download the searchable Studio reference documentation in PDF form."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:508
+msgid "Download Documentation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:510
+msgid "Draft Your Course About Page"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:511
+msgid "Draft a Course Description"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:512
+msgid ""
+"Courses on edX have an About page that includes a course video, description,"
+" and more. Draft the text students will read before deciding to enroll in "
+"your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:515
+#: common/lib/xmodule/xmodule/course_module.py:521
+#: common/lib/xmodule/xmodule/course_module.py:527
+#: common/lib/xmodule/xmodule/course_module.py:533
+msgid "Edit Course Schedule &amp; Details"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:517
+msgid "Add Staff Bios"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:518
+msgid ""
+"Showing prospective students who their instructor will be is helpful. "
+"Include staff bios on the course About page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:523
+msgid "Add Course FAQs"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:524
+msgid "Include a short list of frequently asked questions about your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:529
+msgid "Add Course Prerequisites"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:530
+msgid ""
+"Let students know what knowledge and/or skills they should have before they "
+"enroll in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:537
+msgid "Course Info Sidebar Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:538
+msgid ""
+"Enter the heading that you want students to see above your course handouts "
+"on the Course Info page. Your course handouts appear in the right panel of "
+"the page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:545
+msgid "Due Date Display Format"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:546
+msgid ""
+"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
+"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:550
+msgid "External Login Domain"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:551
+msgid "Enter the external login method students can use for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:555
+msgid "Certificates Downloadable Before End"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:556
+msgid ""
+"Enter true or false. If true, students can download certificates before the "
+"course ends, if they've met certificate requirements."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:563
+msgid "Certificates Display Behavior"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:564
+msgid ""
+"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
+"is the default behavior, where certificates will only appear after a course "
+"has ended. 'early_with_info' will display all certificate information before"
+" a course has ended. 'early_no_info' will hide all certificate information "
+"unless a student has earned a certificate."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:569
+msgid "Course About Page Image"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:570
+msgid ""
+"Edit the name of the course image file. You must upload this file on the "
+"Files & Uploads page. You can also set the course image on the Settings & "
+"Details page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:578
+msgid ""
+"Between quotation marks, enter the short name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:579
+msgid "Certificate Name (Short)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:584
+msgid ""
+"Between quotation marks, enter the long name of the course to use on the "
+"certificate that students receive when they complete the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:585
+msgid "Certificate Name (Long)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:600
+msgid "CSS Class for Course Reruns"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:601
+msgid ""
+"Allows courses to share the same css class across runs even if they have "
+"different numbers."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:612
+msgid "Discussion Forum External Link"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:613
+msgid "Allows specification of an external link to replace discussion forums."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:622
+msgid "Hide Progress Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:623
+msgid "Allows hiding of the progress tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:629
+msgid "Course Organization Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:630
+msgid ""
+"Enter the course organization that you want to appear in the courseware. "
+"This setting overrides the organization that you entered when you created "
+"the course. To use the organization that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:635
+msgid "Course Number Display String"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:636
+msgid ""
+"Enter the course number that you want to appear in the courseware. This "
+"setting overrides the course number that you entered when you created the "
+"course. To use the course number that you entered when you created the "
+"course, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:641
+msgid "Course Maximum Student Enrollment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:642
+msgid ""
+"Enter the maximum number of students that can enroll in the course. To allow"
+" an unlimited number of students, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:646
+msgid "Allow Public Wiki Access"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:647
+msgid ""
+"Enter true or false. If true, edX users can view the course wiki even if "
+"they're not enrolled in the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:651
+msgid "Invitation Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:691
+msgid "General"
+msgstr ""
+
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_module.py:1092
+msgid "TBD"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py:27
+msgid "Category"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py:29
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py:33
+msgid "Subcategory"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py:35
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:33
+msgid "Text"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:35
+#: common/lib/xmodule/xmodule/html_module.py:245
+#: common/lib/xmodule/xmodule/html_module.py:316
+#: common/lib/xmodule/xmodule/peer_grading_module.py:84
+msgid "Html contents to display for this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:36
+msgid "Source code for LaTeX documents. This feature is not well-supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:43
+msgid ""
+"Select Visual to enter content and have the editor automatically create the "
+"HTML. Select Raw to edit HTML directly. If you change this setting, you must"
+" save the component and then re-open it for editing."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:44
+msgid "Editor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:47
+msgid "Visual"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:48
+msgid "Raw"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:284
+msgid "HTML for the additional pages"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py:311
+msgid "List of course update items"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:48
+msgid "Image Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:51
+#: common/lib/xmodule/xmodule/textannotation_module.py:41
+msgid "Tags for Assignments"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:52
+#: common/lib/xmodule/xmodule/textannotation_module.py:42
+msgid ""
+"Add tags that automatically highlight in a certain color using the comma-"
+"separated form, i.e. imagery:red,parallelism:blue"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:57
+#: common/lib/xmodule/xmodule/textannotation_module.py:59
+#: common/lib/xmodule/xmodule/videoannotation_module.py:51
+msgid "Location of Annotation backend"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:60
+#: common/lib/xmodule/xmodule/textannotation_module.py:62
+#: common/lib/xmodule/xmodule/videoannotation_module.py:54
+msgid "Url for Annotation Storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:63
+#: common/lib/xmodule/xmodule/textannotation_module.py:65
+#: common/lib/xmodule/xmodule/videoannotation_module.py:57
+msgid "Secret string for annotation storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:66
+#: common/lib/xmodule/xmodule/textannotation_module.py:68
+#: common/lib/xmodule/xmodule/videoannotation_module.py:60
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:87
+msgid "Secret Token String for Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:69
+#: common/lib/xmodule/xmodule/textannotation_module.py:71
+#: common/lib/xmodule/xmodule/videoannotation_module.py:63
+msgid "Default Annotations Tab"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:70
+#: common/lib/xmodule/xmodule/textannotation_module.py:72
+#: common/lib/xmodule/xmodule/videoannotation_module.py:64
+msgid ""
+"Select which tab will be the default in the annotations table: myNotes, "
+"Instructor, or Public."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:76
+#: common/lib/xmodule/xmodule/textannotation_module.py:78
+#: common/lib/xmodule/xmodule/videoannotation_module.py:70
+msgid "Email for 'Instructor' Annotations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:77
+#: common/lib/xmodule/xmodule/textannotation_module.py:79
+#: common/lib/xmodule/xmodule/videoannotation_module.py:71
+msgid ""
+"Email of the user that will be attached to all annotations that will be "
+"found in 'Instructor' tab."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:82
+#: common/lib/xmodule/xmodule/textannotation_module.py:84
+#: common/lib/xmodule/xmodule/videoannotation_module.py:76
+msgid "Mode for Annotation Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/imageannotation_module.py:83
+#: common/lib/xmodule/xmodule/textannotation_module.py:85
+#: common/lib/xmodule/xmodule/videoannotation_module.py:77
+msgid ""
+"Type in number corresponding to following modes:  'instructor' or 'everyone'"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:111
+msgid ""
+"Enter the name that students see for this component.  Analytics reports may "
+"also use the display name to identify this component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:118
+msgid "LTI ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:120
+msgid ""
+"Enter the LTI ID for the external LTI provider.  This value must be the same"
+" LTI ID that you entered in the LTI Passports setting on the Advanced "
+"Settings page.<br />See "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:129
+msgid "LTI URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:131
+msgid ""
+"Enter the URL of the external tool that this component launches. This "
+"setting is only used when Hide External Tool is set to False.<br />See "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:138
+msgid "Custom Parameters"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:140
+msgid ""
+"Add the key/value pair for any custom parameters, such as the page your "
+"e-book should open to or the background color for this component.<br />See "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:146
+msgid "Open in New Page"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:148
+msgid ""
+"Select True if you want students to click a link that opens the LTI tool in "
+"a new window. Select False if you want the LTI content to open in an IFrame "
+"in the current page. This setting is only used when Hide External Tool is "
+"set to False.  "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:156
+msgid "Scored"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:158
+msgid ""
+"Select True if this component will receive a numerical score from the "
+"external LTI system."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:164
+msgid "Weight"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:166
+msgid ""
+"Enter the number of points possible for this component.  The default value "
+"is 1.0.  This setting is only used when Scored is set to True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:175
+msgid ""
+"The score kept in the xblock KVS -- duplicate of the published score in "
+"django DB"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:180
+msgid "Comment as returned from grader, LTI2.0 spec"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:185
+msgid "Hide External Tool"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:187
+msgid ""
+"Select True if you want to use this component as a placeholder for syncing "
+"with an external grading  system rather than launch an external tool.  This "
+"setting hides the Launch button and any IFrames for this component."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:325
+msgid ""
+"Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
+"string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py:759
+msgid ""
+"Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
+"string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:34
+msgid "Show Single Problem"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:35
+msgid ""
+"When True, only the single problem specified by \"Link to Problem Location\""
+" is shown. When False, a panel is displayed with all problems available for "
+"peer grading."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:41
+msgid "Link to Problem Location"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:42
+msgid ""
+"The location of the problem being graded. Only used when \"Show Single "
+"Problem\" is True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:48
+msgid ""
+"Defines whether the student gets credit for grading this problem. Only used "
+"when \"Show Single Problem\" is True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:53
+msgid "Due date that should be displayed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:64
+msgid "Amount of grace to give on the due date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:68
+msgid "Student data for a given peer grading problem."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py:81
+msgid "Peer Grading Interface"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py:34
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:42
+msgid "Due Date"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/seq_module.py:35
+msgid "Enter the date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:28
+msgid "Group ID {group_id}"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. warning,
+#. e.g. "Warning: this component has not been configured yet".
+#: common/lib/xmodule/xmodule/split_test_module.py:47
+msgid "Warning"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: common/lib/xmodule/xmodule/split_test_module.py:51
+msgid "Error"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:81
+msgid "Not Selected"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:99
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:101
+msgid "Content Experiment"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:106
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:112
+msgid ""
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:114
+msgid "Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:129
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:253
+msgid "{group_name} (inactive)"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:557
+msgid "The experiment is not associated with a group configuration."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:560
+msgid "Select a Group Configuration"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:567
+msgid ""
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:575
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:578
+msgid "Add Missing Groups"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:583
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/split_test_module.py:663
+msgid "This content experiment has issues that affect content visibility."
+msgstr ""
+
+#. Translators: 'Courseware' refers to the tab in the courseware that leads to
+#. the content of a course
+#: common/lib/xmodule/xmodule/tabs.py:276
+msgid "Courseware"
+msgstr ""
+
+#. Translators: "Course Info" is the name of the course's information and
+#. updates page
+#: common/lib/xmodule/xmodule/tabs.py:293
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:213
+msgid "Course Info"
+msgstr ""
+
+#. Translators: "Progress" is the name of the student's course progress page
+#: common/lib/xmodule/xmodule/tabs.py:313
+msgid "Progress"
+msgstr ""
+
+#. Translators: "Wiki" is the name of the course's wiki page
+#: common/lib/xmodule/xmodule/tabs.py:336
+#: lms/djangoapps/course_wiki/views.py:133 lms/templates/wiki/base.html:4
+msgid "Wiki"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/tabs.py:507
+msgid "Textbooks"
+msgstr ""
+
+#. Translators: "Staff grading" appears on a tab that allows
+#. staff to view open-ended problems that require staff grading
+#: common/lib/xmodule/xmodule/tabs.py:601
+msgid "Staff grading"
+msgstr ""
+
+#. Translators: "Peer grading" appears on a tab that allows
+#. students to view open-ended problems that require grading
+#: common/lib/xmodule/xmodule/tabs.py:617
+msgid "Peer grading"
+msgstr ""
+
+#. Translators: "Syllabus" appears on a tab that, when clicked, opens the
+#. syllabus of the course.
+#: common/lib/xmodule/xmodule/tabs.py:651
+msgid "Syllabus"
+msgstr ""
+
+#. Translators: 'Instructor' appears on the tab that leads to the instructor
+#. dashboard, which is
+#. a portal where an instructor can get data and perform various actions on
+#. their course
+#: common/lib/xmodule/xmodule/tabs.py:688
+msgid "Instructor"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py:38
+msgid "Text Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py:47
+msgid "Source/Citation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py:48
+msgid ""
+"Optional for citing source of any material used. Automatic citation can be "
+"done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py:53
+msgid "Diacritic Marks"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/textannotation_module.py:54
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py:37
+msgid "Video Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py:40
+msgid "The external source URL for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py:41
+msgid "Source URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py:45
+msgid "Poster Image URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py:46
+msgid "Poster URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:44
+msgid "Inputs"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:45
+msgid "Number of text boxes available for students to input words/sentences."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:51
+msgid "Maximum Words"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:52
+msgid "Maximum number of words to be displayed in generated word cloud."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:58
+msgid "Show Percents"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:59
+msgid "Statistics are shown for entered words near that word."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:66
+msgid "Whether this student has posted words to the cloud."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:71
+msgid "Student answer."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:76
+msgid "All possible words from all students."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:80
+msgid "Top num_top_words words for word cloud."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:43
+msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:55
+#: lms/lib/xblock/mixin.py:52
+msgid "If true, can be seen only by course staff, regardless of start date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:67
+msgid "GIT URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:68
+msgid "Enter the URL for the course data GIT repository."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:73
+msgid "XQA Key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:74
+msgid "This setting is not currently supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:78
+msgid ""
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:81
+msgid "URL for Annotation Storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:84
+msgid ""
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:95
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", and \"never\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:101
+msgid ""
+"Specify how often variable values in a problem are randomized when a student"
+" loads the problem. Valid values are \"always\", \"onreset\", \"never\", and"
+" \"per_student\". This setting only applies to problems that have randomly "
+"generated numeric values."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:106
+msgid "Days Early for Beta Users"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:107
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:112
+msgid "Static Asset Path"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:113
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:118
+msgid "Text Customization"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:119
+msgid "Enter string customization substitutions for particular locations."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:123
+msgid "Enable LaTeX Compiler"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:124
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:130
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. This"
+" is a course-wide setting, but you can specify a different number when you "
+"create an individual problem. To allow unlimited attempts, enter null."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:134
+msgid "Matlab API key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:135
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:145
+msgid "Experiment Group Configurations"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:146
+msgid ""
+"Enter the configurations that govern how students are grouped for content "
+"experiments."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:151
+msgid "Enable video caching system"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py:152
+msgid ""
+"Enter true or false. If true, video caching will be used for HTML5 videos."
+msgstr ""
+
+#. Translators: "Self" is used to denote an openended response that is self-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:42
+msgid "Self"
+msgstr ""
+
+#. Translators: "AI" is used to denote an openended response that is machine-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:45
+msgid "AI"
+msgstr ""
+
+#. Translators: "Peer" is used to denote an openended response that is peer-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:47
+msgid "Peer"
+msgstr ""
+
+#. Translators: "Not started" is used to communicate to a student that their
+#. response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:53
+msgid "Not started."
+msgstr ""
+
+#. Translators: "Being scored." is used to communicate to a student that their
+#. response
+#. are in the process of being scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:56
+msgid "Being scored."
+msgstr ""
+
+#. Translators: "Scoring finished" is used to communicate to a student that
+#. their response
+#. have been scored, but the full scoring process is not yet complete
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:59
+msgid "Scoring finished."
+msgstr ""
+
+#. Translators: "Complete" is used to communicate to a student that their
+#. openended response has been fully scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:62
+msgid "Complete."
+msgstr ""
+
+#. Translators: "Scored rubric" appears to a user as part of a longer
+#. string that looks something like: "Scored rubric from grader 1".
+#. "Scored" is an adjective that modifies the noun "rubric".
+#. That longer string appears when a user is viewing a graded rubric
+#. returned from one of the graders of their openended response problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:881
+msgid "Scored rubric"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:974
+msgid ""
+"You have attempted this question {number_of_student_attempts} times. You are"
+" only allowed to attempt it {max_number_of_attempts} times."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:1165
+msgid "The problem state got out-of-sync. Please try reloading the page."
+msgstr ""
+
+#. Translators: "Self-Assessment" refers to the self-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:18
+msgid "Self-Assessment"
+msgstr ""
+
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:20
+msgid "Peer-Assessment"
+msgstr ""
+
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:22
+msgid "Instructor-Assessment"
+msgstr ""
+
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:24
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py:26
+msgid "AI-Assessment"
+msgstr ""
+
+#. Translators: 'tag' is one of 'feedback', 'submission_id',
+#. 'grader_id', or 'score'. They are categories that a student
+#. responds to when filling out a post-assessment survey
+#. of his or her grade from an openended problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:164
+msgid ""
+"Could not find needed tag {tag_name} in the survey responses. Please try "
+"submitting again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:185
+msgid "There was an error saving your feedback. Please contact course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:192
+msgid "Couldn't submit feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:225
+msgid "Successfully saved your feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:228
+msgid "Unable to save your feedback. Please try again later."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:296
+msgid "Successfully saved your submission."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:301
+msgid ""
+"Unable to submit your submission to the grader. Please try again later."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:434
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:447
+msgid "Error getting feedback from grader."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:456
+msgid "No feedback available from grader."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:689
+msgid "Error handling action. Please try again."
+msgstr ""
+
+#. Translators: this string appears once an openended response
+#. is submitted but before it has been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py:780
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:95
+msgid "Not started"
+msgstr ""
+
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:98
+msgid "In progress"
+msgstr ""
+
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:101
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:102
+msgid "Done"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:495
+msgid ""
+"We could not find a file in your submission. Please try choosing a file or "
+"pasting a URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:508
+msgid ""
+"We are having trouble saving your file. Please try another file or paste a "
+"URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py:240
+msgid "Error saving your score.  Please notify course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py:111
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{status_code}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py:182
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py:186
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py:191
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py:391
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py:199
+msgid "Basic"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py:411
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py:412
+msgid "Default Video URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:17
+msgid ""
+"The name students see. This name appears in the course ribbon and as a "
+"header for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:18
+msgid "Component Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:24
+msgid "Current position in the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:31
+msgid ""
+"Optional, for older browsers: the YouTube ID for the normal speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:32
+msgid "YouTube ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:37
+msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:38
+msgid "YouTube ID for .75x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:43
+msgid ""
+"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:44
+msgid "YouTube ID for 1.25x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:49
+msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:50
+msgid "YouTube ID for 1.5x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:55
+msgid ""
+"Time you want the video to start if you don't want the entire video to play."
+" Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:56
+msgid "Video Start Time"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:61
+msgid ""
+"Time you want the video to stop if you don't want the entire video to play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:62
+msgid "Video Stop Time"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:71
+msgid "The external URL to download the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:72
+msgid "Download Video"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:77
+msgid ""
+"Allow students to download versions of this video in different formats if "
+"they cannot use the edX video player or do not have access to YouTube. You "
+"must add at least one non-YouTube URL in the Video File URLs field."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:78
+msgid "Video Download Allowed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:83
+msgid ""
+"The URL or URLs where you've posted non-YouTube versions of the video. Each "
+"URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
+"Students will be able to view the first listed video that's compatible with "
+"the student's computer. To allow students to download these videos, set "
+"Video Download Allowed to True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:84
+msgid "Video File URLs"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:88
+msgid ""
+"By default, students can download an .srt or .txt transcript when you set "
+"Download Transcript Allowed to True. If you want to provide a downloadable "
+"transcript in a different format, we recommend that you upload a handout by "
+"using the Upload a Handout field. If this isn't possible, you can post a "
+"transcript file on the Files & Uploads page or on the Internet, and then add"
+" the URL for the transcript here. Students see a link to download that "
+"transcript below the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:89
+msgid "Downloadable Transcript URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:94
+msgid ""
+"Allow students to download the timed transcript. A link to download the file"
+" appears below the video. By default, the transcript is an .srt or .txt "
+"file. If you want to provide the transcript for download in a different "
+"format, upload a file by using the Upload Handout field."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:95
+msgid "Download Transcript Allowed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:100
+msgid ""
+"The default transcript for the video, from the Default Timed Transcript "
+"field on the Basic tab. This transcript should be in English. You don't have"
+" to change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:101
+msgid "Default Timed Transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:106
+msgid "Specify whether the transcripts appear with the video by default."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:107
+msgid "Show Transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:113
+msgid ""
+"Add transcripts in different languages. Click below to specify a language "
+"and upload an .srt transcript file for that language."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:114
+msgid "Transcript Languages"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:119
+msgid "Preferred language for transcript."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:120
+msgid "Preferred language for transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:125
+msgid "Transcript file format to download by user."
+msgstr ""
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:129
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:130
+msgid "Text (.txt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:135
+msgid "The last speed that the user specified for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:139
+msgid "The default speed for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:144
+msgid "Specify whether YouTube is available for the user."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:150
+msgid ""
+"Upload a handout to accompany this video. Students can download the handout "
+"by clicking Download Handout under the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py:151
+msgid "Upload Handout"
 msgstr ""
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
@@ -446,138 +3263,293 @@ msgstr ""
 msgid "Copyright"
 msgstr ""
 
-#: lms/djangoapps/courseware/features/video.py:115
+#: lms/djangoapps/class_dashboard/dashboard_data.py:472
+#: lms/djangoapps/class_dashboard/dashboard_data.py:530
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+#: lms/djangoapps/instructor/views/api.py:613
+msgid "Name"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:472
+#: lms/djangoapps/class_dashboard/dashboard_data.py:530
+#: lms/djangoapps/instructor/views/api.py:612
+#: lms/djangoapps/instructor/views/legacy.py:1108
+#: lms/djangoapps/instructor/views/legacy.py:1186
+#: lms/djangoapps/instructor/views/legacy.py:1379
+#: lms/djangoapps/instructor/views/tools.py:258
+msgid "Username"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:530
+msgid "Grade"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:530
+msgid "Percent"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:558
+msgid "Opened by this number of students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:559
+msgid "subsections"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+msgid "Count of Students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+msgid "Percent of Students"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:561
+msgid "Score"
+msgstr ""
+
+#: lms/djangoapps/class_dashboard/dashboard_data.py:562
+msgid "problems"
+msgstr ""
+
+#. Translators: this string includes wiki markup.  Leave the ** and the _
+#. alone.
+#: lms/djangoapps/course_wiki/views.py:90
+msgid "This is the wiki for **{organization}**'s _{course_name}_."
+msgstr ""
+
+#: lms/djangoapps/course_wiki/views.py:100
+msgid "Course page automatically created."
+msgstr ""
+
+#: lms/djangoapps/course_wiki/views.py:128
+msgid "Welcome to the edX Wiki"
+msgstr ""
+
+#: lms/djangoapps/course_wiki/views.py:130
+msgid "Visit a course wiki to add an article."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py:868
+msgid "Invalid location."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py:886
+msgid "User {username} does not exist."
+msgstr ""
+
+#: lms/djangoapps/courseware/views.py:888
+msgid "User {username} has never accessed problem {location}"
+msgstr ""
+
+#: lms/djangoapps/courseware/features/video.py:434
 msgid "ERROR: No playable video sources found!"
 msgstr ""
 
+#: lms/djangoapps/dashboard/git_import.py:35
+msgid ""
+"Path {0} doesn't exist, please create it, or configure a different path with"
+" GIT_REPO_DIR"
+msgstr ""
+
+#: lms/djangoapps/dashboard/git_import.py:38
+msgid ""
+"Non usable git url provided. Expecting something like: "
+"git@github.com:mitocw/edx4edx_lite.git"
+msgstr ""
+
+#: lms/djangoapps/dashboard/git_import.py:40
+msgid "Unable to get git log"
+msgstr ""
+
+#: lms/djangoapps/dashboard/git_import.py:41
+msgid "git clone or pull failed!"
+msgstr ""
+
+#: lms/djangoapps/dashboard/git_import.py:42
+msgid "Unable to run import command."
+msgstr ""
+
+#: lms/djangoapps/dashboard/git_import.py:43
+msgid "The underlying module store does not support import."
+msgstr ""
+
+#. Translators: This is an error message when they ask for a
+#. particular version of a git repository and that version isn't
+#. available from the remote source they specified
+#: lms/djangoapps/dashboard/git_import.py:47
+msgid "The specified remote branch is not available."
+msgstr ""
+
+#. Translators: Error message shown when they have asked for a git
+#. repository branch, a specific version within a repository, that
+#. doesn't exist, or there is a problem changing to it.
+#: lms/djangoapps/dashboard/git_import.py:51
+msgid "Unable to switch to specified branch. Please check your branch name."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:25
+msgid "Email Address"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:26
+msgid "Course ID"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:37
+msgid "User not found"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:51
+msgid "Invalid course id"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:62
+msgid "Course {course_id} not past the refund window."
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:66
+msgid "No order found for {user} in course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:122
+msgid "Unenrolled {user} from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/support.py:123
+msgid "Refunded {cost} for order id {order_id}"
+msgstr ""
+
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py:138
-msgid "Failed in authenticating {0}, error {1}\n"
+msgid "Failed in authenticating {username}, error {error}\n"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:142
-msgid "Failed in authenticating {0}\n"
+#. Translators: This message means that the user could not be authenticated
+#. (that is, we could
+#. not log them in for some reason - maybe they don't have permission, or
+#. their password was wrong)
+#: lms/djangoapps/dashboard/sysadmin.py:146
+msgid "Failed in authenticating {username}\n"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:143
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:254
+#. Translators: this means that the password has been corrected (sometimes the
+#. database needs to be resynchronized)
+#. Translate this as meaning "the password was fixed" or "the password was
+#. corrected".
+#: lms/djangoapps/dashboard/sysadmin.py:149
 msgid "fixed password"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:148
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:263
+#. Translators: this means everything happened successfully, yay!
+#: lms/djangoapps/dashboard/sysadmin.py:155
 msgid "All ok!"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:155
-#: lms/djangoapps/dashboard/sysadmin.py:227
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:145
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:176
+#: lms/djangoapps/dashboard/sysadmin.py:162
+#: lms/djangoapps/dashboard/sysadmin.py:239
 msgid "Must provide username"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:157
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:151
+#: lms/djangoapps/dashboard/sysadmin.py:164
 msgid "Must provide full name"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:168
-msgid "email must end in"
+#. Translators: Domain is an email domain, such as "@gmail.com"
+#: lms/djangoapps/dashboard/sysadmin.py:176
+msgid "Email address must end in {domain}"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:173
-msgid "Failed - email {0} already exists as external_id"
+#: lms/djangoapps/dashboard/sysadmin.py:181
+msgid "Failed - email {email_addr} already exists as {external_id}"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:179
+#: lms/djangoapps/dashboard/sysadmin.py:189
 msgid "Password must be supplied if not using certificates"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:184
+#: lms/djangoapps/dashboard/sysadmin.py:194
 msgid "email address required (not username)"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:193
-msgid "Oops, failed to create user {0}, IntegrityError"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:220
-msgid "User {0} created successfully!"
+#: lms/djangoapps/dashboard/sysadmin.py:203
+msgid "Oops, failed to create user {user}, {error}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:232
-msgid "Cannot find user with email address {0}"
+msgid "User {user} created successfully!"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:238
-msgid "Cannot find user with username {0} - {1}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:242
-msgid "Deleted user {0}"
+#: lms/djangoapps/dashboard/sysadmin.py:244
+msgid "Cannot find user with email address {email_addr}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:250
-msgid "Statistic"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:250
-msgid "Value"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:251
-msgid "Site statistics"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:252
-msgid "Total number of users"
+msgid "Cannot find user with username {username} - {error}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:256
+msgid "Deleted user {username}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:263
+msgid "Statistic"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:263
+msgid "Value"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:264
+msgid "Site statistics"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:265
+msgid "Total number of users"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:269
 msgid "Courses loaded in the modulestore"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:290
-#: lms/djangoapps/dashboard/sysadmin.py:616
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+#: lms/djangoapps/dashboard/sysadmin.py:304
+#: lms/djangoapps/dashboard/sysadmin.py:662
 msgid "username"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:290
-#: lms/djangoapps/dashboard/sysadmin.py:617
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:344
+#: lms/djangoapps/dashboard/sysadmin.py:304
+#: lms/djangoapps/dashboard/sysadmin.py:663
 msgid "email"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:297
+#: lms/djangoapps/dashboard/sysadmin.py:311
 msgid "Repair Results"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:306
+#: lms/djangoapps/dashboard/sysadmin.py:320
 msgid "Create User Results"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:311
+#: lms/djangoapps/dashboard/sysadmin.py:325
 msgid "Delete User Results"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:355
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:274
+#: lms/djangoapps/dashboard/sysadmin.py:373
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:303
 msgid "The git repo location should end with '.git', and be a valid url"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:371
-msgid "Adding course using git repo {0}"
+#: lms/djangoapps/dashboard/sysadmin.py:424
+msgid "Added Course"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:399
-msgid "Added course from"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:400
-msgid "<pre>{0}</pre>"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:408
+#. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
+#. "XMLModuleStore" and "MongoDB" are database systems. You should not
+#. translate these names.
+#: lms/djangoapps/dashboard/sysadmin.py:439
 msgid ""
 "Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is not turned on, and it "
 "is generally not safe to import into an XMLModuleStore with multithreaded. "
@@ -585,278 +3557,657 @@ msgid ""
 "is a development environment."
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:416
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:324
+#: lms/djangoapps/dashboard/sysadmin.py:447
+#: lms/djangoapps/dashboard/tests/test_sysadmin.py:366
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:427
-msgid "Unable to clone or pull repository. Please check your url."
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:431
-msgid "Failed to clone repository to {0}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:439
-msgid "Loaded course {0} {1}<br/>Errors:"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:467
-#: lms/djangoapps/dashboard/sysadmin.py:582
-msgid "Course Name"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:467
-msgid "Directory/ID"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:468
-msgid "Git Commit"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:468
-msgid "Last Change"
-msgstr ""
-
-#: lms/djangoapps/dashboard/sysadmin.py:469
-msgid "Last Editor"
+#. Translators: unable to download the course content from
+#. the source git repository. Clone occurs if this is brand
+#. new, and pull is when it is being updated from the
+#. source.
+#: lms/djangoapps/dashboard/sysadmin.py:465
+msgid ""
+"Unable to clone or pull repository. Please check your url. Output was: {0!r}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:470
-msgid "Information about all courses"
+msgid "Failed to clone repository to {directory_name}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:481
+msgid "Successfully switched to branch: {branch_name}"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:490
+msgid "Loaded course {course_name}<br/>Errors:"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py:515
+#: lms/djangoapps/dashboard/sysadmin.py:630
+msgid "Course Name"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:516
+msgid "Directory/ID"
+msgstr ""
+
+#. Translators: "Git Commit" is a computer command; see
+#. http://gitref.org/basic/#commit
+#: lms/djangoapps/dashboard/sysadmin.py:518
+msgid "Git Commit"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:519
+msgid "Last Change"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:520
+msgid "Last Editor"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:521
+msgid "Information about all courses"
+msgstr ""
+
+#: lms/djangoapps/dashboard/sysadmin.py:568
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:545
+#: lms/djangoapps/dashboard/sysadmin.py:596
 msgid "Deleted"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:582
-#: lms/djangoapps/dashboard/sysadmin.py:615
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+#: lms/djangoapps/dashboard/sysadmin.py:630
+#: lms/djangoapps/dashboard/sysadmin.py:661
 msgid "course_id"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:583
+#: lms/djangoapps/dashboard/sysadmin.py:631
 msgid "# enrolled"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:583
+#: lms/djangoapps/dashboard/sysadmin.py:631
 msgid "# staff"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:584
+#: lms/djangoapps/dashboard/sysadmin.py:632
 msgid "instructors"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:585
+#: lms/djangoapps/dashboard/sysadmin.py:633
 msgid "Enrollment information for all courses"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:616
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:343
+#: lms/djangoapps/dashboard/sysadmin.py:662
 msgid "role"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:617
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:344
+#: lms/djangoapps/dashboard/sysadmin.py:663
 msgid "full_name"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:663
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py:28
 msgid ""
-"Unable to connect to mongodb to save log, please check MONGODB_LOG settings."
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py:676
-msgid "Cannot find course {0}"
+#: lms/djangoapps/django_comment_client/mustache_helpers.py:25
+msgid "Re-open thread"
 msgstr ""
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:55
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:404
-msgid ""
-"Path {0} doesn't exist, please create it, or configure a different path with"
-" GIT_REPO_DIR"
+#: lms/djangoapps/django_comment_client/mustache_helpers.py:27
+msgid "Close thread"
 msgstr ""
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:67
-msgid "Oops, not a git ssh url?"
+#: lms/djangoapps/django_comment_client/base/views.py:89
+#: lms/djangoapps/django_comment_client/base/views.py:151
+msgid "Title can't be empty"
 msgstr ""
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:68
-msgid "Expecting something like git@github.com:mitocw/edx4edx_lite.git"
+#: lms/djangoapps/django_comment_client/base/views.py:91
+#: lms/djangoapps/django_comment_client/base/views.py:153
+#: lms/djangoapps/django_comment_client/base/views.py:173
+#: lms/djangoapps/django_comment_client/base/views.py:242
+msgid "Body can't be empty"
 msgstr ""
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:82
-msgid "directory already exists, doing a git pull instead of git clone"
+#: lms/djangoapps/django_comment_client/base/views.py:215
+#: lms/djangoapps/django_comment_client/base/views.py:293
+msgid "Comment level too deep"
 msgstr ""
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:95
-msgid "git clone or pull failed!"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:104
-msgid "Unable to get git log"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:107
-msgid ""
-"\n"
-"Commit ID: {0}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:114
-msgid "Unable to get branch info"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:139
-msgid "Unable to run import command."
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:142
-msgid "The underlying module store does not support import."
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:166
-msgid "Studio course dir = {0}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:169
-msgid "   -> exists, but is not symlink"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:175
-msgid "Failed to remove course directory"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:178
-msgid "   -> creating symlink between {0} and {1}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:182
-msgid "Unable to create course symlink"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:195
-msgid ""
-"Unable to connect to mongodb to save log, please check MONGODB_LOG settings"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:208
-msgid "saved CourseImportLog for {0}"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:218
-msgid "Import the specified git repository into the modulestore and directory"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:225
-msgid "This script requires a mongo module store"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:228
-msgid "This script requires at least one argument, the git URL"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:232
-msgid "This script requires no more than two arguments"
-msgstr ""
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py:241
-msgid "Repo was not added, check log output for details"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:183
-msgid "Cannot find user with email address"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:189
-msgid "Cannot find user with username"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:252
-msgid "Failed in authenticating"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:280
-msgid "Unable to clone or pull repository"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:301
-msgid "Error - cannot get course with ID"
-msgstr ""
-
-#: lms/djangoapps/dashboard/tests/test_sysadmin.py:464
-msgid "Cannot find course"
-msgstr ""
-
-#: lms/djangoapps/django_comment_client/base/views.py:566
+#: lms/djangoapps/django_comment_client/base/views.py:556
 #, python-format
 msgid "allowed file types are '%(file_types)s'"
 msgstr ""
 
-#: lms/djangoapps/django_comment_client/base/views.py:581
+#: lms/djangoapps/django_comment_client/base/views.py:571
 #, python-format
-msgid "maximum upload file size is %(file_size)sK"
+msgid "Maximum upload file size is %(file_size)s bytes."
 msgstr ""
 
-#: lms/djangoapps/django_comment_client/base/views.py:590
+#: lms/djangoapps/django_comment_client/base/views.py:580
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:61
+#: lms/djangoapps/django_comment_client/base/views.py:583
+msgid "Good"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:93
 msgid "User does not exist."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:67
+#: lms/djangoapps/instructor/views/api.py:99
 msgid "Task is already running."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:689
-msgid "Complete"
+#: lms/djangoapps/instructor/views/api.py:611
+msgid "User ID"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:689
-msgid "Incomplete"
+#: lms/djangoapps/instructor/views/api.py:614
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:329
+msgid "Email"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:781
+#: lms/djangoapps/instructor/views/api.py:615
+msgid "Language"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:616
+msgid "Location"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:617
+msgid "Birth Year"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:618
+msgid "Gender"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:619
+msgid "Level of Education"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:620
+msgid "Mailing Address"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:621
+msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:966
+msgid "Module does not exist."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:969
+#: lms/djangoapps/instructor/views/legacy.py:400
+msgid "An error occurred while deleting the score."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:1147
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py:784
+#: lms/djangoapps/instructor/views/api.py:1150
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
 "Instructor Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:137
+#: lms/djangoapps/instructor/views/api.py:1402
+msgid "Successfully changed due date for student {0} for {1} to {2}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:1423
+msgid ""
+"Successfully removed invalid due date extension (unit has no due date)."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py:1428
+msgid "Successfully reset due date for student {0} for {1} to {2}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:28
+msgid "coupon id is None"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:35
+#: lms/djangoapps/instructor/views/coupons.py:98
+#: lms/djangoapps/instructor/views/coupons.py:145
+msgid "coupon with the coupon id ({coupon_id}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:39
+#: lms/djangoapps/instructor/views/coupons.py:150
+msgid "coupon with the coupon id ({coupon_id}) is already inactive"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:44
+#: lms/djangoapps/instructor/views/coupons.py:158
+msgid "coupon with the coupon id ({coupon_id}) updated successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:60
+msgid "coupon with the coupon code ({code}) already exist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:66
+#: lms/djangoapps/instructor/views/coupons.py:110
+msgid ""
+"The code ({code}) that you have tried to define is already in use as a "
+"registration code"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:74
+#: lms/djangoapps/instructor/views/coupons.py:118
+msgid "Please Enter the Integer Value for Coupon Discount"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:76
+#: lms/djangoapps/instructor/views/coupons.py:120
+msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:82
+msgid "coupon with the coupon code ({code}) added successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:93
+#: lms/djangoapps/instructor/views/coupons.py:138
+msgid "coupon id not found"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:104
+msgid "coupon with the coupon id ({coupon_id}) already exists"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py:126
+msgid "coupon with the coupon id ({coupon_id}) updated Successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:113
+msgid ""
+"To gain insights into student enrollment and participation, "
+"{link_start}visit the new dashboard for course analytics{link_end}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:154
+msgid "E-Commerce"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:186
+msgid "Please Enter the numeric value for the course price"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:193
+msgid "CourseMode with the mode slug({mode_slug}) DoesNotExist"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:204
+msgid "CourseMode price updated successfully"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:242
 msgid "Membership"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:153
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:265
 msgid "Student Admin"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:168
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:282
+msgid "Extensions"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:297
 msgid "Data Download"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:192
-msgid "Email"
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:350
+msgid "Analytics"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:206
-msgid "Analytics"
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:366
+msgid "Metrics"
+msgstr ""
+
+#. Translators: number sent refers to the number of emails sent
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py:70
+msgid "0 sent"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py:80
+msgid "{num_emails} sent"
+msgid_plural "{num_emails} sent"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py:89
+msgid "{num_emails} failed"
+msgid_plural "{num_emails} failed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py:130
+msgid "Complete"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py:130
+msgid "Incomplete"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:134
+msgid "Course Statistics At A Glance"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:183
+msgid "Found a single student.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:187
+msgid "Couldn't find student with that email or username."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:226
+msgid "List of students enrolled in {course_key}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:232
+msgid "Summary Grades of students enrolled in {course_key}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:239
+msgid "Raw Grades of students enrolled in {course_key}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:268
+msgid "Failed to create a background task for rescoring \"{problem_url}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:285
+msgid ""
+"Failed to create a background task for rescoring \"{problem_url}\": problem "
+"not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:292
+msgid "Failed to create a background task for rescoring \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:304
+msgid "Failed to create a background task for resetting \"{problem_url}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:319
+msgid ""
+"Failed to create a background task for resetting \"{problem_url}\": problem "
+"not found."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:326
+msgid "Failed to create a background task for resetting \"{url}\": {message}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:343
+#: lms/djangoapps/instructor/views/legacy.py:357
+#: lms/djangoapps/instructor/views/legacy.py:377
+msgid "Could not find problem location \"{url}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:410
+msgid "Found module.  "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:413
+msgid "Couldn't find module with that urlname: {url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:424
+msgid "Deleted student module state for {state}!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:438
+msgid "Failed to delete module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:462
+msgid "Module state successfully reset!"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:465
+msgid "Couldn't reset module state for {id}/{url}. "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:476
+msgid ""
+"Failed to create a background task for rescoring \"{key}\" for student {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:493
+msgid "Failed to create a background task for rescoring \"{key}\": {id}."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:524
+msgid "Progress page for username: {username} with email address: {email}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:541
+msgid "Assignment Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:565
+msgid "Please enter an assignment name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:570
+msgid "Invalid assignment name '{name}'"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:574
+#: lms/djangoapps/instructor/views/legacy.py:1379
+msgid "External email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:585
+msgid "Grades for assignment \"{name}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:604
+msgid "List of Staff"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:609
+msgid "List of Instructors"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:652
+msgid "Student profile data for course {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:672
+msgid "Found {num} records to dump."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:675
+msgid "Couldn't find module with that urlname."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:683
+msgid "Student state for problem {problem}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:700
+msgid "List of Beta Testers"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:874
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:880
+msgid "Your email was successfully queued for sending."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:959
+msgid "Grades from {course_id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1055
+msgid "No remote gradebook defined in course metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1060
+msgid "No remote gradebook url defined in settings.FEATURES"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1065
+msgid "No gradebook name defined in course remote_gradebook metadata"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1077
+msgid "Failed to communicate with gradebook server at {url}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1078
+msgid "Error: {err}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1089
+msgid "Remote gradebook response for {action}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1108
+#: lms/djangoapps/instructor/views/legacy.py:1186
+msgid "Full name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1108
+msgid "Roles"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1109
+msgid "List of Forum {name}s in course {id}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1116
+#: lms/djangoapps/instructor/views/legacy.py:1146
+msgid "Error: unknown rolename \"{rolename}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1142
+msgid "Error: unknown username \"{username}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1154
+msgid ""
+"Error: user \"{username}\" does not have rolename \"{rolename}\", cannot "
+"remove"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1157
+msgid "Removed \"{username}\" from \"{course_id}\" forum role = \"{rolename}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1160
+msgid "Error: user \"{username}\" already has rolename \"{rolename}\", cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1163
+msgid ""
+"Error: user \"{username}\" should first be added as staff before adding as a"
+" forum administrator, cannot add"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1166
+msgid "Added \"{username}\" to \"{course_id}\" forum role = \"{rolename}\""
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1188
+msgid "{title} in course {course_key}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1379
+msgid "ID"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1379
+#: lms/djangoapps/instructor/views/tools.py:258
+msgid "Full Name"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1379
+msgid "edX email"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1563
+msgid "Enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1639
+msgid "Un-enrollment of students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1847
+msgid ""
+"Failed to find any background tasks for course \"{course}\", module "
+"\"{problem}\" and student \"{student}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/legacy.py:1850
+msgid ""
+"Failed to find any background tasks for course \"{course}\" and module "
+"\"{problem}\"."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:102
+msgid "Could not find student matching identifier: {student_identifier}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:116
+msgid "Unable to parse date: "
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:139
+msgid "Couldn't find module for url: {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:203
+msgid "Unit {0} has no due date to extend."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:205
+msgid "An extended due date must be later than the original due date."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:209
+msgid "No due date extension is set for that student and unit."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:258
+#: lms/djangoapps/instructor/views/tools.py:288
+msgid "Extended Due Date"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:276
+msgid "Users with due date extensions for {0}"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/tools.py:309
+msgid "Due date extensions for {0} {1} ({2})"
 msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -1009,39 +4360,75 @@ msgstr ""
 msgid " (out of {total})"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:20
+#: lms/djangoapps/linkedin/templates/linkedin_email.html:9
+#, python-format
+msgid ""
+"\n"
+"      Dear %(student_name)s,\n"
+"    "
+msgstr ""
+
+#: lms/djangoapps/linkedin/templates/linkedin_email.html:13
+#, python-format
+msgid ""
+" \n"
+"    Congratulations on earning your certificate in %(course_name)s!\n"
+"    Since you have an account on LinkedIn, you can display your hard earned\n"
+"    credential for your colleagues to see.  Click the button below to add the\n"
+"    certificate to your profile.\n"
+"    "
+msgstr ""
+
+#: lms/djangoapps/linkedin/templates/linkedin_email.html:22
+msgid "Add to profile"
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/staff_grading_service.py:27
+msgid ""
+"Could not contact the external grading server. Please contact the "
+"development team at {email}."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/staff_grading_service.py:318
+msgid ""
+"Cannot find any open response problems in this course. Have you submitted "
+"answers to any open response assessment questions? If not, please do so and "
+"return to this page."
+msgstr ""
+
+#: lms/djangoapps/open_ended_grading/utils.py:19
 msgid "AI Assessment"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:21
+#: lms/djangoapps/open_ended_grading/utils.py:20
 msgid "Peer Assessment"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:22
+#: lms/djangoapps/open_ended_grading/utils.py:21
 msgid "Not yet available"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:23
+#: lms/djangoapps/open_ended_grading/utils.py:22
 msgid "Automatic Checker"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:24
+#: lms/djangoapps/open_ended_grading/utils.py:23
 msgid "Instructor Assessment"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:27
+#: lms/djangoapps/open_ended_grading/utils.py:26
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:28
+#: lms/djangoapps/open_ended_grading/utils.py:27
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX"
 " point of contact."
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:98
+#: lms/djangoapps/open_ended_grading/utils.py:105
 msgid "for course {0} and student {1}."
 msgstr ""
 
@@ -1078,7 +4465,7 @@ msgstr ""
 msgid "Submissions have been flagged for review"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/views.py:129
+#: lms/djangoapps/open_ended_grading/views.py:126
 msgid ""
 "\n"
 "        Error with initializing peer grading.\n"
@@ -1087,33 +4474,40 @@ msgid ""
 "        "
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:163
+#: lms/djangoapps/shoppingcart/models.py:178
 msgid "Order Payment Confirmation"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:234
+#: lms/djangoapps/shoppingcart/models.py:259
 msgid "Trying to add a different currency into the cart"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:457
+#: lms/djangoapps/shoppingcart/models.py:545
+msgid "Registration for Course: {course_name}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py:577
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:524
+#: lms/djangoapps/shoppingcart/models.py:645
 msgid "[Refund] User-Requested Refund"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:571
+#: lms/djangoapps/shoppingcart/models.py:695
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:583
-msgid "Certificate of Achievement, {mode_name} for course {course}"
+#. Translators: In this particular case, mode_name refers to a
+#. particular mode (i.e. Honor Code Certificate, Verified Certificate, etc)
+#. by which a user could enroll in the given course.
+#: lms/djangoapps/shoppingcart/models.py:710
+msgid "{mode_name} for course {course}"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/models.py:626
+#: lms/djangoapps/shoppingcart/models.py:760
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -1121,205 +4515,751 @@ msgid ""
 "Please do NOT include your credit card information."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:32
+#: lms/djangoapps/shoppingcart/reports.py:93
+msgid "Order Number"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:94
+msgid "Customer Name"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:95
+msgid "Date of Original Transaction"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:96
+msgid "Date of Refund"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:97
+msgid "Amount of Refund"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:98
+#: lms/djangoapps/shoppingcart/reports.py:263
+msgid "Service Fees (if any)"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:133
+msgid "Purchase Time"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:134
+msgid "Order ID"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:135
+msgid "Status"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:136
+msgid "Quantity"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:137
+msgid "Unit Cost"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:138
+msgid "Total Cost"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:139
+msgid "Currency"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:140
+msgid "Description"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:141
+msgid "Comments"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:209
+#: lms/djangoapps/shoppingcart/reports.py:259
+msgid "University"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:210
+#: lms/djangoapps/shoppingcart/reports.py:260
+msgid "Course"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:211
+msgid "Course Announce Date"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:212
+msgid "Course Start Date"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:213
+msgid "Course Registration Close Date"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:214
+msgid "Course Registration Period"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:215
+msgid "Total Enrolled"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:216
+msgid "Audit Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:217
+msgid "Honor Code Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:218
+msgid "Verified Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:219
+msgid "Gross Revenue"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:220
+msgid "Gross Revenue over the Minimum"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:221
+msgid "Number of Verified Students Contributing More than the Minimum"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:222
+msgid "Number of Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:223
+msgid "Dollars Refunded"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:261
+msgid "Number of Transactions"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:262
+msgid "Total Payments Collected"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:264
+msgid "Number of Successful Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py:265
+msgid "Total Amount of Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:54
 msgid "You must be logged-in to add to a shopping cart"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:38
-#: lms/djangoapps/shoppingcart/tests/test_views.py:85
+#: lms/djangoapps/shoppingcart/views.py:61
+#: lms/djangoapps/shoppingcart/tests/test_views.py:402
 msgid "The course you requested does not exist."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:40
-#: lms/djangoapps/shoppingcart/tests/test_views.py:72
+#: lms/djangoapps/shoppingcart/views.py:63
 msgid "The course {0} is already in your cart."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:42
-#: lms/djangoapps/shoppingcart/tests/test_views.py:79
+#: lms/djangoapps/shoppingcart/views.py:65
 msgid "You are already registered in course {0}."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:43
+#: lms/djangoapps/shoppingcart/views.py:66
 msgid "Course added to cart."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/views.py:178
+#: lms/djangoapps/shoppingcart/views.py:164
+msgid "Discount does not exist against code '{0}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:179
+msgid "Oops! The code '{0}' you entered is either invalid or expired"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:181
+msgid "Code '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:194
+msgid "Coupon '{0}' already used."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:196
+msgid "Coupon '{0}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py:315
 msgid "You do not have permission to view this page."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:147
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:169
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:153
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:168
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:175
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:190
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:159
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:181
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:317
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:179
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:201
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:307
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:245
+msgid ""
+"\n"
+"            <p class=\"error_msg\">\n"
+"            Sorry! Our payment processor did not accept your payment.\n"
+"            The decision they returned was <span class=\"decision\">{decision}</span>,\n"
+"            and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
+"            You were not charged. Please try a different form of payment.\n"
+"            Contact us with payment-related questions at {email}.\n"
+"            </p>\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:269
+msgid ""
+"\n"
+"                <p class=\"error_msg\">\n"
+"                Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
+"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
+"                </p>\n"
+"                "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:280
+msgid ""
+"\n"
+"                <p class=\"error_msg\">\n"
+"                Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
+"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"                Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
+"                </p>\n"
+"                "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:290
+msgid ""
+"\n"
+"                <p class=\"error_msg\">\n"
+"                Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
+"                unable to validate that the message actually came from the payment processor.\n"
+"                The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
+"                We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
+"                Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
+"                </p>\n"
+"                "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:332
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:505
 msgid "Successful transaction."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:308
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:333
 msgid "The request is missing one or more required fields."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:309
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:334
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:506
 msgid "One or more fields in the request contains invalid data."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:316
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:336
+msgid ""
+"\n"
+"            The merchantReferenceCode sent with this authorization request matches the\n"
+"            merchantReferenceCode of another authorization request that you sent in the last 15 minutes.\n"
+"            Possible fix: retry the payment after 15 minutes.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:341
 msgid ""
 "Error: General system failure. Possible fix: retry the payment after a few "
 "minutes."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:328
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:343
+msgid ""
+"\n"
+"            Error: The request was received but there was a server timeout.\n"
+"            This error does not include timeouts between the client and the server.\n"
+"            Possible fix: retry the payment after some time.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
+msgid ""
+"\n"
+"            Error: The request was received, but a service did not finish running in time\n"
+"            Possible fix: retry the payment after some time.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:353
 msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:340
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:355
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:526
+msgid ""
+"\n"
+"            Expired card. You might also receive this if the expiration date you\n"
+"            provided does not match the date the issuing bank has on file.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:361
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:532
+msgid ""
+"\n"
+"            General decline of the card. No other information provided by the issuing bank.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:365
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:536
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:342
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:353
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:378
 msgid "Unknown reason"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:343
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:368
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:539
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:349
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:370
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:541
+msgid ""
+"\n"
+"            Inactive card or card not authorized for card-not-present transactions.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:374
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:545
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:350
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:375
 msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:354
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:379
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:557
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:360
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:381
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:559
+msgid ""
+"\n"
+"            The card type is not accepted by the payment processor.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:385
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:563
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:366
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:387
+msgid ""
+"\n"
+"            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:391
 msgid "The requested amount exceeds the originally authorized amount."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:367
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:392
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:568
 msgid "Processor Failure.  Possible fix: retry the payment"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:369
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:394
 msgid "The authorization has already been captured"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:372
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:397
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:380
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:399
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:570
+msgid ""
+"\n"
+"            The card type sent is invalid or does not correlate with the credit card number.\n"
+"            Possible fix: retry with the same card or another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:405
 msgid "The request ID is invalid."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:390
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:411
+msgid ""
+"\n"
+"            You requested a capture through the API, but there is no corresponding, unused authorization record.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:415
 msgid "The transaction has already been settled or reversed."
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/processors/CyberSource.py:398
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:418
+msgid ""
+"\n"
+"            The capture or credit is not voidable because the capture or credit information has already been\n"
+"            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:423
 msgid "You requested a credit for a capture that was previously voided"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/tests/test_views.py:346
-msgid "Download Purchase Report"
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:425
+msgid ""
+"\n"
+"            Error: The request was received, but there was a timeout at the payment processor.\n"
+"            Possible fix: retry the payment.\n"
+"            "
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/tests/test_views.py:358
+#: lms/djangoapps/shoppingcart/processors/CyberSource.py:430
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource.'\n"
+"            Possible fix: retry with a different form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:153
+msgid "The payment processor did not return a required parameter: {parameter}"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:161
+msgid ""
+"The payment processor returned a badly-typed value {value} for parameter "
+"{parameter}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:330
+msgid ""
+"The amount charged by the processor {charged_amount} "
+"{charged_amount_currency} is different than the total cost of the order "
+"{total_cost} {total_cost_currency}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:400
+msgid ""
+"Sorry! Our payment processor did not accept your payment.  The decision they"
+" returned was {decision}, and the reason was {reason}.  You were not "
+"charged. Please try a different form of payment.  Contact us with payment-"
+"related questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:431
+msgid ""
+"Sorry! Our payment processor sent us back a payment confirmation that had "
+"inconsistent data!  We apologize that we cannot verify whether the charge "
+"went through and take further action on your order.  The specific error "
+"message is: {msg}  Your credit card may possibly have been charged.  Contact"
+" us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:443
+msgid ""
+"Sorry! Due to an error your purchase was charged for a different amount than"
+" the order total!  The specific error message is: {msg}.  Your credit card "
+"has probably been charged. Contact us with payment-specific questions at "
+"{email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:454
+msgid ""
+"Sorry! Our payment processor sent us back a corrupted message regarding your"
+" charge, so we are unable to validate that the message actually came from "
+"the payment processor. The specific error message is: {msg}. We apologize "
+"that we cannot verify whether the charge went through and take further "
+"action on your order. Your credit card may possibly have been charged.  "
+"Contact us with payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:467
+msgid ""
+"Sorry!  Your payment could not be processed because an unexpected exception "
+"occurred.  Please contact us at {email} for assistance."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:508
+msgid ""
+"\n"
+"            The access_key and transaction_uuid fields for this authorization request matches the access_key and\n"
+"            transaction_uuid of another authorization request that you sent in the last 15 minutes.\n"
+"            Possible fix: retry the payment after 15 minutes.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:513
+msgid "Only a partial amount was approved."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:515
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource\n"
+"            because it did not pass the Address Verification System (AVS).\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:520
+msgid ""
+"\n"
+"            The issuing bank has questions about the request. You do not receive an\n"
+"            authorization code programmatically, but you might receive one verbally by calling the processor.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:538
+msgid "Stolen or lost card"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:546
+msgid ""
+"Invalid card verification number (CVN). Possible fix: retry with another "
+"form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:549
+msgid "The customer matched an entry on the processors negative file."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:550
+msgid "Account frozen. Possible fix: retry with another form of payment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:552
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by\n"
+"            CyberSource because it did not pass the CVN check.\n"
+"            Possible fix: retry with another form of payment\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:565
+msgid ""
+"\n"
+"            There is a problem with the information in your CyberSource account.  Please let us know at {0}\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:574
+msgid "The cardholder is enrolled for payer authentication"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:575
+msgid "Payer authentication could not be authenticated"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py:577
+msgid ""
+"\n"
+"            The authorization request was approved by the issuing bank but declined by CyberSource based\n"
+"            on your legacy Smart Authorization settings.\n"
+"            Possible fix: retry with a different form of payment.\n"
+"            "
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/tests/test_views.py:761
+msgid "Download CSV Reports"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/tests/test_views.py:773
 msgid ""
 "There was an error in your date input.  It should be formatted as YYYY-MM-DD"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/tests/test_views.py:375
-msgid "There are too many results in your report."
-msgstr ""
-
-#: lms/djangoapps/verify_student/models.py:554
+#: lms/djangoapps/verify_student/models.py:670
 msgid "No photo ID was provided."
 msgstr ""
 
-#: lms/djangoapps/verify_student/models.py:555
+#: lms/djangoapps/verify_student/models.py:671
 msgid "We couldn't read your name from your photo ID image."
 msgstr ""
 
-#: lms/djangoapps/verify_student/models.py:556
+#: lms/djangoapps/verify_student/models.py:672
 msgid ""
 "The name associated with your account and the name on your ID do not match."
 msgstr ""
 
-#: lms/djangoapps/verify_student/models.py:557
+#: lms/djangoapps/verify_student/models.py:673
 msgid "The image of your face was not clear."
 msgstr ""
 
-#: lms/djangoapps/verify_student/models.py:558
+#: lms/djangoapps/verify_student/models.py:674
 msgid "Your face was not visible in your self-photo"
 msgstr ""
 
-#: lms/djangoapps/verify_student/models.py:576
+#: lms/djangoapps/verify_student/models.py:692
 msgid "There was an error verifying your ID photos."
 msgstr ""
 
-#: lms/djangoapps/verify_student/views.py:153
+#: lms/djangoapps/verify_student/views.py:197
 msgid "Selected price is not valid number."
 msgstr ""
 
-#: lms/djangoapps/verify_student/views.py:163
+#: lms/djangoapps/verify_student/views.py:211
 msgid "This course doesn't support verified certificates"
 msgstr ""
 
-#: lms/djangoapps/verify_student/views.py:166
+#: lms/djangoapps/verify_student/views.py:214
 msgid "No selected price or selected price is below minimum."
 msgstr ""
 
-#: lms/templates/main_django.html:32
+#: lms/lib/xblock/mixin.py:25
+msgid "Courseware Chrome"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:26
+msgid ""
+"Enter the chrome, or navigation tools, to use for the XBlock in the LMS. Valid values are: \n"
+"\"chromeless\" -- to not use tabs or the accordion; \n"
+"\"tabs\" -- to use tabs only; \n"
+"\"accordion\" -- to use the accordion only; or \n"
+"\"tabs,accordion\" -- to use tabs and the accordion."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:35
+msgid "Default Tab"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:36
+msgid ""
+"Enter the tab that is selected in the XBlock. If not set, the Courseware tab"
+" is selected."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:41
+msgid "LaTeX Source File Name"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:42
+msgid "Enter the source file name for LaTeX."
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:47
+msgid "Course Is Public"
+msgstr ""
+
+#: lms/lib/xblock/mixin.py:48
+msgid ""
+"Enter true or false. If true, the course is open to the public. If false, "
+"the course is open only to admins."
+msgstr ""
+
+#: lms/templates/main_django.html:33
 msgid "Skip to this view's content"
 msgstr ""
 
-#: lms/templates/registration/password_reset_complete.html:8
-#: lms/templates/registration/password_reset_complete.html:63
+#: lms/templates/dashboard/_dashboard_refund.html:27
+#: lms/templates/dashboard/support.html:8
+msgid "Manual Refund"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:46
+msgid "About to refund this order:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:49
+msgid "Order Id:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:52
+msgid "Enrollment:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:52
+msgid "enrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:52
+msgid "unenrolled"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:55
+msgid "Cost:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:58
+msgid "CertificateItem Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:61
+msgid "Order Status:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:64
+msgid "Fulfilled Time:"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_refund.html:67
+msgid "Refund Request Time:"
+msgstr ""
+
+#: lms/templates/registration/password_reset_complete.html:5
+#: lms/templates/registration/password_reset_complete.html:39
 msgid "Your Password Reset is Complete"
 msgstr ""
 
-#: lms/templates/registration/password_reset_complete.html:69
+#: lms/templates/registration/password_reset_complete.html:48
 #, python-format
 msgid ""
 "\n"
@@ -1327,7 +5267,7 @@ msgid ""
 "      "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:9
+#: lms/templates/registration/password_reset_confirm.html:6
 #, python-format
 msgid ""
 "\n"
@@ -1335,7 +5275,7 @@ msgid ""
 "  "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:68
+#: lms/templates/registration/password_reset_confirm.html:43
 #, python-format
 msgid ""
 "\n"
@@ -1343,11 +5283,11 @@ msgid ""
 "          "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:78
+#: lms/templates/registration/password_reset_confirm.html:55
 msgid "Password Reset Form"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:85
+#: lms/templates/registration/password_reset_confirm.html:62
 #, python-format
 msgid ""
 "\n"
@@ -1355,25 +5295,25 @@ msgid ""
 "            "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:92
-msgid "The following errors occured while processing your registration: "
+#: lms/templates/registration/password_reset_confirm.html:73
+msgid "The following errors occurred while processing your registration: "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:94
+#: lms/templates/registration/password_reset_confirm.html:78
 msgid "You must complete all fields."
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:95
+#: lms/templates/registration/password_reset_confirm.html:79
 msgid "The two password fields didn't match."
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:100
+#: lms/templates/registration/password_reset_confirm.html:85
 msgid ""
 "We're sorry, our systems seem to be having trouble processing your password "
 "reset"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:102
+#: lms/templates/registration/password_reset_confirm.html:87
 #, python-format
 msgid ""
 "\n"
@@ -1381,34 +5321,34 @@ msgid ""
 "            "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:109
+#: lms/templates/registration/password_reset_confirm.html:94
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly. <br /> Required fields are noted by <strong "
 "class=\"indicator\">bold text and an asterisk (*)</strong>."
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:113
+#: lms/templates/registration/password_reset_confirm.html:98
 msgid "Required Information"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:117
+#: lms/templates/registration/password_reset_confirm.html:102
 msgid "Your New Password"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:121
+#: lms/templates/registration/password_reset_confirm.html:106
 msgid "Your New Password Again"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:128
+#: lms/templates/registration/password_reset_confirm.html:113
 msgid "Change My Password"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:135
+#: lms/templates/registration/password_reset_confirm.html:120
 msgid "Your Password Reset Was Unsuccessful"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:138
+#: lms/templates/registration/password_reset_confirm.html:123
 #, python-format
 msgid ""
 "\n"
@@ -1416,15 +5356,15 @@ msgid ""
 "        "
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:148
+#: lms/templates/registration/password_reset_confirm.html:133
 msgid "Password Reset Help"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:152
+#: lms/templates/registration/password_reset_confirm.html:137
 msgid "Need Help?"
 msgstr ""
 
-#: lms/templates/registration/password_reset_confirm.html:154
+#: lms/templates/registration/password_reset_confirm.html:139
 #, python-format
 msgid ""
 "\n"
@@ -1442,6 +5382,12 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
+#: lms/templates/registration/password_reset_email.html:9
+msgid ""
+"If you didn't request this change, you can disregard this email - we have "
+"not yet reset your password."
+msgstr ""
+
 #: lms/templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
 msgstr ""
@@ -1450,15 +5396,15 @@ msgstr ""
 msgid "The edX Team"
 msgstr ""
 
-#: lms/templates/wiki/article.html:31
+#: lms/templates/wiki/article.html:32
 msgid "Last modified:"
 msgstr ""
 
-#: lms/templates/wiki/article.html:37
+#: lms/templates/wiki/article.html:38
 msgid "See all children"
 msgstr ""
 
-#: lms/templates/wiki/article.html:48
+#: lms/templates/wiki/article.html:49
 msgid "This article was last modified:"
 msgstr ""
 
@@ -1528,7 +5474,7 @@ msgstr ""
 #: lms/templates/wiki/edit.html:48 lms/templates/wiki/history.html:204
 #: lms/templates/wiki/history.html:235
 #: lms/templates/wiki/includes/cheatsheet.html:4
-msgid "Close Modal"
+msgid "Close"
 msgstr ""
 
 #: lms/templates/wiki/edit.html:51
@@ -1538,7 +5484,7 @@ msgstr ""
 #: lms/templates/wiki/edit.html:51 lms/templates/wiki/history.html:207
 #: lms/templates/wiki/history.html:238
 #: lms/templates/wiki/includes/cheatsheet.html:7
-msgid "modal open"
+msgid "window open"
 msgstr ""
 
 #: lms/templates/wiki/edit.html:66
@@ -1558,7 +5504,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/wiki/history.html:114
-msgid "no log message"
+msgid "(no log message)"
 msgstr ""
 
 #: lms/templates/wiki/history.html:134
@@ -1616,22 +5562,18 @@ msgid "Create new merged version"
 msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:13
-msgid "Previewing revision"
+msgid "Previewing revision:"
 msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:20
-msgid "Previewing merge between"
-msgstr ""
-
-#: lms/templates/wiki/preview_inline.html:22
-msgid "and"
-msgstr ""
-
-#: lms/templates/wiki/preview_inline.html:31
-msgid "This revision has been deleted."
+msgid "Previewing a merge between two revisions:"
 msgstr ""
 
 #: lms/templates/wiki/preview_inline.html:32
+msgid "This revision has been deleted."
+msgstr ""
+
+#: lms/templates/wiki/preview_inline.html:33
 msgid "Restoring to this revision will mark the article as deleted."
 msgstr ""
 
@@ -1684,74 +5626,74 @@ msgid "[Article Name](wiki:ArticleName)"
 msgstr ""
 
 #. Translators: Do not translate "edX"
-#: lms/templates/wiki/includes/cheatsheet.html:27
+#: lms/templates/wiki/includes/cheatsheet.html:25
 msgid "edX Additions:"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:35
+#: lms/templates/wiki/includes/cheatsheet.html:27
+msgid "Math Expression"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:33
 msgid "Useful examples:"
 msgstr ""
 
-#. Translators: Do not translate "edX" or "Wikipedia"
+#: lms/templates/wiki/includes/cheatsheet.html:36
+msgid "Wikipedia"
+msgstr ""
+
+#: lms/templates/wiki/includes/cheatsheet.html:37
+msgid "edX Wiki"
+msgstr ""
+
 #: lms/templates/wiki/includes/cheatsheet.html:40
-msgid "http://wikipedia.org"
-msgstr ""
-
-#: lms/templates/wiki/includes/cheatsheet.html:41
-msgid "[Wikipedia](http://wikipedia.org)"
-msgstr ""
-
-#: lms/templates/wiki/includes/cheatsheet.html:42
-msgid "[edX Wiki](wiki:/edx/)"
-msgstr ""
-
-#: lms/templates/wiki/includes/cheatsheet.html:45
 msgid "Huge Header"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:48
+#: lms/templates/wiki/includes/cheatsheet.html:43
 msgid "Smaller Header"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:51
+#. Translators: Leave the punctuation, but translate "emphasis"
+#: lms/templates/wiki/includes/cheatsheet.html:47
 msgid "*emphasis* or _emphasis_"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:53
+#. Translators: Leave the punctuation, but translate "strong"
+#: lms/templates/wiki/includes/cheatsheet.html:50
 msgid "**strong** or __strong__"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:55
+#: lms/templates/wiki/includes/cheatsheet.html:52
 msgid "Unordered List"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:56
+#: lms/templates/wiki/includes/cheatsheet.html:53
 msgid "Sub Item 1"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:57
+#: lms/templates/wiki/includes/cheatsheet.html:54
 msgid "Sub Item 2"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:59
+#: lms/templates/wiki/includes/cheatsheet.html:56
 msgid "Ordered"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:60
+#: lms/templates/wiki/includes/cheatsheet.html:57
 msgid "List"
 msgstr ""
 
-#: lms/templates/wiki/includes/cheatsheet.html:62
+#: lms/templates/wiki/includes/cheatsheet.html:59
 msgid "Quotes"
 msgstr ""
 
-#. Translators: Do not translate 'cheatsheetLink'
-#: lms/templates/wiki/includes/editor_widget.html:7
+#: lms/templates/wiki/includes/editor_widget.html:4
 #, python-format
 msgid ""
 "\n"
-"\t    Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
-"\t"
+"        Markdown syntax is allowed. See the %(start_link)scheatsheet%(end_link)s for help.\n"
+"    "
 msgstr ""
 
 #: lms/templates/wiki/plugins/attachments/index.html:5
