@@ -16,8 +16,6 @@ To start this stub server on its own from Vagrant:
 3.) Locally, try accessing http://localhost:8031/ and see that
     you get "Unused url" message inside the browser.
 """
-
-import textwrap
 from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
@@ -26,15 +24,7 @@ from urlparse import urlparse
 from collections import OrderedDict
 
 
-IFRAME_API_RESPONSE = textwrap.dedent(
-    "if (!window['YT']) {var YT = {loading: 0,loaded: 0};}if (!window['YTConfig']) {var YTConfig"
-    " = {};}if (!YT.loading) {YT.loading = 1;(function(){var l = [];YT.ready = function(f) {if ("
-    "YT.loaded) {f();} else {l.push(f);}};window.onYTReady = function() {YT.loaded = 1;for (var "
-    "i = 0; i < l.length; i++) {try {l[i]();} catch (e) {}}};YT.setConfig = function(c) {for (var"
-    " k in c) {if (c.hasOwnProperty(k)) {YTConfig[k] = c[k];}}};var a = document.createElement"
-    "('script');a.id = 'www-widgetapi-script';a.src = 'http:' + '"
-    "//s.ytimg.com/yts/jsbin/www-widgetapi-vflxHr_AR.js';a.async = true;var b = "
-    "document.getElementsByTagName('script')[0];b.parentNode.insertBefore(a, b);})();}")
+IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):

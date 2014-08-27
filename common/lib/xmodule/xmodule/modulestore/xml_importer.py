@@ -162,8 +162,8 @@ def import_from_xml(
     # method on XmlModuleStore.
     course_items = []
 
-    with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-        for course_key in xml_module_store.modules.keys():
+    for course_key in xml_module_store.modules.keys():
+        with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
 
             if target_course_id is not None:
                 dest_course_id = target_course_id
@@ -426,7 +426,7 @@ def _import_course_draft(
     draft_course_dir = draft_dir.replace(data_dir, '', 1)
     system = ImportSystem(
         xmlstore=xml_module_store,
-        course_id=target_course_id,
+        course_id=source_course_id,
         course_dir=draft_course_dir,
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
@@ -480,21 +480,27 @@ def _import_course_draft(
                         # Not a 'hidden file', then re-raise exception
                         raise err
 
-                    descriptor = system.process_xml(xml)
+                    # process_xml call below recursively processes all descendants. If
+                    # we call this on all verticals in a course with verticals nested below
+                    # the unit level, we try to import the same content twice, causing naming conflicts.
+                    # Therefore only process verticals at the unit level, assuming that any other
+                    # verticals must be descendants.
+                    if 'index_in_children_list' in xml:
+                        descriptor = system.process_xml(xml)
 
-                    # HACK: since we are doing partial imports of drafts
-                    # the vertical doesn't have the 'url-name' set in the
-                    # attributes (they are normally in the parent object,
-                    # aka sequential), so we have to replace the location.name
-                    # with the XML filename that is part of the pack
-                    fn, fileExtension = os.path.splitext(filename)
-                    descriptor.location = descriptor.location.replace(name=fn)
+                        # HACK: since we are doing partial imports of drafts
+                        # the vertical doesn't have the 'url-name' set in the
+                        # attributes (they are normally in the parent object,
+                        # aka sequential), so we have to replace the location.name
+                        # with the XML filename that is part of the pack
+                        fn, fileExtension = os.path.splitext(filename)
+                        descriptor.location = descriptor.location.replace(name=fn)
 
-                    index = int(descriptor.xml_attributes['index_in_children_list'])
-                    if index in drafts:
-                        drafts[index].append(descriptor)
-                    else:
-                        drafts[index] = [descriptor]
+                        index = int(descriptor.xml_attributes['index_in_children_list'])
+                        if index in drafts:
+                            drafts[index].append(descriptor)
+                        else:
+                            drafts[index] = [descriptor]
 
                 except Exception:
                     logging.exception('Error while parsing course xml.')
@@ -505,24 +511,27 @@ def _import_course_draft(
                 course_key = descriptor.location.course_key
                 try:
                     def _import_module(module):
+                        # IMPORTANT: Be sure to update the module location in the NEW namespace
+                        module_location = module.location.map_into_course(target_course_id)
                         # Update the module's location to DRAFT revision
                         # We need to call this method (instead of updating the location directly)
                         # to ensure that pure XBlock field data is updated correctly.
-                        _update_module_location(module, module.location.replace(revision=MongoRevisionKey.draft))
+                        _update_module_location(module, module_location.replace(revision=MongoRevisionKey.draft))
 
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
-                        # filtered out from the non-draft store export
-                        if module.location.category == 'vertical':
+                        # filtered out from the non-draft store export.
+                        # Note though that verticals nested below the unit level will not have
+                        # a parent_sequential_url and do not need special handling.
+                        if module.location.category == 'vertical' and 'parent_sequential_url' in module.xml_attributes:
                             non_draft_location = module.location.replace(revision=MongoRevisionKey.published)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
                             seq_location = course_key.make_usage_key_from_deprecated_string(sequential_url)
 
-                            # IMPORTANT: Be sure to update the sequential
-                            # in the NEW namespace
+                            # IMPORTANT: Be sure to update the sequential in the NEW namespace
                             seq_location = seq_location.map_into_course(target_course_id)
                             sequential = store.get_item(seq_location, depth=0)
 

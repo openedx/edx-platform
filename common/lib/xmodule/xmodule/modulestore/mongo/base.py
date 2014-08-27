@@ -35,7 +35,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
@@ -46,10 +46,6 @@ from xmodule.exceptions import HeartbeatFailure
 
 log = logging.getLogger(__name__)
 
-
-# Things w/ these categories should never be marked as version=DRAFT
-DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
-
 # sort order that returns DRAFT items first
 SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
 
@@ -59,6 +55,10 @@ SORT_REVISION_FAVOR_PUBLISHED = ('_id.revision', pymongo.ASCENDING)
 BLOCK_TYPES_WITH_CHILDREN = list(set(
     name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
 ))
+
+# Allow us to call _from_deprecated_(son|string) throughout the file
+# pylint: disable=protected-access
+
 
 class MongoRevisionKey(object):
     """
@@ -296,6 +296,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                         assert isinstance(subvalue, basestring)
                         value[key] = self._convert_reference_to_key(subvalue)
         return jsonfields
+
+    def lookup_item(self, location):
+        """
+        Returns the JSON payload of the xblock at location.
+        """
+
+        try:
+            json = self.module_data[location]
+        except KeyError:
+            json = self.modulestore._find_one(location)
+            self.module_data[location] = json
+
+        return json
 
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
@@ -1009,7 +1022,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         location = course_key.make_usage_key(block_type, block_id)
         xblock = self.create_xmodule(location, **kwargs)
-        self.update_item(xblock, user_id, allow_not_found=True)
+        xblock = self.update_item(xblock, user_id, allow_not_found=True)
 
         return xblock
 
@@ -1122,6 +1135,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     'edit_info.subtree_edited_by': user_id
                 }
                 self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
+
+            # update the edit info of the instantiated xblock
+            xblock.edited_on = now
+            xblock.edited_by = user_id
+            xblock.subtree_edited_on = now
+            xblock.subtree_edited_by = user_id
+            if not hasattr(xblock, 'published_date'):
+                xblock.published_date = None
+            if not hasattr(xblock, 'published_by'):
+                xblock.published_by = None
+            if isPublish:
+                xblock.published_date = now
+                xblock.published_by = user_id
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
@@ -1252,11 +1278,17 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
-        :return: list of course locations
+        :return: list of course keys
         """
-        courses = self.collection.find({'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug})
+        courses = self.collection.find(
+            {'_id.category': 'course', 'definition.data.wiki_slug': wiki_slug},
+            {'_id': True}
+        )
         # the course's run == its name. It's the only xblock for which that's necessarily true.
-        return [Location._from_deprecated_son(course['_id'], course['_id']['name']) for course in courses]
+        return [
+            Location._from_deprecated_son(course['_id'], course['_id']['name']).course_key
+            for course in courses
+        ]
 
     def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """

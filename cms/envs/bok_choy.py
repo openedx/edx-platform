@@ -40,7 +40,6 @@ update_module_store_settings(
 
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
-PIPELINE = True
 
 # Silence noisy logs
 import logging

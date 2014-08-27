@@ -69,12 +69,27 @@
 <hr>
 
 <div class="vert-left email-background" id="section-task-history">
-    <h2> ${_("Email Task History")} </h2>
+  <h2> ${_("Email Task History")} </h2>
+  <div>
+    <p>${_("To see the content of all previously sent emails, click this button:")}</p>
+    <br/>
+    <input type="button" name="task-history-email-content" value="${_("Sent Email History")}" data-endpoint="${ section_data['email_content_history_url'] }" >
+    <div class="content-request-response-error msg msg-warning copy"></div>
+    <p>
+    <div class="content-history-email-table">
+      <p><em>${_("To read an email, click its subject.")}</em></p>
+      <br/>
+      <div class="content-history-table-inner"></div>
+    </div>
+    <div class="email-messages-wrapper"></div>
+  </div>
+  <div>
     <p>${_("To see the status for all bulk email tasks ever submitted for this course, click on this button:")}</p>
     <br/>
-  <input type="button" name="task-history-email" value="${_("Show Email Task History")}" data-endpoint="${ section_data['email_background_tasks_url'] }" >
-  <div class="history-request-response-error msg msg-warning copy"></div>
-  <div class="task-history-email-table"></div>
+    <input type="button" name="task-history-email" value="${_("Show Email Task History")}" data-endpoint="${ section_data['email_background_tasks_url'] }" >
+    <div class="history-request-response-error msg msg-warning copy"></div>
+    <div class="task-history-email-table"></div>
+  </div>
 </div>
 %endif
 

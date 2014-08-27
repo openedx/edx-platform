@@ -10,6 +10,7 @@
         </div>
       </li>
 
+      %if can_audit:
       <li class="help-item help-item-coldfeet">
         %if upgrade:
           <h3 class="title">${_("Change your mind?")}</h3>
@@ -23,6 +24,7 @@
           </div>
         %endif
       </li>
+      %endif
 
       <li class="help-item help-item-technical">
         <h3 class="title">${_("Technical Requirements")}</h3>

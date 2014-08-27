@@ -18,6 +18,8 @@ from pytz import UTC
 import uuid
 from collections import defaultdict
 from dogapi import dog_stats_api
+from django.db.models import Q
+import pytz
 
 from django.conf import settings
 from django.utils import timezone
@@ -47,6 +49,8 @@ from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 
 from ratelimitbackend import admin
+
+import analytics
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -746,6 +750,7 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
+
         if activation_changed:
             if self.is_active:
                 self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
@@ -759,7 +764,7 @@ class CourseEnrollment(models.Model):
 
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
-
+                
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
                 dog_stats_api.increment(
@@ -789,6 +794,16 @@ class CourseEnrollment(models.Model):
 
             with tracker.get_tracker().context(event_name, context):
                 tracker.emit(event_name, data)
+
+                if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                    analytics.track(self.user_id, event_name, {
+                        'category': 'conversion',
+                        'label': self.course_id.to_deprecated_string(),
+                        'org': self.course_id.org,
+                        'course': self.course_id.course,
+                        'run': self.course_id.run,
+                        'mode': self.mode,
+                    })
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
@@ -816,6 +831,8 @@ class CourseEnrollment(models.Model):
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
+
+        Also emits relevant events for analytics purposes.
         """
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
@@ -988,6 +1005,17 @@ class CourseEnrollment(models.Model):
         d['total'] = total
         return d
 
+    def is_paid_course(self):
+        """
+        Returns True, if course is paid
+        """
+        paid_course = CourseMode.objects.filter(Q(course_id=self.course_id) & Q(mode_slug='honor') &
+                                                (Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=datetime.now(pytz.UTC)))).exclude(min_price=0)
+        if paid_course or self.mode == 'professional':
+            return True
+
+        return False
+
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""
         self.update_enrollment(is_active=True)
@@ -1018,6 +1046,8 @@ class CourseEnrollment(models.Model):
         # If the student has already been given a certificate they should not be refunded
         if GeneratedCertificate.certificate_for_student(self.user, self.course_id) is not None:
             return False
+
+        #TODO - When Course administrators to define a refund period for paid courses then refundable will be supported. # pylint: disable=W0511
 
         course_mode = CourseMode.mode_for_course(self.course_id, 'verified')
         if course_mode is None:

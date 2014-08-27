@@ -16,6 +16,7 @@ from ..pages.lms.progress import ProgressPage
 from ..pages.lms.dashboard import DashboardPage
 from ..pages.lms.video.video import VideoPage
 from ..pages.xblock.acid import AcidView
+from ..pages.lms.courseware import CoursewarePage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -421,3 +422,87 @@ class XBlockAcidChildTest(XBlockAcidBase):
     @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block(self):
         super(XBlockAcidChildTest, self).test_acid_block()
+
+
+class VisibleToStaffOnlyTest(UniqueCourseTest):
+    """
+    Tests that content with visible_to_staff_only set to True cannot be viewed by students.
+    """
+    def setUp(self):
+        super(VisibleToStaffOnlyTest, self).setUp()
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Subsection With Locked Unit').add_children(
+                    XBlockFixtureDesc('vertical', 'Locked Unit', metadata={'visible_to_staff_only': True}).add_children(
+                        XBlockFixtureDesc('html', 'Html Child in locked unit', data="<html>Visible only to staff</html>"),
+                    ),
+                    XBlockFixtureDesc('vertical', 'Unlocked Unit').add_children(
+                        XBlockFixtureDesc('html', 'Html Child in unlocked unit', data="<html>Visible only to all</html>"),
+                    )
+                ),
+                XBlockFixtureDesc('sequential', 'Unlocked Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc('html', 'Html Child in visible unit', data="<html>Visible to all</html>"),
+                    )
+                ),
+                XBlockFixtureDesc('sequential', 'Locked Subsection', metadata={'visible_to_staff_only': True}).add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
+                        XBlockFixtureDesc(
+                            'html', 'Html Child in locked subsection', data="<html>Visible only to staff</html>"
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.course_nav = CourseNavPage(self.browser)
+
+    def test_visible_to_staff(self):
+        """
+        Scenario: All content is visible for a user marked is_staff (different from course staff)
+            Given some of the course content has been marked 'visible_to_staff_only'
+            And I am logged on with an account marked 'is_staff'
+            Then I can see all course content
+        """
+        AutoAuthPage(self.browser, username="STAFF_TESTER", email="johndoe_staff@example.com",
+                     course_id=self.course_id, staff=True).visit()
+
+        self.courseware_page.visit()
+        self.assertEqual(3, len(self.course_nav.sections['Test Section']))
+
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.assertEqual(["Html Child in locked unit", "Html Child in unlocked unit"], self.course_nav.sequence_items)
+
+        self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
+        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+
+        self.course_nav.go_to_section("Test Section", "Locked Subsection")
+        self.assertEqual(["Html Child in locked subsection"], self.course_nav.sequence_items)
+
+    def test_visible_to_student(self):
+        """
+        Scenario: Content marked 'visible_to_staff_only' is not visible for students in the course
+            Given some of the course content has been marked 'visible_to_staff_only'
+            And I am logged on with an authorized student account
+            Then I can only see content without 'visible_to_staff_only' set to True
+        """
+        AutoAuthPage(self.browser, username="STUDENT_TESTER", email="johndoe_student@example.com",
+                     course_id=self.course_id, staff=False).visit()
+
+        self.courseware_page.visit()
+        self.assertEqual(2, len(self.course_nav.sections['Test Section']))
+
+        self.course_nav.go_to_section("Test Section", "Subsection With Locked Unit")
+        self.assertEqual(["Html Child in unlocked unit"], self.course_nav.sequence_items)
+
+        self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
+        self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)

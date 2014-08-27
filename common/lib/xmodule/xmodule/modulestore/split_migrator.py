@@ -25,7 +25,7 @@ class SplitMigrator(object):
         self.split_modulestore = split_modulestore
         self.source_modulestore = source_modulestore
 
-    def migrate_mongo_course(self, source_course_key, user_id, new_org=None, new_course=None, new_run=None):
+    def migrate_mongo_course(self, source_course_key, user_id, new_org=None, new_course=None, new_run=None, fields=None):
         """
         Create a new course in split_mongo representing the published and draft versions of the course from the
         original mongo store. And return the new CourseLocator
@@ -51,10 +51,14 @@ class SplitMigrator(object):
             new_course = source_course_key.course
         if new_run is None:
             new_run = source_course_key.run
+
         new_course_key = CourseLocator(new_org, new_course, new_run, branch=ModuleStoreEnum.BranchName.published)
+        new_fields = self._get_fields_translate_references(original_course, new_course_key, None)
+        if fields:
+            new_fields.update(fields)
         new_course = self.split_modulestore.create_course(
             new_org, new_course, new_run, user_id,
-            fields=self._get_json_fields_translate_references(original_course, new_course_key, None),
+            fields=new_fields,
             master_branch=ModuleStoreEnum.BranchName.published,
         )
 
@@ -88,7 +92,7 @@ class SplitMigrator(object):
                     course_version_locator,
                     module.location.block_type,
                     block_id=module.location.block_id,
-                    fields=self._get_json_fields_translate_references(
+                    fields=self._get_fields_translate_references(
                         module, course_version_locator, new_course.location.block_id
                     ),
                     continue_version=True
@@ -123,7 +127,7 @@ class SplitMigrator(object):
                     if field.is_set_on(split_module) and not module.fields[name].is_set_on(module):
                         field.delete_from(split_module)
                 for field, value in self._get_fields_translate_references(
-                        module, new_draft_course_loc, published_course_usage_key.block_id
+                        module, new_draft_course_loc, published_course_usage_key.block_id, field_names=False
                 ).iteritems():
                     field.write_to(split_module, value)
 
@@ -134,7 +138,7 @@ class SplitMigrator(object):
                     user_id, new_draft_course_loc,
                     new_locator.block_type,
                     block_id=new_locator.block_id,
-                    fields=self._get_json_fields_translate_references(
+                    fields=self._get_fields_translate_references(
                         module, new_draft_course_loc, published_course_usage_key.block_id
                     )
                 )
@@ -169,43 +173,13 @@ class SplitMigrator(object):
             new_parent.children.insert(new_parent_cursor, new_locator)
             new_parent = self.split_modulestore.update_item(new_parent, user_id)
 
-    def _get_json_fields_translate_references(self, xblock, new_course_key, course_block_id):
-        """
-        Return the json repr for explicitly set fields but convert all references to their Locators
-        """
-        def get_translation(location):
-            """
-            Convert the location
-            """
-            return new_course_key.make_usage_key(
-                location.category,
-                location.block_id if location.category != 'course' else course_block_id
-            )
-
-        result = {}
-        for field_name, field in xblock.fields.iteritems():
-            if field.is_set_on(xblock):
-                field_value = getattr(xblock, field_name)
-                if isinstance(field, Reference) and field_value is not None:
-                    result[field_name] = get_translation(field_value)
-                elif isinstance(field, ReferenceList):
-                    result[field_name] = [
-                        get_translation(ele) for ele in field_value
-                    ]
-                elif isinstance(field, ReferenceValueDict):
-                    result[field_name] = {
-                        key: get_translation(subvalue)
-                        for key, subvalue in field_value.iteritems()
-                    }
-                else:
-                    result[field_name] = field.read_json(xblock)
-
-        return result
-
-    def _get_fields_translate_references(self, xblock, new_course_key, course_block_id):
+    def _get_fields_translate_references(self, xblock, new_course_key, course_block_id, field_names=True):
         """
         Return a dictionary of field: value pairs for explicitly set fields
         but convert all references to their BlockUsageLocators
+        Args:
+            field_names: if Truthy, the dictionary keys are the field names. If falsey, the keys are the
+            field objects.
         """
         def get_translation(location):
             """
@@ -219,19 +193,20 @@ class SplitMigrator(object):
         result = {}
         for field_name, field in xblock.fields.iteritems():
             if field.is_set_on(xblock):
-                field_value = getattr(xblock, field_name)
+                field_value = field.read_from(xblock)
+                field_key = field_name if field_names else field
                 if isinstance(field, Reference) and field_value is not None:
-                    result[field] = get_translation(field_value)
+                    result[field_key] = get_translation(field_value)
                 elif isinstance(field, ReferenceList):
-                    result[field] = [
+                    result[field_key] = [
                         get_translation(ele) for ele in field_value
                     ]
                 elif isinstance(field, ReferenceValueDict):
-                    result[field] = {
+                    result[field_key] = {
                         key: get_translation(subvalue)
                         for key, subvalue in field_value.iteritems()
                     }
                 else:
-                    result[field] = field_value
+                    result[field_key] = field_value
 
         return result

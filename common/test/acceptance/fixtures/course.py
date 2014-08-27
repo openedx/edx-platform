@@ -99,6 +99,7 @@ class XBlockFixtureDesc(object):
         self.grader_type = grader_type
         self.publish = publish
         self.children = []
+        self.locator = None
 
     def add_children(self, *args):
         """
@@ -137,11 +138,12 @@ class XBlockFixtureDesc(object):
                 metadata={2},
                 grader_type={3},
                 publish={4},
-                children={5}
+                children={5},
+                locator={6},
             >
         """).strip().format(
             self.category, self.data, self.metadata,
-            self.grader_type, self.publish, self.children
+            self.grader_type, self.publish, self.children, self.locator
         )
 
 
@@ -199,7 +201,7 @@ class CourseFixture(StudioApiFixture):
 
         self._updates = []
         self._handouts = []
-        self._children = []
+        self.children = []
         self._assets = []
         self._advanced_settings = {}
 
@@ -216,7 +218,7 @@ class CourseFixture(StudioApiFixture):
 
         Returns the course fixture to allow chaining.
         """
-        self._children.extend(args)
+        self.children.extend(args)
         return self
 
     def add_update(self, update):
@@ -257,7 +259,7 @@ class CourseFixture(StudioApiFixture):
         self._configure_course()
         self._upload_assets()
         self._add_advanced_settings()
-        self._create_xblock_children(self._course_location, self._children)
+        self._create_xblock_children(self._course_location, self.children)
 
         return self
 
@@ -362,7 +364,7 @@ class CourseFixture(StudioApiFixture):
         # Construct HTML with each of the handout links
         handouts_li = [
             '<li><a href="/static/{handout}">Example Handout</a></li>'.format(handout=handout)
-             for handout in self._handouts
+            for handout in self._handouts
         ]
         handouts_html = '<ol class="treeview-handoutsnav">{}</ol>'.format("".join(handouts_li))
 
@@ -446,12 +448,31 @@ class CourseFixture(StudioApiFixture):
         Recursively create XBlock children.
         """
         for desc in xblock_descriptions:
-            loc = self._create_xblock(parent_loc, desc)
+            loc = self.create_xblock(parent_loc, desc)
             self._create_xblock_children(loc, desc.children)
 
         self._publish_xblock(parent_loc)
 
-    def _create_xblock(self, parent_loc, xblock_desc):
+    def get_nested_xblocks(self, category=None):
+        """
+        Return a list of nested XBlocks for the course that can be filtered by
+        category.
+        """
+        xblocks = self._get_nested_xblocks(self)
+        if category:
+            xblocks = filter(lambda x: x.category == category, xblocks)
+        return xblocks
+
+    def _get_nested_xblocks(self, xblock_descriptor):
+        """
+        Return a list of nested XBlocks for the course.
+        """
+        xblocks = list(xblock_descriptor.children)
+        for child in xblock_descriptor.children:
+            xblocks.extend(self._get_nested_xblocks(child))
+        return xblocks
+
+    def create_xblock(self, parent_loc, xblock_desc):
         """
         Create an XBlock with `parent_loc` (the location of the parent block)
         and `xblock_desc` (an `XBlockFixtureDesc` instance).
@@ -477,7 +498,7 @@ class CourseFixture(StudioApiFixture):
 
         try:
             loc = response.json().get('locator')
-
+            xblock_desc.locator = loc
         except ValueError:
             raise CourseFixtureError("Could not decode JSON from '{0}'".format(response.content))
 
@@ -499,15 +520,21 @@ class CourseFixture(StudioApiFixture):
         """
         Publish the xblock at `locator`.
         """
+        self._update_xblock(locator, {'publish': 'make_public'})
+
+    def _update_xblock(self, locator, data):
+        """
+        Update the xblock at `locator`.
+        """
         # Create the new XBlock
         response = self.session.put(
             "{}/xblock/{}".format(STUDIO_BASE_URL, locator),
-            data=json.dumps({'publish': 'make_public'}),
+            data=json.dumps(data),
             headers=self.headers,
         )
 
         if not response.ok:
-            msg = "Could not publish {}.  Status was {}".format(locator, response.status_code)
+            msg = "Could not update {} with data {}.  Status was {}".format(locator, data, response.status_code)
             raise CourseFixtureError(msg)
 
     def _encode_post_dict(self, post_dict):

@@ -36,8 +36,8 @@ Connect to the Devstack Virtual Machine
     sudo su edxapp
 
    This command loads the edxapp environment from the file
-   ``/edx/app/edxapp/edxapp_env``. This puts ``venv python``, ``rbenv ruby`` and
-   ``rake`` are in your search path.
+   ``/edx/app/edxapp/edxapp_env``. This puts ``venv python`` and ``rbenv ruby``
+   in your search path.
 
    This command also sets the current working directory to the edx-platform
    repository (``/edx/app/edxapp/edx-platform``).

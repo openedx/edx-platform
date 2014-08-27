@@ -568,7 +568,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         size = file_storage.size(new_file_name)
         if size > cc_settings.MAX_UPLOAD_FILE_SIZE:
             file_storage.delete(new_file_name)
-            msg = _("maximum upload file size is %(file_size)sK") % \
+            msg = _("Maximum upload file size is %(file_size)s bytes.") % \
                 {'file_size': cc_settings.MAX_UPLOAD_FILE_SIZE}
             raise exceptions.PermissionDenied(msg)
 

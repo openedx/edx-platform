@@ -241,7 +241,7 @@ updated_at
 --------------------
 votes
 --------------------
-  Both ``CommentThread`` and ``Comment`` objects support voting. In the user interface, students can vote for posts (``CommentThread``s) and for responses, but not for the third-level comments made on responses. All ``Comment`` objects still have this attribute, even though there is no way to actually vote on the comment-level items in the UI. This attribute is a dictionary that has the following items inside:
+  Both ``CommentThread`` and ``Comment`` objects support voting. In the user interface, students can vote for posts (``CommentThread`` objects) and for responses, but not for the third-level comments made on responses. All ``Comment`` objects still have this attribute, even though there is no way to actually vote on the comment-level items in the UI. This attribute is a dictionary that has the following items inside:
 
   * up = list of User IDs that up-voted this comment or thread.
   * down = list of User IDs that down-voted this comment or thread (no longer used).

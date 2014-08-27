@@ -160,6 +160,17 @@ $shadow-l2: rgba($black, 0.05);
 $shadow-d1: rgba($black, 0.4);
 $shadow-d2: rgba($black, 0.6);
 
+// colors - application
+$color-draft: $gray-l3;
+$color-live: $blue;
+$color-ready: $green;
+$color-warning: $orange-l2;
+$color-error: $red-l2;
+$color-staff-only: $black;
+
+$color-heading-base: $gray-d2;
+$color-copy-base: $gray-l1;
+
 // ====================
 
 // timing - used for animation/transition mixin syncing

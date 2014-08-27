@@ -1,3 +1,4 @@
+
 import json
 import django.db
 import unittest
@@ -12,6 +13,7 @@ from mock import Mock, patch
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
+from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from textwrap import dedent
 from microsite_configuration import microsite
@@ -126,9 +128,11 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
         # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
         request = RequestFactory().post('unused_url')
+        request.user = self.user
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
+        mako_middleware_process_request(request)
         body = render_to_string('emails/activation_email.txt', context)
         host = safe_get_host(request)
 
@@ -281,9 +285,11 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
 
         # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
         request = RequestFactory().post('unused_url')
+        request.user = self.user
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
+        mako_middleware_process_request(request)
         body = render_to_string('emails/confirm_email_change.txt', context)
         url = safe_get_host(request)
 

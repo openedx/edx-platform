@@ -4,6 +4,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# anaseha <anaselhadjamor@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
@@ -11,6 +12,7 @@
 # Françoise Docq, 2014
 # Françoise Docq, 2014
 # Françoise Docq, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
 # Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
 # Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
 # Jeremie Sicsic <jsicsic@gmail.com>, 2013
@@ -21,6 +23,7 @@
 # Jeremie Sicsic <jsicsic@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
+# laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Marco Morales, 2014
 # Nikolaos Maris, 2013
 # Nikolaos Maris, 2013
@@ -35,6 +38,7 @@
 # SLOG90 <slog90@gmail.com>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2013
+# Toreador <torrent_lover@hotmail.com>, 2014
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
@@ -48,6 +52,7 @@
 # francoisedocq, 2014
 # Françoise Docq, 2014
 # Françoise Docq, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
 # Isabelle Gonon <isabelle.gonon@cnam.fr>, 2013
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Jeremie Sicsic <jsicsic@gmail.com>, 2013
@@ -138,8 +143,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-07-11 16:04-0400\n"
-"PO-Revision-Date: 2014-03-03 14:01+0000\n"
+"POT-Creation-Date: 2014-08-04 09:18-0400\n"
+"PO-Revision-Date: 2014-07-22 14:02+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -169,7 +174,7 @@ msgstr "Discussion"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Problem"
 msgstr "Exercice"
 
@@ -448,6 +453,10 @@ msgid "A country is required"
 msgstr "Un pays est requis"
 
 #: common/djangoapps/student/views.py
+msgid "You are missing one or more required fields"
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "Username cannot be more than {0} characters long"
 msgstr "Le nom d'utilisateur ne doit pas contenir plus de {0} caractères"
 
@@ -468,6 +477,10 @@ msgstr ""
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
 msgstr "Mot de passe : "
+
+#: common/djangoapps/student/views.py
+msgid "Username and password fields cannot match"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not send activation e-mail."
@@ -1340,6 +1353,10 @@ msgid "Finished"
 msgstr "Fini"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct or Past Due"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
 msgstr ""
 
@@ -1570,10 +1587,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid ""
-"A list of lists of state dictionaries for student states that are saved.This"
-" field is only populated if the instructor changes tasks afterthe module is "
-"created and students have attempted it (for example changes a self assessed "
-"problem to self and peer assessed."
+"A list of lists of state dictionaries for student states that are saved. "
+"This field is only populated if the instructor changes tasks after the "
+"module is created and students have attempted it (for example, if a self "
+"assessed problem is changed to self and peer assessed)."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -2264,6 +2281,10 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Invitation Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
 msgstr "Général"
 
@@ -2807,6 +2828,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/lib/xblock/mixin.py
+msgid "If true, can be seen only by course staff, regardless of start date."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3884,8 +3910,8 @@ msgid "allowed file types are '%(file_types)s'"
 msgstr "les types de fichiers autorisés sont '%(file_types)s'"
 
 #: lms/djangoapps/django_comment_client/base/views.py
-msgid "maximum upload file size is %(file_size)sK"
-msgstr "la taille maximum de fichier à envoyer est de %(file_size)sK"
+msgid "Maximum upload file size is %(file_size)s bytes."
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -3940,7 +3966,7 @@ msgid "Gender"
 msgstr "Genre"
 
 #: lms/djangoapps/instructor/views/api.py
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 #, fuzzy
 msgid "Level of Education"
 msgstr ""
@@ -4028,6 +4054,17 @@ msgstr ""
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) already exist"
 msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "Please Enter the Integer Value for Coupon Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
+msgstr ""
+"Veuillez entrer la valeur du coupon de réduction inférieure ou égale à 100"
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "coupon with the coupon code ({code}) added successfully"
@@ -5327,7 +5364,7 @@ msgstr ""
 msgid ""
 "\n"
 "            The authorization request was approved by the issuing bank but declined by CyberSource\n"
-"            becouse it did not pass the Address Verification System (AVS).\n"
+"            because it did not pass the Address Verification System (AVS).\n"
 "            "
 msgstr ""
 
@@ -5685,7 +5722,7 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at %(site_name)s."
+" user account at edx.org."
 msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
@@ -5706,7 +5743,7 @@ msgid "Thanks for using our site!"
 msgstr "Merci d'utiliser notre site !"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The %(platform_name)s Team"
+msgid "The edX Team"
 msgstr ""
 
 #: lms/templates/wiki/article.html
@@ -6287,6 +6324,22 @@ msgstr ""
 "\n"
 "{err}"
 
+#: cms/djangoapps/contentstore/views/course.py
+msgid "invalid JSON"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "must have name of the configuration"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "must have at least two groups"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+msgid "This Group Configuration is already in use and cannot be removed."
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
 msgstr ""
@@ -6302,6 +6355,10 @@ msgstr "Fichier Uploadé corrompu. Merci d'essayer à nouveau."
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
 msgstr "Ne peut trouver le fichier course.xml dans le paquet."
+
+#: cms/djangoapps/contentstore/views/item.py
+msgid "Empty"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
@@ -7630,8 +7687,8 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 #: lms/templates/name_changes.html
-msgid "[Reject]"
-msgstr "[Rejeter]"
+msgid "Reject"
+msgstr "Rejeter"
 
 #: lms/templates/navigation.html
 msgid "Global Navigation"
@@ -7712,6 +7769,9 @@ msgid ""
 " collection and use of this information will be governed by their terms of "
 "service and privacy policy."
 msgstr ""
+"Notre nom d'utilisateur, adresse de messagerie et nom complet seront envoyés"
+" à  {destination}, où la récupération et l'utilisation de ces données seront"
+" régies par leurs charte de service et règles de confidentialité."
 
 #: lms/templates/provider_login.html
 msgid "Return To %s"
@@ -7904,10 +7964,6 @@ msgstr ""
 msgid "Please complete the following fields to register for an account. "
 msgstr "Complétez les champs suivants pour créer votre compte."
 
-#: lms/templates/register.html lms/templates/register.html
-msgid "cannot be changed later"
-msgstr "ne pourra pas être modifié ultérieurement"
-
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
 msgstr "exemple : Jean Dupont"
@@ -7915,6 +7971,10 @@ msgstr "exemple : Jean Dupont"
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr "Nécessaire pour tous certificats que vous pourriez obtenir"
+
+#: lms/templates/register.html lms/templates/register.html
+msgid "cannot be changed later"
+msgstr "ne pourra pas être modifié ultérieurement"
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
@@ -7949,7 +8009,7 @@ msgid "Highest Level of Education Completed"
 msgstr "Plus haut niveau de formation obtenu"
 
 #: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
 msgid "Year of Birth"
 msgstr "Année de naissance"
 
@@ -8656,10 +8716,6 @@ msgstr ""
 "{start_help_tag}page d'aide{end_tag} afin de trouver une solution."
 
 #: lms/templates/courseware/course_about.html
-msgid "About {course.display_number_with_default}"
-msgstr "A propos de {course.display_number_with_default}"
-
-#: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
 msgstr "Vous êtes inscrit à ce cours"
 
@@ -8677,6 +8733,14 @@ msgid ""
 msgstr ""
 "Ajouter {course.display_number_with_default} au panier "
 "({currency_symbol}{cost})"
+
+#: lms/templates/courseware/course_about.html
+msgid "Enrollment in this course is by invitation only"
+msgstr "L'inscription à ce cours se fait sur invitation seulement"
+
+#: lms/templates/courseware/course_about.html
+msgid "Enrollment is Closed"
+msgstr "Les inscriptions sont fermées"
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -8850,8 +8914,9 @@ msgid "speed of light"
 msgstr "vitesse de la lumière"
 
 #: lms/templates/courseware/courseware.html
-msgid "freezing point of water in degrees Kelvin"
-msgstr "température de gel de l'eau en degrés Kelvin"
+msgid "Typical room temperature: 298.15 (Kelvin), same as 25C/77F"
+msgstr ""
+"Température ambiante ordinaire de la pièce : 298,15 (Kelvin), soit 25C / 77F"
 
 #: lms/templates/courseware/courseware.html
 msgid "fundamental charge"
@@ -9575,6 +9640,7 @@ msgid "Enrolled as: "
 msgstr "Inscrit en tant que:"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Vérifié"
 
@@ -10536,60 +10602,29 @@ msgstr ""
 msgid "Percentage Discount"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Active Students"
-msgstr "Étudiants actifs"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The count of students who interacted at least once by opening pages, playing"
-" videos, posting in discussions, submitting problems, or completing other "
-"activities. The date range includes all activities from midnight on the "
-"start date (inclusive) though midnight on the end date (exclusive)."
-msgstr ""
-"Le nombre d'étudiants qui ont interagi au moins une fois en accédant à des "
-"pages, en regardant des vidéos, en contribuant aux discussions, en "
-"soumettant des exercices ou en réalisant d'autres activités. La plage de "
-"dates inclut toutes les activités de minuit à la date de départ (inclus) "
-"jusqu'à minuit de la date de fin (exclus)."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Score Distribution"
-msgstr "Distribution des scores"
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"The chart below displays the score distribution for each standard problem in"
-" your class, specified by the problem's url name."
-msgstr ""
-"Le tableau ci-dessous affiche la répartition des notes pour chaque exercice "
-"standard de votre cours, par URL du nom de l'exercice."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid ""
-"Scores are shown without weighting applied, so if your problem contains 2 "
-"questions, it will display as having a total of 2 points."
-msgstr ""
-"Les scores sont affichés sans pondération, donc si votre exercice contient 2"
-" questions, il sera affiché comme ayant un total de 2 points."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Loading problem list..."
-msgstr "Chargement de la liste des exercices..."
-
-#: lms/templates/instructor/instructor_dashboard_2/analytics.html
-msgid "Gender Distribution"
-msgstr "Répartition selon le sexe"
-
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Enrollment Information"
 msgstr "Information d'inscription"
 
+#. Translators: 'track' refers to the enrollment type ('honor', 'verified', or
+#. 'audit')
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
-msgid "Total number of enrollees (instructors, staff members, and students)"
+msgid ""
+"Number of enrollees (instructors, staff members, and students) by track"
 msgstr ""
-"Nombre total d'inscrits (instructeurs, membres de l'équipe pédagogique et "
-"étudiants)"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Audit"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "Honor"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Total"
+msgstr "Total"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -10753,58 +10788,58 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Amount: "
-msgstr ""
+msgstr "Montant total :"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupons Information"
-msgstr ""
+msgstr "Information sur les bons"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
+msgstr "+ Ajouter un bon de réduction"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Course_id"
-msgstr ""
+msgstr "Identifiant du cours"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount(%)"
-msgstr ""
+msgstr "Remise (%)"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Count"
-msgstr ""
+msgstr "Compte"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Coupon Code"
-msgstr ""
+msgstr "Veuillez entrer le code du bon de réduction"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Value Greater than 0"
-msgstr ""
+msgstr "Veuillez entrer une valeur supérieure à 0"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Coupon Discount Value Greater than 0"
-msgstr ""
+msgstr "Veuillez entrer la valeur du bon de réduction supérieure à 0"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Please Enter the Numeric value for Discount"
-msgstr ""
+msgstr "Veuillez entrer la valeur numérique de la remise"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Edit Coupon"
-msgstr ""
+msgstr "Éditer le bon de réduction"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon"
-msgstr ""
+msgstr "Mettre à jour le bon de réduction"
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Information"
-msgstr ""
+msgstr "Mettre à jour l'information concernant le bon de réduction"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -10891,6 +10926,51 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Reset due date for student"
 msgstr "Remettre à zéro l'échéance pour l'étudiant"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Active Students"
+msgstr "Étudiants actifs"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The count of students who interacted at least once by opening pages, playing"
+" videos, posting in discussions, submitting problems, or completing other "
+"activities. The date range includes all activities from midnight on the "
+"start date (inclusive) though midnight on the end date (exclusive)."
+msgstr ""
+"Le nombre d'étudiants qui ont interagi au moins une fois en accédant à des "
+"pages, en regardant des vidéos, en contribuant aux discussions, en "
+"soumettant des exercices ou en réalisant d'autres activités. La plage de "
+"dates inclut toutes les activités de minuit à la date de départ (inclus) "
+"jusqu'à minuit de la date de fin (exclus)."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Score Distribution"
+msgstr "Distribution des scores"
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"The chart below displays the score distribution for each standard problem in"
+" your class, specified by the problem's url name."
+msgstr ""
+"Le tableau ci-dessous affiche la répartition des notes pour chaque exercice "
+"standard de votre cours, par URL du nom de l'exercice."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid ""
+"Scores are shown without weighting applied, so if your problem contains 2 "
+"questions, it will display as having a total of 2 points."
+msgstr ""
+"Les scores sont affichés sans pondération, donc si votre exercice contient 2"
+" questions, il sera affiché comme ayant un total de 2 points."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Loading problem list..."
+msgstr "Chargement de la liste des exercices..."
+
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Gender Distribution"
+msgstr "Répartition selon le sexe"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
@@ -11948,10 +12028,6 @@ msgstr ""
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Order No."
 msgstr "Commande N°"
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Total"
-msgstr "Total"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Billed To"
@@ -13182,8 +13258,9 @@ msgstr "Contenu"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course_info.html cms/templates/edit-tabs.html
-#: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/overview.html cms/templates/textbooks.html
+#: cms/templates/group_configurations.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/overview.html
+#: cms/templates/textbooks.html
 msgid "Page Actions"
 msgstr "Actions de la Page"
 
@@ -13228,7 +13305,8 @@ msgid ""
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/overview.html cms/templates/settings_graders.html
+#: cms/templates/group_configurations.html cms/templates/overview.html
+#: cms/templates/settings_graders.html
 msgid "What can I do on this page?"
 msgstr "Que puis-je faire sur cette page ?"
 
@@ -13760,7 +13838,40 @@ msgid "Group Configurations"
 msgstr ""
 
 #: cms/templates/group_configurations.html
+msgid "New Group Configuration"
+msgstr ""
+
+#: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "You can create, edit, and delete group configurations."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"A group configuration defines how many groups of students are in an "
+"experiment. When you create an experiment, you select the group "
+"configuration to use."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"Click {em_start}New Group Configuration{em_end} to add a new configuration. "
+"To edit a configuration, hover over its box and click "
+"{em_start}Edit{em_end}."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
+msgstr ""
+
+#: cms/templates/group_configurations.html cms/templates/textbooks.html
+msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -14244,8 +14355,10 @@ msgid "e.g. Introduction to Computer Science"
 msgstr "par exemple, Introduction à l'Informatique"
 
 #: cms/templates/index.html
-msgid "The public display name for your course."
-msgstr "Le nom public de votre Cours"
+msgid ""
+"The public display name for your course. This cannot be changed, but you can"
+" set a different display name in Advanced Settings later."
+msgstr ""
 
 #: cms/templates/index.html cms/templates/settings.html
 msgid "Organization"
@@ -15243,10 +15356,6 @@ msgid ""
 "If your textbook doesn't have individual chapters, you can upload the entire"
 " text as a single chapter and enter a name of your choice in the Chapter "
 "Name field."
-msgstr ""
-
-#: cms/templates/textbooks.html
-msgid "Learn More"
 msgstr ""
 
 #: cms/templates/unit.html cms/templates/ux/reference/unit.html

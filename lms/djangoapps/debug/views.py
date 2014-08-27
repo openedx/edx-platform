@@ -3,12 +3,15 @@
 import pprint
 import traceback
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.utils.html import escape
+
 from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec
+
 
 @login_required
 @ensure_csrf_cookie
@@ -29,3 +32,14 @@ def run_python(request):
         else:
             c['results'] = pprint.pformat(g)
     return render_to_response("debug/run_python_form.html", c)
+
+
+@login_required
+def show_parameters(request):
+    """A page that shows what parameters were on the URL and post."""
+    html = []
+    for name, value in sorted(request.GET.items()):
+        html.append(escape("GET {}: {!r}".format(name, value)))
+    for name, value in sorted(request.POST.items()):
+        html.append(escape("POST {}: {!r}".format(name, value)))
+    return HttpResponse("\n".join("<p>{}</p>".format(h) for h in html))

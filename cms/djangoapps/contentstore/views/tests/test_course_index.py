@@ -5,9 +5,16 @@ import json
 import lxml
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url
+from contentstore.utils import reverse_course_url, add_instructor
+from contentstore.views.access import has_course_access
+from contentstore.views.course import course_outline_initial_state
+from contentstore.views.item import create_xblock_info, VisibilityState
+from course_action_state.models import CourseRerunState
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from opaque_keys.edx.locator import Locator
+from opaque_keys.edx.locator import CourseLocator
+from student.tests.factories import UserFactory
+from course_action_state.managers import CourseRerunUIStateManager
 from django.conf import settings
 
 
@@ -98,19 +105,140 @@ class TestCourseIndex(CourseTestCase):
         self.assertEqual(json_response['category'], 'course')
         self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
         self.assertEqual(json_response['display_name'], 'Robot Super Course')
-        self.assertTrue(json_response['is_container'])
-        self.assertFalse(json_response['is_draft'])
+        self.assertTrue(json_response['published'])
+        self.assertIsNone(json_response['visibility_state'])
 
         # Now verify the first child
-        children = json_response['children']
+        children = json_response['child_info']['children']
         self.assertTrue(len(children) > 0)
         first_child_response = children[0]
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
         self.assertEqual(first_child_response['display_name'], 'Week 1')
-        self.assertTrue(first_child_response['is_container'])
-        self.assertFalse(first_child_response['is_draft'])
-        self.assertTrue(len(first_child_response['children']) > 0)
+        self.assertTrue(json_response['published'])
+        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
+        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
+
+        # Finally, validate the entire response for consistency
+        self.assert_correct_json_response(json_response)
+
+    def test_notifications_handler_get(self):
+        state = CourseRerunUIStateManager.State.FAILED
+        action = CourseRerunUIStateManager.ACTION
+        should_display = True
+
+        # try when no notification exists
+        notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': 1,
+        })
+
+        resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
+
+        # verify that we get an empty dict out
+        self.assertEquals(resp.status_code, 400)
+
+        # create a test notification
+        rerun_state = CourseRerunState.objects.update_state(course_key=self.course.id, new_state=state, allow_not_found=True)
+        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=UserFactory(), should_display=should_display)
+
+        # try to get information on this notification
+        notification_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': rerun_state.id,
+        })
+        resp = self.client.get(notification_url, HTTP_ACCEPT='application/json')
+
+        json_response = json.loads(resp.content)
+
+        self.assertEquals(json_response['state'], state)
+        self.assertEquals(json_response['action'], action)
+        self.assertEquals(json_response['should_display'], should_display)
+
+    def test_notifications_handler_dismiss(self):
+        state = CourseRerunUIStateManager.State.FAILED
+        should_display = True
+        rerun_course_key = CourseLocator(org='testx', course='test_course', run='test_run')
+
+        # add an instructor to this course
+        user2 = UserFactory()
+        add_instructor(rerun_course_key, self.user, user2)
+
+        # create a test notification
+        rerun_state = CourseRerunState.objects.update_state(course_key=rerun_course_key, new_state=state, allow_not_found=True)
+        CourseRerunState.objects.update_should_display(entry_id=rerun_state.id, user=user2, should_display=should_display)
+
+        # try to get information on this notification
+        notification_dismiss_url = reverse_course_url('course_notifications_handler', self.course.id, kwargs={
+            'action_state_id': rerun_state.id,
+        })
+        resp = self.client.delete(notification_dismiss_url)
+        self.assertEquals(resp.status_code, 200)
+
+        with self.assertRaises(CourseRerunState.DoesNotExist):
+            # delete nofications that are dismissed
+            CourseRerunState.objects.get(id=rerun_state.id)
+
+        self.assertFalse(has_course_access(user2, rerun_course_key))
+
+    def assert_correct_json_response(self, json_response):
+        """
+        Asserts that the JSON response is syntactically consistent
+        """
+        self.assertIsNotNone(json_response['display_name'])
+        self.assertIsNotNone(json_response['id'])
+        self.assertIsNotNone(json_response['category'])
+        self.assertTrue(json_response['published'])
+        if json_response.get('child_info', None):
+            for child_response in json_response['child_info']['children']:
+                self.assert_correct_json_response(child_response)
+
+
+class TestCourseOutline(CourseTestCase):
+    """
+    Unit tests for the course outline.
+    """
+    def setUp(self):
+        """
+        Set up the for the course outline tests.
+        """
+        super(TestCourseOutline, self).setUp()
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Week 1"
+        )
+        self.sequential = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Lesson 1"
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.sequential.location, category='vertical', display_name='Subsection 1'
+        )
+        self.video = ItemFactory.create(
+            parent_location=self.vertical.location, category="video", display_name="My Video"
+        )
+
+    def test_json_responses(self):
+        """
+        Verify the JSON responses returned for the course.
+        """
+        outline_url = reverse_course_url('course_handler', self.course.id)
+        resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+
+        # First spot check some values in the root response
+        self.assertEqual(json_response['category'], 'course')
+        self.assertEqual(json_response['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertTrue(json_response['published'])
+        self.assertIsNone(json_response['visibility_state'])
+
+        # Now verify the first child
+        children = json_response['child_info']['children']
+        self.assertTrue(len(children) > 0)
+        first_child_response = children[0]
+        self.assertEqual(first_child_response['category'], 'chapter')
+        self.assertEqual(first_child_response['id'], 'i4x://MITx/999/chapter/Week_1')
+        self.assertEqual(first_child_response['display_name'], 'Week 1')
+        self.assertTrue(json_response['published'])
+        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
+        self.assertTrue(len(first_child_response['child_info']['children']) > 0)
 
         # Finally, validate the entire response for consistency
         self.assert_correct_json_response(json_response)
@@ -122,10 +250,26 @@ class TestCourseIndex(CourseTestCase):
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        self.assertIsNotNone(json_response['is_draft'])
-        self.assertIsNotNone(json_response['is_container'])
-        if json_response['is_container']:
-            for child_response in json_response['children']:
+        self.assertTrue(json_response['published'])
+        if json_response.get('child_info', None):
+            for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response)
-        else:
-            self.assertFalse('children' in json_response)
+
+    def test_course_outline_initial_state(self):
+        course_module = modulestore().get_item(self.course.location)
+        course_structure = create_xblock_info(
+            course_module,
+            include_child_info=True,
+            include_children_predicate=lambda xblock: not xblock.category == 'vertical'
+        )
+
+        # Verify that None is returned for a non-existent locator
+        self.assertIsNone(course_outline_initial_state('no-such-locator', course_structure))
+
+        # Verify that the correct initial state is returned for the test chapter
+        chapter_locator = unicode(self.chapter.location)
+        initial_state = course_outline_initial_state(chapter_locator, course_structure)
+        self.assertEqual(initial_state['locator_to_show'], chapter_locator)
+        expanded_locators = initial_state['expanded_locators']
+        self.assertIn(unicode(self.sequential.location), expanded_locators)
+        self.assertIn(unicode(self.vertical.location), expanded_locators)

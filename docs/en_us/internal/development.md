@@ -4,9 +4,8 @@
 
 ### Ruby
 
-To install all of the libraries needed for our rake commands, run `bundle install`.
+To install all of the required ruby libraries, run `bundle install`.
 This will read the `Gemfile` and install all of the gems specified there.
-Note: Rake has been deprecated to the Python Paver. This is only needed until rake is fully deprecated
 
 ### Python
 

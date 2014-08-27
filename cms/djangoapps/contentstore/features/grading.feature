@@ -32,8 +32,7 @@ Feature: CMS.Course Grading
         Then I see that the grade range has changed
 
     Scenario: Users can modify Assignment types
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
         And I press the "Save" notification button
@@ -42,8 +41,7 @@ Feature: CMS.Course Grading
         And I do not see the assignment name "Homework"
 
     Scenario: Users can delete Assignment types
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I delete the assignment type "Homework"
         And I press the "Save" notification button
@@ -51,8 +49,7 @@ Feature: CMS.Course Grading
         Then I do not see the assignment name "Homework"
 
     Scenario: Users can add Assignment types
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I add a new assignment type "New Type"
         And I press the "Save" notification button
@@ -71,31 +68,27 @@ Feature: CMS.Course Grading
         Then the assignment weight is displayed as "7"
 
     Scenario: Settings are only persisted when saved
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
         Then I do not see the changes persisted on refresh
 
     Scenario: Settings are reset on cancel
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
         And I press the "Cancel" notification button
         Then I see the assignment type "Homework"
 
     Scenario: Confirmation is shown on save
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
         And I press the "Save" notification button
         Then I see a confirmation that my changes have been saved
 
     Scenario: User cannot save invalid settings
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change assignment type "Homework" to ""
         Then the save notification button is disabled
@@ -104,8 +97,7 @@ Feature: CMS.Course Grading
     @skip_internetexplorer
     @skip_safari
     Scenario: User can edit grading range names
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change the highest grade range to "Good"
         And I press the "Save" notification button
@@ -113,14 +105,12 @@ Feature: CMS.Course Grading
         Then I see the highest grade range is "Good"
 
     Scenario: User cannot edit failing grade range name
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         Then I cannot edit the "Fail" grade range
 
     Scenario: User can set a grace period greater than one day
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change the grace period to "48:00"
         And I press the "Save" notification button
@@ -128,8 +118,7 @@ Feature: CMS.Course Grading
         Then I see the grace period is "48:00"
 
     Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
-        Given I have opened a new course in Studio
-        And I have populated the course
+        Given I have populated a new course in Studio
         And I am viewing the grading settings
         When I change the grace period to "01:99"
         And I press the "Save" notification button

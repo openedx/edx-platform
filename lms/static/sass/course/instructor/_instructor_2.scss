@@ -774,6 +774,14 @@ input[name="subject"] {
     color: green;
     font-weight: bold;
   }
+  table {
+    tr {
+      height: 21px;
+      td {
+        width: 120px;
+      }
+    }
+  }
 }
 
 .ecommerce-wrapper{
@@ -820,6 +828,19 @@ input[name="subject"] {
     }
   .content{
     padding: 0 !important;
+  }
+  input[name="course_registration_code_number"] {
+    margin-right: 10px;
+    height: 34px;
+    width: 258px;
+    border-radius: 3px;
+  }
+  input[name="transaction_group_name"], input[name="download_transaction_group_name"],
+  input[name="active_transaction_group_name"], input[name="spent_transaction_group_name"] {
+    margin-right: 8px;
+    height: 36px;
+    width: 300px;
+    border-radius: 3px;
   }
   .coupons-table {
     width: 100%;
@@ -923,8 +944,8 @@ input[name="subject"] {
     }
   }
 
-  // coupon edit and add modals 
-  #add-coupon-modal, #edit-coupon-modal{
+  // coupon edit and add modals
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal{
     .inner-wrapper {
       background: #fff;
     }
@@ -937,6 +958,10 @@ input[name="subject"] {
       @extend .button-reset;
     }
     input[type="submit"]#add_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    input[type="submit"]#set_course_button{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -976,9 +1001,21 @@ input[name="subject"] {
       li:last-child{
         margin-bottom: 0px !important;
       }
-
     }
-    #coupon-content {
+    li#set-course-mode-modal-field-price{
+      width: 100%;
+      label.required:after {
+        content: "*";
+        margin-left: 5px;
+      }
+    }
+    li#set-course-mode-modal-field-currency{
+      margin-left: 0px !important;
+      select {
+        width: 100%;
+      }
+    }
+    #coupon-content, #course-content {
       padding: 20px;
       header {
         margin: 0;
@@ -1038,4 +1075,89 @@ input[name="subject"] {
       }
     }
   }
+
+}
+
+.profile-distribution-widget {
+  margin-bottom: $baseline * 2;
+
+  .display-text {}
+
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 250px;
+  }
+
+  .display-table {
+    .slickgrid {
+      height: 250px;
+    }
+  }
+}
+
+.grade-distributions-widget {
+  margin-bottom: $baseline * 2;
+
+  .last-updated {
+    line-height: 2.2em;
+    @include font-size(12);
+  }
+
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 200px;
+  }
+
+  .display-text {
+    line-height: 2em;
+  }
+}
+
+input[name="subject"] {
+  width:600px;
+}
+
+.enrollment-wrapper {
+  margin-bottom: $baseline * 2;
+
+  .count {
+    color: green;
+    font-weight: bold;
+  }
+}
+
+.ecommerce-wrapper{
+  h2{
+    height: 26px;
+    line-height: 26px;
+    padding-left: 25px;
+    span{
+      float: right;
+      font-size: 16px;
+      font-weight: bold;
+      span{
+        background: #ddd;
+        padding: 2px 9px;
+        border-radius: 2px;
+        float: none;
+        font-weight: 400;
+      }
+    }
+  }
+  span.tip{
+    padding: 10px 15px;
+    display: block;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background: #f8f4ec;
+    color: #3c3c3c;
+    line-height: 30px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+      float: right;
+    }
+  }
+
 }

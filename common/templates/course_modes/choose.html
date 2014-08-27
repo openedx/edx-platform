@@ -15,13 +15,27 @@
 <%block name="js_extra">
 <script type="text/javascript">
 
+var expandCallback = function(event) {
+  event.preventDefault();
+  $(this).next('.expandable-area').slideToggle();
+  var title = $(this).parent();
+  title.toggleClass('is-expanded');
+  if (title.attr("aria-expanded") === "false") {
+    title.attr("aria-expanded", "true");
+  } else {
+    title.attr("aria-expanded", "false");
+  }
+}
+
 $(document).ready(function() {
   $('.expandable-area').slideUp();
   $('.is-expandable').addClass('is-ready');
-  $('.is-expandable .title-expand').click(function(e) {
-      e.preventDefault();
-      $(this).next('.expandable-area').slideToggle();
-      $(this).parent().toggleClass('is-expanded');
+
+  $('.is-expandable .title-expand').click(expandCallback);
+  $('.is-expandable .title-expand').keypress(function(e) {
+    if (e.which == 13) {  // only activate on pressing enter
+      expandCallback.call(this, e); // make sure that we bind `this` correctly
+    }
   });
 
   $('#contribution-other-amt').focus(function() {
@@ -66,17 +80,27 @@ $(document).ready(function() {
           <div class="register-choice register-choice-certificate">
             <div class="wrapper-copy">
               <span class="deco-ribbon"></span>
-              <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
-
-              %if upgrade:
-                <div class="copy">
-                  <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
-                </div>
+              %if verified_name == "Verified Certificate":
+                <h4 class="title">${_("Certificate of Achievement (ID Verified)")}</h4>
               %else:
-                <div class="copy">
-                  <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
-                </div>
+                <h4 class="title">${verified_name}</h4>
               %endif
+
+              %if verified_name == "Verified Certificate":
+                %if upgrade:
+                    <div class="copy">
+                    <p>${_("Upgrade and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %else:
+                    <div class="copy">
+                    <p>${_("Sign up and work toward a verified Certificate of Achievement.")}</p>
+                    </div>
+                %endif
+              %else:
+                    <div class="copy">
+                    <p>${verified_description}</p>
+                    </div>
+               %endif
             </div>
 
             <div class="field field-certificate-contribution">
@@ -93,7 +117,10 @@ $(document).ready(function() {
               <%include file="_contribution.html" args="suggested_prices=suggested_prices, currency=currency, chosen_price=chosen_price, min_price=min_price"/>
 
               <div class="help-tip is-expandable">
-                <h5 class="title title-expand"><i class="icon-caret-down expandable-icon"></i> ${_("Why do I have to pay? What if I want a free honor code certificate?")}</h5>
+                <h5 class="title title-expand" tabindex="0" aria-expanded="false" role="link">
+                  <i class="icon-caret-down expandable-icon"></i>
+                  ${_("Why do I have to pay? What if I want a free honor code certificate?")}
+                </h5>
 
                 <div class="copy expandable-area">
                   <dl class="list-faq">

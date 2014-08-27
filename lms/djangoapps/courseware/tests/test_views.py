@@ -20,6 +20,7 @@ from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, NonRegisteredUserFactory
 from edxmako.middleware import MakoMiddleware
+from edxmako.tests import mako_middleware_process_request
 
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
@@ -146,6 +147,10 @@ class ViewsTestCase(TestCase):
         mock_module.get_display_items.return_value = []
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module, views.CONTENT_DEPTH)
+
+    def test_invalid_course_id(self):
+        response = self.client.get('/courses/MITx/3.091X/')
+        self.assertEqual(response.status_code, 404)
 
     def test_index_invalid_position(self):
         request_url = '/'.join([
@@ -413,6 +418,8 @@ class TestProgressDueDate(BaseDueDateTests):
 
     def get_text(self, course):
         """ Returns the HTML for the progress page """
+
+        mako_middleware_process_request(self.request)
         return views.progress(self.request, course.id.to_deprecated_string(), self.user.id).content
 
 

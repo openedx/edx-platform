@@ -153,6 +153,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.edited_on = edit_info.get('edited_on')
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
+        module.source_version = edit_info.get('source_version', None)
         module.definition_locator = definition_id
         # decache any pending field settings
         module.save()

@@ -11,7 +11,17 @@ from django.db.models import Q
 
 from xmodule_django.models import CourseKeyField
 
-Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_datetime'])
+Mode = namedtuple('Mode',
+                  [
+                      'slug',
+                      'name',
+                      'min_price',
+                      'suggested_prices',
+                      'currency',
+                      'expiration_datetime',
+                      'description'
+                  ])
+
 
 class CourseMode(models.Model):
     """
@@ -42,7 +52,11 @@ class CourseMode(models.Model):
 
     expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
+    # optional description override
+    # WARNING: will not be localized
+    description = models.TextField(null=True, blank=True)
+
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None)
     DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
@@ -66,7 +80,8 @@ class CourseMode(models.Model):
             mode.min_price,
             mode.suggested_prices,
             mode.currency,
-            mode.expiration_datetime
+            mode.expiration_datetime,
+            mode.description
         ) for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
@@ -96,6 +111,21 @@ class CourseMode(models.Model):
             return matched[0]
         else:
             return None
+
+    @classmethod
+    def verified_mode_for_course(cls, course_id):
+        """
+        Since we have two separate modes that can go through the verify flow,
+        we want to be able to select the 'correct' verified mode for a given course.
+
+        Currently, we prefer to return the professional mode over the verified one
+        if both exist for the given course.
+        """
+        modes_dict = cls.modes_for_course_dict(course_id)
+        verified_mode = modes_dict.get('verified', None)
+        professional_mode = modes_dict.get('professional', None)
+        # we prefer professional over verify
+        return professional_mode if professional_mode else verified_mode
 
     @classmethod
     def min_course_price_for_verified_for_currency(cls, course_id, currency):
@@ -128,3 +158,35 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}, prices={}".format(
             self.course_id.to_deprecated_string(), self.mode_slug, self.min_price, self.suggested_prices
         )
+
+
+class CourseModesArchive(models.Model):
+    """
+    Store the past values of course_mode that a course had in the past. We decided on having
+    separate model, because there is a uniqueness contraint on (course_mode, course_id)
+    field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
+    such as course price changes
+    """
+    # the course that this mode is attached to
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    # the reference to this mode that can be used by Enrollments to generate
+    # similar behavior for the same slug across courses
+    mode_slug = models.CharField(max_length=100)
+
+    # The 'pretty' name that can be translated and displayed
+    mode_display_name = models.CharField(max_length=255)
+
+    # minimum price in USD that we would like to charge for this mode of the course
+    min_price = models.IntegerField(default=0)
+
+    # the suggested prices for this mode
+    suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
+
+    # the currency these prices are in, using lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8)
+
+    # turn this mode off after the given expiration date
+    expiration_date = models.DateField(default=None, null=True, blank=True)
+
+    expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)

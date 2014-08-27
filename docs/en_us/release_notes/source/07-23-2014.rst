@@ -1,0 +1,63 @@
+###################################
+July 23, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of July 23,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* On the **Create a New Course** page, additional information in now available below the **Course Name** field. (STUD-2001)
+
+* Instructors can use a new **Invitation Only** advanced setting to limit course enrollment to a specific group. If this setting is set to True, potential students see an "Enrollment in this course is by invitation only" message on the course About page. By default, this setting is set to False. (LMS-2670)
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+  Recent changes include: 
+
+  * A set of `example messages to students <http://edx-partner-course-staff.readthedocs.org/en/latest/releasing_course/course_launching.html#example-messages-to-students>`_ is now available in the `Course Launching Activities`_ chapter.
+
+  * A `Grade Ranges and Certificates`_ section is now available in the `Establishing a Grading Policy`_ chapter.
+       
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

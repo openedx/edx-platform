@@ -8,10 +8,8 @@ from glob import glob
 from mock import patch
 
 from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore import ModuleStoreEnum
 
-from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
@@ -32,15 +30,6 @@ class TestXMLModuleStore(unittest.TestCase):
     """
     Test around the XML modulestore
     """
-    def test_path_to_location(self):
-        """Make sure that path_to_location works properly"""
-
-        print "Starting import"
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
-        print "finished import"
-
-        check_path_to_location(modulestore)
-
     def test_xml_modulestore_type(self):
         store = XMLModuleStore(DATA_DIR, course_dirs=['toy', 'simple'])
         self.assertEqual(store.get_modulestore_type(), ModuleStoreEnum.Type.xml)
@@ -81,7 +70,7 @@ class TestXMLModuleStore(unittest.TestCase):
         for course in store.get_courses():
             course_locations = store.get_courses_for_wiki(course.wiki_slug)
             self.assertEqual(len(course_locations), 1)
-            self.assertIn(course.location, course_locations)
+            self.assertIn(course.location.course_key, course_locations)
 
         course_locations = store.get_courses_for_wiki('no_such_wiki')
         self.assertEqual(len(course_locations), 0)
@@ -96,7 +85,7 @@ class TestXMLModuleStore(unittest.TestCase):
         course_locations = store.get_courses_for_wiki('simple')
         self.assertEqual(len(course_locations), 2)
         for course_number in ['toy', 'simple']:
-            self.assertIn(Location('edX', course_number, '2012_Fall', 'course', '2012_Fall'), course_locations)
+            self.assertIn(SlashSeparatedCourseKey('edX', course_number, '2012_Fall'), course_locations)
 
     def test_has_course(self):
         """
@@ -107,3 +96,20 @@ class TestXMLModuleStore(unittest.TestCase):
             SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
             locator_key_fields=SlashSeparatedCourseKey.KEY_FIELDS
         )
+
+    def test_branch_setting(self):
+        """
+        Test the branch setting context manager
+        """
+        store = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
+        course_key = store.get_courses()[0]
+
+        # XML store allows published_only branch setting
+        with store.branch_setting(ModuleStoreEnum.Branch.published_only, course_key):
+            store.get_item(course_key.location)
+
+        # XML store does NOT allow draft_preferred branch setting
+        with self.assertRaises(ValueError):
+            with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_key):
+                # verify that the above context manager raises a ValueError
+                pass  # pragma: no cover

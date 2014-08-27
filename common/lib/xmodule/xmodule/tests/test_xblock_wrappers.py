@@ -286,6 +286,10 @@ class XBlockWrapperTestMixin(object):
         descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
         descriptor = LeafModuleFactory(descriptor_cls=descriptor_cls, **fields)
+        mocked_course = Mock()
+        modulestore = Mock()
+        modulestore.get_course.return_value = mocked_course
+        descriptor.runtime.modulestore = modulestore
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls

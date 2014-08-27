@@ -12,15 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import threading
 from django.template import RequestContext
 from util.request import safe_get_host
-requestcontext = None
+
+REQUEST_CONTEXT = threading.local()
 
 
 class MakoMiddleware(object):
 
     def process_request(self, request):
-        global requestcontext
-        requestcontext = RequestContext(request)
-        requestcontext['is_secure'] = request.is_secure()
-        requestcontext['site'] = safe_get_host(request)
+        REQUEST_CONTEXT.context = RequestContext(request)
+        REQUEST_CONTEXT.context['is_secure'] = request.is_secure()
+        REQUEST_CONTEXT.context['site'] = safe_get_host(request)
+
+    def process_response(self, request, response):
+        REQUEST_CONTEXT.context = None
+        return response

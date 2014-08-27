@@ -2,7 +2,7 @@
 Acceptance tests for Studio related to the acid xblock.
 """
 from unittest import skip
-
+from nose.plugins.attrib import attr
 from bok_choy.web_app_test import WebAppTest
 
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -11,6 +11,7 @@ from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
+@attr('shard_1')
 class XBlockAcidBase(WebAppTest):
     """
     Base class for tests that verify that XBlock integration is working correctly
@@ -72,7 +73,7 @@ class XBlockAcidBase(WebAppTest):
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
-        acid_block = AcidView(self.browser, unit.components[0].preview_selector)
+        acid_block = AcidView(self.browser, unit.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
 
     def test_acid_block_editor(self):
@@ -84,9 +85,7 @@ class XBlockAcidBase(WebAppTest):
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
-        unit.edit_draft()
-
-        acid_block = AcidView(self.browser, unit.components[0].edit().editor_selector)
+        acid_block = AcidView(self.browser, unit.xblocks[0].edit().editor_selector)
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('content'))
@@ -121,6 +120,7 @@ class XBlockAcidNoChildTest(XBlockAcidBase):
         self.user = course_fix.user
 
 
+@attr('shard_1')
 class XBlockAcidParentBase(XBlockAcidBase):
     """
     Base class for tests that verify that parent XBlock integration is working correctly
@@ -139,14 +139,10 @@ class XBlockAcidParentBase(XBlockAcidBase):
         self.outline.visit()
         subsection = self.outline.section('Test Section').subsection('Test Subsection')
         unit = subsection.toggle_expand().unit('Test Unit').go_to()
-        container = unit.components[0].go_to_container()
+        container = unit.xblocks[0].go_to_container()
 
         acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
         self.validate_acid_block_preview(acid_block)
-
-    @skip('This will fail until the container page supports editing')
-    def test_acid_block_editor(self):
-        super(XBlockAcidParentBase, self).test_acid_block_editor()
 
 
 class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
@@ -178,6 +174,7 @@ class XBlockAcidEmptyParentTest(XBlockAcidParentBase):
         self.user = course_fix.user
 
 
+@attr('shard_1')
 class XBlockAcidChildTest(XBlockAcidParentBase):
     """
     Tests of an AcidBlock with children
@@ -208,7 +205,6 @@ class XBlockAcidChildTest(XBlockAcidParentBase):
         ).install()
 
         self.user = course_fix.user
-
 
     @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block_preview(self):

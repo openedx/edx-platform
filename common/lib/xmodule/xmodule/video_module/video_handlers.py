@@ -11,7 +11,6 @@ from webob import Response
 
 from xblock.core import XBlock
 
-from xmodule.course_module import CourseDescriptor
 from xmodule.exceptions import NotFoundError
 from xmodule.fields import RelativeTime
 
@@ -196,12 +195,12 @@ class VideoStudentViewHandlers(object):
         if transcript_name:
             # Get the asset path for course
             asset_path = None
-            if hasattr(self.descriptor.runtime, 'modulestore'):
-                course = self.descriptor.runtime.modulestore.get_course(self.course_id)
+            course = self.descriptor.runtime.modulestore.get_course(self.course_id)
+            if course.static_asset_path:
                 asset_path = course.static_asset_path
             else:
-                # Handle XML Courses that don't have modulestore in the runtime
-                asset_path = getattr(self.descriptor, 'data_dir', None)
+                # It seems static_asset_path is not set in any XMLModuleStore courses.
+                asset_path = getattr(course, 'data_dir', '')
 
             if asset_path:
                 response = Response(
@@ -251,7 +250,7 @@ class VideoStudentViewHandlers(object):
 
             try:
                 transcript = self.translation(request.GET.get('videoId', None))
-            except NotFoundError, ex:
+            except (TypeError, NotFoundError) as ex:
                 log.info(ex.message)
                 # Try to return static URL redirection as last resort
                 # if no translation is required

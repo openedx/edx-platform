@@ -8,16 +8,17 @@ xblock_url = xblock_studio_url(xblock)
 show_inline = xblock.has_children and not xblock_url
 section_class = "level-nesting" if show_inline else "level-element"
 collapsible_class = "is-collapsible" if xblock.has_children else ""
+label = xblock.display_name or xblock.scope_ids.block_type
 %>
 
 % if not is_root:
     % if is_reorderable:
-    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}">
+    <li class="studio-xblock-wrapper is-draggable" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % else:
-    <div class="studio-xblock-wrapper" data-locator="${xblock.location}">
+    <div class="studio-xblock-wrapper" data-locator="${xblock.location}" data-course-key="${xblock.location.course_key}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}" data-course-key="${xblock.location.course_key}">
+    <section class="wrapper-xblock ${section_class} ${collapsible_class}">
 % endif
 
 <header class="xblock-header xblock-header-${xblock.category}">
@@ -29,11 +30,11 @@ collapsible_class = "is-collapsible" if xblock.has_children else ""
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
             % endif
-            <span class="xblock-display-name">${xblock.display_name_with_default | h}</span>
+            <span class="xblock-display-name">${label | h}</span>
         </div>
         <div class="header-actions">
             <ul class="actions-list">
-                % if not xblock_context['read_only'] and not is_root:
+                % if not is_root:
                     % if not show_inline:
                         <li class="action-item action-edit">
                             <a href="#" class="edit-button action-button">

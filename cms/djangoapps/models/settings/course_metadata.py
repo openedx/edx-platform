@@ -2,6 +2,7 @@ from xblock.fields import Scope
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
 
+
 class CourseMetadata(object):
     '''
     For CRUD operations on metadata fields which do not have specific editors
@@ -25,7 +26,6 @@ class CourseMetadata(object):
                      'pdf_textbooks',
                      'name',  # from xblock
                      'tags',  # from xblock
-                     'video_speed_optimizations',
                      'visible_to_staff_only',
                      'enable_enrollment_email'
     ]

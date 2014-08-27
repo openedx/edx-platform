@@ -268,22 +268,21 @@ ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
 ANALYTICS_DATA_TOKEN = ""
 FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
 
-##### segment-io  ######
+##### Segment.io  ######
 
 # If there's an environment variable set, grab it and turn on Segment.io
 SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     FEATURES['SEGMENT_IO_LMS'] = True
 
-###################### Payment ##############################3
+###################### Payment ######################
 
 CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
 CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = os.environ.get('CYBERSOURCE_MERCHANT_ID', '')
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = os.environ.get('CYBERSOURCE_SERIAL_NUMBER', '')
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_PURCHASE_ENDPOINT', '')
 
-
-########################## USER API ########################
+########################## USER API ##########################
 EDX_API_KEY = None
 
 ####################### Shoppingcart ###########################
@@ -291,6 +290,9 @@ FEATURES['ENABLE_SHOPPING_CART'] = True
 
 ### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
+
+### This settings is for the course registration code length ############
+REGISTRATION_CODE_LENGTH = 8
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

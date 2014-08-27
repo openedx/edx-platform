@@ -1,7 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django_comment_client.permissions import has_permission %>
 <%include file="_underscore_templates.html" />
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}">
     <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id | h}" role="button"><span class="show-hide-discussion-icon"></span><span class="button-text">${_("Show Discussion")}</span></a>
-    <a href="#" class="new-post-btn" role="button"><span class="icon icon-edit new-post-icon"></span>${_("New Post")}</a>
+    % if has_permission(user, 'create_thread', course.id):
+        <a href="#" class="new-post-btn" role="button"><span class="icon icon-edit new-post-icon"></span>${_("New Post")}</a>
+    % endif
 </div>

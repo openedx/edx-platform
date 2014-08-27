@@ -1,0 +1,89 @@
+<div class="xblock-editor" data-locator="<%= xblockInfo.get('id') %>" data-course-key="<%= xblockInfo.get('courseKey') %>">
+    <div class="message modal-introduction">
+        <% if (xblockInfo.isChapter() || xblockInfo.isSequential()) { %>
+          <p>
+            <%= interpolate(gettext("Change the settings for %(display_name)s"), {display_name: xblockInfo.get('display_name')}, true) %>
+          </p>
+        <% } %>
+    </div>
+
+    <form class="edit-settings-form" action="#">
+        <div class="modal-section edit-settings-release scheduled-date-input">
+            <h3 class="modal-section-title"><%= gettext('Release Date and Time') %></h3>
+            <div class="modal-section-content has-actions">
+                <ul class="list-fields list-input datepair">
+                    <li class="field field-text field-start-date field-release-date">
+                        <label for="start_date" class="label"><%= gettext('Release Date:') %></label>
+                        <input type="text" id="start_date" name="start_date"
+                          value=""
+                          placeholder="MM/DD/YYYY" class="start-date release-date date input input-text" autocomplete="off" />
+                    </li>
+                    <li class="field field-text field-start-time field-release-time">
+                        <label for="start_time" class="label"><%= gettext('Release Time in UTC:') %></label>
+                        <input type="text" id="start_time" name="start_time"
+                          value=""
+                          placeholder="HH:MM" class="start-time release-time time input input-text" autocomplete="off" />
+                    </li>
+                </ul>
+
+                <% if (xblockInfo.isSequential()) { %>
+                  <ul class="list-actions">
+                      <li class="action-item">
+                          <a href="#" data-tooltip="<%= gettext('Clear Release Date/Time') %>" class="clear-date action-button action-clear">
+                              <i class="icon-undo"></i>
+                              <span class="sr"><%= gettext('Clear Release Date/Time') %></span>
+                          </a>
+                      </li>
+                  </ul>
+                <% } %>
+              </div>
+          </div>
+
+        <% if (xblockInfo.isSequential()) { %>
+          <div class="modal-section edit-settings-grading">
+              <h3 class="modal-section-title"><%= gettext('Grading') %></h3>
+
+              <div class="modal-section-content grading-type">
+                  <ul class="list-fields list-input">
+                      <li class="field field-grading-type field-select">
+                          <label for="grading_type" class="label"><%= gettext('Grade as:') %></label>
+                          <select class="input" id="grading_type">
+                              <option value="notgraded"><%= gettext('Not Graded') %></option>
+                            <% _.each(graderTypes, function(grader) { %>
+                              <option value="<%= grader %>"><%= grader %></option>
+                            <% }); %>
+                          </select>
+                      </li>
+                  </ul>
+              </div>
+
+              <div class="modal-section-content has-actions due-date-input grading-due-date">
+                  <ul class="list-fields list-input datepair date-setter">
+                      <li class="field field-text field-due-date">
+                          <label for="due_date"><%= gettext('Due Date:') %></label>
+                          <input type="text" id="due_date" name="due_date"
+                            value=""
+                          placeholder="MM/DD/YYYY" class="due-date date input input-text" autocomplete="off"/>
+                      </li>
+
+                      <li class="field field-text field-due-time">
+                          <label for="due_time"><%= gettext('Due Time in UTC:') %></label>
+                          <input type="text" id="due_time" name="due_time"
+                          value=""
+                          placeholder="HH:MM" class="due-time time input input-text" autocomplete="off" />
+                      </li>
+                  </ul>
+
+                  <ul class="list-actions">
+                      <li class="action-item">
+                          <a href="#" data-tooltip="<%= gettext('Clear Grading Due Date') %>" class="clear-date action-button action-clear">
+                              <i class="icon-undo"></i>
+                              <span class="sr"><%= gettext('Clear Grading Due Date') %></span>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+        <% } %>
+    </form>
+</div>

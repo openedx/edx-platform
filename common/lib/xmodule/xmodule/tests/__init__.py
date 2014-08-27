@@ -3,7 +3,7 @@ unittests for xmodule
 
 Run like this:
 
-    rake test_common/lib/xmodule
+    paver test_lib -l common/lib/xmodule
 
 """
 

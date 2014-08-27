@@ -2,6 +2,7 @@
 <%namespace name='static' file='/static_content.html'/>
 ${static.css(group='style-vendor-tinymce-content', raw=True)}
 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
+${static.css(group='style-xmodule-annotations', raw=True)}
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -165,34 +166,47 @@ ${static.css(group='style-vendor-tinymce-skin', raw=True)}
     };
 
 	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+    var ova, Catch, annotator, catchOptions;
+    var startova = function() {
+    	//remove old instances
+        if (Annotator._instances.length !== 0) {
+          $('#videoHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
 
-	//remove old instances
-    if (Annotator._instances.length !== 0) {
-      $('#videoHolder').annotator("destroy");
+        ova.annotator.addPlugin('Tags');
+        var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
+                '${instructor_email}':
+                '${user.email}';
+
+        //Catch
+        annotator = ova.annotator;
+        catchOptions = {
+                media:'video',
+                externalLink:false,
+                imageUrlRoot:imgURLRoot,
+                showMediaSelector: false,
+                showPublicPrivate: true,
+    	        userId:userId,
+                pagination:pagination,//Number of Annotations per load in the pagination,
+                flags:is_staff,
+                default_tab: "${default_tab}",
+                instructor_email: "${instructor_email}",
+                annotation_mode: "${annotation_mode}",
+            };
+        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
     }
-    delete ova;
-    //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
-
-    ova.annotator.addPlugin('Tags');
-    var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
-            '${instructor_email}':
-            '${user.email}';
-
-    //Catch
-    var annotator = ova.annotator;
-    var catchOptions = {
-            media:'video',
-            externalLink:false,
-            imageUrlRoot:imgURLRoot,
-            showMediaSelector: false,
-            showPublicPrivate: true,
-	        userId:userId,
-            pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff,
-            default_tab: "${default_tab}",
-            instructor_email: "${instructor_email}",
-            annotation_mode: "${annotation_mode}",
-        };
-        var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+    if (typeof Annotator !== 'undefined') {
+        startova();
+    } else {
+        try {
+            require(["ova"], function(ova) {
+                startova();
+            });
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
+    }
 </script>
