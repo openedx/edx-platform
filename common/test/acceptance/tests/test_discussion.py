@@ -30,10 +30,10 @@ from ..fixtures.discussion import (
 )
 
 
-class DiscussionResponsePaginationTestMixin(object):
+class DiscussionTestMixin(object):
     """
-    A mixin containing tests for response pagination for use by both inline
-    discussion and the discussion tab
+    A mixin containing test methods and helper methods for use by both inline
+    discussion tests and discussion tab tests.
     """
 
     def setup_thread(self, num_responses, **thread_kwargs):
@@ -124,9 +124,46 @@ class DiscussionResponsePaginationTestMixin(object):
         self.setup_thread(5, closed=True)
         self.assertFalse(self.thread_page.has_add_response_button())
 
+    def test_non_cohort_visibility_label(self):
+        self.setup_thread(1)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post visible to everyone.")
+
+
+class CohortedDiscussionTestMixin(DiscussionTestMixin):
+    """
+    Mixin for tests of cohorted discussions.
+    """
+
+    def setup_cohorts(self):
+        """
+        Sets up the course to use cohorting, and installs a default "Mock Cohort" cohort.
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"cohort_config": {
+                    "auto_cohort_groups": [
+                        "Mock Cohort"
+                    ],
+                    "auto_cohort": True,
+                    "cohorted_discussions": [
+                        "mock-thread-id"
+                    ],
+                    "cohorted": True
+                },
+                },
+            })
+
+    def test_cohort_visibility_label(self):
+        self.setup_thread(1, group_id=1)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post visible only to Mock Cohort.")
+
+    def test_obsolete_cohort_visibility_label(self):
+        self.setup_thread(1, group_id=999)
+        self.assertEquals(self.thread_page.get_group_visibility_label(), "This post no longer visible to students.")
+
 
 @attr('shard_1')
-class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionTestMixin):
     """
     Tests for the discussion page displaying a single thread
     """
@@ -136,7 +173,7 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
 
         # Create a course to register for
-        CourseFixture(**self.course_info).install()
+        self.course_fixture = CourseFixture(**self.course_info).install()
 
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
@@ -164,6 +201,27 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.assertTrue(self.thread_page.is_comment_visible(comment_id))
         self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
+
+@attr('shard_1')
+class CohortedDiscussionTabSingleThreadTest(UniqueCourseTest, CohortedDiscussionTestMixin):
+    """
+    Tests for the discussion page displaying a single thread
+    """
+
+    def setUp(self):
+        super(CohortedDiscussionTabSingleThreadTest, self).setUp()
+        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+
+        # Create a course to register for
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.setup_cohorts()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def setup_thread_page(self, thread_id):
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint:disable=W0201
+        self.thread_page.visit()
 
 
 @attr('shard_1')
@@ -301,7 +359,7 @@ class DiscussionCommentEditTest(UniqueCourseTest):
 
 
 @attr('shard_1')
-class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
+class InlineDiscussionTest(UniqueCourseTest, DiscussionTestMixin):
     """
     Tests for inline discussions
     """
@@ -309,7 +367,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        self.course_fix = CourseFixture(**self.course_info).add_children(
+        self.course_fixture = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
                     XBlockFixtureDesc("vertical", "Test Unit").add_children(
@@ -359,7 +417,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def test_discussion_blackout_period(self):
         now = datetime.datetime.now(UTC)
-        self.course_fix.add_advanced_settings(
+        self.course_fixture.add_advanced_settings(
             {
                 u"discussion_blackouts": {
                     "value": [
@@ -371,7 +429,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
                 }
             }
         )
-        self.course_fix._add_advanced_settings()
+        self.course_fixture._add_advanced_settings()
         self.browser.refresh()
         thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
@@ -388,6 +446,43 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_editable("comment2"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+
+
+@attr('shard_1')
+class InlineCohortedDiscussionTest(UniqueCourseTest, CohortedDiscussionTestMixin):
+    """
+    Tests for inline discussions
+    """
+
+    def setUp(self):
+        super(InlineCohortedDiscussionTest, self).setUp()
+        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+        self.course_fixture = CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                            metadata={"discussion_id": self.discussion_id}
+                        )
+                    )
+                )
+            )
+        ).install()
+        self.setup_cohorts()
+
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        self.courseware_page.visit()
+        self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+
+    def setup_thread_page(self, thread_id):
+        self.discussion_page.expand_discussion()
+        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
+        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
+        self.thread_page.expand()
 
 
 @attr('shard_1')
