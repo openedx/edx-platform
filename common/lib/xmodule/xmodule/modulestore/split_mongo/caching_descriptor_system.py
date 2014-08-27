@@ -276,7 +276,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         for child in json_data.get('fields', {}).get('children', []):
             child_data = self.get_module_data(child, course_key)
             if '_subtree_edited_on' not in json_data.setdefault('edit_info', {}):
-                self._compute_subtree_edited_internal(child, child_data)
+                self._compute_subtree_edited_internal(child, child_data, course_key)
             if child_data['edit_info']['_subtree_edited_on'] > max_date:
                 max_date = child_data['edit_info']['_subtree_edited_on']
                 max_by = child_data['edit_info']['_subtree_edited_by']

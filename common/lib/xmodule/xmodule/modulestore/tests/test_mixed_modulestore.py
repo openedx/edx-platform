@@ -999,7 +999,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(self.user_id, block.edited_by)
         self.assertGreater(datetime.datetime.now(UTC), block.edited_on)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_create_item_populates_subtree_edited_info(self, default_ms):
         self.initdb(default_ms)
         block = self.store.create_item(
@@ -1122,6 +1122,147 @@ class TestMixedModuleStore(unittest.TestCase):
         item = self.store.update_item(item, self.user_id)
         self.assertTrue(self.store.has_changes(item))
         self.assertTrue(self.store.has_published_version(item))
+
+    @ddt.data('draft', 'split')
+    def test_update_edit_info_ancestors(self, default_ms):
+        """
+        Tests that edited_on, edited_by, subtree_edited_on, and subtree_edited_by are set correctly during update
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        def check_node(location_key, after, before, edited_by, subtree_after, subtree_before, subtree_by):
+            """
+            Checks that the node given by location_key matches the given edit_info constraints.
+            """
+            node = self.store.get_item(location_key)
+            if after:
+                self.assertLess(after, node.edited_on)
+            self.assertLess(node.edited_on, before)
+            self.assertEqual(node.edited_by, edited_by)
+            if subtree_after:
+                self.assertLess(subtree_after, node.subtree_edited_on)
+            self.assertLess(node.subtree_edited_on, subtree_before)
+            self.assertEqual(node.subtree_edited_by, subtree_by)
+
+        # Create a dummy vertical & html to test against
+        component = self.store.create_child(
+            self.user_id,
+            test_course.location,
+            'vertical',
+            block_id='test_vertical'
+        )
+        child = self.store.create_child(
+            self.user_id,
+            component.location,
+            'html',
+            block_id='test_html'
+        )
+        sibling = self.store.create_child(
+            self.user_id,
+            component.location,
+            'html',
+            block_id='test_html_no_change'
+        )
+
+        after_create = datetime.datetime.now(UTC)
+        # Verify that all nodes were last edited in the past by create_user
+        [
+            check_node(block.location, None, after_create, self.user_id, None, after_create, self.user_id)
+            for block in [component, child, sibling]
+        ]
+
+        # Change the component, then check that there now are changes
+        component.display_name = 'Changed Display Name'
+
+        editing_user = self.user_id - 2
+        component = self.store.update_item(component, editing_user)
+        after_edit = datetime.datetime.now(UTC)
+        check_node(component.location, after_create, after_edit, editing_user, after_create, after_edit, editing_user)
+        # but child didn't change
+        check_node(child.location, None, after_create, self.user_id, None, after_create, self.user_id)
+
+
+        # Change the child
+        child = self.store.get_item(child.location)
+        child.display_name = 'Changed Display Name'
+        self.store.update_item(child, user_id=editing_user)
+
+        after_edit = datetime.datetime.now(UTC)
+
+        # Verify that child was last edited between after_create and after_edit by edit_user
+        check_node(child.location, after_create, after_edit, editing_user, after_create, after_edit, editing_user)
+
+        # Verify that ancestors edit info is unchanged, but their subtree edit info matches child
+        check_node(test_course.location, None, after_create, self.user_id, after_create, after_edit, editing_user)
+
+        # Verify that others have unchanged edit info
+        check_node(sibling.location, None, after_create, self.user_id, None, after_create, self.user_id)
+
+    @ddt.data('draft', 'split')
+    def test_update_edit_info(self, default_ms):
+        """
+        Tests that edited_on and edited_by are set correctly during an update
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        # Create a dummy component to test against
+        component = self.store.create_child(
+            self.user_id,
+            test_course.location,
+            'vertical',
+        )
+
+        # Store the current edit time and verify that user created the component
+        self.assertEqual(component.edited_by, self.user_id)
+        old_edited_on = component.edited_on
+
+        edit_user = self.user_id - 2
+        # Change the component
+        component.display_name = 'Changed'
+        self.store.update_item(component, edit_user)
+        updated_component = self.store.get_item(component.location)
+
+        # Verify the ordering of edit times and that dummy_user made the edit
+        self.assertLess(old_edited_on, updated_component.edited_on)
+        self.assertEqual(updated_component.edited_by, edit_user)
+
+    @ddt.data('draft', 'split')
+    def test_update_published_info(self, default_ms):
+        """
+        Tests that published_on and published_by are set correctly
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+
+        publish_user = 456
+
+        # Create a dummy component to test against
+        component = self.store.create_child(
+            self.user_id,
+            test_course.location,
+            'vertical',
+        )
+
+        # Store the current time, then publish
+        old_time = datetime.datetime.now(UTC)
+        self.store.publish(component.location, publish_user)
+        updated_component = self.store.get_item(component.location)
+
+        # Verify the time order and that publish_user caused publication
+        self.assertLessEqual(old_time, updated_component.published_on)
+        self.assertEqual(updated_component.published_by, publish_user)
+
+        # Verify that changing the item doesn't unset the published info
+        updated_component.display_name = 'changed'
+        self.store.update_item(updated_component, self.user_id)
+        updated_component = self.store.get_item(updated_component.location)
+        self.assertLessEqual(old_time, updated_component.published_on)
+        self.assertEqual(updated_component.published_by, publish_user)
 
     @ddt.data('draft', 'split')
     def test_auto_publish(self, default_ms):
