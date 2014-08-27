@@ -23,6 +23,7 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -45,7 +46,7 @@ class SplitModuleTest(unittest.TestCase):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
-        'xblock_mixins': (InheritanceMixin, XModuleMixin)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin, EditInfoMixin)
     }
 
     MODULESTORE = {
