@@ -202,6 +202,7 @@
 // ====================
 $edx-footer-spacing: ($baseline*0.75);
 $edx-footer-link-color: rgb(0, 158, 231);
+$edx-footer-bg-color: rgb(252,252,252);
 
 %edx-footer-reset {
   @include box-sizing(border-box);
@@ -283,7 +284,7 @@ $edx-footer-link-color: rgb(0, 158, 231);
 
 .edx-footer-new {
   width: 100%;
-  background: rgb(252, 252, 252) url("../images/footer-seal.png") -($baseline*15.5) ($baseline) no-repeat;
+  background: $edx-footer-bg-color;
 
   // NOTE: resetting older footer styles - can be removed once not needed
   box-shadow: none;
