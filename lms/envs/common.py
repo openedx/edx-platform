@@ -460,7 +460,7 @@ TRACKING_BACKENDS = {
 
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
-TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat', r'^/segmentio/event']
 
 EVENT_TRACKING_ENABLED = True
 EVENT_TRACKING_BACKENDS = {
@@ -491,6 +491,10 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
             'ENGINE': 'track.backends.django.DjangoBackend'
         }
     })
+
+TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
+TRACKING_SEGMENTIO_ALLOWED_ACTIONS = ['Track', 'Screen']
+TRACKING_SEGMENTIO_ALLOWED_CHANNELS = ['mobile']
 
 ######################## GOOGLE ANALYTICS ###########################
 GOOGLE_ANALYTICS_ACCOUNT = None
