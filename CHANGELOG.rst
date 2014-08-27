@@ -5,6 +5,14 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Course teams can turn off Chinese Caching from Studio. BLD-1207
+
+LMS: Instructors can request and see content of previous bulk emails sent in the instructor dashboard.
+
+Studio: New course outline and unit/container pages with revised publishing model. STUD-1790 (part 1)
+
+Studio: Backbone version of the course outline page. STUD-1726.
+
 Studio: New advanced setting "invitation_only" for courses. This setting overrides the enrollment start/end dates
   if set. LMS-2670
 

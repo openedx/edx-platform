@@ -142,7 +142,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(usage_key.course_key)
         return store.get_item(usage_key, depth, **kwargs)
 
-    def get_items(self, course_key, settings=None, content=None, **kwargs):
+    def get_items(self, course_key, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -153,11 +153,12 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Args:
             course_key (CourseKey): the course identifier
-            settings (dict): fields to look for which have settings scope. Follows same syntax
-                and rules as kwargs below
-            content (dict): fields to look for which have content scope. Follows same syntax and
-                rules as kwargs below.
-            kwargs (key=value): what to look for within the course.
+            kwargs:
+                settings (dict): fields to look for which have settings scope. Follows same syntax
+                    and rules as kwargs below
+                content (dict): fields to look for which have content scope. Follows same syntax and
+                    rules as kwargs below.
+            additional kwargs (key=value): what to look for within the course.
                 Common qualifiers are ``category`` or any field name. if the target field is a list,
                 then it searches for the given value in the list not list equivalence.
                 Substring matching pass a regex object.
@@ -170,7 +171,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             raise Exception("Must pass in a course_key when calling get_items()")
 
         store = self._get_modulestore_for_courseid(course_key)
-        return store.get_items(course_key, settings=settings, content=content, **kwargs)
+        return store.get_items(course_key, **kwargs)
 
     def get_courses(self):
         '''
@@ -287,7 +288,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(None, 'create_course')
         return store.create_course(org, course, run, user_id, **kwargs)
 
-    def clone_course(self, source_course_id, dest_course_id, user_id):
+    def clone_course(self, source_course_id, dest_course_id, user_id, fields=None):
         """
         See the superclass for the general documentation.
 
@@ -302,16 +303,16 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         # to have only course re-runs go to split. This code, however, uses the config'd priority
         dest_modulestore = self._get_modulestore_for_courseid(dest_course_id)
         if source_modulestore == dest_modulestore:
-            return source_modulestore.clone_course(source_course_id, dest_course_id, user_id)
+            return source_modulestore.clone_course(source_course_id, dest_course_id, user_id, fields)
 
         # ensure super's only called once. The delegation above probably calls it; so, don't move
         # the invocation above the delegation call
-        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id)
+        super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
             split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
             split_migrator.migrate_mongo_course(
-                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run
+                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run, fields
             )
 
     def create_item(self, user_id, course_key, block_type, block_id=None, fields=None, **kwargs):
@@ -414,7 +415,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         Return the list of courses which use this wiki_slug
         :param wiki_slug: the course wiki root slug
-        :return: list of course locations
+        :return: list of course keys
         """
         courses = []
         for modulestore in self.modulestores:
@@ -468,19 +469,19 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Create a copy of the source and mark its revision as draft.
         Note: This method is to support the Mongo Modulestore and may be deprecated.
 
-        :param source: the location of the source (its revision must be None)
+        :param location: the location of the source (its revision must be None)
         """
         store = self._verify_modulestore_support(location.course_key, 'convert_to_draft')
         return store.convert_to_draft(location, user_id)
 
-    def has_changes(self, usage_key):
+    def has_changes(self, xblock):
         """
         Checks if the given block has unpublished changes
-        :param usage_key: the block to check
+        :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
-        store = self._verify_modulestore_support(usage_key.course_key, 'has_changes')
-        return store.has_changes(usage_key)
+        store = self._verify_modulestore_support(xblock.location.course_key, 'has_changes')
+        return store.has_changes(xblock)
 
     def _verify_modulestore_support(self, course_key, method):
         """
@@ -519,7 +520,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         A context manager for temporarily setting the branch value for the given course' store
         to the given branch_setting.  If course_id is None, the default store is used.
         """
-        store = self._get_modulestore_for_courseid(course_id)
+        store = self._verify_modulestore_support(course_id, 'branch_setting')
         with store.branch_setting(branch_setting, course_id):
             yield
 

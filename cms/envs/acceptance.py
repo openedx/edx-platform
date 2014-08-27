@@ -64,7 +64,7 @@ CONTENTSTORE = {
     }
 }
 
-# Set this up so that rake lms[acceptance] and running the
+# Set this up so that 'paver cms --settings=acceptance' and running the
 # harvest command both use the same (test) database
 # which they can flush without messing up your dev db
 DATABASES = {
@@ -77,12 +77,6 @@ DATABASES = {
         },
     }
 }
-
-# Enable asset pipeline
-# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
-# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
-PIPELINE = True
-STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True

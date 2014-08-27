@@ -147,7 +147,7 @@ Caveats and Warnings
 
    Next, run the commands::
 
-     rake i18n:generate
+     paver i18n_generate
      python i18n/verify.py
 
    This will generate reports of broken translations in your language. This will not, however,

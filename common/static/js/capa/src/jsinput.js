@@ -54,6 +54,8 @@ var JSInput = (function ($, undefined) {
             stateSetter = sectionAttr("data-setstate"),
             // Get stored state
             storedState = sectionAttr("data-stored"),
+            // Get initial state
+            initialState = sectionAttr("data-initial-state"),
             // Bypass single-origin policy only if this attribute is "false"
             // In that case, use JSChannel to do so.
             sop = sectionAttr("data-sop"),
@@ -132,19 +134,25 @@ var JSInput = (function ($, undefined) {
         // state to give it. If stateSetter is specified but calling it
         // fails, wait and try again, since the iframe might still be
         // loading.
-        if (stateSetter && storedState) {
+        if (stateSetter && (storedState || initialState)) {
             var stateValue, jsonValue;
 
-            try {
-              jsonValue = JSON.parse(storedState);
-            } catch (err) {
-              jsonValue = storedState;
-            }
+            if (storedState) {
+                try {
+                    jsonValue = JSON.parse(storedState);
+                } catch (err) {
+                    jsonValue = storedState;
+                }
 
-            if (typeof(jsonValue) === "object") {
-                stateValue = jsonValue["state"];
-            } else {
-                stateValue = jsonValue;
+                if (typeof(jsonValue) === "object") {
+                    stateValue = jsonValue["state"];
+                } else {
+                    stateValue = jsonValue;
+                }
+            }
+            else {
+                // use initial_state string as the JSON string for stateValue.
+                stateValue = initialState;
             }
 
             // Try calling setstate every 200ms while it throws an exception,

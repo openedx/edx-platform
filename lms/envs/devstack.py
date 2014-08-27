@@ -41,6 +41,10 @@ ANALYTICS_DATA_URL = "http://127.0.0.1:8080"
 ANALYTICS_DATA_TOKEN = ""
 FEATURES['ENABLE_ANALYTICS_ACTIVE_COUNT'] = False
 
+# Set this to the dashboard URL in order to display the link from the
+# dashboard to the Analytics Dashboard.
+ANALYTICS_DASHBOARD_URL = None
+
 
 ################################ DEBUG TOOLBAR ################################
 

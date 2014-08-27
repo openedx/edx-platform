@@ -156,11 +156,13 @@
 
         <nav class="nav-wizard ${"is-not-ready" if is_not_active else "is-ready"}">
 
+        %if can_audit:
           %if upgrade:
             <span class="help help-inline">${_("Missing something? You can always continue to audit this course instead.")}</span>
           %else:
             <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(a_start='<a href="{}">'.format(course_modes_choose_url), a_end="</a>")}</span>
           %endif
+        %endif
 
           <ol class="wizard-steps">
             <li class="wizard-step">

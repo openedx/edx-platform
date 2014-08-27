@@ -112,7 +112,8 @@ Reset Your Password
 
 The process to reset your password on edX.org and Edge is the same.
 
-#. On edx.org or edge.edx.org, go to your Dashboard.
+#. On edx.org or edge.edx.org, log in or click the site logo at top left to go
+   to your **Current Courses** dashboard.
 
 #. In the account information pane in the upper left corner, click **Reset Password**. 
 

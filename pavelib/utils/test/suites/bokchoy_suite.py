@@ -21,7 +21,7 @@ class BokChoyTestSuite(TestSuite):
     """
     def __init__(self, *args, **kwargs):
         super(BokChoyTestSuite, self).__init__(*args, **kwargs)
-        self.test_dir = Env.BOK_CHOY_DIR / "tests"
+        self.test_dir = Env.BOK_CHOY_DIR / kwargs.get('test_dir', 'tests')
         self.log_dir = Env.BOK_CHOY_LOG_DIR
         self.report_dir = Env.BOK_CHOY_REPORT_DIR
         self.xunit_report = self.report_dir / "xunit.xml"
@@ -29,12 +29,20 @@ class BokChoyTestSuite(TestSuite):
         self.fasttest = kwargs.get('fasttest', False)
         self.test_spec = kwargs.get('test_spec', None)
         self.verbosity = kwargs.get('verbosity', 2)
+        self.extra_args = kwargs.get('extra_args', '')
+        self.ptests = kwargs.get('ptests', False)
+        self.har_dir = self.log_dir / 'hars'
+        self.imports_dir = kwargs.get('imports_dir', None)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
 
         # Ensure that we have a directory to put logs and reports
         self.log_dir.makedirs_p()
+
+        if self.ptests:
+            self.har_dir.makedirs_p()
+
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()
 
@@ -59,6 +67,9 @@ class BokChoyTestSuite(TestSuite):
             "./manage.py lms --settings bok_choy loaddata --traceback"
             " common/test/db_fixtures/*.json"
         )
+
+        if self.imports_dir:
+            sh("./manage.py cms --settings=bok_choy import {}".format(self.imports_dir))
 
         # Ensure the test servers are available
         msg = colorize('green', "Starting test servers...")
@@ -91,12 +102,13 @@ class BokChoyTestSuite(TestSuite):
         # screenshots and XUnit XML reports
         cmd = [
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
+            "HAR_DIR='{}'".format(self.har_dir),
             "nosetests",
             test_spec,
             "--with-xunit",
-            "--with-flaky",
             "--xunit-file={}".format(self.xunit_report),
             "--verbosity={}".format(self.verbosity),
+            self.extra_args,
         ]
 
         cmd = (" ").join(cmd)

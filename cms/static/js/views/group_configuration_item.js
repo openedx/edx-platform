@@ -1,14 +1,20 @@
 define([
-    'js/views/baseview', 'jquery', 'js/views/group_configuration_details',
-    'js/views/group_configuration_edit'
+    'js/views/baseview', 'jquery', "gettext", 'js/views/group_configuration_details',
+    'js/views/group_configuration_edit', "js/views/utils/view_utils"
 ], function(
-    BaseView, $, GroupConfigurationDetails, GroupConfigurationEdit
+    BaseView, $, gettext, GroupConfigurationDetails, GroupConfigurationEdit, ViewUtils
 ) {
     'use strict';
     var GroupConfigurationsItem = BaseView.extend({
         tagName: 'section',
-        attributes: {
-            'tabindex': -1
+        attributes: function () {
+            return {
+                'id': this.model.get('id'),
+                'tabindex': -1
+            };
+        },
+        events: {
+            'click .delete': 'deleteConfiguration'
         },
 
         className: function () {
@@ -24,6 +30,24 @@ define([
         initialize: function() {
             this.listenTo(this.model, 'change:editing', this.render);
             this.listenTo(this.model, 'remove', this.remove);
+        },
+
+        deleteConfiguration: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            var self = this;
+            ViewUtils.confirmThenRunOperation(
+                gettext('Delete this Group Configuration?'),
+                gettext('Deleting this Group Configuration is permanent and cannot be undone.'),
+                gettext('Delete'),
+                function() {
+                    return ViewUtils.runOperationShowingMessage(
+                        gettext('Deleting') + '&hellip;',
+                        function () {
+                            return self.model.destroy({ wait: true });
+                        }
+                    );
+                }
+            );
         },
 
         render: function() {
@@ -44,7 +68,6 @@ define([
             }
 
             this.$el.html(this.view.render().el);
-            this.$el.focus();
 
             return this;
         }

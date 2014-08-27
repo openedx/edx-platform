@@ -39,7 +39,7 @@ class VidoComponentPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='div{0}'.format(CLASS_SELECTORS['video_xmodule'])).present
 
-    def _wait_for(self, check_func, desc, result=False, timeout=200):
+    def _wait_for(self, check_func, desc, result=False, timeout=30):
         """
         Calls the method provided as an argument until the Promise satisfied or BrokenPromise
 

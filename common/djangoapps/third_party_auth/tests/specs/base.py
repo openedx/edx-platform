@@ -13,6 +13,7 @@ from django.contrib.messages.storage import fallback
 from django.contrib.sessions.backends import cache
 from django.test import utils as django_utils
 from django.conf import settings as django_settings
+from edxmako.tests import mako_middleware_process_request
 from social import actions, exceptions
 from social.apps.django_app import utils as social_utils
 from social.apps.django_app import views as social_views
@@ -420,6 +421,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client.get(
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+
+        mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
         actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
@@ -453,6 +456,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client.get(
             pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+
+        mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
         actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
@@ -508,6 +513,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         self.client.get('/login')
         self.client.get(pipeline.get_login_url(self.PROVIDER_CLASS.NAME, pipeline.AUTH_ENTRY_LOGIN))
         actions.do_complete(strategy, social_views._do_login)  # pylint: disable-msg=protected-access
+
+        mako_middleware_process_request(strategy.request)
         student_views.signin_user(strategy.request)
         student_views.login_user(strategy.request)
         actions.do_complete(strategy, social_views._do_login, user=user)  # pylint: disable-msg=protected-access
@@ -547,6 +554,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # pylint: disable-msg=protected-access
         self.assert_redirect_to_login_looks_correct(actions.do_complete(strategy, social_views._do_login))
 
+        mako_middleware_process_request(strategy.request)
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the login form and posts it via JS.
         self.assert_login_response_in_pipeline_looks_correct(student_views.signin_user(strategy.request))
@@ -568,6 +576,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         user.is_active = False
         user.save()
 
+        mako_middleware_process_request(strategy.request)
         self.assert_json_failure_response_is_inactive_account(student_views.login_user(strategy.request))
 
     def test_signin_fails_if_no_account_associated(self):
@@ -613,6 +622,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # pylint:disable-msg=protected-access
         self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
 
+        mako_middleware_process_request(strategy.request)
         # At this point we know the pipeline has resumed correctly. Next we
         # fire off the view that displays the registration form.
         self.assert_register_response_in_pipeline_looks_correct(
@@ -672,6 +682,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
         # pylint:disable-msg=protected-access
         self.assert_redirect_to_register_looks_correct(actions.do_complete(strategy, social_views._do_login))
+
+        mako_middleware_process_request(strategy.request)
         self.assert_register_response_in_pipeline_looks_correct(
             student_views.register_user(strategy.request), pipeline.get(request)['kwargs'])
         strategy.request.POST = self.get_registration_post_vars()

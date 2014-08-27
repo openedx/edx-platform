@@ -25,24 +25,18 @@
 
 // ====================
 
-.view-unit {
+// overriding outline styling for general drag and drop cases
+.outline-section, .outline-subsection {
 
-  .unit-location .draggable-drop-indicator {
-    display: none; //needed to not show DnD UI (UI is shared across both views)
+  // STATE: is dragging
+  &.is-dragging {
+    border-color: $gray-d3;
   }
-}
 
-// ====================
-
-// needed to override ui-window styling for dragging state (outline selectors get too specific)
-.courseware-section.is-dragging {
-    box-shadow: 0 1px 2px 0 $shadow-d1 !important;
-    border: 1px solid $gray-d3 !important;
-}
-
-.courseware-section.is-dragging.valid-drop {
-  border-color: $blue-s1 !important;
-  box-shadow: 0 1px 2px 0 $blue-t2 !important;
+  // STATE: is dragging + valid drop
+  &.valid-drop {
+    border-color: $ui-action-primary-color-focus;
+  }
 }
 
 // ====================
@@ -82,3 +76,40 @@ body b {
     overflow: visible !important;
   }
 }
+
+// ====================
+
+// Latex Compiler
+.wrapper-comp-editor.latex-problem {
+  margin-top: ($baseline*2.5);
+}
+
+.launch-latex-compiler {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  background-color: $white;
+  padding: $baseline/2 0 $baseline/2 $baseline;
+  border-bottom: 1px solid $gray-l2;
+}
+
+//  hides latex compiler button if settings mode is-active
+div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
+ display: none;
+}
+
+// ====================
+
+// masthead button hidden states
+.mast.has-actions .nav-actions .button.is-hidden {
+  @extend .is-hidden;
+}
+
+// ====================
+
+// TODOs:
+
+// * font-weight syncing
+// * divorce display: inline-block from base button definitions/placeholders
+// * canned typography class syncing
+

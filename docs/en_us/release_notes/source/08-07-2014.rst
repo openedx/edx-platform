@@ -1,0 +1,113 @@
+###################################
+August 7, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of August
+7, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* When you add an Advanced component to a unit in Studio, an identifying name
+  for every available component is now included in the list of **Advanced
+  Components**. If the component does not have a defined display name, its
+  category name appears on this list. Previously, components that did not have
+  a display name did not appear as an option in the list.
+
+*******************************
+edX Learning Management System
+*******************************
+
+* On the Instructor Dashboard, the **Course Info** page now includes the number
+  of students who selected each certification track (Verified, Honor, or Audit)
+  in addition to the total number of enrollees in the course.
+
+* For email messages sent from the Instructor Dashboard, two additional
+  features are available.
+
+  * On the **Email** page, you can now click **Sent Email History** to see a
+    list of sent messages, and click on a message subject to review its
+    complete text.
+
+  * When you review a previously sent message, the new **Copy Email to Editor**
+    option duplicates the title and body of that message so that you can use it
+    as the basis for a new message.
+
+**************************
+edX Data & Analytics
+**************************
+
+* Daily event tracking data files are now available for download from the
+  Amazon S3 storage service. Weekly, cumulative event logs will remain
+  available for several weeks.
+
+* A defect that caused session ID values to be duplicated for certain events
+  has been fixed. All browser events, and server enrollment events, include a
+  value for the session. (AN-2369)
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce two upcoming features that will release in the next
+few weeks:
+
+* In Studio, new capabilities will make it easier for course authors to edit
+  and publish content. We've simplified the publishing workflow and added clear
+  indications to the UI so you'll know at a glance whether your content is
+  published and released--and whether students can see it.
+
+* In addition to the existing Discussion post type, course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts to find unanswered questions easily.
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+       
+* `edX Research Guide`_
+
+  Recent changes include: 
+
+  The new `Data Delivered in Data Packages`_ chapter describes the compressed
+  and encrypted data files that make up a data package, the locations of those
+  files on the Amazon S3 storage service, and the files that data czars extract
+  from the packages after download.
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

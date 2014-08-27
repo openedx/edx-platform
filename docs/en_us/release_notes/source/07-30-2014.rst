@@ -1,0 +1,93 @@
+###################################
+July 30, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of July 30,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we have updated the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* In some versions of Internet Explorer, users could not edit plain HTML in HTML components. This problem has been fixed.
+
+* Problem components have a new **Correct or Past Due** setting. With this setting, course staff can configure a problem so that students can only see the answer if they have answered the problem correctly or the problem's due date has passed.
+
+***************************************
+edX Website
+***************************************
+
+* On the edX.org sign-up page, the **Public Username** field is now above the **Password** field. 
+
+* In the student dashboard, the appearance of the user profile area in the left pane has changed.
+
+  Former user profile area:
+
+  .. image:: /images/StDash_Old.png
+     :width: 350
+     :alt: User profile in the old student dashboard
+
+  Current user profile area:
+
+  .. image:: /images/StDash_New.png
+     :width: 350
+     :alt: User profile in the new student dashboard
+
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce two upcoming features that will release in the next few weeks:
+
+* In Studio, new capabilities will make it easier for course authors to edit
+  and publish content. We've simplified the publishing workflow and added clear
+  indications to the UI so you'll know at a glance whether your content is
+  published and released--and whether students can see it.
+
+* In addition to the existing Discussion post type, course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts by unanswered questions.
+
+**************************
+edX Documentation
+**************************
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+       
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

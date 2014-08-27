@@ -19,13 +19,13 @@ MATLAB_API_KEY = "Matlab API key"
 
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
     step.given("I have created another Blank Common Problem")
 
 
 @step('I have created a unit with advanced module "(.*)"$')
 def i_created_unit_with_advanced_module(step, advanced_module):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
 
     url = world.browser.url
     step.given("I select the Advanced Settings")
@@ -239,7 +239,7 @@ def enable_latex_compiler(step):
 
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
-    world.create_course_with_unit()
+    step.given('I am in Studio editing a new unit')
     step.given('I have enabled latex compiler')
     world.create_component_instance(
         step=step,
@@ -305,15 +305,13 @@ def i_can_edit_problem(_step):
 
 @step(u'I edit first blank advanced problem for annotation response$')
 def i_edit_blank_problem_for_annotation_response(_step):
-    edit_css = """$('.component-header:contains("Blank Advanced Problem")').parent().find('a.edit-button').click()"""
+    world.edit_component(1)
     text = """
         <problem>
             <annotationresponse>
                 <annotationinput><text>Text of annotation</text></annotationinput>
             </annotationresponse>
         </problem>"""
-    world.browser.execute_script(edit_css)
-    world.wait_for_ajax_complete()
     type_in_codemirror(0, text)
     world.save_component()
 

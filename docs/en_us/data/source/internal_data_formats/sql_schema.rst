@@ -537,7 +537,7 @@ Columns in the student_courseenrollment Table
 
 A row in this table represents a student's enrollment for a particular course run. 
 
-note:: A row is created for every student who starts the enrollment process, even if they never complete registration. 
+.. note:: A row is created for every student who starts the enrollment process, even if they never complete registration.
 
 **History**: As of 20 Aug 2013, this table retains the records of students who unenroll. Records are no longer deleted from this table.
 

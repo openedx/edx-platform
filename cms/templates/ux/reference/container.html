@@ -1,32 +1,52 @@
 <%inherit file="../../base.html" />
+
 <%!
-from django.core.urlresolvers import reverse
+  import logging
+  from util.date_utils import get_default_time_display
+  from django.utils.translation import ugettext as _
+  from contentstore.utils import reverse_usage_url
 %>
+
 <%block name="title">Container</%block>
 <%block name="bodyclass">is-signedin course uploads view-container</%block>
 
 <%namespace name='static' file='../../static_content.html'/>
-<%namespace name="units" file="../../widgets/units.html" />
 
 <%block name="content">
 <div id="content">
 
+
 <div class="wrapper-mast wrapper">
-    <header class="mast has-navigation">
-        <h1 class="page-header">
-            <small class="navigation navigation-parents">
-                <a href="#" class="navigation-link navigation-parent-previous">Parent of Unit Page</a>
-                <a href="#" class="navigation-link navigation-parent">Unit Page Super Long Title Name Goes Here Yeah Whats Up Parent</a>
-                <a href="#" class="navigation-link navigation-current">Container Name</a>
+    <header class="mast has-actions has-navigation has-subtitle">
+        <div class="page-header">
+            <small class="navigation navigation-parents subtitle">
+                        <a href="" class="navigation-item navigation-link navigation-parent">
+                            Section parent
+                        </a>
+                        <span class="navigation-item navigation-parent">Subsection parent</span>
             </small>
-        </h1>
+            <div class="wrapper-xblock-field" data-field="display_name">
+                <h1 class="page-header-title is-editable xblock-field-value">Unit Example</h1>
+            </div>
+        </div>
 
         <nav class="nav-actions">
-            <h3 class="sr">Page Actions</h3>
+            <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
-                <li class="sr nav-item">
-                    No Actions
+
+<!-- begin publishing changes -->
+                <li class="action-item action-view nav-item">
+                    <a href="#" class="button view-button action-button">
+                        <span class="action-button-text">${_("View Published Version")}</span>
+                    </a>
                 </li>
+                <li class="action-item action-preview nav-item">
+                    <a href="#" class="button preview-button action-button">
+                        <span class="action-button-text">${_("Preview Changes")}</span>
+                    </a>
+                </li>
+<!-- end publishing changes -->
+
             </ul>
         </nav>
     </header>
@@ -108,7 +128,7 @@ from django.core.urlresolvers import reverse
                                                         </div>
                                                     </header>
                                                     <article class="xblock-render">
-                                                        <section class="xblock xblock-student_view xmodule_display xmodule_VideoModule" data-runtime-version="1" data-init="XBlockToXModuleShim" data-handler-prefix="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_72b5a0d74e8c4ed4a4d4e6bf67837c09/handler" data-type="Video" data-block-type="video">
+                                                        <section class="xblock xblock-student_view xmodule_display xmodule_VideoModule" data-runtime-version="1" data-init="XBlockToXModuleShim" data-handler-prefix="/preview/xblock/i4x:;_;_AndyA;_ABT101;_video;_72b5a0d74e8c4ed4a4d4e6bf67837c09/handler" data-type="Video">
 
 
                                                             <h2>Video</h2>
@@ -432,6 +452,236 @@ from django.core.urlresolvers import reverse
                 </section>
             </article>
             <aside class="content-supplementary" role="complimentary">
+
+<!-- begin publishing changes 1 -->
+
+                <!-- case never published, future release no staff lock -->
+
+                <div class="bit-publishing ">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft (Never published)")}</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 1 -->
+
+<!-- begin publishing changes 2 -->
+
+                <!-- case published no changes, future release no staff lock -->
+
+                <div class="bit-publishing is-published">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Published")}</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Last published on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary is-disabled" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 2 -->
+
+
+<!-- begin publishing changes 3 -->
+
+                <!-- case unpubbed changes, future release no staff lock -->
+
+                <div class="bit-publishing is-draft">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft (Unpublished changes)")}</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 3 -->
+
+
+<!-- begin publishing changes 4 -->
+
+                <!-- case unpubbed changes, future release with staff lock -->
+
+                <div class="bit-publishing is-draft is-staff-only">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Draft (Unpublished changes)")}</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Draft saved on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Scheduled to Release:</h5>
+                      <p class="copy">
+                          <span class="release-date">July 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Will be Visible to:</h5>
+                      <p class="copy">Staff only</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon-lock"></i> Hidden from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 4 -->
+
+
+<!-- begin publishing changes 5 -->
+
+                <!-- case published no changes, release in past no staff lock -->
+
+                <div class="bit-publishing is-published">
+                  <h3 class="bar-mod-title pub-status"><span class="sr">${_("Publishing Status")} </span>${_("Published")}</h3>
+                  <div class="wrapper-last-draft bar-mod-content">
+
+                  <!-- case: unpubbed changes -->
+                      <p class="copy meta">
+                          Last published on 6/15/2014 at 12:45pm by amako
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-release bar-mod-content">
+                      <h5 class="title">Released:</h5>
+                      <p class="copy">
+                          <span class="release-date">May 25, 2014</span> with
+                          <span class="release-with">Section "Week 1"</span>
+                      </p>
+                  </div>
+
+                  <!-- case: staff and students - no lock -->
+                  <div class="wrapper-visibility bar-mod-content">
+                      <h5 class="title">Currently Visible to:</h5>
+                      <p class="copy">Staff and Students</p>
+                      <p class="action-inline">
+                        <a href="">
+                          <i class="icon-unlock"></i> Hide from Students
+                        </a>
+                      </p>
+                  </div>
+
+                  <!-- case: future release -->
+                  <div class="wrapper-pub-actions bar-mod-actions">
+                      <ul class="action-list">
+                        <li class="action-item"><a class="action-publish action-primary is-disabled" href="">Publish</a></li>
+                        <li class="action-item"><a class="action-discard action-secondary is-disabled" href="">Discard Changes</a></li>
+                      </ul>
+                  </div>
+                </div>
+
+<!-- end publishing changes 2 -->
+
+
                 <div class="bit-publishing">
                     <h3 class="title-3">Publishing Status</h3>
                     <p class="copy">This content is published with unit <a href="">Unit 1</a>. To make changes to the content of this container, place <a href="">Unit 1</a> in draft mode.</p>

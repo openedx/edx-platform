@@ -3,6 +3,7 @@ Course Group Configurations page.
 """
 
 from .course_page import CoursePage
+from .utils import confirm_prompt
 
 
 class GroupConfigurationsPage(CoursePage):
@@ -15,6 +16,7 @@ class GroupConfigurationsPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='body.view-group-configurations').present
 
+    @property
     def group_configurations(self):
         """
         Return list of the group configurations for the course.
@@ -52,8 +54,20 @@ class GroupConfiguration(object):
         """
         Expand/collapse group configuration.
         """
-        css = 'a.group-toggle'
-        self.find_css(css).first.click()
+        self.find_css('a.group-toggle').first.click()
+
+    @property
+    def is_expanded(self):
+        """
+        Group configuration usage information is expanded.
+        """
+        return self.find_css('a.group-toggle.hide-groups').present
+
+    def add_group(self):
+        """
+        Add new group.
+        """
+        self.find_css('button.action-add-group').first.click()
 
     def get_text(self, css):
         """
@@ -61,27 +75,51 @@ class GroupConfiguration(object):
         """
         return self.find_css(css).first.text[0]
 
+    def click_outline_anchor(self):
+        """
+        Click on the `Course Outline` link.
+        """
+        self.find_css('p.group-configuration-usage-text a').first.click()
+
+    def click_unit_anchor(self, index=0):
+        """
+        Click on the link to the unit.
+        """
+        self.find_css('li.group-configuration-usage-unit a').nth(index).click()
+
     def edit(self):
         """
         Open editing view for the group configuration.
         """
-        css = '.action-edit .edit'
-        self.find_css(css).first.click()
+        self.find_css('.action-edit .edit').first.click()
+
+    @property
+    def delete_button_is_disabled(self):
+        return self.find_css('.actions .delete.is-disabled').present
+
+    @property
+    def delete_button_is_absent(self):
+        return not self.find_css('.actions .delete').present
+
+    def delete(self):
+        """
+        Delete the group configuration.
+        """
+        self.find_css('.actions .delete').first.click()
+        confirm_prompt(self.page)
 
     def save(self):
         """
         Save group configuration.
         """
-        css = '.action-primary'
-        self.find_css(css).first.click()
+        self.find_css('.action-primary').first.click()
         self.page.wait_for_ajax()
 
     def cancel(self):
         """
         Cancel group configuration.
         """
-        css = '.action-secondary'
-        self.find_css(css).first.click()
+        self.find_css('.action-secondary').first.click()
 
     @property
     def mode(self):
@@ -108,6 +146,14 @@ class GroupConfiguration(object):
         return self.get_text('.message-status.error')
 
     @property
+    def usages(self):
+        """
+        Return list of usages.
+        """
+        css = '.group-configuration-usage-unit'
+        return self.find_css(css).text
+
+    @property
     def name(self):
         """
         Return group configuration name.
@@ -119,8 +165,7 @@ class GroupConfiguration(object):
         """
         Set group configuration name.
         """
-        css = '.group-configuration-name-input'
-        self.find_css(css).first.fill(value)
+        self.find_css('.group-configuration-name-input').first.fill(value)
 
     @property
     def description(self):
@@ -134,20 +179,24 @@ class GroupConfiguration(object):
         """
         Set group configuration description.
         """
-        css = '.group-configuration-description-input'
-        self.find_css(css).first.fill(value)
+        self.find_css('.group-configuration-description-input').first.fill(value)
 
     @property
     def groups(self):
         """
         Return list of groups.
         """
-        css = '.group'
+        def group_selector(group_index):
+            return self.get_selector('.group-{} '.format(group_index))
 
-        def group_selector(config_index, group_index):
-            return self.get_selector('.groups-{} .group-{} '.format(config_index, group_index))
+        return [Group(self.page, group_selector(index)) for index, element in enumerate(self.find_css('.group'))]
 
-        return [Group(self.page, group_selector(self.index, index)) for index, element in enumerate(self.find_css(css))]
+    @property
+    def delete_note(self):
+        """
+        Return delete note for the group configuration.
+        """
+        return self.find_css('.wrapper-delete-button').first.attrs('data-tooltip')[0]
 
     def __repr__(self):
         return "<{}:{}>".format(self.__class__.__name__, self.name)
@@ -170,10 +219,18 @@ class Group(object):
     @property
     def name(self):
         """
-        Return group name.
+        Return the name of the group .
         """
         css = '.group-name'
         return self.find_css(css).first.text[0]
+
+    @name.setter
+    def name(self, value):
+        """
+        Set the name for the group.
+        """
+        css = '.group-name'
+        self.find_css(css).first.fill(value)
 
     @property
     def allocation(self):
@@ -182,6 +239,13 @@ class Group(object):
         """
         css = '.group-allocation'
         return self.find_css(css).first.text[0]
+
+    def remove(self):
+        """
+        Remove the group.
+        """
+        css = '.action-close'
+        return self.find_css(css).first.click()
 
     def __repr__(self):
         return "<{}:{}>".format(self.__class__.__name__, self.name)

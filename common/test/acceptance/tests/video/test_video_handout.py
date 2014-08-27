@@ -3,7 +3,6 @@
 """
 Acceptance tests for CMS Video Handout.
 """
-
 from .test_studio_video_module import CMSVideoBaseTest
 
 

@@ -11,7 +11,7 @@
 <%block name="bodyclass">is-signedin course view-group-configurations</%block>
 
 <%block name="header_extras">
-% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "basic-modal", "modal-button"]:
+% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "group-edit", "basic-modal", "modal-button"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -23,9 +23,10 @@
 require(["domReady!", "js/collections/group_configuration", "js/views/pages/group_configurations"],
 function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
   % if configurations is not None:
-    var collection = new GroupConfigurationCollection(${json.dumps(configurations)});
+    var collection = new GroupConfigurationCollection(${json.dumps(configurations)}, { parse: true });
 
     collection.url = "${group_configuration_url}";
+    collection.outlineUrl = "${course_outline_url}";
     new GroupConfigurationsPage({
         el: $('#content'),
         collection: collection
@@ -71,11 +72,13 @@ function(doc, GroupConfigurationCollection, GroupConfigurationsPage) {
       <aside class="content-supplementary" role="complimentary">
       <div class="bit">
         <h3 class="title-3">${_("What can I do on this page?")}</h3>
-        <p>${_("You can create and edit group configurations.")}</p>
+        <p>${_("You can create, edit, and delete group configurations.")}</p>
 
-        <p>${_("A group configuration defines how many groups of students are in an experiment. When you create a content experiment, you select the group configuration to use.")}</p>
+        <p>${_("A group configuration defines how many groups of students are in an experiment. When you create an experiment, you select the group configuration to use.")}</p>
 
-        <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit an existing configuration, hover over its box and click {em_start}Edit{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+        <p>${_("Click {em_start}New Group Configuration{em_end} to add a new configuration. To edit a configuration, hover over its box and click {em_start}Edit{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+        <p>${_("You can delete a group configuration only if it is not in use in an experiment. To delete a configuration, hover over its box and click the delete icon.")}</p>
 
         <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Learn More")}</a></p>
       </div>

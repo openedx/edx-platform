@@ -57,6 +57,26 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('I have populated a new course in Studio$')
+def i_have_populated_a_new_course(_step):
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    world.scenario_dict['COURSE'] = course
+    section = world.ItemFactory.create(parent_location=course.location)
+    world.ItemFactory.create(
+        parent_location=section.location,
+        category='sequential',
+        display_name='Subsection One',
+    )
+    user = create_studio_user(is_staff=False)
+    add_course_author(user, course)
+
+    log_into_studio()
+
+    world.css_click('a.course-link')
+    world.wait_for_js_to_load()
+
+
 @step('(I select|s?he selects) the new course')
 def select_new_course(_step, whom):
     course_link_css = 'a.course-link'
@@ -182,24 +202,9 @@ def create_a_course():
     assert_true(world.is_css_present(course_title_css))
 
 
-def add_section(name='My Section'):
-    link_css = 'a.new-courseware-section-button'
-    world.css_click(link_css)
-    name_css = 'input.new-section-name'
-    save_css = 'input.new-section-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
-    span_css = 'span.section-name-span'
-    assert_true(world.is_css_present(span_css))
-
-
-def add_subsection(name='Subsection One'):
-    css = 'a.new-subsection-item'
-    world.css_click(css)
-    name_css = 'input.new-subsection-name-input'
-    save_css = 'input.new-subsection-name-save'
-    world.css_fill(name_css, name)
-    world.css_click(save_css)
+def add_section():
+    world.css_click('.outline .button-new')
+    assert_true(world.is_css_present('.outline-section .xblock-field-value'))
 
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time, key=None):
@@ -230,50 +235,37 @@ def i_enabled_the_advanced_module(step, module):
 
 
 @world.absorb
-def create_course_with_unit():
+def create_unit_from_course_outline():
     """
-    Prepare for tests by creating a course with a section, subsection, and unit.
-    Performs the following:
-        Clear out all courseware
-        Create a course with a section, subsection, and unit
-        Create a user and make that user a course author
-        Log the user into studio
-        Open the course from the dashboard
-        Expand the section and click on the New Unit link
-    The end result is the page where the user is editing the new unit
+    Expands the section and clicks on the New Unit link.
+    The end result is the page where the user is editing the new unit.
     """
-    world.clear_courses()
-    course = world.CourseFactory.create()
-    world.scenario_dict['COURSE'] = course
-    section = world.ItemFactory.create(parent_location=course.location)
-    world.ItemFactory.create(
-        parent_location=section.location,
-        category='sequential',
-        display_name='Subsection One',
-    )
-    user = create_studio_user(is_staff=False)
-    add_course_author(user, course)
-
-    log_into_studio()
-    world.css_click('a.course-link')
-
-    world.wait_for_js_to_load()
     css_selectors = [
-        'div.section-item a.expand-collapse', 'a.new-unit-item'
+        '.outline-subsection .expand-collapse', '.outline-subsection .button-new'
     ]
     for selector in css_selectors:
         world.css_click(selector)
 
     world.wait_for_mathjax()
     world.wait_for_xmodule()
+    world.wait_for_loading()
 
     assert world.is_css_present('ul.new-component-type')
+
+
+@world.absorb
+def wait_for_loading():
+    """
+    Waits for the loading indicator to be hidden.
+    """
+    world.wait_for(lambda _driver: len(world.browser.find_by_css('div.ui-loading.is-hidden')) > 0)
 
 
 @step('I have clicked the new unit button$')
 @step(u'I am in Studio editing a new unit$')
 def edit_new_unit(step):
-    create_course_with_unit()
+    step.given('I have populated a new course in Studio')
+    create_unit_from_course_outline()
 
 
 @step('the save notification button is disabled')
@@ -345,6 +337,7 @@ def get_codemirror_value(index=0, find_prefix="$"):
 def attach_file(filename, sub_path):
     path = os.path.join(TEST_ROOT, sub_path, filename)
     world.browser.execute_script("$('input.file-input').css('display', 'block')")
+    assert_true(os.path.exists(path))
     world.browser.attach_file('file', os.path.abspath(path))
 
 
@@ -396,27 +389,3 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 def log_out(_step):
     world.visit('logout')
 
-
-@step(u'I click on "edit a draft"$')
-def i_edit_a_draft(_step):
-    world.css_click("a.create-draft")
-
-
-@step(u'I click on "replace with draft"$')
-def i_replace_w_draft(_step):
-    world.css_click("a.publish-draft")
-
-
-@step(u'I click on "delete draft"$')
-def i_delete_draft(_step):
-    world.css_click("a.delete-draft")
-
-
-@step(u'I publish the unit$')
-def publish_unit(_step):
-    world.select_option('visibility-select', 'public')
-
-
-@step(u'I unpublish the unit$')
-def unpublish_unit(_step):
-    world.select_option('visibility-select', 'private')

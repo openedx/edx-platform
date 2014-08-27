@@ -1,4 +1,4 @@
-<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option" />
+<%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course" />
 
 <%! from django.utils.translation import ugettext as _ %>
 <%!
@@ -56,6 +56,11 @@
             <span class="label">${_("Enrolled as: ")}</span>
             <span class="sts-enrollment-value">${_("Auditing")}</span>
           </span>
+        % elif enrollment.mode == "professional":
+          <span class="sts-enrollment" title="${_("You're enrolled as a professional education student")}">
+          <span class="label">${_("Enrolled as: ")}</span>
+          <span class="sts-enrollment-value">${_("Professional Ed")}</span>
+        </span>
         % endif
     % endif
 
@@ -126,7 +131,19 @@
         % endif
       % endif
 
-      % if enrollment.mode != "verified":
+      % if is_paid_course and show_refund_option:
+        ## Translators: The course's name will be added to the end of this sentence.
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the purchased course")}';
+        document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">
+          ${_('Unregister')}
+        </a>
+      % elif is_paid_course and not show_refund_option:
+        ## Translators: The course's name will be added to the end of this sentence.
+        <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from the purchased course")}';
+        document.getElementById('refund-info').innerHTML=gettext('You will not be refunded the amount you paid.')">
+          ${_('Unregister')}
+        </a>
+      % elif enrollment.mode != "verified":
         ## Translators: The course's name will be added to the end of this sentence.
         <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='${_("Are you sure you want to unregister from")}'; document.getElementById('refund-info').innerHTML=''">
           ${_('Unregister')}

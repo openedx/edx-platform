@@ -1,13 +1,15 @@
 define([
-    'js/views/baseview', 'underscore', 'jquery', 'gettext'
+    'js/views/baseview', 'underscore', 'jquery', 'gettext',
+    'js/views/group_edit', 'js/views/utils/view_utils'
 ],
-function(BaseView, _, $, gettext) {
+function(BaseView, _, $, gettext, GroupEdit, ViewUtils) {
     'use strict';
     var GroupConfigurationEdit = BaseView.extend({
         tagName: 'div',
         events: {
             'change .group-configuration-name-input': 'setName',
             'change .group-configuration-description-input': 'setDescription',
+            "click .action-add-group": "createGroup",
             'focus .input-text': 'onFocus',
             'blur .input-text': 'onBlur',
             'submit': 'setAndClose',
@@ -24,8 +26,14 @@ function(BaseView, _, $, gettext) {
         },
 
         initialize: function() {
+            var groups;
+
             this.template = this.loadTemplate('group-configuration-edit');
             this.listenTo(this.model, 'invalid', this.render);
+            groups = this.model.get('groups');
+            this.listenTo(groups, 'add', this.addOne);
+            this.listenTo(groups, 'reset', this.addAll);
+            this.listenTo(groups, 'all', this.render);
         },
 
         render: function() {
@@ -34,11 +42,32 @@ function(BaseView, _, $, gettext) {
                 uniqueId: _.uniqueId(),
                 name: this.model.escape('name'),
                 description: this.model.escape('description'),
+                usage: this.model.get('usage'),
                 isNew: this.model.isNew(),
                 error: this.model.validationError
             }));
+            this.addAll();
+            return this;
+        },
+
+        addOne: function(group) {
+            var view = new GroupEdit({ model: group });
+            this.$('ol.groups').append(view.render().el);
 
             return this;
+        },
+
+        addAll: function() {
+            this.model.get('groups').each(this.addOne, this);
+        },
+
+        createGroup: function(event) {
+            if(event && event.preventDefault) { event.preventDefault(); }
+            var collection = this.model.get('groups');
+            collection.add([{
+                name: collection.getNextDefaultGroupName(),
+                order: collection.nextOrder()
+            }]);
         },
 
         setName: function(event) {
@@ -62,6 +91,16 @@ function(BaseView, _, $, gettext) {
             this.setName();
             this.setDescription();
 
+            _.each(this.$('.groups li'), function(li, i) {
+                var group = this.model.get('groups').at(i);
+
+                if(group) {
+                    group.set({
+                        'name': $('.group-name', li).val()
+                    });
+                }
+            }, this);
+
             return this;
         },
 
@@ -73,7 +112,7 @@ function(BaseView, _, $, gettext) {
                 return false;
             }
 
-            this.runOperationShowingMessage(
+            ViewUtils.runOperationShowingMessage(
                 gettext('Saving') + '&hellip;',
                 function () {
                     var dfd = $.Deferred();

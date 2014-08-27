@@ -101,11 +101,17 @@ To make the cross reference in text:
 
         see :ref:`Set Grade Brackets<Set-Grade-Brackets>`
 
-To cross-reference a topic, but use your own text instead of the topic title, use the :ref: directive, but enter your own text followed by the topic anchor in angle brackets:
+To cross-reference a topic, but use your own text instead of the topic title,
+use the :ref: directive, but enter your own text followed by the topic anchor in
+angle brackets:
 
-        If you want to add a graded tool or exercise, add the tool as a :ref:`custom JavaScript problem<Custom JavaScript>` or an :ref:`LTI component<LTI Component>`.
+        If you want to add a graded tool or exercise, add the tool as a
+        :ref:`custom JavaScript problem<Custom JavaScript>` or an :ref:`LTI
+        component<LTI Component>`.
 
-        (In this sentence, the text appears as "custom JavaScript problem" and "LTI component", and the linked-to topic titles are "Custom JavaScript Problem" and "LTI Component".)
+        (In this sentence, the text appears as "custom JavaScript problem" and
+        "LTI component", and the linked-to topic titles are "Custom JavaScript
+        Problem" and "LTI Component".)
 
 External page reference
 

@@ -44,18 +44,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             .subscribe("annotationsLoaded", function (annotations){
                 if (!self.annotationInstance) {
                 
-                	//annotation instance should include the OSD item and annotator
+                    // annotation instance should include the OSD item and annotator
                     self.annotationInstance = new $._annotation({
                         viewer: self,
                         annotator: annotator,
                     });
                     
-                    //this collection of items is included as an item of annotator so
-                    //that there is a method to communicate back and forth. 
+                    // this collection of items is included as an item of annotator so
+                    // that there is a method to communicate back and forth. 
                     annotator.osda = self.annotationInstance;
                     
-                    //Because it takes a while for both OSD to open and for annotator
-                    //to get items from the backend, we wait until we get the "open" call
+                    // Because it takes a while for both OSD to open and for annotator
+                    // to get items from the backend, we wait until we get the "open" call
                     function refreshDisplay(){
                         if(!isOpenViewer){
                             setTimeout(refreshDisplay,200);
@@ -75,48 +75,48 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
      * @constructor
      */
     $._annotation = function(options) {
-        //options
+        // options
         options = options || {};
         if (!options.viewer) {
             throw new Error("A viewer must be specified.");
         }
 
-        //variables
+        // variables
         this.viewer = options.viewer;
         this.annotator = options.annotator;
         this.options = options;
-        this.isAnnotating = false; //If the user is annotating
-        this.isDrawing = false; //if the user is drawing something
+        this.isAnnotating = false; // If the user is annotating
+        this.isDrawing = false; // if the user is drawing something
         this.rectPosition = undefined;
         
-        //Init
+        // Init
         this.init();
     };
     
     //-- Methods
     $._annotation.prototype = {
-    	/**
-    	 * This function makes sure that the OSD buttons are created, that the
-    	 * panning and zooming functionality is created and the annotation events.
-    	 */
+        /**
+         * This function makes sure that the OSD buttons are created, that the
+         * panning and zooming functionality is created and the annotation events.
+         */
         init: function(){
             var viewer = this.viewer;
             
-            //create Buttons
+            // create Buttons
             this._createNewButton();
             
             /* canvas Events */
-            //- Bind canvas functions
+            // Bind canvas functions
             var onCanvasMouseDown = this.__bind(this._onCanvasMouseDown,this);
             var onCanvasMouseMove = this.__bind(this._onCanvasMouseMove,this);
             var onDocumentMouseUp = this.__bind(this._onDocumentMouseUp,this);
                 
-            //- Add canvas events
+            // Add canvas events
             $.addEvent(viewer.canvas, "mousedown", onCanvasMouseDown, true);
             $.addEvent(viewer.canvas, "mousemove", onCanvasMouseMove, true);
             $.addEvent(document, "mouseup", onDocumentMouseUp, true);
             
-            //Viewer events
+            // Viewer events
             var self = this;
         },
         
@@ -128,17 +128,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         newAnnotation:function(){
             var annotator = this.annotator;
             
-            //This variable tells editor that we want create an image annotation
+            // This variable tells editor that we want create an image annotation
             annotator.editor.OpenSeaDragon = this.viewer.id;
-        	
-        	//allows the adder to actually show up
+            
+            // allows the adder to actually show up
             annotator.adder.show();
             
-            //takes into account the various wrappers and instances to put the shape
-            //over the correct place. 
+            // takes into account the various wrappers and instances to put the shape
+            // over the correct place. 
             this._setOverShape(annotator.adder);
             
-            //Open a new annotator dialog
+            // Open a new annotator dialog
             annotator.onAdderClick();
         },
         
@@ -148,16 +148,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * @param {TinyMCEEditor} editor The item that pops up when you edit an annotation.
          */
         editAnnotation: function(annotation,editor){
-            //Stupid check: is the annotation you're trying to edit an image?
+            // Stupid check: is the annotation you're trying to edit an image?
             if (this._isOpenSeaDragon(annotation)){
                 
                 var editor = editor || this.annotator.editor;
             
-                //set the editor over the highlighted element
+                // set the editor over the highlighted element
                 this._setOverShape(editor.element);
                 editor.checkOrientation();
             
-                //makes sure that we are making an image annotation
+                // makes sure that we are making an image annotation
                 editor.OpenSeaDragon = this.viewer.id;
             }
         },
@@ -171,23 +171,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var allannotations = this.annotator.plugins['Store'].annotations;
             var annotator = this.annotator;
         
-            //Sort the annotations by date
+            // Sort the annotations by date
             this._sortByDate(allannotations);
         
-            //remove all of the overlays
+            // remove all of the overlays
             this.viewer.drawer.clearOverlays();
         
             for (var item in allannotations) {
                 var an = allannotations[item];
             
-                //check if the annotation is an OpenSeaDragon annotation
+                // check if the annotation is an OpenSeaDragon annotation
                 if (this._isOpenSeaDragon(an)){
                     this.drawRect(an);    
-            	}
-        	}
-        	
-        	//if the colored highlights by tags plugin it is notified to colorize
-           	annotator.publish('colorizeHighlight', [an]);
+                }
+            }
+            
+            // if the colored highlights by tags plugin it is notified to colorize
+               annotator.publish('colorizeHighlight', [an]);
         },
         
         /**
@@ -199,15 +199,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             this._reset();
             var viewer = this.viewer;
             if (!this.isAnnotating){
-            	//When annotating, the cursor turns into a crosshair and there is a
-            	//green border around the OSD instance.
+                // When annotating, the cursor turns into a crosshair and there is a
+                // green border around the OSD instance.
                 jQuery('.openseadragon1').css('cursor', 'crosshair');
                 jQuery('.openseadragon1').css('border', '2px solid rgb(51,204,102)');
                 e.eventSource.imgGroup.src =  this.resolveUrl( viewer.prefixUrl,"newan_hover.png");
                 e.eventSource.imgRest.src =  this.resolveUrl( viewer.prefixUrl,"newan_hover.png");
                 e.eventSource.imgHover.src = this.resolveUrl( viewer.prefixUrl,"newan_grouphover.png");
             }else{
-            	//Otherwise, the cursor is a cross with four arrows to indicate movement
+                // Otherwise, the cursor is a cross with four arrows to indicate movement
                 jQuery('.openseadragon1').css('cursor', 'all-scroll');
                 jQuery('.openseadragon1').css('border', 'inherit');
                 e.eventSource.imgGroup.src =  this.resolveUrl( viewer.prefixUrl,"newan_grouphover.png");
@@ -215,7 +215,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 e.eventSource.imgHover.src =  this.resolveUrl( viewer.prefixUrl,"newan_hover.png");
             }
             
-            //toggles the annotating flag
+            // toggles the annotating flag
             this.isAnnotating = !this.isAnnotating?true:false;
         },
         
@@ -225,28 +225,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * @param {Object} an Annotation item from the list in the Annotator instance.
          */
         drawRect:function(an){
-        	//Stupid check: Does this annotation actually have an area of annotation
+            // Stupid check: Does this annotation actually have an area of annotation
             if (typeof an.rangePosition!='undefined'){
-                //Sets up the visual aspects of the area for the user
+                // Sets up the visual aspects of the area for the user
                 var span = document.createElement('span');
                 var rectPosition = an.rangePosition;
                 span.className = "annotator-hl";
                 span.style.border = '2px solid rgba(0,0,0,0.5)';
                 span.style.background = 'rgba(0,0,0,0)';
                 
-                //Adds listening items for the viewer and editor
+                // Adds listening items for the viewer and editor
                 var onAnnotationMouseMove = this.__bind(this._onAnnotationMouseMove,this);
                 var onAnnotationClick = this.__bind(this._onAnnotationClick,this);
                 $.addEvent(span, "mousemove", onAnnotationMouseMove, true);
                 $.addEvent(span, "click", onAnnotationClick, true);
                 
-                //Set the object in the div
+                // Set the object in the div
                 jQuery.data(span, 'annotation', an);
                 
-                //Add the highlights to the annotation
+                // Add the highlights to the annotation
                 an.highlights = jQuery(span);
-            	
-            	//Sends the element created to the proper location within the OSD instance
+                
+                // Sends the element created to the proper location within the OSD instance
                 var olRect = new OpenSeadragon.Rect(rectPosition.left, rectPosition.top, rectPosition.width, rectPosition.height);
                 return this.viewer.drawer.addOverlay({
                     element: span,
@@ -262,19 +262,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * screen coordinates and OSD image coordinates. 
          */
         setRectPosition:function(){
-        	//Get the actual locations of the rectangle
+            // Get the actual locations of the rectangle
             var left = parseInt(this.rect.style.left);
             var top = parseInt(this.rect.style.top);
-            var width = parseInt(this.rect.style.left)+parseInt(this.rect.style.width);
-            var height = parseInt(this.rect.style.top)+parseInt(this.rect.style.height);
+            var width = parseInt(this.rect.style.left) + parseInt(this.rect.style.width);
+            var height = parseInt(this.rect.style.top) + parseInt(this.rect.style.height);
             var startPoint = new $.Point(left,top);
             var endPoint = new $.Point(width,height);
             
-            //return the proper value of the rectangle
+            // return the proper value of the rectangle
             this.rectPosition = {left:this._physicalToLogicalXY(startPoint).x,
                 top:this._physicalToLogicalXY(startPoint).y,
-                width:this._physicalToLogicalXY(endPoint).x-this._physicalToLogicalXY(startPoint).x,
-                height:this._physicalToLogicalXY(endPoint).y-this._physicalToLogicalXY(startPoint).y
+                width:this._physicalToLogicalXY(endPoint).x - this._physicalToLogicalXY(startPoint).x,
+                height:this._physicalToLogicalXY(endPoint).y - this._physicalToLogicalXY(startPoint).y
             };
         },
         
@@ -287,18 +287,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          */
         _onCanvasMouseDown: function(event) {
             
-            //action is ONLY performed if we are in annotation creation mode
+            // action is ONLY performed if we are in annotation creation mode
             if (this.isAnnotating){
                 var viewer = this.viewer;
                 event.preventDefault();
                 
-                //reset the display
+                // reset the display
                 this._reset();
                 
-                //set mode drawing
+                // set mode drawing
                 this.isDrawing = true;
                 
-                //Create rect element
+                // Create rect element
                 var mouse  = $.getMousePosition( event );
                 var elementPosition = $.getElementPosition(viewer.canvas);
                 var position = mouse.minus( elementPosition );
@@ -308,18 +308,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 this.rect.style.border = '2px solid rgba(0,0,0,0.5)';
                 this.rect.style.position = 'absolute';
                 this.rect.className = 'DrawingRect';
-                //set the initial position
-                this.rect.style.top = position.y+"px";
-                this.rect.style.left = position.x+"px";
+                // set the initial position
+                this.rect.style.top = position.y + "px";
+                this.rect.style.left = position.x + "px";
                 this.rect.style.width = "1px";
                 this.rect.style.height = "1px";
                 
-                //save the start Position
+                // save the start Position
                 this.startPosition = position;
-                //save rectPosition as initial rectangle parameter to Draw in the canvas
+                // save rectPosition as initial rectangle parameter to Draw in the canvas
                 this.setRectPosition();
                 
-                //append Child to the canvas
+                // append Child to the canvas
                 viewer.canvas.appendChild(this.rect);
             }
         },
@@ -330,31 +330,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          */
         _onCanvasMouseMove: function(event) {
         
-        	//of course, this only runs when we are in annotation creation mode and
-        	//when the user has clicked down (and is therefore drawing the rectangle)
+            // of course, this only runs when we are in annotation creation mode and
+            // when the user has clicked down (and is therefore drawing the rectangle)
             if (this.isAnnotating && this.isDrawing){ 
                 var viewer = this.viewer;
                 
-                //Calculate the new end position
+                // Calculate the new end position
                 var mouse  = $.getMousePosition( event );
                 var elementPosition = $.getElementPosition(viewer.canvas);
                 var endPosition = mouse.minus( elementPosition );
-                //retrieve start position    
+                // retrieve start position    
                 var startPosition = this.startPosition;
                 
                 var newWidth= endPosition.x-startPosition.x;
                 var newHeight =endPosition.y-startPosition.y;
                 
-                //Set new position
-                this.rect.style.width = (newWidth<0) ? (-1*newWidth) +'px' : newWidth +'px';
-                this.rect.style.left = (newWidth<0) ? (startPosition.x + newWidth) +'px' : startPosition.x +'px';
-                this.rect.style.height = (newHeight<0) ? (-1*newHeight) +'px' : newHeight +'px';
-                this.rect.style.top = (newHeight<0) ? (startPosition.y + newHeight) +'px' : startPosition.y +'px';
+                // Set new position
+                this.rect.style.width = (newWidth < 0) ? (-1*newWidth) + 'px' : newWidth + 'px';
+                this.rect.style.left = (newWidth < 0) ? (startPosition.x + newWidth) + 'px' : startPosition.x + 'px';
+                this.rect.style.height = (newHeight < 0) ? (-1*newHeight) + 'px' : newHeight + 'px';
+                this.rect.style.top = (newHeight < 0) ? (startPosition.y + newHeight) + 'px' : startPosition.y + 'px';
                 
-                //Modify the rectPosition with the new this.rect values
+                // Modify the rectPosition with the new this.rect values
                 this.setRectPosition();
                 
-                //Show adder and hide editor
+                // Show adder and hide editor
                 this.annotator.editor.element[0].style.display = 'none';
                 this._setOverShape(this.annotator.adder);
             }
@@ -366,21 +366,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          */
         _onDocumentMouseUp: function() {
         
-        	//Stupid check: only do it when in annotation creation mode and
-        	//when the user has begun making a rectangle over the annotation area
+            // Stupid check: only do it when in annotation creation mode and
+            // when the user has begun making a rectangle over the annotation area
             if (this.isAnnotating && this.isDrawing){
                 var viewer = this.viewer;
                 
                 viewer.innerTracker.setTracking(true);
                 this.isDrawing = false;
                 
-                //Set the new position for the rectangle
+                // Set the new position for the rectangle
                 this.setRectPosition();
                 
-                //Open Annotator editor
+                // Open Annotator editor
                 this.newAnnotation();
                 
-                //Hide adder and show editor
+                // Hide adder and show editor
                 this.annotator.editor.element[0].style.display = 'block';
                 this._setOverShape(this.annotator.editor.element);
                 this.annotator.editor.checkOrientation();
@@ -396,11 +396,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var annotator = this.annotator;
             var elem = jQuery(event.target).parents('.annotator-hl').andSelf();
             
-            //if there is a opened annotation then show the new annotation mouse over
+            // if there is a opened annotation then show the new annotation mouse over
             if (typeof annotator!='undefined' && elem.hasClass("annotator-hl") && !this.isDrawing){
-                //hide the last open viewer
+                // hide the last open viewer
                 annotator.viewer.hide();
-                //get the annotation over the mouse
+                // get the annotation over the mouse
                 var annotations = jQuery(event.target.parentNode).find('.annotator-hl').map(function() {
                     var self = jQuery(this);
                     var offset = self.offset();
@@ -414,21 +414,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                     var maxx = l + w;
                     var maxy = t + h;
                     
-                    //if the current position of the mouse is within the bounds of an area
-                    //change the background of that area to a light yellow to simulate
-                    //a hover. Otherwise, keep it translucent.
+                    // if the current position of the mouse is within the bounds of an area
+                    // change the background of that area to a light yellow to simulate
+                    // a hover. Otherwise, keep it translucent.
                     this.style.background = (y <= maxy && y >= t) && (x <= maxx && x >= l)?
                         'rgba(255, 255, 10, 0.05)':'rgba(0, 0, 0, 0)';
                     
                     return (y <= maxy && y >= t) && (x <= maxx && x >= l)? jQuery(this).data("annotation") : null;
                 });
-                //show the annotation in the viewer
+                // show the annotation in the viewer
                 var mousePosition = {
                     top:$.getMousePosition(event).y,
                     left:$.getMousePosition(event).x,
                 };
-                //if the user is hovering over multiple annotation areas, 
-                //they will be stacked as usual
+                // if the user is hovering over multiple annotation areas, 
+                // they will be stacked as usual
                 if (annotations.length>0) annotator.showViewer(jQuery.makeArray(annotations), mousePosition);
             }
         },
@@ -438,17 +438,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * @param {Event} event The actual action of clicking down within an annotation area.
          */
         _onAnnotationClick: function(event){
-        	//gets the annotation from the data stored in the element
+            // gets the annotation from the data stored in the element
             var an = jQuery.data(event.target, 'annotation');
-            //gets the bound within the annotation data
+            // gets the bound within the annotation data
             var bounds = typeof an.bounds!='undefined'?an.bounds:{};
             var currentBounds = this.viewer.drawer.viewport.getBounds();
-            //if the area is not already panned and zoomed in to the correct area
+            // if the area is not already panned and zoomed in to the correct area
             if (typeof bounds.x!='undefined') currentBounds.x = bounds.x;
             if (typeof bounds.y!='undefined') currentBounds.y = bounds.y;
             if (typeof bounds.width!='undefined') currentBounds.width = bounds.width;
             if (typeof bounds.height!='undefined') currentBounds.height = bounds.height;
-        	//change the zoom to the saved parameter
+            // change the zoom to the saved parameter
             this.viewer.drawer.viewport.fitBounds(currentBounds);
         },
         
@@ -459,13 +459,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * @param {String} type Either 'asc' for ascending or 'desc' for descending
          */
         _sortByDate: function (annotations,type){
-            var type = type || 'asc'; //asc => The value [0] will be the most recent date
+            var type = type || 'asc'; // asc => The value [0] will be the most recent date
             annotations.sort(function(a,b){
-            	//gets the date from when they were last updated
+                // gets the date from when they were last updated
                 a = new Date(typeof a.updated!='undefined'?createDateFromISO8601(a.updated):'');
                 b = new Date(typeof b.updated!='undefined'?createDateFromISO8601(b.updated):'');
                 
-                //orders them based on type passed in
+                // orders them based on type passed in
                 if (type == 'asc')
                     return b<a?-1:b>a?1:0;
                 else
@@ -481,22 +481,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var onFocusHandler          = $.delegate( this, onFocus );
             var onBlurHandler           = $.delegate( this, onBlur );
             var onModeAnnotationHandler  = $.delegate( this, this.modeAnnotation );
-			/* Buttons */
-			var viewer = this.viewer;
-			var self = this;
-			viewer.modeAnnotation = new $.Button({
-				element:    viewer.modeAnnotation ? $.getElement( viewer.modeAnnotation ) : null,
-				clickTimeThreshold: viewer.clickTimeThreshold,
-				clickDistThreshold: viewer.clickDistThreshold,
-				tooltip:    "New Annotation",
-				srcRest:    self.resolveUrl( viewer.prefixUrl,"newan_rest.png"),
-				srcGroup:      self.resolveUrl( viewer.prefixUrl,"newan_grouphover.png"),
-				srcHover:   self.resolveUrl( viewer.prefixUrl,"newan_hover.png"),
-				srcDown:    self.resolveUrl( viewer.prefixUrl,"newan_pressed.png"),
-				onRelease:  onModeAnnotationHandler,
-				onFocus:    onFocusHandler,
-				onBlur:     onBlurHandler
-			});
+            /* Buttons */
+            var viewer = this.viewer;
+            var self = this;
+            viewer.modeAnnotation = new $.Button({
+                element:    viewer.modeAnnotation ? $.getElement( viewer.modeAnnotation ) : null,
+                clickTimeThreshold: viewer.clickTimeThreshold,
+                clickDistThreshold: viewer.clickDistThreshold,
+                tooltip:    "New Annotation",
+                srcRest:    self.resolveUrl( viewer.prefixUrl,"newan_rest.png"),
+                srcGroup:      self.resolveUrl( viewer.prefixUrl,"newan_grouphover.png"),
+                srcHover:   self.resolveUrl( viewer.prefixUrl,"newan_hover.png"),
+                srcDown:    self.resolveUrl( viewer.prefixUrl,"newan_pressed.png"),
+                onRelease:  onModeAnnotationHandler,
+                onFocus:    onFocusHandler,
+                onBlur:     onBlurHandler
+            });
             
             //- Wrapper Annotation Menu
             viewer.wrapperAnnotation = new $.ButtonGroup({
@@ -507,8 +507,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
                 clickDistThreshold: viewer.clickDistThreshold
             });
             
-            //area makes sure that the annotation button only appears when everyone is
-            //allowed to annotate or if you are an instructor
+            // area makes sure that the annotation button only appears when everyone is
+            // allowed to annotate or if you are an instructor
             if(this.options.viewer.annotation_mode == "everyone" || this.options.viewer.flags){
                 /* Set elements to the control menu */
                 viewer.annotatorControl  = viewer.wrapperAnnotation.element;
@@ -531,10 +531,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * the last rectangle you drew (but didn't save) gets destroyed.
          */
         _reset: function(){
-            //Find and remove DrawingRect. This is the previous rectangle
+            // Find and remove DrawingRect. This is the previous rectangle
             this._removeElemsByClass('DrawingRect',this.viewer.canvas);
             
-            //Show adder and hide editor
+            // Show adder and hide editor
             this.annotator.editor.element[0].style.display = 'none';
         },
         
@@ -569,21 +569,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             var annotator = this.annotator;
             var rp = an.rangePosition;
             
-            //Makes sure OSD exists and that annotation is an image annotation
-            //with a position in the OSD instance
+            // Makes sure OSD exists and that annotation is an image annotation
+            // with a position in the OSD instance
             var isOpenSeaDragon = (typeof annotator.osda != 'undefined');
             var isContainer = (typeof an.target!='undefined' && an.target.container==this.viewer.id );
             var isImage = (typeof an.media!='undefined' && an.media=='image');
             var isRP = (typeof rp!='undefined');
             var isSource = false;
             
-			//Double checks that the image being displayed matches the annotations 
-			var source = this.viewer.source;
-			var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-			var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-			var compareUrl = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' ');
-			if(isContainer) isSource = (an.target.src == compareUrl);
-			
+            // Double checks that the image being displayed matches the annotations 
+            var source = this.viewer.source;
+            var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+            var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
+            var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
+            if(isContainer) isSource = (an.target.src == compareUrl);
+            
             return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
         },
         
@@ -594,25 +594,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
          * @param {HTMLElement} elem Element where shape is overlayed
          */
         _setOverShape: function(elem){
-            //Calculate Point absolute positions 
+            // Calculate Point absolute positions 
             var rectPosition = this.rectPosition || {};
             var startPoint = this._logicalToPhysicalXY(new $.Point(rectPosition.left,rectPosition.top));
-            var endPoint = this._logicalToPhysicalXY(new $.Point(rectPosition.left+rectPosition.width,rectPosition.top+rectPosition.height));
+            var endPoint = this._logicalToPhysicalXY(new $.Point(rectPosition.left + rectPosition.width,rectPosition.top + rectPosition.height));
             
-            //Calculate Point absolute positions    
+            // Calculate Point absolute positions    
             var wrapper = jQuery('.annotator-wrapper')[0];
             var positionAnnotator = $.getElementPosition(wrapper);
             var positionCanvas = $.getElementPosition(this.viewer.canvas);
             var positionAdder = {};
             
-            //Fix with positionCanvas based on annotator wrapper and OSD area
+            // Fix with positionCanvas based on annotator wrapper and OSD area
             startPoint = startPoint.plus(positionCanvas);
             endPoint = endPoint.plus(positionCanvas);
             
-            elem[0].style.display = 'block'; //Show the adder
+            elem[0].style.display = 'block'; // Show the adder
         
             positionAdder.left = (startPoint.x - positionAnnotator.x) + (endPoint.x - startPoint.x) / 2;
-            positionAdder.top =  (startPoint.y - positionAnnotator.y) + (endPoint.y - startPoint.y) / 2; //It is not necessary fix with - positionAnnotator.y
+            positionAdder.top =  (startPoint.y - positionAnnotator.y) + (endPoint.y - startPoint.y) / 2; // It is not necessary fix with - positionAnnotator.y
             elem.css(positionAdder);
         },
         
@@ -717,12 +717,12 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         this.pluginSubmit = __bind(this.pluginSubmit, this);
         _ref = OpenSeaDragon.__super__.constructor.apply(this, arguments);
         
-        //To facilitate calling items, we want to be able to get the index of a value 
+        // To facilitate calling items, we want to be able to get the index of a value 
         this.__indexOf = [].indexOf; 
         if(!this.__indexOf){
         
-        	//Basically you iterate through every item on the list, if it matches
-        	//the item you are looking for return the current index, otherwise return -1
+            // Basically you iterate through every item on the list, if it matches
+            // the item you are looking for return the current index, otherwise return -1
             this.__indexOf = function(item) { 
                 for (var i = 0, l = this.length; i < l; i++) { 
                     if (i in this && this[i] === item) 
@@ -737,13 +737,13 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 
     OpenSeaDragon.prototype.field = null;
     OpenSeaDragon.prototype.input = null;
-	
-	/**
-	 * This function initiates the editor that will apear when you edit/create an
-	 * annotation and the viewer that appears when you hover over an item.
-	 */
+    
+    /**
+     * This function initiates the editor that will apear when you edit/create an
+     * annotation and the viewer that appears when you hover over an item.
+     */
     OpenSeaDragon.prototype.pluginInit = function() {
-        //Check that annotator is working
+        // Check that annotator is working
         if (!Annotator.supported()) {
             return;
         }
@@ -751,12 +751,12 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         //-- Editor
         this.field = this.annotator.editor.addField({
             id: 'osd-input-rangePosition-annotations',
-            type: 'input', //options (textarea,input,select,checkbox)
+            type: 'input', // options (textarea,input,select,checkbox)
             submit: this.pluginSubmit,
             EditOpenSeaDragonAn: this.EditOpenSeaDragonAn
         });
         
-        //Modify the element created with annotator to be an invisible span
+        // Modify the element created with annotator to be an invisible span
         var select = '<li><span id="osd-input-rangePosition-annotations"></span></li>';
         var newfield = Annotator.$(select);
         Annotator.$(this.field).replaceWith(newfield);
@@ -774,40 +774,40 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
      * metadata for the image in an object that will be passed to the backend. 
      */
     OpenSeaDragon.prototype.pluginSubmit = function(field, annotation) {
-        //Select the new JSON for the Object to save
+        // Select the new JSON for the Object to save
         if (this.EditOpenSeaDragonAn()){
             var annotator = this.annotator;
             var osda = annotator.osda;
             var position = osda.rectPosition || {};
             var isNew = typeof annotation.media=='undefined';
             if(isNew){
-            	//if it's undefined, we know it's an image because the editor within
-            	//the OSD instance was open
+                // if it's undefined, we know it's an image because the editor within
+                // the OSD instance was open
                 if (typeof annotation.media == 'undefined') annotation.media = "image"; // - media
                 annotation.target = annotation.target || {}; // - target
                 annotation.target.container = osda.viewer.id || ""; // - target.container
                 
-                //Save source url
+                // Save source url
                 var source = osda.viewer.source;
                 var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
                 var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-                annotation.target.src = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
+                annotation.target.src = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
                 annotation.target.ext = source.fileFormat || ""; // - target.ext (extension)
                 
-                //Gets the bounds in order to save them for zooming in and highlight properties
+                // Gets the bounds in order to save them for zooming in and highlight properties
                 annotation.bounds = osda.viewer.drawer.viewport.getBounds() || {}; // - bounds
-				var finalimagelink = source["@id"].replace("/info.json", "");
+                var finalimagelink = source["@id"].replace("/info.json", "");
                 var highlightX = Math.round(position.left * source["width"]);
                 var highlightY = Math.round(position.top * source["width"]);
                 var highlightWidth = Math.round(position.width * source["width"]);
                 var highlightHeight = Math.round(position.height * source["width"]);
                 
-                //creates a link to the OSD server that contains the image to get
-                //the thumbnail of the selected portion of the image
+                // creates a link to the OSD server that contains the image to get
+                // the thumbnail of the selected portion of the image
                 annotation.target.thumb = finalimagelink + "/" + highlightX + "," + highlightY + "," + highlightWidth + "," + highlightHeight + "/full/0/native." + source["formats"][0];
                 if(isNew) annotation.rangePosition =     position || {};    // - rangePosition
                 
-                //updates the dates associated with creation and update
+                // updates the dates associated with creation and update
                 annotation.updated = new Date().toISOString(); // - updated
                 if (typeof annotation.created == 'undefined')
                     annotation.created = annotation.updated; // - created
@@ -830,30 +830,30 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
     };
     
     /** 
-	 * Detect if the annotation is an image annotation and there's a target, open
-	 * OSD instance.
-	 * @param {Object} an Annotation from the Annotator instance
-	 */
+     * Detect if the annotation is an image annotation and there's a target, open
+     * OSD instance.
+     * @param {Object} an Annotation from the Annotator instance
+     */
     OpenSeaDragon.prototype.isOpenSeaDragon = function (an){
         var annotator = this.annotator;
-		var rp = an.rangePosition;
-		
-		//Makes sure OSD exists and that annotation is an image annotation
-		//with a position in the OSD instance
-		var isOpenSeaDragon = (typeof annotator.osda != 'undefined');
-		var isContainer = (typeof an.target!='undefined' && an.target.container==this.viewer.id );
-		var isImage = (typeof an.media!='undefined' && an.media=='image');
-		var isRP = (typeof rp!='undefined');
-		var isSource = false;
-		
-		//Double checks that the image being displayed matches the annotations 
-		var source = this.viewer.source;
-		var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
-		var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
-		var compareUrl = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' ');
-		if(isContainer) isSource = (an.target.src == compareUrl);
-		
-		return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
+        var rp = an.rangePosition;
+        
+        // Makes sure OSD exists and that annotation is an image annotation
+        // with a position in the OSD instance
+        var isOpenSeaDragon = (typeof annotator.osda != 'undefined');
+        var isContainer = (typeof an.target!='undefined' && an.target.container==this.viewer.id );
+        var isImage = (typeof an.media!='undefined' && an.media=='image');
+        var isRP = (typeof rp!='undefined');
+        var isSource = false;
+        
+        // Double checks that the image being displayed matches the annotations 
+        var source = this.viewer.source;
+        var tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+        var functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
+        var compareUrl = tilesUrl!=''?tilesUrl:('' + functionUrl).replace(/\s+/g, ' ');
+        if(isContainer) isSource = (an.target.src == compareUrl);
+        
+        return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
     };
     
     /**
@@ -861,14 +861,14 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
      * @param {Object} an Annotation object from the Annotator instance
      */
     OpenSeaDragon.prototype._deleteAnnotation = function(an){
-        //Remove the annotation of the plugin Store
+        // Remove the annotation of the plugin Store
         var annotations = this.annotator.plugins['Store'].annotations;
         
-        //Failsafe in case annotation is not immediately removed from annotations list
+        // Failsafe in case annotation is not immediately removed from annotations list
         if (annotations.indexOf(an)>-1)
             annotations.splice(annotations.indexOf(an), 1);
         
-        //Refresh the annotations in the display
+        // Refresh the annotations in the display
         this.annotator.osda.refreshDisplay();
     };
     
@@ -881,12 +881,12 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         var isOpenSeaDragon = this.isOpenSeaDragon;
         var self = this;
             
-        //local functions
+        // local functions
         //-- Editor
         function annotationEditorHidden(editor) {
             if (EditOpenSeaDragonAn()){
                 annotator.osda._reset();
-                annotator.osda.refreshDisplay(); //Reload the display of annotations
+                annotator.osda.refreshDisplay(); // Reload the display of annotations
             }
             annotator.editor.OpenSeaDragon=-1;
             annotator.unsubscribe("annotationEditorHidden", annotationEditorHidden);
@@ -910,7 +910,7 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
         function annotationViewerShown(viewer,annotations) {
             var wrapper = jQuery('.annotator-wrapper').offset();
 
-            //Fix with positionCanvas
+            // Fix with positionCanvas
             var startPoint = {x: parseFloat(viewer.element[0].style.left),
                 y: parseFloat(viewer.element[0].style.top)};
         
@@ -921,12 +921,12 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
                 };
             viewer.element.css(newpos);
             
-            //Remove the time to wait until disapear, to be more faster that annotator by default
+            // Remove the time to wait until disapear, to be more faster that annotator by default
             viewer.element.find('.annotator-controls').removeClass(viewer.classes.showControls);
             
             annotator.viewer.subscribe("hide", hideViewer);
         };    
-        //subscribe to Annotator
+        // subscribe to Annotator
         annotator.subscribe("annotationEditorShown", annotationEditorShown)
             .subscribe("annotationDeleted", annotationDeleted)
             .subscribe("annotationViewerShown", annotationViewerShown);
@@ -940,18 +940,18 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 
 //----------------PUBLIC OBJECT TO CONTROL THE ANNOTATIONS----------------//
 
-//The name of the plugin that the user will write in the html
+// The name of the plugin that the user will write in the html
 OpenSeadragonAnnotation = ("OpenSeadragonAnnotation" in window) ? OpenSeadragonAnnotation : {};
 
 OpenSeadragonAnnotation = function (element, options) {
-    //local variables
+    // local variables
     var $ = jQuery;
     var options = options || {};
     options.optionsOpenSeadragon = options.optionsOpenSeadragon || {};
     options.optionsOSDA = options.optionsOSDA || {};
     options.optionsAnnotator = options.optionsAnnotator || {};
     
-    //if there isn't store optinos it will create a uri and limit variables for the Back-end of Annotations 
+    // if there isn't store optinos it will create a uri and limit variables for the Back-end of Annotations 
     if (typeof options.optionsAnnotator.store=='undefined')
         options.optionsAnnotator.store = {};
     var store = options.optionsAnnotator.store;
@@ -968,11 +968,11 @@ OpenSeadragonAnnotation = function (element, options) {
     if (typeof store.loadFromSearch.limit=='undefined')
         store.loadFromSearch.limit = 10000;
         
-    //global variables
+    // global variables
     this.currentUser = null;
 
     //-- Init all the classes --/
-    //Annotator
+    // Annotator
     this.annotator = $(element).annotator(options.optionsAnnotator.annotator).data('annotator');
     
     //-- Activate all the Annotator plugins --//
@@ -1011,8 +1011,11 @@ OpenSeadragonAnnotation = function (element, options) {
     //- OpenSeaDragon Plugins
     this.viewer.annotation(options.optionsOSDA);
     
-    //Set annotator.editor.OpenSeaDragon by default
+    // Set annotator.editor.OpenSeaDragon by default
     this.annotator.editor.OpenSeaDragon=-1;
+    
+    // We need to make sure that osda is accessible via annotator
+    this.annotator.osda = this;
 
     function reloadEditor(){
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, "annotator-field-0");

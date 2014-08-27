@@ -74,4 +74,4 @@ fi
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
 
-rake test:acceptance:${TEST_SUITE}["-v 3 ${FEATURE_PATH}"]
+paver test_acceptance -s ${TEST_SUITE} --extra_args="-v 3 ${FEATURE_PATH}"

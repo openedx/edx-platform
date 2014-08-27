@@ -66,5 +66,5 @@ def i_am_on_tab(step, tab_name):
 
 @step('I see a link for adding a new section$')
 def i_see_new_section_link(step):
-    link_css = 'a.new-courseware-section-button'
+    link_css = '.outline .button-new'
     assert world.css_has_text(link_css, 'New Section')

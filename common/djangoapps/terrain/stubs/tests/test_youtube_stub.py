@@ -4,7 +4,7 @@ Unit test for stub YouTube implementation.
 
 import unittest
 import requests
-from ..youtube import StubYouTubeService
+from ..youtube import StubYouTubeService, IFRAME_API_RESPONSE
 
 
 class StubYouTubeServiceTest(unittest.TestCase):

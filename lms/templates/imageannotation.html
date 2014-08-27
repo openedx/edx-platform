@@ -31,6 +31,7 @@
                 <%namespace name='static' file='/static_content.html'/>
                 ${static.css(group='style-vendor-tinymce-content', raw=True)}
                 ${static.css(group='style-vendor-tinymce-skin', raw=True)}
+                ${static.css(group='style-xmodule-annotations', raw=True)}
             </div> 
             <div id="catchDIV">
                 <div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
@@ -161,11 +162,12 @@
             richText: {
                 tinymce:{
                     selector: "li.annotator-item textarea",
-                    plugins: "image codemirror",
+                    plugins: "image link codemirror media",
                     menubar: false,
                     toolbar_items_size: 'small',
                     extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | image rubric | code ",
+                    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | code ",
+                    resize: "both",
                 }
             },
         },
@@ -180,23 +182,23 @@
 
     };
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-    
-    if (typeof Annotator != 'undefined'){
-            //remove old instances
+    var osda, annotator, catchOptions, Catch;
+    var startosda = function() {
+        //remove old instances
         if (Annotator._instances.length !== 0) {
           $('#imageHolder').annotator("destroy");
         }
         delete osda;
         //Load the plugin Image/Text Annotation
-        var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
+        osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
         
         var userId = ('${default_tab}'.toLowerCase() === 'instructor') ? 
             '${instructor_email}':
             '${user.email}';
 
         //Catch
-        var annotator = osda.annotator;
-        var catchOptions = {
+        annotator = osda.annotator;
+        catchOptions = {
             media:'image',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
@@ -213,10 +215,23 @@
         // if annotations are opened to everyone (2) or if they want to create no annotations (1 with no instructor)
         // then the table at the bottom of the source should be displayed
         if ("${annotation_mode}" == "everyone" || ("${annotation_mode}" == "instructor" && "${instructor_email}" != ""))
-            var Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+            Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 
         // if it is in instructor mode only (1), the annotator should be destroyed for all except the instructor
         if ("${annotation_mode}" == "instructor" && "${instructor_email}" == "" && !is_staff)
             osda.annotator.destroy();
+    }
+
+    // if the following is true, template is being rendered in LMS, otherwise it is in Studio
+    if (typeof Annotator !== 'undefined') {
+        startosda();
+    } else {
+        try {
+            require(["osda"], function(osda){
+                startosda();
+            });
+        } catch(error) {
+            console.log("Error: " + error.message + " - Annotator not loaded in LMS.");
+        }
     }
 </script>

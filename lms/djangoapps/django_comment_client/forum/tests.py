@@ -4,6 +4,7 @@ from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
@@ -276,6 +277,8 @@ class UserProfileTestCase(ModuleStoreTestCase):
         mock_request.side_effect = make_mock_request_impl(self.TEST_THREAD_TEXT, self.TEST_THREAD_ID)
         request = RequestFactory().get("dummy_url", data=params, **headers)
         request.user = self.student
+
+        mako_middleware_process_request(request)
         response = views.user_profile(
             request,
             self.course.id.to_deprecated_string(),

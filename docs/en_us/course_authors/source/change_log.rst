@@ -2,6 +2,22 @@
 Change Log
 ############
 
+**************
+August, 2014
+**************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 08/07/14
+     - Added information about reviewing and duplicating the contents of
+       previously-sent messages to the :ref:`Bulk Email` section.
+   * - 
+     - Updated the :ref:`view_enrollment_count` section to include the
+       breakdown by certification track in the enrollment section.
 
 ***********
 July, 2014
@@ -13,6 +29,14 @@ July, 2014
 
    * - Date
      - Change
+   * - 07/30/14
+     - Expanded the :ref:`Discussions for Students and Staff` chapter to
+       include information about adding posts, responses, and comments.
+   * - 07/23/14
+     - Added the section :ref:`Grade Ranges and Certificates` to the
+       :ref:`Establish a Grading Policy` chapter.
+   * - 07/22/14
+     - Added :ref:`Example Messages to Students` to the :ref:`Launch` chapter.
    * - 07/15/14
      - Added the :ref:`Discussions for Students and Staff` chapter.
    * - 07/11/14

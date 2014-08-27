@@ -127,6 +127,7 @@ class SplitTestFields(object):
         scope=Scope.content
     )
 
+
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
 @XBlock.wants('partitions')
 class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
@@ -266,6 +267,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
         is_root = root_xblock and root_xblock.location == self.location
         active_groups_preview = None
         inactive_groups_preview = None
+
         if is_root:
             [active_children, inactive_children] = self.descriptor.active_and_inactive_children()
             active_groups_preview = self.studio_render_children(
@@ -281,6 +283,7 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
             'is_configured': is_configured,
             'active_groups_preview': active_groups_preview,
             'inactive_groups_preview': inactive_groups_preview,
+            'group_configuration_url': self.descriptor.group_configuration_url,
         }))
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/split_test_author_view.js'))
         fragment.initialize_js('SplitTestAuthorView')
@@ -562,6 +565,23 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
             # TODO user.id - to be fixed by Publishing team
             self.system.modulestore.update_item(self, None)
         return Response()
+
+    @property
+    def group_configuration_url(self):
+        assert hasattr(self.system, 'modulestore') and hasattr(self.system.modulestore, 'get_course'), \
+            "modulestore has to be available"
+
+        course_module = self.system.modulestore.get_course(self.location.course_key)
+        group_configuration_url = None
+        if 'split_test' in course_module.advanced_modules:
+            user_partition = self.get_selected_partition()
+            if user_partition:
+                group_configuration_url = "{url}#{configuration_id}".format(
+                    url='/group_configurations/' + unicode(self.location.course_key),
+                    configuration_id=str(user_partition.id)
+                )
+
+        return group_configuration_url
 
     def _create_vertical_for_group(self, group, user_id):
         """

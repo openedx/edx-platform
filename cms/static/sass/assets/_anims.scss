@@ -247,3 +247,50 @@
 %anim-flashDouble {
   @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }
+
+
+// ====================
+
+
+// pulse
+@include keyframes(pulse) {
+  0% {
+    opacity: 0.0;
+  }
+
+  50% {
+    opacity: 1.0;
+  }
+
+  100% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-pulse {
+  @include animation(pulse $tmg-f1 ease-in-out 1);
+}
+
+// ====================
+
+
+// was-dropped
+@include keyframes(was-dropped) {
+  0% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-was-dropped {
+  @include animation(was-dropped $tmg-f1 ease-in-out 1);
+}

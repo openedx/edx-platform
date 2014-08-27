@@ -5,6 +5,7 @@ JSON views which the instructor dashboard requests.
 
 Many of these GETs may become PUTs in the future.
 """
+from django.views.decorators.http import require_POST
 
 import hashlib
 import json
@@ -15,12 +16,16 @@ from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.html import strip_tags
+import string  # pylint: disable=W0402
+import random
 from util.json_request import JsonResponse
+from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -34,10 +39,10 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response
 from courseware.models import StudentModule
+from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
-from instructor_task.views import get_task_completion_info
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
@@ -48,12 +53,12 @@ from instructor.enrollment import (
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
-import analytics.basic
-import analytics.distributions
-import analytics.csvs
+import instructor_analytics.basic
+import instructor_analytics.distributions
+import instructor_analytics.csvs
 import csv
 
-from submissions import api as sub_api # installed from the edx-submissions repository
+from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
 
@@ -539,13 +544,41 @@ def get_grading_config(request, course_id):
     course = get_course_with_access(
         request.user, 'staff', course_id, depth=None
     )
-    grading_config_summary = analytics.basic.dump_grading_context(course)
+    grading_config_summary = instructor_analytics.basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'grading_config_summary': grading_config_summary,
     }
     return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+    """
+    return the summary of all purchased transactions for a particular course
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    query_features = [
+        'id', 'username', 'email', 'course_id', 'list_price', 'coupon_code',
+        'unit_cost', 'purchase_time', 'orderitem_id',
+        'order_id',
+    ]
+
+    student_data = instructor_analytics.basic.purchase_transactions(course_id, query_features)
+
+    if not csv:
+        response_payload = {
+            'course_id': course_id.to_deprecated_string(),
+            'students': student_data,
+            'queried_features': query_features
+        }
+        return JsonResponse(response_payload)
+    else:
+        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
+        return instructor_analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
 
 
 @ensure_csrf_cookie
@@ -562,14 +595,14 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    available_features = analytics.basic.AVAILABLE_FEATURES
+    available_features = instructor_analytics.basic.AVAILABLE_FEATURES
     query_features = [
         'id', 'username', 'name', 'email', 'language', 'location',
         'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
         'goals',
     ]
 
-    student_data = analytics.basic.enrolled_students_features(course_id, query_features)
+    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -599,8 +632,157 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
-        return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
+        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+
+
+def save_registration_codes(request, course_id, generated_codes_list, group_name):
+    """
+    recursive function that generate a new code every time and saves in the Course Registration Table
+    if validation check passes
+    """
+    code = random_code_generator()
+
+    # check if the generated code is in the Coupon Table
+    matching_coupons = Coupon.objects.filter(code=code, is_active=True)
+    if matching_coupons:
+        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+
+    course_registration = CourseRegistrationCode(
+        code=code, course_id=course_id.to_deprecated_string(),
+        transaction_group_name=group_name, created_by=request.user
+    )
+    try:
+        course_registration.save()
+        generated_codes_list.append(course_registration)
+    except IntegrityError:
+        return save_registration_codes(request, course_id, generated_codes_list, group_name)
+
+
+def registration_codes_csv(file_name, codes_list, csv_type=None):
+    """
+    Respond with the csv headers and data rows
+    given a dict of codes list
+    :param file_name:
+    :param codes_list:
+    :param csv_type:
+    """
+    # csv headers
+    query_features = ['code', 'course_id', 'transaction_group_name', 'created_by', 'redeemed_by']
+
+    registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
+    header, data_rows = instructor_analytics.csvs.format_dictlist(registration_codes, query_features)
+    return instructor_analytics.csvs.create_csv_response(file_name, header, data_rows)
+
+
+def random_code_generator():
+    """
+    generate a random alphanumeric code of length defined in
+    REGISTRATION_CODE_LENGTH settings
+    """
+    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
+    return string.join((random.choice(chars) for _ in range(code_length)), '')
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def get_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    #filter all the  course registration codes
+    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+
+    group_name = request.POST['download_transaction_group_name']
+    if group_name:
+        registration_codes = registration_codes.filter(transaction_group_name=group_name)
+
+    csv_type = 'download'
+    return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def generate_registration_codes(request, course_id):
+    """
+    Respond with csv which contains a summary of all Generated Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_registration_codes = []
+
+    # covert the course registration code number into integer
+    try:
+        course_code_number = int(request.POST['course_registration_code_number'])
+    except ValueError:
+        course_code_number = int(float(request.POST['course_registration_code_number']))
+
+    group_name = request.POST['transaction_group_name']
+
+    for _ in range(course_code_number):  # pylint: disable=W0621
+        save_registration_codes(request, course_id, course_registration_codes, group_name)
+
+    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def active_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Active Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    # find all the registration codes in this course
+    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('transaction_group_name')
+
+    group_name = request.POST['active_transaction_group_name']
+    if group_name:
+        registration_codes_list = registration_codes_list.filter(transaction_group_name=group_name)
+    # find the redeemed registration codes if any exist in the db
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    if code_redemption_set.exists():
+        redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
+        # exclude the redeemed registration codes from the registration codes list and you will get
+        # all the registration codes that are active
+        registration_codes_list = registration_codes_list.exclude(code__in=redeemed_registration_codes)
+
+    return registration_codes_csv("Active_Registration_Codes.csv", registration_codes_list)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def spent_registration_codes(request, course_id):  # pylint: disable=W0613
+    """
+    Respond with csv which contains a summary of all Spent(used) Registration Codes.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
+    # find the redeemed registration codes if any exist in the db
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    spent_codes_list = []
+    if code_redemption_set.exists():
+        redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
+        # filter the Registration Codes by course id and the redeemed codes and
+        # you will get a list of all the spent(Redeemed) Registration Codes
+        spent_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id, code__in=redeemed_registration_codes).order_by('transaction_group_name')
+
+        group_name = request.POST['spent_transaction_group_name']
+        if group_name:
+            spent_codes_list = spent_codes_list.filter(transaction_group_name=group_name)  # pylint:  disable=E1103
+
+    csv_type = 'spent'
+    return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
 
 
 @ensure_csrf_cookie
@@ -611,9 +793,10 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
     # TODO: the User.objects query and CSV generation here could be
-    # centralized into analytics. Currently analytics has similar functionality
-    # but not quite what's needed.
+    # centralized into instructor_analytics. Currently instructor_analytics
+    # has similar functionality but not quite what's needed.
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
         response = HttpResponse(mimetype='text/csv')
@@ -656,7 +839,7 @@ def get_distribution(request, course_id):
     else:
         feature = str(feature)
 
-    available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
+    available_features = instructor_analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
     if not feature in available_features + (None,):
         return HttpResponseBadRequest(strip_tags(
@@ -667,12 +850,12 @@ def get_distribution(request, course_id):
         'course_id': course_id.to_deprecated_string(),
         'queried_feature': feature,
         'available_features': available_features,
-        'feature_display_names': analytics.distributions.DISPLAY_NAMES,
+        'feature_display_names': instructor_analytics.distributions.DISPLAY_NAMES,
     }
 
     p_dist = None
     if not feature is None:
-        p_dist = analytics.distributions.profile_distribution(course_id, feature)
+        p_dist = instructor_analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
             'feature': p_dist.feature,
             'feature_display_name': p_dist.feature_display_name,
@@ -851,45 +1034,6 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
-def extract_task_features(task):
-    """
-    Convert task to dict for json rendering.
-    Expects tasks have the following features:
-    * task_type (str, type of task)
-    * task_input (dict, input(s) to the task)
-    * task_id (str, celery id of the task)
-    * requester (str, username who submitted the task)
-    * task_state (str, state of task eg PROGRESS, COMPLETED)
-    * created (datetime, when the task was completed)
-    * task_output (optional)
-    """
-    # Pull out information from the task
-    features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
-    task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
-    # Some information (created, duration, status, task message) require additional formatting
-    task_feature_dict['created'] = task.created.isoformat()
-
-    # Get duration info, if known
-    duration_sec = 'unknown'
-    if hasattr(task, 'task_output') and task.task_output is not None:
-        try:
-            task_output = json.loads(task.task_output)
-        except ValueError:
-            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
-        else:
-            if 'duration_ms' in task_output:
-                duration_sec = int(task_output['duration_ms'] / 1000.0)
-    task_feature_dict['duration_sec'] = duration_sec
-
-    # Get progress status message & success information
-    success, task_message = get_task_completion_info(task)
-    status = _("Complete") if success else _("Incomplete")
-    task_feature_dict['status'] = status
-    task_feature_dict['task_message'] = task_message
-
-    return task_feature_dict
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -904,6 +1048,24 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_email_content(request, course_id):  # pylint: disable=unused-argument
+    """
+    List the content of bulk emails sent
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    task_type = 'bulk_course_email'
+    # First get tasks list of bulk emails sent
+    emails = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+
+    response_payload = {
+        'emails': map(extract_email_features, emails),
     }
     return JsonResponse(response_payload)
 

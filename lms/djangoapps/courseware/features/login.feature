@@ -46,3 +46,13 @@ Feature: LMS.Login in as a registered user
     And I visit the url "/login?next=http://www.google.com/"
     When I submit my credentials on the login form
     Then I should be on the dashboard page
+
+    Scenario: Login with a redirect with parameters
+    Given I am an edX user
+    And I am not logged in
+    And I visit the url "/debug/show_parameters?foo=hello&bar=world"
+    And I should see that the path is "/accounts/login?next=/debug/show_parameters%3Ffoo%3Dhello%26bar%3Dworld"
+    When I submit my credentials on the login form
+    And I wait for "2" seconds
+    Then I should see "foo: u'hello'" somewhere on the page
+    And I should see "bar: u'world'" somewhere on the page
