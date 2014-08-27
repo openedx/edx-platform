@@ -3,6 +3,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 """
 
 from split import SplitMongoModuleStore, EXCLUDE_ALL
+from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 from xmodule.modulestore.draft_and_published import (
@@ -252,6 +253,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             user_id,
             # Directly using the replace function rather than the for_branch function
             # because for_branch obliterates the version_guid and will lead to missed version conflicts.
+            # TODO Instead, the for_branch implementation should be fixed in the Opaque Keys library.
             location.course_key.replace(branch=ModuleStoreEnum.BranchName.draft),
             location.course_key.for_branch(ModuleStoreEnum.BranchName.published),
             [location],
@@ -277,7 +279,22 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
         :raises InvalidVersionError: if no published version exists for the location specified
         """
-        raise NotImplementedError()
+        if location.category in DIRECT_ONLY_CATEGORIES:
+            return
+
+        if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
+            raise InvalidVersionError(location)
+
+        SplitMongoModuleStore.copy(
+            self,
+            user_id,
+            # Directly using the replace function rather than the for_branch function
+            # because for_branch obliterates the version_guid and will lead to missed version conflicts.
+            # TODO Instead, the for_branch implementation should be fixed in the Opaque Keys library.
+            location.course_key.replace(branch=ModuleStoreEnum.BranchName.published),
+            location.course_key.for_branch(ModuleStoreEnum.BranchName.draft),
+            [location]
+        )
 
     def get_course_history_info(self, course_locator):
         """

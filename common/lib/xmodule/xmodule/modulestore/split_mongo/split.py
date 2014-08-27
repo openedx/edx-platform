@@ -1421,7 +1421,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             # brand new course
             raise ItemNotFoundError(destination_course)
         if destination_course.branch not in index_entry['versions']:
-            # must be publishing the dag root if there's no current dag
+            # must be copying the dag root if there's no current dag
             root_block_id = source_structure['root']
             if not any(root_block_id == subtree.block_id for subtree in subtree_list):
                 raise ItemNotFoundError(u'Must publish course root {}'.format(root_block_id))
@@ -1457,7 +1457,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                     )
             # update/create the subtree and its children in destination (skipping blacklist)
             orphans.update(
-                self._publish_subdag(
+                self._copy_subdag(
                     user_id, destination_structure['_id'],
                     subtree_root.block_id, source_structure['blocks'], destination_blocks, blacklist
                 )
@@ -1886,7 +1886,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         destination_parent['fields']['children'] = destination_reordered
         return orphans
 
-    def _publish_subdag(self, user_id, destination_version, block_id, source_blocks, destination_blocks, blacklist):
+    def _copy_subdag(self, user_id, destination_version, block_id, source_blocks, destination_blocks, blacklist):
         """
         Update destination_blocks for the sub-dag rooted at block_id to be like the one in
         source_blocks excluding blacklist.
@@ -1900,7 +1900,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if destination_block:
             # reorder children to correspond to whatever order holds for source.
             # remove any which source no longer claims (put into orphans)
-            # add any which are being published
+            # add any which are being copied
             source_children = new_block['fields'].get('children', [])
             existing_children = destination_block['fields'].get('children', [])
             destination_reordered = SparseList()
@@ -1939,7 +1939,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             for child in destination_block['fields'].get('children', []):
                 if child not in blacklist:
                     orphans.update(
-                        self._publish_subdag(
+                        self._copy_subdag(
                             user_id, destination_version, child, source_blocks, destination_blocks, blacklist
                         )
                     )

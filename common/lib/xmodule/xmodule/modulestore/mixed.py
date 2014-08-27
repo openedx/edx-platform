@@ -472,7 +472,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     def revert_to_published(self, location, user_id):
         """
         Reverts an item to its last published version (recursively traversing all of its descendants).
-        If no published version exists, a VersionConflictError is thrown.
+        If no published version exists, an InvalidVersionError is thrown.
 
         If a published version exists but there is no draft version of this item or any of its descendants, this
         method is a no-op.

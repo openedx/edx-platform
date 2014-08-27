@@ -762,7 +762,7 @@ class TestMixedModuleStore(unittest.TestCase):
             with self.assertRaises(ItemNotFoundError):
                 path_to_location(self.store, location)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_revert_to_published_root_draft(self, default_ms):
         """
         Test calling revert_to_published on draft vertical.
@@ -791,7 +791,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(vertical_children_num, len(published_parent.children))
         self.assertEqual(reverted_parent, published_parent)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_revert_to_published_root_published(self, default_ms):
         """
         Test calling revert_to_published on a published vertical with a draft child.
@@ -811,7 +811,7 @@ class TestMixedModuleStore(unittest.TestCase):
         reverted_problem = self.store.get_item(self.problem_x1a_1)
         self.assertEqual(orig_display_name, reverted_problem.display_name)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_revert_to_published_no_draft(self, default_ms):
         """
         Test calling revert_to_published on vertical with no draft content does nothing.
@@ -825,7 +825,7 @@ class TestMixedModuleStore(unittest.TestCase):
         reverted_vertical = self.store.get_item(self.vertical_x1a)
         self.assertEqual(orig_vertical, reverted_vertical)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_revert_to_published_no_published(self, default_ms):
         """
         Test calling revert_to_published on vertical with no published version errors.
@@ -835,7 +835,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(InvalidVersionError):
             self.store.revert_to_published(self.vertical_x1a, self.user_id)
 
-    @ddt.data('draft')
+    @ddt.data('draft', 'split')
     def test_revert_to_published_direct_only(self, default_ms):
         """
         Test calling revert_to_published on a direct-only item is a no-op.
