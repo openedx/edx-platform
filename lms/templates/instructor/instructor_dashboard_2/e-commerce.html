@@ -280,67 +280,73 @@
      generate_registration_code_form.submit(function () {
       registration_code_error.attr('style', 'display: none');
       generate_registration_button.attr('disabled', true);
-      var total_registration_codes = $('input[name="total-registration-codes"]').val();
-      var invoice_number = $('input[name="total-registration-codes"]').val();
+      var total_registration_codes = $('input[name="total_registration_codes"]').val();
       var contact_name = $('input[name="contact_name"]').val();
       var sale_price = $('input[name="sale_price"]').val();
       var company_name = $('input[name="company_name"]').val();
       var contact_email = $('input[name="contact_email"]').val();
+      var address_line = $('input[name="address_line_1"]').val();
 
       if (company_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Company Name');
+        registration_code_error.text('Please enter the company name');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the non-numeric value for Company Name');
+        registration_code_error.text('Please enter the non-numeric value for company name');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (sale_price == '') {
+       if (contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Sale Price');
-        generate_registration_button.removeAttr('disabled');
-        return false
-      }
-      if (!($.isNumeric(sale_price))) {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the numeric value for Sale Price');
-        generate_registration_button.removeAttr('disabled');
-        return false
-      }
-      if (total_registration_codes == '') {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Total Registration Codes');
-        generate_registration_button.removeAttr('disabled');
-        return false
-      }
-      if (!($.isNumeric(total_registration_codes))) {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the numeric value for Total Registration Codes');
-        generate_registration_button.removeAttr('disabled');
-        return false;
-      }
-      if (contact_name == '') {
-        registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Contact Name');
+        registration_code_error.text('Please enter the contact name');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (contact_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the Contact Email');
+        registration_code_error.text('Please enter the contact email');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please Enter the valid email address');
+        registration_code_error.text('Please enter the valid email address');
         generate_registration_button.removeAttr('disabled');
+        return false;
       }
-
+      if (address_line == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the billing address');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (sale_price == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the sale price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(sale_price))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the numeric value for sale price');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (total_registration_codes == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the total registration codes');
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(total_registration_codes))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the numeric value for total registration codes');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
       var modal_overLay = $('#lean_overlay')
       var registration_code_modal = $('#registration_code_generation_modal');
       registration_code_modal.hide();
@@ -369,7 +375,7 @@
        // Check if empty of not
        if (course_price === '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Enter the Course Price')}");
+         $('#set_price_form #course_form_error').text("${_('Please enter the course price')}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
@@ -381,7 +387,7 @@
        }
        if (currency == '') {
          $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text("${_('Please Select the Currency')}");
+         $('#set_price_form #course_form_error').text("${_('Please select the currency')}");
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
@@ -396,25 +402,25 @@
        if (code === '') {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Code')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon code')}");
          return false;
        }
        if (coupon_discount == '0') {
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Greater than 0')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon discount value greater than 0')}");
          $("#add_coupon_button").removeAttr('disabled');
          return false;
        }
        if (parseInt(coupon_discount) > 100) {
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Coupon Discount Value Less than or Equal to 100')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the coupon discount value less than or equal to 100')}");
          $("#add_coupon_button").removeAttr('disabled');
          return false;
        }
        if (!$.isNumeric(coupon_discount)) {
          $("#add_coupon_button").removeAttr('disabled');
          $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text("${_('Please Enter the Numeric value for Discount')}");
+         $('#add_coupon_form #coupon_form_error').text("${_('Please enter the numeric value for discount')}");
          return false;
        }
      });
@@ -514,13 +520,20 @@
      $('input#coupon_discount').val('');
      $('textarea#coupon_description').val('');
      $('input[name="company_name"]').val('');
-     $('input[name="total-registration-codes"]').val('');
+     $('input[name="total_registration_codes"]').val('');
+     $('input[name="address_line_1"]').val('');
+     $('input[name="address_line_2"]').val('');
+     $('input[name="address_line_3"]').val('');
+     $('input[name="city"]').val('');
+     $('input[name="state"]').val('');
+     $('input[name="zip"]').val('');
+     $('input[name="country"]').val('');
+     $('input[name="purchase_order"]').val('');
      $('input[name="contact_name"]').val('');
      $('input[name="sale_price"]').val('');
      $('input[name="contact_email"]').val('');
-     $('input[name="tax"]').val('');
      $('input[name="invoice"]').attr('checked', 'checked');
-     $('input[name="reference"]').val('');
+     $('input[name="company_reference"]').val('');
      $('input[name="internal_reference"]').val('');
    }
 </script>
