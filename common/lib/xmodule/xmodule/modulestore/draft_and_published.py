@@ -96,7 +96,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         raise NotImplementedError
 
     @abstractmethod
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         raise NotImplementedError
 
     @abstractmethod

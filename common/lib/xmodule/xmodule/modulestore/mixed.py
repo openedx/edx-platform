@@ -540,7 +540,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             )
         )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
         Returns whether this xblock is draft, public, or private.
 
@@ -552,7 +552,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         course_id = xblock.scope_ids.usage_id.course_key
         store = self._get_modulestore_for_courseid(course_id)
-        return store.compute_publish_state(xblock)
+        return store.has_published_version(xblock)
 
     @strip_key
     def publish(self, location, user_id, **kwargs):

@@ -90,16 +90,6 @@ class ModuleStoreEnum(object):
         test = -3
 
 
-class PublishState(object):
-    """
-    The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
-    are no longer used in Studio, but they are still referenced in a few places in LMS.
-    """
-    draft = 'draft'
-    private = 'private'
-    public = 'public'
-
-
 class ModuleStoreRead(object):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
@@ -307,15 +297,9 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns whether this xblock is draft, public, or private.
-
-        Returns:
-            PublishState.draft - content is in the process of being edited, but still has a previous
-                version deployed to LMS
-            PublishState.public - content is locked and deployed to LMS
-            PublishState.private - content is editable and not deployed to LMS
+        Returns true if this xblock exists in the published course regardless of whether it's up to date
         """
         pass
 
@@ -529,11 +513,11 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 None
             )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns PublishState.public since this is a read-only store.
+        Returns True since this is a read-only store.
         """
-        return PublishState.public
+        return True
 
     def heartbeat(self):
         """
