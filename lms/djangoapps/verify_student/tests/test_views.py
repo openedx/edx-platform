@@ -38,7 +38,7 @@ from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 
 def mock_render_to_response(*args, **kwargs):
