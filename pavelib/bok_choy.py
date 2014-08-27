@@ -5,7 +5,7 @@ http://bok-choy.readthedocs.org/en/latest/
 from paver.easy import task, needs, cmdopts, sh
 from pavelib.utils.test.suites.bokchoy_suite import BokChoyTestSuite
 from pavelib.utils.envs import Env
-from pavelib.utils.test.utils import check_firefox_and_selenium_versions
+from pavelib.utils.test.utils import check_firefox_and_selenium_version_compatibility
 from optparse import make_option
 
 try:
@@ -25,7 +25,7 @@ __test__ = False  # do not collect
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity"),
-    make_option("--skip-version-check", action='store_false', dest="check_versions")
+    make_option("--skip_firefox_selenium_compatibility_check", action='store_false', dest="check_firefox_selenium_compatibility")
 ])
 def test_bokchoy(options):
     """
@@ -39,8 +39,8 @@ def test_bokchoy(options):
     - path/to/test.py:TestFoo.test_bar
     It can also be left blank to run all tests in the suite.
     """
-    if getattr(options, 'check_versions', True):
-        check_firefox_and_selenium_versions()
+    if getattr(options, 'check_firefox_selenium_compatibility', True):
+        check_firefox_and_selenium_version_compatibility()
         
     opts = {
         'test_spec': getattr(options, 'test_spec', None),

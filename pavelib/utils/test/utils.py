@@ -55,15 +55,12 @@ def clean_mongo():
         repo_root=Env.REPO_ROOT,
     ))
 
-def check_firefox_and_selenium_versions():
+def check_firefox_and_selenium_version_compatibility():
     """
     Check that the pairing of firefox and selenium version is a known compatible one.
     """
     firefox_ver = subprocess.check_output("firefox --version", shell=True).strip()
-    print firefox_ver
-
     selenium_ver = subprocess.check_output( "pip freeze | grep selenium==", shell=True).strip()
-    print selenium_ver
 
     compatible_versions = [
         ("Mozilla Firefox 28.0", "selenium==2.42.1"),
@@ -71,6 +68,14 @@ def check_firefox_and_selenium_versions():
         ("Mozilla Firefox 25.0", "selenium==2.39.0"),
     ]
 
-    if (firefox_ver, selenium_ver) not in compatible_versions:
-        raise Exception('Browser and selenium versions not compatible. Please use {}.'.format(compatible_versions[0]))
+    current_versions = (firefox_ver, selenium_ver)
+
+    if current_versions not in compatible_versions:
+        raise Exception(
+            'Browser and selenium versions not compatible.\nCurrently installed versions:\n{}.\n'
+            '\nKnown compatible versions:\n{}'.format(
+                current_versions,
+                "\n".join(str(i) for i in compatible_versions),
+            )
+        )
 
