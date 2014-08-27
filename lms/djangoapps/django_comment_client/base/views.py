@@ -208,7 +208,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         body=post["body"]
     )
     comment.save()
-    event_data = {'comment_id': comment.id}
+    event_data = {'comment_id': comment.id, 'forum_id': comment.commentable_id}
     if thread_id:
         event_data['thread_id'] = thread_id
     if parent_id:
