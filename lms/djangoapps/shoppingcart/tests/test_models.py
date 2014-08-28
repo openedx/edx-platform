@@ -337,6 +337,16 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
+    def test_user_cart_has_both_items(self):
+        """
+        This test exists b/c having both CertificateItem and PaidCourseRegistration in an order used to break
+        PaidCourseRegistration.contained_in_order
+        """
+        cart = Order.get_cart_for_user(self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.assertTrue(PaidCourseRegistration.contained_in_order(cart, self.course_key))
+
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CertificateItemTest(ModuleStoreTestCase):
