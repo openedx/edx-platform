@@ -1,20 +1,8 @@
-<!--
-
-DESIGN/UI NOTES:
-
-* create-course and new-course prefixed classes have been changed to use rerun-courses plus generic form-create class
-* changed form <input /> elements to <button> elements
-
-- - -
-
-TODO:
-
-* sync up styling of stateful classes
-* need to add support for allow_unicode_course_id in real view's template
-
- -->
-
 <%inherit file="../../base.html" />
+
+<%block name="view_notes">
+  <%include file="_note-usage.html" />
+</%block>
 
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>

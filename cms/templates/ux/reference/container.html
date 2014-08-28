@@ -1,5 +1,9 @@
 <%inherit file="../../base.html" />
 
+<%block name="view_notes">
+    <%include file="_note-usage.html" />
+</%block>
+
 <%!
   import logging
   from util.date_utils import get_default_time_display
