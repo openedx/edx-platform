@@ -478,8 +478,11 @@ class PaidCourseRegistration(OrderItem):
         """
         Is the course defined by course_id contained in the order?
         """
-        return course_id in [item.paidcourseregistration.course_id
-                             for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
+        return course_id in [
+            item.course_id
+            for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")
+            if isinstance(item, cls)
+        ]
 
     @classmethod
     def get_total_amount_of_purchased_item(cls, course_key):
