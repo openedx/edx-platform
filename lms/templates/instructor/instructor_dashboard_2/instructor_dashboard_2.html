@@ -66,7 +66,7 @@
       %if studio_url:
       <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
       %endif
-      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
+      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD') and sections[0]['access']['admin']:
       <a class="instructor-info-action" href="${ old_dashboard_url }"> ${_("Revert to Legacy Dashboard")} </a>
       %endif
     </div>
