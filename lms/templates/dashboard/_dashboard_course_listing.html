@@ -222,7 +222,9 @@
       % endif
 
 % if show_email_settings:
-        % if not is_course_blocked:
+        % if course.id.to_deprecated_string() in course_optouts_force:
+        <div title="${_('Your registered Email address might be wrong or denied by Spam-filter')}" class="email-settings f_label right tiny radius alert" style="margin-right:1rem;">${_('Email not delivered')}</div>not is_course_blocked:
+        % elif not is_course_blocked:
         <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" data-optout="${course.id.to_deprecated_string() in course_optouts}">${_('Email Settings')}</a>
         % else:
         <a class="disable-look-settings" data-course-id="${course.id.to_deprecated_string()}" data-course-number="${course.number}" data-optout="${course.id.to_deprecated_string() in course_optouts}">${_('Email Settings')}</a>
