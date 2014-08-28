@@ -310,6 +310,8 @@ class UsersList(SecureListAPIView):
             user.is_staff = is_staff
         user.save()
 
+        # Be sure to always create a UserProfile record when adding users
+        # Bad things happen with the UserSerializer if one does not exist
         profile = UserProfile(user=user)
         profile.name = '{} {}'.format(first_name, last_name)
         profile.city = city
