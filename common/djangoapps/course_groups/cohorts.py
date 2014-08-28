@@ -4,6 +4,7 @@ forums, and to the cohort admin views.
 """
 
 from django.http import Http404
+
 import logging
 import random
 
@@ -86,14 +87,14 @@ def is_commentable_cohorted(course_key, commentable_id):
 
 def get_cohorted_commentables(course_key):
     """
-    Given a course_key return a list of strings representing cohorted commentables
+    Given a course_key return a set of strings representing cohorted commentables.
     """
 
     course = courses.get_course_by_id(course_key)
 
     if not course.is_cohorted:
         # this is the easy case :)
-        ans = []
+        ans = set()
     else:
         ans = course.cohorted_discussions
 
@@ -213,8 +214,13 @@ def add_cohort(course_key, name):
                                       name=name).exists():
         raise ValueError("Can't create two cohorts with the same name")
 
+    try:
+        course = courses.get_course_by_id(course_key)
+    except Http404:
+        raise ValueError("Invalid course_key")
+
     return CourseUserGroup.objects.create(
-        course_id=course_key,
+        course_id=course.id,
         group_type=CourseUserGroup.COHORT,
         name=name
     )
@@ -240,7 +246,6 @@ def add_user_to_cohort(cohort, username_or_email):
 
     Raises:
         User.DoesNotExist if can't find user.
-
         ValueError if user already present in this cohort.
     """
     user = get_user_by_username_or_email(username_or_email)
