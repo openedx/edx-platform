@@ -65,15 +65,15 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
     def test_course_sale_features(self):
 
         query_features = [
-            'company_name', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
-            'purchase_order_number', 'company_contact_name', 'company_contact_email', 'created_by', 'internal_reference', 'invoice_number',
+            'company_name', 'company_email', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
+            'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by', 'internal_reference', 'invoice_number',
             'codes', 'course_id'
         ]
 
         #create invoice
         sale_invoice = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='Testw_1',
-            company_contact_email='test2@test.com', purchase_order_number='2Fwe23S', internal_reference="ABC",
+            total_amount=1234.32, company_name='Test1', company_email='test@company.com', recipient_name='Testw_1',
+            recipient_email='test2@test.com', customer_reference_number='2Fwe23S', internal_reference="ABC",
             company_reference='', course_id=self.course.id
         )
         for i in range(5):
@@ -87,12 +87,13 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
 
         for sale_record in course_sale_records_list:
             self.assertEqual(sale_record['total_amount'], sale_invoice.total_amount)
-            self.assertEqual(sale_record['company_contact_email'], sale_invoice.company_contact_email)
-            self.assertEqual(sale_record['company_contact_name'], sale_invoice.company_contact_name)
+            self.assertEqual(sale_record['recipient_email'], sale_invoice.recipient_email)
+            self.assertEqual(sale_record['recipient_name'], sale_invoice.recipient_name)
             self.assertEqual(sale_record['company_name'], sale_invoice.company_name)
+            self.assertEqual(sale_record['company_email'], sale_invoice.company_email)
             self.assertEqual(sale_record['internal_reference'], sale_invoice.internal_reference)
             self.assertEqual(sale_record['company_reference'], sale_invoice.company_reference)
-            self.assertEqual(sale_record['purchase_order_number'], sale_invoice.purchase_order_number)
+            self.assertEqual(sale_record['customer_reference_number'], sale_invoice.customer_reference_number)
             self.assertEqual(sale_record['invoice_number'], sale_invoice.id)
             self.assertEqual(sale_record['created_by'], self.instructor)
             self.assertEqual(sale_record['total_used_codes'], 0)
@@ -114,9 +115,10 @@ class TestCourseRegistrationCodeAnalyticsBasic(TestCase):
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
-            'contact_name': 'Test123', 'contact_email': 'test@123.com', 'address_line_1': 'Portland Street',
-            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'purchase_order_number': '123A23F', 'company_reference': '', 'internal_reference': '', 'invoice': ''
+            'company_email': 'test@company.com', 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
+            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '',
+            'state': '', 'zip': '', 'country': '', 'customer_reference_number': '123A23F',
+            'company_reference': '', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
