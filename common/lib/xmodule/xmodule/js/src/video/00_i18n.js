@@ -11,6 +11,13 @@ function() {
      */
 
     return {
+        'Play': gettext('Play'),
+        'Pause': gettext('Pause'),
+        'Mute': gettext('Mute'),
+        'Unmute': gettext('Unmute'),
+        'Exit full browser': gettext('Exit full browser'),
+        'Fill browser': gettext('Fill browser'),
+        'Speed': gettext('Speed'),
         'Volume': gettext('Volume'),
         // Translators: Volume level equals 0%.
         'Muted': gettext('Muted'),
