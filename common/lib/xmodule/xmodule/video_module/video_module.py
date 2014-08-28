@@ -84,6 +84,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             resource_string(module, 'js/src/video/07_video_volume_control.js'),
             resource_string(module, 'js/src/video/08_video_speed_control.js'),
             resource_string(module, 'js/src/video/09_video_caption.js'),
+            resource_string(module, 'js/src/video/10_commands.js'),
             resource_string(module, 'js/src/video/10_main.js')
         ]
     }
@@ -92,7 +93,6 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         resource_string(module, 'css/video/accessible_menu.scss'),
     ]}
     js_module_name = "Video"
-
 
     def get_html(self):
         track_url = None

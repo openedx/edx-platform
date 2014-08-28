@@ -198,7 +198,7 @@ function (Iterator) {
             var speed = $(event.currentTarget).parent().data('speed');
 
             this.closeMenu();
-            this.setSpeed(this.state.speedToString(speed));
+            this.state.videoCommands.execute('speed', speed);
 
             return false;
         },
