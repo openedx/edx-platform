@@ -1,6 +1,22 @@
 ############
 Change Log
 ############
+       
+*****************
+September, 2014
+*****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 09/02/14
+     - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
+       Staff` chapters to include information about choosing the type of post
+       and to reflect changes in the user interface.
+
 
 **************
 August, 2014

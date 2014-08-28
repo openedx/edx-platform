@@ -305,7 +305,7 @@ thread_type
 --------------------
   Identifies the type of post as a "question" or "discussion".  
 
-  **History**: Added 12 Aug 2014.
+  **History**: Added 2 Sep 2014.
 
 ********************
 Comment Fields
@@ -350,7 +350,7 @@ endorsement
   response to a post was endorsed and the numeric user ID (from
   ``auth_user.id``) of the person who endorsed it.
 
-  **History**: Added 12 Aug 2014.
+  **History**: Added 2 Sep 2014.
 
 --------------------
 comment_thread_id
