@@ -444,7 +444,9 @@
             ## Translators: This labels the selector for which group of students can view a post
             ${_("Make visible to:")}
             <select class="group-filter-select new-post-group" name="group_id">
+                ${'<% if (user_is_staff) { %>'}
                 <option value="">${_("All Groups")}</option>
+                ${'<% } %>'}
                 ${'<% _.each(cohort_options, function(opt) { %>'}
                     <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
                 ${'<% }); %>'}

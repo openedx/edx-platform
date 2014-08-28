@@ -14,7 +14,7 @@ class CourseUserGroup(models.Model):
     course, and cohorts are used to split up the forums by group.
     """
     class Meta:
-        unique_together = (('name', 'course_id'), )
+        unique_together = (('name', 'course_id', 'group_type'), )
 
     name = models.CharField(max_length=255,
                             help_text=("What is the name of this group?  "
@@ -29,6 +29,8 @@ class CourseUserGroup(models.Model):
 
     # For now, only have group type 'cohort', but adding a type field to support
     # things like 'question_discussion', 'friends', 'off-line-class', etc
+    ANY = 'any'
     COHORT = 'cohort'
-    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
+    WORKGROUP = 'workgroup'
+    GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'), (WORKGROUP, 'Workgroup'))
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)

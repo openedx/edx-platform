@@ -5,8 +5,9 @@ from django.conf import settings
 from django.test.utils import override_settings
 
 from course_groups.models import CourseUserGroup
-from course_groups.cohorts import (get_cohort, get_course_cohorts,
-                                   is_commentable_cohorted, get_cohort_by_name)
+from course_groups.cohorts import (add_cohort, get_cohort, get_course_cohorts, add_user_to_cohort,
+                                   is_commentable_cohorted, get_cohort_by_name, get_cohort_by_id,
+                                   get_course_cohort_names)
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -103,6 +104,10 @@ class TestCohorts(django.test.TestCase):
         cohort = CourseUserGroup.objects.create(name="TestCohort",
                                                 course_id=course.id,
                                                 group_type=CourseUserGroup.COHORT)
+
+        # we shouldn't be able to create a cohort of the same name
+        with self.assertRaises(ValueError):
+            add_cohort(course.id, 'TestCohort')
 
         cohort.users.add(user)
 
@@ -254,3 +259,93 @@ class TestCohorts(django.test.TestCase):
         self.assertTrue(
             is_commentable_cohorted(course.id, to_id("Feedback")),
             "Feedback was listed as cohorted.  Should be.")
+
+    def test_cohort_workgroup(self):
+        """
+        Test workgroup cohorts.
+        """
+
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(course.is_cohorted)
+
+        user = User.objects.create(username="test", email="a@b.com")
+
+        # Create cohorts
+        cohort = CourseUserGroup.objects.create(name="TestCohort",
+                                                course_id=course.id,
+                                                group_type=CourseUserGroup.COHORT)
+        cohort.users.add(user)
+
+        cohort2 = CourseUserGroup.objects.create(name="TestCohort2",
+                                                 course_id=course.id,
+                                                 group_type=CourseUserGroup.COHORT)
+
+        # Make the course cohorted...
+        self.config_course_cohorts(course, [], cohorted=True)
+
+        # we should be able to create a workgroup cohort of the same group
+        workgroup_cohort = add_cohort(course.id, "TestCohort", group_type=CourseUserGroup.WORKGROUP)
+
+        # add the user to a workgroup_cohort
+        (_, previous_cohort) = add_user_to_cohort(workgroup_cohort,
+                                                  user.username,
+                                                  CourseUserGroup.WORKGROUP,
+                                                  allow_multiple=True)
+        self.assertIsNone(previous_cohort)
+
+        # normal get_cohort
+        self.assertEquals(cohort, get_cohort(user, course.id))
+        # get workgroup_cohort
+        self.assertEquals(
+            workgroup_cohort,
+            get_cohort(user, course.id, group_type=CourseUserGroup.WORKGROUP)
+        )
+
+        # get_cohort tests
+        self.assertEquals(
+            len(get_cohort(user, course.id,
+                           group_type=CourseUserGroup.WORKGROUP,
+                           allow_multiple=True)),
+            1
+        )
+        self.assertEquals(
+            len(get_cohort(user, course.id, group_type=CourseUserGroup.ANY, allow_multiple=True)),
+            2
+        )
+        self.assertEquals(
+            len(get_course_cohorts(course.id, group_type=CourseUserGroup.COHORT)),
+            2
+        )
+        self.assertEquals(
+            len(get_course_cohorts(course.id, group_type=CourseUserGroup.ANY)),
+            3
+        )
+
+        # shouldn't be able a cohort by name, without specifying the group_type
+        with self.assertRaises(ValueError):
+            get_cohort_by_name(course.id, "TestCohort", CourseUserGroup.ANY)
+
+        self.assertEquals(
+            workgroup_cohort,
+            get_cohort_by_name(course.id, "TestCohort", CourseUserGroup.WORKGROUP)
+        )
+
+        # no group_type have to be specified for a get_cohort_by_id
+        self.assertEquals(
+            workgroup_cohort,
+            get_cohort_by_id(course.id, workgroup_cohort.id)
+        )
+
+        # get_course_cohort_names tests
+        self.assertEquals(
+            len(get_course_cohort_names(course.id, group_type=CourseUserGroup.COHORT)),
+            2
+        )
+        self.assertEquals(
+            len(get_course_cohort_names(course.id, group_type=CourseUserGroup.ANY)),
+            3
+        )
+        self.assertEquals(
+            len(get_course_cohort_names(course.id, group_type=CourseUserGroup.WORKGROUP)),
+            1
+        )
