@@ -12,12 +12,12 @@ August, 2014
 
    * - Date
      - Change
-   * - 08/27/14
+   * - 08/28/14
      - Updated documentation in :ref:`Developing Your Course Index`
        for new capabilities to publish or hide multiple units 
        from the outline.
    * - 
-     - Added documentation for :ref:`Creating Content Experiments`
+     - Added documentation for :ref:`Creating Content Experiments`.
    * - 08/22/14
      - Added warnings about the effects of changing the course grading policy,
        graded subsections, or graded components after the course begins.
@@ -99,7 +99,7 @@ June, 2014
    * - Date
      - Change
    * - 06/20/14
-     - Added a :ref:`Preface` with resources for course teams, developers,
+     - Added a `Preface`_ with resources for course teams, developers,
        researchers, and students.
    * - 06/18/14    
      - In the :ref:`View and download student data` section, updated the
@@ -431,3 +431,5 @@ December, 2013
    * - 12/05/2013
      - Complete revision of edX Studio documentation and integration of edX101
        content.
+
+.. _Preface: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/

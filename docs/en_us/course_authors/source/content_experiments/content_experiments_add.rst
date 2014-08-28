@@ -53,7 +53,7 @@ Create the Content Experiment
     :alt: The content experiment component in a unit page
 
    You can work with the content experiment as you can any other component.
-   See :ref:`Components` for more information.
+   See :ref:`Developing Course Components` for more information.
 
 #. Click either **Select a Group Configuration** or **Edit** to open the content
    experiment component.
