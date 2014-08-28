@@ -24,6 +24,8 @@ except ImportError:
 
 
 log = logging.getLogger('mitx.' + __name__)
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
 
 
 class ProctorPanel(object):
@@ -151,8 +153,8 @@ class ProctorModule(ProctorFields, XModule):
         log.debug("proctor module children (should only be 1): %s",
                   self.get_children())
         self.child = self.get_children()[0]
-        log.info('Proctor module child={0}'.format(self.child))
-        log.info('Proctor module child display_name={0}'.format(self.child.display_name))
+        # log.info('Proctor module child={0}'.format(self.child))
+        # log.info('Proctor module child display_name={0}'.format(self.child.display_name))
         # TODO: This attr is read-only now - need to figure out if/why this is
         # needed and find a fix if necessary (disabling doesnt appear to break
         # anything)
