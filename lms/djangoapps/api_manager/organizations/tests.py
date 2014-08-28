@@ -13,6 +13,7 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
+from student.models import UserProfile
 from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -56,6 +57,10 @@ class OrganizationsApiTests(TestCase):
             email=self.test_user_email,
             username=self.test_user_username
         )
+        profile = UserProfile(user=self.test_user)
+        profile.city = 'Boston'
+        profile.save()
+
         self.course = CourseFactory.create()
         self.second_course = CourseFactory.create(
             number="899"
@@ -101,7 +106,8 @@ class OrganizationsApiTests(TestCase):
                 'username': 'test_user{}'.format(i),
                 'password': 'test_pass',
                 'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
+                'last_name': 'Doe{}'.format(i),
+                'city': 'Boston',
             }
             response = self.do_post(self.base_users_uri, data)
             self.assertEqual(response.status_code, 201)
@@ -162,7 +168,7 @@ class OrganizationsApiTests(TestCase):
         self.assertIsNotNone(response.data['modified'])
 
     def test_organizations_detail_get_undefined(self):
-        test_uri = '{}/123456789/'.format(self.base_organizations_uri)
+        test_uri = '{}123456789/'.format(self.base_organizations_uri)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
