@@ -281,10 +281,12 @@
       registration_code_error.attr('style', 'display: none');
       generate_registration_button.attr('disabled', true);
       var total_registration_codes = $('input[name="total_registration_codes"]').val();
-      var contact_name = $('input[name="contact_name"]').val();
+      var recipient_name = $('input[name="recipient_name"]').val();
+      var recipient_email = $('input[name="recipient_email"]').val();
       var sale_price = $('input[name="sale_price"]').val();
       var company_name = $('input[name="company_name"]').val();
-      var contact_email = $('input[name="contact_email"]').val();
+      var company_email = $('input[name="company_email"]').val();
+
       var address_line = $('input[name="address_line_1"]').val();
 
       if (company_name == '') {
@@ -299,19 +301,37 @@
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-       if (contact_name == '') {
+      if (company_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the contact name');
+        registration_code_error.text('Please enter the company email');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (contact_email == '') {
+      if (!(validateEmail(company_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the contact email');
+        registration_code_error.text('Please enter the valid email address');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (!(validateEmail(contact_email))) {
+      if (recipient_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the recipient name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(recipient_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the non-numeric value for recipient name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (recipient_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the recipient email');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(recipient_email))) {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please enter the valid email address');
         generate_registration_button.removeAttr('disabled');
@@ -528,10 +548,11 @@
      $('input[name="state"]').val('');
      $('input[name="zip"]').val('');
      $('input[name="country"]').val('');
-     $('input[name="purchase_order"]').val('');
-     $('input[name="contact_name"]').val('');
+     $('input[name="customer_reference_number"]').val('');
+     $('input[name="recipient_name"]').val('');
      $('input[name="sale_price"]').val('');
-     $('input[name="contact_email"]').val('');
+     $('input[name="recipient_email"]').val('');
+     $('input[name="company_email"]').val('');
      $('input[name="invoice"]').attr('checked', 'checked');
      $('input[name="company_reference"]').val('');
      $('input[name="internal_reference"]').val('');

@@ -15,8 +15,8 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
-SALE_FEATURES = ('total_amount', 'company_name', 'company_contact_email', 'company_contact_name',
-                 'purchase_order_number', 'company_reference', 'internal_reference')
+SALE_FEATURES = ('total_amount', 'company_name', 'company_email', 'recipient_name', 'recipient_email',
+                 'customer_reference_number', 'company_reference', 'internal_reference')
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
@@ -207,7 +207,7 @@ def course_registration_features(features, registration_codes, csv_type):
         if registration_code.invoice:
             sale_invoice = Invoice.objects.get(id=registration_code.invoice_id)
             course_registration_dict['invoice_id'] = sale_invoice.id
-            course_registration_dict['purchaser'] = sale_invoice.company_contact_name
+            course_registration_dict['purchaser'] = sale_invoice.recipient_name
             course_registration_dict['company_reference'] = sale_invoice.company_reference
             course_registration_dict['internal_reference'] = sale_invoice.internal_reference
 

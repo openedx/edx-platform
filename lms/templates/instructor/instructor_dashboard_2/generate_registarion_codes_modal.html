@@ -29,29 +29,33 @@
 
           <ol class="list-input">
             <li class="field required text" id="generate-registration-modal-field-company-name">
-              <label for="id_company_name"  class="required text">${_("Organization Name")}</label>
+              <label for="id_company_name"  class="required text">${_("Organization Contact")}</label>
               <input class="field required" id="id_company_name" type="text" name="company_name"
-                     aria-required="true" />
+                     placeholder="${_('(Required) Organization Name')}" aria-required="true" />
               <span class="tip-text">
                 ${_("What is the company the seats were sold to?")}
               </span>
             </li>
-            <li class="field required text" id="generate-registration-modal-field-purchaser-contact">
-              <label for="id_contact_name" class="required text">${_("Name of organization contact")}</label>
-              <input class="field required" id="id_contact_name" type="text" name="contact_name"
-                     aria-required="true"/>
+            <li class="field text" id="generate-registration-modal-field-company-email">
+              <label for="id_company_email"  class="text">&nbsp;</label>
+              <input class="field" id="id_company_email" type="email" value="" name="company_email"
+                     placeholder="${_('(Required) Organization Email')}"  aria-required="true" />
+            </li>
+            <div class="clearfix"></div>
+            <li class="field required text" id="generate-registration-modal-field-recipient-name">
+              <label for="id_recipient_name" class="required text">${_("Invoice Recipient")}</label>
+              <input class="field required" id="id_recipient_name" type="text" name="recipient_name"
+                     placeholder="${_('(Required) Recipient Name')}" aria-required="true"/>
               <span class="tip-text">
                 ${_("Who is the key contact at the company the sale was made to?")}
               </span>
             </li>
-            <li class="field required text" id="generate-registration-modal-field-purchaser-email">
-              <label for="id_contact_email"  class="required text">${_("Email of organization contact")}</label>
-              <input class="field required" id="id_contact_email" type="email" value="" placeholder="${_('username@domain.com')}"
-                     name="contact_email" aria-required="true"/>
-              <span class="tip-text">
-                ${_("Who is the key contact at the company the sale was made to?")}
-              </span>
+            <li class="field text" id="generate-registration-modal-field-recipient-email">
+              <label for="id_recipient_email"  class="text">&nbsp;</label>
+              <input class="field required" id="id_recipient_email" type="email" value="" placeholder="${_('(Required) Recipient Email')}"
+                     name="recipient_email" aria-required="true"/>
             </li>
+            <div class="clearfix"></div>
             <li class="field required text address_fields"  id="generate-registration-modal-field-address-line-1">
               <label for="id_address_line_1"  class="required text">${_("Organization Billing Address")}</label>
               <input class="field required" id="id_address_line_1" type="text" name="address_line_1"
@@ -121,9 +125,9 @@
                 ${_("Internal tag to associate with the sale")}
               </span>
             </li>
-            <li class="field text" id="generate-registration-modal-field-purchase-order">
-              <label for="id_purchase_order" >${_("(Optional) Purchase Order Number")}</label>
-              <input class="field" id="id_purchase_order" type="text" name="purchase_order"
+            <li class="field text" id="generate-registration-modal-field-custom-reference-number">
+              <label for="id_customer_reference_number" >${_("(Optional) Customer Reference Number")}</label>
+              <input class="field" id="id_customer_reference_number" type="text" name="customer_reference_number"
                      aria-required="true" placeholder="Order 213"/>
               <span class="tip-text">
                 ${_("Internal tag to associate with the sale")}
