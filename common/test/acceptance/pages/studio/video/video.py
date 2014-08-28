@@ -503,7 +503,6 @@ class VideoComponentPage(VideoPage):
             self.click_button('collapse_link')
 
         self.q(css=CLASS_SELECTORS['url_inputs']).nth(field_number - 1).fill(url)
-
         time.sleep(DELAY)
         self.wait_for_ajax()
 
@@ -548,6 +547,19 @@ class VideoComponentPage(VideoPage):
 
         return statuses
 
+    def clear_field(self, index):
+        """
+        Clear a video url field at index specified by `index`.
+        """
+        self.q(css=CLASS_SELECTORS['url_inputs']).nth(index - 1).fill('')
+
+        # Trigger an 'input' event after filling the field with an empty value.
+        self.browser.execute_script(
+            "$('{}:eq({})').trigger('{}')".format(CLASS_SELECTORS['url_inputs'], index, 'input'))
+
+        time.sleep(DELAY)
+        self.wait_for_ajax()
+
     def clear_fields(self):
         """
         Clear video url fields.
@@ -562,6 +574,13 @@ class VideoComponentPage(VideoPage):
         self.browser.execute_script(script)
         time.sleep(DELAY)
         self.wait_for_ajax()
+
+    def revert_field(self, field_name):
+        """
+        Revert a field.
+        """
+        _, setting = self._get_setting_entry(field_name)
+        setting.find_element_by_class_name('setting-clear').click()
 
     def is_transcript_button_visible(self, button_name, index=0, button_text=None):
         """
