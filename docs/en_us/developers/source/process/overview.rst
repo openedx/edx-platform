@@ -30,10 +30,10 @@ different jobs and responsibilities:
     Prioritizes the work of core committers.
 
 :doc:`community-manager`
-    helps keep the community healthy and working smoothly.
+    Helps keep the community healthy and working smoothly.
 
 :doc:`contributor`
-    submits pull requests for eventual committing to an Open edX repository.
+    Submits pull requests for eventual committing to an Open edX repository.
 
 .. note::
   At the moment, developers who work for edX are core committers, and other
@@ -49,10 +49,10 @@ Overview
 If you are a :doc:`contributor <contributor>` submitting a pull request, expect that it will
 take a few weeks before it can be merged. The earlier you can start talking
 with the rest of the Open edX community about the changes you want to make,
-before you even start changing code if possible, the better the whole process
-will go.  Follow the guidelines in the document for a high-quality pull
-request: include a detailed description, keep the code clear and readable,
-make sure the tests pass, be responsive to code review comments.
+before you even start changing code, the better the whole process
+will go.  Follow the guidelines in this document for a high-quality pull
+request: include a detailed description of your pull request when you open it on Github,
+keep the code clear and readable, make sure the tests pass, be responsive to code review comments.
 Small pull requests are easier to review than large pull requests, so
 split up your changes into several small pull requests when possible --
 it will make everything go faster.  See the full :doc:`contributor guidelines <contributor>`
