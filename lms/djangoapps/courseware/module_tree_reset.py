@@ -263,7 +263,15 @@ class ProctorModuleInfo(object):
         # get grades, match gradeset assignments with StudentModule states, and
         # put grades there
         self.get_grades(student)
-        for score in self.gradeset['totaled_scores']['Assessment']:
+        totaled_scores = self.gradeset['totaled_scores']
+        try:
+            assessments = totaled_scores['Assessment']
+        except KeyError:
+            assessments = []
+            for assessment in totaled_scores:
+                assessments.extend(totaled_scores[assessment])
+
+        for score in assessments:
             if score.section in smstates:
                 smstates[score.section].score = score
 
