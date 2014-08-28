@@ -67,5 +67,5 @@ def get_enrolled():
 
 def get_data(users, exclude=None):
     exclude = exclude if exclude else set()
-    emails = (e[0] for e in users.values_list('email'))
+    emails = (u.email for u in users)
     return ({'EMAIL': e} for e in emails if e not in exclude)
