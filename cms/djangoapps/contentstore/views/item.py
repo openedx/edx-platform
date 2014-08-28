@@ -571,7 +571,7 @@ def _get_xblock(usage_key, user):
     """
     store = modulestore()
     try:
-        return store.get_item(usage_key)
+        return store.get_item(usage_key, depth=None)
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.

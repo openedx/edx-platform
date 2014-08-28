@@ -1,9 +1,7 @@
 """Tests for items views."""
-import os
 import json
 from datetime import datetime, timedelta
 import ddt
-from unittest import skipUnless
 
 from mock import patch
 from pytz import UTC
