@@ -26,7 +26,7 @@ from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
 from opaque_keys.edx.keys import UsageKey, CourseKey
@@ -83,7 +83,8 @@ class ItemTest(CourseTestCase):
         return self.response_usage_key(resp)
 
 
-class GetItem(ItemTest):
+@ddt.ddt
+class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
 
     def _get_container_preview(self, usage_key):
@@ -99,6 +100,25 @@ class GetItem(ItemTest):
         resources = resp_content['resources']
         self.assertIsNotNone(resources)
         return html, resources
+
+    @ddt.data(
+        (1, 21, 23, 35, 37),
+        (2, 22, 24, 38, 39),
+        (3, 23, 25, 41, 41),
+    )
+    @ddt.unpack
+    def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
+        self.populate_course(branching_factor)
+        # Retrieve it
+        with check_mongo_calls(chapter_queries):
+            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['chapter'][-1]))
+        with check_mongo_calls(section_queries):
+            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['sequential'][-1]))
+        with check_mongo_calls(unit_queries):
+            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
+        with check_mongo_calls(problem_queries):
+            self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
+
 
     def test_get_vertical(self):
         # Add a vertical

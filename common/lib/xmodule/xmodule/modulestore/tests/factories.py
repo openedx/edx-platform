@@ -217,12 +217,12 @@ class ItemFactory(XModuleFactory):
 
 
 @contextmanager
-def check_exact_number_of_calls(object_with_method, method, num_calls, method_name=None):
+def check_exact_number_of_calls(object_with_method, method_name, num_calls):
     """
     Instruments the given method on the given object to verify the number of calls to the
     method is exactly equal to 'num_calls'.
     """
-    with check_number_of_calls(object_with_method, method, num_calls, num_calls, method_name):
+    with check_number_of_calls(object_with_method, method_name, num_calls, num_calls):
         yield
 
 

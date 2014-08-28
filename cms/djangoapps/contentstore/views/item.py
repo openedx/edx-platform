@@ -756,7 +756,7 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info['children']
+    children = child_info and child_info.get('children', [])
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True

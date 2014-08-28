@@ -10,6 +10,7 @@ from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
 import datetime
 import pytz
+from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
@@ -275,6 +276,8 @@ class ModuleStoreTestCase(TestCase):
         # the next time they are accessed.
         # We do this at *both* setup and teardown just to be safe.
         clear_existing_modulestores()
+        # clear RequestCache to emulate its clearance after each http request.
+        RequestCache().clear_request_cache()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
