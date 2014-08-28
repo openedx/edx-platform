@@ -1,3 +1,6 @@
+import pprint
+import pymongo.message
+
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from factory.containers import CyclicDefinitionError
 from uuid import uuid4
@@ -214,88 +217,83 @@ class ItemFactory(XModuleFactory):
 
 
 @contextmanager
-def check_exact_number_of_calls(object_with_method, method, num_calls, method_name=None):
+def check_exact_number_of_calls(object_with_method, method_name, num_calls):
     """
     Instruments the given method on the given object to verify the number of calls to the
     method is exactly equal to 'num_calls'.
     """
-    with check_number_of_calls(object_with_method, method, num_calls, num_calls, method_name):
+    with check_number_of_calls(object_with_method, method_name, num_calls, num_calls):
         yield
 
 
-@contextmanager
-def check_number_of_calls(object_with_method, method, maximum_calls, minimum_calls=1, method_name=None):
+def check_number_of_calls(object_with_method, method_name, maximum_calls, minimum_calls=1):
     """
     Instruments the given method on the given object to verify the number of calls to the method is
     less than or equal to the expected maximum_calls and greater than or equal to the expected minimum_calls.
     """
-    method_wrap = Mock(wraps=method)
-    wrap_patch = patch.object(object_with_method, method_name or method.__name__, method_wrap)
-
-    try:
-        wrap_patch.start()
-        yield
-
-    finally:
-        wrap_patch.stop()
-
-        # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
-        assert_greater_equal(method_wrap.call_count, minimum_calls)
-
-        # now verify the number of actual calls is less than (or equal to) the expected maximum
-        assert_less_equal(method_wrap.call_count, maximum_calls)
+    return check_sum_of_calls(object_with_method, [method_name], maximum_calls, minimum_calls)
 
 
 @contextmanager
-def check_mongo_calls(mongo_store, num_finds=0, num_sends=None):
+def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
+    """
+    Instruments the given methods on the given object to verify that the total sum of calls made to the
+    methods falls between minumum_calls and maximum_calls.
+    """
+    mocks = {
+        method: Mock(wraps=getattr(object_, method))
+        for method in methods
+    }
+
+    with patch.multiple(object_, **mocks):
+        yield
+
+    call_count = sum(mock.call_count for mock in mocks.values())
+    calls = pprint.pformat({
+        method_name: mock.call_args_list
+        for method_name, mock in mocks.items()
+    })
+
+    # Assertion errors don't handle multi-line values, so pretty-print to std-out instead
+    if not minimum_calls <= call_count <= maximum_calls:
+        print "Expected between {} and {} calls, {} were made. Calls: {}".format(
+            minimum_calls,
+            maximum_calls,
+            call_count,
+            calls,
+        )
+
+    # verify the counter actually worked by ensuring we have counted greater than (or equal to) the minimum calls
+    assert_greater_equal(call_count, minimum_calls)
+
+    # now verify the number of actual calls is less than (or equal to) the expected maximum
+    assert_less_equal(call_count, maximum_calls)
+
+
+@contextmanager
+def check_mongo_calls(num_finds=0, num_sends=None):
     """
     Instruments the given store to count the number of calls to find (incl find_one) and the number
     of calls to send_message which is for insert, update, and remove (if you provide num_sends). At the
     end of the with statement, it compares the counts to the num_finds and num_sends.
 
-    :param mongo_store: the MongoModulestore or subclass to watch or a SplitMongoModuleStore
     :param num_finds: the exact number of find calls expected
     :param num_sends: If none, don't instrument the send calls. If non-none, count and compare to
         the given int value.
     """
-    if mongo_store.get_modulestore_type() == ModuleStoreEnum.Type.mongo:
-        with check_exact_number_of_calls(mongo_store.collection, mongo_store.collection.find, num_finds):
-            if num_sends is not None:
-                with check_exact_number_of_calls(
-                    mongo_store.database.connection,
-                    mongo_store.database.connection._send_message,  # pylint: disable=protected-access
-                    num_sends,
-                ):
-                    yield
-            else:
+    with check_sum_of_calls(
+        pymongo.message,
+        ['query', 'get_more'],
+        num_finds,
+        num_finds
+    ):
+        if num_sends is not None:
+            with check_sum_of_calls(
+                pymongo.message,
+                ['insert', 'update', 'delete'],
+                num_sends,
+                num_sends
+            ):
                 yield
-    elif mongo_store.get_modulestore_type() == ModuleStoreEnum.Type.split:
-        collections = [
-            mongo_store.db_connection.course_index,
-            mongo_store.db_connection.structures,
-            mongo_store.db_connection.definitions,
-        ]
-        # could add else clause which raises exception or just rely on the below to suss that out
-        try:
-            find_wraps = []
-            wrap_patches = []
-            for collection in collections:
-                find_wrap = Mock(wraps=collection.find)
-                find_wraps.append(find_wrap)
-                wrap_patch = patch.object(collection, 'find', find_wrap)
-                wrap_patches.append(wrap_patch)
-                wrap_patch.start()
-            if num_sends is not None:
-                connection = mongo_store.db_connection.database.connection
-                with check_exact_number_of_calls(
-                    connection,
-                    connection._send_message,  # pylint: disable=protected-access
-                    num_sends,
-                ):
-                    yield
-            else:
-                yield
-        finally:
-            map(lambda wrap_patch: wrap_patch.stop(), wrap_patches)
-            call_count = sum([find_wrap.call_count for find_wrap in find_wraps])
-            assert_equal(call_count, num_finds)
+        else:
+            yield

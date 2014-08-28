@@ -867,7 +867,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with mongo_store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            with check_mongo_calls(mongo_store, 4, 0):
+            with check_mongo_calls(4, 0):
                 course = mongo_store.get_course(course_id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
@@ -879,7 +879,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
         # beyond direct only categories
         with mongo_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            with check_mongo_calls(mongo_store, 4, 0):
+            with check_mongo_calls(4, 0):
                 mongo_store.get_course(course_id, depth=2)
 
     def test_export_course_without_content_store(self):

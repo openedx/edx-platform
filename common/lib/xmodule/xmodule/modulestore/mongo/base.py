@@ -17,6 +17,7 @@ import sys
 import logging
 import copy
 import re
+import threading
 from uuid import uuid4
 
 from bson.son import SON
@@ -414,7 +415,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # performance optimization to prevent updating the meta-data inheritance tree during
         # bulk write operations
-        self.ignore_write_events_on_courses = set()
+        self.ignore_write_events_on_courses = threading.local()
         self._course_run_cache = {}
 
     def close_connections(self):
@@ -435,27 +436,36 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         connection.drop_database(self.collection.database)
         connection.close()
 
-    def _begin_bulk_write_operation(self, course_id):
+    def _begin_bulk_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """
-        self.ignore_write_events_on_courses.add(course_id)
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            self.ignore_write_events_on_courses.courses = set()
 
-    def _end_bulk_write_operation(self, course_id):
+        self.ignore_write_events_on_courses.courses.add(course_id)
+
+    def _end_bulk_operation(self, course_id):
         """
         Restart updating the meta-data inheritance cache for the given course.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.
         """
-        if course_id in self.ignore_write_events_on_courses:
-            self.ignore_write_events_on_courses.remove(course_id)
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            return
+
+        if course_id in self.ignore_write_events_on_courses.courses:
+            self.ignore_write_events_on_courses.courses.remove(course_id)
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
     def _is_bulk_write_in_progress(self, course_id):
         """
         Returns whether a bulk write operation is in progress for the given course.
         """
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            return False
+
         course_id = course_id.for_branch(None)
-        return course_id in self.ignore_write_events_on_courses
+        return course_id in self.ignore_write_events_on_courses.courses
 
     def fill_in_run(self, course_key):
         """

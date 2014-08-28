@@ -310,6 +310,13 @@ class ModuleStoreRead(object):
         """
         pass
 
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+        """
+        yield
+
 
 class ModuleStoreWrite(ModuleStoreRead):
     """
@@ -543,6 +550,33 @@ class ModuleStoreReadBase(ModuleStoreRead):
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
 
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO: Make this multi-process-safe if future operations need it.
+        try:
+            self._begin_bulk_operation(course_id)
+            yield
+        finally:
+            self._end_bulk_operation(course_id)
+
+    def _begin_bulk_operation(self, course_id):
+        """
+        Begin a bulk write operation on course_id.
+        """
+        pass
+
+    def _end_bulk_operation(self, course_id):
+        """
+        End the active bulk write operation on course_id.
+        """
+        pass
+
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
@@ -642,29 +676,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
-
-    @contextmanager
-    def bulk_write_operations(self, course_id):
-        """
-        A context manager for notifying the store of bulk write events.
-
-        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
-        until the bulk operation is completed.
-        """
-        # TODO
-        # Make this multi-process-safe if future operations need it.
-        # Right now, only Import Course, Clone Course, and Delete Course use this, so
-        # it's ok if the cached metadata in the memcache is invalid when another
-        # request comes in for the same course.
-        try:
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._begin_bulk_write_operation(course_id)
-            yield
-        finally:
-            # check for the begin method here,
-            # since it's an error if an end method is not defined when a begin method is
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

@@ -1,4 +1,5 @@
 from opaque_keys.edx.locator import DefinitionLocator
+from bson import SON
 
 
 class DefinitionLazyLoader(object):
@@ -24,3 +25,9 @@ class DefinitionLazyLoader(object):
         loader pointer with the result so as not to fetch more than once
         """
         return self.modulestore.db_connection.get_definition(self.definition_locator.definition_id)
+
+    def as_son(self):
+        return SON((
+            ('category', self.definition_locator.block_type),
+            ('definition', self.definition_locator.definition_id)
+        ))
