@@ -8,8 +8,8 @@ Contributing to Open edX
     :maxdepth: 2
 
     overview
-    core-committer
-    product-owner
-    community-manager
     contributor
-    
+    cover-letter
+    community-manager
+    product-owner
+    core-committer
