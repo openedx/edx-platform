@@ -40,6 +40,7 @@ class SecureClient(Client):
         super(SecureClient, self).__init__(*args, **kwargs)
 
 
+@override_settings(DEBUG=True)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
 @override_settings(API_PAGE_SIZE=10)
@@ -508,7 +509,7 @@ class UsersApiTests(ModuleStoreTestCase):
         test_uri = self.users_base_uri
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
-                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name, 'title': 'The King'}
         response = self.do_post(test_uri, data)
         test_uri = test_uri + '/' + str(response.data['id'])
         response = self.do_get(test_uri)
@@ -532,7 +533,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         test_uri = '{}/{}'.format(test_uri, str(user_id))
-        fail_user_id_group_uri = '{}/{}/groups'.format(test_uri, '22')
+        fail_user_id_group_uri = '{}/{}/groups'.format(self.users_base_uri, '22')
 
         group_url = self.groups_base_uri
         group_name = 'Alpha Group'
