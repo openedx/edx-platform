@@ -33,6 +33,7 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from certificates.models import CertificateStatuses
 from certificates.tests.factories import GeneratedCertificateFactory
 import shoppingcart
+from bulk_email.models import Optout
 
 log = logging.getLogger(__name__)
 
@@ -233,6 +234,51 @@ class DashboardTest(TestCase):
         verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
         verified_mode.save()
         self.assertFalse(enrollment.refundable())
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch('courseware.views.log.warning')
+    def test_blocked_course_scenario(self, log_warning):
+
+        self.client.login(username="jack", password="test")
+
+        #create testing invoice 1
+        sale_invoice_1 = shoppingcart.models.Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
+            company_contact_email='test1@test.com', purchase_order_number='2Fwe23S', internal_reference="A",
+            company_reference='', course_id=self.course.id, is_valid=False
+        )
+        course_reg_code = shoppingcart.models.CourseRegistrationCode(code="abcde", course_id=self.course.id,
+                                                                     created_by=self.user, invoice=sale_invoice_1)
+        course_reg_code.save()
+
+        cart = shoppingcart.models.Order.get_cart_for_user(self.user)
+        shoppingcart.models.PaidCourseRegistration.add_to_order(cart, self.course.id)
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': course_reg_code.code})
+        self.assertEqual(resp.status_code, 200)
+
+        # freely enroll the user into course
+        resp = self.client.get(reverse('shoppingcart.views.register_courses'))
+        self.assertIn('success', resp.content)
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
+        optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
+        self.assertEqual(len(optout_object), 1)
+
+        # Direct link to course redirect to user dashboard
+        self.client.get(reverse('courseware', kwargs={"course_id": self.course.id.to_deprecated_string()}))
+        log_warning.assert_called_with(
+            u'User %s cannot access the course %s because payment has not yet been received', self.user, self.course.id.to_deprecated_string())
+
+        # Now re-validating the invoice
+        invoice = shoppingcart.models.Invoice.objects.get(id=sale_invoice_1.id)
+        invoice.is_valid = True
+        invoice.save()
+
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
+        optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
+        self.assertEqual(len(optout_object), 0)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_refundable_of_purchased_course(self):

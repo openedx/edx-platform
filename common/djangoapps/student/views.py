@@ -90,6 +90,7 @@ from util.password_policy_validators import (
 
 from third_party_auth import pipeline, provider
 from xmodule.error_module import ErrorDescriptor
+from shoppingcart.models import CourseRegistrationCode
 
 
 log = logging.getLogger("edx.student")
@@ -422,6 +423,28 @@ def complete_course_mode_info(course_id, enrollment):
     return mode_info
 
 
+def is_course_blocked(request, redeemed_registration_codes, course_key):
+    """Checking either registration is blocked or not ."""
+    blocked = False
+    for redeemed_registration in redeemed_registration_codes:
+        if not getattr(redeemed_registration.invoice, 'is_valid'):
+            blocked = True
+            # disabling email notifications
+            Optout.objects.get_or_create(user=request.user, course_id=course_key)
+            log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
+            track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
+            break
+
+    if not blocked:
+        # enabling email notifications
+        optout_object = Optout.objects.filter(user=request.user, course_id=course_key)
+        if optout_object:
+            optout_object.delete()
+            log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(request.user.username, request.user.email, course_key))
+            track.views.server_track(request, "change-email1-settings", {"receive_emails": "yes", "course": course_key.to_deprecated_string()}, page='dashboard')
+
+    return blocked
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -484,6 +507,10 @@ def dashboard(request):
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
 
+    block_courses = frozenset(course.id for course, enrollment in course_enrollment_pairs
+                              if is_course_blocked(request, CourseRegistrationCode.objects.filter(course_id=course.id, registrationcoderedemption__redeemed_by=request.user), course.id))
+
+
     enrolled_courses_either_paid = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                              if _enrollment.is_paid_course())
     # get info w.r.t ExternalAuthMap
@@ -529,6 +556,7 @@ def dashboard(request):
         'verification_status': verification_status,
         'verification_msg': verification_msg,
         'show_refund_option_for': show_refund_option_for,
+        'block_courses': block_courses,
         'denied_banner': denied_banner,
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
         'language_options': language_options,
