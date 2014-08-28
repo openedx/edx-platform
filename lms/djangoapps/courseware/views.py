@@ -84,17 +84,18 @@ def user_groups(user):
 
 def verify_course_id(view_func):
     """
-    This decorator should only be used with views whose second argument is course_id.
+    This decorator should only be used with views whose kwargs must contain course_id.
     If course_id is not valid raise 404.
     """
 
     @wraps(view_func)
-    def _decorated(request, course_id, *args, **kwargs):
+    def _decorated(request, *args, **kwargs):
+        course_id = kwargs.get("course_id")
         try:
             SlashSeparatedCourseKey.from_deprecated_string(course_id)
         except InvalidKeyError:
             raise Http404
-        response = view_func(request, course_id, *args, **kwargs)
+        response = view_func(request, *args, **kwargs)
         return response
 
     return _decorated
