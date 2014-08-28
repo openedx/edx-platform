@@ -47,12 +47,14 @@ three hierarchical levels of interaction.
   post as a whole.
  
 The dialogue created by a post, its responses, and the comments on those
-responses is called a *thread*.
+responses is sometimes called a thread.
 
 All course staff members and enrolled students can add posts, responses, and
 comments, and view all of the posts, responses, and comments made by other
-course participants. Discussion threads are saved as part of the course
-history.
+course participants. Members of the course community, both staff and students,
+can be given permission to moderate or administer course discussions through a
+set of discussion administration roles. Discussion threads are saved as part of
+the course history.
 
 .. note:: 
   The :ref:`Discussions for Students and Staff` chapter describes features that
@@ -151,25 +153,27 @@ You can designate a team of people to help you run course discussions.
 Different options for working with discussions are available through
 these roles:
 
-* Discussion moderators can edit and delete messages at any level, review
+* *Discussion moderators* can edit and delete messages at any level, review
   messages flagged for misuse, close and reopen posts, pin posts, and endorse
   responses. Posts made by moderators are marked as "By: Staff" in the list of
   posts. Responses and comments made by moderators have a colored "Staff"
-  banner. This role is often given to course team members who already have the
-  Course Staff role.
+  identifier. This role is often given to course team members who already have
+  the Course Staff role.
 
 .. removed this clause from 1st sentence per JAAkana and MHoeber: , and, if the
 .. course is cohorted, see posts from all cohorts
 
-* Discussion community TAs have the same options for working with discussions
+* *Discussion community TAs* have the same options for working with discussions
   as moderators. Posts made by community TAs are marked as "By: Community TA"
   in the list of posts on the **Discussion** page. Responses and comments made
-  by community TAs have a colored "Community TA" banner. This role is often
+  by community TAs have a colored "Community TA" identifier. This role is often
   given to students.
 
-* Discussion admins have the same options for working with discussions as
+.. put this comment in to make the formatting of this bulleted list consistent when output using the spinx template
+
+* *Discussion admins* have the same options for working with discussions as
   moderators, and their posts, responses, and comments have the same "Staff"
-  identifier. This role can be reserved for assignment to course team members
+  identifiers. This role can be reserved for assignment to course team members
   who have the Instructor role only: the discussion admins can then both
   moderate discussions and give other users these discussion management roles
   whenever necessary.
@@ -181,7 +185,7 @@ addresses or usernames.
   click **Membership** and then select **Course Staff** or **Instructor** from
   the drop-down list.
 
-* To get this information for any enrolled student, on the Instructor Dashboard
+* To get this information for an enrolled student, on the Instructor Dashboard
   click **Data Download**, then **Download profile information as a CSV**.
 
 To assign a role, you must be the course author or an Instructor (that is, you
@@ -272,28 +276,25 @@ discussion.
 * Pin a post. Pinning a post makes it appear at the top of the list of posts on
   the **Discussion** page. As a result, it is more likely that students will
   see and respond to pinned posts. You can write your own post and then pin it,
-  or pin a post by any author. Click **Pin Thread**.
+  or pin a post by any author. Select the "More" icon and then **Pin**.
 
     .. image:: ../Images/Pin_Discussion.png
      :alt: Image of the pin icon for discussion posts
 
 * Endorse a response. Endorsing a response indicates that it provides value to
-  the discussion. Click the **check** (or tick) mark icon that displays at
-  upper right of the response.
+  the discussion. Click the "check mark" (or tick mark) icon for the response.
 
     .. image:: ../Images/Endorse_Discussion.png
      :alt: Image of the Endorse button for discussion posts
 
-.. replace this image ^ when new one is available
-
 * Mark a question as answered. You use the same procedure to mark a response as
   the correct answer to a question as you do to endorse contributions to a
-  discussion. Click the **check** (or tick) mark icon for correct answers.
+  discussion: click the "check mark" (or tick mark) icon for correct answers.
 
 * Close a post. You can respond to a redundant post by (optionally) pasting in
   a link to the post that you prefer students to contribute to, and prevent
-  further interaction by closing the post. Click the **Close** button that
-  displays below the post to close it.
+  further interaction by closing the post. Select the "More" icon and then
+  **Close** to close it.
 
 * Provide post/response/comment guidelines. You can post information from the
   :ref:`overview<Overview_discussions>` in this chapter, or the :ref:`anatomy
@@ -395,11 +396,11 @@ In addition to these visual cues, filters can help you find questions and
 discussions that need review. Above the list of posts on the **Discussion**
 page, the **Show all** filter is selected by default. You can also select:
 
-* **Unanswered**, to list only questions that do not yet have any responses
-  marked as answers.
-
 * **Unread**, to list only the discussions and questions that you have not yet
   viewed.
+
+* **Unanswered**, to list only questions that do not yet have any responses
+  marked as answers.
 
 ==================
 Edit Messages
@@ -413,8 +414,12 @@ text, images, or links.
 #. Log in to the site and then select the course on your **Current Courses**
    dashboard.
 
-#. Click the **Edit** button below the post or response, or click the pencil
-   icon for the comment.
+#. Open the **Discussion** page and then open the post with the content that
+   requires editing. You can select a single topic from the drop-down list of
+   discussion topics, apply a filter, or search to locate the post.
+
+#. For the post or for the response or comment that you want to edit, click the
+   "More" icon and then **Edit**.
 
 #. Remove the problematic portion of the message, or replace it with standard
    text such as "[REMOVED BY MODERATOR]".
@@ -433,34 +438,41 @@ language may need to be deleted, rather than edited.
 #. Log in to the site and then select the course on your **Current Courses**
    dashboard.
 
-#. Click the **Delete** button below the post or response or the "X" icon for
-   the comment.
+#. Open the **Discussion** page and then open the post with the content that
+   requires deletion. You can select a single topic from the drop-down list of
+   discussion topics, apply a filter, or search to locate the post.
+
+#. For the post or for the response or comment that you want to delete, click
+   the "More" icon and then **Delete**.
 
 #. Click **OK** to confirm the deletion.
 
 .. how to communicate with the poster?
 
-.. important:: If a message is threatening or indicates serious harmful intent, contact campus security at your institution. Report the incident before taking any other action.
+.. important:: If a message is threatening or indicates serious harmful 
+ intent, contact campus security at your institution. Report the incident
+ before taking any other action.
 
 ==================================
 Respond to Reports of Misuse
 ==================================
 
-Students can use the **Report Misuse** flag to indicate messages that they find
-inappropriate. Moderators, community TAs, and admins can check for messages
-that have been flagged in this way and edit or delete them as needed.
+Students have the option to report contributions that they find inappropriate.
+Moderators, community TAs, and admins can check for messages that have been
+flagged in this way and edit or delete them as needed.
 
 #. View the live version of your course and click **Discussion** at the top of
    the page.
 
 #. In the list of posts on the left side of the page, use the filter drop-down
-   (set to **Show all** by default) to select **Flagged**.
+   list (set to **Show all** by default) to select **Flagged**.
 
-#. Review each post listed as a flagged discussion. Posts and responses show a
-   flag and **Misuse Reported** in red font; comments show only a red flag.
+#. Review listed posts. A post is listed if it or any of its responses or
+   comments has been reported. The reported contribution includes a
+   **Reported** identifier.
 
-#. Edit or delete the post, response, or comment. Alternatively, to remove the
-   misuse flag from a message click **Misuse Reported** or the red flag icon.
+#. Edit or delete the post, response, or comment. Alternatively, remove the
+   flag: click the "More" icon and then **Unreport**.
 
 ===============
 Block Users
@@ -493,7 +505,9 @@ course units and all of the course-wide topics are affected.
   and Discussion Community TAs are not affected when you close the discussions
   for a course. Users with these roles can continue to add to discussions. 
 
-.. note:: To assure that your students understand why they cannot add to  discussions, you can add the dates that discussions are closed to the **Course Info** page and post them to a General discussion.
+.. note:: To assure that your students understand why they cannot add to 
+  discussions, you can add the dates that discussions are closed to the
+  **Course Info** page and post them to a General discussion.
 
 =====================================
 Start-End Date Format Specification
