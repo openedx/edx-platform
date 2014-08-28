@@ -1,9 +1,9 @@
 ###################################
-August 27, 2014
+August 28, 2014
 ###################################
 
 The following information reflects what is new in the edX Platform as of August
-27, 2014. See previous pages in this document for a history of changes.
+28, 2014. See previous pages in this document for a history of changes.
 
 ****************************************
 edX Release Announcements Mailing List
