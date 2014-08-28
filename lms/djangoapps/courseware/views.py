@@ -16,6 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.db import IntegrityError
 from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
@@ -39,6 +40,7 @@ from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
+from util.request import retry_on_exception
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -262,6 +264,7 @@ def chat_settings(course, user):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @verify_course_id
+@retry_on_exception()
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -441,6 +444,10 @@ def index(request, course_id, chapter=None, section=None,
             ))
 
         result = render_to_response('courseware/courseware.html', context)
+
+    # Let the retry_on_exception decorator handle IntegrityErrors
+    except IntegrityError:
+        raise
     except Exception as e:
 
         # Doesn't bar Unicode characters from URL, but if Unicode characters do

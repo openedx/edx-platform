@@ -11,14 +11,15 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from edxmako.shortcuts import render_to_response
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from verify_student.models import SoftwareSecurePhotoVerification
+from xmodule.modulestore.django import modulestore
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
+from edxmako.shortcuts import render_to_response
 from student.models import CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
+from util.request import retry_on_exception
 
 
 class ChooseModeView(View):
@@ -121,6 +122,7 @@ class ChooseModeView(View):
         return render_to_response("course_modes/choose.html", context)
 
     @method_decorator(login_required)
+    @method_decorator(retry_on_exception())
     def post(self, request, course_id):
         """ Takes the form submission from the page and parses it """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)

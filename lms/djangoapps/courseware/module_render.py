@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.db import IntegrityError
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -50,6 +51,7 @@ from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
 from util.json_request import JsonResponse
+from util.request import retry_on_exception
 from util.sandboxing import can_execute_unsafe_code
 
 
@@ -542,6 +544,7 @@ def get_module_system_for_user(user, field_data_cache,
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         user_location=user_location,
+        exceptions_to_raise=(IntegrityError,)
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -680,6 +683,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 
+@retry_on_exception()
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -793,6 +797,9 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
                     exc_info=True)
         return JsonResponse(object={'success': err.args[0]}, status=200)
 
+    # Let the retry_on_exception decorator handle IntegrityErrors
+    except IntegrityError:
+        raise
     # If any other error occurred, re-raise it to trigger a 500 response
     except Exception:
         log.exception("error executing xblock handler")

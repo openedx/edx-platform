@@ -927,6 +927,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                     field_data=self._field_data,
                 )
                 self.xmodule_runtime.xmodule_instance.save()
+            except getattr(self.xmodule_runtime, 'exceptions_to_raise', ()):
+                raise
             except Exception:  # pylint: disable=broad-except
                 # xmodule_instance is set by the XModule.__init__. If we had an error after that,
                 # we need to clean it out so that we can set up the ErrorModule instead
@@ -1244,7 +1246,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            user_location=None, **kwargs):
+            user_location=None, exceptions_to_raise=(), **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1341,6 +1343,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         self.get_real_user = get_real_user
         self.user_location = user_location
+        self.exceptions_to_raise = exceptions_to_raise
 
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime

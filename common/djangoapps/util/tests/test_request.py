@@ -4,9 +4,10 @@ import unittest
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
+from django.db import IntegrityError
 from django.test.client import RequestFactory
 
-from util.request import course_id_from_url, safe_get_host
+from util.request import course_id_from_url, retry_on_exception, safe_get_host
 
 
 class ResponseTestCase(unittest.TestCase):
@@ -53,3 +54,45 @@ class ResponseTestCase(unittest.TestCase):
         self.assertEqual(course_id.org, 'edX')
         self.assertEqual(course_id.course, 'maths')
         self.assertEqual(course_id.run, '2020')
+
+
+class RetryDecoratorTestCase(unittest.TestCase):
+    """ Tests for the retry_on_exception decorator factory."""
+
+    def setUp(self):
+        def func():
+            """ Function to wrap with the decorator. """
+            func.call_count += 1
+            if func.exceptions_to_raise:
+                exception = func.exceptions_to_raise[0]
+                func.exceptions_to_raise = func.exceptions_to_raise[1:]
+                raise exception
+            return "Finished."
+        func.exceptions_to_raise = []
+        func.call_count = 0
+        self.func_to_retry = func
+
+    def test_no_exceptions1(self):
+        self.assertEqual(retry_on_exception(tries=2)(self.func_to_retry)(), "Finished.")
+        self.assertEqual(self.func_to_retry.call_count, 1)
+
+    def test_no_exceptions2(self):
+        self.assertEqual(retry_on_exception(tries=3)(self.func_to_retry)(), "Finished.")
+        self.assertEqual(self.func_to_retry.call_count, 1)
+
+    def test_exceptions1(self):
+        with self.assertRaises(ValueError):
+            self.func_to_retry.exceptions_to_raise = [ValueError]
+            retry_on_exception(tries=3)(self.func_to_retry)()
+        self.assertEqual(self.func_to_retry.call_count, 1)
+
+    def test_exceptions2(self):
+        self.func_to_retry.exceptions_to_raise = [IntegrityError]
+        self.assertEqual(retry_on_exception(tries=3)(self.func_to_retry)(), "Finished.")
+        self.assertEqual(self.func_to_retry.call_count, 2)
+
+    def test_exceptions3(self):
+        with self.assertRaises(IntegrityError):
+            self.func_to_retry.exceptions_to_raise = [IntegrityError, IntegrityError, IntegrityError, IntegrityError]
+            retry_on_exception(tries=4)(self.func_to_retry)()
+        self.assertEqual(self.func_to_retry.call_count, 4)
