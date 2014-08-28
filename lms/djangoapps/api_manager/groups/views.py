@@ -465,7 +465,10 @@ class GroupsGroupsDetail(SecureAPIView):
         response_status = status.HTTP_404_NOT_FOUND
         from_group_relationship = GroupRelationship.objects.get(group__id=group_id)
         if from_group_relationship:
-            to_group_relationship = GroupRelationship.objects.get(group__id=related_group_id)
+            try:
+                to_group_relationship = GroupRelationship.objects.get(group__id=related_group_id)
+            except ObjectDoesNotExist:
+                return Response(response_data, status=status.HTTP_404_NOT_FOUND)
             if to_group_relationship and str(to_group_relationship.parent_group_id) == str(group_id):
                 response_data['relationship_type'] = RELATIONSHIP_TYPES['hierarchical']
                 response_status = status.HTTP_200_OK

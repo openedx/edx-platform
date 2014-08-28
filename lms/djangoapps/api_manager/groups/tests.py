@@ -790,7 +790,7 @@ class GroupsApiTests(ModuleStoreTestCase):
         data = {'name': 'Alpha Group', 'type': 'test'}
         alpha_response = self.do_post(self.base_groups_uri, data)
         self.assertEqual(alpha_response.status_code, 201)
-        test_uri = alpha_response.data['uri'] + '/groups/gaois89sdf98'
+        test_uri = alpha_response.data['uri'] + '/groups/1234'
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 

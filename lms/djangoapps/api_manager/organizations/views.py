@@ -9,10 +9,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api_manager.models import Organization
+from api_manager.users.serializers import UserSerializer
 from api_manager.utils import str2bool
 from student.models import CourseEnrollment
 
-from .serializers import OrganizationSerializer, UserSerializer
+from .serializers import OrganizationSerializer
 
 
 class OrganizationsViewSet(viewsets.ModelViewSet):
