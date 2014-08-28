@@ -29,12 +29,16 @@ class EnrollmentTest(ModuleStoreTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
+    USERNAME = "Bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "edx"
+
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
-        self.client.login(username=self.user.username, password="edx")
+        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
         self.urls = [
             reverse('course_modes_choose', kwargs={'course_id': unicode(self.course.id)})
@@ -106,6 +110,50 @@ class EnrollmentTest(ModuleStoreTestCase):
             course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
             self.assertTrue(is_active)
             self.assertEqual(course_mode, enrollment_mode)
+
+    # TODO (ECOM-16): Remove once the auto-registration A/B test completes.
+    def test_enroll_from_redirect_autoreg(self):
+        # Bugfix (ECOM-199): Visitors removed from auto-enroll pool
+        # if they need to authenticate while attempting to enroll.
+        # If a user is (a) in the experimental condition of the A/B test (autoreg enabled)
+        # and (b) is not logged in when registering for a course, then
+        # the user will be redirected to the "control" URL (change_enrollment)
+        # instead of the experimental URL (change_enrollment_autoreg)
+        # We work around this by setting a flag in the session, such that
+        # if a user is *ever* in the experimental condition, they remain
+        # in the experimental condition.
+        for mode_slug in ['honor', 'audit', 'verified']:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+                expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+            )
+
+        # Log out, so we're no longer authenticated
+        self.client.logout()
+
+        # Visit the experimental condition URL
+        resp = self._change_enrollment('enroll', auto_reg=True)
+
+        # Expect that we're denied (since we're not authenticated)
+        # and instead are redirected to the login page
+        self.assertEqual(resp.status_code, 403)
+
+        # Log the user in
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+        # Go to the control URL
+        # This simulates what the JavaScript client does after getting a 403 response
+        # from the register button.
+        resp = self._change_enrollment('enroll')
+
+        # Expect that we're auto-enrolled (even though we used the control URL the second time)
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+
+        # Expect that the auto register flag is still set in the user's session
+        self.assertIn('auto_register', self.client.session)
+        self.assertTrue(self.client.session['auto_register'])
 
     def test_unenroll(self):
         # Enroll the student in the course

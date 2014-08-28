@@ -15,6 +15,7 @@ from django.test.utils import override_settings
 from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
+from django.contrib.sessions.middleware import SessionMiddleware
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -634,8 +635,17 @@ class PaidRegistrationTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     def test_change_enrollment_add_to_cart(self):
-        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id.to_deprecated_string(),
-                                                                       'enrollment_action': 'add_to_cart'})
+        request = self.req_factory.post(
+            reverse('change_enrollment'), {
+                'course_id': self.course.id.to_deprecated_string(),
+                'enrollment_action': 'add_to_cart'
+            }
+        )
+
+        # Add a session to the request
+        SessionMiddleware().process_request(request)
+        request.session.save()
+
         request.user = self.user
         response = change_enrollment(request)
         self.assertEqual(response.status_code, 200)
