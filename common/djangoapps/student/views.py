@@ -619,6 +619,14 @@ def change_enrollment(request, auto_register=False):
         Response
 
     """
+    user = request.user
+
+    action = request.POST.get("enrollment_action")
+    if 'course_id' not in request.POST:
+        return HttpResponseBadRequest(_("Course id not specified"))
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+
     # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
     # If a user is in the experimental condition (auto-registration enabled),
     # immediately set a session flag so they stay in the experimental condition.
@@ -630,13 +638,13 @@ def change_enrollment(request, auto_register=False):
     if request.session.get('auto_register') and not auto_register:
         auto_register = True
 
-    user = request.user
-
-    action = request.POST.get("enrollment_action")
-    if 'course_id' not in request.POST:
-        return HttpResponseBadRequest(_("Course id not specified"))
-
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
+    # We've agreed to exclude certain courses from the A/B test.  If we find ourselves
+    # registering for one of these courses, immediately switch to the control.
+    if unicode(course_id) in getattr(settings, 'AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES', []):
+        auto_register = False
+        if 'auto_register' in request.session:
+            del request.session['auto_register']
 
     if not user.is_authenticated():
         return HttpResponseForbidden()

@@ -78,7 +78,6 @@ class EnrollmentTest(ModuleStoreTestCase):
                 course_id=self.course.id,
                 mode_slug=mode_slug,
                 mode_display_name=mode_slug,
-                expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
             )
 
         # Reverse the expected next URL, if one is provided
@@ -126,8 +125,7 @@ class EnrollmentTest(ModuleStoreTestCase):
             CourseModeFactory.create(
                 course_id=self.course.id,
                 mode_slug=mode_slug,
-                mode_display_name=mode_slug,
-                expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+                mode_display_name=mode_slug
             )
 
         # Log out, so we're no longer authenticated
@@ -154,6 +152,31 @@ class EnrollmentTest(ModuleStoreTestCase):
         # Expect that the auto register flag is still set in the user's session
         self.assertIn('auto_register', self.client.session)
         self.assertTrue(self.client.session['auto_register'])
+
+    # TODO (ECOM-16): Remove once the auto-registration A/B test completes
+    def test_enroll_auto_registration_excluded_course(self):
+        # Create the course modes
+        for mode_slug in ['honor', 'audit', 'verified']:
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug,
+            )
+
+        # Visit the experimental condition URL (when the course is NOT excluded)
+        # This should place us into the experimental condition flow
+        self._change_enrollment('enroll', auto_reg=True)
+
+        # Unenroll from the course (we were registered because auto enroll was enabled)
+        self._change_enrollment('unenroll')
+
+        # Register for the course again, with the course excluded
+        # At this point, we should NOT be in the experimental condition flow
+        excluded_course_ids = [self.course.id.to_deprecated_string()]
+        with self.settings(AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES=excluded_course_ids):
+            self._change_enrollment('enroll')
+            self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+            self.assertNotIn('auto_register', self.client.session)
 
     def test_unenroll(self):
         # Enroll the student in the course
