@@ -1,5 +1,6 @@
-import ddt
 import unittest
+import decimal
+import ddt
 from django.conf import settings
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -162,7 +163,7 @@ class CourseModeViewTest(ModuleStoreTestCase):
     POST_PARAMS_FOR_COURSE_MODE = {
         'audit': {'audit_mode': True},
         'honor': {'honor-code': True},
-        'verified': {'certificate_mode': True}
+        'verified': {'certificate_mode': True, 'contribution': '1.23'}
     }
 
     # TODO (ECOM-16): Remove the auto-register flag once the AB-test completes
@@ -203,3 +204,20 @@ class CourseModeViewTest(ModuleStoreTestCase):
             self.fail("Must provide a valid redirect URL name")
 
         self.assertRedirects(resp, redirect_url)
+
+    def test_remember_donation_for_course(self):
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Choose the mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['verified'])
+
+        # Expect that the contribution amount is stored in the user's session
+        self.assertIn('donation_for_course', self.client.session)
+        self.assertIn(unicode(self.course.id), self.client.session['donation_for_course'])
+
+        actual_amount = self.client.session['donation_for_course'][unicode(self.course.id)]
+        expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
+        self.assertEqual(actual_amount, expected_amount)
