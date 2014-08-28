@@ -14,9 +14,7 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory, Client
 from django.contrib.auth.models import User, AnonymousUser
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponse
-from unittest.case import SkipTest
+from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -43,12 +41,12 @@ class CourseEndingTest(TestCase):
     def test_process_survey_link(self):
         username = "fred"
         user = Mock(username=username)
-        id = unique_id_for_user(user)
+        user_id = unique_id_for_user(user)
         link1 = "http://www.mysurvey.com"
         self.assertEqual(process_survey_link(link1, user), link1)
 
         link2 = "http://www.mysurvey.com?unique={UNIQUE_ID}"
-        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=id)
+        link2_expected = "http://www.mysurvey.com?unique={UNIQUE_ID}".format(UNIQUE_ID=user_id)
         self.assertEqual(process_survey_link(link2, user), link2_expected)
 
     def test_cert_info(self):
@@ -56,90 +54,122 @@ class CourseEndingTest(TestCase):
         survey_url = "http://a_survey.com"
         course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
 
-        self.assertEqual(_cert_info(user, course, None),
-                         {'status': 'processing',
-                          'show_disabled_download_button': False,
-                          'show_download_url': False,
-                          'show_survey_button': False,
-                          })
+        self.assertEqual(
+            _cert_info(user, course, None),
+            {
+                'status': 'processing',
+                'show_disabled_download_button': False,
+                'show_download_url': False,
+                'show_survey_button': False,
+            }
+        )
 
         cert_status = {'status': 'unavailable'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'processing',
-                          'show_disabled_download_button': False,
-                          'show_download_url': False,
-                          'show_survey_button': False,
-                          'mode': None
-                          })
+        self.assertEqual(
+            _cert_info(user, course, cert_status),
+            {
+                'status': 'processing',
+                'show_disabled_download_button': False,
+                'show_download_url': False,
+                'show_survey_button': False,
+                'mode': None
+            }
+        )
 
         cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'generating',
-                          'show_disabled_download_button': True,
-                          'show_download_url': False,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67',
-                          'mode': 'honor'
-                          })
+        self.assertEqual(
+            _cert_info(user, course, cert_status),
+            {
+                'status': 'generating',
+                'show_disabled_download_button': True,
+                'show_download_url': False,
+                'show_survey_button': True,
+                'survey_url': survey_url,
+                'grade': '67',
+                'mode': 'honor'
+            }
+        )
 
         cert_status = {'status': 'regenerating', 'grade': '67', 'mode': 'verified'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'generating',
-                          'show_disabled_download_button': True,
-                          'show_download_url': False,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67',
-                          'mode': 'verified'
-                          })
+        self.assertEqual(
+            _cert_info(user, course, cert_status),
+            {
+                'status': 'generating',
+                'show_disabled_download_button': True,
+                'show_download_url': False,
+                'show_survey_button': True,
+                'survey_url': survey_url,
+                'grade': '67',
+                'mode': 'verified'
+            }
+        )
 
         download_url = 'http://s3.edx/cert'
-        cert_status = {'status': 'downloadable', 'grade': '67',
-                       'download_url': download_url, 'mode': 'honor'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'ready',
-                          'show_disabled_download_button': False,
-                          'show_download_url': True,
-                          'download_url': download_url,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67',
-                          'mode': 'honor'
-                          })
+        cert_status = {
+            'status': 'downloadable', 'grade': '67',
+            'download_url': download_url,
+            'mode': 'honor'
+        }
+        self.assertEqual(
+            _cert_info(user, course, cert_status),
+            {
+                'status': 'ready',
+                'show_disabled_download_button': False,
+                'show_download_url': True,
+                'download_url': download_url,
+                'show_survey_button': True,
+                'survey_url': survey_url,
+                'grade': '67',
+                'mode': 'honor'
+            }
+        )
 
-        cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url, 'mode': 'honor'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'notpassing',
-                          'show_disabled_download_button': False,
-                          'show_download_url': False,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67',
-                          'mode': 'honor'
-                          })
+        cert_status = {
+            'status': 'notpassing', 'grade': '67',
+            'download_url': download_url,
+            'mode': 'honor'
+        }
+        self.assertEqual(
+            _cert_info(user, course, cert_status),
+            {
+                'status': 'notpassing',
+                'show_disabled_download_button': False,
+                'show_download_url': False,
+                'show_survey_button': True,
+                'survey_url': survey_url,
+                'grade': '67',
+                'mode': 'honor'
+            }
+        )
 
         # Test a course that doesn't have a survey specified
         course2 = Mock(end_of_course_survey_url=None)
-        cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url, 'mode': 'honor'}
-        self.assertEqual(_cert_info(user, course2, cert_status),
-                         {'status': 'notpassing',
-                          'show_disabled_download_button': False,
-                          'show_download_url': False,
-                          'show_survey_button': False,
-                          'grade': '67',
-                          'mode': 'honor'
-                          })
+        cert_status = {
+            'status': 'notpassing', 'grade': '67',
+            'download_url': download_url, 'mode': 'honor'
+        }
+        self.assertEqual(
+            _cert_info(user, course2, cert_status),
+            {
+                'status': 'notpassing',
+                'show_disabled_download_button': False,
+                'show_download_url': False,
+                'show_survey_button': False,
+                'grade': '67',
+                'mode': 'honor'
+            }
+        )
 
         # test when the display is unavailable or notpassing, we get the correct results out
         course2.certificates_display_behavior = 'early_no_info'
         cert_status = {'status': 'unavailable'}
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
-        cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url, 'mode': 'honor'}
+        cert_status = {
+            'status': 'notpassing', 'grade': '67',
+            'download_url': download_url,
+            'mode': 'honor'
+        }
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
 
@@ -256,7 +286,7 @@ class DashboardTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_refundable_when_certificate_exists(self):
-        verified_mode = CourseModeFactory.create(
+        CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='verified',
             mode_display_name='Verified',
@@ -266,7 +296,7 @@ class DashboardTest(TestCase):
 
         self.assertTrue(enrollment.refundable())
 
-        generated_certificate = GeneratedCertificateFactory.create(
+        GeneratedCertificateFactory.create(
             user=self.user,
             course_id=self.course.id,
             status=CertificateStatuses.downloadable,
@@ -274,6 +304,7 @@ class DashboardTest(TestCase):
         )
 
         self.assertFalse(enrollment.refundable())
+
 
 class EnrollInCourseTest(TestCase):
     """Tests enrolling and unenrolling in courses."""
@@ -513,7 +544,8 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.client.login(username=self.user.username, password='secret')
         self.url = reverse('change_enrollment')
 
-    def enroll_through_view(self, course):
+    def _enroll_through_view(self, course):
+        """ Enroll a student in a course. """
         response = self.client.post(
             reverse('change_enrollment'), {
                 'course_id': course.id.to_deprecated_string(),
@@ -524,7 +556,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
 
     def test_enroll_as_honor(self):
         """Tests that a student can successfully enroll through this view"""
-        response = self.enroll_through_view(self.course)
+        response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 200)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
@@ -540,7 +572,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course.id)
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         # now try to enroll that student
-        response = self.enroll_through_view(self.course)
+        response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
 
     def test_change_to_honor_if_verified(self):
@@ -551,7 +583,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
         # now try to enroll the student in the honor mode:
-        response = self.enroll_through_view(self.course)
+        response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
@@ -574,7 +606,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertFalse(is_active)
         self.assertEqual(enrollment_mode, u'verified')
         # now enroll them through the view:
-        response = self.enroll_through_view(self.course)
+        response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 200)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
             self.user, self.course.id
@@ -640,7 +672,7 @@ class AnonymousLookupTable(TestCase):
         self.assertIsNone(user_by_anonymous_id(None))
 
     def test_roundtrip_for_logged_user(self):
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
