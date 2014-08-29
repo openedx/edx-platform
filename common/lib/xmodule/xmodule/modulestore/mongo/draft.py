@@ -589,13 +589,13 @@ class DraftModuleStore(MongoModuleStore):
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
         self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
+    @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
         """
         Check if the xblock or its children have been changed since the last publish.
         :param xblock: xblock to check
         :return: True if the draft and published versions differ
         """
-
         # don't check children if this block has changes (is not public)
         if self.compute_publish_state(xblock) != PublishState.public:
             return True

@@ -571,7 +571,7 @@ def _get_xblock(usage_key, user):
     """
     store = modulestore()
     try:
-        return store.get_item(usage_key)
+        return store.get_item(usage_key, depth=None)
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
@@ -595,6 +595,9 @@ def _get_module_info(xblock, rewrite_static_links=True):
             None,
             course_id=xblock.location.course_key
         )
+
+    # Pre-cache has changes for the entire course because we'll need it for the ancestor info
+    modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
 
     # Note that children aren't being returned until we have a use case.
     return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
@@ -756,7 +759,7 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info['children']
+    children = child_info and child_info.get('children', [])
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True
