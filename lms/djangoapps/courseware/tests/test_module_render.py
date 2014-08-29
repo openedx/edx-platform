@@ -326,8 +326,13 @@ class TestTOC(ModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
         self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
+<<<<<<< HEAD
         self.toy_course = self.store.get_course(self.toy_loc, depth=2)
         with check_mongo_calls(num_finds, num_sends):
+=======
+        with check_mongo_calls(num_finds, num_sends):
+            self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+>>>>>>> release
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 self.toy_loc, self.request.user, self.toy_course, depth=2
             )

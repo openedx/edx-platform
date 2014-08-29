@@ -27,6 +27,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from .access import has_course_access
 from django.utils.translation import ugettext as _
+from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
