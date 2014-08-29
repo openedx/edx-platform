@@ -1,19 +1,43 @@
 describe 'ThreadResponseView', ->
     beforeEach ->
-        setFixtures """
-            <script id="thread-response-template" type="text/template">
-                <div/>
-            </script>
-            <div id="thread-response-fixture"/>
-        """
+        DiscussionSpecHelper.setUpGlobals()
+        DiscussionSpecHelper.setUnderscoreFixtures()
+
         @response = new Comment {
             children: [{}, {}]
         }
-        @view = new ThreadResponseView({model: @response, el: $("#thread-response-fixture")})
+        @view = new ThreadResponseView({model: @response, el: $("#fixture-element")})
         spyOn(ThreadResponseShowView.prototype, "render")
         spyOn(ResponseCommentView.prototype, "render")
 
     describe 'renderComments', ->
+        it 'hides "show comments" link if collapseComments is not set', ->
+            @view.render()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
+        it 'hides "show comments" link if collapseComments is set but response has no comments', ->
+            @response = new Comment { children: [] }
+            @view = new ThreadResponseView({
+                model: @response, el: $("#fixture-element"),
+                collapseComments: true
+            })
+            @view.render()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
+        it 'hides comments if collapseComments is set and shows them when "show comments" link is clicked', ->
+            @view = new ThreadResponseView({
+                model: @response, el: $("#fixture-element"),
+                collapseComments: true
+            })
+            @view.render()
+            expect(@view.$(".comments")).not.toBeVisible()
+            expect(@view.$(".action-show-comments")).toBeVisible()
+            @view.$(".action-show-comments").click()
+            expect(@view.$(".comments")).toBeVisible()
+            expect(@view.$(".action-show-comments")).not.toBeVisible()
+
         it 'populates commentViews and binds events', ->
             # Ensure that edit view is set to test invocation of cancelEdit
             @view.createEditView()

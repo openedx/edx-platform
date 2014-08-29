@@ -34,6 +34,8 @@ if Backbone?
 
     retrieveAnotherPage: (mode, options={}, sort_options={}, error=null)->
       data = { page: @current_page + 1 }
+      if _.contains(["unread", "unanswered", "flagged"], options.filter)
+        data[options.filter] = true
       switch mode
         when 'search'
           url = DiscussionUtil.urlFor 'search'
@@ -43,9 +45,6 @@ if Backbone?
           data['commentable_ids'] = options.commentable_ids
         when 'all'
           url = DiscussionUtil.urlFor 'threads'
-        when 'flagged'
-          data['flagged'] = true
-          url = DiscussionUtil.urlFor 'search'
         when 'followed'
           url = DiscussionUtil.urlFor 'followed_threads', options.user_id
       if options['group_id']

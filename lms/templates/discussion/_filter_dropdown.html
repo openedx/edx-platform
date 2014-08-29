@@ -14,7 +14,7 @@
 <%def name="render_entry(entries, entry)">
     <li
         class="forum-nav-browse-menu-item"
-        data-discussion-id='${json.dumps(entries[entry])}'
+        data-discussion-id='${entries[entry]["id"]}'
         data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
     >
         <a href="#" class="forum-nav-browse-title">${entry}</a>
@@ -42,11 +42,6 @@
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
             <a href="#" class="forum-nav-browse-title">${_("All Discussions")}</a>
         </li>
-        %if flag_moderator:
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-flagged">
-            <a href="#" class="forum-nav-browse-title"><i class="icon icon-flag"></i>${_("Flagged Discussions")}</a>
-        </li>
-        %endif
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
             <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>${_("Posts I'm Following")}</a>
         </li>

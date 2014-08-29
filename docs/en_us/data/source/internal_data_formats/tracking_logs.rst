@@ -215,7 +215,12 @@ on the server. The values in this field are:
 
 **Type:** string
 
-**Details:** The type of event triggered. Values depend on ``event_source``. 
+**Details:** The type of event triggered. Values depend on ``event_source``.
+
+The :ref:`Student_Event_Types` and :ref:`Instructor_Event_Types` sections in
+this chapter provide descriptions of each type of event that is included in
+data packages. To locate information about a specific event type, see the
+:ref:`event_list`.
 
 ===================
 ``host`` Field
