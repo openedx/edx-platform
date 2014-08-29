@@ -124,7 +124,7 @@ pep8==1.4.5
 pylint==0.28
 python-subunit==0.0.16
 rednose==0.3
-selenium==2.39.0
+selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
 
