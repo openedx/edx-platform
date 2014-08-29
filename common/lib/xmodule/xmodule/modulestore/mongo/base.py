@@ -1228,6 +1228,38 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     jsonfields[field_name] = field.read_json(xblock)
         return jsonfields
 
+    def _get_non_orphan_parents(self, location, parents, revision):
+        """
+        Extract non orphan parents by traversing the list of possible parents and remove current location
+        from orphan parents to avoid parents calculation overhead next time.
+        """
+        non_orphan_parents = []
+        for parent in parents:
+            parent_loc = Location._from_deprecated_son(parent['_id'], location.course_key.run)
+
+            # travel up the tree for orphan validation
+            ancestor_loc = parent_loc
+            while ancestor_loc is not None:
+                current_loc = ancestor_loc
+                ancestor_loc = self._get_raw_parent_location(current_loc, revision)
+                if ancestor_loc is None:
+                    # The parent is an orphan, so remove all the children including
+                    # the location whose parent we are looking for from orphan parent
+                    self.collection.update(
+                        {'_id': parent_loc.to_deprecated_son()},
+                        {'$set': {'definition.children': []}},
+                        multi=False,
+                        upsert=True,
+                        safe=self.collection.safe
+                    )
+                elif ancestor_loc.category == 'course':
+                    # once we reach the top location of the tree and if the location is not an orphan then the
+                    # parent is not an orphan either
+                    non_orphan_parents.append(parent_loc)
+                    break
+
+        return non_orphan_parents
+
     def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):
         '''
         Helper for get_parent_location that finds the location that is the parent of this location in this course,
@@ -1254,10 +1286,18 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         if revision == ModuleStoreEnum.RevisionOption.published_only:
             if parents.count() > 1:
-                # should never have multiple PUBLISHED parents
-                raise ReferentialIntegrityError(
-                    u"{} parents claim {}".format(parents.count(), location)
-                )
+                non_orphan_parents = self._get_non_orphan_parents(location, parents, revision)
+                if len(non_orphan_parents) == 0:
+                    # no actual parent found
+                    return None
+
+                if len(non_orphan_parents) > 1:
+                    # should never have multiple PUBLISHED parents
+                    raise ReferentialIntegrityError(
+                        u"{} parents claim {}".format(parents.count(), location)
+                    )
+                else:
+                    return non_orphan_parents[0]
             else:
                 # return the single PUBLISHED parent
                 return Location._from_deprecated_son(parents[0]['_id'], location.course_key.run)
@@ -1265,9 +1305,20 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             # there could be 2 different parents if
             #   (1) the draft item was moved or
             #   (2) the parent itself has 2 versions: DRAFT and PUBLISHED
+            #  if there are multiple parents with version PUBLISHED then choose from non-orphan parents
+            all_parents = []
+            published_parents = 0
+            for parent in parents:
+                if parent['_id']['revision'] is None:
+                    published_parents += 1
+                all_parents.append(parent)
 
             # since we sorted by SORT_REVISION_FAVOR_DRAFT, the 0'th parent is the one we want
-            found_id = parents[0]['_id']
+            if published_parents > 1:
+                non_orphan_parents = self._get_non_orphan_parents(location, all_parents, revision)
+                return non_orphan_parents[0]
+
+            found_id = all_parents[0]['_id']
             # don't disclose revision outside modulestore
             return Location._from_deprecated_son(found_id, location.course_key.run)
 
