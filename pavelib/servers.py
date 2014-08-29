@@ -10,7 +10,7 @@ from .utils.process import run_process, run_multi_processes
 
 
 DEFAULT_PORT = {"lms": 8000, "studio": 8001}
-DEFAULT_SETTINGS = 'dev'
+DEFAULT_SETTINGS = 'devstack'
 
 
 def run_server(system, settings=None, port=None, skip_assets=False):
@@ -25,6 +25,9 @@ def run_server(system, settings=None, port=None, skip_assets=False):
         print("System must be either lms or studio", file=sys.stderr)
         exit(1)
 
+    if not settings:
+        settings = DEFAULT_SETTINGS
+
     if not skip_assets:
         # Local dev settings use staticfiles to serve assets, so we can skip the collecstatic step
         args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
@@ -32,9 +35,6 @@ def run_server(system, settings=None, port=None, skip_assets=False):
 
     if port is None:
         port = DEFAULT_PORT[system]
-
-    if settings is None:
-        settings = DEFAULT_SETTINGS
 
     run_process(django_cmd(
         system, settings, 'runserver', '--traceback',
@@ -78,6 +78,7 @@ def studio(options):
 @task
 @needs('pavelib.prereqs.install_prereqs')
 @consume_args
+@no_help
 def devstack(args):
     """
     Start the devstack lms or studio server
@@ -115,7 +116,7 @@ def run_all_servers(options):
     """
     Runs Celery workers, Studio, and LMS.
     """
-    settings = getattr(options, 'settings', 'dev')
+    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     settings_lms = getattr(options, 'settings_lms', settings)
     settings_cms = getattr(options, 'settings_cms', settings)
     worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
@@ -145,7 +146,7 @@ def update_db():
     """
     Runs syncdb and then migrate.
     """
-    settings = getattr(options, 'settings', 'dev')
+    settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     sh(django_cmd('lms', settings, 'syncdb', '--traceback', '--pythonpath=.'))
     sh(django_cmd('lms', settings, 'migrate', '--traceback', '--pythonpath=.'))
 

@@ -207,7 +207,7 @@ def update_assets(args):
         help="lms or studio",
     )
     parser.add_argument(
-        '--settings', type=str, default="dev",
+        '--settings', type=str, default="devstack",
         help="Django settings module",
     )
     parser.add_argument(
