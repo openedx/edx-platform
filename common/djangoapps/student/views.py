@@ -634,6 +634,25 @@ def change_enrollment(request, auto_register=False):
         ))
         return HttpResponseBadRequest(_("Invalid course id"))
 
+    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
+    # If a user is in the experimental condition (auto-registration enabled),
+    # immediately set a session flag so they stay in the experimental condition.
+    # We keep them in the experimental condition even if later on the user
+    # tries to register using the control URL (e.g. because of a redirect from the login page,
+    # which is hard-coded to use the control URL).
+    if auto_register:
+        request.session['auto_register'] = True
+    if request.session.get('auto_register') and not auto_register:
+        auto_register = True
+
+    # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
+    # We've agreed to exclude certain courses from the A/B test.  If we find ourselves
+    # registering for one of these courses, immediately switch to the control.
+    if unicode(course_id) in getattr(settings, 'AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES', []):
+        auto_register = False
+        if 'auto_register' in request.session:
+            del request.session['auto_register']
+
     if not user.is_authenticated():
         return HttpResponseForbidden()
 
@@ -671,11 +690,6 @@ def change_enrollment(request, auto_register=False):
         # TODO (ECOM-16): Once the auto-registration AB-test is complete, delete
         # one of these two conditions and remove the `auto_register` flag.
         if auto_register:
-            # TODO (ECOM-16): This stores a flag in the session so downstream
-            # views will recognize that the user is in the "auto-registration"
-            # experimental condition.  We can remove this once the AB test completes.
-            request.session['auto_register'] = True
-
             available_modes = CourseMode.modes_for_course_dict(course_id)
 
             # Handle professional ed as a special case.
@@ -710,12 +724,6 @@ def change_enrollment(request, auto_register=False):
         # before sending them to the "choose your track" page.
         # This is the control for the auto-registration AB-test.
         else:
-            # TODO (ECOM-16): If the user is NOT in the experimental condition,
-            # make sure their session reflects this.  We can remove this
-            # once the AB test completes.
-            if 'auto_register' in request.session:
-                del request.session['auto_register']
-
             # If this course is available in multiple modes, redirect them to a page
             # where they can choose which mode they want.
             available_modes = CourseMode.modes_for_course(course_id)
