@@ -11,11 +11,10 @@ from django.conf import settings
 from django.dispatch import Signal
 from django.core.cache import get_cache
 
-from xmodule.modulestore import Location
-from courseware.models import StudentModule, StudentModuleHistory
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 from instructor.offline_gradecalc import student_grades
+from courseware.models import StudentModule, StudentModuleHistory
 
 
 log = logging.getLogger("mitx.module_tree_reset")
@@ -42,13 +41,13 @@ class TreeNode(object):
             try:
                 self.smstate = StudentModule.objects.get(
                     course_id=self.course_id,
-                    module_state_key=str(self.module.location),
+                    module_state_key=self.module.location.url(),
                     student=student)
             except StudentModule.DoesNotExist:
                 pass
 
     def __str__(self):
-        s = "-" * self.level + ("> %s" % str(self.module.location))
+        s = "-" * self.level + ("> %s" % self.module.location.url())
         s += '  (%s)' % self.module.display_name
 
         if self.smstate is not None:
@@ -218,7 +217,7 @@ class ProctorModuleInfo(object):
         for rpmod in self.rpmods:
             try:
                 sm = StudentModule.objects.get(
-                    module_state_key=str(rpmod.ra_rand.location),
+                    module_state_key=rpmod.ra_rand.location.url(),
                     course_id=self.course.id,
                     student=student)  # randomize state
             except StudentModule.DoesNotExist:
@@ -226,7 +225,7 @@ class ProctorModuleInfo(object):
             sm.rpmod = rpmod
             try:
                 ps_sm = StudentModule.objects.get(
-                    module_state_key=str(rpmod.ra_ps.location),
+                    module_state_key=rpmod.ra_ps.location.url(),
                     course_id=self.course.id,
                     student=student)  # problemset state
             except StudentModule.DoesNotExist:
@@ -277,7 +276,7 @@ class ProctorModuleInfo(object):
 
         s = 'State for student %s:\n' % student
         status = {}  # this can be turned into a JSON str for the proctor panel
-        status['student'] = dict(username=str(student),
+        status['student'] = dict(username=student.username,
                                  name=student.profile.name, id=student.id)
         status['assignments'] = []
 
@@ -303,7 +302,8 @@ class ProctorModuleInfo(object):
                         attempted=attempted,
                         visited=visited,
                         earned=earned,
-                        possible=possible)
+                        possible=possible,
+                        proctor_loc=sm.rpmod.location.url())
             status['assignments'].append(stat)
             s += "[%s] %s -> %s (%s) %s [%s]\n" % (name, stat['assignment'],
                                                    stat['pm_sm'], sm.choice,
@@ -336,43 +336,42 @@ class ProctorModuleInfo(object):
                 ret["grade_%s" % stat['name']] = ''
         return ret
 
-    def _get_od_for_assignment(self, student, assignment):
-        return OrderedDict(id=student.id,
-                           name=student.profile.name,
-                           username=student.username,
-                           assignment=assignment['name'],
-                           problem=assignment['problem'],
-                           date=str(datetime.datetime.now()),
-                           earned=assignment['earned'],
-                           possible=assignment['possible'])
+    def proctor_reset(self, student, proctor_loc,
+                      wipe_randomize_history=False, student_status=None):
+        student = self._get_student_obj(student)
+        status = student_status or self.get_student_status(student)
+        assignments = status['assignments']
+        try:
+            ass = [i for i in assignments if i['proctor_loc'] == proctor_loc]
+            assert len(ass) == 1
+            ass = ass.pop()
+        except AssertionError:
+            raise Exception("proctor_loc = %s not found!" % proctor_loc)
+        if ass['visited'] and ass['earned'] != ass['possible']:
+            log.info('Resetting %s for student %s' %
+                     (ass['name'], student.username))
+            pmod = self.ms.get_instance(self.course.id, proctor_loc)
+            tnset = TreeNodeSet(self.course.id, pmod, self.ms, student)
+            msg = tnset.reset_randomization(wipe_history=wipe_randomize_history)
+            log.debug(msg)
+            return msg
 
     def get_assignments_attempted_and_failed(self, student, reset=False,
                                              wipe_randomize_history=False):
         student = self._get_student_obj(student)
         status = self.get_student_status(student)
-        failed = [self._get_od_for_assignment(student, a)
-                  for a in status['assignments']
-                  if a['visited'] and a['earned'] != a['possible']]
+        failed = [a for a in status['assignments'] if a['visited'] and
+                  a['earned'] != a['possible']]
         for f in failed:
             log.info(
                 "Student %s Assignment %s attempted '%s' but failed "
-                "(%s/%s)" % (student, f['assignment'], f['problem'],
+                "(%s/%s)" % (student.username, f['name'], f['problem'],
                              f['earned'], f['possible']))
             if reset:
                 try:
-                    log.info('resetting %s for student %s' %
-                             (f['assignment'], f['username']))
-                    cloc = self.course.location
-                    assi_url = Location(cloc.tag, cloc.org,
-                                        cloc.course, 'proctor',
-                                        f['assignment'])
-                    pmod = self.ms.get_instance(self.course.id,
-                                                assi_url.url())
-                    tnset = TreeNodeSet(self.course.id, pmod, self.ms,
-                                        student)
-                    msg = tnset.reset_randomization(
-                        wipe_history=wipe_randomize_history)
-                    log.debug(str(msg))
+                    self.proctor_reset(
+                        student, f['proctor_loc'], student_status=status,
+                        wipe_randomize_history=wipe_randomize_history)
                 except Exception:
                     log.exception("Failed to do reset of %s for %s" %
                                   (f['assignment'], student))

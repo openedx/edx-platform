@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import csv
+import datetime
+from collections import OrderedDict
 
 from courseware.module_tree_reset import ProctorModuleInfo
 
@@ -43,11 +45,22 @@ arguments."""
             courseenrollment__course_id=pminfo.course.id).order_by('username')
         failed = []
         for student in students:
-            failed += pminfo.get_assignments_attempted_and_failed(
-                student, reset=not dry_run,
-                wipe_randomize_history=wipe_history)
+            failed += [self._get_od_for_assignment(student, i) for i in
+                       pminfo.get_assignments_attempted_and_failed(
+                           student, reset=not dry_run,
+                           wipe_randomize_history=wipe_history)]
         if csv_file:
             self.write_to_csv(csv_file, failed)
+
+    def _get_od_for_assignment(self, student, assignment):
+        return OrderedDict(id=student.id,
+                           name=student.profile.name,
+                           username=student.username,
+                           assignment=assignment['name'],
+                           problem=assignment['problem'],
+                           date=str(datetime.datetime.now()),
+                           earned=assignment['earned'],
+                           possible=assignment['possible'])
 
     def write_to_csv(self, file_name, failed_assignments):
         fieldnames = ['id', 'name', 'username', 'assignment', 'problem',
