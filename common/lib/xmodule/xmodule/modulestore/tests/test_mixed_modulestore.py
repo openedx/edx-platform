@@ -1,34 +1,32 @@
-import pymongo
-from uuid import uuid4
+import datetime
 import ddt
 import itertools
-from importlib import import_module
-from collections import namedtuple
+import pymongo
 import unittest
-import datetime
+
+from collections import namedtuple
+from importlib import import_module
 from pytz import UTC
-
-from xmodule.tests import DATA_DIR
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.exceptions import InvalidVersionError
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from uuid import uuid4
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
-from xmodule.modulestore.tests.factories import check_mongo_calls
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import DuplicateCourseError, NoPathToItem
-
 if not settings.configured:
     settings.configure()
-from xmodule.modulestore.mixed import MixedModuleStore
+
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.tests import DATA_DIR
 
 
 @ddt.ddt
@@ -908,6 +906,68 @@ class TestMixedModuleStore(unittest.TestCase):
         with check_mongo_calls(max_find, max_send):
             found_orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID].course_key)
         self.assertItemsEqual(found_orphans, orphan_locations)
+
+    @ddt.data('draft')
+    def test_get_non_orphan_parents(self, default_ms):
+        """
+        Test finding non orphan parents from many possible parents.
+        """
+        self.initdb(default_ms)
+        course_id = self.course_locations[self.MONGO_COURSEID].course_key
+
+        # create parented children
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        # test that problem "problem_x1a_1" has only one published parent
+        mongo_store = self.store._get_modulestore_for_courseid(course_id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)
+            self.assertEqual(parent, self.vertical_x1a)
+
+        # add some published orphans
+        orphan_sequential = course_id.make_usage_key('sequential', 'OrphanSequential')
+        orphan_vertical = course_id.make_usage_key('vertical', 'OrphanVertical')
+        orphan_locations = [orphan_sequential, orphan_vertical]
+        for location in orphan_locations:
+            self.store.create_item(
+                self.user_id,
+                location.course_key,
+                location.block_type,
+                block_id=location.block_id
+            )
+            self.store.publish(location, self.user_id)
+
+        found_orphans = mongo_store.get_orphans(course_id)
+        self.assertEqual(set(found_orphans), set(orphan_locations))
+        self.assertEqual(len(set(found_orphans)), 2)
+
+        # add orphan vertical and sequential as another parents of problem "problem_x1a_1"
+        mongo_store.collection.update(
+            orphan_sequential.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+        mongo_store.collection.update(
+            orphan_vertical.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+        # test that "get_parent_location" method of published branch still returns the correct non-orphan parent for
+        # problem "problem_x1a_1" since the two other parents are orphans
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)
+            self.assertEqual(parent, self.vertical_x1a)
+
+        # now add valid published vertical as another parent of problem
+        mongo_store.collection.update(
+            self.sequential_x1.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+        # now check that "get_parent_location" method of published branch raises "ReferentialIntegrityError" for
+        # problem "problem_x1a_1" since it has now 2 valid published parents
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
+            self.assertTrue(self.store.has_item(self.problem_x1a_1))
+            with self.assertRaises(ReferentialIntegrityError):
+                self.store.get_parent_location(self.problem_x1a_1)
 
     @ddt.data('draft')
     def test_create_item_from_parent_location(self, default_ms):
