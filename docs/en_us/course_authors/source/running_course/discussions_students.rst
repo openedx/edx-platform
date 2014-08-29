@@ -277,10 +277,8 @@ Add a Response or Comment to a Content-Specific Discussion Topic
 
 6. Add a response or comment.
 
- - To add a response to the post, click **Add A Response** either immediately
-   below the post or in the text box that appears below the existing
-   responses. (If yours is the first response, you can just begin typing in
-   your text.) When your response is complete, click **Submit**.
+ - To add a response to the post, click **Add A Response**. When your response
+   is complete, click **Submit**.
 
  - To add a comment to a response, click in the **Add a comment** field below
    the response. When your comment is complete, click **Submit**.
@@ -298,10 +296,8 @@ content-specific discussion topics.
 
 #. Add a response or comment.
 
- - To add a response to the post, click **Add A Response** either immediately
-   below the post or in the text box that appears below the existing responses.
-   (If yours is the first response, you can just begin typing in your text.)
-   When your response is complete, click **Submit**.
+ - To add a response to the post, click **Add A Response**. When your response
+   is complete, click **Submit**.
 
   .. image:: /Images/Discussion_add_response.png
     :alt: The **Add A Response** button located between a post and its 
