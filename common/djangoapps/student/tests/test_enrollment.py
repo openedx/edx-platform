@@ -142,6 +142,11 @@ class EnrollmentTest(ModuleStoreTestCase):
         resp = self._change_enrollment('not_an_action')
         self.assertEqual(resp.status_code, 400)
 
+    def test_with_invalid_course_id(self):
+        CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
+        resp = self._change_enrollment('unenroll', course_id="edx/")
+        self.assertEqual(resp.status_code, 400)
+
     def _change_enrollment(self, action, course_id=None, auto_reg=False):
         """
         Change the student's enrollment status in a course.
