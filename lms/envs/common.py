@@ -367,6 +367,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
 
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.open_source_footer_context_processor',
+
+    # TODO: Used for header and footer feature flags. Remove as part of ECOM-136
+    'edxmako.shortcuts.header_footer_context_processor',
+
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
 )
