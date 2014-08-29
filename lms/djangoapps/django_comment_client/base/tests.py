@@ -12,6 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from django_comment_client.base import views
+from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_common.utils import seed_permissions_roles
@@ -19,6 +20,7 @@ from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +33,114 @@ class MockRequestSetupMixin(object):
 
     def _set_mock_request_data(self, mock_request, data):
         mock_request.return_value = self._create_repsonse_mock(data)
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class CreateCohortedThreadTestCase(CohortedContentTestCase):
+    """
+    Tests how `views.create_thread` passes `group_id` to the comments service
+    for cohorted topics.
+    """
+    def _create_thread_in_cohorted_topic(
+            self,
+            user,
+            mock_request,
+            group_id,
+            pass_group_id=True,
+            expected_status_code=200
+    ):
+        self._create_thread(user, "cohorted_topic", mock_request, group_id, pass_group_id, expected_status_code)
+
+    def test_student_without_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.student, mock_request, None, pass_group_id=False)
+        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
+
+    def test_student_none_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.student, mock_request, None)
+        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
+
+    def test_student_with_own_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.student, mock_request, self.student_cohort.id)
+        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
+
+    def test_student_with_other_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.student, mock_request, self.moderator_cohort.id)
+        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
+
+    def test_moderator_without_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, pass_group_id=False)
+        self._assert_mock_request_called_with_group_id(mock_request, self.moderator_cohort.id)
+
+    def test_moderator_none_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, None, expected_status_code=400)
+        self.assertFalse(mock_request.called)
+
+    def test_moderator_with_own_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, self.moderator_cohort.id)
+        self._assert_mock_request_called_with_group_id(mock_request, self.moderator_cohort.id)
+
+    def test_moderator_with_other_group_id(self, mock_request):
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, self.student_cohort.id)
+        self._assert_mock_request_called_with_group_id(mock_request, self.student_cohort.id)
+
+    def test_moderator_with_invalid_group_id(self, mock_request):
+        invalid_id = self.student_cohort.id + self.moderator_cohort.id
+        self._create_thread_in_cohorted_topic(self.moderator, mock_request, invalid_id, expected_status_code=400)
+        self.assertFalse(mock_request.called)
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class CreateNonCohortedThreadTestCase(CohortedContentTestCase):
+    """
+    Tests how `views.create_thread` passes `group_id` to the comments service
+    for non-cohorted topics.
+    """
+    def _create_thread_in_non_cohorted_topic(
+            self,
+            user,
+            mock_request,
+            group_id,
+            pass_group_id=True,
+            expected_status_code=200
+    ):
+        self._create_thread(user, "non_cohorted_topic", mock_request, group_id, pass_group_id, expected_status_code)
+
+    def test_student_without_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None, pass_group_id=False)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_student_none_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_student_with_own_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.student, mock_request, self.student_cohort.id)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_student_with_other_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.student, mock_request, self.moderator_cohort.id)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_moderator_without_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, None, pass_group_id=False)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_moderator_none_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.student, mock_request, None)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_moderator_with_own_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, self.moderator_cohort.id)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_moderator_with_other_group_id(self, mock_request):
+        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, self.student_cohort.id)
+        self._assert_mock_request_called_without_group_id(mock_request)
+
+    def test_moderator_with_invalid_group_id(self, mock_request):
+        invalid_id = self.student_cohort.id + self.moderator_cohort.id
+        self._create_thread_in_non_cohorted_topic(self.moderator, mock_request, invalid_id)
+        self._assert_mock_request_called_without_group_id(mock_request)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -574,6 +684,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
         assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
+
 
 @patch("lms.lib.comment_client.utils.requests.request")
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
