@@ -24,9 +24,9 @@ from edx_notifications.lib.publisher import (
     get_notification_type
 )
 from edx_notifications.data import NotificationMessage
-from courseware.courses import get_course_with_access, get_course_by_id
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, is_commentable_cohorted, get_cohort_by_id
 from openedx.core.djangoapps.course_groups.tasks import publish_course_group_notification_task
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 import django_comment_client.settings as cc_settings
 from django_comment_common.signals import (
     thread_created,
@@ -274,6 +274,33 @@ def create_thread(request, course_id, commentable_id):
         return HttpResponseBadRequest("Invalid cohort id")
     if group_id is not None:
         thread.group_id = group_id
+
+    user = cc.User.from_django_user(request.user)
+
+    #kevinchugh because the new requirement is that all groups will be determined
+    #by the group id in the request this all goes away
+    #not anymore, only for admins
+
+    # Cohort the thread if the commentable is cohorted.
+    if is_commentable_cohorted(course_key, commentable_id):
+        user_group_id = get_cohort_id(user, course_key)
+
+        # TODO (vshnayder): once we have more than just cohorts, we'll want to
+        # change this to a single get_group_for_user_and_commentable function
+        # that can do different things depending on the commentable_id
+        if has_permission(request.user, "see_all_cohorts", course_key):
+            # admins can optionally choose what group to post as
+            try:
+                group_id = int(post.get('group_id', user_group_id))
+                get_cohort_by_id(course_key, group_id)
+            except (ValueError, CourseUserGroup.DoesNotExist):
+                return HttpResponseBadRequest("Invalid cohort id")
+        else:
+            # regular users always post with their own id.
+            group_id = user_group_id
+
+        if group_id:
+            thread.group_id = group_id
 
     thread.save()
 
