@@ -38,7 +38,7 @@ define('video/10_commands.js', [], function() {
             var args = [].slice.call(arguments, 1) || [];
 
             if (_.has(this.commands, command)) {
-                this.commands[command].execute.apply(this, [this.state].concat(args));
+                return this.commands[command].execute.apply(this, [this.state].concat(args));
             } else {
                 console.log('Command "' + command + '" is not available.');
             }
@@ -67,30 +67,34 @@ define('video/10_commands.js', [], function() {
 
     playCommand = new Command('play', function (state) {
         state.videoPlayer.play();
+        return true;
     });
 
     pauseCommand = new Command('pause', function (state) {
         state.videoPlayer.pause();
+        return false;
     });
 
     togglePlaybackCommand = new Command('togglePlayback', function (state) {
         if (state.videoControl.isPlaying) {
-            pauseCommand.execute(state);
+            return pauseCommand.execute(state);
         } else {
-            playCommand.execute(state);
+            return playCommand.execute(state);
         }
     });
 
     muteCommand = new Command('mute', function (state) {
         state.videoVolumeControl.mute(true);
+        return true;
     });
 
     unmuteCommand = new Command('unmute', function (state) {
         state.videoVolumeControl.mute(false);
+        return false;
     });
 
     toggleMuteCommand = new Command('toggleMute', function (state) {
-        state.videoVolumeControl.toggleMute();
+        return state.videoVolumeControl.toggleMute();
     });
 
     toggleFullScreenCommand = new Command('toggleFullScreen', function (state) {

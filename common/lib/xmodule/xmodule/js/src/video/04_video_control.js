@@ -277,6 +277,7 @@ function () {
             .text(text);
 
         this.el.trigger('fullscreen', [this.isFullScreen]);
+        return this.isFullScreen;
     }
 
     function exitFullScreen(event) {
