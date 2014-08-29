@@ -1399,7 +1399,7 @@ class CustomResponseTest(ResponseTest):
         #       or an ordered list of answers (if there are multiple inputs)
         #
         # The function should return a dict of the form
-        # { 'ok': BOOL, 'msg': STRING }
+        # { 'ok': BOOL, 'msg': STRING } (no 'grade_decimal' key to test that it's optional)
         #
         script = textwrap.dedent("""
             def check_func(expect, answer_given):
@@ -1414,9 +1414,11 @@ class CustomResponseTest(ResponseTest):
 
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
+        npoints = correct_map.get_npoints('1_2_1')
 
         self.assertEqual(correctness, 'correct')
         self.assertEqual(msg, "Message text")
+        self.assertEqual(npoints, 1)
 
         # Incorrect answer
         input_dict = {'1_2_1': '0'}
@@ -1424,9 +1426,45 @@ class CustomResponseTest(ResponseTest):
 
         correctness = correct_map.get_correctness('1_2_1')
         msg = correct_map.get_msg('1_2_1')
+        npoints = correct_map.get_npoints('1_2_1')
 
         self.assertEqual(correctness, 'incorrect')
         self.assertEqual(msg, "Message text")
+        self.assertEqual(npoints, 0)
+
+    def test_function_code_single_input_decimal_score(self):
+        # For function code, we pass in these arguments:
+        #
+        #   'expect' is the expect attribute of the <customresponse>
+        #
+        #   'answer_given' is the answer the student gave (if there is just one input)
+        #       or an ordered list of answers (if there are multiple inputs)
+        #
+        # The function should return a dict of the form
+        # { 'ok': BOOL, 'msg': STRING, 'grade_decimal': FLOAT }
+        #
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {
+                    'ok': answer_given == expect,
+                    'msg': 'Message text',
+                    'grade_decimal': 0.9 if answer_given == expect else 0.1,
+                }
+        """)
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42")
+
+        # Correct answer
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.9)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+        # Incorrect answer
+        input_dict = {'1_2_1': '43'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
     def test_function_code_multiple_input_no_msg(self):
 
@@ -1469,7 +1507,7 @@ class CustomResponseTest(ResponseTest):
         # the check function can return a dict of the form:
         #
         # {'overall_message': STRING,
-        #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] }
+        #  'input_list': [{'ok': BOOL, 'msg': STRING}, ...] } (no grade_decimal to test it's optional)
         #
         # 'overall_message' is displayed at the end of the response
         #
@@ -1502,10 +1540,58 @@ class CustomResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
         self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
 
+        # Expect that the inputs were given correct npoints
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0)
+        self.assertEqual(correct_map.get_npoints('1_2_2'), 1)
+        self.assertEqual(correct_map.get_npoints('1_2_3'), 1)
+
         # Expect that we received messages for each individual input
         self.assertEqual(correct_map.get_msg('1_2_1'), 'Feedback 1')
         self.assertEqual(correct_map.get_msg('1_2_2'), 'Feedback 2')
         self.assertEqual(correct_map.get_msg('1_2_3'), 'Feedback 3')
+
+    def test_function_code_multiple_inputs_decimal_score(self):
+
+        # If the <customresponse> has multiple inputs associated with it,
+        # the check function can return a dict of the form:
+        #
+        # {'overall_message': STRING,
+        #  'input_list': [{'ok': BOOL, 'msg': STRING, 'grade_decimal': FLOAT}, ...] }
+        #        #
+        # 'input_list' contains dictionaries representing the correctness
+        #           and message for each input.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                check1 = (int(answer_given[0]) == 1)
+                check2 = (int(answer_given[1]) == 2)
+                check3 = (int(answer_given[2]) == 3)
+                score1 = 0.9 if check1 else 0.1
+                score2 = 0.9 if check2 else 0.1
+                score3 = 0.9 if check3 else 0.1
+                return {
+                    'input_list': [
+                        {'ok': check1, 'grade_decimal': score1, 'msg': 'Feedback 1'},
+                        {'ok': check2, 'grade_decimal': score2, 'msg': 'Feedback 2'},
+                        {'ok': check3, 'grade_decimal': score3, 'msg': 'Feedback 3'},
+                    ]
+                }
+            """)
+
+        problem = self.build_problem(script=script, cfn="check_func", num_inputs=3)
+
+        # Grade the inputs (one input incorrect)
+        input_dict = {'1_2_1': '-999', '1_2_2': '2', '1_2_3': '3'}
+        correct_map = problem.grade_answers(input_dict)
+
+        # Expect that the inputs were graded individually
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+        self.assertEqual(correct_map.get_correctness('1_2_2'), 'correct')
+        self.assertEqual(correct_map.get_correctness('1_2_3'), 'correct')
+
+        # Expect that the inputs were given correct npoints
+        self.assertEqual(correct_map.get_npoints('1_2_1'), 0.1)
+        self.assertEqual(correct_map.get_npoints('1_2_2'), 0.9)
+        self.assertEqual(correct_map.get_npoints('1_2_3'), 0.9)
 
     def test_function_code_with_extra_args(self):
         script = textwrap.dedent("""\
