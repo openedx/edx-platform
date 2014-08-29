@@ -15,7 +15,7 @@ function (Component) {
                 items: {},
 
                 name: '',
-                dataAttrs: {options: options, menu: this},
+                dataAttrs: {menu: this},
                 attrs: {},
                 callback: $.noop
             };
@@ -49,6 +49,104 @@ function (Component) {
             return this.element;
         },
 
+        show: function () { },
+
+        open: function () {
+            this.getChilds()[0].focus();
+        },
+        close: function () { },
+
+        delegateEvents: function () {
+            this.getElement().on('keydown', '.menu-item', this.itemHandler.bind(this));
+        },
+
+        openHandler: function (event) {},
+        closeHandler: function (event) {},
+
+        // Get previous element in array or cycles back to the last if it is the
+        // first.
+        previousItem: function (index) {
+            var childs = this.getChilds();
+            return childs[index < 1 ? childs.length - 1 : index - 1];
+        },
+
+        // Get next element in array or cycles back to the first if it is the last.
+        nextItem: function (index) {
+            var childs = this.getChilds();
+            return childs[index >= childs.length - 1 ? 0 : index + 1];
+        },
+
+        isItemsFocused: function () {
+            // var childs = this.getChilds();
+            // return $(childs).is(':focus');
+        },
+
+        itemHandler: function (event) {
+            var callback = this.options.callback,
+                item = $(event.currentTarget).data('menu');
+
+            // if ($.isFunction(callback)) {
+                event.preventDefault();
+                switch(event.type) {
+                    case 'click':
+                        // callback.call(this, key, options);
+                        break;
+                    case 'keydown':
+                        this.keyDownHandler.call(this, event, item);
+                        break;
+                }
+            // }
+        },
+
+        keyDownHandler: function (event, item) {
+            var KEY = $.ui.keyCode,
+                keyCode = event.keyCode,
+                target = $(event.currentTarget),
+                index = target.index();
+
+            debugger
+            switch (keyCode) {
+                // Scroll up menu, wrapping at the top. Keep menu open.
+                case KEY.UP:
+                    this.previousItem(index).focus();
+                    event.stopPropagation();
+                    break;
+                // Scroll down  menu, wrapping at the bottom. Keep menu
+                // open.
+                case KEY.DOWN:
+                    this.nextItem(index).focus();
+                    event.stopPropagation();
+                    break;
+                // Close menu.
+                case KEY.TAB:
+                    this.close();
+                    event.stopPropagation();
+                    break;
+                // Close menu, give focus to button and change
+                // file type.
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.close();
+                    event.stopPropagation();
+                    break;
+                // Close menu and give focus to speed control.
+                case KEY.ESCAPE:
+                    this.close();
+                    break;
+            }
+
+            return false;
+        }
+    });
+
+    Menu = AbstractMenu.extend({
+        createElement: function () {
+            return $('<ol />', {
+                'class': 'menu',
+                'role': 'menu'
+            });
+        },
+
         show: function () {
             var fragment = document.createDocumentFragment();
 
@@ -60,103 +158,9 @@ function (Component) {
             return this.getElement();
         },
 
-        open: function () { },
-        close: function () { },
-
-        delegateEvents: function () {
-            this.getElement().on('keydown', '> li', this.itemHandler.bind(this));
-        },
-
-        openHandler: function (event) {},
-        closeHandler: function (event) {},
-
-        // Get previous element in array or cycles back to the last if it is the
-        // first.
-        previousItem: function (index) {
-            var childs = this.getChilds();
-            return childs[index < 1 ? childs.length - 1 : index - 1].getElement();
-        },
-
-        // Get next element in array or cycles back to the first if it is the last.
-        nextItem: function (index) {
-            var childs = this.getChilds();
-            return childs[index >= childs.length - 1 ? 0 : index + 1].getElement();
-        },
-
-        isItemsFocused: function () {
-            // var childs = this.getChilds();
-            // return $(childs).is(':focus');
-        },
-
-        itemHandler: function (event) {
-            var callback = this.options.callback,
-                data, key, options;
-
-            // if ($.isFunction(callback)) {
-                event.preventDefault();
-                data = $(event.currentTarget).data();
-                key = data.key;
-                options = data.options;
-                switch(event.type) {
-                    case 'click':
-                        // callback.call(this, key, options);
-                        break;
-                    case 'keydown':
-                        this.keyDownHandler.call(this, event);
-                        break;
-                }
-            // }
-        },
-
-        keyDownHandler: function (event) {
-            var KEY = $.ui.keyCode,
-                keyCode = event.keyCode,
-                target = $(event.currentTarget),
-                index;
-
-            index = target.index();
-            switch (keyCode) {
-                // Scroll up menu, wrapping at the top. Keep menu open.
-                case KEY.UP:
-                    this.previousItem(index).focus();
-                    break;
-                // Scroll down  menu, wrapping at the bottom. Keep menu
-                // open.
-                case KEY.DOWN:
-                    this.nextItem(index).focus();
-                    break;
-                // Close menu.
-                case KEY.TAB:
-                    this.close();
-                    // TODO
-                    // What has to happen here? In speed menu, tabbing backward
-                    // will give focus to Play/Pause button and tabbing
-                    // forward to Volume button.
-                    break;
-                // Close menu, give focus to button and change
-                // file type.
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    // this.button.focus();
-                    // this.changeFileType.call(this, event);
-                    this.close();
-                    break;
-                // Close menu and give focus to speed control.
-                case KEY.ESCAPE:
-                    this.close();
-                    // this.button.focus();
-                    break;
-            }
-            return false;
-        }
-    });
-
-    Menu = AbstractMenu.extend({
-        createElement: function () {
-            return $('<ol />', {
-                'class': 'menu',
-                'role': 'menu'
-            }).data({'menu': this});
+        focus: function () {
+            this.getChilds()[0].focus();
+            return this;
         }
     });
 
@@ -177,10 +181,8 @@ function (Component) {
 
             element.append(this.list);
             return element;
-        }
-    });
+        },
 
-    Submenu.prototype = {
         show: function () {
             var fragment = document.createDocumentFragment();
 
@@ -192,27 +194,33 @@ function (Component) {
             return this.getElement();
         },
 
-        keyDownHandler: function (event) {
+        keyDownHandler: function (event, item) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
+            debugger
             switch (keyCode) {
                 case KEY.RIGHT:
-                    if (this.getChilds()[0]) {
-                      this.getChilds()[0].getElement().focus();
-                    }
+                    this.open();
+                    event.stopPropagation();
                     break;
 
                 case KEY.LEFT:
-                    if (this.parent) {
-                      this.parent.getElement().focus();
-                    }
+                    this.focus();
+                    event.stopPropagation();
                     break;
-            };
+                default:
+                    this.__super__.keyDownHandler.apply(this, arguments);
+            }
 
-            return this.__super__.keyDownHandler.apply(this);
-        }
-    };
+            return false;
+        },
+
+        focus: function () {
+            this.getElement().focus();
+            return this;
+        }
+    });
 
     MenuItem = function (options) {
         this.options = $.extend(true, {
@@ -284,6 +292,11 @@ function (Component) {
                         break;
                 }
             }
+        },
+
+        focus: function () {
+            this.getElement().focus();
+            return this;
         }
     };
 
@@ -326,6 +339,7 @@ function (Component) {
                         }
                     },
                     'speed': {
+                        name: 'Speed',
                         items: {
                             '0.75': {name: '0.75x', callback: speedCallback},
                             '1.0': {name: '1.0x', callback: speedCallback},
