@@ -272,13 +272,14 @@ Add a Response or Comment to a Content-Specific Discussion Topic
 #. Click **Expand discussion**.
    
   .. image:: /Images/Discussion_expand.png
-    :alt: The **Expand discussion** link under a postß
+    :alt: The **Expand discussion** link under a post
 
 6. Add a response or comment.
 
- - To add a response to the post, click **Add A Response** below the post. (If
-   yours is the first response, you can just begin typing in your text.) When
-   your response is complete, click **Submit**.
+ - To add a response to the post, click **Add A Response** either immediately
+   below the post or in the text box that appears below the existing
+   responses. (If yours is the first response, you can just begin typing in
+   your text.) When your response is complete, click **Submit**.
 
  - To add a comment to a response, click in the **Add a comment** field below
    the response. When your comment is complete, click **Submit**.
@@ -296,12 +297,14 @@ content-specific discussion topics.
 
 #. Add a response or comment.
 
- - To add a response to the post, click **Add A Response** below the post. (If
-   yours is the first response, you can just begin typing in your text.) When
-   your response is complete, click **Submit**.  
+ - To add a response to the post, click **Add A Response** either immediately
+   below the post or in the text box that appears below the existing responses.
+   (If yours is the first response, you can just begin typing in your text.)
+   When your response is complete, click **Submit**.
 
   .. image:: /Images/Discussion_add_response.png
-    :alt: The **Add Response** button located between a post and its responses 
+    :alt: The **Add A Response** button located between a post and its 
+          responses 
 
  - To add a comment to a response, click in the **Add a comment** field below
    the response. When your comment is complete, click **Submit**.   
@@ -414,7 +417,7 @@ correct: click the "Mark as Answer" icon that appears at upper right of
 the response.
 
 .. image:: ../Images/Discussion_answer_question.png
- :alt: A question and a response, with the Marck as Answer icon circled
+ :alt: A question and a response, with the Mark as Answer icon circled
 
 After at least one response is marked as the answer, a check or tick mark image
 replaces the question mark image for the post in the list on the **Discussion**
@@ -435,6 +438,6 @@ review: view the contribution, click the "More" icon, and then click
 **Report**.
 
 .. image:: ../Images/Discussion_reportmisuse.png
- :alt: A post and a response with the "Report Misuse" link circled
+ :alt: A post and a response with the "Report" link circled
 
 .. Future: DOC-121 As a course author, I need a template of discussion guidelines to give to students

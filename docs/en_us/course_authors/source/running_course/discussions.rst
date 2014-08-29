@@ -169,7 +169,7 @@ these roles:
   by community TAs have a colored "Community TA" identifier. This role is often
   given to students.
 
-.. 
+.. put this comment in to make the formatting of this bulleted list consistent when output using the spinx template
 
 * *Discussion admins* have the same options for working with discussions as
   moderators, and their posts, responses, and comments have the same "Staff"
