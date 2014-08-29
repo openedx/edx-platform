@@ -53,7 +53,7 @@ from course_modes.models import CourseMode
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
-EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","company_reference","internal_reference"'
+EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
 EXPECTED_COUPON_CSV_HEADER = '"course_id","percentage_discount","code_redeemed_count","description"'
 
 @common_exceptions_400
@@ -1366,9 +1366,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         #create testing invoice 1
         self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_email='Test@company.com', recipient_name='Testw',
-            recipient_email='test1@test.com', customer_reference_number='2Fwe23S', internal_reference="A",
-            company_reference='', course_id=self.course.id, is_valid=True
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
+            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="A", course_id=self.course.id, is_valid=True
         )
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -1500,9 +1500,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         #create test invoice 2
         sale_invoice_2 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test2', company_email='test2@test.com', recipient_name='Testw_2',
-            recipient_email='test2@test.com', customer_reference_number='2Fwe23S', internal_reference="B",
-            company_reference='', course_id=self.course.id
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
+            recipient_name='Testw_2', recipient_email='test2@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="B", course_id=self.course.id
         )
 
         for i in range(5):
@@ -1528,9 +1528,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res['recipient_email'], invoice.recipient_email)
         self.assertEqual(res['recipient_name'], invoice.recipient_name)
         self.assertEqual(res['company_name'], invoice.company_name)
-        self.assertEqual(res['company_email'], invoice.company_email)
+        self.assertEqual(res['company_contact_name'], invoice.company_contact_name)
+        self.assertEqual(res['company_contact_email'], invoice.company_contact_email)
         self.assertEqual(res['internal_reference'], invoice.internal_reference)
-        self.assertEqual(res['company_reference'], invoice.company_reference)
         self.assertEqual(res['customer_reference_number'], invoice.customer_reference_number)
         self.assertEqual(res['invoice_number'], invoice.id)
         self.assertEqual(res['created_by'], course_registration_code.created_by.username)
@@ -2607,10 +2607,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_email': 'Test@company.com', 'sale_price': 122.45,
-            'recipient_name': 'Test123', 'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
+            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
             'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'company_reference': '', 'internal_reference': '', 'invoice': ''
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
@@ -2635,11 +2636,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
                                kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_email': 'test@company.com',
-            'sale_price': 121.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': 'True'
+            'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 121.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
         }
 
         # user invoice copy preference will be saved in api user preference; model
@@ -2677,11 +2678,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_email': 'test@company.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
@@ -2703,11 +2704,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         coupon = Coupon(code='first', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor)
         coupon.save()
         data = {
-            'total_registration_codes': 3, 'company_name': 'Group Alpha', 'company_email': 'test@company.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 3, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
@@ -2727,11 +2728,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 2, 'company_name': 'Test Group', 'company_email': 'test@123.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 2, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
@@ -2763,10 +2764,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         )
 
         data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_email': 'test@213.com', 'sale_price': 122.45,
-            'recipient_name': 'Test123', 'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
-            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
-            'customer_reference_number': '123A23F', 'company_reference': '', 'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'sale_price': 122.45, 'company_contact_email': 'Test@company.com', 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
@@ -2812,11 +2814,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         )
 
         data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_email': 'test@21312.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
@@ -2851,11 +2853,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         )
 
         data = {
-            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_email': 'test@ac.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': ''
+            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
@@ -2878,11 +2880,11 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         )
 
         data = {
-            'total_registration_codes': 5.5, 'company_name': 'Group Invoice', 'company_email': 'test@ac.com',
-            'sale_price': 122.45, 'recipient_name': 'Test123', 'recipient_email': 'test@123.com',
-            'address_line_1': 'Portland Street', 'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '',
-            'zip': '', 'country': '', 'customer_reference_number': '123A23F', 'company_reference': '',
-            'internal_reference': '', 'invoice': True
+            'total_registration_codes': 5.5, 'company_name': 'Group Invoice', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': True
         }
 
         response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})

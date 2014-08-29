@@ -1057,10 +1057,12 @@ input[name="subject"] {
       li:nth-child(even){
         margin-left: 0px !important;
       }
-      li:nth-child(3n+2) {
+      li:nth-child(3n) {
         margin-left: 15px !important;
       }
-      li:nth-child(3n) {
+      li#generate-registration-modal-field-company-contact-name,
+      li#generate-registration-modal-field-address-line-3,
+      li#generate-registration-modal-field-zipcode {
         margin-left: 15px !important;
       }
       li:last-child{
