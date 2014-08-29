@@ -1744,8 +1744,10 @@ def get_survey(request, course_id):  # pylint: disable=W0613
             writer.writerow(encoded)
         return response
 
-    header = ['Unit ID', 'Survey Name', 'Created', 'User Name', 'Gender', 'Year of Birth',
-              'Level of Education', 'Disabled']
+    #Note(#EDX-501): Modified temporarily.
+    #header = ['Unit ID', 'Survey Name', 'Created', 'User Name', 'Gender', 'Year of Birth',
+    #          'Level of Education', 'Disabled']
+    header = ['Unit ID', 'Survey Name', 'Created', 'User Name', 'Disabled']
     rows = []
 
     submissions = list(SurveySubmission.objects.raw(
@@ -1772,9 +1774,10 @@ def get_survey(request, course_id):  # pylint: disable=W0613
 
         for s in submissions:
             row = [s.unit_id, s.survey_name, s.created, s.username]
-            row.append(dict(UserProfile.GENDER_CHOICES).get(s.gender, s.gender) or '')
-            row.append(s.year_of_birth or '')
-            row.append(dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES).get(s.level_of_education, s.level_of_education) or '')
+            #Note(EDX-501): Modified temporarily.
+            #row.append(dict(UserProfile.GENDER_CHOICES).get(s.gender, s.gender) or '')
+            #row.append(s.year_of_birth or '')
+            #row.append(dict(UserProfile.LEVEL_OF_EDUCATION_CHOICES).get(s.level_of_education, s.level_of_education) or '')
             row.append(s.account_status if s.account_status == UserStanding.ACCOUNT_DISABLED else '')
             for key in keys:
                 value = s.get_survey_answer().get(key, '')
