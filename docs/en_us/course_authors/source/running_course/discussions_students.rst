@@ -19,11 +19,7 @@ participation more effective. These include ways to:
 
 * :ref:`Keep Up with New Activity`
 
-* :ref:`Follow Posts`
-
-* :ref:`Vote for Posts or Responses`
-
-* :ref:`Report Discussion Misuse`
+* :ref:`React to Contributions`
 
 .. _Anatomy of edX Course Discussions:
 
