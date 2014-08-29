@@ -1610,7 +1610,7 @@ class CoursesCompletionsLeadersList(SecureAPIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
         detached_categories = ['discussion-course', 'group-project', 'discussion-forum']
-        total_possible_completions = len(get_course_leaf_nodes(course_key, detached_categories))
+        total_possible_completions = float(len(get_course_leaf_nodes(course_key, detached_categories)))
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
         cat_list = [Q(content_id__contains=item.strip()) for item in detached_categories]
         cat_list = reduce(lambda a, b: a | b, cat_list)
