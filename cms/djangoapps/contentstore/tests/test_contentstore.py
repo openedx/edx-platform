@@ -1488,6 +1488,12 @@ class ContentStoreTest(ContentStoreTestCase):
         course_module = self.store.get_course(course_key)
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
 
+    def test_course_handler_with_invalid_course_key_string(self):
+        """Test viewing the course overview page with invalid course id"""
+
+        response = self.client.get_html('/course/edX/test')
+        self.assertEquals(response.status_code, 404)
+
 
 class MetadataSaveTestCase(ContentStoreTestCase):
     """Test that metadata is correctly cached and decached."""
