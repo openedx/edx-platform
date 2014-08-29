@@ -285,7 +285,8 @@
       var recipient_email = $('input[name="recipient_email"]').val();
       var sale_price = $('input[name="sale_price"]').val();
       var company_name = $('input[name="company_name"]').val();
-      var company_email = $('input[name="company_email"]').val();
+      var company_contact_name = $('input[name="company_contact_name"]').val();
+      var company_contact_email = $('input[name="company_contact_email"]').val();
 
       var address_line = $('input[name="address_line_1"]').val();
 
@@ -301,13 +302,25 @@
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (company_email == '') {
+      if (company_contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company email');
+        registration_code_error.text('Please enter the company contact name');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (!(validateEmail(company_email))) {
+      if (($.isNumeric(company_contact_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the non-numeric value for company contact name');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (company_contact_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text('Please enter the company contact email');
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(company_contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please enter the valid email address');
         generate_registration_button.removeAttr('disabled');
@@ -552,7 +565,8 @@
      $('input[name="recipient_name"]').val('');
      $('input[name="sale_price"]').val('');
      $('input[name="recipient_email"]').val('');
-     $('input[name="company_email"]').val('');
+     $('input[name="company_contact_name"]').val('');
+     $('input[name="company_contact_email"]').val('');
      $('input[name="invoice"]').attr('checked', 'checked');
      $('input[name="company_reference"]').val('');
      $('input[name="internal_reference"]').val('');

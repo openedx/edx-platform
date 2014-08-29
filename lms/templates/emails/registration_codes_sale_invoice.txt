@@ -12,7 +12,7 @@ ${_("Bill To:")}
 
 ${_("{company_name}").format(company_name=invoice.company_name)}
 
-${_("{purchaser_name}").format(purchaser_name=invoice.recipient_name)}
+${_("{purchaser_name}").format(purchaser_name=invoice.company_contact_name)}
 
 % if invoice.customer_reference_number:
 ${_("Customer Reference Number: {customer_reference_number}").format(customer_reference_number=invoice.customer_reference_number)}

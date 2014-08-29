@@ -566,9 +566,9 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     query_features = [
-        'company_name', 'company_email', 'total_codes', 'total_used_codes', 'total_amount', 'created_at', 'company_reference',
-        'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by', 'internal_reference', 'invoice_number',
-        'codes', 'course_id'
+        'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
+        'total_amount', 'created_at', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
+        'internal_reference', 'invoice_number', 'codes', 'course_id'
     ]
 
     sale_data = instructor_analytics.basic.sale_record_features(course_id, query_features)
@@ -781,7 +781,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     # csv headers
     query_features = [
         'code', 'course_id', 'company_name', 'created_by',
-        'redeemed_by', 'invoice_id', 'purchaser', 'company_reference', 'internal_reference'
+        'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
     ]
 
     registration_codes = instructor_analytics.basic.course_registration_features(query_features, codes_list, csv_type)
@@ -843,7 +843,8 @@ def generate_registration_codes(request, course_id):
         course_code_number = int(float(request.POST['total_registration_codes']))
 
     company_name = request.POST['company_name']
-    company_email = request.POST['company_email']
+    company_contact_name = request.POST['company_contact_name']
+    company_contact_email = request.POST['company_contact_email']
     sale_price = request.POST['sale_price']
     recipient_name = request.POST['recipient_name']
     recipient_email = request.POST['recipient_email']
@@ -854,7 +855,6 @@ def generate_registration_codes(request, course_id):
     state = request.POST['state']
     zip_code = request.POST['zip']
     country = request.POST['country']
-    company_reference = request.POST['company_reference']
     internal_reference = request.POST['internal_reference']
     customer_reference_number = request.POST['customer_reference_number']
     recipient_list = [recipient_email]
@@ -864,12 +864,11 @@ def generate_registration_codes(request, course_id):
 
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
-        total_amount=sale_price, company_name=company_name, company_email=company_email,
-        course_id=course_id, recipient_name=recipient_name, recipient_email=recipient_email,
-        address_line_1=address_line_1, address_line_2=address_line_2,
+        total_amount=sale_price, company_name=company_name, company_contact_email=company_contact_email,
+        company_contact_name=company_contact_name, course_id=course_id, recipient_name=recipient_name,
+        recipient_email=recipient_email, address_line_1=address_line_1, address_line_2=address_line_2,
         address_line_3=address_line_3, city=city, state=state, zip=zip_code, country=country,
-        company_reference=company_reference, internal_reference=internal_reference,
-        customer_reference_number=customer_reference_number
+        internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
     for _ in range(course_code_number):  # pylint: disable=W0621
         save_registration_codes(request, course_id, course_registration_codes, sale_invoice)

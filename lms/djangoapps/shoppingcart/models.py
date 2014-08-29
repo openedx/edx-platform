@@ -324,7 +324,8 @@ class Invoice(models.Model):
          but will not do so via a Credit Card transaction.
     """
     company_name = models.CharField(max_length=255, db_index=True)
-    company_email = models.CharField(max_length=255)
+    company_contact_name = models.CharField(max_length=255)
+    company_contact_email = models.CharField(max_length=255)
     recipient_name = models.CharField(max_length=255)
     recipient_email = models.CharField(max_length=255)
     address_line_1 = models.CharField(max_length=255)
@@ -336,7 +337,6 @@ class Invoice(models.Model):
     country = models.CharField(max_length=64, null=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     total_amount = models.FloatField()
-    company_reference = models.CharField(max_length=255, null=True)
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)

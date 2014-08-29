@@ -275,8 +275,9 @@ class DashboardTest(TestCase):
         #create testing invoice 1
         sale_invoice_1 = shoppingcart.models.Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
-            company_contact_email='test1@test.com', purchase_order_number='2Fwe23S', internal_reference="A",
-            company_reference='', course_id=self.course.id, is_valid=False
+            company_contact_email='test1@test.com', customer_reference_number='2Fwe23S',
+            recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
+            course_id=self.course.id, is_valid=False
         )
         course_reg_code = shoppingcart.models.CourseRegistrationCode(code="abcde", course_id=self.course.id,
                                                                      created_by=self.user, invoice=sale_invoice_1)
