@@ -85,9 +85,9 @@ discussion topics.
 
 * Content-specific topics are indented under an identifying category name. 
 
-Notice that while you can access content-specific topics both on the
-**Discussion** page and while you are navigating through course content on the
-**Courseware** page, you can only access the course-wide topics on the
+Notice that you can access content-specific topics both on the **Discussion**
+page and also while you are navigating through course content on the
+**Courseware** page. However, you can only access the course-wide topics on the
 **Discussion** page.
 
 Before you add a post, look through the topics. When you add your post to the
@@ -125,11 +125,12 @@ open-ended conversation (a discussion).
 Find Posts
 ******************************
 
-Finding out whether someone else has already started a conversation about the
-same subject that interests you, and then reading and contributing to that
-exchange instead of starting a new one, helps make the time that everyone
-spends with the course discussion more productive. You can search for something
-specific, or you can browse through the posts in a single discussion topic.
+Finding out whether someone else has already asked the same question or
+initiated a conversation about the same subject that interests you, and then
+reading and contributing to that exchange instead of starting a new one, helps
+make the time that everyone spends with the course discussion more productive.
+You can search for something specific, or you can browse through the posts in a
+single discussion topic.
 
 =======================
 Search the Discussions
@@ -338,10 +339,10 @@ completely.
 
 The total number of contributions in the exchange (the post and its responses
 and comments) appears in each callout image. To see the number of contributions
-that you haven't read yet, move your cursor to hover over the callout image.
+that you haven't read yet, move your cursor over the callout image.
 
 .. image:: ../Images/Discussion_mouseover.png
- :alt: A post with 3 contributions total and a popup that shows only two are 
+ :alt: A post with 4 contributions total and a popup that shows only two are 
        unread 
 
 The color-coded callout images appear when you sort the list of posts **by
@@ -357,34 +358,49 @@ You have the option to receive an email message each day that summarizes
 discussion activity for the posts you are following. To receive this daily
 digest, click **Discussion** and then select the **Receive updates** checkbox.
 
-.. _Follow Posts:
+
+.. _React to Contributions:
 
 ************************************
-Follow Posts
+Provide Feedback on Contributions
 ************************************
 
-If you find a post particularly interesting and want to return to it in the
-future, you can follow it: view that post and click the "Follow" icon.
+As you read the contributions that other students and staff make to discussion
+topics, you can provide feedback without writing a complete response or
+comment. You can:
 
-.. image:: ../Images/Discussion_follow.png
- :alt: A post with the Follow icon circled
+* :ref:`Vote for posts and responses<Vote for Posts or Responses>` to provide
+  positive feedback.
 
-Each post that you follow appears with a "Following" indicator in the list of
-posts.
+* :ref:`Follow posts<Follow Posts>` so that you can check back in on
+  interesting conversations and questions easily.
 
-To list only the posts that you are following, regardless of the discussion
-topic they apply to, click the drop-down Discussion list and select
-**Posts I'm Following**.
+* :ref:`Answer questions, and mark your questions as answered<Answer
+  Questions>`.
 
-.. image:: ../Images/Discussion_filterfollowing.png
- :alt: The list of posts with the "Posts I'm Following" filter selected. Every
-       post in the list shows the following indicator.
+* :ref:`Report a contribution<Report Discussion Misuse>` that is inappropriate
+  to the course staff.
+
+To select a feedback option, you use the icons at the top right of each post,
+response, or comment. When you move your cursor over these icons a label
+appears.
+
+.. image:: ../Images/Discussion_options_mouseover.png
+ :alt: The icons at top right of a post, shown before the cursor is 
+      placed over each one and with the Vote, Follow, and More labels
+
+When you click the "More" icon, a menu of the options that currently apply
+appears.
+
+.. image:: ../Images/Discussion_More_menu.png
+ :alt: The More icon expanded to show a menu with one option and a menu with 
+       three options
 
 .. _Vote for Posts or Responses:
 
-************************************
+==============================
 Vote for Posts or Responses
-************************************
+==============================
 
 If you like a post or one of its responses, you can vote for it: view the
 post or response and click the "Vote" icon at top right.
@@ -403,16 +419,39 @@ votes**.
 The number of votes that each post has received displays in the list of posts.
 (Votes for responses are not included in the number.)
 
+.. _Follow Posts:
+
+==============================
+Follow Posts
+==============================
+
+If you find a post particularly interesting and want to return to it in the
+future, you can follow it: view that post and click the "Follow" icon.
+
+.. image:: ../Images/Discussion_follow.png
+ :alt: A post with the Follow icon circled
+
+Each post that you follow appears with a "Following" indicator in the list of
+posts.
+
+To list only the posts that you are following, regardless of the discussion
+topic they apply to, click the drop-down Discussion list and select
+**Posts I'm Following**.
+
+.. image:: ../Images/Discussion_filterfollowing.png
+ :alt: The list of posts with the "Posts I'm Following" filter selected. Every
+       post in the list shows the following indicator.
+
 .. _Answer Questions:
 
-************************************************************
+============================================================
 Answer Questions and Mark Questions as Answered 
-************************************************************
+============================================================
 
-Anyone in a course can answer questions. Just add a response to the post with
-your answer.
+Anyone in a course can answer questions. Just add a response to the question
+post with your answer.
 
-The person who posted the question and staff members can mark responses as
+The person who posted the question (and staff members) can mark responses as
 correct: click the "Mark as Answer" icon that appears at upper right of
 the response.
 
@@ -429,9 +468,9 @@ page.
 
 .. _Report Discussion Misuse:
 
-************************************
+==============================
 Report Discussion Misuse
-************************************
+==============================
 
 You can flag any post, response, or comment for a discussion moderator to
 review: view the contribution, click the "More" icon, and then click
