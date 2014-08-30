@@ -148,6 +148,11 @@ $a11y--blue-s1: saturate($blue,15%);
     &:first-childs {
       border-top: none;
     }
+
+    &:hover {
+      background: #000;
+      color: #fff;
+    }
   }
 
   .submenu-item {

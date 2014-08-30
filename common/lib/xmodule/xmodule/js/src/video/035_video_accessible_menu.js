@@ -13,9 +13,9 @@ function (Component) {
     AbstractMenu = Component.extend({
         initialize: function (options) {
             this.options = {
+                id: _.uniqueId(),
                 prefix: 'prefix-',
                 items: {},
-
                 label: '',
                 dataAttrs: {menu: this},
                 attrs: {},
@@ -151,8 +151,6 @@ function (Component) {
                     event.stopPropagation();
                     break;
                 case KEY.ESCAPE:
-                case KEY.ENTER:
-                case KEY.SPACE:
                     this.close();
                     break;
             }
@@ -291,7 +289,13 @@ function (Component) {
 
             if ($.isFunction(callback)) {
                 callback.call(this, event, this, this.options);
+                this.parent.close();
+                // this.getElement().addClass('is-active');
             }
+        },
+
+        unactivate: function () {
+            this.getElement().removeClass('is-active');
         },
 
         itemHandler: function (event) {
