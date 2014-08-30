@@ -290,7 +290,7 @@ function (Component) {
             if ($.isFunction(callback)) {
                 callback.call(this, event, this, this.options);
                 this.parent.close();
-                // this.getElement().addClass('is-active');
+                this.getElement().addClass('is-active');
             }
         },
 
