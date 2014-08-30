@@ -7,130 +7,152 @@ define(
 function (Component) {
     var AbstractMenu, Menu, Submenu, MenuItem;
 
+    var DEBUG_KEYDOWN_EVENTS = false;
+    var DEBUG_MOUSE_EVENTS = false;
+
     AbstractMenu = Component.extend({
-        initialize: function (container, options) {
+        initialize: function (options) {
             this.options = {
-                menuClass: 'specific-menu-class',
-                itemClass: 'specific-menu-item-class',
+                prefix: 'prefix-',
                 items: {},
 
-                name: '',
+                label: '',
                 dataAttrs: {menu: this},
                 attrs: {},
                 callback: $.noop
             };
 
             $.extend(true, this.options, options);
-            this.childs = [];
+            this.children = [];
             this.element = this.createElement();
             this.delegateEvents();
+        },
+
+        delegateEvents: function () {
+            this.getElement().on('keydown mouseleave mouseover', '.menu-item', this.itemHandler.bind(this));
         },
 
         createElement: function () {
             return null;
         },
 
-
         remove: function () {
-            this.element.removeNode(true);
+            this.getElement().remove();
         },
 
         addChild: function (child) {
-            this.childs.push(child);
+            var firstChild = null, lastChild = null;
+            if (this.hasChildren()) {
+                lastChild = this.getLastChild();
+                lastChild.next = child;
+                firstChild = this.getFirstChild();
+                firstChild.prev = child;
+            }
             child.parent = this;
+            child.next = firstChild;
+            child.prev = lastChild;
+            this.children.push(child);
         },
 
-        getChilds: function () {
+        getChildren: function () {
             // Returns the copy.
-            return this.childs.concat();
+            return this.children.concat();
+        },
+
+        hasChildren: function () {
+            return this.getChildren().length > 0;
+        },
+
+        getFirstChild: function () {
+            return this.children[0];
+        },
+
+        getLastChild: function () {
+            var len = this.children.length;
+            return this.children[len - 1];
         },
 
         getElement: function () {
             return this.element;
         },
 
-        show: function () { },
+        populateElement: function () {
+            var fragment = document.createDocumentFragment();
 
-        open: function () {
-            this.getChilds()[0].focus();
+            _.each(this.getChildren(), function (child) {
+                fragment.appendChild(child.populateElement()[0]);
+            }, this);
+
+            this.appendContent([fragment]);
+            return this.getElement();
         },
+
+        open: function () { },
         close: function () { },
-
-        delegateEvents: function () {
-            this.getElement().on('keydown', '.menu-item', this.itemHandler.bind(this));
-        },
-
-        openHandler: function (event) {},
-        closeHandler: function (event) {},
-
-        // Get previous element in array or cycles back to the last if it is the
-        // first.
-        previousItem: function (index) {
-            var childs = this.getChilds();
-            return childs[index < 1 ? childs.length - 1 : index - 1];
-        },
-
-        // Get next element in array or cycles back to the first if it is the last.
-        nextItem: function (index) {
-            var childs = this.getChilds();
-            return childs[index >= childs.length - 1 ? 0 : index + 1];
-        },
-
-        isItemsFocused: function () {
-            // var childs = this.getChilds();
-            // return $(childs).is(':focus');
-        },
+        openHandler: function (event) { },
+        closeHandler: function (event) { },
 
         itemHandler: function (event) {
-            var callback = this.options.callback,
-                item = $(event.currentTarget).data('menu');
+            event.preventDefault();
+            var item = $(event.currentTarget).data('menu');
+            switch(event.type) {
+                case 'keydown':
+                    this.keyDownHandler.call(this, event, item);
+                    break;
+                case 'mouseover':
+                    this.mouseOverHandler.call(this, event, item);
+                    break;
+                case 'mouseleave':
+                    this.mouseLeaveHandler.call(this, event, item);
+                    break;
+            }
+        },
 
-            // if ($.isFunction(callback)) {
-                event.preventDefault();
-                switch(event.type) {
-                    case 'click':
-                        // callback.call(this, key, options);
-                        break;
-                    case 'keydown':
-                        this.keyDownHandler.call(this, event, item);
-                        break;
-                }
-            // }
+        keyDownHandler: function () { },
+        mouseOverHandler: function () { },
+        mouseLeaveHandler: function () { }
+    });
+
+    Menu = AbstractMenu.extend({
+        createElement: function () {
+            return $('<ol />', {
+                'class': ['menu', this.options.prefix + 'menu'].join(' '),
+                'role': 'menu'
+            });
+        },
+
+        appendContent: function (content) {
+            this.getElement().append(content);
+        },
+
+        focus: function () {
+            if (this.hasChildren()) {
+                this.getChildren()[0].focus();
+            }
+            return this;
         },
 
         keyDownHandler: function (event, item) {
             var KEY = $.ui.keyCode,
-                keyCode = event.keyCode,
-                target = $(event.currentTarget),
-                index = target.index();
+                keyCode = event.keyCode;
 
-            debugger
+            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
+
             switch (keyCode) {
-                // Scroll up menu, wrapping at the top. Keep menu open.
                 case KEY.UP:
-                    this.previousItem(index).focus();
+                    item.prev.focus();
                     event.stopPropagation();
                     break;
-                // Scroll down  menu, wrapping at the bottom. Keep menu
-                // open.
                 case KEY.DOWN:
-                    this.nextItem(index).focus();
+                    item.next.focus();
                     event.stopPropagation();
                     break;
-                // Close menu.
                 case KEY.TAB:
-                    this.close();
                     event.stopPropagation();
                     break;
-                // Close menu, give focus to button and change
-                // file type.
+                case KEY.ESCAPE:
                 case KEY.ENTER:
                 case KEY.SPACE:
-                    this.close();
-                    event.stopPropagation();
-                    break;
-                // Close menu and give focus to speed control.
-                case KEY.ESCAPE:
                     this.close();
                     break;
             }
@@ -139,104 +161,99 @@ function (Component) {
         }
     });
 
-    Menu = AbstractMenu.extend({
-        createElement: function () {
-            return $('<ol />', {
-                'class': 'menu',
-                'role': 'menu'
-            });
-        },
-
-        show: function () {
-            var fragment = document.createDocumentFragment();
-
-            _.each(this.getChilds(), function (child) {
-                fragment.appendChild(child.show()[0]);
-            }, this);
-
-            this.getElement().append([fragment]);
-            return this.getElement();
-        },
-
-        focus: function () {
-            this.getChilds()[0].focus();
-            return this;
-        }
-    });
-
     Submenu = AbstractMenu.extend({
         createElement: function () {
             var element = $('<li />', {
-                'class': ['menu-item', this.options.itemClass].join(' '),
+                'class': ['submenu-item','menu-item', this.options.prefix + 'submenu-item'].join(' '),
                 'aria-disabled': 'false',
-                'role': 'menuitem',
+                'role': 'menu',
                 'tabindex': 0,
-                'text': this.options.name
+                'text': this.options.label
             }).attr(this.options.attrs).data(this.options.dataAttrs);
 
             this.list = $('<ol />', {
-                'class': 'menu',
-                'role': 'menu'
+                'class': ['menu', 'submenu', this.options.prefix + 'submenu'].join(' '),
+                'aria-disabled': 'false',
+                'role': 'presentation'
             });
 
             element.append(this.list);
             return element;
         },
 
-        show: function () {
-            var fragment = document.createDocumentFragment();
-
-            _.each(this.getChilds(), function (child) {
-                fragment.appendChild(child.show()[0]);
-            }, this);
-
-            this.list.append([fragment]);
-            return this.getElement();
+        delegateEvents: function () {
+            this.getElement().on('keydown mouseleave mouseover', this.itemHandler.bind(this));
         },
 
-        keyDownHandler: function (event, item) {
+        appendContent: function (content) {
+            this.list.append(content);
+        },
+
+        open: function () {
+            this.getElement().addClass('is-opened');
+            this.getChildren()[0].focus();
+        },
+
+        close: function () {
+            this.getElement().removeClass('is-opened');
+            this.focus();
+        },
+
+        focus: function () {
+            this.getElement().focus();
+            return this;
+        },
+
+        keyDownHandler: function (event) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode;
 
-            debugger
+            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
             switch (keyCode) {
                 case KEY.RIGHT:
                     this.open();
                     event.stopPropagation();
                     break;
-
                 case KEY.LEFT:
-                    this.focus();
+                    this.close();
                     event.stopPropagation();
                     break;
-                default:
-                    this.__super__.keyDownHandler.apply(this, arguments);
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.open();
+                    event.stopPropagation();
+                    break;
             }
 
             return false;
         },
 
-        focus: function () {
-            this.getElement().focus();
-            return this;
+        mouseOverHandler: function () {
+            if (DEBUG_MOUSE_EVENTS) {debugger;}
+            this.open();
+        },
+
+        mouseLeaveHandler: function () {
+            if (DEBUG_MOUSE_EVENTS) {debugger;}
+            this.close();
         }
     });
 
     MenuItem = function (options) {
         this.options = $.extend(true, {
-            name: '',
+            label: '',
             itemClass: '',
-            dataAttrs: {options: options, menu: this},
+            dataAttrs: {menu: this},
             attrs: {},
             callback: $.noop
         }, options);
 
         this.element = $('<li />', {
-            'class': ['menu-item', this.options.itemClass].join(' '),
+            'class': ['menu-item', this.options.prefix + 'menu-item'].join(' '),
             'aria-disabled': 'false',
             'role': 'menuitem',
             'tabindex': 0,
-            'text': this.options.name
+            'text': this.options.label
         }).attr(this.options.attrs).data(this.options.dataAttrs);
         this.delegateEvents();
     };
@@ -244,9 +261,9 @@ function (Component) {
     MenuItem.prototype = {
         addChild: function () { },
 
-        getChilds: function () { },
+        getChildren: function () { },
 
-        show: function () {
+        populateElement: function () {
             return this.getElement();
         },
 
@@ -259,92 +276,103 @@ function (Component) {
             return this;
         },
 
-        setAttrs: function (attrs) {
-            this.getElement().attr(attrs);
+        setLabel: function (label) {
+            this.getElement().text(label);
             return this;
-        },
-
-        setDataAttrs: function (dataAttrs) {
-            this.getElement().data(dataAttrs);
-            return this;
-        },
-
-        getDataAttrs: function () {
-            return this.getElement().data();
-        },
-
-        setName: function (name) {
-            this.getElement().text(name);
-            return this;
-        },
-
-        itemHandler: function (event) {
-            var callback = this.options.callback,
-                options;
-
-            if ($.isFunction(callback)) {
-                event.preventDefault();
-                options = this.options;
-                switch(event.type) {
-                    case 'click':
-                    // case 'keydown':
-                        callback.call(this, event, this, options);
-                        break;
-                }
-            }
         },
 
         focus: function () {
             this.getElement().focus();
             return this;
-        }
+        },
+
+        activate: function () {
+            var callback = this.options.callback;
+
+            if ($.isFunction(callback)) {
+                callback.call(this, event, this, this.options);
+            }
+        },
+
+        itemHandler: function (event) {
+            event.preventDefault();
+            switch(event.type) {
+                case 'click':
+                    this.activate();
+                    break;
+
+                case 'keydown':
+                    this.keyDownHandler.call(this, event);
+                    break;
+            }
+        },
+
+        keyDownHandler: function (event) {
+            var KEY = $.ui.keyCode,
+                keyCode = event.keyCode;
+
+            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
+            switch (keyCode) {
+                case KEY.RIGHT:
+                    event.stopPropagation();
+                    break;
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.activate();
+                    event.stopPropagation();
+                    break;
+            }
+
+            return false;
+        }
     };
 
     // VideoAccessibleMenu() function - what this module 'exports'.
     return function (state) {
+
         var speedCallback = function (event, menuitem, options) {
-                var speed = parseFloat(options.name);
+                var speed = parseFloat(options.label);
                 state.videoCommands.execute('speed', speed);
             },
             options = {
                 items: {
                     'play': {
-                        name: 'Play', attrs: {title: 'aaaa'}, dataAttrs: {aaaa: 'bbbb'},
+                        label: 'Play', attrs: {title: 'aaaa'}, dataAttrs: {aaaa: 'bbbb'},
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('togglePlayback')) {
-                                menuitem.setName('Pause');
+                                menuitem.setLabel('Pause');
                             } else {
-                                menuitem.setName('Play');
+                                menuitem.setLabel('Play');
                             }
                         }
                     },
                     'mute': {
-                        name: 'Mute',
+                        label: state.videoVolumeControl.getMuteStatus() ? 'Unmute' : 'Mute',
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('toggleMute')) {
-                                menuitem.setName('Mute');
+                                menuitem.setLabel('Unmute');
                             } else {
-                                menuitem.setName('Unmute');
+                                menuitem.setLabel('Mute');
                             }
                         }
                     },
                     'fullscreen': {
-                        name: 'Go to fullscreen mode',
+                        label: 'Go to fullscreen mode',
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('toggleFullScreen')) {
-                                menuitem.setName('Go to fullscreen mode');
+                                menuitem.setLabel('Exit from fullscreen mode');
                             } else {
-                                menuitem.setName('Exit from fullscreen mode');
+                                menuitem.setLabel('Go to fullscreen mode');
                             }
                         }
                     },
                     'speed': {
-                        name: 'Speed',
+                        label: 'Speed',
                         items: {
-                            '0.75': {name: '0.75x', callback: speedCallback},
-                            '1.0': {name: '1.0x', callback: speedCallback},
-                            '1.25': {name: '1.25x', callback: speedCallback},
-                            '1.5': {name: '1.5x', callback: speedCallback},
+                            '0.75': {label: '0.75x', callback: speedCallback},
+                            '1.0': {label: '1.0x', callback: speedCallback},
+                            '1.25': {label: '1.25x', callback: speedCallback},
+                            '1.5': {label: '1.5x', callback: speedCallback},
                         }
                     }
                 }
@@ -366,7 +394,7 @@ function (Component) {
             return container;
         } (topMenu, options.items));
 
-        $('.video').append(topMenu.show());
+        $('.video').append(topMenu.populateElement());
 
         return $.Deferred().resolve().promise();
     };

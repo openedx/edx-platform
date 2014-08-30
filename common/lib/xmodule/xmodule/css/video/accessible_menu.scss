@@ -131,3 +131,45 @@ $a11y--blue-s1: saturate($blue,15%);
     }
   }
 }
+
+
+.menu {
+  border: 1px solid #000;
+  background: #fff;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: absolute;
+
+  .menu-item, .submenu-item {
+    border-top: 1px solid #ccc;
+    padding: 5px 10px;
+
+    &:first-childs {
+      border-top: none;
+    }
+  }
+
+  .submenu-item {
+    position: relative;
+
+    &:after {
+      content: '>';
+      position: absolute;
+      right: 5px;
+      top: 25%;
+    }
+
+    .menu {
+      display: none;
+      left: 100%;
+      top: 0;
+    }
+
+    &.is-opened {
+      .menu {
+        display: block;
+      }
+    }
+  }
+}
