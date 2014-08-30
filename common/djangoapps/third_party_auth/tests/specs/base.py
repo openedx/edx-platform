@@ -282,7 +282,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
         self.assertEqual(200, response.status_code)
-        self.assertIn('Sign in with ' + self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn('Sign up with ' + self.PROVIDER_CLASS.NAME, response.content)
         self.assert_signin_button_looks_functional(response.content, pipeline.AUTH_ENTRY_REGISTER)
 
     def assert_signin_button_looks_functional(self, content, auth_entry):
