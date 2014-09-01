@@ -141,6 +141,11 @@ $a11y--blue-s1: saturate($blue,15%);
   margin: 0;
   list-style: none;
   position: absolute;
+  display: none;
+
+  &.is-opened {
+     display: block;
+  }
 
   .menu-item, .submenu-item {
     border-top: 1px solid #ccc;
@@ -173,9 +178,19 @@ $a11y--blue-s1: saturate($blue,15%);
     }
 
     &.is-opened {
-      .menu {
+      & > .menu {
         display: block;
       }
     }
   }
+}
+
+.is-active {
+  pointer-events: none;
+  font-weight: bold;
+}
+
+.is-disabled {
+  pointer-events: none;
+  color: #ccc;
 }

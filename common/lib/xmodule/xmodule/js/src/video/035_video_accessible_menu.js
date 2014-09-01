@@ -5,17 +5,35 @@ define(
 'video/035_video_accessible_menu.js',
 ['video/00_component.js'],
 function (Component) {
-    var AbstractMenu, Menu, Submenu, MenuItem;
+    var AbstarctItem, AbstractMenu, Menu, Submenu, MenuItem;
 
-    var DEBUG_KEYDOWN_EVENTS = false;
+    var DEBUG_KEYDOWN_EVENTS = true;
     var DEBUG_MOUSE_EVENTS = false;
 
-    AbstractMenu = Component.extend({
+    AbstarctItem = Component.extend({
+        addChild: function () { },
+        close: function () { },
+        getChildren: function () { },
+        createElement: function () {
+            return null;
+        },
+        populateElement: function () { },
+        remove: function () { },
+        focus: function () { },
+        activate: function () { },
+        unactivate: function () { },
+        siblings: function () { },
+        disable: function () { },
+        enable: function () { },
+        itemHandler: function (event) { },
+        keyDownHandler: function (event) { }
+    });
+
+    AbstractMenu = AbstarctItem.extend({
         initialize: function (options) {
             this.options = {
-                id: _.uniqueId(),
                 prefix: 'prefix-',
-                items: {},
+                items: [],
                 label: '',
                 dataAttrs: {menu: this},
                 attrs: {},
@@ -23,6 +41,7 @@ function (Component) {
             };
 
             $.extend(true, this.options, options);
+            this.id = _.uniqueId();
             this.children = [];
             this.element = this.createElement();
             this.delegateEvents();
@@ -30,10 +49,6 @@ function (Component) {
 
         delegateEvents: function () {
             this.getElement().on('keydown mouseleave mouseover', '.menu-item', this.itemHandler.bind(this));
-        },
-
-        createElement: function () {
-            return null;
         },
 
         remove: function () {
@@ -68,8 +83,7 @@ function (Component) {
         },
 
         getLastChild: function () {
-            var len = this.children.length;
-            return this.children[len - 1];
+            return _.last(this.children);
         },
 
         getElement: function () {
@@ -88,7 +102,12 @@ function (Component) {
         },
 
         open: function () { },
-        close: function () { },
+        close: function () {
+            _.each(this.getChildren(), function (child) {
+                child.close();
+            }, this);
+            this.getElement().removeClass('is-opened');
+        },
         openHandler: function (event) { },
         closeHandler: function (event) { },
 
@@ -123,6 +142,11 @@ function (Component) {
 
         appendContent: function (content) {
             this.getElement().append(content);
+        },
+
+        open: function () {
+            this.getElement().addClass('is-opened');
+            this.getChildren()[0].focus();
         },
 
         focus: function () {
@@ -183,6 +207,8 @@ function (Component) {
             this.getElement().on('keydown mouseleave mouseover', this.itemHandler.bind(this));
         },
 
+        unactivate: function () {},
+
         appendContent: function (content) {
             this.list.append(content);
         },
@@ -193,13 +219,21 @@ function (Component) {
         },
 
         close: function () {
-            this.getElement().removeClass('is-opened');
+            AbstractMenu.prototype.close.call(this);
             this.focus();
         },
 
         focus: function () {
             this.getElement().focus();
             return this;
+        },
+
+        disable: function () {
+          this.getElement().addClass('is-disabled');
+        },
+
+        enable: function () {
+          this.getElement().removeClass('is-disabled');
         },
 
         keyDownHandler: function (event) {
@@ -213,7 +247,7 @@ function (Component) {
                     event.stopPropagation();
                     break;
                 case KEY.LEFT:
-                    this.close();
+                    this.parent.close();
                     event.stopPropagation();
                     break;
                 case KEY.ENTER:
@@ -237,10 +271,11 @@ function (Component) {
         }
     });
 
-    MenuItem = function (options) {
+    MenuItem = AbstarctItem.extend({
+      initialize: function (options) {
         this.options = $.extend(true, {
             label: '',
-            itemClass: '',
+            prefix: 'prefix-',
             dataAttrs: {menu: this},
             attrs: {},
             callback: $.noop
@@ -253,15 +288,10 @@ function (Component) {
             'tabindex': 0,
             'text': this.options.label
         }).attr(this.options.attrs).data(this.options.dataAttrs);
+        this.id = _.uniqueId();
         this.delegateEvents();
-    };
-
-    MenuItem.prototype = {
-        addChild: function () { },
-
-        getChildren: function () { },
-
-        populateElement: function () {
+      },
+      populateElement: function () {
             return this.getElement();
         },
 
@@ -289,8 +319,11 @@ function (Component) {
 
             if ($.isFunction(callback)) {
                 callback.call(this, event, this, this.options);
-                this.parent.close();
                 this.getElement().addClass('is-active');
+                _.each(this.siblings(), function (sibling) {
+                  sibling.unactivate();
+                });
+                this.getRoot().close();
             }
         },
 
@@ -298,15 +331,50 @@ function (Component) {
             this.getElement().removeClass('is-active');
         },
 
+        siblings: function () {
+          var items = [],
+              item = this;
+          while (item.next && item.next.id !== this.id) {
+            item = item.next;
+            items.push(item);
+          }
+
+          return items;
+        },
+
+        disable: function () {
+          this.getElement().addClass('is-disabled');
+        },
+
+        enable: function () {
+          this.getElement().removeClass('is-disabled');
+        },
+
+        // @TODO pass as argument?
+        getRoot: function () {
+          var item = null;
+          return function () {
+            if (item) {
+              return item;
+            }
+
+            item = this;
+            do {
+              item = item.parent;
+            } while (item.parent);
+
+            return item;
+          };
+        }(),
+
         itemHandler: function (event) {
             event.preventDefault();
             switch(event.type) {
                 case 'click':
                     this.activate();
                     break;
-
                 case 'keydown':
-                    this.keyDownHandler.call(this, event);
+                    this.keyDownHandler.call(this, event, this);
                     break;
             }
         },
@@ -320,6 +388,10 @@ function (Component) {
                 case KEY.RIGHT:
                     event.stopPropagation();
                     break;
+                case KEY.LEFT:
+                    this.parent.close();
+                    event.stopPropagation();
+                    break;
                 case KEY.ENTER:
                 case KEY.SPACE:
                     this.activate();
@@ -329,7 +401,7 @@ function (Component) {
 
             return false;
         }
-    };
+    });
 
     // VideoAccessibleMenu() function - what this module 'exports'.
     return function (state) {
@@ -339,8 +411,7 @@ function (Component) {
                 state.videoCommands.execute('speed', speed);
             },
             options = {
-                items: {
-                    'play': {
+                items: [{
                         label: 'Play', attrs: {title: 'aaaa'}, dataAttrs: {aaaa: 'bbbb'},
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('togglePlayback')) {
@@ -349,8 +420,7 @@ function (Component) {
                                 menuitem.setLabel('Play');
                             }
                         }
-                    },
-                    'mute': {
+                    }, {
                         label: state.videoVolumeControl.getMuteStatus() ? 'Unmute' : 'Mute',
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('toggleMute')) {
@@ -359,8 +429,7 @@ function (Component) {
                                 menuitem.setLabel('Mute');
                             }
                         }
-                    },
-                    'fullscreen': {
+                    }, {
                         label: 'Go to fullscreen mode',
                         callback: function (event, menuitem) {
                             if (state.videoCommands.execute('toggleFullScreen')) {
@@ -369,17 +438,18 @@ function (Component) {
                                 menuitem.setLabel('Go to fullscreen mode');
                             }
                         }
-                    },
-                    'speed': {
+                    }, {
                         label: 'Speed',
-                        items: {
-                            '0.75': {label: '0.75x', callback: speedCallback},
-                            '1.0': {label: '1.0x', callback: speedCallback},
-                            '1.25': {label: '1.25x', callback: speedCallback},
-                            '1.5': {label: '1.5x', callback: speedCallback},
-                        }
+                        items: [
+                            {label: '0.75x', callback: speedCallback},
+                            {label: '1.0x', callback: speedCallback},
+                            {label: '1.25x', callback: speedCallback},
+                            {label: '1.5x', callback: speedCallback, items: [
+                                {label: 'AAAA'}, {label: 'BBBB'}
+                            ]},
+                        ]
                     }
-                }
+                ]
             };
 
         var topMenu = new Menu();
@@ -398,7 +468,12 @@ function (Component) {
             return container;
         } (topMenu, options.items));
 
-        $('.video').append(topMenu.populateElement());
+        $('.video')
+            .append(topMenu.populateElement())
+            .on('contextmenu', function (event) {
+                event.preventDefault();
+                topMenu.open();
+            });
 
         return $.Deferred().resolve().promise();
     };
