@@ -107,21 +107,3 @@ if Backbone?
         complete: =>
           $('.forum-content').fadeIn(200)
       )
-
-    retrieveSingleThread: (forum_name, thread_id, callback) ->
-      DiscussionUtil.safeAjax
-        url: DiscussionUtil.urlFor('retrieve_single_thread', forum_name, thread_id)
-        success: (data, textStatus, xhr) =>
-          callback(new Thread(data['content']))
-        error: (xhr) =>
-          if xhr.status == 404
-            DiscussionUtil.discussionAlert(
-              gettext("Sorry"),
-              gettext("The thread you selected has been deleted. Please select another thread.")
-            )
-          else
-            DiscussionUtil.discussionAlert(
-              gettext("Sorry"),
-              gettext("We had some trouble loading more responses. Please try again.")
-            )
-          @allThreads()
