@@ -475,6 +475,10 @@ function (Component) {
                 topMenu.open();
             });
 
+        $(document).on('click', function () {
+                topMenu.close();
+            });
+
         return $.Deferred().resolve().promise();
     };
 });
