@@ -333,8 +333,9 @@ class TestTOC(ModuleStoreTestCase):
             )
 
 
-    # TODO: LMS-11220: Document why split find count is 21
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 5, 0))
+    # TODO: LMS-11220: Document why split find count is 9
+    # TODO: LMS-11220: Document why mongo find count is 4
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 0), (ModuleStoreEnum.Type.split, 9, 0))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, num_finds, num_sends):
         with self.store.default_store(default_ms):
@@ -361,8 +362,9 @@ class TestTOC(ModuleStoreTestCase):
         for toc_section in expected:
             self.assertIn(toc_section, actual)
 
-    # TODO: LMS-11220: Document why split find count is 21
-    @ddt.data((ModuleStoreEnum.Type.mongo, 1, 0), (ModuleStoreEnum.Type.split, 5, 0))
+    # TODO: LMS-11220: Document why split find count is 9
+    # TODO: LMS-11220: Document why mongo find count is 4
+    @ddt.data((ModuleStoreEnum.Type.mongo, 4, 0), (ModuleStoreEnum.Type.split, 9, 0))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, num_finds, num_sends):
         with self.store.default_store(default_ms):
