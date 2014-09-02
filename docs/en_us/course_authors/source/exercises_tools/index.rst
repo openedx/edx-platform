@@ -35,6 +35,7 @@ Course Content Index`.
    lti_component
    math_expression_input
    molecule_editor
+   molecule_viewer
    multiple_choice
    mult_choice_num_input
    numerical_input

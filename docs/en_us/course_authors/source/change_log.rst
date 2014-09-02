@@ -22,6 +22,8 @@ September, 2014
      - Removed "These problems only allow integers and a few select constants" from table of problem types in :ref:`Create Exercises`.
    * - 
      - Added a note about angle bracket characters to the :ref:`Dropdown` topic.
+   * - 09/26/14
+     - Added :ref:`Molecule Viewer` to :ref:`Create Exercises`
 
 **************
 August, 2014
