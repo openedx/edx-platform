@@ -610,6 +610,14 @@
         display: block;
       }
     }
+
+    .third-party-signin.message {
+      display: none;
+
+      &.is-shown {
+        display: block;
+      }
+    }
   }
 }
 
