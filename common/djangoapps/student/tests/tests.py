@@ -309,8 +309,6 @@ class DashboardTest(TestCase):
 
         response = self.client.get(reverse('dashboard'))
         self.assertNotIn('You can no longer access this course because payment has not yet been received', response.content)
-        optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
-        self.assertEqual(len(optout_object), 0)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_refundable_of_purchased_course(self):
@@ -362,6 +360,7 @@ class EnrollInCourseTest(TestCase):
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment(self):
         user = User.objects.create_user("joe", "joe@joe.com", "password")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
@@ -466,6 +465,7 @@ class EnrollInCourseTest(TestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assert_enrollment_event_was_emitted(user, course_id)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment_by_email(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
@@ -503,6 +503,7 @@ class EnrollInCourseTest(TestCase):
         CourseEnrollment.unenroll_by_email("not_jack@fake.edx.org", course_id)
         self.assert_no_events_were_emitted()
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
         course_id1 = SlashSeparatedCourseKey("edX", "Test101", "2013")
@@ -525,6 +526,7 @@ class EnrollInCourseTest(TestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
         self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_activation(self):
         user = User.objects.create(username="jack", email="jack@fake.edx.org")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
