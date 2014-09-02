@@ -185,6 +185,11 @@ STEM Exercises and Tools
           :alt: Example molecule editor problem
      - :ref:`Molecule Editor`
      - The molecule editor allows students to draw molecules that follow the rules for covalent bond formation and formal charge, even if the molecules are chemically impossible, are unstable, or do not exist in living systems.
+   * - .. image:: /Images/MoleculeViewer.png
+          :width: 100
+          :alt: Example molecule viewer
+     - :ref:`Molecule Viewer`
+     - With the molecule viewer, you can create three-dimensional representations of molecules for your students to see.
    * - .. image:: /Images/image292.png
           :width: 100
           :alt: Example numerical input problem
