@@ -1,486 +1,309 @@
-(function (define) {
+
+(function (requirejs, require, define) {
 
 // VideoAccessibleMenu module.
 define(
 'video/035_video_accessible_menu.js',
-['video/00_component.js'],
-function (Component) {
-    var AbstractItem, AbstractMenu, Menu, Submenu, MenuItem;
+[],
+function () {
 
-    var DEBUG_KEYDOWN_EVENTS = true;
-    var DEBUG_MOUSE_EVENTS = false;
-
-    AbstractItem = Component.extend({
-        addChild: function () { },
-        close: function () { },
-        getChildren: function () { },
-        createElement: function () {
-            return null;
-        },
-        populateElement: function () { },
-        remove: function () { },
-        focus: function () { },
-        activate: function () { },
-        unactivate: function () { },
-        siblings: function () { },
-        disable: function () { },
-        enable: function () { },
-        itemHandler: function (event) { },
-        keyDownHandler: function (event) { }
-    });
-
-    AbstractMenu = AbstractItem.extend({
-        initialize: function (options) {
-            this.options = {
-                prefix: 'prefix-',
-                items: [],
-                label: '',
-                dataAttrs: {menu: this},
-                attrs: {},
-                callback: $.noop
-            };
-
-            $.extend(true, this.options, options);
-            this.id = _.uniqueId();
-            this.children = [];
-            this.element = this.createElement();
-            this.delegateEvents();
-        },
-
-        delegateEvents: function () {
-            this.getElement().on('keydown mouseleave mouseover', '.menu-item', this.itemHandler.bind(this));
-        },
-
-        remove: function () {
-            this.getElement().remove();
-        },
-
-        addChild: function (child) {
-            var firstChild = null, lastChild = null;
-            if (this.hasChildren()) {
-                lastChild = this.getLastChild();
-                lastChild.next = child;
-                firstChild = this.getFirstChild();
-                firstChild.prev = child;
-            }
-            child.parent = this;
-            child.next = firstChild;
-            child.prev = lastChild;
-            this.children.push(child);
-        },
-
-        getChildren: function () {
-            // Returns the copy.
-            return this.children.concat();
-        },
-
-        hasChildren: function () {
-            return this.getChildren().length > 0;
-        },
-
-        getFirstChild: function () {
-            return this.children[0];
-        },
-
-        getLastChild: function () {
-            return _.last(this.children);
-        },
-
-        getElement: function () {
-            return this.element;
-        },
-
-        populateElement: function () {
-            var fragment = document.createDocumentFragment();
-
-            _.each(this.getChildren(), function (child) {
-                fragment.appendChild(child.populateElement()[0]);
-            }, this);
-
-            this.appendContent([fragment]);
-            return this.getElement();
-        },
-
-        open: function () { },
-        close: function () {
-            _.each(this.getChildren(), function (child) {
-                child.close();
-            }, this);
-            this.getElement().removeClass('is-opened');
-        },
-        openHandler: function (event) { },
-        closeHandler: function (event) { },
-
-        itemHandler: function (event) {
-            event.preventDefault();
-            var item = $(event.currentTarget).data('menu');
-            switch(event.type) {
-                case 'keydown':
-                    this.keyDownHandler.call(this, event, item);
-                    break;
-                case 'mouseover':
-                    this.mouseOverHandler.call(this, event, item);
-                    break;
-                case 'mouseleave':
-                    this.mouseLeaveHandler.call(this, event, item);
-                    break;
-            }
-        },
-
-        keyDownHandler: function () { },
-        mouseOverHandler: function () { },
-        mouseLeaveHandler: function () { }
-    });
-
-    Menu = AbstractMenu.extend({
-        createElement: function () {
-            return $('<ol />', {
-                'class': ['menu', this.options.prefix + 'menu'].join(' '),
-                'role': 'menu'
-            });
-        },
-
-        appendContent: function (content) {
-            this.getElement().append(content);
-        },
-
-        open: function () {
-            this.getElement().addClass('is-opened');
-            this.getChildren()[0].focus();
-        },
-
-        focus: function () {
-            if (this.hasChildren()) {
-                this.getChildren()[0].focus();
-            }
-            return this;
-        },
-
-        keyDownHandler: function (event, item) {
-            var KEY = $.ui.keyCode,
-                keyCode = event.keyCode;
-
-            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
-
-            switch (keyCode) {
-                case KEY.UP:
-                    item.prev.focus();
-                    event.stopPropagation();
-                    break;
-                case KEY.DOWN:
-                    item.next.focus();
-                    event.stopPropagation();
-                    break;
-                case KEY.TAB:
-                    event.stopPropagation();
-                    break;
-                case KEY.ESCAPE:
-                    this.close();
-                    break;
-            }
-
-            return false;
-        }
-    });
-
-    Submenu = AbstractMenu.extend({
-        createElement: function () {
-            var element = $('<li />', {
-                'class': ['submenu-item','menu-item', this.options.prefix + 'submenu-item'].join(' '),
-                'aria-disabled': 'false',
-                'role': 'menu',
-                'tabindex': 0,
-                'text': this.options.label
-            }).attr(this.options.attrs).data(this.options.dataAttrs);
-
-            this.list = $('<ol />', {
-                'class': ['menu', 'submenu', this.options.prefix + 'submenu'].join(' '),
-                'aria-disabled': 'false',
-                'role': 'presentation'
-            });
-
-            element.append(this.list);
-            return element;
-        },
-
-        delegateEvents: function () {
-            this.getElement().on('keydown mouseleave mouseover', this.itemHandler.bind(this));
-        },
-
-        unactivate: function () {},
-
-        appendContent: function (content) {
-            this.list.append(content);
-        },
-
-        open: function () {
-            this.getElement().addClass('is-opened');
-            this.getChildren()[0].focus();
-        },
-
-        close: function () {
-            AbstractMenu.prototype.close.call(this);
-            this.focus();
-        },
-
-        focus: function () {
-            this.getElement().focus();
-            return this;
-        },
-
-        disable: function () {
-            this.getElement().addClass('is-disabled');
-        },
-
-        enable: function () {
-            this.getElement().removeClass('is-disabled');
-        },
-
-        keyDownHandler: function (event) {
-            var KEY = $.ui.keyCode,
-                keyCode = event.keyCode;
-
-            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
-            switch (keyCode) {
-                case KEY.RIGHT:
-                    this.open();
-                    event.stopPropagation();
-                    break;
-                case KEY.LEFT:
-                    this.parent.close();
-                    event.stopPropagation();
-                    break;
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.open();
-                    event.stopPropagation();
-                    break;
-            }
-
-            return false;
-        },
-
-        mouseOverHandler: function () {
-            if (DEBUG_MOUSE_EVENTS) {debugger;}
-            this.open();
-        },
-
-        mouseLeaveHandler: function () {
-            if (DEBUG_MOUSE_EVENTS) {debugger;}
-            this.close();
-        }
-    });
-
-    MenuItem = AbstractItem.extend({
-        initialize: function (options) {
-            this.options = $.extend(true, {
-                label: '',
-                prefix: 'prefix-',
-                dataAttrs: {menu: this},
-                attrs: {},
-                callback: $.noop
-            }, options);
-
-            this.element = $('<li />', {
-                'class': ['menu-item', this.options.prefix + 'menu-item'].join(' '),
-                'aria-disabled': 'false',
-                'role': 'menuitem',
-                'tabindex': 0,
-                'text': this.options.label
-            }).attr(this.options.attrs).data(this.options.dataAttrs);
-            this.id = _.uniqueId();
-            this.delegateEvents();
-        },
-        populateElement: function () {
-            return this.getElement();
-        },
-
-        getElement: function () {
-            return this.element;
-        },
-
-        delegateEvents: function () {
-            this.getElement().on('click keydown', this.itemHandler.bind(this));
-            return this;
-        },
-
-        setLabel: function (label) {
-            this.getElement().text(label);
-            return this;
-        },
-
-        focus: function () {
-            this.getElement().focus();
-            return this;
-        },
-
-        activate: function () {
-            var callback = this.options.callback;
-
-            if ($.isFunction(callback)) {
-                callback.call(this, event, this, this.options);
-                this.getElement().addClass('is-active');
-                _.each(this.siblings(), function (sibling) {
-                    sibling.unactivate();
-                });
-                this.getRoot().close();
-            }
-        },
-
-        unactivate: function () {
-            this.getElement().removeClass('is-active');
-        },
-
-        siblings: function () {
-            var items = [],
-                item = this;
-            while (item.next && item.next.id !== this.id) {
-                item = item.next;
-                items.push(item);
-            }
-
-            return items;
-        },
-
-        disable: function () {
-            this.getElement().addClass('is-disabled');
-        },
-
-        enable: function () {
-            this.getElement().removeClass('is-disabled');
-        },
-
-        // @TODO pass as argument?
-        getRoot: function () {
-            var item = null;
-            return function () {
-                if (item) {
-                    return item;
-                }
-
-                item = this;
-                do {
-                    item = item.parent;
-                } while (item.parent);
-
-                return item;
-            };
-        }(),
-
-        itemHandler: function (event) {
-            event.preventDefault();
-            switch(event.type) {
-                case 'click':
-                    this.activate();
-                    break;
-                case 'keydown':
-                    this.keyDownHandler.call(this, event, this);
-                    break;
-            }
-        },
-
-        keyDownHandler: function (event) {
-            var KEY = $.ui.keyCode,
-                keyCode = event.keyCode;
-
-            if (DEBUG_KEYDOWN_EVENTS) {debugger;}
-            switch (keyCode) {
-                case KEY.RIGHT:
-                    event.stopPropagation();
-                    break;
-                case KEY.LEFT:
-                    this.parent.close();
-                    event.stopPropagation();
-                    break;
-                case KEY.ENTER:
-                case KEY.SPACE:
-                    this.activate();
-                    event.stopPropagation();
-                    break;
-            }
-
-            return false;
-        }
-    });
-
-    // VideoAccessibleMenu() function - what this module 'exports'.
+    // VideoAccessibleMenu() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
 
-        var speedCallback = function (event, menuitem, options) {
-                var speed = parseFloat(options.label);
-                state.videoCommands.execute('speed', speed);
-            },
-            options = {
-                items: [{
-                        label: 'Play', attrs: {title: 'aaaa'}, dataAttrs: {aaaa: 'bbbb'},
-                        callback: function (event, menuitem) {
-                            if (state.videoCommands.execute('togglePlayback')) {
-                                menuitem.setLabel('Pause');
-                            } else {
-                                menuitem.setLabel('Play');
-                            }
-                        }
-                    }, {
-                        label: state.videoVolumeControl.getMuteStatus() ? 'Unmute' : 'Mute',
-                        callback: function (event, menuitem) {
-                            if (state.videoCommands.execute('toggleMute')) {
-                                menuitem.setLabel('Unmute');
-                            } else {
-                                menuitem.setLabel('Mute');
-                            }
-                        }
-                    }, {
-                        label: 'Go to fullscreen mode',
-                        callback: function (event, menuitem) {
-                            if (state.videoCommands.execute('toggleFullScreen')) {
-                                menuitem.setLabel('Exit from fullscreen mode');
-                            } else {
-                                menuitem.setLabel('Go to fullscreen mode');
-                            }
-                        }
-                    }, {
-                        label: 'Speed',
-                        items: [
-                            {label: '0.75x', callback: speedCallback},
-                            {label: '1.0x', callback: speedCallback},
-                            {label: '1.25x', callback: speedCallback},
-                            {label: '1.5x', callback: speedCallback, items: [
-                                {label: 'AAAA'}, {label: 'BBBB'}
-                            ]},
-                        ]
-                    }
-                ]
-            };
+        if (state.el.find('li.video-tracks') === 0) {
+            dfd.resolve();
+            return dfd.promise();
+        }
 
-        var topMenu = new Menu();
-        // Do that on first menu invocation.
-        (function build(container, options) {
-            _.each(options, function(item) {
-                var child;
-                if (_.has(item, 'items')) {
-                    child = build((new Submenu(item)), item.items);
-                } else {
-                    child = new MenuItem(item);
-                }
-                container.addChild(child);
-            }, this);
+        state.videoAccessibleMenu = {
+            value: state.storage.getItem('transcript_download_format')
+        };
 
-            return container;
-        } (topMenu, options.items));
+        _initialize(state);
+        dfd.resolve();
+        return dfd.promise();
+    };
 
-        $('.video')
-            .append(topMenu.populateElement())
-            .on('contextmenu', function (event) {
-                event.preventDefault();
-                topMenu.open();
-            });
+    // ***************************************************************
+    // Private functions start here.
+    // ***************************************************************
 
-        $(document).on('click', function () {
-            topMenu.close();
+    function _initialize(state) {
+        _makeFunctionsPublic(state);
+        _renderElements(state);
+        _addAriaAttributes(state);
+        _bindHandlers(state);
+    }
+
+    // function _makeFunctionsPublic(state)
+    //
+    //     Functions which will be accessible via 'state' object. When called,
+    //     these functions will get the 'state' object as a context.
+    function _makeFunctionsPublic(state) {
+        var methodsDict = {
+            changeFileType: changeFileType,
+            setValue: setValue
+        };
+
+        state.bindTo(methodsDict, state.videoAccessibleMenu, state);
+    }
+
+    // function _renderElements(state)
+    //
+    //     Create any necessary DOM elements, attach them, and set their
+    //     initial configuration. Also make the created DOM elements available
+    //     via the 'state' object. Much easier to work this way - you don't
+    //     have to do repeated jQuery element selects.
+    function _renderElements(state) {
+
+        // For the  time being, we assume that the menu structure is present in
+        // the template HTML. In the future accessible menu plugin, everything
+        // inside <div class='menu-container'></div> will be generated in this
+        // file.
+        var container = state.el.find('li.video-tracks>div.a11y-menu-container'),
+            button = container.children('a.a11y-menu-button'),
+            menuList = container.children('ol.a11y-menu-list'),
+            menuItems = menuList.children('li.a11y-menu-item'),
+            menuItemsLinks = menuItems.children('a.a11y-menu-item-link'),
+            value = (function (val, activeElement) {
+                return val || activeElement.find('a').data('value') || 'srt';
+            }(state.videoAccessibleMenu.value, menuItems.filter('.active'))),
+            msg = '.' + value;
+
+        $.extend(state.videoAccessibleMenu, {
+            container: container,
+            button: button,
+            menuList: menuList,
+            menuItems: menuItems,
+            menuItemsLinks: menuItemsLinks
         });
 
-        return $.Deferred().resolve().promise();
-    };
+        if (value) {
+            state.videoAccessibleMenu.setValue(value);
+            button.text(gettext(msg));
+        }
+    }
+
+    function _addAriaAttributes(state) {
+        var menu = state.videoAccessibleMenu;
+
+        menu.button.attr({
+            'role': 'button',
+            'aria-disabled': 'false'
+        });
+
+        menu.menuList.attr('role', 'menu');
+
+        menu.menuItemsLinks.each(function(){
+            $(this).attr({
+                'role': 'menuitem',
+                'aria-disabled': 'false'
+            });
+        });
+    }
+
+    // Get previous element in array or cyles back to the last if it is the
+    // first.
+    function _previousMenuItemLink(links, index) {
+        return $(links.eq(index < 1 ? links.length - 1 : index - 1));
+    }
+
+    // Get next element in array or cyles back to the first if it is the last.
+    function _nextMenuItemLink(links, index) {
+        return $(links.eq(index >= links.length - 1 ? 0 : index + 1));
+    }
+
+    function _menuItemsLinksFocused(menu) {
+        return menu.menuItemsLinks.is(':focus');
+    }
+
+    function _openMenu(menu, without_handler) {
+        // When menu items have focus, the menu stays open on
+        // mouseleave. A _closeMenuHandler is added to the window
+        // element to have clicks close the menu when they happen
+        // outside of it. We namespace the click event to easily remove it (and
+        // only it) in _closeMenu.
+        menu.container.addClass('open');
+        menu.button.text('...');
+        if (!without_handler) {
+            $(window).on('click.currentMenu', _closeMenuHandler.bind(menu));
+        }
+
+        // @TODO: onOpen callback
+    }
+
+    function _closeMenu(menu, without_handler) {
+        // Remove the previously added clickHandler from window element.
+        var msg = '.' + menu.value;
+
+        menu.container.removeClass('open');
+        menu.button.text(gettext(msg));
+        if (!without_handler) {
+            $(window).off('click.currentMenu');
+        }
+
+        // @TODO: onClose callback
+    }
+
+    function _openMenuHandler(event) {
+        _openMenu(this, true);
+
+        return false;
+    }
+
+    function _closeMenuHandler(event) {
+        // Only close the menu if no menu item link has focus or `click` event.
+        if (!_menuItemsLinksFocused(this) || event.type == 'click') {
+            _closeMenu(this, true);
+        }
+
+        return false;
+    }
+
+    function _toggleMenuHandler(event) {
+        if (this.container.hasClass('open')) {
+            _closeMenu(this, true);
+        } else {
+            _openMenu(this, true);
+        }
+
+        return false;
+    }
+
+    // Various event handlers. They all return false to stop propagation and
+    // prevent default behavior.
+    function _clickHandler(event) {
+        var target = $(event.currentTarget);
+
+        this.changeFileType.call(this, event);
+        _closeMenu(this, true);
+
+        return false;
+    }
+
+    function _keyDownHandler(event) {
+        var KEY = $.ui.keyCode,
+            keyCode = event.keyCode,
+            target = $(event.currentTarget),
+            index;
+
+        if (target.is('a.a11y-menu-item-link')) {
+
+            index = target.parent().index();
+
+            switch (keyCode) {
+                // Scroll up menu, wrapping at the top. Keep menu open.
+                case KEY.UP:
+                    _previousMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
+                // Scroll down  menu, wrapping at the bottom. Keep menu
+                // open.
+                case KEY.DOWN:
+                    _nextMenuItemLink(this.menuItemsLinks, index).focus();
+                    break;
+                // Close menu.
+                case KEY.TAB:
+                    _closeMenu(this);
+                    // TODO
+                    // What has to happen here? In speed menu, tabbing backward
+                    // will give focus to Play/Pause button and tabbing
+                    // forward to Volume button.
+                    break;
+                // Close menu, give focus to button and change
+                // file type.
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    this.button.focus();
+                    this.changeFileType.call(this, event);
+                    _closeMenu(this);
+                    break;
+                // Close menu and give focus to speed control.
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    this.button.focus();
+                    break;
+            }
+            return false;
+        }
+        else {
+            switch(keyCode) {
+                // Open menu and focus on last element of list above it.
+                case KEY.ENTER:
+                case KEY.SPACE:
+                case KEY.UP:
+                    _openMenu(this);
+                    this.menuItemsLinks.last().focus();
+                    break;
+                // Close menu.
+                case KEY.ESCAPE:
+                    _closeMenu(this);
+                    break;
+            }
+            // We do not stop propagation and default behavior on a TAB
+            // keypress.
+            return event.keyCode === KEY.TAB;
+        }
+    }
+
+    /**
+     * @desc Bind any necessary function callbacks to DOM events (click,
+     *     mousemove, etc.).
+     *
+     * @type {function}
+     * @access private
+     *
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {undefined}
+     */
+    function _bindHandlers(state) {
+        var menu = state.videoAccessibleMenu;
+
+        // Attach various events handlers to menu container.
+        menu.container.on({
+            'mouseenter': _openMenuHandler.bind(menu),
+            'mouseleave': _closeMenuHandler.bind(menu),
+            'click': _toggleMenuHandler.bind(menu),
+            'keydown': _keyDownHandler.bind(menu)
+        });
+
+        // Attach click and keydown event handlers to individual menu items.
+        menu.menuItems
+            .on('click', 'a.a11y-menu-item-link', _clickHandler.bind(menu))
+            .on('keydown', 'a.a11y-menu-item-link', _keyDownHandler.bind(menu));
+    }
+
+    function setValue(value) {
+        var menu = this.videoAccessibleMenu;
+
+        menu.value = value;
+        menu.menuItems
+            .removeClass('active')
+            .find("a[data-value='" + value + "']")
+            .parent()
+            .addClass('active');
+    }
+
+    // ***************************************************************
+    // Public functions start here.
+    // These are available via the 'state' object. Their context ('this'
+    // keyword) is the 'state' object. The magic private function that makes
+    // them available and sets up their context is makeFunctionsPublic().
+    // ***************************************************************
+
+    function changeFileType(event) {
+        var fileType = $(event.currentTarget).data('value');
+
+        this.videoAccessibleMenu.setValue(fileType);
+        this.saveState(true, {'transcript_download_format': fileType});
+        this.storage.setItem('transcript_download_format', fileType);
+    }
+
 });
 
-}(RequireJS.define));
+}(RequireJS.requirejs, RequireJS.require, RequireJS.define));
