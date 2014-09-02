@@ -31,13 +31,24 @@
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
   <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to this view's content" %}</a>
-  {% include "navigation.html" %}
+  {% if ENABLE_NEW_EDX_HEADER %}
+    {% include "navigation.html" %}
+  {% else %}
+    {% include "original_navigation.html" %}
+  {% endif %}
   <div class="content-wrapper" id="content">
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
   </div>
-
-  {% include "edx_footer.html" %}
+  {% if IS_EDX_DOMAIN %}
+    {% if ENABLE_NEW_EDX_FOOTER %}
+        {% include "edx_footer.html" %}
+    {% else %}
+        {% include "original_edx_footer.html" %}
+    {% endif %}
+  {% else %}
+    {% include "footer.html" %}
+  {% endif %}
 
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
