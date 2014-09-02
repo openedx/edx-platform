@@ -3,7 +3,6 @@ Acceptance tests for Studio related to course reruns.
 """
 
 import random
-from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
 
 from ..pages.studio.index import DashboardPage
@@ -15,7 +14,6 @@ from ..fixtures.course import XBlockFixtureDesc
 from .base_studio_test import StudioCourseTest
 
 
-@attr('shard_2')
 class CourseRerunTest(StudioCourseTest):
     """
     Feature: Courses can be rerun

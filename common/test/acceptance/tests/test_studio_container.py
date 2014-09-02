@@ -289,6 +289,7 @@ class EditContainerTest(NestedVerticalTest):
         self.modify_display_name_and_verify(container)
 
 
+@attr('shard_1')
 class UnitPublishingTest(ContainerBase):
     """
     Tests of the publishing control and related widgets on the Unit page.
