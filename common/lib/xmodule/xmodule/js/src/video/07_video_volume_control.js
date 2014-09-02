@@ -202,6 +202,7 @@ function() {
         /** Toggles the state of the volume button. */
         toggleMute: function() {
             this.mute(!this.getMuteStatus());
+            return this.getMuteStatus();
         },
 
         /**

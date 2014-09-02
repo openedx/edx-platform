@@ -131,3 +131,65 @@ $a11y--blue-s1: saturate($blue,15%);
     }
   }
 }
+
+
+.menu {
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: absolute;
+  display: none;
+
+  &.is-opened {
+     display: block;
+  }
+
+  .menu-item, .submenu-item {
+    border-top: 1px solid #ccc;
+    padding: 5px 10px;
+
+    &:first-childs {
+      border-top: none;
+    }
+
+    &:hover, &:focus {
+      background: #000;
+      color: #fff;
+    }
+  }
+
+  .submenu-item {
+    position: relative;
+
+    &:after {
+      content: '>';
+      position: absolute;
+      right: 5px;
+      top: 25%;
+    }
+
+    .menu {
+      display: none;
+      left: 100%;
+      top: 0;
+    }
+
+    &.is-opened {
+      & > .menu {
+        display: block;
+      }
+    }
+  }
+}
+
+.is-active {
+  font-weight: bold;
+}
+
+.is-disabled {
+  pointer-events: none;
+  color: #ccc;
+}

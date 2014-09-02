@@ -1,3 +1,4 @@
+
 (function (requirejs, require, define) {
 
 // VideoAccessibleMenu module.

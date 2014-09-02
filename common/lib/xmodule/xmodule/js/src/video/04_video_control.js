@@ -246,16 +246,15 @@ function () {
 
     function togglePlayback(event) {
         event.preventDefault();
+        this.videoCommands.execute('togglePlayback');
+    }
 
-        if (this.videoControl.isPlaying) {
-            this.trigger('videoPlayer.pause', null);
-        } else {
-            this.trigger('videoPlayer.play', null);
-        }
+    function toggleFullScreenHandler(event) {
+        event.preventDefault();
+        this.videoCommands.execute('toggleFullScreen');
     }
 
     function toggleFullScreen(event) {
-        event.preventDefault();
         var fullScreenClassNameEl = this.el.add(document.documentElement),
             win = $(window),
             text;
@@ -278,6 +277,7 @@ function () {
             .text(text);
 
         this.el.trigger('fullscreen', [this.isFullScreen]);
+        return this.isFullScreen;
     }
 
     function exitFullScreen(event) {
