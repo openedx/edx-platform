@@ -44,12 +44,6 @@ FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
 WIKI_ENABLED = True
 
-LOGGING = get_logger_config(ENV_ROOT / "log",
-                            logging_env="dev",
-                            local_loglevel="DEBUG",
-                            dev_env=True,
-                            debug=True)
-
 DJFS = {
     'type': 'osfs',
     'directory_root': 'lms/static/djpyfs',

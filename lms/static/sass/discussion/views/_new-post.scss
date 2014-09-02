@@ -1,0 +1,258 @@
+// discussion - views - new post
+// ====================
+
+// UI: form structure
+.forum-new-post-form {
+  @include clearfix;
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: 3px;
+  padding: ($baseline*2);
+  min-width: 760px;
+  max-width: 1180px;
+  background: $gray-l5;
+
+  .post-field {
+    margin-bottom: $baseline;
+
+    .field-label {
+      display: inline-block;
+      width: 50%;
+      vertical-align: top;
+      line-height: 40px;
+
+      .field-input {
+        display: inline-block;
+        width: 100%;
+        vertical-align: top;
+      }
+
+      .field-label-text {
+        display: inline-block;
+        width: 25%;
+        vertical-align: top;
+        text-transform: uppercase;
+        font-size: 12px;
+        line-height: 40px;
+      }
+
+      .field-label-text + .field-input {
+        width: 75%;
+      }
+    }
+
+    // UI: support text for input fields
+    .field-help {
+      @include box-sizing(border-box);
+      display: inline-block;
+      padding-left: $baseline;
+      width: 50%;
+      font-size: 12px;
+    }
+  }
+
+  .post-options {
+    margin-bottom: ($baseline/2);
+  }
+}
+
+// CASE: inline styling
+.discussion-module .forum-new-post-form {
+  background: $white;
+}
+
+// ====================
+
+// UI: inputs
+.forum-new-post-form {
+  .post-topic-button {
+    @include white-button;
+    @extend %cont-truncated;
+    z-index: 1000;
+    padding: 0 $baseline 0 ($baseline*.75);
+    height: 40px;
+    font-size: 14px;
+    line-height: 36px;
+
+    .drop-arrow {
+      float: right;
+      color: #999;
+    }
+  }
+
+  .post-type-input {
+    @extend %text-sr;
+  }
+
+  .post-type-label {
+    @extend %cont-truncated;
+    @include box-sizing(border-box);
+    @include white-button;
+    @include font-size(14);
+    display: inline-block;
+    padding: 0 ($baseline/2);
+    width: 48%;
+    height: 40px;
+    text-align: center;
+    color: $gray-d3;
+    font-weight: 600;
+    line-height: 36px;
+
+    .icon {
+      margin-right: 5px;
+    }
+  }
+
+  .post-type-input:checked + .post-type-label {
+    background-color: $forum-color-active-thread;
+    background-image: none;
+    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset;
+  }
+
+  .post-type-input:focus + .post-type-label {
+    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset, 0 0 2px 2px $blue;
+  }
+
+  input[type=text].field-input {
+    @include box-sizing(border-box);
+    border: 1px solid $gray-l2;
+    border-radius: 3px;
+    padding: 0 $baseline/2;
+    height: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+    color: #333;
+    font-weight: 700;
+    font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  .post-option {
+    @include box-sizing(border-box);
+    display: inline-block;
+    margin-right: $baseline;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    padding: ($baseline/2);
+
+    &:hover {
+      border-color: $gray-l3;
+    }
+
+    &.is-enabled {
+      border-color: $blue;
+      color: $blue;
+    }
+
+    .post-option-input {
+      margin-right: ($baseline/2);
+    }
+
+    .icon {
+      margin-right: 0.5em;
+    }
+  }
+}
+
+// ====================
+
+// UI: actions
+.forum-new-post-form {
+  .submit {
+    @include blue-button;
+    display: inline-block;
+    margin-right: ($baseline/2);
+  }
+
+  .cancel {
+    @include white-button;
+    display: inline-block;
+  }
+}
+
+// ====================
+
+// UI: errors - new post creation
+.forum-new-post-form {
+  .post-errors {
+    margin-bottom: $baseline;
+    border-radius: 3px;
+    padding: 0;
+    background: $error-red;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
+    color: $white;
+    list-style: none;
+
+    .post-error {
+      padding: ($baseline/2) $baseline 12px 45px;
+      border-bottom: 1px solid $red;
+      background: url(../images/white-error-icon.png) no-repeat 15px 14px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+// ====================
+
+// UI: topic menu
+
+// TO-DO: refactor to use _navigation.scss as general topic selector
+.forum-new-post-form .post-topic {
+  position: relative;
+
+  .topic-menu-wrapper {
+    @include box-sizing(border-box);
+    position: absolute;
+    top: 40px;
+    left: 0;
+    z-index: 9999;
+    border: 1px solid $gray-l3;
+    width: 100%;
+    background: $white;
+    box-shadow: 0 2px 1px $shadow;
+  }
+
+  .topic-filter-label {
+    border-bottom: 1px solid $gray-l2;
+    padding: ($baseline/4);
+  }
+
+  .topic-filter-input {
+    @include box-sizing(border-box);
+    border: 1px solid $gray-l3;
+    padding: 0 15px;
+    width: 100%;
+    height: 30px;
+    color: #333;
+    font-size: 11px;
+    line-height: 16px;
+  }
+
+  .topic-menu {
+    overflow-y: scroll;
+    max-height: 400px;
+    list-style: none;
+  }
+
+  .topic-submenu {
+    padding-left: $baseline;
+    list-style: none;
+  }
+
+  .topic-title {
+    display: block;
+    border-bottom: 1px solid $gray-l3;
+    padding: ($baseline/2);
+    font-size: 14px;
+  }
+
+  a.topic-title {
+    @include transition(none);
+
+    &:hover, &:focus {
+      background-color: $gray-l4;
+    }
+  }
+}

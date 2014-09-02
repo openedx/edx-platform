@@ -16,7 +16,8 @@ class Thread(models.Model):
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
         'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
-        'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total'
+        'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
+        'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
     ]
 
     updatable_fields = [
@@ -29,7 +30,7 @@ class Thread(models.Model):
         'endorsed', 'read'
     ]
 
-    initializable_fields = updatable_fields
+    initializable_fields = updatable_fields + ['thread_type']
 
     base_url = "{prefix}/threads".format(prefix=settings.PREFIX)
     default_retrieve_params = {'recursive': False}

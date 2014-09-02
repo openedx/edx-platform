@@ -10,6 +10,7 @@ if Backbone?
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
+      "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
 
     initialize: ->
@@ -75,7 +76,7 @@ if Backbone?
     #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
       commentable_id = thread.get("commentable_id")
-      menuItem = @$(".forum-nav-browse-menu-item[data-discussion-id]").filter(-> $(this).data("discussion-id").id == commentable_id)
+      menuItem = @$(".forum-nav-browse-menu-item[data-discussion-id]").filter(-> $(this).data("discussion-id") == commentable_id)
       @setCurrentTopicDisplay(@getPathText(menuItem))
       @retrieveDiscussion commentable_id, =>
         @trigger "thread:created", thread.get('id')
@@ -173,7 +174,7 @@ if Backbone?
       loadingElem = loadMoreElem.find(".forum-nav-loading")
       DiscussionUtil.makeFocusTrap(loadingElem)
       loadingElem.focus()
-      options = {}
+      options = {filter: @filter}
       switch @mode
         when 'search'
           options.search_text = @current_search
@@ -242,7 +243,7 @@ if Backbone?
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
-      $(".discussion-column").html(@template)
+      $(".forum-content").html(@template)
       $(".forum-nav-thread-list a").removeClass("is-active")
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
@@ -363,26 +364,24 @@ if Backbone?
         @discussionIds = ""
         @$('.forum-nav-filter-cohort').show()
         @retrieveAllThreads()
-      else if item.hasClass("forum-nav-browse-menu-flagged")
-        @discussionIds = ""
-        @$('.forum-nav-filter-cohort').hide()
-        @retrieveFlaggedThreads() 
       else if item.hasClass("forum-nav-browse-menu-following")
         @retrieveFollowed()
         @$('.forum-nav-filter-cohort').hide()
       else
         allItems = item.find(".forum-nav-browse-menu-item").andSelf()
         discussionIds = allItems.filter("[data-discussion-id]").map(
-          (i, elem) -> $(elem).data("discussion-id").id
+          (i, elem) -> $(elem).data("discussion-id")
         ).get()
         @retrieveDiscussions(discussionIds)
         @$(".forum-nav-filter-cohort").toggle(item.data('cohorted') == true)
 
-    chooseCohort: (event) ->
+    chooseFilter: (event) =>
+      @filter = $(".forum-nav-filter-main-control :selected").val()
+      @retrieveFirstPage()
+
+    chooseCohort: (event) =>
       @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
-      @collection.current_page = 0
-      @collection.reset()
-      @loadMorePages(event)
+      @retrieveFirstPage()
       
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
@@ -413,12 +412,6 @@ if Backbone?
       @collection.reset()
       @loadMorePages(event)
 
-    retrieveFlaggedThreads: (event)->
-      @collection.current_page = 0
-      @collection.reset()
-      @mode = 'flagged'
-      @loadMorePages(event)
-
     sortThreads: (event) ->
       @displayedCollection.setSortComparator(@$(".forum-nav-sort-control").val())
 
@@ -434,6 +427,7 @@ if Backbone?
 
     searchFor: (text) ->
       @clearSearchAlerts()
+      @clearFilters()
       @mode = 'search'
       @current_search = text
       url = DiscussionUtil.urlFor("search")
@@ -499,6 +493,11 @@ if Backbone?
     clearSearch: ->
       @$(".forum-nav-search-input").val("")
       @current_search = ""
+      @clearSearchAlerts()
+
+    clearFilters: ->
+     @$(".forum-nav-filter-main-control").val("all")
+     @$(".forum-nav-filter-cohort-control").val("all")
 
     retrieveFollowed: () =>
       @mode = 'followed'

@@ -190,19 +190,17 @@
 
     % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
 
-    <hr />
-
-    <p class="instructions">
-      ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
-      ## Translators: this is the last choice of a number of choices of how to log in to the site.
-      ${_('or, if you have connected one of these providers, log in below.')}
-    </p>
+      <span class="deco-divider">
+        ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
+        ## Translators: this is the last choice of a number of choices of how to log in to the site.
+        <span class="copy">${_('or')}</span>
+      </span>
 
     <div class="form-actions form-third-party-auth">
 
     % for enabled in provider.Registry.enabled():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+      <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
     % endfor
 
     </div>
