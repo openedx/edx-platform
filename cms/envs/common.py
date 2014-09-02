@@ -107,6 +107,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Enable course reruns, by default
+    'ALLOW_COURSE_RERUNS': True,
 }
 ENABLE_JASMINE = False
 
