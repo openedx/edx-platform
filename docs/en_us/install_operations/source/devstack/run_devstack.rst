@@ -88,13 +88,13 @@ To run the LMS on Devstack:
    
    .. code-block:: bash
 
-    paver devstack lms
+    paver lms
 
    Or, to start the LMS without updating requirements and compiling assets, use the ``fast`` option:
    
    .. code-block:: bash
 
-    paver devstack --fast lms 
+    paver lms --fast 
 
    The LMS starts. 
 
@@ -120,14 +120,14 @@ To run Studio on Devstack:
    
    .. code-block:: bash
 
-    paver devstack studio
+    paver studio
 
    Or, to start Studio without updating requirements and compiling assets, use
    the ``fast`` option:
    
    .. code-block:: bash
 
-    paver devstack --fast studio 
+    paver studio --fast 
 
    Studio starts. 
 
