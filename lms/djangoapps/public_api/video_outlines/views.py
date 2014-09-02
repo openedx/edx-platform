@@ -22,21 +22,17 @@ from xmodule.video_module.video_module import get_transcripts
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
-# from xmodule.xmodule.video_module.transcripts_utils import Transcript
-
 from student.models import CourseEnrollment, User
-from courseware.module_render import get_module_system_for_user
 from courseware.model_data import FieldDataCache
 
 
 class BlockOutline(object):
 
-    def __init__(self, start_block, categories_to_outliner, request, system):
+    def __init__(self, start_block, categories_to_outliner, request):
         """How to specify the kind of outline that'll be generated? Method?"""
         self.start_block = start_block
         self.categories_to_outliner = categories_to_outliner
         self.request = request # needed for making full URLS
-        self.system = system
 
     def __iter__(self):
         child_to_parent = {}
@@ -72,7 +68,6 @@ class BlockOutline(object):
 
         while stack:
             curr_block = stack.pop()
-            curr_block.runtime = self.system
 
             if curr_block.category in self.categories_to_outliner:
                 summary_fn = self.categories_to_outliner[curr_block.category]
@@ -140,18 +135,8 @@ class VideoSummaryList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course = modulestore().get_course(course_id)
-        system, _student_data = get_module_system_for_user(
-            user=request.user,
-            field_data_cache=FieldDataCache([course], course_id, request.user),
-            descriptor=course,
-            course_id=course_id,
-            track_function=None,
-            xqueue_callback_url_prefix=None,
-            request_token='video_api',
-        )
-        system.export_fs = None
         video_outline = BlockOutline(
-            course, {"video": partial(video_summary, course)}, request, system
+            course, {"video": partial(video_summary, course)}, request
         )
 
         return Response(video_outline)
@@ -167,9 +152,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
         lang = kwargs['lang']
 
         usage_key = BlockUsageLocator(
-            course_key,
-            block_type="video",
-            block_id=block_id
+            course_key, block_type="video", block_id=block_id
         )
         video_descriptor = modulestore().get_item(usage_key)
         content, filename, mimetype = video_descriptor.get_transcript(lang=lang)
