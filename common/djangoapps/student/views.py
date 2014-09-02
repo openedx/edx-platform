@@ -883,13 +883,16 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             AUDIT_LOG.warning(
                 u'Login failed - user with username {username} has no social auth with backend_name {backend_name}'.format(
                     username=username, backend_name=backend_name))
-            return JsonResponse({
-                "success": False,
-                # Translators: provider_name is the name of an external, third-party user authentication service (like
-                # Google or LinkedIn).
-                "value": _('There is no {platform_name} account associated with your {provider_name} account. Please use your {platform_name} credentials or pick another provider.').format(
-                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME)
-            })  # TODO: this should be a status code 401  # pylint: disable=fixme
+            return HttpResponseBadRequest(
+                _("<p>You've successfully logged into your {provider_name} account, but this account "
+               "isn't linked with an {platform_name} account yet. Use your {platform_name} username and "
+               "password to log into {platform_name} below, and then link your {platform_name} account with "
+               "{provider_name} from your dashboard.</p><p>If you don't have an {platform_name} account yet, click "
+               "<strong>Register Now</strong> at the top of the page.</p>").format(
+                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME),
+                content_type= "text/plain",
+                status=401
+            )
 
     else:
 
