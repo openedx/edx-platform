@@ -472,17 +472,28 @@ function (Component) {
         $('.video')
             .append(topMenu.populateElement())
             .on('contextmenu', function (event) {
-                // Get mouse coordinates relative to '.video' element
                 var offset = $(this).offset(),
-                    relX = event.pageX - offset.left,
-                    relY = event.pageY - offset.top;
+                    mouseX = event.pageX - offset.left,
+                    mouseY = event.pageY - offset.top,
+                    videoWidth = $(this).width(),
+                    videoHeight = $(this).height(),
+                    menuWidth = topMenu.getElement().width(),
+                    menuHeight = topMenu.getElement().height();
+
+                if (mouseX + menuWidth > videoWidth) {
+                    mouseX -= menuWidth;
+                }
+                if (mouseY + menuHeight > videoHeight) {
+                    mouseY -= menuHeight;
+                }
+
                 event.preventDefault();
                 topMenu.open();
                 topMenu.getElement().position({
                     my: 'left top',
-                    at: 'left+' + relX.toString(10) + ' ' + 'top+' + relY.toString(10),
+                    at: 'left+' + mouseX + ' ' + 'top+' + mouseY,
                     of: '.video',
-                    collision: 'flipfit'
+                    collision: 'none'
                 });
             });
 
