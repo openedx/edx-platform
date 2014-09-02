@@ -5,13 +5,13 @@ Acceptance tests for Studio related to course reruns.
 import random
 from bok_choy.promise import EmptyPromise
 
-from ..pages.studio.index import DashboardPage
-from ..pages.studio.course_rerun import CourseRerunPage
-from ..pages.studio.overview import CourseOutlinePage
-from ..pages.lms.courseware import CoursewarePage
-from ..fixtures.course import XBlockFixtureDesc
+from ...pages.studio.index import DashboardPage
+from ...pages.studio.course_rerun import CourseRerunPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.courseware import CoursewarePage
+from ...fixtures.course import XBlockFixtureDesc
 
-from .base_studio_test import StudioCourseTest
+from base_studio_test import StudioCourseTest
 
 
 class CourseRerunTest(StudioCourseTest):

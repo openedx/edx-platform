@@ -6,16 +6,16 @@ import itertools
 from pytz import UTC
 from bok_choy.promise import EmptyPromise
 
-from ..pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
-from ..pages.studio.utils import add_discussion, drag, verify_ordering
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.course_nav import CourseNavPage
-from ..pages.lms.staff_view import StaffPage
-from ..fixtures.course import XBlockFixtureDesc
+from ...pages.studio.overview import CourseOutlinePage, ContainerPage, ExpandCollapseLinkState
+from ...pages.studio.utils import add_discussion, drag, verify_ordering
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.course_nav import CourseNavPage
+from ...pages.lms.staff_view import StaffPage
+from ...fixtures.course import XBlockFixtureDesc
 
-from .base_studio_test import StudioCourseTest
-from .helpers import load_data_str
-from ..pages.lms.progress import ProgressPage
+from base_studio_test import StudioCourseTest
+from ..helpers import load_data_str
+from ...pages.lms.progress import ProgressPage
 
 
 SECTION_NAME = 'Test Section'

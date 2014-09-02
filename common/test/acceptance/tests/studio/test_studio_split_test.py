@@ -11,17 +11,17 @@ from selenium.webdriver.support.ui import Select
 from xmodule.partitions.partitions import Group, UserPartition
 from bok_choy.promise import Promise, EmptyPromise
 
-from ..fixtures.course import XBlockFixtureDesc
-from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
-from ..pages.studio.settings_advanced import AdvancedSettingsPage
-from ..pages.studio.container import ContainerPage
-from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
-from ..pages.studio.utils import add_advanced_component
-from ..pages.xblock.utils import wait_for_xblock_initialization
-from ..pages.lms.courseware import CoursewarePage
+from ...fixtures.course import XBlockFixtureDesc
+from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.container import ContainerPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from ...pages.studio.utils import add_advanced_component
+from ...pages.xblock.utils import wait_for_xblock_initialization
+from ...pages.lms.courseware import CoursewarePage
 
-from .base_studio_test import StudioCourseTest
+from base_studio_test import StudioCourseTest
 
 from test_studio_container import ContainerBase
 

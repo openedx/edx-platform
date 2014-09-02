@@ -5,16 +5,16 @@ displaying containers within units.
 """
 from nose.plugins.attrib import attr
 
-from ..fixtures.course import XBlockFixtureDesc
-from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.html_component_editor import HtmlComponentEditorView
-from ..pages.studio.utils import add_discussion, drag
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.staff_view import StaffPage
+from ...fixtures.course import XBlockFixtureDesc
+from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.html_component_editor import HtmlComponentEditorView
+from ...pages.studio.utils import add_discussion, drag
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.staff_view import StaffPage
 
 import datetime
 from bok_choy.promise import Promise, EmptyPromise
-from .base_studio_test import ContainerBase
+from base_studio_test import ContainerBase
 
 
 class NestedVerticalTest(ContainerBase):

@@ -1,8 +1,8 @@
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..fixtures.course import CourseFixture
-from .helpers import UniqueCourseTest
-from ..pages.studio.overview import CourseOutlinePage
-from ..pages.studio.utils import verify_ordering
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...fixtures.course import CourseFixture
+from ..helpers import UniqueCourseTest
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.utils import verify_ordering
 
 
 class StudioCourseTest(UniqueCourseTest):
