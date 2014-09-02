@@ -15,6 +15,8 @@ from xmodule.error_module import ErrorDescriptor
 from django.test.client import Client
 from student.models import CourseEnrollment
 from student.views import get_course_enrollment_pairs
+import unittest
+from django.conf import settings
 
 
 class TestCourseListing(ModuleStoreTestCase):
@@ -54,6 +56,7 @@ class TestCourseListing(ModuleStoreTestCase):
         self.client.logout()
         super(TestCourseListing, self).tearDown()
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_get_course_list(self):
         """
         Test getting courses

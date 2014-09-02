@@ -46,6 +46,7 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.tabs import CourseTabList, StaffGradingTab, PeerGradingTab, OpenEndedGradingTab
 from xmodule.x_module import STUDENT_VIEW
 import shoppingcart
+from shoppingcart.models import CourseRegistrationCode
 from opaque_keys import InvalidKeyError
 
 from microsite_configuration import microsite
@@ -291,6 +292,14 @@ def index(request, course_id, chapter=None, section=None,
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
+
+    # Redirecting to dashboard if the course is blocked due to un payment.
+    redeemed_registration_codes = CourseRegistrationCode.objects.filter(course_id=course_key, registrationcoderedemption__redeemed_by=request.user)
+    for redeemed_registration in redeemed_registration_codes:
+        if not getattr(redeemed_registration.invoice, 'is_valid'):
+            log.warning(u'User %s cannot access the course %s because payment has not yet been received', user, course_key.to_deprecated_string())
+            return redirect(reverse('dashboard'))
+
     request.user = user  # keep just one instance of User
     course = get_course_with_access(user, 'load', course_key, depth=2)
     staff_access = has_access(user, 'staff', course)
