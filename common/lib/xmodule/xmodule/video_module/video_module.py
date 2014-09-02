@@ -17,6 +17,7 @@ Examples of html5 videos for manual testing:
 """
 import json
 import logging
+import os.path
 from operator import itemgetter
 
 from lxml import etree
@@ -30,12 +31,14 @@ from django.conf import settings
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
+from .transcripts_utils import Transcript
 from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
@@ -90,7 +93,28 @@ def get_transcripts(video):
     return track_url, transcript_language, sorted_languages
 
 
-class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
+class VideoTranscripts(object):
+    def available_translations(self):
+        """Return a list of language codes for which we have transcripts."""
+        translations = []
+        if self.sub:  # check if sjson exists for 'en'.
+            try:
+                Transcript.asset(self.location, self.sub, 'en')
+            except NotFoundError:
+                pass
+            else:
+                translations = ['en']
+        for lang in self.transcripts:
+            try:
+                Transcript.asset(self.location, None, None, self.transcripts[lang])
+            except NotFoundError:
+                continue
+            translations.append(lang)
+
+        return translations
+
+
+class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModule):
     """
     XML source example:
 
@@ -199,7 +223,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         })
 
 
-class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
+class VideoDescriptor(VideoFields, VideoTranscripts, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """
     Descriptor for `VideoModule`.
     """
@@ -548,3 +572,47 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
             "display_name": self.display_name,
             "category": self.category,
         }
+
+    # FIXME: dormsbee
+    # Copying over for temporary expedience. Fix before actually opening a PR
+    def get_transcript(self, transcript_format='srt', lang=None):
+        """
+        Returns transcript, filename and MIME type.
+
+        Raises:
+            - NotFoundError if cannot find transcript file in storage.
+            - ValueError if transcript file is empty or incorrect JSON.
+            - KeyError if transcript file has incorrect format.
+
+        If language is 'en', self.sub should be correct subtitles name.
+        If language is 'en', but if self.sub is not defined, this means that we
+        should search for video name in order to get proper transcript (old style courses).
+        If language is not 'en', give back transcript in proper language and format.
+        """
+        from .transcripts_utils import Transcript
+
+        if not lang:
+            lang = self.transcript_language
+
+        if lang == 'en':
+            if self.sub:  # HTML5 case and (Youtube case for new style videos)
+                transcript_name = self.sub
+            elif self.youtube_id_1_0:  # old courses
+                transcript_name = self.youtube_id_1_0
+            else:
+                log.debug("No subtitles for 'en' language")
+                raise ValueError
+
+            data = Transcript.asset(self.location, transcript_name, lang).data
+            filename = u'{}.{}'.format(transcript_name, transcript_format)
+            content = Transcript.convert(data, 'sjson', transcript_format)
+        else:
+            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
+            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            content = Transcript.convert(data, 'srt', transcript_format)
+
+        if not content:
+            log.debug('no subtitles produced in get_transcript')
+            raise ValueError
+
+        return content, filename, Transcript.mime_types[transcript_format]
