@@ -213,6 +213,16 @@ if FEATURES.get('AUTH_USE_CAS'):
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+############### XBlock filesystem field config ##########
+if 'XBLOCK-FS-STORAGE-BUCKET' in ENV_TOKENS:
+    DJFS = {
+        'type' : 's3fs',
+        'bucket' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-BUCKET', None),
+        'prefix' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-PREFIX', '/xblock-storage/')
+    }
+    DJFS['aws_access_key_id'] = AUTH_TOKENS.get('AWS_ACCESS_KEY_ID', None)
+    DJFS['aws_secret_access_key'] = AUTH_TOKENS.get('AWS_SECRET_ACCESS_KEY', None)
+
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
