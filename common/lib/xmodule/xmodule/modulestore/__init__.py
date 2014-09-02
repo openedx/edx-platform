@@ -24,6 +24,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
+import functools
 
 log = logging.getLogger('edx.modulestore')
 
@@ -577,6 +578,36 @@ class ModuleStoreReadBase(ModuleStoreRead):
         """
         pass
 
+    @staticmethod
+    def memoize_request_cache(func):
+        """
+        Memoize a function call results on the request_cache if there's one. Creates the cache key by
+        joining the unicode of all the args with &; so, if your arg may use the default &, it may
+        have false hits
+        """
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self.request_cache:
+                cache_key = '&'.join([hashvalue(arg) for arg in args])
+                if cache_key in self.request_cache.data.setdefault(func.__name__, {}):
+                    return self.request_cache.data[func.__name__][cache_key]
+
+                result = func(self, *args, **kwargs)
+
+                self.request_cache.data[func.__name__][cache_key] = result
+                return result
+            else:
+                return func(self, *args, **kwargs)
+        return wrapper
+
+def hashvalue(arg):
+    """
+    If arg is an xblock, use its location. otherwise just turn it into a string
+    """
+    if isinstance(arg, XBlock):
+        return unicode(arg.location)
+    else:
+        return unicode(arg)
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''

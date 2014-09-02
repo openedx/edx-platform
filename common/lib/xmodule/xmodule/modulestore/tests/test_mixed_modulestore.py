@@ -354,8 +354,9 @@ class TestMixedModuleStore(unittest.TestCase):
             )
 
     # draft: 2 to look in draft and then published and then 5 for updating ancestors.
-    # split: 1 for the course index, 1 for the course structure before the change, 1 for the structure after the change
-    #  2 sends: insert structure, update index_entry
+    # split: 3 to get the course structure & the course definition (show_calculator is scope content)
+    #  before the change. 1 during change to refetch the definition. 3 afterward (b/c it calls get_item to return the "new" object).
+    #  2 sends to update index & structure (calculator is a setting field)
     @ddt.data(('draft', 11, 5), ('split', 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
@@ -438,7 +439,6 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_changes(component))
 
     # TODO: LMS-11220: Document why split find count is 4
-    # TODO: LMS-11220: Document why draft find count is 8
     # TODO: LMS-11220: Document why split send count is 3
     @ddt.data(('draft', 8, 2), ('split', 4, 3))
     @ddt.unpack
@@ -459,7 +459,7 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(ItemNotFoundError):
             self.store.get_item(self.writable_chapter_location)
 
-    # TODO: LMS-11220: Document why draft find count is 9
+    # TODO: LMS-11220: Document why split find count is 4
     # TODO: LMS-11220: Document why split send count is 3
     @ddt.data(('draft', 9, 2), ('split', 4, 3))
     @ddt.unpack
@@ -506,8 +506,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_item(leaf_loc))
         self.assertNotIn(vert_loc, course.children)
 
-    # TODO: LMS-11220: Document why split send count is 2
-    # TODO: LMS-11220: Document why draft find count is 5
+    # TODO: LMS-11220: Document why split find count is 2
     @ddt.data(('draft', 5, 1), ('split', 2, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
@@ -712,9 +711,9 @@ class TestMixedModuleStore(unittest.TestCase):
     #        - load vertical
     #        - load inheritance data
 
-    # TODO: LMS-11220: Document why draft send count is 6
-    # TODO: LMS-11220: Document why draft find count is 18
-    # TODO: LMS-11220: Document why split find count is 16
+    # TODO: LMS-11220: Document why draft send count is 5
+    # TODO: LMS-11220: Document why draft find count is [19, 6]
+    # TODO: LMS-11220: Document why split find count is [2, 2]
     @ddt.data(('draft', [19, 6], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
@@ -1045,6 +1044,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # Sends:
     #    - insert structure
     #    - write index entry
+    # TODO: LMS-11220: Document why split find count is 3
     @ddt.data(('draft', 3, 6), ('split', 3, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
