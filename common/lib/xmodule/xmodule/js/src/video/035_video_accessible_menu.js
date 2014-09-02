@@ -5,12 +5,12 @@ define(
 'video/035_video_accessible_menu.js',
 ['video/00_component.js'],
 function (Component) {
-    var AbstarctItem, AbstractMenu, Menu, Submenu, MenuItem;
+    var AbstractItem, AbstractMenu, Menu, Submenu, MenuItem;
 
     var DEBUG_KEYDOWN_EVENTS = true;
     var DEBUG_MOUSE_EVENTS = false;
 
-    AbstarctItem = Component.extend({
+    AbstractItem = Component.extend({
         addChild: function () { },
         close: function () { },
         getChildren: function () { },
@@ -29,7 +29,7 @@ function (Component) {
         keyDownHandler: function (event) { }
     });
 
-    AbstractMenu = AbstarctItem.extend({
+    AbstractMenu = AbstractItem.extend({
         initialize: function (options) {
             this.options = {
                 prefix: 'prefix-',
@@ -229,11 +229,11 @@ function (Component) {
         },
 
         disable: function () {
-          this.getElement().addClass('is-disabled');
+            this.getElement().addClass('is-disabled');
         },
 
         enable: function () {
-          this.getElement().removeClass('is-disabled');
+            this.getElement().removeClass('is-disabled');
         },
 
         keyDownHandler: function (event) {
@@ -271,27 +271,27 @@ function (Component) {
         }
     });
 
-    MenuItem = AbstarctItem.extend({
-      initialize: function (options) {
-        this.options = $.extend(true, {
-            label: '',
-            prefix: 'prefix-',
-            dataAttrs: {menu: this},
-            attrs: {},
-            callback: $.noop
-        }, options);
+    MenuItem = AbstractItem.extend({
+        initialize: function (options) {
+            this.options = $.extend(true, {
+                label: '',
+                prefix: 'prefix-',
+                dataAttrs: {menu: this},
+                attrs: {},
+                callback: $.noop
+            }, options);
 
-        this.element = $('<li />', {
-            'class': ['menu-item', this.options.prefix + 'menu-item'].join(' '),
-            'aria-disabled': 'false',
-            'role': 'menuitem',
-            'tabindex': 0,
-            'text': this.options.label
-        }).attr(this.options.attrs).data(this.options.dataAttrs);
-        this.id = _.uniqueId();
-        this.delegateEvents();
-      },
-      populateElement: function () {
+            this.element = $('<li />', {
+                'class': ['menu-item', this.options.prefix + 'menu-item'].join(' '),
+                'aria-disabled': 'false',
+                'role': 'menuitem',
+                'tabindex': 0,
+                'text': this.options.label
+            }).attr(this.options.attrs).data(this.options.dataAttrs);
+            this.id = _.uniqueId();
+            this.delegateEvents();
+        },
+        populateElement: function () {
             return this.getElement();
         },
 
@@ -321,7 +321,7 @@ function (Component) {
                 callback.call(this, event, this, this.options);
                 this.getElement().addClass('is-active');
                 _.each(this.siblings(), function (sibling) {
-                  sibling.unactivate();
+                    sibling.unactivate();
                 });
                 this.getRoot().close();
             }
@@ -332,39 +332,39 @@ function (Component) {
         },
 
         siblings: function () {
-          var items = [],
-              item = this;
-          while (item.next && item.next.id !== this.id) {
-            item = item.next;
-            items.push(item);
-          }
+            var items = [],
+                item = this;
+            while (item.next && item.next.id !== this.id) {
+                item = item.next;
+                items.push(item);
+            }
 
-          return items;
+            return items;
         },
 
         disable: function () {
-          this.getElement().addClass('is-disabled');
+            this.getElement().addClass('is-disabled');
         },
 
         enable: function () {
-          this.getElement().removeClass('is-disabled');
+            this.getElement().removeClass('is-disabled');
         },
 
         // @TODO pass as argument?
         getRoot: function () {
-          var item = null;
-          return function () {
-            if (item) {
-              return item;
-            }
+            var item = null;
+            return function () {
+                if (item) {
+                    return item;
+                }
 
-            item = this;
-            do {
-              item = item.parent;
-            } while (item.parent);
+                item = this;
+                do {
+                    item = item.parent;
+                } while (item.parent);
 
-            return item;
-          };
+                return item;
+            };
         }(),
 
         itemHandler: function (event) {
@@ -476,8 +476,8 @@ function (Component) {
             });
 
         $(document).on('click', function () {
-                topMenu.close();
-            });
+            topMenu.close();
+        });
 
         return $.Deferred().resolve().promise();
     };
