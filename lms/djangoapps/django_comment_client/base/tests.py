@@ -312,7 +312,13 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             data={"body": updated_body}
         )
 
-    def test_flag_thread(self, mock_request):
+    def test_flag_thread_open(self, mock_request):
+        self.flag_thread(mock_request, False)
+
+    def test_flag_thread_close(self, mock_request):
+        self.flag_thread(mock_request, True)
+
+    def flag_thread(self, mock_request, is_closed):
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "title": "Hello",
@@ -324,7 +330,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "created_at": "2013-05-10T18:53:43Z",
             "updated_at": "2013-05-10T18:53:43Z",
             "at_position_list": [],
-            "closed": False,
+            "closed": is_closed,
             "id": "518d4237b023791dca00000d",
             "user_id": "1","username": "robot",
             "votes": {
@@ -380,7 +386,13 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
         assert_equal(response.status_code, 200)
 
-    def test_un_flag_thread(self, mock_request):
+    def test_un_flag_thread_open(self, mock_request):
+        self.un_flag_thread(mock_request, False)
+
+    def test_un_flag_thread_close(self, mock_request):
+        self.un_flag_thread(mock_request, True)
+
+    def un_flag_thread(self, mock_request, is_closed):
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "title": "Hello",
@@ -392,7 +404,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "created_at": "2013-05-10T18:53:43Z",
             "updated_at": "2013-05-10T18:53:43Z",
             "at_position_list": [],
-            "closed": False,
+            "closed": is_closed,
             "id": "518d4237b023791dca00000d",
             "user_id": "1",
             "username": "robot",
@@ -449,7 +461,13 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
         assert_equal(response.status_code, 200)
 
-    def test_flag_comment(self, mock_request):
+    def test_flag_comment_open(self, mock_request):
+        self.flag_comment(mock_request, False)
+
+    def test_flag_comment_close(self, mock_request):
+        self.flag_comment(mock_request, True)
+
+    def flag_comment(self, mock_request, is_closed):
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "body": "this is a comment",
@@ -460,7 +478,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "created_at": "2013-05-10T18:53:43Z",
             "updated_at": "2013-05-10T18:53:43Z",
             "at_position_list": [],
-            "closed": False,
+            "closed": is_closed,
             "id": "518d4237b023791dca00000d",
             "user_id": "1",
             "username": "robot",
@@ -512,7 +530,13 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
         assert_equal(response.status_code, 200)
 
-    def test_un_flag_comment(self, mock_request):
+    def test_un_flag_comment_open(self, mock_request):
+        self.un_flag_comment(mock_request, False)
+
+    def test_un_flag_comment_close(self, mock_request):
+        self.un_flag_comment(mock_request, True)
+
+    def un_flag_comment(self, mock_request, is_closed):
         mock_request.return_value.status_code = 200
         self._set_mock_request_data(mock_request, {
             "body": "this is a comment",
@@ -523,7 +547,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
             "created_at": "2013-05-10T18:53:43Z",
             "updated_at": "2013-05-10T18:53:43Z",
             "at_position_list": [],
-            "closed": False,
+            "closed": is_closed,
             "id": "518d4237b023791dca00000d",
             "user_id": "1",
             "username": "robot",
