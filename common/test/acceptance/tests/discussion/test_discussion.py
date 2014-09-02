@@ -7,10 +7,10 @@ from pytz import UTC
 from uuid import uuid4
 from nose.plugins.attrib import attr
 
-from .helpers import UniqueCourseTest
-from ..pages.lms.auto_auth import AutoAuthPage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.discussion import (
+from ..helpers import UniqueCourseTest
+from ...pages.lms.auto_auth import AutoAuthPage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.discussion import (
     DiscussionTabSingleThreadPage,
     InlineDiscussionPage,
     InlineDiscussionThreadPage,
@@ -18,8 +18,8 @@ from ..pages.lms.discussion import (
     DiscussionTabHomePage,
     DiscussionSortPreferencePage,
 )
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
-from ..fixtures.discussion import (
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...fixtures.discussion import (
     SingleThreadViewFixture,
     UserProfileViewFixture,
     SearchResultFixture,
