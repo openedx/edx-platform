@@ -20,6 +20,8 @@ September, 2014
      - Added info about possible problem types to :ref:`Problem with Adaptive Hint`.
    * - 
      - Removed "These problems only allow integers and a few select constants" from table of problem types in :ref:`Create Exercises`.
+   * - 
+     - Added a note about angle bracket characters to the :ref:`Dropdown` topic.
 
 **************
 August, 2014
