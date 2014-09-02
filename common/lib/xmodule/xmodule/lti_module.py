@@ -741,11 +741,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         )
 
         if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
-            log.exception( "OAuth body hash verification failed, provided: {} calculated: {}, for url: {}, body is: {}".format(oauth_headers.get('oauth_body_hash'),oauth_body_hash,self.get_outcome_service_url(),request.body))
+            log.error("OAuth body hash verification failed, provided: {} calculated: {}, for url: {}, body is: {}".format(oauth_headers.get('oauth_body_hash'),oauth_body_hash,self.get_outcome_service_url(),request.body))
             raise LTIError("OAuth body hash verification is failed.")
 
         if not signature.verify_hmac_sha1(mock_request, client_secret):
-            log.exception( "OAuth signature verification failed, for url:{}".format(oauth_headers,self.get_outcome_service_url()))
+            log.error("OAuth signature verification failed, for url:{}".format(oauth_headers,self.get_outcome_service_url()))
             raise LTIError("OAuth signature verification is failed.")
 
     def get_client_key_secret(self):
