@@ -51,9 +51,9 @@ class ShortcutsTests(UrlResetMixin, TestCase):
             self.assertEquals(footer_setting, result.get('ENABLE_NEW_EDX_FOOTER'))
             self.assertEquals(header_setting, result.get('ENABLE_NEW_EDX_HEADER'))
 
-    @ddt.data(True, False)
+    @ddt.data((True, None), (False, None))
     @ddt.unpack
-    def test_edx_footer(self, expected_result):
+    def test_edx_footer(self, expected_result, _):
         with patch.dict('django.conf.settings.FEATURES', {
             'IS_EDX_DOMAIN': expected_result
         }):
