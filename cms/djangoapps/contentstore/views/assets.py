@@ -126,8 +126,9 @@ def _assets_json(request, course_key):
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         thumbnail_location = asset.get('thumbnail_location', None)
         if thumbnail_location:
-            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4],_license = asset.get('license', None)
+            thumbnail_location = course_key.make_asset_key('thumbnail', thumbnail_location[4])
 
+        _license = asset.get('license', None)
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, _license, thumbnail_location, asset_locked))
 
