@@ -39,7 +39,7 @@ class CourseDetails(object):
         descriptor = modulestore().get_course(course_key)
         course_details = cls(course_key.org, course_key.course, course_key.run)
 
-        course.license = descriptor.license
+        course_details.license = descriptor.license
         course_details.start_date = descriptor.start
         course_details.end_date = descriptor.end
         course_details.enrollment_start = descriptor.enrollment_start

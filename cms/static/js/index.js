@@ -1,6 +1,6 @@
 define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/views/utils/create_course_utils",
-    "js/views/utils/view_utils"],
-    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, ViewUtils) {
+    "js/views/utils/view_utils", "js/views/license-selector"],
+    function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, ViewUtils, LicenseSelector) {
         var CreateCourseUtils = CreateCourseUtilsFactory({
             name: '.new-course-name',
             org: '.new-course-org',
