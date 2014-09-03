@@ -1542,11 +1542,12 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
 
-        data = [
+        data = {'ignore_roles': ['staff'], 'roles': [
             {'course_id': unicode(self.course.id), 'role': 'instructor'},
             {'course_id': unicode(course2.id), 'role': 'instructor'},
             {'course_id': unicode(course3.id), 'role': 'instructor'},
-        ]
+            {'course_id': unicode(course3.id), 'role': 'staff'},
+        ]}
 
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 200)
@@ -1556,10 +1557,10 @@ class UsersApiTests(ModuleStoreTestCase):
         for role in response.data['results']:
             self.assertEqual(role['role'], 'instructor')
 
-        data = [
+        data = {'roles': [
             {'course_id': unicode(self.course.id), 'role': 'staff'},
             {'course_id': unicode(course2.id), 'role': 'staff'},
-        ]
+        ]}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 200)
         response = self.do_get(test_uri)
@@ -1572,10 +1573,10 @@ class UsersApiTests(ModuleStoreTestCase):
         allow_access(course4, self.user, 'staff')
         # Now modify the existing no-moderator role using the API, which tries to set the moderator role
         # Also change one of the existing moderator roles, but call it using the deprecated string version
-        data = [
+        data = {'roles': [
             {'course_id': course4.id.to_deprecated_string(), 'role': 'instructor'},
             {'course_id': course2.id.to_deprecated_string(), 'role': 'instructor'},
-        ]
+        ]}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 200)
         response = self.do_get(test_uri)
@@ -1584,7 +1585,7 @@ class UsersApiTests(ModuleStoreTestCase):
 
     def test_users_roles_list_put_invalid_user(self):
         test_uri = '{}/2131/roles/'.format(self.users_base_uri)
-        data = [{'course_id': unicode(self.course.id), 'role': 'instructor'}]
+        data = {'roles': [{'course_id': unicode(self.course.id), 'role': 'instructor'}]}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 404)
 
@@ -1594,7 +1595,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
 
-        data = [{'course_id': self.test_bogus_course_id, 'role': 'instructor'}]
+        data = {'roles': [{'course_id': self.test_bogus_course_id, 'role': 'instructor'}]}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
@@ -1605,10 +1606,10 @@ class UsersApiTests(ModuleStoreTestCase):
 
     def test_users_roles_list_put_invalid_roles(self):
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
-        data = []
+        data = {'roles': []}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
-        data = [{'course_id': unicode(self.course.id), 'role': 'invalid-role'}]
+        data = {'roles': [{'course_id': unicode(self.course.id), 'role': 'invalid-role'}]}
         response = self.do_put(test_uri, data)
         self.assertEqual(response.status_code, 400)
 
