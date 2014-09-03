@@ -884,12 +884,13 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 u'Login failed - user with username {username} has no social auth with backend_name {backend_name}'.format(
                     username=username, backend_name=backend_name))
             return HttpResponseBadRequest(
-                _("You've successfully logged into your {provider_name} account, but this account "
-                  "isn't linked with an {platform_name} account yet. Use your {platform_name} username and "
-                  "password to log into {platform_name} below, and then link your {platform_name} account with "
-                  "{provider_name} from your dashboard.") + "<br/><br/>" + _("If you don't have an {platform_name} "
-                  "account yet, click <strong>Register Now</strong> at the top of the page.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME),
+                _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
+                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME) 
+                  + "<br/><br/>" + _("Use your {platform_name} username and password to log into {platform_name} below, "
+                  "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
+                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME) 
+                  + "<br/><br/>" + _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
+                      platform_name=settings.PLATFORM_NAME),
                 content_type="text/plain",
                 status=401
             )
