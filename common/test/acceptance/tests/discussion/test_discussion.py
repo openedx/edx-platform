@@ -29,28 +29,14 @@ from ...fixtures.discussion import (
     SearchResult,
 )
 
+from helpers import BaseDiscussionMixin
 
-class DiscussionResponsePaginationTestMixin(object):
+
+class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
     """
     A mixin containing tests for response pagination for use by both inline
     discussion and the discussion tab
     """
-
-    def setup_thread(self, num_responses, **thread_kwargs):
-        """
-        Create a test thread with the given number of responses, passing all
-        keyword arguments through to the Thread fixture, then invoke
-        setup_thread_page.
-        """
-        thread_id = "test_thread_{}".format(uuid4().hex)
-        thread_fixture = SingleThreadViewFixture(
-            Thread(id=thread_id, commentable_id=self.discussion_id, **thread_kwargs)
-        )
-        for i in range(num_responses):
-            thread_fixture.addResponse(Response(id=str(i), body=str(i)))
-        thread_fixture.push()
-        self.setup_thread_page(thread_id)
-
     def assert_response_display_correct(self, response_total, displayed_responses):
         """
         Assert that various aspects of the display of responses are all correct:
