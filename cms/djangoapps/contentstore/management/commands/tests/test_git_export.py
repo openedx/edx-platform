@@ -56,29 +56,21 @@ class TestGitExport(CourseTestCase):
         Test that the command interface works. Ignore stderr for clean
         test output.
         """
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
-                call_command('git_export', 'blah', 'blah', 'blah',
-                             stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+            call_command('git_export', 'blah', 'blah', 'blah',
+                         stderr=StringIO.StringIO())
 
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
-                call_command('git_export', stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, 'This script requires.*'):
+            call_command('git_export', stderr=StringIO.StringIO())
 
         # Send bad url to get course not exported
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, GitExportError.URL_BAD):
-                call_command('git_export', 'foo/bar/baz', 'silly',
-                             stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, str(GitExportError.URL_BAD)):
+            call_command('git_export', 'foo/bar/baz', 'silly', stderr=StringIO.StringIO())
+
         # Send bad course_id to get course not exported
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, GitExportError.BAD_COURSE):
-                call_command('git_export', 'foo/bar:baz', 'silly',
-                             stderr=StringIO.StringIO())
-        self.assertEqual(ex.exception.code, 1)
+        with self.assertRaisesRegexp(CommandError, str(GitExportError.BAD_COURSE)):
+            call_command('git_export', 'foo/bar:baz', 'silly',
+                         stderr=StringIO.StringIO())
 
     def test_error_output(self):
         """
