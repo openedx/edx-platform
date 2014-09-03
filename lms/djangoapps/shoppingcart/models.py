@@ -351,6 +351,7 @@ class CourseRegistrationCode(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
     invoice = models.ForeignKey(Invoice, null=True)
 
     @classmethod
@@ -377,7 +378,7 @@ class RegistrationCodeRedemption(models.Model):
     """
     This model contains the registration-code redemption info
     """
-    order = models.ForeignKey(Order, db_index=True)
+    order = models.ForeignKey(Order, db_index=True, null=True)
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
@@ -410,6 +411,15 @@ class RegistrationCodeRedemption(models.Model):
 
         log.warning("Course item does not exist against registration code '{0}'".format(course_reg_code.code))
         raise ItemDoesNotExistAgainstRegCodeException
+
+    @classmethod
+    def create_invoice_generated_registration_redemption(cls, course_reg_code, user):
+        """
+        This function creates a RegistrationCodeRedemption entry in case the registration codes were invoice generated
+        and thus the order_id is missing.
+        """
+        code_redemption = RegistrationCodeRedemption(registration_code=course_reg_code, redeemed_by=user)
+        code_redemption.save()
 
 
 class SoftDeleteCouponManager(models.Manager):
