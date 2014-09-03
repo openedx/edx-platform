@@ -1699,6 +1699,18 @@ class RerunCourseTest(ContentStoreTestCase):
             self.user.save()
             self.post_rerun_request(source_course.id, response_code=403, expect_error=True)
 
+    def test_rerun_error(self):
+        error_message = "Mock Error Message"
+        with mock.patch(
+                'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
+                mock.Mock(side_effect=Exception(error_message))
+        ):
+            source_course = CourseFactory.create()
+            destination_course_key = self.post_rerun_request(source_course.id)
+            rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+            self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+            self.assertIn(error_message, rerun_state.message)
+
 
 class EntryPageTestCase(TestCase):
     """
