@@ -17,6 +17,7 @@
   @include box-sizing(border-box);
   display: table;
   border-bottom: 1px solid $gray-l2;
+  width: 100%;
   background-color: $gray-l3;
 }
 
