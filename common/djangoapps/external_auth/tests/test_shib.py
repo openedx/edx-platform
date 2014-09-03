@@ -37,12 +37,13 @@ TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT,
 # b/c of how mod_shib works but should test the behavior with the rest of the attributes present/missing
 
 # For the sake of python convention we'll make all of these variable names ALL_CAPS
-IDP = u'https://idp.stanford.edu/'
-REMOTE_USER = u'test_user@stanford.edu'
-MAILS = [None, u'', u'test_user@stanford.edu']
-DISPLAYNAMES = [None, u'', u'Jason \u5305']
-GIVENNAMES = [None, u'', u'jas\xf6n; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
-SNS = [None, u'', u'\u5305; smith']  # At Stanford, the sns can be a list delimited by ';'
+# These values would all returned from request.META, so they need to be str, not unicode
+IDP = 'https://idp.stanford.edu/'
+REMOTE_USER = 'test_user@stanford.edu'
+MAILS = [None, '', 'test_user@stanford.edu']  # unicode shouldn't be in emails, would fail django's email validator
+DISPLAYNAMES = [None, '', 'Jason 包']
+GIVENNAMES = [None, '', 'jasön; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
+SNS = [None, '', '包; smith']  # At Stanford, the sns can be a list delimited by ';'
 
 
 def gen_all_identities():
@@ -108,6 +109,7 @@ class ShibSPTest(ModuleStoreTestCase):
 
     def _assert_shib_login_is_logged(self, audit_log_call, remote_user):
         """Asserts that shibboleth login attempt is being logged"""
+        remote_user = _flatten_to_ascii(remote_user)  # django usernames have to be ascii
         method_name, args, _kwargs = audit_log_call
         self.assertEquals(method_name, 'info')
         self.assertEquals(len(args), 1)
@@ -312,12 +314,13 @@ class ShibSPTest(ModuleStoreTestCase):
             client = DjangoTestClient()
             response1 = client.get(path='/shib-login/', data={}, follow=False, **identity)
             # Then we have the user answer the registration form
-            postvars = {'email': 'post_email@stanford.edu',
-                        'username': 'post_username',
-                        'password': 'post_password',
-                        'name': 'post_name',
-                        'terms_of_service': 'true',
-                        'honor_code': 'true'}
+            # These are unicode because request.POST returns unicode
+            postvars = {'email': u'post_email@stanford.edu',
+                        'username': u'post_username',  # django usernames can't be unicode
+                        'password': u'post_pássword',
+                        'name': u'post_náme',
+                        'terms_of_service': u'true',
+                        'honor_code': u'true'}
             # use RequestFactory instead of TestClient here because we want access to request.user
             request2 = self.request_factory.post('/create_account', data=postvars)
             request2.session = client.session
@@ -374,7 +377,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertNotIn(u';', profile.name)
             else:
                 self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
-                self.assertEqual(profile.name, identity.get('displayName'))
+                self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
 
             # clean up for next loop
             request2.session['ExternalAuthMap'].delete()
@@ -596,9 +599,9 @@ class ShibUtilFnTest(TestCase):
         DIACRITIC = u"àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
         STR_DIACRI = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸåÅçÇ"  # pylint: disable=C0103
         FLATTENED = u"aeiouAEIOUaeiouyAEIOUYaeiouAEIOUanoANOaeiouyAEIOUYaAcC"  # pylint: disable=C0103
-        self.assertEqual(_flatten_to_ascii(u'jas\xf6n'), u'jason')  # umlaut
-        self.assertEqual(_flatten_to_ascii(u'Jason\u5305'), u'Jason')  # mandarin, so it just gets dropped
-        self.assertEqual(_flatten_to_ascii(u'abc'), u'abc')  # pass through
+        self.assertEqual(_flatten_to_ascii('jasön'), 'jason')  # umlaut
+        self.assertEqual(_flatten_to_ascii('Jason包'), 'Jason')  # mandarin, so it just gets dropped
+        self.assertEqual(_flatten_to_ascii('abc'), 'abc')  # pass through
 
         unicode_test = _flatten_to_ascii(DIACRITIC)
         self.assertEqual(unicode_test, FLATTENED)
