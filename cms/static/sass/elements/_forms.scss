@@ -363,7 +363,7 @@ form {
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
     @extend %cont-truncated;
-    display: inline-block;
+    display: inline; // needed for chrome to render truncated text properly (see - https://code.google.com/p/chromium/issues/detail?id=133700)
     vertical-align: middle;
     max-width: 80%;
   }
