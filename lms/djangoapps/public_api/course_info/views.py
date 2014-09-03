@@ -15,14 +15,15 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module
 from courseware.courses import get_course_about_section
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
 from student.models import CourseEnrollment, User
+from public_api import get_mobile_course
 
 # section_key values are 'updates', 'handouts'
 
 def get_course_info_module(request, course_id, section_key):
-    course = modulestore().get_course(course_id)
+    course = get_mobile_course(course_id)
+
     usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Empty cache
@@ -73,7 +74,8 @@ class CourseAboutDetail(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
-        course = modulestore().get_course(course_id)
+        course = get_mobile_course(course_id)
+
         # There are other fields, but they don't seem to be in use.
         # see courses.py:get_course_about_section
         return Response(
