@@ -18,7 +18,7 @@ ${_("Activation ensures that you can register for {platform_name} courses and"
       " If you require assistance, please use our web form at"
       " {contact_us} or email {info_address}.").format(
              platform_name=settings.PLATFORM_NAME,
-             contact_us=settings.MKTG_URL_LINK_MAP['CONTACT'],
+             contact_us='https://www.edx.org/contact-us',
              info_address=settings.CONTACT_EMAIL
       )}
 
