@@ -44,6 +44,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             return False
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem):
+class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
@@ -233,25 +234,16 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
                     inherit_metadata(module, metadata_to_inherit)
 
-                edit_info = json_data.get('edit_info')
+                module._edit_info = json_data.get('edit_info')
 
-                # migrate published_by and published_date if edit_info isn't present
-                if not edit_info:
-                    module.edited_by = module.edited_on = module.subtree_edited_on = \
-                        module.subtree_edited_by = module.published_date = None
+                # migrate published_by and published_on if edit_info isn't present
+                if module._edit_info is None:
+                    module._edit_info = {}
                     raw_metadata = json_data.get('metadata', {})
-                    # published_date was previously stored as a list of time components instead of a datetime
+                    # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module.published_date = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
-                    module.published_by = raw_metadata.get('published_by')
-                # otherwise restore the stored editing information
-                else:
-                    module.edited_by = edit_info.get('edited_by')
-                    module.edited_on = edit_info.get('edited_on')
-                    module.subtree_edited_on = edit_info.get('subtree_edited_on')
-                    module.subtree_edited_by = edit_info.get('subtree_edited_by')
-                    module.published_date = edit_info.get('published_date')
-                    module.published_by = edit_info.get('published_by')
+                        module._edit_info['published_date'] = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                    module._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 # decache any computed pending field settings
                 module.save()
@@ -315,6 +307,42 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             self.module_data[location] = json
 
         return json
+
+    def get_edited_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('edited_by')
+
+    def get_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('edited_on')
+
+    def get_subtree_edited_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('subtree_edited_by')
+
+    def get_subtree_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('subtree_edited_on')
+
+    def get_published_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('published_by')
+
+    def get_published_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('published_date')
 
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
@@ -1153,15 +1181,20 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._serialize_scope(xblock, Scope.settings),
-                'edit_info.edited_on': now,
-                'edit_info.edited_by': user_id,
-                'edit_info.subtree_edited_on': now,
-                'edit_info.subtree_edited_by': user_id,
+                'edit_info': {
+                    'edited_on': now,
+                    'edited_by': user_id,
+                    'subtree_edited_on': now,
+                    'subtree_edited_by': user_id,
+                }
             }
 
             if isPublish:
-                payload['edit_info.published_date'] = now
-                payload['edit_info.published_by'] = user_id
+                payload['edit_info']['published_date'] = now
+                payload['edit_info']['published_by'] = user_id
+            elif 'published_date' in getattr(xblock, '_edit_info', {}):
+                payload['edit_info']['published_date'] = xblock._edit_info['published_date']
+                payload['edit_info']['published_by'] = xblock._edit_info['published_by']
 
             if xblock.has_children:
                 children = self._serialize_scope(xblock, Scope.children)
@@ -1181,17 +1214,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
 
             # update the edit info of the instantiated xblock
-            xblock.edited_on = now
-            xblock.edited_by = user_id
-            xblock.subtree_edited_on = now
-            xblock.subtree_edited_by = user_id
-            if not hasattr(xblock, 'published_date'):
-                xblock.published_date = None
-            if not hasattr(xblock, 'published_by'):
-                xblock.published_by = None
-            if isPublish:
-                xblock.published_date = now
-                xblock.published_by = user_id
+            xblock._edit_info = payload['edit_info']
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)

@@ -37,6 +37,7 @@ from git.test.lib.asserts import assert_not_none
 from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 log = logging.getLogger(__name__)
 
@@ -105,7 +106,9 @@ class TestMongoModuleStore(unittest.TestCase):
             content_store,
             doc_store_config, FS_ROOT, RENDER_TEMPLATE,
             default_class=DEFAULT_CLASS,
-            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred
+            branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
+            xblock_mixins=(EditInfoMixin,)
+
         )
         import_from_xml(
             draft_store,
@@ -706,106 +709,6 @@ class TestMongoModuleStore(unittest.TestCase):
         self.assertTrue(self._has_changes(parent_location))
         self.assertTrue(self._has_changes(child_location))
 
-    def test_update_edit_info_ancestors(self):
-        """
-        Tests that edited_on, edited_by, subtree_edited_on, and subtree_edited_by are set correctly during update
-        """
-        create_user = 123
-        edit_user = 456
-        locations =self._create_test_tree('update_edit_info_ancestors', create_user)
-
-        def check_node(location_key, after, before, edited_by, subtree_after, subtree_before, subtree_by):
-            """
-            Checks that the node given by location_key matches the given edit_info constraints.
-            """
-            node = self.draft_store.get_item(locations[location_key])
-            if after:
-                self.assertLess(after, node.edited_on)
-            self.assertLess(node.edited_on, before)
-            self.assertEqual(node.edited_by, edited_by)
-            if subtree_after:
-                self.assertLess(subtree_after, node.subtree_edited_on)
-            self.assertLess(node.subtree_edited_on, subtree_before)
-            self.assertEqual(node.subtree_edited_by, subtree_by)
-
-        after_create = datetime.now(UTC)
-        # Verify that all nodes were last edited in the past by create_user
-        for key in locations:
-            check_node(key, None, after_create, create_user, None, after_create, create_user)
-
-        # Change the child
-        child = self.draft_store.get_item(locations['child'])
-        child.display_name = 'Changed Display Name'
-        self.draft_store.update_item(child, user_id=edit_user)
-
-        after_edit = datetime.now(UTC)
-        ancestors = ['parent', 'grandparent']
-        others = ['child_sibling', 'parent_sibling']
-
-        # Verify that child was last edited between after_create and after_edit by edit_user
-        check_node('child', after_create, after_edit, edit_user, after_create, after_edit, edit_user)
-
-        # Verify that ancestors edit info is unchanged, but their subtree edit info matches child
-        for key in ancestors:
-            check_node(key, None, after_create, create_user, after_create, after_edit, edit_user)
-
-        # Verify that others have unchanged edit info
-        for key in others:
-            check_node(key, None, after_create, create_user, None, after_create, create_user)
-
-    def test_update_edit_info(self):
-        """
-        Tests that edited_on and edited_by are set correctly during an update
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
-
-        # Create a dummy component to test against
-        self.draft_store.create_item(
-            self.dummy_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-
-        # Store the current edit time and verify that dummy_user created the component
-        component = self.draft_store.get_item(location)
-        self.assertEqual(component.edited_by, self.dummy_user)
-        old_edited_on = component.edited_on
-
-        # Change the component
-        component.display_name = component.display_name + ' Changed'
-        self.draft_store.update_item(component, self.dummy_user)
-        updated_component = self.draft_store.get_item(location)
-
-        # Verify the ordering of edit times and that dummy_user made the edit
-        self.assertLess(old_edited_on, updated_component.edited_on)
-        self.assertEqual(updated_component.edited_by, self.dummy_user)
-
-    def test_update_published_info(self):
-        """
-        Tests that published_date and published_by are set correctly
-        """
-        location = Location('edX', 'toy', '2012_Fall', 'html', 'test_html')
-        create_user = 123
-        publish_user = 456
-
-        # Create a dummy component to test against
-        self.draft_store.create_item(
-            create_user,
-            location.course_key,
-            location.block_type,
-            block_id=location.block_id
-        )
-
-        # Store the current time, then publish
-        old_time = datetime.now(UTC)
-        self.draft_store.publish(location, publish_user)
-        updated_component = self.draft_store.get_item(location)
-
-        # Verify the time order and that publish_user caused publication
-        self.assertLessEqual(old_time, updated_component.published_date)
-        self.assertEqual(updated_component.published_by, publish_user)
-
     def test_migrate_published_info(self):
         """
         Tests that blocks that were storing published_date and published_by through CMSBlockMixin are loaded correctly
@@ -829,7 +732,7 @@ class TestMongoModuleStore(unittest.TestCase):
 
         # Retrieve the block and verify its fields
         component = self.draft_store.get_item(location)
-        self.assertEqual(component.published_date, published_date)
+        self.assertEqual(component.published_on, published_date)
         self.assertEqual(component.published_by, published_by)
 
     def test_export_course_with_peer_component(self):

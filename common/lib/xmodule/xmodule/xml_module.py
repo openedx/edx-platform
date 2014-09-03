@@ -124,7 +124,7 @@ class XmlDescriptor(XModuleDescriptor):
     # import and export.
 
     metadata_to_strip = ('data_dir',
-                         'tabs', 'grading_policy', 'published_by', 'published_date',
+                         'tabs', 'grading_policy',
                          'discussion_blackouts',
                          # VS[compat] -- remove the below attrs once everything is in the CMS
                          'course', 'org', 'url_name', 'filename',

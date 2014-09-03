@@ -387,3 +387,12 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             return self._update_item_from_fields(
                 user_id, course_key, block_type, block_id, partitioned_fields, None, allow_not_found=True, force=True
             )
+
+    def compute_published_info_internal(self, xblock):
+        """
+        Get the published branch and find when it was published if it was. Cache the results in the xblock
+        """
+        published_block = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
+        if published_block is not None:
+            setattr(xblock, '_published_by', published_block['edit_info']['edited_by'])
+            setattr(xblock, '_published_on', published_block['edit_info']['edited_on'])
