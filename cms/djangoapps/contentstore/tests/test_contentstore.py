@@ -1612,17 +1612,15 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 
-    def test_rerun_course_success(self):
-
-        source_course = CourseFactory.create()
-        destination_course_key = self.post_rerun_request(source_course.id)
-
-        # Verify the contents of the course rerun action
+    def verify_rerun_course(self, source_course_key, destination_course_key, destination_display_name):
+        """
+        Verify the contents of the course rerun action
+        """
         rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
         expected_states = {
             'state': CourseRerunUIStateManager.State.SUCCEEDED,
-            'display_name': self.destination_course_data['display_name'],
-            'source_course_key': source_course.id,
+            'display_name': destination_display_name,
+            'source_course_key': source_course_key,
             'course_key': destination_course_key,
             'should_display': True,
         }
@@ -1633,28 +1631,46 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, destination_course_key))
 
         # Verify both courses are in the course listing section
-        self.assertInCourseListing(source_course.id)
+        self.assertInCourseListing(source_course_key)
         self.assertInCourseListing(destination_course_key)
 
-    @skipIf(not settings.FEATURES.get('ALLOW_COURSE_RERUNS', False), "ALLOW_COURSE_RERUNS are not enabled")
+
+    def test_rerun_course_success(self):
+        source_course = CourseFactory.create()
+        destination_course_key = self.post_rerun_request(source_course.id)
+        self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
+
+    def test_rerun_of_rerun(self):
+        source_course = CourseFactory.create()
+        rerun_course_key = self.post_rerun_request(source_course.id)
+        rerun_of_rerun_data = {
+            'org': rerun_course_key.org,
+            'number': rerun_course_key.course,
+            'display_name': 'rerun of rerun',
+            'run': 'rerun2'
+        }
+        rerun_of_rerun_course_key = self.post_rerun_request(rerun_course_key, rerun_of_rerun_data)
+        self.verify_rerun_course(rerun_course_key, rerun_of_rerun_course_key, rerun_of_rerun_data['display_name'])
+
     def test_rerun_course_fail_no_source_course(self):
-        existent_course_key = CourseFactory.create().id
-        non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
-        destination_course_key = self.post_rerun_request(non_existent_course_key)
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ALLOW_COURSE_RERUNS': True}):
+            existent_course_key = CourseFactory.create().id
+            non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
+            destination_course_key = self.post_rerun_request(non_existent_course_key)
 
-        # Verify that the course rerun action is marked failed
-        rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
-        self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
-        self.assertIn("Cannot find a course at", rerun_state.message)
+            # Verify that the course rerun action is marked failed
+            rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+            self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+            self.assertIn("Cannot find a course at", rerun_state.message)
 
-        # Verify that the creator is not enrolled in the course.
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, non_existent_course_key))
+            # Verify that the creator is not enrolled in the course.
+            self.assertFalse(CourseEnrollment.is_enrolled(self.user, non_existent_course_key))
 
-        # Verify that the existing course continues to be in the course listings
-        self.assertInCourseListing(existent_course_key)
+            # Verify that the existing course continues to be in the course listings
+            self.assertInCourseListing(existent_course_key)
 
-        # Verify that the failed course is NOT in the course listings
-        self.assertInUnsucceededCourseActions(destination_course_key)
+            # Verify that the failed course is NOT in the course listings
+            self.assertInUnsucceededCourseActions(destination_course_key)
 
     def test_rerun_course_fail_duplicate_course(self):
         existent_course_key = CourseFactory.create().id
