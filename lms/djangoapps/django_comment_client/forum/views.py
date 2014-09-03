@@ -25,6 +25,9 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohorted_commentables,
     get_cohort_by_id,
     
+    is_commentable_cohorted,
+    get_cohorted_threads_privacy,
+    get_cohort_by_id
 )
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
