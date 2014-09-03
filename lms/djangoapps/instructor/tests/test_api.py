@@ -1900,8 +1900,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res['coupon_code'], code)
         self.assertEqual(res['username'], user.username)
         self.assertEqual(res['email'], user.email)
-        self.assertEqual(res['list_price'], item.list_price)
-        self.assertEqual(res['unit_cost'], item.unit_cost)
+        self.assertEqual(res['list_price'], str(item.list_price))
+        self.assertEqual(res['unit_cost'], str(item.unit_cost))
         self.assertEqual(res['order_id'], cart.id)
         self.assertEqual(res['orderitem_id'], item.id)
 
