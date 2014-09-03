@@ -2,12 +2,12 @@
 Acceptance tests for Studio related to edit/save peer grading interface.
 """
 
-from ..fixtures.course import XBlockFixtureDesc
-from ..pages.studio.export import ExportPage
-from ..pages.studio.component_editor import ComponentEditorView
-from ..pages.studio.overview import CourseOutlinePage
-from .base_studio_test import StudioCourseTest
-from .helpers import load_data_str
+from ...fixtures.course import XBlockFixtureDesc
+from ...pages.studio.export import ExportPage
+from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.overview import CourseOutlinePage
+from base_studio_test import StudioCourseTest
+from ..helpers import load_data_str
 
 
 class ORAComponentTest(StudioCourseTest):

@@ -5,26 +5,26 @@ Acceptance tests for Studio.
 from unittest import skip
 from bok_choy.web_app_test import WebAppTest
 
-from ..pages.studio.asset_index import AssetIndexPage
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.studio.checklists import ChecklistsPage
-from ..pages.studio.course_import import ImportPage
-from ..pages.studio.course_info import CourseUpdatesPage
-from ..pages.studio.edit_tabs import PagesPage
-from ..pages.studio.export import ExportPage
-from ..pages.studio.howitworks import HowitworksPage
-from ..pages.studio.index import DashboardPage
-from ..pages.studio.login import LoginPage
-from ..pages.studio.manage_users import CourseTeamPage
-from ..pages.studio.overview import CourseOutlinePage
-from ..pages.studio.settings import SettingsPage
-from ..pages.studio.settings_advanced import AdvancedSettingsPage
-from ..pages.studio.settings_graders import GradingPage
-from ..pages.studio.signup import SignupPage
-from ..pages.studio.textbooks import TextbooksPage
-from ..fixtures.course import XBlockFixtureDesc
+from ...pages.studio.asset_index import AssetIndexPage
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.studio.checklists import ChecklistsPage
+from ...pages.studio.course_import import ImportPage
+from ...pages.studio.course_info import CourseUpdatesPage
+from ...pages.studio.edit_tabs import PagesPage
+from ...pages.studio.export import ExportPage
+from ...pages.studio.howitworks import HowitworksPage
+from ...pages.studio.index import DashboardPage
+from ...pages.studio.login import LoginPage
+from ...pages.studio.manage_users import CourseTeamPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.settings import SettingsPage
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_graders import GradingPage
+from ...pages.studio.signup import SignupPage
+from ...pages.studio.textbooks import TextbooksPage
+from ...fixtures.course import XBlockFixtureDesc
 
-from .base_studio_test import StudioCourseTest
+from base_studio_test import StudioCourseTest
 
 
 class LoggedOutTest(WebAppTest):

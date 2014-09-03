@@ -4,9 +4,9 @@ Acceptance tests for Studio's Setting pages
 
 from nose.plugins.attrib import attr
 
-from acceptance.tests.base_studio_test import StudioCourseTest
+from base_studio_test import StudioCourseTest
 
-from ..pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_advanced import AdvancedSettingsPage
 
 
 @attr('shard_1')
