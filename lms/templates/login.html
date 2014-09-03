@@ -46,8 +46,10 @@
         toggleSubmitButton(false);
       });
 
-      $('#login-form').on('ajax:error', function() {
+      $('#login-form').on('ajax:error', function(event, request, status_string) {
         toggleSubmitButton(true);
+        $('.third-party-signin.message').addClass('is-shown').focus();
+        $('.third-party-signin.message .instructions').html(request.responseText);
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
@@ -138,10 +140,14 @@
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occurred while logging you in:")} </h3>
+        <h3 class="message-title">${_("We couldn't log you in.")} </h3>
         <ul class="message-copy">
           <li>${_("Your email or password is incorrect")}</li>
         </ul>
+      </div>
+
+      <div role="alert" class="third-party-signin message" tabindex="-1">
+        <p class="instructions"> </p>
       </div>
 
       <p class="instructions sr">
