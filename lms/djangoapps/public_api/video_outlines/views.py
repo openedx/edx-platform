@@ -15,6 +15,7 @@ from rest_framework.authentication import OAuth2Authentication, SessionAuthentic
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from public_api import get_mobile_course
 
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
@@ -134,7 +135,8 @@ class VideoSummaryList(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
-        course = modulestore().get_course(course_id)
+        course = get_mobile_course(course_id)
+
         video_outline = BlockOutline(
             course, {"video": partial(video_summary, course)}, request
         )

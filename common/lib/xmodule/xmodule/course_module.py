@@ -277,7 +277,7 @@ class CourseFields(object):
     mobile_available = Boolean(
         display_name=_("Mobile Course Available"),
         help=_("Enter true or false. If true, the course will be available to mobile devices."),
-        default=False,
+        default=True,
         scope=Scope.settings
     )
 
