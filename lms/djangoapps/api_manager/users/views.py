@@ -1275,26 +1275,29 @@ class UsersRolesList(SecureListAPIView):
         except ObjectDoesNotExist:
             raise Http404
 
-        if not len(request.DATA):
+        if not len(request.DATA['roles']):
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        ignore_roles = request.DATA.get('ignore_roles', [])
         current_roles = self.get_queryset()
         for current_role in current_roles:
-            course_descriptor, course_key, course_content = get_course(request, user, unicode(current_role.course_id))  # pylint: disable=W0612
-            _manage_role(course_descriptor, user, current_role.role, 'revoke')
-        for role in request.DATA:
-            try:
-                course_id = role['course_id']
-                course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
-                if not course_descriptor:
-                    raise ValueError  # ValueError is also thrown by the following role setters
-                _manage_role(course_descriptor, user, role['role'], 'allow')
-            except ValueError:
-                # Restore the current roleset to the User
-                for current_role in current_roles:
-                    course_descriptor, course_key, course_content = get_course(
-                        request, user, unicode(current_role.course_id))  # pylint: disable=W0612
-                    _manage_role(course_descriptor, user, current_role.role, 'allow')
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            if current_role.role not in ignore_roles:
+                course_descriptor, course_key, course_content = get_course(request, user, unicode(current_role.course_id))  # pylint: disable=W0612
+                _manage_role(course_descriptor, user, current_role.role, 'revoke')
+        for role in request.DATA['roles']:
+            if role['role'] not in ignore_roles:
+                try:
+                    course_id = role['course_id']
+                    course_descriptor, course_key, course_content = get_course(request, user, course_id)  # pylint: disable=W0612
+                    if not course_descriptor:
+                        raise ValueError  # ValueError is also thrown by the following role setters
+                    _manage_role(course_descriptor, user, role['role'], 'allow')
+                except ValueError:
+                    # Restore the current roleset to the User
+                    for current_role in current_roles:
+                        course_descriptor, course_key, course_content = get_course(
+                            request, user, unicode(current_role.course_id))  # pylint: disable=W0612
+                        _manage_role(course_descriptor, user, current_role.role, 'allow')
+                    return Response({}, status=status.HTTP_400_BAD_REQUEST)
         return Response(request.DATA, status=status.HTTP_200_OK)
 
 
