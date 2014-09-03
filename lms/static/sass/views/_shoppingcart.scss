@@ -171,3 +171,97 @@
     }
   }
 }
+.confirm-enrollment {
+  .title {
+    font-size:24px;
+    border-bottom:1px solid #f2f2f2;
+    text-align: left;
+    line-height:70px;
+  }
+  .course-image {
+    display: inline-block;
+    width: 223px;
+    margin-right: 10px;
+    vertical-align: top;
+  }
+  .enrollment-details {
+    margin-bottom: 20px;
+    display: inline-block;
+    width: calc(100% - 237px);
+    .sub-title {
+      font-size: 18px;
+      text-transform: uppercase;
+      color: #9b9b93;
+    }
+    .course-date-label {
+      float: right;
+      color: #9b9b93;
+    }
+    .course-dates {
+      float: right;
+      font-size: 18px;
+    }
+    .course-title {
+      h1 {
+        color: #4a4a46;
+        font-size: 26px;
+        text-align: left;
+        font-weight: 600;
+      }
+    }
+    .enrollment-text {
+      color: #4A4A46;
+      font-family: 'Open Sans',Verdana,Geneva,sans;
+      line-height: normal;
+      a {
+        font-family: 'Open Sans',Verdana,Geneva,sans;
+      }
+    }
+  }
+  a.contact-support-bg-color {
+    background-color: #9b9b9b;
+    background-image: linear-gradient(#9b9b9b, #9b9b9b);
+    border: 16px solid #9b9b9b;
+    box-shadow: 0 1px 0 0 #9b9b9b inset;
+    text-shadow: 0 1px 0 #9b9b9b;
+  }
+  a.course-link-bg-color {
+    background-color: #00A1E5;
+    background-image: linear-gradient(#00A1E5, #00A1E5);
+    border: 16px solid #00A1E5;
+    box-shadow: 0 1px 0 0 #00A1E5 inset;
+    text-shadow: 0 1px 0 #00A1E5;
+  }
+
+  a.link-button {
+    text-transform: none;
+    width: 250px;
+    background-clip: padding-box;
+    float: right;
+    border-radius: 3px;
+    color: #FFFFFF;
+    display: inline-block;
+    padding: 6px 18px;
+    text-decoration: none;
+    font-size: 24px;
+    text-align: center;
+  }
+  input[type="submit"] {
+    text-transform: none;
+    width: 450px;
+    height: 70px;
+    background-clip: padding-box;
+    background-color: #00a1e5;
+    background-image: linear-gradient(#00A1E5,#00A1E5);
+    float: right;
+    border: 1px solid #00A1E5;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 0 #00A1E5 inset;
+    color: #FFFFFF;
+    display: inline-block;
+    padding: 7px 18px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #00A1E5;
+    font-size: 24px;
+  }
+}
