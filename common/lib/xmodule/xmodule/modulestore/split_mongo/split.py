@@ -168,7 +168,8 @@ class BulkWriteRecord(object):
         return self.structures.get(self.index.get('versions', {}).get(branch))
 
     def set_structure_for_branch(self, branch, structure):
-        self.index.get('versions', {})[branch] = structure['_id']
+        if self.index is not None:
+            self.index.setdefault('versions', {})[branch] = structure['_id']
         self.structures[structure['_id']] = structure
 
     def __repr__(self):

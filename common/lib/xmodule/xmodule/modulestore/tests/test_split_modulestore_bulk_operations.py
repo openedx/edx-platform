@@ -174,6 +174,13 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
             self.structure['_id']
         )
 
+    def test_version_structure_new_course(self):
+        self.conn.get_course_index.return_value = None
+        self.bulk._begin_bulk_operation(self.course_key)
+        version_result = self.bulk.version_structure(self.course_key, self.structure, 'user_id')
+        get_result = self.bulk.get_structure(self.course_key, version_result['_id'])
+        self.assertEquals(version_result, get_result)
+
 class TestBulkWriteMixinClosedAfterPrevTransaction(TestBulkWriteMixinClosed, TestBulkWriteMixinPreviousTransaction):
     """
     Test that operations on with a closed transaction aren't affected by a previously executed transaction
