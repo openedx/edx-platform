@@ -43,14 +43,16 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     lookup_field = 'username'
 
     def get_queryset(self):
-        user = User.objects.get(username=self.kwargs['username'])
-        return self.queryset.filter(user=user).order_by('created')
+        qset = self.queryset.filter(user__username=self.kwargs['username']).order_by('created')
+        # return the courses that are enabled for mobile
+        return (ce for ce in qset if ce.course.mobile_available)
 
     def get(self, request, *args, **kwargs):
         if request.user.username != kwargs['username']:
             raise PermissionDenied
 
         return super(UserCourseEnrollmentsList, self).get(self, request, *args, **kwargs)
+
 
 @api_view(["GET"])
 @authentication_classes((OAuth2Authentication, SessionAuthentication))
