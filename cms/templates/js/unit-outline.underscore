@@ -4,7 +4,11 @@
         <div class="<%= xblockType %>-header">
             <h3 class="<%= xblockType %>-header-details">
                 <span class="<%= xblockType %>-title item-title">
-                    <a href="<%= xblockInfo.get('studio_url') %>"><%= xblockInfo.get('display_name') %></a>
+                    <a href="<%= xblockInfo.get('studio_url') %>">
+                        <span class="wrapper-truncate">
+                            <%= xblockInfo.get('display_name') %>
+                        </span>
+                    </a>
                 </span>
             </h3>
         </div>

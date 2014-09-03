@@ -55,7 +55,9 @@ if (xblockInfo.get('graded')) {
                     </span>
                 <% } else { %>
                     <span class="wrapper-<%= xblockType %>-title wrapper-xblock-field incontext-editor is-editable" data-field="display_name" data-field-display-name="<%= gettext("Display Name") %>">
-                        <span class="<%= xblockType %>-title item-title xblock-field-value incontext-editor-value"><%= xblockInfo.get('display_name') %></span>
+                        <span class="<%= xblockType %>-title item-title xblock-field-value incontext-editor-value">
+                            <span class="wrapper-truncate"><%= xblockInfo.get('display_name') %></span>
+                        </span>
                     </span>
                 <% } %>
             </h3>
