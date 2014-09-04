@@ -475,20 +475,12 @@ describe "DiscussionThreadListView", ->
         testSelectionRequest = (callback, itemText) ->
           setupAjax(callback)
           $(".forum-nav-browse-title:contains(#{itemText})").click()
+          expect($.ajax).toHaveBeenCalled()
 
         it "should get all discussions", ->
           testSelectionRequest(
             (params) -> expect(params.url.path()).toEqual(DiscussionUtil.urlFor("threads")),
             "All"
-          )
-
-        it "should get flagged threads", ->
-          testSelectionRequest(
-            (params) ->
-              expect(params.url.path()).toEqual(DiscussionUtil.urlFor("search"))
-              expect(params.data.flagged).toEqual(true)
-            ,
-            "Flagged"
           )
 
         it "should get followed threads", ->
