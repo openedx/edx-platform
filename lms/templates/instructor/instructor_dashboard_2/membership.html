@@ -26,7 +26,6 @@
   </div>
 </script>
 
-<div class="vert-left">
 <div class="batch-enrollment">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
@@ -112,9 +111,8 @@
   <div class="request-response-error"></div>
 </div>
 %endif
-</div>
 
-<div class="vert-right member-lists-management">
+<div class="member-lists-management">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
@@ -216,3 +214,29 @@
   %endif
 
 </div>
+
+%if course.is_cohorted:
+<hr class="divider" />
+<div class="cohort-management membership-section" data-ajax_url="${section_data['cohorts_ajax_url']}">
+</div>
+% endif
+
+<%block name="headextra">
+    <script>
+    $(document).ready(function() {
+        var cohortManagementElement = $('.cohort-management');
+        if (cohortManagementElement.length > 0) {
+            var cohorts = new CohortCollection();
+            cohorts.url = cohortManagementElement.data('ajax_url');
+            var cohortsView = new CohortsView({
+                el: cohortManagementElement,
+                model: cohorts
+            });
+            cohortsView.render();
+            cohorts.fetch().done(function() {
+                cohortsView.render();
+            });
+        }
+    });
+    </script>
+</%block>
