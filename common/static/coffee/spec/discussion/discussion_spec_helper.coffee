@@ -9,6 +9,13 @@ class @DiscussionSpecHelper
     @makeModerator = () ->
         DiscussionUtil.roleIds["Moderator"].push(parseInt(window.user.id))
 
+    @makeAjaxSpy = (fakeAjax) ->
+        spyOn($, "ajax").andCallFake(
+            (params) ->
+                fakeAjax(params)
+                {always: ->}
+        )
+
     @setUnderscoreFixtures = ->
         appendSetFixtures("""
 <div id="fixture-element"></div>
