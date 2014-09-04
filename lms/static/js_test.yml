@@ -46,11 +46,16 @@ lib_paths:
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/js/vendor/backbone-min.js
+    - js/models/cohort.js
+    - js/collections/cohort.js
+    - js/views/cohort_editor.js
+    - js/views/cohorts.js
 
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
-    - js/src
     - js
 
 # Paths to spec (test) JavaScript files
@@ -69,7 +74,7 @@ spec_paths:
 #
 fixture_paths:
     - coffee/fixtures
-    - js/fixtures
+    - templates/instructor/instructor_dashboard_2
 
 # Regular expressions used to exclude *.js files from
 # appearing in the test runner page.
