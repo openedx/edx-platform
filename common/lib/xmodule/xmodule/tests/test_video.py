@@ -594,13 +594,15 @@ class VideoLinkTransienceTest(unittest.TestCase):
         """
         aws_access_key = "test_key"
         aws_secret_key = "test_secret"
-        expires_in = 10
+        bucket_name = 'bucket'
+        credentials = '{}:{}:{}'.format(bucket_name, aws_access_key, aws_secret_key)
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/video.mp4",
             "http://bucket.s3.amazonaws.com/video.mp4",
         ]
         for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url, aws_access_key, aws_secret_key, expires_in)
+            url = get_s3_transient_url(origin_url, credentials)
+            self.assertIn('https://bucket.s3.amazonaws.com/video.mp4', url)
             self.assertIn('https://bucket.s3.amazonaws.com/video.mp4', url)
 
         origin_video_urls = [
@@ -608,5 +610,5 @@ class VideoLinkTransienceTest(unittest.TestCase):
             "http://bucket.s3.amazonaws.com/subfolder/video.mp4",
         ]
         for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url, aws_access_key, aws_secret_key, expires_in)
+            url = get_s3_transient_url(origin_url, credentials)
             self.assertIn('https://bucket.s3.amazonaws.com/subfolder/video.mp4', url)
