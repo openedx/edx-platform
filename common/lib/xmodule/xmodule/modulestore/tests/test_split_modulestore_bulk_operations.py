@@ -18,8 +18,8 @@ class TestBulkWriteMixin(unittest.TestCase):
         self.conn = self.bulk.db_connection = MagicMock(name='db_connection', spec=MongoConnection)
         self.conn.get_course_index.return_value = {'initial': 'index'}
 
-        self.course_key = CourseLocator('org', 'course', 'run-a')
-        self.course_key_b = CourseLocator('org', 'course', 'run-b')
+        self.course_key = CourseLocator('org', 'course', 'run-a', branch='test')
+        self.course_key_b = CourseLocator('org', 'course', 'run-b', branch='test')
         self.structure = {'this': 'is', 'a': 'structure', '_id': ObjectId()}
         self.index_entry = {'this': 'is', 'an': 'index'}
 
