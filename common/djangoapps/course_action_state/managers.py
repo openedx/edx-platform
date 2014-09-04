@@ -1,6 +1,7 @@
 """
 Model Managers for Course Actions
 """
+import traceback
 from django.db import models, transaction
 
 
@@ -142,7 +143,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
         self.update_state(
             course_key=course_key,
             new_state=self.State.FAILED,
-            message=exception.message,
+            message=exception.message + " " + traceback.format_exc(),
         )
 
 
