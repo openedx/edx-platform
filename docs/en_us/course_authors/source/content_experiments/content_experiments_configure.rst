@@ -26,14 +26,17 @@ To enable content experiments in your course, you add ``split_test`` to the
   ``split_test`` is the internal edX Platform name for a content experiment.
 
 #. From the **Settings** menu, select **Advanced Settings**.
+
 #. On the **Advanced Settings** page, locate **Advanced Modules List**.
-#. In the **Advanced Modules List** field, add ``"split_test"``. Be sure that 
-you include the double quotation marks.
+
+#. In the **Advanced Modules List** field, add ``"split_test"``. Be sure that
+   you include the double quotation marks.
 
    If you have multiple values, ensure that they are separated by commas
    (``,``).
 
-   For example, the text in the **Advanced Modules List** field may resemble the following:
+   For example, the text in the **Advanced Modules List** field may resemble
+   the following:
 
    .. code-block:: json
      

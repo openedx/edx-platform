@@ -8,9 +8,10 @@ You can :ref:`Export a Course` and :ref:`Import a Course` through Studio.
 
 .. _Export a Course:
 
-*************** 
+***************
 Export a Course
 ***************
+
 There are several reasons you may want to export your course:
 
 * To save your work
