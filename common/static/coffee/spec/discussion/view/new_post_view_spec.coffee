@@ -1,57 +1,7 @@
 # -*- coding: utf-8 -*-
 describe "NewPostView", ->
     beforeEach ->
-        setFixtures(
-            """
-            <div class="discussion-body">
-                <div class="discussion-column">
-                  <article class="new-post-article" style="display: block;"></article>
-                </div>
-            </div>
-
-            <script aria-hidden="true" type="text/template" id="new-post-template">
-                <form class="forum-new-post-form">
-                    <% if (mode=="tab") { %>
-                    <div class="post-field">
-                        <div class="field-label">
-                            <span class="field-label-text">
-                               Topic Area:
-                            </span>
-                            <div class="field-input post-topic">
-                                <a href="#" class="post-topic-button">
-                                    <span class="sr">${_("Discussion topics; current selection is: ")}</span>
-                                    <span class="js-selected-topic"></span>
-                                    <span class="drop-arrow" aria-hidden="true">▾</span>
-                                </a>
-                                <div class="topic-menu-wrapper">
-                                    <ul class="topic-menu" role="menu"><%= topics_html %></ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% } %>
-                    <select class="js-group-select">
-                      <option value="">All Groups</option>
-                      <option value="1">Group 1</option>
-                      <option value="2">Group 2</option>
-                    </select>
-                </form>
-            </script>
-
-            <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
-                <li role="menuitem">
-                    <a href="#" class="topic-title" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></a>
-                </li>
-            </script>
-
-            <script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
-                <li role="menuitem">
-                    <span class="topic-title"><%- text %></span>
-                    <ul role="menu" class="topic-submenu"><%= entries %></ul>
-                </li>
-            </script>
-            """
-        )
+        DiscussionSpecHelper.setUnderscoreFixtures()
         window.$$course_id = "edX/999/test"
         spyOn(DiscussionUtil, "makeWmdEditor")
         @discussion = new Discussion([], {pages: 1})
@@ -77,10 +27,11 @@ describe "NewPostView", ->
             "entries": {}
           },
           "allow_anonymous": true,
-          "allow_anonymous_to_peers": true
+          "allow_anonymous_to_peers": true,
+          "is_cohorted": true
         })
         @view = new NewPostView(
-          el: $(".new-post-article"),
+          el: $("#fixture-element"),
           collection: @discussion,
           course_settings: @course_settings,
           mode: "tab"
@@ -144,6 +95,7 @@ describe "NewPostView", ->
               }
             }
           )
+          DiscussionSpecHelper.makeModerator()
           view.render()
 
         expectCohortSelectorEnabled = (view, enabled) ->
@@ -171,7 +123,7 @@ describe "NewPostView", ->
           {always: ->}
       )
       view = new NewPostView(
-        el: $(".new-post-article"),
+        el: $("#fixture-element"),
         collection: @discussion,
         course_settings: new DiscussionCourseSettings({
           allow_anonymous: false,
