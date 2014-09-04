@@ -386,7 +386,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             course_key = self._map_revision_to_branch(course_key)  # cast to branch_setting
             return self._update_item_from_fields(
                 user_id, course_key, block_type, block_id, partitioned_fields, None, allow_not_found=True, force=True
-            )
+            ) or self.get_item(new_usage_key)
 
     def compute_published_info_internal(self, xblock):
         """
