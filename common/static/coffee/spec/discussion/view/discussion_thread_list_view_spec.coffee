@@ -133,7 +133,7 @@ describe "DiscussionThreadListView", ->
         ]
 
         spyOn($, "ajax")
-
+        
         @discussion = new Discussion([])
         @view = new DiscussionThreadListView(
           collection: @discussion,
@@ -154,7 +154,7 @@ describe "DiscussionThreadListView", ->
     renderSingleThreadWithProps = (props) ->
       makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render()
 
-    makeView = (discussion) ->
+     makeView = (discussion) ->
       return new DiscussionThreadListView(
           el: $("#fixture-element"),
           collection: discussion,
