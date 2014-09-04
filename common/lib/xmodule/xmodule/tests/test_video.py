@@ -19,7 +19,8 @@ from mock import Mock, patch
 from . import LogicTest
 from lxml import etree
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
+from xmodule.video_module import (VideoDescriptor, create_youtube_string,
+                                    get_video_from_cdn, get_s3_transient_url)
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -581,3 +582,23 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response.return_value=Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+
+class VideoLinkTransienceTest(unittest.TestCase):
+    """
+    Tests for temporary video links.
+    """
+
+    def test_url_create(self):
+        """
+        Test if bucket name and object name is present in transient URL..
+        """
+        origin_video_urls = [
+            "http://s3.amazonaws.com/test-bucket/test-video.mp4",
+            "http://test-bucket.s3.amazonaws.com/test-video.mp4",
+        ]
+        aws_access_key = "test_key"
+        aws_secret_key = "test_secret"
+        expires_in = 10
+        for origin_url in origin_video_urls:
+            url = get_s3_transient_url(origin_url, aws_access_key, aws_secret_key, expires_in)
+            self.assertIn('https://test-bucket.s3.amazonaws.com/test-video.mp4', url)
