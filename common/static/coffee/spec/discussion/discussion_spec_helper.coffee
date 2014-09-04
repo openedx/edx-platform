@@ -10,6 +10,10 @@ class @DiscussionSpecHelper
         DiscussionUtil.roleIds["Moderator"].push(parseInt(window.user.id))
 
     @setUnderscoreFixtures = ->
+        for templateName in ['thread-show']
+            templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
+            appendSetFixtures($('<script>', { id: templateName + '-template', type: 'text/template' })
+                .text(templateFixture))
         appendSetFixtures("""
 <div id="fixture-element"></div>
 
@@ -54,52 +58,6 @@ browser and pasting the output.  When that file changes, this one should be rege
             <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> Collapse discussion</a>
         </div>
     </article>
-</script>
-
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      <% if (obj.group_id) { %>
-      <div class="group-visibility-label"><%- obj.group_string%></div>
-              <% }  %>
-
-          <div class="post-header-content">
-
-            <h1><%- title %></h1>
-            <p class="posted-details">
-                <%- thread_type %> posted <span class='timeago' title='<%- created_at %>'><%- created_at %></span> by <%= author_display %>
-            </p>
-            <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i>Pinned</span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i>Reported</span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i>Closed</span>
-            </div>
-          </div>
-          <div class="post-header-actions post-extended-content">
-            <%=
-                _.template(
-                    $('#forum-actions').html(),
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close']
-                    }
-                )
-            %>
-          </div>
-      </header>
-
-      <div class="post-body"><%- body %></div>
-
-      
-      <% if (mode == "tab" && obj.courseware_url) { %>
-          <div class="post-context"><%
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('(this post is about %(courseware_title_linked)s)', {'courseware_title_linked': courseware_link}, true));
-          %></div>
-      <% } %>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
