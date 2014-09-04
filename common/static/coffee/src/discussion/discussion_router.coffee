@@ -8,7 +8,11 @@ if Backbone?
         @discussion = options['discussion']
         @course_settings = options['course_settings']
 
-        @nav = new DiscussionThreadListView(collection: @discussion, el: $(".forum-nav"))
+        @nav = new DiscussionThreadListView(
+            collection: @discussion,
+            el: $(".forum-nav"),
+            courseSettings: @course_settings
+        )
         @nav.on "thread:selected", @navigateToThread
         @nav.on "thread:removed", @navigateToAllThreads
         @nav.on "threads:rendered", @setActiveThread

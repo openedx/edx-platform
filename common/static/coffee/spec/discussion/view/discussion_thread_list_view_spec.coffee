@@ -75,6 +75,7 @@ describe "DiscussionThreadListView", ->
                             <option value="flagged">Flagged</option>
                         </select>
                     </label>
+                    <% if (isCohorted && isPrivilegedUser) { %>
                     <label class="forum-nav-filter-cohort">
                         <span class="sr">Cohort:</span>
                         <select class="forum-nav-filter-cohort-control">
@@ -83,6 +84,7 @@ describe "DiscussionThreadListView", ->
                             <option value="2">Cohort2</option>
                         </select>
                     </label>
+                    <% } %>
                     <label class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
                             <option value="date">by recent activity</option>
@@ -123,7 +125,11 @@ describe "DiscussionThreadListView", ->
         spyOn($, "ajax")
 
         @discussion = new Discussion([])
-        @view = new DiscussionThreadListView({collection: @discussion, el: $("#fixture-element")})
+        @view = new DiscussionThreadListView(
+          collection: @discussion,
+          el: $("#fixture-element"),
+          courseSettings: new DiscussionCourseSettings({is_cohorted: true})
+        )
         @view.render()
 
     setupAjax = (callback) ->
@@ -141,7 +147,8 @@ describe "DiscussionThreadListView", ->
     makeView = (discussion) ->
       return new DiscussionThreadListView(
           el: $("#fixture-element"),
-          collection: discussion
+          collection: discussion,
+          courseSettings: new DiscussionCourseSettings({is_cohorted: true})
       )
 
     expectFilter = (filterVal) ->
@@ -164,7 +171,12 @@ describe "DiscussionThreadListView", ->
         )
 
     describe "cohort selector", ->
-        it "should filter correctly", ->
+        it "should not be visible to students", ->
+            expect(@view.$(".forum-nav-filter-cohort-control:visible")).not.toExist()
+
+        it "should allow moderators to select visibility", ->
+            DiscussionSpecHelper.makeModerator()
+            @view.render()
             expectedGroupId = null
             setupAjax((params) => expect(params.data.group_id).toEqual(expectedGroupId))
             _.each(
@@ -498,6 +510,8 @@ describe "DiscussionThreadListView", ->
           expect($(".forum-nav-browse-current").text()).toEqual("Posts I'm Following")
 
         it "should show/hide the cohort selector", ->
+          DiscussionSpecHelper.makeModerator()
+          @view.render()
           setupAjax()
           _.each(
             [

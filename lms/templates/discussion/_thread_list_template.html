@@ -37,10 +37,7 @@
                         <option value="flagged">${_("Flagged")}</option>
                     %endif
                 </select>
-            </label>\
-            %if is_course_cohorted and is_moderator:
-## Lack of indentation is intentional to avoid whitespace between this and siblings
-<label class="forum-nav-filter-cohort">
+            </label>${"<% if (isCohorted && isPrivilegedUser) { %>"}<label class="forum-nav-filter-cohort">
                 ## Translators: This labels a cohort menu in forum navigation
                 <span class="sr">${_("Cohort:")}</span>
                 <select class="forum-nav-filter-cohort-control">
@@ -49,10 +46,7 @@
                             <option value="${c['id']}">${c['name']}</option>
                         %endfor
                 </select>
-            </label>\
-            %endif
-## Lack of indentation is intentional to avoid whitespace between this and siblings
-<label class="forum-nav-sort">
+            </label>${"<% } %>"}<label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
                 <span class="sr">${_("Sort:")}</span>
                 <select class="forum-nav-sort-control">
