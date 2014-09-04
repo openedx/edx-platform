@@ -592,13 +592,21 @@ class VideoLinkTransienceTest(unittest.TestCase):
         """
         Test if bucket name and object name is present in transient URL..
         """
-        origin_video_urls = [
-            "http://s3.amazonaws.com/test-bucket/test-video.mp4",
-            "http://test-bucket.s3.amazonaws.com/test-video.mp4",
-        ]
         aws_access_key = "test_key"
         aws_secret_key = "test_secret"
         expires_in = 10
+        origin_video_urls = [
+            "http://s3.amazonaws.com/bucket/video.mp4",
+            "http://bucket.s3.amazonaws.com/video.mp4",
+        ]
         for origin_url in origin_video_urls:
             url = get_s3_transient_url(origin_url, aws_access_key, aws_secret_key, expires_in)
-            self.assertIn('https://test-bucket.s3.amazonaws.com/test-video.mp4', url)
+            self.assertIn('https://bucket.s3.amazonaws.com/video.mp4', url)
+
+        origin_video_urls = [
+            "http://s3.amazonaws.com/bucket/subfolder/video.mp4",
+            "http://bucket.s3.amazonaws.com/subfolder/video.mp4",
+        ]
+        for origin_url in origin_video_urls:
+            url = get_s3_transient_url(origin_url, aws_access_key, aws_secret_key, expires_in)
+            self.assertIn('https://bucket.s3.amazonaws.com/subfolder/video.mp4', url)
