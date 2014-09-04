@@ -43,7 +43,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     lookup_field = 'username'
 
     def get_queryset(self):
-        qset = self.queryset.filter(user__username=self.kwargs['username']).order_by('created')
+        qset = self.queryset.filter(user__username=self.kwargs['username'], is_active=True).order_by('created')
         # return the courses that are enabled for mobile
         return (ce for ce in qset if ce.course.mobile_available)
 
