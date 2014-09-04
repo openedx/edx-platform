@@ -442,11 +442,13 @@ The page in the learning management system that shows students their scores on g
 
 .. _Public Unit:
  
-**Public Unit**
+.. **Public Unit**
 
-  A unit whose **Visibility** option is set to Public so that the unit is visible to students, if the subsection that contains the unit has been released.
+..  A unit whose **Visibility** option is set to Public so that the unit is
+..  visible to students, if the subsection that contains the unit has been
+..  released.
 
-  See :ref:`Public and Private Units` for more information.
+..  See :ref:`Public and Private Units` for more information.
 
 .. _Q:
 
