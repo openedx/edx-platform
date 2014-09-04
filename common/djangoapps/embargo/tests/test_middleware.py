@@ -219,6 +219,7 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
     @ddt.data(
+        (None, False),
         ("", False),
         ("us", False),
         ("CU", True),
