@@ -59,7 +59,7 @@ describe "DiscussionThreadListView", ->
                     <li
                         class="forum-nav-browse-menu-item"
                         data-discussion-id="other"
-                        data-cohorted="false"
+                        data-cohorted="true"
                     >
                         <a href="#" class="forum-nav-browse-title">Other Category</a>
                     </li>
@@ -73,6 +73,14 @@ describe "DiscussionThreadListView", ->
                             <option value="unread">Unread</option>
                             <option value="unanswered">Unanswered</option>
                             <option value="flagged">Flagged</option>
+                        </select>
+                    </label>
+                    <label class="forum-nav-filter-cohort">
+                        <span class="sr">Cohort:</span>
+                        <select class="forum-nav-filter-cohort-control">
+                            <option value="">in all cohorts</option>
+                            <option value="1">Cohort1</option>
+                            <option value="2">Cohort2</option>
                         </select>
                     </label>
                     <label class="forum-nav-sort">
@@ -118,6 +126,15 @@ describe "DiscussionThreadListView", ->
         @view = new DiscussionThreadListView({collection: @discussion, el: $("#fixture-element")})
         @view.render()
 
+    setupAjax = (callback) ->
+      $.ajax.andCallFake(
+        (params) =>
+          if callback
+            callback(params)
+          params.success({discussion_data: [], page: 1, num_pages: 1})
+          {always: ->}
+      )
+
     renderSingleThreadWithProps = (props) ->
       makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render()
 
@@ -145,6 +162,23 @@ describe "DiscussionThreadListView", ->
                 @view.$(".forum-nav-filter-main-control").val(filterVal).change()
                 expect($.ajax).toHaveBeenCalled()
         )
+
+    describe "cohort selector", ->
+        it "should filter correctly", ->
+            expectedGroupId = null
+            setupAjax((params) => expect(params.data.group_id).toEqual(expectedGroupId))
+            _.each(
+                [
+                    {val: "", expectedGroupId: undefined},
+                    {val: "1", expectedGroupId: "1"},
+                    {val: "2", expectedGroupId: "2"}
+                ],
+                (optionInfo) =>
+                    expectedGroupId = optionInfo.expectedGroupId
+                    @view.$(".forum-nav-filter-cohort-control").val(optionInfo.val).change()
+                    expect($.ajax).toHaveBeenCalled()
+                    $.ajax.reset()
+            )
 
     it "search should clear filter", ->
         expectFilter(null)
@@ -388,15 +422,6 @@ describe "DiscussionThreadListView", ->
         expect($(".forum-nav-thread-labels").length).toEqual(0)
 
     describe "browse menu", ->
-      setupAjax = (callback) ->
-        $.ajax.andCallFake(
-          (params) =>
-            if callback
-              callback(params)
-            params.success({discussion_data: [], page: 1, num_pages: 1})
-            {always: ->}
-        )
-
       afterEach ->
         # Remove handler added to make browse menu disappear
         $("body").unbind("click")
@@ -471,6 +496,24 @@ describe "DiscussionThreadListView", ->
           setupAjax()
           $(".forum-nav-browse-menu-following .forum-nav-browse-title").click()
           expect($(".forum-nav-browse-current").text()).toEqual("Posts I'm Following")
+
+        it "should show/hide the cohort selector", ->
+          setupAjax()
+          _.each(
+            [
+              {selector: ".forum-nav-browse-menu-all", cohortVisibility: true},
+              {selector: ".forum-nav-browse-menu-following", cohortVisibility: false},
+              {
+                selector: ".forum-nav-browse-menu-item:has(.forum-nav-browse-menu-item .forum-nav-browse-menu-item)",
+                cohortVisibility: false
+              },
+              {selector: "[data-discussion-id=child]", cohortVisibility: false},
+              {selector: "[data-discussion-id=other]", cohortVisibility: true}
+            ],
+            (itemInfo) =>
+              @view.$("#{itemInfo.selector} > .forum-nav-browse-title").click()
+              expect(@view.$(".forum-nav-filter-cohort").is(":visible")).toEqual(itemInfo.cohortVisibility)
+          )
 
         testSelectionRequest = (callback, itemText) ->
           setupAjax(callback)
