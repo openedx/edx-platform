@@ -120,9 +120,8 @@ class GradeDistributionDisplay
 
         # populate selector
         @$problem_selector.empty()
-        for {module_id, grade_info} in data.data
-          I4X_PROBLEM = /i4x:\/\/.*\/.*\/problem\/(.*)/
-          label = (I4X_PROBLEM.exec module_id)?[1]
+        for {module_id, block_id, grade_info} in data.data
+          label = block_id
           label ?= module_id
 
           @$problem_selector.append $ '<option/>',

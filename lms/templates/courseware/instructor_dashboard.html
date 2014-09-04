@@ -665,7 +665,7 @@ function goto( mode)
         </tr>
       %for row in analytics_results['ProblemGradeDistribution']['data']:
         <tr>
-          <td>${row['module_id'].split('/')[-1]}</td>
+          <td>${row['block_id']}</td>
           <td>${max(grade_record['max_grade'] for grade_record in row["grade_info"])}
           %for grade_record in row["grade_info"]:
           <td>
