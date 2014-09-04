@@ -503,3 +503,47 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
 
         self.course_nav.go_to_section("Test Section", "Unlocked Subsection")
         self.assertEqual(["Html Child in visible unit"], self.course_nav.sequence_items)
+
+
+class TooltipTest(UniqueCourseTest):
+    """
+    Tests that tooltips are displayed
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(TooltipTest, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('static_tab', 'Test Static Tab'),
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
+                    XBlockFixtureDesc('problem', 'Test Problem 2', data=load_data_str('formula_problem.xml')),
+                    XBlockFixtureDesc('html', 'Test HTML'),
+                )
+            )
+        ).install()
+
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_tooltip(self):
+        """
+        Verify that tooltips are displayed when you hover over the sequence nav bar.
+        """
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+
+        self.assertTrue(self.courseware_page.tooltips_displayed())

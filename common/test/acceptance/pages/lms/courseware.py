@@ -3,6 +3,7 @@ Courseware page.
 """
 
 from .course_page import CoursePage
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 class CoursewarePage(CoursePage):
@@ -61,3 +62,14 @@ class CoursewarePage(CoursePage):
 
         """
         return self.q(css=self.xblock_component_selector).attrs('innerHTML')[index].strip()
+
+    def tooltips_displayed(self):
+        """
+        Verify if sequence navigation bar tooltips are being displayed upon mouse hover.
+        """
+        for index, tab in enumerate(self.q(css='#sequence-list > li')):
+            ActionChains(self.browser).move_to_element(tab).perform()
+            if not self.q(css='#tab_{index} > p'.format(index=index)).visible:
+                return False
+
+        return True
