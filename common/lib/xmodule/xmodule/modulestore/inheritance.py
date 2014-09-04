@@ -153,15 +153,10 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
-    aws_access_key = String(
-        help=_("Enter the AWS access key used for creating a transient video URL."),
-        display_name=_("AWS access key"),
-        scope=Scope.settings,
-    )
-    aws_secret_key = String(
-        help=_("Enter the AWS Secret key used for creating a transient video URL."),
-        display_name=_("AWS Secret key"),
-        scope=Scope.settings,
+    video_link_transience = String(
+        help=_("Enter the AWS access key, secret key and bucket name used for creating a transient video URLs in the following format: \"bucket_name\":\"access_key:secret_key\"."),
+        display_name=_("Video Link Transience Credentials"),
+        scope=Scope.settings
     )
 
 

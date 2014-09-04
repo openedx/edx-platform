@@ -115,10 +115,9 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
                     sources[index] = new_url
 
         for index, source_url in enumerate(sources):
-            if (getattr(self, 'aws_access_key', False) and
-                getattr(self, 'aws_secret_key', False) and
+            if (getattr(self, 'video_link_transience', False) and
                 'amazonaws.com' in source_url):
-                new_url = get_s3_transient_url(source_url, self.aws_access_key, self.aws_secret_key)
+                new_url = get_s3_transient_url(source_url, self.video_link_transience)
                 if new_url:
                     sources[index] = new_url
 

@@ -72,11 +72,13 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
     else:
         return None
 
-def get_s3_transient_url(video_url, aws_access_key, aws_secret_key, expires_in=10):
+def get_s3_transient_url(video_url, video_link_transience, expires_in=10):
     """
     Get S3 transient video url.
     """
-    conn = S3Connection(aws_access_key, aws_secret_key)
+    bucket_name, access_key, secret_key = [i.strip() for i in video_link_transience.split(':')]
+
+    conn = S3Connection(access_key, secret_key)
     url = urlparse(video_url)
 
     # Get bucket name from video_url.
@@ -84,10 +86,10 @@ def get_s3_transient_url(video_url, aws_access_key, aws_secret_key, expires_in=1
     # http(s)://<bucket>.s3.amazonaws.com/<object>
     # http(s)://s3.amazonaws.com/<bucket>/<object>
 
-    if url.netloc.startswith('s3'):
-        bucket_name, sep, video_name = url.path.strip('/').partition('/')
-    else:
-        bucket_name = url.netloc.split('.')[0]
+    if bucket_name in url.path:
+        bucket, sep, video_name = url.path.strip('/').partition('/')
+    elif bucket_name in url.netloc:
         video_name = url.path.strip('/')
-
+    else:
+        return None # this needs to be checked. is it possible to not having bucket name in origin_url
     return conn.generate_url(expires_in, 'GET', bucket_name, video_name)
