@@ -2,75 +2,8 @@ describe "DiscussionThreadListView", ->
 
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures """
-        <script type="text/template" id="thread-list-item-template">
-          <li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
-            <a href="#" class="forum-nav-thread-link">
-              <div class="forum-nav-thread-wrapper-0">
-                <%
-                var icon_class, sr_text;
-                if (thread_type == "discussion") {
-                    icon_class = "icon-comments";
-                    sr_text = "discussion";
-                } else if (endorsed) {
-                    icon_class = "icon-ok";
-                    sr_text = "answered question";
-                } else {
-                    icon_class = "icon-question";
-                    sr_text = "unanswered question";
-                }
-                %>
-                <span class="sr"><%= sr_text %></span>
-                <i class="icon <%= icon_class %>"></i>
-              </div><div class="forum-nav-thread-wrapper-1">
-                <span class="forum-nav-thread-title"><%- title %></span>
-                <%
-                var labels = "";
-                if (pinned) {
-                    labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
-                }
-                if (typeof(subscribed) != "undefined" && subscribed) {
-                    labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>Following</li> ';
-                }
-                if (staff_authored) {
-                    labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>By: Staff</li> ';
-                }
-                if (community_ta_authored) {
-                    labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
-                }
-                if (labels != "") {
-                    print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
-                }
-                %>
-              </div><div class="forum-nav-thread-wrapper-2">
-                <span class="forum-nav-thread-votes-count">+<%=
-                    interpolate(
-                        '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
-                        {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
-                        true
-                        )
-                %></span>
-                <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
-                    <%
-                var fmt;
-                var data = {
-                    'span_sr_open': '<span class="sr">',
-                    'span_close': '</span>',
-                    'unread_comments_count': unread_comments_count,
-                    'comments_count': comments_count
-                    };
-                if (unread_comments_count > 0) {
-                    fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
-                } else {
-                    fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
-                }
-                print(interpolate(fmt, data, true));
-                %>
-                </span>
-              </div>
-            </a>
-          </li>
-        </script>
+        DiscussionSpecHelper.setUnderscoreFixtures()
+        appendSetFixtures("""
         <script type="text/template" id="thread-list-template">
             <div class="forum-nav-header">
                 <a href="#" class="forum-nav-browse" aria-haspopup="true">
@@ -154,19 +87,7 @@ describe "DiscussionThreadListView", ->
             <div class="search-alerts"></div>
             <ul class="forum-nav-thread-list"></ul>
         </script>
-        <script aria-hidden="true" type="text/template" id="search-alert-template">
-            <div class="search-alert" id="search-alert-<%- cid %>">
-                <div class="search-alert-content">
-                  <p class="message"><%- message %></p>
-                </div>
-
-                <div class="search-alert-controls">
-                  <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
-                </div>
-            </div>
-        </script>
-        <div class="forum-nav"></div>
-        """
+        """)
         @threads = [
           DiscussionViewSpecHelper.makeThreadWithProps({
             id: "1",
@@ -194,7 +115,7 @@ describe "DiscussionThreadListView", ->
         spyOn($, "ajax")
 
         @discussion = new Discussion([])
-        @view = new DiscussionThreadListView({collection: @discussion, el: $(".forum-nav")})
+        @view = new DiscussionThreadListView({collection: @discussion, el: $("#fixture-element")})
         @view.render()
 
     renderSingleThreadWithProps = (props) ->
@@ -202,7 +123,7 @@ describe "DiscussionThreadListView", ->
 
     makeView = (discussion) ->
       return new DiscussionThreadListView(
-          el: $(".forum-nav"),
+          el: $("#fixture-element"),
           collection: discussion
       )
 
@@ -444,23 +365,23 @@ describe "DiscussionThreadListView", ->
 
       it "for pinned", ->
         renderSingleThreadWithProps({pinned: true})
-        expect($(".forum-nav-thread-label-pinned").length).toEqual(1)
+        expect($(".post-label-pinned").length).toEqual(1)
 
       it "for following", ->
         renderSingleThreadWithProps({subscribed: true})
-        expect($(".forum-nav-thread-label-following").length).toEqual(1)
+        expect($(".post-label-following").length).toEqual(1)
 
       it "for moderator", ->
         renderSingleThreadWithProps({user_id: @moderatorId})
-        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+        expect($(".post-label-by-staff").length).toEqual(1)
 
       it "for administrator", ->
         renderSingleThreadWithProps({user_id: @administratorId})
-        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+        expect($(".post-label-by-staff").length).toEqual(1)
 
       it "for community TA", ->
         renderSingleThreadWithProps({user_id: @communityTaId})
-        expect($(".forum-nav-thread-label-community-ta").length).toEqual(1)
+        expect($(".post-label-by-community-ta").length).toEqual(1)
 
       it "when none should be present", ->
         renderSingleThreadWithProps({})
