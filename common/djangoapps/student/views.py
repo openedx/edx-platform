@@ -982,7 +982,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     # Track the user's sign in
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(anonymous_id_for_user(user, None), {
+        analytics.identify(user.id, {
             'email': email,
             'username': username,
         })
@@ -1457,7 +1457,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     # Track the user's registration
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
-        analytics.identify(anonymous_id_for_user(user, None), {
+        analytics.identify(user.id, {
             email: email,
             username: username,
         })
