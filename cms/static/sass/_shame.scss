@@ -124,6 +124,42 @@ div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
 
 // ====================
 
+// Outline truncation fix:
+// Chrome not rendering text-overflow: ellipsis; properly - https://code.google.com/p/chromium/issues/detail?id=133700
+.view-outline {
+
+  .section-header, .subsection-header, .unit-header {
+
+    .is-editable {
+
+      .incontext-editor-value {
+        @extend %ui-depth1;
+        padding-right: ($baseline*0.75);
+        position: relative;
+
+        &:after {
+          @extend %ui-depth2;
+          @include linear-gradient(90deg, $white-t0 0%, $white 90%);
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          display: block;
+          width: ($baseline*0.75);
+          height: 100%;
+        }
+
+        .wrapper-truncate {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+
+// ====================
+
 // TODOs:
 
 // * font-weight syncing

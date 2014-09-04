@@ -362,16 +362,19 @@ form {
 
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
-    @extend %cont-truncated;
     display: inline-block;
     vertical-align: middle;
-    max-width: 80%;
   }
 
   .incontext-editor-open-action {
     @extend %ui-btn-non-blue;
     @extend %t-copy-base;
     padding-top: ($baseline/10);
+  }
+
+  .incontext-editor-value {
+    @extend %cont-truncated;
+    max-width: 80%;
   }
 
   .incontext-editor-form {
