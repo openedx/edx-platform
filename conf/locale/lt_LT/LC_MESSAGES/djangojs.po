@@ -1,46 +1,44 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
-# Copyright (C) 2015 EdX
+# edX community translations have been downloaded from Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/).
+# Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Riina <ciairdabar@yahoo.com>, 2014-2015
+# Riina <ciairdabar@yahoo.com>, 2014
 # Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2013
 # Žygimantas Medelis <zzygis@gmail.com>, 2013
 # Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2015 EdX
+# Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Riina <ciairdabar@yahoo.com>, 2014-2015
+# Riina <ciairdabar@yahoo.com>, 2014
 # Edukometrija <jolitad@mruni.eu>, 2014
 # Gediminas Trakas <gediminas.trakas@gmail.com>, 2013-2014
 # Žygimantas Medelis <zzygis@gmail.com>, 2013
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Riina <ciairdabar@yahoo.com>, 2014-2015
-# Edukometrija <jolitad@mruni.eu>, 2014
+# Riina <ciairdabar@yahoo.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2015 edX
+# Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Riina <ciairdabar@yahoo.com>, 2014-2015
-# Edukometrija <jolitad@mruni.eu>, 2014
+# Riina <ciairdabar@yahoo.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-26 13:20+0000\n"
-"PO-Revision-Date: 2015-01-26 13:44+0000\n"
+"POT-Creation-Date: 2014-09-03 09:35-0400\n"
+"PO-Revision-Date: 2014-08-28 00:15+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)\n"
 "MIME-Version: 1.0\n"
@@ -52,54 +50,44 @@ msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
+#: cms/static/coffee/src/views/tabs.js
 #: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/modals/edit_xblock.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
 msgid "OK"
-msgstr "Gerai"
+msgstr ""
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: cms/static/coffee/src/views/tabs.js cms/static/js/factories/export.js
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js cms/static/js/views/asset.js
+#: cms/static/coffee/src/views/tabs.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
 #: cms/static/js/views/modals/base_modal.js
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/static/js/views/utils/view_utils.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 #: cms/templates/js/add-xblock-component-menu.underscore
-#: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course_info_handouts.underscore
 #: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/section-name-edit.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cancel"
-msgstr "Atšaukti"
+msgstr ""
 
 #: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
+#: cms/templates/js/checklist.underscore
 msgid "This link will open in a new browser window/tab"
-msgstr "Ši nuoroda atvers puslapį naujame naršyklės lange/kortelėje"
+msgstr ""
 
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-msgid "Unknown"
-msgstr "Nežinoma"
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js cms/static/js/views/asset.js
-#: cms/static/js/views/list_item.js cms/static/js/views/show_textbook.js
+#: cms/static/js/views/asset.js
+#: cms/static/js/views/group_configuration_item.js
+#: cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/course-outline.underscore
@@ -107,71 +95,59 @@ msgstr "Nežinoma"
 #: cms/templates/js/course_grade_policy.underscore
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 #: cms/templates/js/show-textbook.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
-msgstr "Pašalinti"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/asset-library.underscore
 msgid "Name"
-msgstr "Vardas"
-
-#: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
-msgid "Upload File"
 msgstr ""
 
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: cms/static/js/views/xblock_validation.js
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-#: lms/static/js/verify_student/views/step_view.js
-msgid "Error"
-msgstr ""
-
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/modals/base_modal.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/group-configuration-edit.underscore
+#: cms/templates/js/section-name-edit.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Save"
-msgstr "Išsaugoti"
-
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/edit_xblock.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Close"
-msgstr "Uždaryti"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
-msgstr "Rodyti komentarus"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Hide Annotations"
-msgstr "Slėpti komentarus"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Expand Instructions"
-msgstr "Išskleisti instrukcijas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Collapse Instructions"
-msgstr "Suskleisti instrukcijas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Commentary"
-msgstr "Pastabos"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
-msgstr "Atsakyti į komentarus"
+msgstr ""
 
 #. Translators: %(earned)s is the number of points earned. %(total)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -180,61 +156,61 @@ msgstr "Atsakyti į komentarus"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(earned)s/%(possible)s point)"
 msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] "(%(earned)s/%(possible)s taško)"
-msgstr[1] "(%(earned)s/%(possible)s taško)"
-msgstr[2] "(%(earned)s/%(possible)s taškų)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10). There will always be at least 1 point possible.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "(%(num_points)s point possible)"
 msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(galima gauti %(num_points)s tašką)"
-msgstr[1] "(galima gauti %(num_points)s tašką)"
-msgstr[2] "(galima gauti %(num_points)s taškus)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
-msgstr "Atsakymas:"
+msgstr ""
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
-msgstr "Slėpti atsakymą"
+msgstr ""
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Show Answer"
-msgstr "Rodyti atsakymą"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Reveal Answer"
-msgstr "Parodyti atsakymą"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer hidden"
-msgstr "Atsakymas paslėptas"
+msgstr ""
 
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unanswered"
-msgstr "neatsakyta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
-msgstr "Statusas: nepateikta"
+msgstr ""
 
 #. Translators: A "rating" is a score a student gives to indicate how well
 #. they feel they were graded on this problem
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "You need to pick a rating before you can submit."
-msgstr "Prieš pateikdami turite pasirinkti įvertinimą."
+msgstr ""
 
 #. Translators: this message appears when transitioning between openended
 #. grading
@@ -243,25 +219,24 @@ msgstr "Prieš pateikdami turite pasirinkti įvertinimą."
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
-msgstr "Jūsų rezultatas nepakankamas, kad galėtumėte pereiti į kitą pakopą."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Submit"
-msgstr "Pateikti"
+msgstr ""
 
 #. Translators: one clicks this button after one has finished filling out the
 #. grading
 #. form for an openended assessment
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Submit assessment"
-msgstr "Pateikti vertinimą"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Your response has been submitted. Please check back later for your grade."
 msgstr ""
-"Jūsų atsakymas pateiktas. Prašome vėliau pasitikrinti, kokį pažymį gavote. "
 
 #. Translators: this button is clicked to submit a student's rating of
 #. an evaluator's assessment
@@ -271,33 +246,28 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Answer saved, but not yet submitted."
-msgstr "Atsakymas išsaugotas, bet dar nepateiktas."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
 msgstr ""
-"Prašome patvirtinti, kad norite pateikti darbą. Pateikę negalėsite nieko "
-"keisti."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "You are trying to upload a file that is too large for our system.  Please "
 "choose a file under 2MB or paste a link to it into the answer box."
 msgstr ""
-"Bandote įkelti failą, kuris mūsų sistemai yra per didelis. Prašome "
-"pasirinkti failą, mažesnį negu 2MB, arba nukopijuokite jo nuorodą į atsakymo"
-" langelį."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
-msgstr "Ar jūs tikrai norite panaikinti ankstesnį atsakymą į šį klausimą?"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Moved to next step."
-msgstr "Perėjote į kitą pakopą."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid ""
@@ -306,9 +276,6 @@ msgid ""
 " uploaded the image to another website, you can paste a link to it into the "
 "answer box."
 msgstr ""
-"Šiame klausime reikia įkelti failus, bet jūsų naršyklė to neleidžia. "
-"Išmėginkite naujausią \"Google Chrome\" versiją arba, jeigu paveikslėlį "
-"įkėlėte į kitą svetainę, galite nukopijuoti jo nuorodą į atsakymo langelį."
 
 #. Translators: "Show Question" is some text that, when clicked, shows a
 #. question's
@@ -316,86 +283,88 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
-msgstr "Rodyti klausimą"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
-msgstr "Slėpti klausimą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
-msgstr "Pastraipa"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Preformatted"
-msgstr "Iš anksto suformatuota"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 1"
-msgstr "1 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 2"
-msgstr "2 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
-msgstr "3 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Add to Dictionary"
-msgstr "Pridėti į žodyną"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
-msgstr "Sudėtingesnis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align center"
-msgstr "Lygiuoti centrus"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align left"
-msgstr "Lygiuoti kairiąją pusę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Align right"
-msgstr "Lygiuoti dešiniąją pusę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alignment"
-msgstr "Lygiuotė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
-msgstr "Alternatyvus šaltinis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -413,687 +382,708 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Author"
-msgstr "Autorius"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Background color"
-msgstr "Fono spalva"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote"
-msgstr "Citatos blokas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Blocks"
-msgstr "Blokai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Body"
-msgstr "Pagrindinė dalis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bold"
-msgstr "Paryškintas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border color"
-msgstr "Kraštinių spalva"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Border"
-msgstr "Kraštinė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bottom"
-msgstr "Apačia"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Bullet list"
-msgstr "Ženklelių sąrašas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Caption"
-msgstr "Pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell padding"
-msgstr "Langelių užpildymas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell properties"
-msgstr "Langelių savybės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
-msgstr "Langelių išretinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell type"
-msgstr "Langelio tipas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell"
-msgstr "Langelis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Center"
-msgstr "Centras"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Circle"
-msgstr "Apskritimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Clear formatting"
-msgstr "Valyti formatavimą"
+msgstr ""
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/templates/js/image-modal.underscore
+msgid "Close"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Code block"
-msgstr "Kodo blokas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Code"
-msgstr "Kodas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Color"
-msgstr "Spalva"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cols"
-msgstr "Stulpeliai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column group"
-msgstr "Stulpelių grupė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Column"
-msgstr "Stulpelis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Constrain proportions"
-msgstr "Riboti proporcijas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy row"
-msgstr "Kopijuoti eilutę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Copy"
-msgstr "Kopijuoti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Could not find the specified string."
-msgstr "Nepavyko rasti nurodytos eilutės."
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom color"
-msgstr "Tinkinta spalva"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Custom..."
-msgstr "Tinkinti..."
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut row"
-msgstr "Iškirpti eilutę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cut"
-msgstr "Iškirpti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Decrease indent"
-msgstr "Mažinti įtrauką"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Default"
-msgstr "Numatytasis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete column"
-msgstr "Pašalinti stulpelį"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete row"
-msgstr "Pašalinti eilutę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
-msgstr "Pašalinti lentelę"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Description"
-msgstr "Aprašas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Dimensions"
-msgstr "Matmenys"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
-msgstr "Diskas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Div"
-msgstr "Skyr"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Document properties"
-msgstr "Dokumento savybės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Edit HTML"
-msgstr "Redaguoti HTML"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/course_info_handouts.underscore
+#: cms/templates/js/group-configuration-details.underscore
+#: cms/templates/js/show-textbook.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+#: cms/templates/js/mock/mock-container-page.underscore
 msgid "Edit"
-msgstr "Taisyti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Embed"
-msgstr "Įterpti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Emoticons"
-msgstr "Jaustukai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Encoding"
-msgstr "Koduotė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "File"
-msgstr "Failas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find and replace"
-msgstr "Rasti ir keisti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find next"
-msgstr "Rasti paskesnį"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find previous"
-msgstr "Rasti ankstesnį"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Find"
-msgstr "Rasti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Finish"
-msgstr "Baigti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Family"
-msgstr "Šriftų šeima"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Font Sizes"
-msgstr "Šrifto dydis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Footer"
-msgstr "Poraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Format"
-msgstr "Formatas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Formats"
-msgstr "Formatai"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/templates/js/image-modal.underscore
 msgid "Fullscreen"
-msgstr "Visas ekranas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "General"
-msgstr "Bendras"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "H Align"
-msgstr "H lygiuotė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 1"
-msgstr "1 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 2"
-msgstr "2 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 3"
-msgstr "3 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 4"
-msgstr "4 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 5"
-msgstr "5 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header 6"
-msgstr "6 antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header cell"
-msgstr "Antraštės langelis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Header"
-msgstr "Antraštė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headers"
-msgstr "Antraštės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 4"
-msgstr "4 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 5"
-msgstr "5 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 6"
-msgstr "6 pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Headings"
-msgstr "Pavadinimai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
-msgstr "Aukštis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal line"
-msgstr "Horizontali linija"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal space"
-msgstr "Horizontalus tarpas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "HTML source code"
-msgstr "HTML šaltinio kodas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore all"
-msgstr "Nepaisyti visko"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ignore"
-msgstr "Nepaisyti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Image description"
-msgstr "Paveikslo aprašas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Increase indent"
-msgstr "Didinti įtrauką"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Inline"
-msgstr "Tiesiogiai įterpta"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column after"
-msgstr "Įterpti stulpelius iš dešinės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert column before"
-msgstr "Įterpti stulpelius iš kairės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert date/time"
-msgstr "Įterpti datą/laiką"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert image"
-msgstr "Įterpti paveikslą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert link"
-msgstr "Įterpti nuorodą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row after"
-msgstr "Įterpti eilutes žemiau"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert row before"
-msgstr "Įterpti eilutes aukščiau"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
-msgstr "Įterpti lentelę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert template"
-msgstr "Įterpti šabloną"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert video"
-msgstr "Įterpti vaizdo įrašą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert"
-msgstr "Įterpti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit image"
-msgstr "Įterpti/redaguoti paveikslą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit link"
-msgstr "Įterpti/redaguoti nuorodą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
-msgstr "Įterpti/redaguoti vaizdo įrašą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
-msgstr "Pasvirasis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Justify"
-msgstr "Abipusė lygiuotė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Keywords"
-msgstr "Reikšminiai žodžiai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left to right"
-msgstr "Iš kairės į dešinę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Left"
-msgstr "Kairė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Alpha"
-msgstr "Mažosios lotyniškos raidės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Greek"
-msgstr "Mažosios graikiškos raidės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Lower Roman"
-msgstr "Mažieji romėniški skaitmenys"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Match case"
-msgstr "Skirti didžiąsias ir mažąsias raides"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Merge cells"
-msgstr "Sulieti langelius"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Middle"
-msgstr "Vidurys"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New document"
-msgstr "Naujas dokumentas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "New window"
-msgstr "Naujas langas"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/paging-footer.underscore
+#: cms/templates/js/paging-header.underscore
 msgid "Next"
-msgstr "Kitas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "No color"
-msgstr "Be spalvų"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Nonbreaking space"
-msgstr "Neperkeliantis tarpas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1105,25 +1095,25 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Numbered list"
-msgstr "Sunumeruotas sąrašas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
-msgstr "Gerai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Page break"
-msgstr "Puslapio lūžis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste as text"
-msgstr "Įklijuoti kaip tekstą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1132,101 +1122,104 @@ msgid ""
 "Paste is now in plain text mode. Contents will now be pasted as plain text "
 "until you toggle this option off."
 msgstr ""
-"Dabar įklijuojama grynojo teksto režimu. Turinys dabar bus įklijuotas kaip "
-"grynasis tekstas, kol neišjungsite šios parinkties."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row after"
-msgstr "Įklijuoti eilutę žemiau"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste row before"
-msgstr "Įklijuoti eilutę aukščiau"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste your embed code below:"
-msgstr "Žemiau įklijuoti įterptąjį kodą:"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paste"
-msgstr "Įklijuoti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Poster"
-msgstr "Plakatas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
-msgstr "Peržiūra"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
-msgstr "Ankstesnis"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/coffee/src/customwmd.js
+#: cms/templates/js/asset-library.underscore
 msgid "Preview"
-msgstr "Peržiūra"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Print"
-msgstr "Spausdinti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Redo"
-msgstr "Grąžinti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Remove link"
-msgstr "Pašalinti nuorodą"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace all"
-msgstr "Keisti viską"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace with"
-msgstr "Keisti į"
+msgstr ""
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/metadata-file-uploader-item.underscore
+#: cms/templates/js/video/metadata-translations-item.underscore
 msgid "Replace"
-msgstr "Pakeisti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Restore last draft"
-msgstr "Atkurti paskutinį juodraštį"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1235,159 +1228,156 @@ msgid ""
 "Rich Text Area. Press ALT-F9 for menu. Press ALT-F10 for toolbar. Press "
 "ALT-0 for help"
 msgstr ""
-"Raiškiojo teksto sritis. Norėdami atsidaryti meniu spauskite ALT-F9. "
-"Norėdami atsidaryti įrankių juostą spauskite ALT-F10. Norėdami gauti "
-"pagalbos spauskite ALT-0."
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right to left"
-msgstr "Iš dešinės į kairę"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Right"
-msgstr "Dešinė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Robots"
-msgstr "Robotai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row group"
-msgstr "Eilučių grupė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row properties"
-msgstr "Eilutės savybės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row type"
-msgstr "Eilutės tipas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Row"
-msgstr "Eilutė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Rows"
-msgstr "Eilutės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Scope"
-msgstr "Galiojimo sritis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Select all"
-msgstr "Pasirinkti viską"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show blocks"
-msgstr "Rodyti blokus"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Show invisible characters"
-msgstr "Rodyti nematomus simbolius"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source code"
-msgstr "Šaltinio kodas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
-msgstr "Šaltinis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Special character"
-msgstr "Specialusis simbolis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Spellcheck"
-msgstr "Rašybos tikrinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Split cell"
-msgstr "Skaidyti langelį"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Square"
-msgstr "Kvadratas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Start search"
-msgstr "Pradėti paiešką"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Strikethrough"
-msgstr "Perbraukimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Style"
-msgstr "Stilius"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Subscript"
-msgstr "Apatinis indeksas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Superscript"
-msgstr "Viršutinis indeksas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table properties"
-msgstr "Lentelės savybės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Table"
-msgstr "Lentelė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1399,19 +1389,19 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Templates"
-msgstr "Šablonai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text color"
-msgstr "Teksto spalva"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Text to display"
-msgstr "Rodytinas tekstas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1428,104 +1418,102 @@ msgid ""
 "The URL you entered seems to be an external link. Do you want to add the "
 "required http:// prefix?"
 msgstr ""
-"Atrodo, kad jūsų įvesta URL nuoroda yra išorinė nuoroda. Ar norite pridėti "
-"privalomą priešdėlį \"http://\"?"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Title"
-msgstr "Pavadinimas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Tools"
-msgstr "Įrankiai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Top"
-msgstr "Viršus"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Underline"
-msgstr "Pabraukti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Undo"
-msgstr "Atšaukti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Alpha"
-msgstr "Didžiosios lotyniškos raidės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Upper Roman"
-msgstr "Didieji romėniški skaitmenys"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Url"
-msgstr "Url nuoroda"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "V Align"
-msgstr "V lygiuotė"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
-msgstr "Vertikalusis tarpas"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "View"
-msgstr "Žiūrėti"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Visual aids"
-msgstr "Vaizdinės priemonės"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Whole words"
-msgstr "Ištisi žodžiai"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Width"
-msgstr "Plotis"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Words: {0}"
-msgstr "Žodžiai: {0}"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "You have unsaved changes are you sure you want to navigate away?"
-msgstr "Yra neišsaugotų pakeitimų. Ar tikrai norite išeiti iš šio puslapio?"
+msgstr ""
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1534,172 +1522,122 @@ msgid ""
 "Your browser doesn't support direct access to the clipboard. Please use the "
 "Ctrl+X/C/V keyboard shortcuts instead."
 msgstr ""
-"Jūsų naršyklė nepalaiko tiesioginės prieigos prie iškarpinės. Naudokitės "
-"sparčiųjų klavišų deriniais Ctrl+X/C/V. "
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr ""
-"Spauskite \"Gerai\", jeigu norite išsiųsti savo naudotojo vardą ir elektroninio pašto adresą 3-iosios šalies taikomajai programai.\n"
-"\n"
-"Spauskite \"Atšaukti\", jeigu norite grįžti į šį puslapį neišsiuntę savo informacijos."
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your username sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr ""
-"Spauskite \"Gerai\", jeigu norite išsiųsti savo naudotojo vardą 3-iosios šalies taikomajai programai.\n"
-"\n"
-"Spauskite \"Atšaukti\", jeigu norite grįžti į šį puslapį neišsiuntę savo informacijos."
-
-#: common/lib/xmodule/xmodule/js/src/lti/lti.js
-msgid ""
-"Click OK to have your e-mail address sent to a 3rd party application.\n"
-"\n"
-"Click Cancel to return to this page without sending your information."
-msgstr ""
-"Spauskite \"Gerai\", jeigu norite išsiųsti savo elektroninio pašto adresą 3-iosios šalies taikomajai programai.\n"
-"\n"
-"Spauskite \"Atšaukti\", jeigu norite grįžti į šį puslapį neišsiuntę savo informacijos."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
 "Sequence error! Cannot navigate to tab %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"Sekos klaida! Neįmanoma pereiti į %(tab_name)s kortelę šiame sekos modulyje."
-" Prašome susisiekti su kurso personalu."
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Play"
-msgstr "Paleisti"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Pause"
-msgstr "Pauzė"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Mute"
-msgstr "Išjungti garsą"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Unmute"
-msgstr "Įjungti garsą"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Exit full browser"
-msgstr "Išjungti pilno ekrano naršyklę"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
-msgid "Fill browser"
-msgstr "Padidinti naršyklę"
-
-#: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
-msgid "Speed"
-msgstr "Greitis"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
-msgstr "Garsas"
+msgstr ""
 
 #. Translators: Volume level equals 0%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Muted"
-msgstr "Nutildyta"
+msgstr ""
 
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
-msgstr "Labai tyliai"
+msgstr ""
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Low"
-msgstr "Tyliai"
+msgstr ""
 
 #. Translators: Volume level in range ]40,60]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Average"
-msgstr "Vidutiniškai"
+msgstr ""
 
 #. Translators: Volume level in range ]60,80]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Loud"
-msgstr "Garsiai"
+msgstr ""
 
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr "Labai garsiai"
+msgstr ""
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Maximum"
-msgstr "Maksimumas"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid ""
 "VideoPlayer: Element corresponding to the given selector was not found."
-msgstr "Vaizdo leistuvė: elementas, atitinkantis šį parinkiklį, nerastas."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "This browser cannot play .mp4, .ogg, or .webm files."
-msgstr "Šioje naršyklėje .mp4, .ogg ir .webm failai neveikia."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/02_html5_video.js
 msgid "Try using a different browser, such as Google Chrome."
-msgstr "Pabandykite kitą naršyklę, pavyzdžiui, Google Chrome."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
 msgid "Video slider"
-msgstr "Vaizdo juosta"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Pauzė"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Paleisti"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Padidinti naršyklę"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Išjungti pilno ekrano naršyklę"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr "Didelė raiška įjungta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr "Didelė raiška išjungta"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
-msgstr "Vaizdo pozicija"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video ended"
-msgstr "Vaizdas baigėsi"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s hour"
 msgid_plural "%(value)s hours"
-msgstr[0] "%(value)s valandą"
-msgstr[1] "%(value)s valandų"
-msgstr[2] "%(value)s valandų"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s minute"
 msgid_plural "%(value)s minutes"
-msgstr[0] "%(value)s minutę"
-msgstr[1] "%(value)s minučių"
-msgstr[2] "%(value)s minučių"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
-msgstr[0] "%(value)s sekundę"
-msgstr[1] "%(value)s sekundžių"
-msgstr[2] "%(value)s sekundžių"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Caption will be displayed when "
@@ -1713,22 +1651,18 @@ msgstr "Įjungti subtitrus"
 msgid "Turn off captions"
 msgstr "Išjungti subtitrus"
 
-#: common/lib/xmodule/xmodule/public/js/library_content_edit.js
-msgid "Updating with latest library content"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
-msgid "Creating missing groups"
+msgid "Creating missing groups&hellip;"
 msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
-msgstr "Slėpti diskusiją"
+msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Show Discussion"
-msgstr "Rodyti diskusiją"
+msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -1741,504 +1675,670 @@ msgstr "Rodyti diskusiją"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Sorry"
-msgstr "Atsiprašome"
+msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "We had some trouble loading the discussion. Please try again."
-msgstr "Iškilo problema įkeliant diskusiją. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 msgid ""
 "We had some trouble loading the threads you requested. Please try again."
 msgstr ""
-"Iškilo problema įkeliant jūsų prašomą temų giją. Prašome bandyti dar kartą."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "Loading content"
-msgstr "Įkeliamas turinys"
+msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any unsaved work and then reload the page."
 msgstr ""
-"Iškilo problema vykdant jūsų užklausą. Prašome įsitikinti, kad išsaugojote "
-"visus savo darbus, ir perkraukite puslapį iš naujo."
 
 #: common/static/coffee/src/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
-msgstr "Iškilo problema vykdant jūsų užklausą. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
+#: common/static/coffee/src/discussion/views/new_post_view.js
 msgid "…"
-msgstr "…"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "currently %(numVotes)s vote"
 msgid_plural "currently %(numVotes)s votes"
-msgstr[0] "šiuo metu %(numVotes)s balsas"
-msgstr[1] "šiuo metu %(numVotes)s balsai"
-msgstr[2] "šiuo metu %(numVotes)s balsų"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
-msgstr[0] "%(numVotes)s balsas"
-msgstr[1] "%(numVotes)s balsai"
-msgstr[2] "%(numVotes)s balsų"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
 msgstr ""
-"Iškilo problema užregistruojant jus į šią giją. Prašome bandyti dar kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble unsubscribing you from this thread. Please try again."
 msgstr ""
-"Iškilo problema išregistruojant jus iš šios gijos. Prašome bandyti dar "
-"kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble marking this response as an answer.  Please try again."
 msgstr ""
-"Iškilo problema pažymint šį atsiliepimą kaip atsakymą. Prašome bandyti dar "
-"kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing this response as an answer.  Please try again."
 msgstr ""
-"Iškilo problema pašalinant šį atsiliepimą kaip atsakymą. Prašome bandyti dar"
-" kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble marking this response endorsed.  Please try again."
 msgstr ""
-"Iškilo problema pažymint šį atsiliepimą kaip patvirtintą. Prašome bandyti "
-"dar kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble removing this endorsement.  Please try again."
 msgstr ""
-"Iškilo problema pašalinant šį patvirtinimą. Prašome bandyti dar kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble saving your vote.  Please try again."
-msgstr "Iškilo problema įrašant jūsų balsavimą. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble pinning this thread. Please try again."
-msgstr "Iškilo problema prisegant šią giją. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble unpinning this thread. Please try again."
-msgstr "Iškilo problema atsegant šią giją. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing your flag on this post.  Please try again."
 msgstr ""
-"Iškilo problema pašalinant jūsų gairelę šiame skelbime. Prašome bandyti dar "
-"kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble reporting this post.  Please try again."
-msgstr "Iškilo problema paskelbiant šį skelbimą. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble closing this thread.  Please try again."
-msgstr "Iškilo problema uždarant šią giją. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble reopening this thread.  Please try again."
 msgstr ""
-"Iškilo problema iš naujo atidarant šią giją. Prašome bandyti dar kartą."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
-msgstr "Įkelti daugiau"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr "Įkeliama daugiau gijų"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
-msgstr "Iškilo problema įkeliant daugiau gijų. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
-msgstr[0] "%(unread_count)s naujas komentaras"
-msgstr[1] "%(unread_count)s nauji komentarai"
-msgstr[2] "%(unread_count)s nauji komentarai"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "Search Results"
-msgstr "Paieškos rezultatai"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Loading thread list"
-msgstr "Įkeliamas gijų sąrašas"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid ""
 "No results found for %(original_query)s. Showing results for "
 "%(suggested_query)s."
 msgstr ""
-"Užklausos %(original_query)s rezultatų nerasta. Rodomi užklausos "
-"%(suggested_query)s rezultatai."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "No threads matched your query."
-msgstr " Jokios gijos neatitiko jūsų užklausos."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by %(username)s."
-msgstr "Rodyti %(username)s skelbimus."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr "Jūsų pasirinkta gija buvo pašalinta. Prašome pasirinkti kitą giją."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
-msgstr "Iškilo problema įkeliant atsakymus. Prašome perkrauti puslapį."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
-msgstr "Iškilo problema įkeliant daugiau atsakymų. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
-msgstr[0] "%(numResponses)s kitas atsakymas"
-msgstr[1] "%(numResponses)s kiti atsakymai"
-msgstr[2] "%(numResponses)s kiti atsakymai"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
-msgstr[0] "%(numResponses)s atsakymas"
-msgstr[1] "%(numResponses)s atsakymai"
-msgstr[2] "%(numResponses)s atsakymai"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
-msgstr "Rodomi visi atsakymai"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] "Rodomas pirmas atsakymas"
-msgstr[1] "Rodomas pirmas atsakymas"
-msgstr[2] "Rodomi pirmi %(numResponses)s atsakymai"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr "Įkelti visus atsakymus"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
-msgstr "Įkelti kitus %(numResponses)s atsakymus"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr "Ar jūs tikrai norite pašalinti šį pranešimą?"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
-"Iškilo problema įkeliant jūsų prašomą puslapį. Prašome bandyti dar kartą."
-
-#: common/static/coffee/src/discussion/views/new_post_view.js
-msgid "Your post will be discarded."
-msgstr "Jūsų skelbimas bus panaikintas."
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
-msgstr "anonimas"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
-msgstr "Ar jūs tikrai norite panaikinti šį komentarą?"
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
-msgstr "Iškilo problema šalinant šį komentarą. Prašome bandyti dar kartą."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "Ar jūs tikrai norite panaikinti šį atsakymą?"
+msgstr ""
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
-msgstr "Padėti paskirties paveikslą"
+msgstr ""
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dragging out of slider"
-msgstr "nutempiama iš slankiklio"
+msgstr ""
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dragging"
-msgstr "tempiama"
+msgstr ""
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dropped in slider"
-msgstr "nutempta į slankiklį"
+msgstr ""
 
 #: common/static/js/capa/drag_and_drop/draggable_events.js
 msgid "dropped on target"
-msgstr "nutempta į paskirties vietą"
+msgstr ""
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s ago"
-msgstr "prieš %s"
+msgstr ""
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%s from now"
-msgstr "%s nuo dabar"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr "mažiau nei minutę"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr "apie minutę"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d minutę"
-msgstr[1] "%d minutes"
-msgstr[2] "%d minutes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr "apie valandą"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "apie %d valandą"
-msgstr[1] "apie %d valandas"
-msgstr[2] "apie %d valandas"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr "diena"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d dieną"
-msgstr[1] "%d dienas"
-msgstr[2] "%d dienas"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr "apie mėnesį"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] "%d mėnesį"
-msgstr[1] "%d mėnesius"
-msgstr[2] "%d mėnesius"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr "apie metus"
+msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] "%d metus"
-msgstr[1] "%d metus"
-msgstr[2] "%d metų"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. Translators: please note that this is not a literal flag, but rather a
 #. report
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove all flags."
-msgstr "Norėdami pašalinti visas gaireles pažymėkite šį langelį."
+msgstr ""
 
 #. Translators: 'totalFlags' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(totalFlags)s flag."
 msgid_plural "Check the box to remove %(totalFlags)s flags."
-msgstr[0] "Norėdami pašalinti %(totalFlags)s gairelę pažymėkite šį langelį."
-msgstr[1] "Norėdami pašalinti %(totalFlags)s gaireles pažymėkite šį langelį."
-msgstr[2] "Norėdami pašalinti %(totalFlags)s gaireles pažymėkite šį langelį."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. Translators: 'count' is the number of flags solely for that annotation that
 #. will be removed
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Check the box to remove %(count)s flag."
 msgid_plural "Check the box to remove %(count)s flags."
-msgstr[0] "Norėdami pašalinti %(count)s gairelę pažymėkite šį langelį."
-msgstr[1] "Norėdami pašalinti %(count)s gaireles pažymėkite šį langelį."
-msgstr[2] "Norėdami pašalinti %(count)s gaireles pažymėkite šį langelį."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
 msgstr ""
-"Visos gairelės pašalintos. Norėdami atšaukti veiksmą, panaikinkite šio "
-"langelio žymėjimą."
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "You have already reported this annotation."
-msgstr "Jūs jau pranešėte apie šį komentarą."
+msgstr ""
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Report annotation as inappropriate or offensive."
-msgstr "Praneškite apie netinkamą arba įžeidžiantį komentarą."
+msgstr ""
 
 #. Translators: 'count' is the number of flags solely for that annotation
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
-msgstr[0] "Šis komentaras pažymėtas %(count)s gairele."
-msgstr[1] "Šis komentaras pažymėtas %(count)s gairelėmis."
-msgstr[2] "Šis komentaras pažymėtas %(count)s gairelėmis."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "User"
-msgstr "Naudotojas"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation"
-msgstr "Komentaras"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Start"
-msgstr "Pradėti"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "End"
-msgstr "Baigti"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "#Replies"
-msgstr "#Atsakymai"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Date posted"
-msgstr "Data paskelbta"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "More"
-msgstr "Daugiau"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
-msgstr "Mano užrašai"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Instructor"
-msgstr "Lektorius"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Public"
-msgstr "Vieša"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Search"
-msgstr "Paieška"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Users"
-msgstr "Naudotojai"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Tags"
-msgstr "Žymos"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation Text"
-msgstr "Komentaro tekstas"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
+#: cms/templates/js/metadata-dict-entry.underscore
+#: cms/templates/js/metadata-file-uploader-entry.underscore
+#: cms/templates/js/metadata-list-entry.underscore
+#: cms/templates/js/metadata-number-entry.underscore
+#: cms/templates/js/metadata-option-entry.underscore
+#: cms/templates/js/metadata-string-entry.underscore
+#: cms/templates/js/mock/mock-xmodule-editor.underscore
+#: cms/templates/js/mock/mock-xmodule-settings-only-editor.underscore
+#: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear"
-msgstr "Išvalyti"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Text"
-msgstr "Tekstas"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Video"
-msgstr "Vaizdo įrašas"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Image"
-msgstr "Paveikslas"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Reply"
-msgstr "Atsakyti"
+msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Tags:"
-msgstr "Žymos:"
+msgstr ""
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Available %s"
+msgstr "Galimi %s"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Galimų %s sąrašas. Pasirinkite, pažymėdami apačioje esančiame rėmelyje ir "
+"spausdami rodyklę \"Pasirinkti\", esančią tarp abiejų rėmelių."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Įrašykite šiame langelyje, norėdami filtruoti galimų %s sąrašą."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Filter"
+msgstr "Filtras"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Choose all"
+msgstr "Pasirinkti visus"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Click to choose all %s at once."
+msgstr "Spauskite, norėdami pasirinkti visus %s iš karto."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Choose"
+msgstr "Pasirinkti"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Remove"
+msgstr "Pašalinti"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Chosen %s"
+msgstr "Pasirinktas %s"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Pasirinktų %s sąrašas. Pasirinktus įrašus galima pašalinti, pažymint "
+"apačioje esančiame rėmelyje ir paspaudus \"Šalinti\" rodyklę, esančią tarp "
+"abiejų rėmelių."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Remove all"
+msgstr "Pašalinti viską"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Click to remove all chosen %s at once."
+msgstr "Spauskite, norėdami pašalinti iš karto visus pasirinktus %s."
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "Pasirinkta %(sel)s iš %(cnt)s"
+msgstr[1] "Pasirinkta %(sel)s iš %(cnt)s"
+msgstr[2] "Pasirinkta %(sel)s iš %(cnt)s"
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Redaguojamuose laukuose yra neišsaugotų pakeitimų. Jei dabar atliksite "
+"veiksmą, visi neišsaugoti pakeitimai bus prarasti."
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"Jūs pasirinkote veiksmą, tačiau neišsaugojote pakeitimų, atliktų atskiruose "
+"laukuose. Išsaugojimui paspauskite OK ir pakartotinai pasirinkite veiksmą. "
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Jūs pasirinkote veiksmą, tačiau neatlikote jokių pakeitimų atskiruose "
+"laukuose. Tikėtina, kad jums reikia naudoti \"Vykdyti\", o ne \"Saugoti\" "
+"mygtuką."
+
+#. Translators: the names of months, keep the pipe (|) separators.
+#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
+msgid ""
+"January|February|March|April|May|June|July|August|September|October|November|December"
+msgstr ""
+
+#. Translators: abbreviations for days of the week, keep the pipe (|)
+#. separators.
+#: lms/static/admin/js/calendar.js
+msgid "S|M|T|W|T|F|S"
+msgstr ""
+
+#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
+#: lms/static/admin/js/collapse.min.js
+msgid "Show"
+msgstr "Rodyti"
+
+#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
+msgid "Hide"
+msgstr "Slėpti"
+
+#. Translators: the names of days, keep the pipe (|) separators.
+#: lms/static/admin/js/dateparse.js
+msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
+msgstr ""
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Now"
+msgstr "Dabar"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Clock"
+msgstr "Laikrodis"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Choose a time"
+msgstr "Pasirinkti laiką"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Midnight"
+msgstr "Vidurnaktis"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "6 a.m."
+msgstr "6:00 ryto"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Noon"
+msgstr "Vidurdienis"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Today"
+msgstr "Šiandien"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Calendar"
+msgstr "Kalendorius"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Yesterday"
+msgstr "Vakar"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Tomorrow"
+msgstr "Rytoj"
 
 #: lms/static/coffee/src/calculator.js
 msgid "Open Calculator"
-msgstr "Atverti skaičiuoklę"
+msgstr ""
 
 #: lms/static/coffee/src/calculator.js
 msgid "Close Calculator"
-msgstr "Užverti skaičiuoklę"
+msgstr ""
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
-msgstr "Pranešimo tekstas"
-
-#: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "Error generating student profile information. Please try again."
 msgstr ""
-"Klaida formuojant kurso dalyvių profilio informaciją. Prašome bandyti dar "
-"kartą."
+
+#. Translators: "Distribution" refers to a grade distribution. This error
+#. message appears when there is an error getting the data on grade
+#. distribution.;
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+msgid "Error fetching distribution."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/analytics.js
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "<%= num_students %> kurso dalyvių (-ai) gavo balų."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-msgid "Loading"
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Loading..."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
-msgstr "Klaida gaunant kurso dalyvių sąrašą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
-msgstr "Klaida nuskaitant įvertinimą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr "Klaida generuojant įvertinimą. Prašome bandyti dar kartą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "File Name"
-msgstr "Failo pavadinimas"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid ""
@@ -2248,147 +2348,99 @@ msgstr ""
 "Nuorodos sugeneruotos pagal užklausą ir dėl kurso dalyvių informacijos "
 "konfidencialumo bus panaikintos per 5 minutes."
 
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "Metrinis vaizdas neįmanomas "
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "Klaida parsiunčiant pažymių pasiskirstymą"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "Paskutinį kartą atnaujinta: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "<%= num_students %> kurso dalyvių (-ai) gavo balų."
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
-msgstr "Naudotojo vardas"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Email"
-msgstr "El. paštas"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Revoke access"
-msgstr "Panaikinti prieigą"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Enter username or email"
-msgstr "Įvesti naudotojo vardą arba el. paštą"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
-msgstr "Prašome įvesti naudotojo vardą arba el. paštą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
-msgstr "Klaida keičiant naudotojo teises."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%= identifier %>'."
 msgstr ""
-"Nepavyko rasti naudotojo, turinčio naudotojo vardą arba el. adresą <%= "
-"identifier %>."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%= username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
-"Klaida: naudotojas <%= username %> neaktyvavo savo paskyros. Naudotojai turi"
-" susikurti ir aktyvuoti paskyras prieš jiems suteikiant vaidmenis."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr "Klaida: jūs negalite pašalinti savęs iš lektorių grupės!"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Errors"
 msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following errors were generated:"
-msgstr "Generuotos šios klaidos:"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Warnings"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "The following warnings were generated:"
-msgstr "Generuoti šie įspėjimai:"
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Success"
-msgstr ""
-
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "All accounts were created successfully."
-msgstr "Visos paskyros sėkmingai sukurtos."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
-msgstr "Klaida pridedant / šalinant naudotojus kaip beta versijos bandytojus."
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
-msgstr "Šie naudotojai buvo sėkmingai pridėti kaip beta versijos bandytojai:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr ""
-"Šie naudotojai buvo sėkmingai pašalinti kaip beta versijos bandytojai:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
-msgstr "Šie naudotojai nebuvo pridėti kaip beta versijos bandytojai:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
-msgstr "Šie naudotojai nebuvo pašalinti kaip beta versijos bandytojai:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
 msgstr ""
-"Naudotojai turi susikurti ir aktyvuoti paskyras prieš juos pakeliant į beta "
-"versijos bandytojus."
 
 #. Translators: A list of identifiers (which are email addresses and/or
 #. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
-msgstr "Nerasti naudotojai, susiję su šiais identifikatoriais:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
-msgstr "Klaida įtraukiant į sąrašą / išbraukiant iš sąrašo naudotojus."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
-msgstr "Šie el. pašto adresai ir (arba) naudotojų vardai negalioja:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
 msgstr ""
-"Sėkmingai įtraukti į sąrašą ir išsiųsti el. laiškai šiems naudotojams:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
-msgstr "Sėkmingai įtraukti į sąrašą šie naudotojai:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2396,14 +2448,11 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
 msgstr ""
-"Sėkmingai išsiųsti registracijos el. laiškai šiems naudotojams. Juos bus "
-"leista įtraukti į sąrašą, kai tik jie užsiregistruos:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr ""
-"Šiuos naudotojus bus leista įtraukti į sąrašą, kai tik jie užsiregistruos:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2411,13 +2460,11 @@ msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
 msgstr ""
-"Sėkmingai išsiųsti registracijos el. laiškai šiems naudotojams. Jie bus "
-"įtraukti į sąrašą, kai tik užsiregistruos:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
-msgstr "Šie naudotojai bus įtraukti į sąrašą, kai tik užsiregistruos: "
+msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2425,12 +2472,11 @@ msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
 msgstr ""
-"El. laiškai išsiųsti sėkmingai. Šie naudotojai išbraukti iš kurso sąrašo:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
-msgstr "Šie naudotojai išbraukti iš kurso sąrašo:"
+msgstr ""
 
 #. Translators: A list of users appears after this sentence. This situation
 #. arises when a staff member tries to unenroll a user who is not currently
@@ -2439,40 +2485,30 @@ msgstr "Šie naudotojai išbraukti iš kurso sąrašo:"
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
-"Šie naudotojai nepriskirti kursui ir todėl negali būti įtraukti į sąrašą:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr "Jūsų pranešimas turi turėti temos pavadinimą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
-msgstr "Jūsų pranešimas negali būti tuščias."
-
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
-msgid ""
-"There are invalid keywords in your email. Please check the following "
-"keywords and try again:"
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
-msgstr "Jūsų el. laiškas sėkmingai parengtas siuntimui."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to yourself. Is this "
 "OK?"
 msgstr ""
-"Jūs ketinate sau siųsti el. laišką, pavadintą \"<%= subject %>\". Teisingai?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
 "You are about to send an email titled '<%= subject %>' to everyone who is "
 "staff or instructor on this course. Is this OK?"
 msgstr ""
-"Jūs ketinate siųsti el. laišką, pavadintą \"<%= subject %>\", visiems kurso "
-"darbuotojams ir lektoriams. Teisingai? "
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -2488,27 +2524,23 @@ msgid ""
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
-"Jūsų el. laiškas sėkmingai parengtas siuntimui. Atminkite, kad esant "
-"dideliam kurso dalyvių skaičiui, el. laiško išsiuntimas gali užtrukti iki "
-"valandos (arba net ilgiau, jei tuo pat metu ir kitų kursų dalyviai siunčia "
-"el. laiškus)."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Error sending email."
-msgstr "Klaida siunčiant el. laišką."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
-msgstr "Šiame kurse nėra kaupiama el. laiškų istorija."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
-msgstr "Klaida gaunant šio kurso el. laiškų užduočių istoriją."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
-msgstr "Klaida gaunant šio kurso el. laiškų turinio istoriją."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -2516,7 +2548,7 @@ msgstr "Klaida gaunant šio kurso el. laiškų turinio istoriją."
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr "Prašome įvesti kurso dalyvio el. adresą arba naudotojo vardą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2534,7 +2566,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
-msgstr "Prašome įvesti uždavinio adresą."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2573,7 +2605,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
-msgstr "Modulio būsena sėkmingai pašalinta."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2617,9 +2649,6 @@ msgid ""
 " Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
-"Sėkmingai pradėtas nustatymas, kad būtų galima iš naujo spręsti <%= "
-"problem_id %> uždavinį. Norėdami pamatyti užduoties būseną, spragtelėkite "
-"mygtuką \"Rodyti pirminę užduoties istoriją\"."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2651,8 +2680,6 @@ msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
-"Klaida pradedant <%= problem_id %> uždavinio įvertinimo perskaičiavimą. "
-"Įsitikinkite, ar teisingai ir iki galo parašytas uždavinio identifikatorius."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
@@ -2662,289 +2689,289 @@ msgstr "Klaida pateikiant šio kurso dalyvio šio uždavinio užduočių istorij
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Type"
-msgstr "Užduoties tipas"
+msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task inputs"
-msgstr "Užduoties įvestis"
+msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task ID"
-msgstr "Užduoties indentifikatorius"
+msgstr ""
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Requester"
-msgstr "Užklausėjas"
+msgstr ""
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Submitted"
-msgstr "Pateikta"
+msgstr ""
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Duration (sec)"
-msgstr "Trukmė (s)"
+msgstr ""
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "State"
-msgstr "Būsena"
+msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Status"
-msgstr "Užduoties būsena"
+msgstr ""
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Task Progress"
-msgstr "Užduoties pažanga"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr ""
-"Įvyko klaida gaunant jūsų el. laišką. Bandykite vėliau ir, jeigu problema "
-"išliks, susisiekite su techninės priežiūros komanda."
+
+#: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/coffee/src/instructor_dashboard/util.js
+msgid "Unknown"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject"
-msgstr "Tema"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By"
-msgstr "Nuo"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent"
-msgstr "Siuntimo laikas"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Number Sent"
-msgstr "Išsiųstas kiekis"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Copy Email To Editor"
-msgstr "El. laišką nukopijuoti į rengyklę"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject:"
-msgstr "Tema:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By:"
-msgstr "Nuo:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent:"
-msgstr "Siuntimo laikas:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent To:"
-msgstr "Kam:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Message:"
-msgstr "Žinutė:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "No tasks currently running."
-msgstr "Šiuo metu nevykdoma nė viena užduotis."
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Grades saved.  Fetching the next submission to grade."
-msgstr "Vertinimai išsaugoti. Pateikite kitą užklausą vertinimui."
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Problem Name"
-msgstr "Užduoties pavadinimas"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Graded"
-msgstr "Įvertinta"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Available to Grade"
-msgstr "Galima vertinti"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Required"
-msgstr "Būtinas"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Progress"
-msgstr "Pažanga"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Back to problem list"
-msgstr "Grįžti į užduočių sąrašą"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Try loading again"
-msgstr "Bandykite įkelti vėl"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> available "
-msgstr "<%= num %> laisvas"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> graded "
-msgstr "<%= num %> įvertintas"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
-msgstr "Reikia dar <%= num %> norint pradėti ML"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"
-msgstr "Patikrinkite prieš pateikiant"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state: <%= state %>"
-msgstr "Sistema pateko į klaidingą būseną: <%= state %> "
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "System got into invalid state for submission: "
-msgstr "Sistema pateko į klaidingą būseną dėl pateikimo: "
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
-msgstr "(Slėpti)"
+msgstr ""
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Show)"
-msgstr "(Rodyti)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Hyperlink"
-msgstr "Įterpti hipersaitą "
+msgstr ""
 
 #. Translators: Please keep the quotation marks (") around this text
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js.c
 msgid "\"optional title\""
-msgstr "\"neprivalomas pavadinimas\""
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type url)"
-msgstr "Įterpkite paveikslėlį (įkelkite failą arba parašykite url nuorodą)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Markdown Editing Help"
-msgstr "Markdown redagavimo pagalba"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bold (Ctrl+B)"
-msgstr "Paryškintas (Ctrl+B)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Italic (Ctrl+I)"
-msgstr "Pasvirasis (Ctrl+I)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr "Nuoroda (Ctrl+L)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
-msgstr "Įtrauka (Ctrl+Q)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
-msgstr "Kodo pavyzdys (Ctrl+K)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
-msgstr "Vaizdas (Ctrl+G)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Numbered List (Ctrl+O)"
-msgstr "Sunumeruotas sąrašas (Ctrl+O)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Bulleted List (Ctrl+U)"
-msgstr "Suženklintas sąrašas (Ctrl+U)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading (Ctrl+H)"
-msgstr "Pavadinimas (Ctrl+H)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Horizontal Rule (Ctrl+R)"
-msgstr "Horizontali taisyklė  (Ctrl+R)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Undo (Ctrl+Z)"
-msgstr "Atšaukti (Ctrl+Z)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Y)"
-msgstr "Atstatyti (Ctrl+Y)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
-msgstr "Atstatyti (Ctrl+Shift+Z)"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "strong text"
-msgstr "ryškus tekstas"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "emphasized text"
-msgstr "pabrėžtas tekstas"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter image description here"
-msgstr "čia įvesti paveikslo aprašymą"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "enter link description here"
-msgstr "čia įvesti nuorodos aprašymą"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
 msgid "enter code here"
-msgstr "čia įveskite kodą"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "List item"
-msgstr "Sąrašo punktas"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Heading"
-msgstr "Pavadinimas"
+msgstr ""
 
 #: lms/static/js/ajax-error.js
 msgid "You have been logged out of your edX account. "
-msgstr "Jūs atsijungėte nuo edX paskyros."
-
-#: lms/static/js/course_survey.js
-msgid "There has been an error processing your survey."
-msgstr "Atliekant jūsų užklausą įvyko klaida."
+msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
-msgstr "Įvyko nežinoma klaida"
+msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully reset the attempts for user {user}"
-msgstr "Sėkmingai nustatyta, kad naudotojas {user} galėtų bandyti iš naujo. "
+msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to reset attempts."
-msgstr "Nepavyko nustatyti, kad būtų galima bandyti iš naujo."
+msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
@@ -2956,329 +2983,37 @@ msgstr "Nepavyko panaikinti kurso dalyvio būsenos."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
-msgstr "Sėkmingai perskaičiuotas naudotojo {user} uždavinio įvertinimas."
+msgstr ""
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem."
-msgstr "Nepavyko perskaičiuoti uždavinio įvertinimo."
-
-#: lms/static/js/dashboard/donation.js
-msgid "Please enter a valid donation amount."
-msgstr "Prašome įvesti tinkamą aukos sumą."
-
-#: lms/static/js/dashboard/donation.js
-msgid "Your donation could not be submitted."
-msgstr "Nepavyko pateikti jūsų aukos."
-
-#: lms/static/js/dashboard/legacy.js
-msgid "An error occurred. Please try again later."
-msgstr "Įvyko klaida. Prašome pabandyti vėliau."
-
-#: lms/static/js/dashboard/legacy.js
-msgid "Please verify your new email address"
-msgstr "Patvirtinkite naują el. pašto adresą"
-
-#: lms/static/js/dashboard/legacy.js
-msgid ""
-"You'll receive a confirmation in your inbox. Please follow the link in the "
-"email to confirm your email address change."
-msgstr ""
-"Nurodytu el. paštu gausite patvirtinimą. Spustelėkite gautą nuorodą ir "
-"patvirtinkite el. pašto pakeitimą.  "
-
-#: lms/static/js/edxnotes/views/search_box.js
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid ""
-"An error has occurred. Make sure that you are connected to the Internet, and"
-" then try refreshing the page."
-msgstr ""
-
-#: lms/static/js/edxnotes/views/search_box.js
-msgid ""
-"Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
-msgstr ""
-
-#: lms/static/js/edxnotes/views/tab_item.js
-msgid "Current tab"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hide notes"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Showing notes"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Show notes"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hiding notes"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/tabs/course_structure.js
-msgid "Location in Course"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/tabs/recent_activity.js
-msgid "Recent Activity"
-msgstr ""
-
-#: lms/static/js/edxnotes/views/tabs/search_results.js
-msgid "No results found for \"%(query_string)s\". Please try searching again."
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Selected tab"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "Saved cohort"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "Error adding students."
-msgstr "Klaida pridedant kurso dalyvius."
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "Enter a username or email."
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numUsersAdded} student has been added to this cohort"
-msgid_plural "{numUsersAdded} students have been added to this cohort"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numMoved} student was removed from {oldCohort}"
-msgid_plural "{numMoved} students were removed from {oldCohort}"
-msgstr[0] "{numMoved} kurso dalyvis pašalintas iš {oldCohort}"
-msgstr[1] "{numMoved} kurso dalyviai pašalinti iš {oldCohort}"
-msgstr[2] "{numMoved} kurso dalyvių pašalinta iš {oldCohort}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "{numPresent} student was already in the cohort"
-msgid_plural "{numPresent} students were already in the cohort"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "Unknown user: {user}"
-msgstr "Nežinomas naudotojas: {user}"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "There was an error when trying to add students:"
-msgid_plural "There were {numErrors} errors when trying to add students:"
-msgstr[0] "Įvyko klaida bandant pridėti kurso dalyvius:"
-msgstr[1] "Įvyko {numErrors} klaidos bandant pridėti kurso dalyvius:"
-msgstr[2] "Įvyko {numErrors} klaidų bandant pridėti kurso dalyvius:"
-
-#: lms/static/js/groups/views/cohort_editor.js
-msgid "View all errors"
-msgstr "Peržiūrėti visas klaidas"
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "You must specify a name for the cohort"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "You did not select a content group"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "The selected content group does not exist"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "The cohort cannot be saved"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "The cohort cannot be added"
-msgstr ""
-
-#: lms/static/js/groups/views/cohort_form.js
-msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid "You currently have no cohorts configured"
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Add Cohort"
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid ""
-"The {cohortGroupName} cohort has been created. You can manually add students"
-" to this cohort below."
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid "Assign students to cohorts by uploading a CSV file."
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid "Choose a .csv file"
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid "Only properly formatted .csv files will be accepted."
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid "Upload File and Assign Students"
-msgstr ""
-
-#: lms/static/js/groups/views/cohorts.js
-msgid ""
-"Your file '{file}' has been uploaded. Allow a few minutes for processing."
-msgstr ""
-
-#: lms/static/js/student_account/account.js
-#: lms/static/js/student_profile/profile.js
-msgid "The data could not be saved."
-msgstr "Nepavyko įrašyti duomenų."
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid email address"
-msgstr "Prašome įvesti galiojantį el. pašto adresą"
-
-#: lms/static/js/student_account/account.js
-msgid "Please enter a valid password"
-msgstr "Prašome įvesti tinkamą slaptažodį"
-
-#: lms/static/js/student_account/account.js
-msgid ""
-"Password reset email sent. Follow the link in the email to change your "
-"password."
-msgstr ""
-"Išsiųstas el. laiškas dėl naujo slaptažodžio nustatymo. Norėdami pakeisti "
-"slaptažodį, spauskite ant laiške esančios nuorodos."
-
-#: lms/static/js/student_account/account.js
-msgid "We weren't able to send you a password reset email."
-msgstr "Nepavyko išsiųsti el. laiško dėl slaptažodžio nustatymo."
-
-#: lms/static/js/student_account/account.js
-msgid "Please check your email to confirm the change"
-msgstr "Patikrinkite savo el. paštą, kad galėtumėte patvirtinti pakeitimą"
-
-#: lms/static/js/student_profile/profile.js
-msgid "Full name cannot be blank"
-msgstr "Vardo ir pavardės vieta negali būti tuščia"
-
-#: lms/static/js/student_profile/profile.js
-msgid "Language cannot be blank"
-msgstr "Kalbos vieta negali būti tuščia"
-
-#: lms/static/js/student_profile/profile.js
-msgid "We couldn't populate the list of language choices."
-msgstr "Nepavyko automatiškai įvesti kalbų sąrašo."
-
-#: lms/static/js/student_profile/profile.js
-msgid "Saved"
-msgstr "Įrašyta"
-
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An error has occurred. Please try again."
-msgstr ""
-
-#: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "Could not submit order"
-msgstr ""
-
-#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
-msgid "Could not retrieve payment information"
-msgstr ""
-
-#: lms/static/js/verify_student/views/review_photos_step_view.js
-msgid "An error has occurred. Please try again later."
-msgstr ""
-
-#: lms/static/js/verify_student/views/review_photos_step_view.js
-msgid "Could not submit photos"
-msgstr ""
-
-#: lms/static/js/verify_student/views/step_view.js
-msgid "An error has occurred. Please try reloading the page."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "Video Capture Error"
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid ""
-"Please verify that your webcam is connected and that you have allowed your "
-"browser to access it."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "No Webcam Detected"
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "You don't seem to have a webcam connected."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "Double-check that your webcam is connected and working to continue."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "Flash Not Detected"
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "You don't seem to have Flash installed."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "%(a_start)s Get Flash %(a_end)s to continue your enrollment."
-msgstr ""
-
-#: lms/static/js/views/file_uploader.js
-msgid "Your upload of '{file}' succeeded."
-msgstr ""
-
-#: lms/static/js/views/file_uploader.js
-msgid "Your upload of '{file}' failed."
 msgstr ""
 
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
-msgstr "Neįmanoma gauti duomenų, prašome pabandyti vėliau."
+msgstr ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student opened Subsection"
 msgid_plural "%(num_students)s students opened Subsection"
-msgstr[0] "%(num_students)s kurso dalyvis atsidarė potemę"
-msgstr[1] "%(num_students)s kurso dalyviai atsidarė potemę"
-msgstr[2] "%(num_students)s kurso dalyvių atsidarė potemę"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_students)s student"
 msgid_plural "%(num_students)s students"
-msgstr[0] "%(num_students)s kurso dalyvis"
-msgstr[1] "%(num_students)s kurso dalyviai"
-msgstr[2] "%(num_students)s kurso dalyvių"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "%(num_questions)s question"
 msgid_plural "%(num_questions)s questions"
-msgstr[0] "%(num_questions)s klausimas"
-msgstr[1] "%(num_questions)s klausimai"
-msgstr[2] "%(num_questions)s klausimų"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: lms/templates/class_dashboard/d3_stacked_bar_graph.js
 msgid "Number of Students"
@@ -3292,39 +3027,33 @@ msgstr ""
 
 #: cms/static/coffee/src/main.js
 msgid "Studio's having trouble saving your work"
-msgstr "Sistemai iškilo problema išsaugant jūsų darbą"
+msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
 #: cms/static/js/views/course_info_handout.js
-#: cms/static/js/views/course_info_update.js
-#: cms/static/js/views/edit_textbook.js
-#: cms/static/js/views/list_item_editor.js cms/static/js/views/overview.js
-#: cms/static/js/views/overview_assignment_grader.js
+#: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
 #: cms/static/js/views/modals/edit_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Saving"
+msgid "Saving&hellip;"
 msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Page Confirmation"
-msgstr "Puslapio pašalinimo patvirtinimas"
+msgstr ""
 
 #: cms/static/coffee/src/views/tabs.js
 msgid ""
 "Are you sure you want to delete this page? This action cannot be undone."
 msgstr ""
-"Ar jūs tikrai norite pašalinti šį puslapį? Šis veiksmas negalės būti "
-"atšauktas."
 
 #: cms/static/coffee/src/views/tabs.js
-#: cms/static/js/views/course_info_update.js cms/static/js/views/list_item.js
-#: cms/static/js/views/show_textbook.js
+#: cms/static/js/views/course_info_update.js
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting"
+msgid "Deleting&hellip;"
 msgstr ""
 
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
@@ -3333,6 +3062,14 @@ msgstr ""
 
 #: cms/static/js/base.js
 msgid "This link will open in a modal window"
+msgstr ""
+
+#: cms/static/js/sock.js
+msgid "Hide Studio Help"
+msgstr ""
+
+#: cms/static/js/sock.js
+msgid "Looking for Help with Studio?"
 msgstr ""
 
 #: cms/static/js/collections/group.js
@@ -3344,177 +3081,6 @@ msgstr ""
 #. Group B, ..., Group AA, etc.
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error while exporting."
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export to XML at least one component. It is "
-"recommended that you go to the edit page and repair the error before "
-"attempting another export. Please check that all components on the page are "
-"valid and do not display any error messages."
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "Correct failed component"
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "Return to Export"
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid ""
-"There has been a failure to export your course to XML. Unfortunately, we do "
-"not have specific enough information to assist you in identifying the failed"
-" component. It is recommended that you inspect your courseware to identify "
-"any components in error and try again."
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "The raw error message is:"
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "There has been an error with your export."
-msgstr ""
-
-#: cms/static/js/factories/export.js
-msgid "Yes, take me to the main course page"
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error during the upload process."
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while unpacking the file."
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while verifying the file you submitted."
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "There was an error while importing the new course to our database."
-msgstr ""
-
-#: cms/static/js/factories/import.js
-msgid "Your import has failed."
-msgstr ""
-
-#: cms/static/js/factories/import.js cms/static/js/factories/import.js
-#: cms/static/js/views/import.js cms/static/js/views/import.js.c
-msgid "Choose new file"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "A valid email address is required"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid "You must enter a valid email address in order to add a new team member"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Return and add email address"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid "Already a course team member"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid ""
-"{email} is already on the {course} team. Recheck the email address if you "
-"want to add a new member."
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Return to team listing"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Error adding user"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure?"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid ""
-"Are you sure you want to delete {email} from the course team for “{course}”?"
-msgstr "Ar tikrai norite pašalinti {email} iš “{course}” kurso komandos?"
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Error removing user"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users_lib.js
-msgid "There was an error changing the user's role"
-msgstr ""
-
-#: cms/static/js/factories/manage_users.js
-msgid "Try Again"
-msgstr ""
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid "You must enter a valid email address in order to add an instructor"
-msgstr ""
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Already a library team member"
-msgstr ""
-
-#: cms/static/js/factories/manage_users_lib.js
-msgid "Are you sure you want to delete {email} from the library “{library}”?"
-msgstr ""
-
-#: cms/static/js/factories/settings_advanced.js
-msgid "Hide Deprecated Settings"
-msgstr ""
-
-#: cms/static/js/factories/settings_advanced.js
-msgid "Show Deprecated Settings"
-msgstr ""
-
-#: cms/static/js/factories/textbooks.js
-#: cms/static/js/views/pages/group_configurations.js
-msgid "You have unsaved changes. Do you really want to leave this page?"
-msgstr ""
-
-#. Translators: This is the status of a video upload that is queued
-#. waiting for other uploads to complete
-#: cms/static/js/models/active_video_upload.js
-msgid "Queued"
-msgstr ""
-
-#. Translators: This is the status of an active video upload
-#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-msgid "Uploading"
-msgstr ""
-
-#. Translators: This is the status of a video upload that has
-#. completed successfully
-#: cms/static/js/models/active_video_upload.js
-msgid "Upload completed"
-msgstr ""
-
-#. Translators: This is the status of a video upload that has failed
-#: cms/static/js/models/active_video_upload.js
-msgid "Upload failed"
 msgstr ""
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
@@ -3545,10 +3111,6 @@ msgstr ""
 msgid "All groups must have a name."
 msgstr ""
 
-#: cms/static/js/models/group_configuration.js
-msgid "All groups must have a unique name."
-msgstr ""
-
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -3557,10 +3119,6 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
-
-#: cms/static/js/models/xblock_validation.js
-msgid "This component has validation issues."
 msgstr ""
 
 #: cms/static/js/models/settings/course_details.js
@@ -3587,10 +3145,6 @@ msgstr ""
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr ""
 
-#: cms/static/js/models/settings/course_details.js
-msgid "Please enter an integer between "
-msgstr ""
-
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
 msgstr ""
@@ -3615,16 +3169,9 @@ msgstr ""
 msgid "Grace period must be specified in HH:MM format."
 msgstr ""
 
-#: cms/static/js/spec/views/assets_spec.js
-#: cms/static/js/spec/views/paging_spec.js
-#: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
-#: cms/templates/js/asset-library.underscore
-msgid "Type"
-msgstr ""
-
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
-msgstr "Failo pašalinimo patvirtinimas"
+msgstr ""
 
 #: cms/static/js/views/asset.js
 msgid ""
@@ -3632,35 +3179,17 @@ msgid ""
 "\n"
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr ""
-"Ar jūs tikrai norite pašalinti šį elementą? Šio veiksmo nebus galima atšaukti.\n"
-"\n"
-"Taip pat bet koks turinys, susietas su šiuo elementu, gali nebeveikti (pvz., gali būti nerodomi paveikslėliai arba gali neveikti nuorodos)"
 
 #: cms/static/js/views/asset.js
 msgid "Your file has been deleted."
-msgstr "Jūsų failas buvo pašalintas."
+msgstr ""
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
-#: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr ""
 
 #: cms/static/js/views/assets.js
-msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid ""
-"Please follow the instructions here to upload a file elsewhere and link to "
-"it: {maxFileSizeRedirectUrl}"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Max file size exceeded"
+msgid "Uploading…"
 msgstr ""
 
 #: cms/static/js/views/assets.js
@@ -3668,28 +3197,18 @@ msgstr ""
 msgid "Choose File"
 msgstr ""
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr ""
 
-#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
+#: cms/static/js/views/assets.js
 msgid "Load Another File"
-msgstr ""
-
-#. Translators: This refers to a content group that can be linked to a student
-#. cohort.
-#: cms/static/js/views/content_group_list.js
-msgid "content group"
-msgstr ""
-
-#: cms/static/js/views/content_group_list.js
-msgid "You have not created any content groups yet."
 msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "Are you sure you want to delete this update?"
-msgstr "Ar jūs tikrai norite pašalinti šį atnaujinimą?"
+msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
@@ -3711,6 +3230,12 @@ msgstr ""
 msgid "Please select a PDF file to upload."
 msgstr ""
 
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/group_configuration_edit.js
+#: cms/static/js/views/overview_assignment_grader.js
+msgid "Saving"
+msgstr ""
+
 #. Translators: 'count' is number of groups that the group
 #. configuration contains.
 #: cms/static/js/views/group_configuration_details.js
@@ -3729,9 +3254,9 @@ msgstr ""
 #: cms/static/js/views/group_configuration_details.js
 msgid "Used in %(count)s unit"
 msgid_plural "Used in %(count)s units"
-msgstr[0] "Naudojama %(count)s skyriuje"
-msgstr[1] "Naudojama %(count)s skyriuose"
-msgstr[2] "Naudojama %(count)s skyriuose"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. Translators: 'outlineAnchor' is an anchor pointing to
 #. the course outline page.
@@ -3740,26 +3265,22 @@ msgid ""
 "This Group Configuration is not in use. Start by adding a content experiment"
 " to any Unit via the %(outlineAnchor)s."
 msgstr ""
-"Ši grupės konfigūracija nenaudojama. Pradėkite ją naudoti prie bet kurio "
-"skyriaus pridėdami turinio bandymą per %(outlineAnchor)s."
 
 #: cms/static/js/views/group_configuration_details.js
-#: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Course Outline"
 msgstr ""
 
-#. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
-#: cms/static/js/views/group_configurations_list.js
-msgid "group configuration"
+msgid "Delete this Group Configuration?"
 msgstr ""
 
-#: cms/static/js/views/group_configurations_list.js
-msgid "You have not created any group configurations yet."
+#: cms/static/js/views/group_configuration_item.js
+msgid "Deleting this Group Configuration is permanent and cannot be undone."
 msgstr ""
 
-#: cms/static/js/views/import.js
-msgid "Error importing course"
+#: cms/static/js/views/group_configuration_item.js
+#: cms/static/js/views/show_textbook.js
+msgid "Deleting"
 msgstr ""
 
 #: cms/static/js/views/import.js
@@ -3772,23 +3293,17 @@ msgid ""
 "extension."
 msgstr ""
 
-#. Translators: "item_display_name" is the name of the item to be deleted.
-#: cms/static/js/views/list_item.js
-msgid "Delete this %(item_display_name)s?"
-msgstr ""
-
-#. Translators: "item_display_name" is the name of the item to be deleted.
-#: cms/static/js/views/list_item.js
-msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
+#: cms/static/js/views/metadata.js
+msgid "Upload File"
 msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
-msgstr "Suskleisti visas temas"
+msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Expand All Sections"
-msgstr "Išskleisti visas temas"
+msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Release date:"
@@ -3800,7 +3315,7 @@ msgstr ""
 
 #: cms/static/js/views/overview.js
 msgid "Edit section release date"
-msgstr "Redaguoti temos paskelbimo datą"
+msgstr ""
 
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/course-outline.underscore
@@ -3808,23 +3323,20 @@ msgstr "Redaguoti temos paskelbimo datą"
 msgid "Not Graded"
 msgstr ""
 
-#: cms/static/js/views/paged_container.js
-msgid "Date added"
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added ascending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s ascending"
 msgstr ""
 
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. ascending"
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
-#. descending"
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-#. Translators: sample result:
-#. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js cms/static/js/views/paging_header.js
-#: cms/static/js/views/paging_header.js cms/static/js/views/paging_header.js
-msgid "Showing %(current_item_range)s out of %(total_items_count)s, "
+#. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
+#. Added descending"
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_item_range)s out of %(total_items_count)s, sorted by "
+"%(sort_name)s descending"
 msgstr ""
 
 #. Translators: turns into "25 total" to be used in other sentences, e.g.
@@ -3833,24 +3345,23 @@ msgstr ""
 msgid "%(total_items)s total"
 msgstr ""
 
-#. Translators: This is listed as the duration for a video
-#. that has not yet reached the point in its processing by
-#. the servers where its duration is determined.
-#: cms/static/js/views/previous_video_upload.js
-msgid "Pending"
+#: cms/static/js/views/section_edit.js
+msgid "Your change could not be saved"
+msgstr ""
+
+#: cms/static/js/views/section_edit.js
+msgid "Return and resolve this issue"
 msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
-msgstr "Ar pašalinti “<%= name %>”?"
+msgstr ""
 
 #: cms/static/js/views/show_textbook.js
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr ""
-"Vadovėlio pašalinimas vėliau negalės būti atšauktas, o jį pašalinus, visos "
-"nuorodos į jį, sukurtos kurso priemonėse, taip pat bus pašalintos."
 
 #: cms/static/js/views/uploads.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
@@ -3892,7 +3403,7 @@ msgid "Editor"
 msgstr ""
 
 #: cms/static/js/views/xblock_editor.js
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Settings"
 msgstr ""
 
@@ -3900,16 +3411,9 @@ msgstr ""
 msgid "New %(component_type)s"
 msgstr ""
 
-#. Translators: This message will be added to the front of messages of type
-#. warning,
-#. e.g. "Warning: this component has not been configured yet".
-#: cms/static/js/views/xblock_validation.js
-msgid "Warning"
-msgstr ""
-
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Adding"
+msgid "Adding&hellip;"
 msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -3935,13 +3439,12 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
-#. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Editing: %(title)s"
+msgid "Component"
 msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
-msgid "Component"
+msgid "Editing: %(title)s"
 msgstr ""
 
 #: cms/static/js/views/modals/validation_error_modal.js
@@ -3956,17 +3459,12 @@ msgstr ""
 msgid "Change Manually"
 msgstr ""
 
-#. Translators: "title" is the name of the current component being edited.
 #: cms/static/js/views/pages/container.js
-msgid "Editing visibility for: %(title)s"
-msgstr ""
-
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
+msgid "Duplicating&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Publishing"
+msgid "Publishing&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -3980,23 +3478,21 @@ msgid ""
 "Are you sure you want to revert to the last published version of the unit? "
 "You cannot undo this action."
 msgstr ""
-"Ar jūs tikrai norite grįžti prie paskutinės paskelbtos skyriaus versijos? "
-"Jūs negalėsite atšaukti šio veiksmo. "
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Discarding Changes"
+msgid "Discarding Changes&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Hiding from Students"
+msgid "Hiding from Students&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Explicitly Hiding from Students"
+msgid "Explicitly Hiding from Students&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Inheriting Student Visibility"
+msgid "Inheriting Student Visibility&hellip;"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
@@ -4010,12 +3506,13 @@ msgid ""
 "you made to the unit when it was hidden will now be visible to students. Do "
 "you want to proceed?"
 msgstr ""
-"Jeigu skyrius buvo paskelbtas ir leistas rodyti kurso dalyviams, visi "
-"pakeitimai, kuriuos padarėte skyriuje, kai jis buvo paslėptas, dabar bus "
-"matomi kurso dalyviams. Ar norite tęsti? "
 
 #: cms/static/js/views/pages/container_subviews.js
-msgid "Making Visible to Students"
+msgid "Making Visible to Students&hellip;"
+msgstr ""
+
+#: cms/static/js/views/pages/group_configurations.js
+msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
@@ -4036,10 +3533,6 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/settings/main.js
-msgid "%(hours)s:%(minutes)s (current UTC time)"
-msgstr ""
-
-#: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
 msgstr ""
 
@@ -4048,27 +3541,21 @@ msgid "Files must be in JPEG or PNG format."
 msgstr ""
 
 #: cms/static/js/views/utils/create_course_utils.js
-msgid ""
-"The combined length of the organization, course number, and course run "
-"fields cannot be more than <%=limit%> characters."
-msgstr ""
-
-#: cms/static/js/views/utils/create_library_utils.js
-msgid ""
-"The combined length of the organization and library code fields cannot be "
-"more than <%=limit%> characters."
-msgstr ""
-
-#: cms/static/js/views/utils/view_utils.js
 msgid "Required field."
 msgstr ""
 
-#: cms/static/js/views/utils/view_utils.js
+#: cms/static/js/views/utils/create_course_utils.js
 msgid "Please do not use any spaces in this field."
 msgstr ""
 
-#: cms/static/js/views/utils/view_utils.js
+#: cms/static/js/views/utils/create_course_utils.js
 msgid "Please do not use any spaces or special characters in this field."
+msgstr ""
+
+#: cms/static/js/views/utils/create_course_utils.js
+msgid ""
+"The combined length of the organization, course number, and course run "
+"fields cannot be more than 65 characters."
 msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
@@ -4077,7 +3564,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this %(xblock_type)s?"
-msgstr "Pašalinti šį %(xblock_type)s?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
@@ -4085,19 +3572,19 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
-msgstr "Taip, pašalinti šį %(xblock_type)s"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr "tema"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
-msgstr "potemė"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "unit"
-msgstr "skyrius"
+msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
@@ -4107,11 +3594,6 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Status"
 msgstr ""
 
 #: common/templates/js/image-modal.underscore
@@ -4124,746 +3606,6 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "%(post_type)s posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Reported"
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "Closed"
-msgstr ""
-
-#: common/templates/js/discussion/thread-show.underscore
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
-
-#: lms/templates/dashboard/donation.underscore
-msgid "Donate"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Highlighted text"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Less"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Note"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "You commented..."
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "References"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Noted in:"
-msgstr ""
-
-#: lms/templates/edxnotes/note-item.underscore
-msgid "Last Edited:"
-msgstr ""
-
-#: lms/templates/edxnotes/tab-item.underscore
-msgid "name"
-msgstr ""
-
-#: lms/templates/edxnotes/tab-item.underscore
-msgid "Clear search results"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "(contains %(student_count)s student)"
-msgid_plural "(contains %(student_count)s students)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Students are added to this cohort only when you provide their email "
-"addresses or usernames on this page."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "What does this mean?"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Students are added to this cohort automatically."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Edit settings in Studio"
-msgstr "Redaguoti nuostatas Studio aplinkoje"
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Manage Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Add students to this cohort"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Note: Students can be in only one cohort. Adding students to this group "
-"overrides any previous group assignment."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"Enter email addresses and/or usernames, separated by new lines or commas, "
-"for the students you want to add. *"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "(Required Field)"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid ""
-"You will not receive notification for emails that bounce, so double-check "
-"your spelling."
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-msgid "Add Students"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Add a New Cohort"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Cohort Name"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Enter the name of the cohort"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Associated Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "No Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Select a Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Choose a content group to associate"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Not selected"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Deleted Content Group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-msgid "Create a content group"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
-msgid "Select a cohort"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
-msgid "%(cohort_name)s (%(user_count)s)"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Cohort Management"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Assign students to cohorts manually"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Select a cohort group to manage"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "View Cohort"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid "Assign students to cohorts by uploading a CSV file"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid ""
-"To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on "
-"%(link_start)s the Data Download page. %(link_end)s"
-msgstr ""
-
-#: lms/templates/student_account/account.underscore
-msgid "New Address"
-msgstr ""
-
-#: lms/templates/student_account/account.underscore
-msgid "Password"
-msgstr ""
-
-#: lms/templates/student_account/account.underscore
-msgid "Change My Email Address"
-msgstr ""
-
-#: lms/templates/student_account/account.underscore
-msgid "Reset Password"
-msgstr ""
-
-#: lms/templates/student_account/form_field.underscore
-msgid "Forgot password?"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"You've successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account isn't linked with an %(platformName)s account. "
-"To link your accounts, go to your %(platformName)s dashboard."
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "We couldn't sign you in."
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/register.underscore
-msgid "Sign in"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "or sign in with"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "New to %(platformName)s?"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "Create an account"
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
-msgid "An error occurred."
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
-msgid "Password assistance"
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
-msgid ""
-"Please enter your email address below and we will send you instructions for "
-"setting a new password."
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
-msgid "Reset my password"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "We couldn't create your account."
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid ""
-"We just need a little more information before you start learning with "
-"%(platformName)s."
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Create an account using"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "or create a new one here"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Create your account"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Required field"
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-msgid "Already have an account?"
-msgstr ""
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Full Name"
-msgstr ""
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Preferred Language"
-msgstr ""
-
-#: lms/templates/student_profile/profile.underscore
-msgid "Update Profile"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Congratulations! You are now verified on %(platformName)s!"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "You are now enrolled as a verified student for:"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "A list of courses you have just enrolled in as a verified student"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Course"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Starts: %(start)s"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Explore your course!"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Go to your Dashboard"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid "Verified Status"
-msgstr ""
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-msgid ""
-"Thank you for submitting your photos. We will review them shortly. You can "
-"now sign up for any %(platformName)s course that offers verified "
-"certificates. Verification is good for one year. After one year, you must "
-"submit photos for verification again."
-msgstr ""
-
-#: lms/templates/verify_student/error.underscore
-msgid "Error:"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid "Take Your Photo"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your face. We will match this photo with "
-"the photo on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Tips on taking a successful photo"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid "Make sure your face is well-lit"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid "Be sure your entire face is inside the frame"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid "Once in position, use the camera button %(icon)s to capture your photo"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-msgid "Can we match the photo you took with the one on your ID?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Use the retake photo button if you are not pleased with your photo"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Frequently Asked Questions"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Why does %(platformName)s need my photo?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"As part of the verification process, you take a photo of both your face and "
-"a government-issued photo ID. Our authorization service confirms your "
-"identity by comparing the photo you take with the photo on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "What does %(platformName)s do with this photo?"
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"We use the highest levels of security available to encrypt your photo and "
-"send it to our authorization service for review. Your photo and information "
-"are not saved or visible anywhere on %(platformName)s after the verification"
-" process is complete."
-msgstr ""
-
-#: lms/templates/verify_student/face_photo_step.underscore
-#: lms/templates/verify_student/id_photo_step.underscore
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next: %(nextStepTitle)s"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Take a Photo of Your ID"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"Use your webcam to take a photo of your ID. We will match this photo with "
-"the photo of your face and the name on your account."
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"You need an ID with your name and photo. A driver's license, passport, or "
-"other government-issued IDs are all acceptable."
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Ensure that you can see your photo and read your name"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Make sure your ID is well-lit"
-msgstr ""
-
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid "Once in position, use the camera button %(icon)s to capture your ID"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Thanks for returning to verify your ID in: %(courseName)s"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email. After you complete activation you can "
-"return and refresh this page."
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Activate Your Account"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Check Your Email"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Photo ID"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-msgid ""
-"A driver's license, passport, or other government-issued ID with your name "
-"and photo"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-#: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Webcam"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "You are enrolling in: %(courseName)s"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "You are upgrading your enrollment for: %(courseName)s"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can now enter your payment information and complete your enrollment."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Choose your contribution for your Verified Track upgrade"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Enter Your Contribution Level"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"Please confirm your contribution for this course (min. %(minPrice)s "
-"%(currency)s)"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Your Total Contribution"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "To complete your enrollment, you will need to pay:"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
-"Certificate."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid ""
-"You can pay now even if you don't have the following items available, but "
-"you will need to have these to qualify to earn a Verified Certificate."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Government-Issued Photo ID"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Next: Make payment"
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Continue to payment"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for %(courseName)s."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"Please print this page for your records; it serves as your receipt. You will"
-" also receive an email with the same information."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Order No."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Date"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Amount"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Total"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Please Note"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Crossed out items have been refunded."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed to"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Next Step: Confirm your identity"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email"
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"photo."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"If you don't verify your identity now, you can still explore your course "
-"from your dashboard. You will receive periodic reminders from "
-"%(platformName)s to verify your identity."
-msgstr ""
-
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Want to confirm your identity later?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Review Your Photos"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid ""
-"Make sure we can verify your identity with the photos and information you "
-"have provided."
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Photo of %(fullName)s"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Photo of %(fullName)s's ID"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Photo requirements:"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you show your whole face?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the photo of you match your ID photo?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Is your name on your ID readable?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Does the name on your ID match your account name: %(fullName)s?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Edit Your Name"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid ""
-"Make sure that the full name on your account matches the name on your ID."
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Photos don't meet the requirements?"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Retake Your Photos"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Before proceeding, please confirm that your details match"
-msgstr ""
-
-#: lms/templates/verify_student/review_photos_step.underscore
-msgid "Confirm"
-msgstr ""
-
-#: lms/templates/verify_student/webcam_photo.underscore
-msgid ""
-"Don't see your picture? Make sure to allow your browser to use your camera "
-"when it asks for permission."
-msgstr ""
-
-#: lms/templates/verify_student/webcam_photo.underscore
-msgid "Live view of webcam"
-msgstr ""
-
-#: lms/templates/verify_student/webcam_photo.underscore
-msgid "Retake Photo"
-msgstr ""
-
-#: lms/templates/verify_student/webcam_photo.underscore
-msgid "Take Photo"
-msgstr ""
-
-#: cms/templates/js/active-video-upload-list.underscore
-msgid "Drag and drop or click here to upload video files."
-msgstr ""
-
-#: cms/templates/js/active-video-upload.underscore
-msgid "status"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -4883,12 +3625,11 @@ msgid "List of uploaded files and assets in this course"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
-#: cms/templates/js/asset-library.underscore
-msgid "- Sortable"
+msgid "Embed URL"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
-msgid "URL"
+msgid "External URL"
 msgstr ""
 
 #: cms/templates/js/asset-library.underscore
@@ -4909,24 +3650,12 @@ msgid "close"
 msgstr ""
 
 #: cms/templates/js/asset.underscore
-msgid "No description available"
-msgstr ""
-
-#: cms/templates/js/asset.underscore
 msgid "Open/download this file"
 msgstr ""
 
 #: cms/templates/js/asset.underscore
-msgid "Studio:"
-msgstr ""
-
-#: cms/templates/js/asset.underscore
-msgid "Web:"
-msgstr ""
-
-#: cms/templates/js/asset.underscore
 msgid "Delete this asset"
-msgstr "Pašalinti šį mokymosi komponentą"
+msgstr ""
 
 #: cms/templates/js/asset.underscore
 msgid "Lock this asset"
@@ -4949,27 +3678,6 @@ msgid ""
 "Caution: The last published version of this unit is live. By publishing "
 "changes you will change the student experience."
 msgstr ""
-"Įspėjimas: paskutinė paskelbta šio skyriaus versija yra tiesiogiai "
-"naudojama. Paskelbdami pakeitimus pakeisite kurso dalyvių atliktą darbą."
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
-msgstr ""
-
-#: cms/templates/js/content-group-editor.underscore
-msgid "Content Group Name"
-msgstr ""
-
-#: cms/templates/js/content-group-editor.underscore
-msgid "This is the name of the group"
-msgstr ""
-
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "Create"
-msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Contains staff only content"
@@ -4981,7 +3689,7 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished units will not be released"
-msgstr "Nepaskelbti skyriai nebus rodomi"
+msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 msgid "Unpublished changes to content that will release in the future"
@@ -4989,8 +3697,8 @@ msgstr ""
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore cms/templates/js/list.underscore
-#: cms/templates/js/list.underscore cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -5134,7 +3842,7 @@ msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
-msgstr "įkelti PDF failą arba pateikti Studio šaltinių medžiagos failo kelią"
+msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Upload PDF"
@@ -5142,19 +3850,24 @@ msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "delete chapter"
-msgstr "pašalinti skyrių"
+msgstr ""
+
+#: cms/templates/js/edit-textbook.underscore
+#: cms/templates/js/group-configuration-edit.underscore
+msgid "error.message"
+msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook information"
-msgstr "Vadovėlio informacija"
+msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Textbook Name"
-msgstr "Vadovėlio pavadinimas"
+msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid "Introduction to Cookie Baking"
-msgstr "Sausainių kepimo įvadas"
+msgstr ""
 
 #: cms/templates/js/edit-textbook.underscore
 msgid ""
@@ -5183,69 +3896,73 @@ msgid "ID"
 msgstr ""
 
 #: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Cannot delete when in use by an experiment"
-msgstr "Negalima pašalinti, kai naudojama bandyme"
+msgstr ""
 
 #: cms/templates/js/group-configuration-details.underscore
 msgid "This Group Configuration is used in:"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration information"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration Name"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration ID"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "This is the Name of the Group Configuration"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Name or short description of the configuration"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "This is the Description of the Group Configuration"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Optional long description"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Group information"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Groups"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid ""
 "Name of the groups that students will be assigned to, for example, Control, "
 "Video, Problems. You must have two or more groups."
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid "Add another group"
 msgstr ""
 
-#: cms/templates/js/group-configuration-editor.underscore
+#: cms/templates/js/group-configuration-edit.underscore
 msgid ""
 "This configuration is currently used in content experiments. If you make "
 "changes to the groups, you may need to edit those experiments."
 msgstr ""
 
+#: cms/templates/js/group-configuration-edit.underscore
+msgid "Create"
+msgstr ""
+
 #: cms/templates/js/group-edit.underscore
 msgid "delete group"
-msgstr "pašalinti grupę"
+msgstr ""
 
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-list-entry.underscore
@@ -5270,13 +3987,21 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
+#: cms/templates/js/no-group-configurations.underscore
+msgid "You haven't created any group configurations yet."
+msgstr ""
+
+#: cms/templates/js/no-group-configurations.underscore
+msgid "Add your first Group Configuration"
+msgstr ""
+
 #: cms/templates/js/no-textbooks.underscore
 msgid "You haven't added any textbooks to this course yet."
 msgstr ""
 
 #: cms/templates/js/no-textbooks.underscore
 msgid "Add your first textbook"
-msgstr "Pridėkite savo pirmą vadovėlį"
+msgstr ""
 
 #: cms/templates/js/paging-footer.underscore
 #: cms/templates/js/paging-header.underscore
@@ -5285,22 +4010,6 @@ msgstr ""
 
 #: cms/templates/js/paging-footer.underscore
 msgid "Page number"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
-msgid "Previous Uploads"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
-msgid "Download available encodings (.csv)"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
-msgid "Duration"
-msgstr ""
-
-#: cms/templates/js/previous-video-upload-list.underscore
-msgid "Video ID"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore
@@ -5373,10 +4082,6 @@ msgid "Staff and Students"
 msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
-msgid "Some content in this unit is visible only to particular content groups"
-msgstr ""
-
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from students"
 msgstr ""
@@ -5411,9 +4116,6 @@ msgid ""
 "If the unit was previously published and released to students, any changes "
 "you made to the unit when it was hidden will now be visible to students."
 msgstr ""
-"Jeigu skyrius buvo paskelbtas ir leistas rodyti kurso dalyviams, visi "
-"pakeitimai, kuriuos padarėte skyriuje, kai jis buvo paslėptas, dabar bus "
-"matomi kurso dalyviams."
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
@@ -5421,24 +4123,18 @@ msgid ""
 "to see its content after the release date has passed and you have published "
 "the unit(s)."
 msgstr ""
-"Jeigu šį %(xblockType)s padarysite matomą kurso dalyviams, kurso dalyviai "
-"matys jo turinį praėjus išleidimo datai ir jums paskelbus skyrių (-ius)."
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
 "Any subsections or units that are explicitly hidden from students will "
 "remain hidden after you clear this option for the section."
 msgstr ""
-"Potemės ir skyriai, kurie yra paslėpti nuo kurso dalyvių, liks paslėpti jums"
-" panaikinus šią temos parinktį."
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
 "Any units that are explicitly hidden from students will remain hidden after "
 "you clear this option for the subsection."
 msgstr ""
-"Skyriai, kurie yra paslėpti nuo kurso dalyvių, liks paslėpti jums panaikinus"
-" šią potemės parinktį."
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
@@ -5470,55 +4166,33 @@ msgid "formLabel"
 msgstr ""
 
 #: cms/templates/js/mock/mock-container-page.underscore
+msgid "View Live Version"
+msgstr ""
+
+#: cms/templates/js/mock/mock-container-page.underscore
+msgid "Preview Changes"
+msgstr ""
+
+#: cms/templates/js/mock/mock-container-page.underscore
 msgid "Unit Location"
-msgstr "Skyriaus vieta"
+msgstr ""
 
 #: cms/templates/js/mock/mock-container-page.underscore
 msgid ""
 "Use this ID when you create links to this unit from other course content. "
 "You enter the ID in the URL field."
 msgstr ""
-"Pasinaudokite šiuo identifikatoriumi kurdami nuorodas į šį skyrių iš kito "
-"kurso turinio. Identifikatorių įvedate į URL nuorodos lauką."
 
-#: cms/templates/js/mock/mock-index-page.underscore
-msgid "Courses"
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Group Configurations"
 msgstr ""
 
-#: cms/templates/js/mock/mock-index-page.underscore
-msgid "Libraries"
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "Page Actions"
 msgstr ""
 
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Entrance Exam"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Require students to pass an exam before beginning the course."
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "To create your course entrance exam, go to the"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid ". An Entrance Exam section will be created automatically."
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "Minimum Passing Score"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "%"
-msgstr ""
-
-#: cms/templates/js/mock/mock-settings-page.underscore
-msgid "The minimum score a student must receive to pass the entrance exam."
-msgstr ""
-
-#: cms/templates/js/video/metadata-translations-item.underscore
-msgid "Remove"
+#: cms/templates/js/mock/mock-group-configuration-page.underscore
+msgid "New Group Configuration"
 msgstr ""
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
@@ -5532,11 +4206,6 @@ msgid ""
 "another version. These URLs cannot be YouTube URLs. The first listed video "
 "that\\'s compatible with the student\\'s computer will play."
 msgstr ""
-"Kad tikrai visi kurso dalyviai galėtų pažiūrėti vaizdo įrašą, rekomenduojame"
-" pateikti ir .mp4, ir .webm vaizdo įrašo versijas. Norėdami pridėti kitos "
-"versijos URL nuorodą, paspauskite žemiau. Šios URL nuorodos negali būti "
-"YouTube nuorodos. Bus rodomas pirmas sąraše esantis vaizdo įrašas, derantis "
-"su kurso dalyvio kompiuteriu."
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Default Timed Transcript"
@@ -5612,7 +4281,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "No EdX Timed Transcript"
-msgstr "Nėra EdX nustatyto laiko kopijos"
+msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid ""
@@ -5620,14 +4289,11 @@ msgid ""
 " a transcript on YouTube. You can import the YouTube transcript or upload "
 "your own .srt transcript file."
 msgstr ""
-"EdX Studio nėra šio vaizdo įrašo nustatyto laiko kopijos, bet mes radome "
-"kopiją YouTube. Galite importuoti kopiją iš YouTube arba įkelti savo .srt "
-"kopijos failą."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "Import YouTube Transcript"
-msgstr "Importuoti kopiją iš YouTube "
+msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
 msgid "No Timed Transcript"
@@ -5638,26 +4304,22 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
-"EdX nėra šio vaizdo įrašo nustatyto laiko kopijos. Prašome įkelti .srt "
-"failą."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
 "The timed transcript for this video on edX is out of date, but YouTube has a"
 " current timed transcript for this video."
 msgstr ""
-"Šio vaizdo įrašo nustatyto laiko kopija edX yra pasenusi, bet YouTube yra "
-"dabartinė šio vaizdo įrašo nustatyto laiko kopija."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
-msgstr "Ar norite edX kopiją pakeisti kopija iš YouTube ?"
+msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Yes, replace the edX transcript with the YouTube transcript"
-msgstr "Taip, edX kopiją pakeisti kopija iš YouTube "
+msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 msgid "Timed Transcript Uploaded Successfully"
