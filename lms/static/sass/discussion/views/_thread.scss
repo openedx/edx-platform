@@ -32,6 +32,10 @@ body.discussion, .discussion-module {
       @extend %t-weight5;
     }
 
+    .posted-details .username {
+      font-size: inherit;
+    }
+
     .response-header-content {
       display: inline-block;
       vertical-align: top;
