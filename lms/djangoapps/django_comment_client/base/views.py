@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
 from django.core.files.storage import get_storage_class
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
@@ -18,7 +18,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
+from course_groups.models import CourseUserGroup
+from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -116,7 +117,11 @@ def create_thread(request, course_id, commentable_id):
         # that can do different things depending on the commentable_id
         if cached_has_permission(request.user, "see_all_cohorts", course_key):
             # admins can optionally choose what group to post as
-            group_id = post.get('group_id', user_group_id)
+            try:
+                group_id = int(post.get('group_id', user_group_id))
+                get_cohort_by_id(course_key, group_id)
+            except (ValueError, CourseUserGroup.DoesNotExist):
+                return HttpResponseBadRequest("Invalid cohort id")
         else:
             # regular users always post with their own id.
             group_id = user_group_id
