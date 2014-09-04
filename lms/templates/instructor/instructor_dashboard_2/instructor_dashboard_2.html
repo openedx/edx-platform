@@ -33,12 +33,12 @@
     }
   </script>
   <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
@@ -50,6 +50,21 @@
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <%static:js group='module-descriptor-js'/>
   <%static:js group='instructor_dash'/>
+
+  ## Backbone classes declared explicitly until RequireJS is supported
+  <script type="text/javascript" src="${static.url('js/models/cohort.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/collections/cohort.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/cohort_editor.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/cohorts.js')}"></script>
+</%block>
+
+## Include Underscore templates
+<%block name="header_extras">
+% for template_name in ["cohorts", "cohort-editor"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
+</script>
+% endfor
 </%block>
 
 ## NOTE that instructor is set as the active page so that the instructor button lights up, even though this is the instructor_2 page.
