@@ -1,0 +1,6 @@
+<header class="cohort-management-group-header">
+    <h3 class="group-header-title">
+        <span class="title-value"><%- cohort.get('name') %></span>
+        <span class="group-count"><%- cohort.get('user_count') %></span>
+    </h3>
+</header>
