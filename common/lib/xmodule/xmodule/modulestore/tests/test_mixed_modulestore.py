@@ -158,8 +158,14 @@ class TestMixedModuleStore(unittest.TestCase):
                                     BlockInfo('problem_x1a_3', 'problem', 'Problem_x1a_3', []),
                                     BlockInfo('html_x1a_1', 'html', 'HTML_x1a_1', []),
                                 ]
+                            ),
+                            BlockInfo(
+                                'vertical_x1b', 'vertical', 'Vertical_x1b', []
                             )
                         ]
+                    ),
+                    BlockInfo(
+                        'sequential_x2', 'sequential', 'Sequential_x2', []
                     )
                 ]
             ),
@@ -441,6 +447,184 @@ class TestMixedModuleStore(unittest.TestCase):
         component = self.store.publish(component.location, self.user_id)
         self.assertFalse(self.store.has_changes(component))
 
+    def _has_changes(self, location):
+        return self.store.has_changes(self.store.get_item(location))
+
+    def setup_has_changes(self, default_ms):
+        """
+        Common set up for has_changes tests below.
+        Returns a dictionary of useful location maps for testing.
+        """
+        self.initdb(default_ms)
+        self._create_block_hierarchy()
+
+        locations = {
+            'grandparent': self.chapter_x,
+            'parent_sibling': self.sequential_x2,
+            'parent': self.sequential_x1,
+            'child_sibling': self.vertical_x1b,
+            'child': self.vertical_x1a,
+        }
+
+        # Publish the vertical units
+        self.store.publish(locations['parent_sibling'], self.user_id)
+        self.store.publish(locations['parent'], self.user_id)
+
+        return locations
+
+    @ddt.data('draft', 'split')
+    def test_has_changes_ancestors(self, default_ms):
+        """
+        Tests that has_changes() returns true on ancestors when a child is changed
+        """
+        locations = self.setup_has_changes(default_ms)
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self._has_changes(locations[key]))
+
+        # Change the child
+        child = self.store.get_item(locations['child'])
+        child.display_name = 'Changed Display Name'
+        self.store.update_item(child, self.user_id)
+
+        # All ancestors should have changes, but not siblings
+        self.assertTrue(self._has_changes(locations['grandparent']))
+        self.assertTrue(self._has_changes(locations['parent']))
+        self.assertTrue(self._has_changes(locations['child']))
+        self.assertFalse(self._has_changes(locations['parent_sibling']))
+        self.assertFalse(self._has_changes(locations['child_sibling']))
+
+        # Publish the unit with changes
+        self.store.publish(locations['parent'], self.user_id)
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self._has_changes(locations[key]))
+
+    @ddt.data('draft', 'split')
+    def test_has_changes_publish_ancestors(self, default_ms):
+        """
+        Tests that has_changes() returns false after a child is published only if all children are unchanged
+        """
+        locations = self.setup_has_changes(default_ms)
+
+        # Verify that there are no unpublished changes
+        for key in locations:
+            self.assertFalse(self._has_changes(locations[key]))
+
+        # Change both children
+        child = self.store.get_item(locations['child'])
+        child_sibling = self.store.get_item(locations['child_sibling'])
+        child.display_name = 'Changed Display Name'
+        child_sibling.display_name = 'Changed Display Name'
+        self.store.update_item(child, user_id=self.user_id)
+        self.store.update_item(child_sibling, user_id=self.user_id)
+
+        # Verify that ancestors have changes
+        self.assertTrue(self._has_changes(locations['grandparent']))
+        self.assertTrue(self._has_changes(locations['parent']))
+
+        # Publish one child
+        self.store.publish(locations['child_sibling'], self.user_id)
+
+        # Verify that ancestors still have changes
+        self.assertTrue(self._has_changes(locations['grandparent']))
+        self.assertTrue(self._has_changes(locations['parent']))
+
+        # Publish the other child
+        self.store.publish(locations['child'], self.user_id)
+
+        # Verify that ancestors now have no changes
+        self.assertFalse(self._has_changes(locations['grandparent']))
+        self.assertFalse(self._has_changes(locations['parent']))
+
+    @ddt.data('draft', 'split')
+    def test_has_changes_add_remove_child(self, default_ms):
+        """
+        Tests that has_changes() returns true for the parent when a child with changes is added
+        and false when that child is removed.
+        """
+        locations = self.setup_has_changes(default_ms)
+
+        # Test that the ancestors don't have changes
+        self.assertFalse(self._has_changes(locations['grandparent']))
+        self.assertFalse(self._has_changes(locations['parent']))
+
+        # Create a new child and attach it to parent
+        self.store.create_child(
+            self.user_id,
+            locations['parent'],
+            'vertical',
+            block_id='new_child',
+        )
+
+        # Verify that the ancestors now have changes
+        self.assertTrue(self._has_changes(locations['grandparent']))
+        self.assertTrue(self._has_changes(locations['parent']))
+
+        # Remove the child from the parent
+        parent = self.store.get_item(locations['parent'])
+        parent.children = [locations['child'], locations['child_sibling']]
+        self.store.update_item(parent, user_id=self.user_id)
+
+        # Verify that ancestors now have no changes
+        self.assertFalse(self._has_changes(locations['grandparent']))
+        self.assertFalse(self._has_changes(locations['parent']))
+
+    @ddt.data('draft', 'split')
+    def test_has_changes_non_direct_only_children(self, default_ms):
+        """
+        Tests that has_changes() returns true after editing the child of a vertical (both not direct only categories).
+        """
+        self.initdb(default_ms)
+
+        parent = self.store.create_item(
+            self.user_id,
+            self.course.id,
+            'vertical',
+            block_id='parent',
+        )
+        child = self.store.create_child(
+            self.user_id,
+            parent.location,
+            'html',
+            block_id='child',
+        )
+        self.store.publish(parent.location, self.user_id)
+
+        # Verify that there are no changes
+        self.assertFalse(self._has_changes(parent.location))
+        self.assertFalse(self._has_changes(child.location))
+
+        # Change the child
+        child.display_name = 'Changed Display Name'
+        self.store.update_item(child, user_id=self.user_id)
+
+        # Verify that both parent and child have changes
+        self.assertTrue(self._has_changes(parent.location))
+        self.assertTrue(self._has_changes(child.location))
+
+    @ddt.data('draft', 'split')
+    def test_has_changes_missing_child(self, default_ms):
+        """
+        Tests that has_changes() does not throw an exception when a child doesn't exist.
+        """
+        self.initdb(default_ms)
+
+        # Create the parent and point it to a fake child
+        parent = self.store.create_item(
+            self.user_id,
+            self.course.id,
+            'vertical',
+            block_id='parent',
+        )
+        parent.children += [self.course.id.make_usage_key('vertical', 'does_not_exist')]
+        parent = self.store.update_item(parent, self.user_id)
+
+        # Check the parent for changes should return True and not throw an exception
+        self.assertTrue(self.store.has_changes(parent))
+
     # TODO: LMS-11220: Document why split find count is 4
     # TODO: LMS-11220: Document why split send count is 3
     @ddt.data(('draft', 8, 2), ('split', 4, 3))
@@ -717,7 +901,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # TODO: LMS-11220: Document why draft send count is 5
     # TODO: LMS-11220: Document why draft find count is [19, 6]
     # TODO: LMS-11220: Document why split find count is [2, 2]
-    @ddt.data(('draft', [19, 6], 0), ('split', [2, 2], 0))
+    @ddt.data(('draft', [21, 6], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
@@ -866,10 +1050,11 @@ class TestMixedModuleStore(unittest.TestCase):
         """
         self.initdb(default_ms)
         self._create_block_hierarchy()
+        num_children = len(self.store.get_item(self.sequential_x1).children)
         self.store.revert_to_published(self.sequential_x1, self.user_id)
         reverted_parent = self.store.get_item(self.sequential_x1)
         # It does not discard the child vertical, even though that child is a draft (with no published version)
-        self.assertEqual(1, len(reverted_parent.children))
+        self.assertEqual(num_children, len(reverted_parent.children))
 
     @ddt.data(('draft', 1, 0), ('split', 2, 0))
     @ddt.unpack

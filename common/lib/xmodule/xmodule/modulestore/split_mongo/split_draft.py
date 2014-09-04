@@ -236,18 +236,34 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         :param xblock: the block to check
         :return: True if the draft and published versions differ
         """
-        def get_block(branch_name):
-            course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch_name))['structure']
-            return self._get_block_from_structure(course_structure, xblock.location.block_id)
+        def get_course(branch_name):
+            return self._lookup_course(xblock.location.course_key.for_branch(branch_name))['structure']
 
-        draft_block = get_block(ModuleStoreEnum.BranchName.draft)
-        published_block = get_block(ModuleStoreEnum.BranchName.published)
-        if not published_block:
-            return True
+        def get_block(course_structure, block_id):
+            return self._get_block_from_structure(course_structure, block_id)
 
-        # check if the draft has changed since the published was created
-        return self._get_version(draft_block) != self._get_version(published_block)
+        draft_course = get_course(ModuleStoreEnum.BranchName.draft)
+        published_course = get_course(ModuleStoreEnum.BranchName.published)
 
+        def has_changes_subtree(block_id):
+            draft_block = get_block(draft_course, block_id)
+            published_block = get_block(published_course, block_id)
+            if not published_block:
+                return True
+
+            # check if the draft has changed since the published was created
+            if self._get_version(draft_block) != self._get_version(published_block):
+                return True
+
+            # check the children in the draft
+            if 'children' in draft_block.setdefault('fields', {}):
+                return any(
+                    [has_changes_subtree(child_block_id) for child_block_id in draft_block['fields']['children']]
+                )
+
+            return False
+
+        return has_changes_subtree(xblock.location.block_id)
 
     def publish(self, location, user_id, blacklist=None, **kwargs):
         """
