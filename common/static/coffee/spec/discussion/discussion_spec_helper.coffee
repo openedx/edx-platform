@@ -38,6 +38,13 @@ class @DiscussionSpecHelper
             is_cohorted: is_cohorted
         )
 
+    @makeAjaxSpy = (fakeAjax) ->
+        spyOn($, "ajax").andCallFake(
+            (params) ->
+                fakeAjax(params)
+                {always: ->}
+        )
+
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
             templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')
