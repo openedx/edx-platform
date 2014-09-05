@@ -57,7 +57,6 @@ from path import path
 import copy
 from pytz import UTC
 from bson.objectid import ObjectId
-from pymongo.errors import DuplicateKeyError
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
@@ -1628,14 +1627,19 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         }
         if definition_id is not None:
             json_data['definition'] = definition_id
-        if parent_xblock is not None:
-            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.inherited_settings.copy()
+        if parent_xblock is None:
+            # If no parent, then nothing to inherit.
+            inherited_settings = {}
+        else:
+            inherited_settings = parent_xblock.xblock_kvs.inherited_settings.copy()
             if fields is not None:
                 for field_name in inheritance.InheritanceMixin.fields:
                     if field_name in fields:
-                        json_data['_inherited_settings'][field_name] = fields[field_name]
+                        inherited_settings[field_name] = fields[field_name]
 
-        new_block = runtime.xblock_from_json(xblock_class, course_key, block_id, json_data, **kwargs)
+        new_block = runtime.xblock_from_json(
+            xblock_class, course_key, block_id, json_data, inherited_settings, **kwargs
+        )
         for field_name, value in fields.iteritems():
             setattr(new_block, field_name, value)
 
@@ -1936,12 +1940,14 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         # in case the course is later restored.
         # super(SplitMongoModuleStore, self).delete_course(course_key, user_id)
 
-    def inherit_settings(self, block_map, block_json, inheriting_settings=None):
+    def inherit_settings(self, block_map, block_id, inherited_settings_map, inheriting_settings=None):
         """
         Updates block_json with any inheritable setting set by an ancestor and recurses to children.
         """
-        if block_json is None:
+        encoded_key = encode_key_for_mongo(block_id)
+        if encoded_key not in block_map:
             return
+        block_json = block_map[encoded_key]
 
         if inheriting_settings is None:
             inheriting_settings = {}
@@ -1949,11 +1955,10 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         # the currently passed down values take precedence over any previously cached ones
         # NOTE: this should show the values which all fields would have if inherited: i.e.,
         # not set to the locally defined value but to value set by nearest ancestor who sets it
-        # ALSO NOTE: no xblock should ever define a _inherited_settings field as it will collide w/ this logic.
-        block_json.setdefault('_inherited_settings', {}).update(inheriting_settings)
+        inherited_settings_map.setdefault((block_json['category'], block_id), {}).update(inheriting_settings)
 
         # update the inheriting w/ what should pass to children
-        inheriting_settings = block_json['_inherited_settings'].copy()
+        inheriting_settings = inherited_settings_map[(block_json['category'], block_id)].copy()
         block_fields = block_json['fields']
         for field_name in inheritance.InheritanceMixin.fields:
             if field_name in block_fields:
@@ -1962,7 +1967,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         for child in block_fields.get('children', []):
             try:
                 child = encode_key_for_mongo(child)
-                self.inherit_settings(block_map, block_map[child], inheriting_settings)
+                self.inherit_settings(block_map, child, inherited_settings_map, inheriting_settings)
             except KeyError:
                 # here's where we need logic for looking up in other structures when we allow cross pointers
                 # but it's also getting this during course creation if creating top down w/ children set or
