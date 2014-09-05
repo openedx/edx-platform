@@ -331,6 +331,49 @@ class LTIModuleTest(LogicTest):
         except LTIError as err:
             self.fail("verify_oauth_body_sign() raised LTIError: " + err.message)
 
+    @patch('xmodule.lti_module.LTIModule.get_outcome_service_url', Mock(return_value=u'https://testurl/'))
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret',
+           Mock(return_value=(u'__consumer_key__', u'__lti_secret__')))
+    def test_failed_verify_oauth_body_sign_proxy_mangle_url(self):
+        """
+        Oauth signing verify fail.
+        """
+        try:
+            request = self.get_signed_grade_mock_request_with_correct_signature()
+            self.xmodule.verify_oauth_body_sign(request)
+            # we should verify against get_outcome_service_url not request url
+            # proxy and load balancer along the way may change url presented to the method
+            request.uri = 'http://testurl/'
+            self.xmodule.verify_oauth_body_sign(request)
+        except LTIError as err:
+            self.fail("verify_oauth_body_sign() raised LTIError: " + err.message)
+            pass
+
+    def get_signed_grade_mock_request_with_correct_signature(self):
+        mock_request = Mock()
+        mock_request.headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': u'OAuth realm="https://testurl/", oauth_body_hash="wwzA3s8gScKD1VpJ7jMt9b%2BMj9Q%3D", \
+            oauth_nonce="18821463", oauth_timestamp="1409321145", \
+            oauth_consumer_key="__consumer_key__", oauth_signature_method="HMAC-SHA1", \
+            oauth_version="1.0", oauth_signature="fHsE1hhIz76/msUoMR3Lyb7Aou4%3D"'
+        }
+        mock_request.url = u'https://testurl'
+        mock_request.http_method = u'POST'
+        mock_request.method = mock_request.http_method
+
+        mock_request.body = '<?xml version=\'1.0\' encoding=\'utf-8\'?>\n\
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">\
+<imsx_POXHeader><imsx_POXRequestHeaderInfo><imsx_version>V1.0</imsx_version>\
+<imsx_messageIdentifier>edX_fix</imsx_messageIdentifier></imsx_POXRequestHeaderInfo>\
+</imsx_POXHeader><imsx_POXBody><replaceResultRequest><resultRecord><sourcedGUID>\
+<sourcedId>MITxLTI/MITxLTI/201x:localhost%3A8000-i4x-MITxLTI-MITxLTI-lti-3751833a214a4f66a0d18f63234207f2:363979ef768ca171b50f9d1bfb322131</sourcedId>\
+</sourcedGUID><result><resultScore><language>en</language><textString>0.32</textString></resultScore>\
+</result></resultRecord></replaceResultRequest></imsx_POXBody></imsx_POXEnvelopeRequest>'
+
+        return mock_request
+
     def test_wrong_xml_namespace(self):
         """
         Test wrong XML Namespace.
