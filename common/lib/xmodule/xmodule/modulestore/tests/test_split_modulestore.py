@@ -72,54 +72,54 @@ class SplitModuleTest(unittest.TestCase):
             "user_id": "test@edx.org",
             "fields": {
                 "tabs": [
-                        {
-                            "type": "courseware"
-                        },
-                        {
-                            "type": "course_info",
-                            "name": "Course Info"
-                        },
-                        {
-                            "type": "discussion",
-                            "name": "Discussion"
-                        },
-                        {
-                            "type": "wiki",
-                            "name": "Wiki"
-                        }
-                    ],
+                    {
+                        "type": "courseware"
+                    },
+                    {
+                        "type": "course_info",
+                        "name": "Course Info"
+                    },
+                    {
+                        "type": "discussion",
+                        "name": "Discussion"
+                    },
+                    {
+                        "type": "wiki",
+                        "name": "Wiki"
+                    }
+                ],
                 "start": _date_field.from_json("2013-02-14T05:00"),
                 "display_name": "The Ancient Greek Hero",
                 "grading_policy": {
                     "GRADER": [
-                    {
-                        "min_count": 5,
-                        "weight": 0.15,
-                        "type": "Homework",
-                        "drop_count": 1,
-                        "short_label": "HWa"
-                    },
-                    {
-                        "short_label": "",
-                        "min_count": 2,
-                        "type": "Lab",
-                        "drop_count": 0,
-                        "weight": 0.15
-                    },
-                    {
-                        "short_label": "Midterm",
-                        "min_count": 1,
-                        "type": "Midterm Exam",
-                        "drop_count": 0,
-                        "weight": 0.3
-                    },
-                    {
-                        "short_label": "Final",
-                        "min_count": 1,
-                        "type": "Final Exam",
-                        "drop_count": 0,
-                        "weight": 0.4
-                    }
+                        {
+                            "min_count": 5,
+                            "weight": 0.15,
+                            "type": "Homework",
+                            "drop_count": 1,
+                            "short_label": "HWa"
+                        },
+                        {
+                            "short_label": "",
+                            "min_count": 2,
+                            "type": "Lab",
+                            "drop_count": 0,
+                            "weight": 0.15
+                        },
+                        {
+                            "short_label": "Midterm",
+                            "min_count": 1,
+                            "type": "Midterm Exam",
+                            "drop_count": 0,
+                            "weight": 0.3
+                        },
+                        {
+                            "short_label": "Final",
+                            "min_count": 1,
+                            "type": "Final Exam",
+                            "drop_count": 0,
+                            "weight": 0.4
+                        }
                     ],
                     "GRADE_CUTOFFS": {
                         "Pass": 0.75
@@ -132,31 +132,31 @@ class SplitModuleTest(unittest.TestCase):
                     "head12345": {
                         "end": _date_field.from_json("2013-04-13T04:30"),
                         "tabs": [
-                        {
-                            "type": "courseware"
-                        },
-                        {
-                            "type": "course_info",
-                            "name": "Course Info"
-                        },
-                        {
-                            "type": "discussion",
-                            "name": "Discussion"
-                        },
-                        {
-                            "type": "wiki",
-                            "name": "Wiki"
-                        },
-                        {
-                            "type": "static_tab",
-                            "name": "Syllabus",
-                            "url_slug": "01356a17b5924b17a04b7fc2426a3798"
-                        },
-                        {
-                            "type": "static_tab",
-                            "name": "Advice for Students",
-                            "url_slug": "57e9991c0d794ff58f7defae3e042e39"
-                        }
+                            {
+                                "type": "courseware"
+                            },
+                            {
+                                "type": "course_info",
+                                "name": "Course Info"
+                            },
+                            {
+                                "type": "discussion",
+                                "name": "Discussion"
+                            },
+                            {
+                                "type": "wiki",
+                                "name": "Wiki"
+                            },
+                            {
+                                "type": "static_tab",
+                                "name": "Syllabus",
+                                "url_slug": "01356a17b5924b17a04b7fc2426a3798"
+                            },
+                            {
+                                "type": "static_tab",
+                                "name": "Advice for Students",
+                                "url_slug": "57e9991c0d794ff58f7defae3e042e39"
+                            }
                         ],
                         "graceperiod": _time_delta_field.from_json("2 hours 0 minutes 0 seconds"),
                         "grading_policy": {
@@ -195,7 +195,7 @@ class SplitModuleTest(unittest.TestCase):
                             }
                         },
                     }}
-                },
+            },
                 {"user_id": "testassist@edx.org",
                  "update":
                     {"head12345": {
@@ -239,50 +239,50 @@ class SplitModuleTest(unittest.TestCase):
                         "enrollment_end": _date_field.from_json("2013-03-02T05:00"),
                         "advertised_start": "Fall 2013",
                     }},
-                "create": [
-                    {
-                        "id": "chapter1",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hercules"
-                        },
-                    },
-                    {
-                        "id": "chapter2",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hera heckles Hercules"
-                        },
-                    },
-                    {
-                        "id": "chapter3",
-                        "parent": "head12345",
-                        "category": "chapter",
-                        "fields": {
-                            "display_name": "Hera cuckolds Zeus"
-                        },
-                    },
-                    {
-                        "id": "problem1",
-                        "parent": "chapter3",
-                        "category": "problem",
-                        "fields": {
-                            "display_name": "Problem 3.1",
-                            "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
-                        },
-                    },
-                    {
-                        "id": "problem3_2",
-                        "parent": "chapter3",
-                        "category": "problem",
-                        "fields": {
-                            "display_name": "Problem 3.2"
-                        },
-                    }
-                ]
-                },
+                 "create": [
+                     {
+                         "id": "chapter1",
+                         "parent": "head12345",
+                         "category": "chapter",
+                         "fields": {
+                             "display_name": "Hercules"
+                         },
+                     },
+                     {
+                         "id": "chapter2",
+                         "parent": "head12345",
+                         "category": "chapter",
+                         "fields": {
+                             "display_name": "Hera heckles Hercules"
+                         },
+                     },
+                     {
+                         "id": "chapter3",
+                         "parent": "head12345",
+                         "category": "chapter",
+                         "fields": {
+                             "display_name": "Hera cuckolds Zeus"
+                         },
+                     },
+                     {
+                         "id": "problem1",
+                         "parent": "chapter3",
+                         "category": "problem",
+                         "fields": {
+                             "display_name": "Problem 3.1",
+                             "graceperiod": _time_delta_field.from_json("4 hours 0 minutes 0 seconds"),
+                         },
+                     },
+                     {
+                         "id": "problem3_2",
+                         "parent": "chapter3",
+                         "category": "problem",
+                         "fields": {
+                             "display_name": "Problem 3.2"
+                         },
+                     }
+                 ]
+                 },
             ]
         },
         "testx.wonderful": {
@@ -451,7 +451,7 @@ class SplitModuleTest(unittest.TestCase):
     }
 
     @staticmethod
-    def bootstrapDB(split_store):
+    def bootstrapDB(split_store):  # pylint: disable=invalid-name
         '''
         Sets up the initial data into the db
         '''
@@ -517,7 +517,7 @@ class SplitModuleTest(unittest.TestCase):
             SplitModuleTest.modulestore = None
         super(SplitModuleTest, self).tearDown()
 
-    def findByIdInResult(self, collection, _id):
+    def findByIdInResult(self, collection, _id):  # pylint: disable=invalid-name
         """
         Result is a collection of descriptors. Find the one whose block id
         matches the _id.
@@ -715,6 +715,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(result.children[0].locator.version_guid, versions[-2])
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
+
 
 class SplitModuleItemTests(SplitModuleTest):
     '''
@@ -946,6 +947,10 @@ class SplitModuleItemTests(SplitModuleTest):
 
 
 def version_agnostic(children):
+    """
+    children: list of descriptors
+    Returns the `children` list with each member version-agnostic
+    """
     return [child.version_agnostic() for child in children]
 
 
@@ -1034,7 +1039,6 @@ class TestItemCrud(SplitModuleTest):
         parent = modulestore().get_item(locator)
         self.assertIn(new_module.location.version_agnostic(), version_agnostic(parent.children))
         self.assertEqual(new_module.definition_locator.definition_id, original.definition_locator.definition_id)
-
 
     def test_unique_naming(self):
         """
@@ -1760,6 +1764,6 @@ def modulestore():
     return SplitModuleTest.modulestore
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument, missing-docstring
 def render_to_template_mock(*args):
     pass

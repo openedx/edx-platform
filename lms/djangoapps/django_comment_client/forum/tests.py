@@ -193,7 +193,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         )
         mock_request.assert_called_with(
             "get",
-            StringEndsWithMatcher(thread_id), # url
+            StringEndsWithMatcher(thread_id),  # url
             data=None,
             params=PartialDictMatcher({"mark_as_read": True, "user_id": 1, "recursive": True}),
             headers=ANY,
@@ -227,7 +227,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         )
         mock_request.assert_called_with(
             "get",
-            StringEndsWithMatcher(thread_id), # url
+            StringEndsWithMatcher(thread_id),  # url
             data=None,
             params=PartialDictMatcher({
                 "mark_as_read": True,
@@ -365,7 +365,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
                 "course_id": self.course.id.to_deprecated_string(),
                 "page": params.get("page", 1),
                 "per_page": views.THREADS_PER_PAGE
-                }),
+            }),
             headers=ANY,
             timeout=ANY
         )
@@ -393,7 +393,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertEqual(
             sorted(response_data.keys()),
             ["annotated_content_info", "discussion_data", "num_pages", "page"]
-            )
+        )
         self.assertEqual(len(response_data['discussion_data']), 1)
         self.assertEqual(response_data["page"], 1)
         self.assertEqual(response_data["num_pages"], 1)
@@ -444,6 +444,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         )
         self.assertEqual(response.status_code, 405)
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('requests.request')
 class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
@@ -463,8 +464,8 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     def assert_all_calls_have_header(self, mock_request, key, value):
         expected = call(
-            ANY, # method
-            ANY, # url
+            ANY,  # method
+            ANY,  # url
             data=ANY,
             params=ANY,
             headers=PartialDictMatcher({key: value}),
@@ -537,7 +538,7 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         mock_request.side_effect = make_mock_request_impl(text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest" # so request.is_ajax() == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.forum_form_discussion(request, self.course.id.to_deprecated_string())
         self.assertEqual(response.status_code, 200)
@@ -559,7 +560,7 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         mock_request.side_effect = make_mock_request_impl(text, thread_id)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest" # so request.is_ajax() == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.single_thread(request, self.course.id.to_deprecated_string(), "dummy_discussion_id", thread_id)
         self.assertEqual(response.status_code, 200)
@@ -580,7 +581,7 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         mock_request.side_effect = make_mock_request_impl(text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest" # so request.is_ajax() == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.user_profile(request, self.course.id.to_deprecated_string(), str(self.student.id))
         self.assertEqual(response.status_code, 200)
@@ -601,7 +602,7 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         mock_request.side_effect = make_mock_request_impl(text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest" # so request.is_ajax() == True
+        request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
 
         response = views.followed_threads(request, self.course.id.to_deprecated_string(), str(self.student.id))
         self.assertEqual(response.status_code, 200)
