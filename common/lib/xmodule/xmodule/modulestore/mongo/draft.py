@@ -147,6 +147,8 @@ class DraftModuleStore(MongoModuleStore):
         :param course_key: which course to delete
         :param user_id: id of the user deleting the course
         """
+        # Note: does not need to inform the bulk mechanism since after the course is deleted,
+        # it can't calculate inheritance anyway. Nothing is there to be dirty.
         # delete the assets
         super(DraftModuleStore, self).delete_course(course_key, user_id)
 
@@ -414,6 +416,8 @@ class DraftModuleStore(MongoModuleStore):
             item['_id']['revision'] = MongoRevisionKey.draft
             # ensure keys are in fixed and right order before inserting
             item['_id'] = self._id_dict_to_son(item['_id'])
+            bulk_record = self._get_bulk_ops_record(location.course_key)
+            bulk_record.dirty = True
             try:
                 self.collection.insert(item)
             except pymongo.errors.DuplicateKeyError:
@@ -588,7 +592,10 @@ class DraftModuleStore(MongoModuleStore):
                 _internal(next_tier)
 
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
-        self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+        if len(to_be_deleted) > 0:
+            bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
+            bulk_record.dirty = True
+            self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
     @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
@@ -679,6 +686,8 @@ class DraftModuleStore(MongoModuleStore):
 
         _internal_depth_first(location, True)
         if len(to_be_deleted) > 0:
+            bulk_record = self._get_bulk_ops_record(location.course_key)
+            bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
         return self.get_item(as_published(location))
 
