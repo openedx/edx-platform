@@ -685,6 +685,7 @@ ADVANCED_COMPONENT_TYPES = [
     'done',  # Lets students mark things as done. See https://github.com/pmitros/DoneXBlock
     'audio',  # Embed an audio file. See https://github.com/pmitros/AudioXBlock
     'recommender',  # Crowdsourced recommender. Prototype by dli&pmitros. Intended for roll-out in one place in one course.
+    'profile', # Prototype user profile XBlock. Used to test XBlock parameter passing. See https://github.com/pmitros/ProfileXBlock
     'split_test',
     'combinedopenended',
     'peergrading',

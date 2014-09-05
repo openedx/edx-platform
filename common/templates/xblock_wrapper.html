@@ -1,3 +1,8 @@
 <div class="${' '.join(classes)}" ${data_attributes}>
+% if js_pass_parameters:
+  <script type="json/xblock-args" class="xblock_json_init_args">
+    ${js_init_parameters}
+  </script>
+% endif
     ${content}
 </div>
