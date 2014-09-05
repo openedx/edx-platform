@@ -1,5 +1,5 @@
 tddium:
-  :firefox: 25.0.1
+  :firefox: '28.0'
   :timeout: 3600
   :timeout_hook: 900
   :tool_config:
@@ -52,14 +52,7 @@ tddium:
       - "reports/javascript/javascript_xunit.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_1"
-      :invocation: single
-      :output: exit-status
-      :report_files:
-      - "reports/acceptance/lms.xml"
-    - :type: junit
-      :mode: basic
-      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_2"
+      :command: paver test_acceptance -s lms
       :invocation: single
       :output: exit-status
       :report_files:
@@ -94,7 +87,14 @@ tddium:
       - "reports/bok_choy/xunit.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_bokchoy --extra_args="-a '!shard_1'"
+      :command: paver test_bokchoy --extra_args="-a shard_2"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/bok_choy/xunit.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False"
       :invocation: single
       :output: exit-status
       :report_files:
