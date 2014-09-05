@@ -25,6 +25,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 
 from student.models import CourseEnrollment, User
 from courseware.model_data import FieldDataCache
+from courseware.access import has_access
 
 
 class BlockOutline(object):
@@ -67,10 +68,15 @@ class BlockOutline(object):
                 request=self.request,
             )
 
+        user = self.request.user
+        course_id = self.start_block.id
         while stack:
             curr_block = stack.pop()
 
             if curr_block.category in self.categories_to_outliner:
+                if not has_access(user, 'load', curr_block, course_key=course_id):
+                    continue
+
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(block))
                 yield {
