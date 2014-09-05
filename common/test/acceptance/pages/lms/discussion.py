@@ -60,6 +60,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
                 "Secondary action menu closed"
             ).fulfill()
 
+    def get_group_visibility_label(self):
+        """
+        Returns the group visibility label shown for the thread.
+        """
+        return self._get_element_text(".group-visibility-label")
+
     def get_response_total_text(self):
         """Returns the response count text, or None if not present"""
         return self._get_element_text(".response-count")
