@@ -51,21 +51,37 @@ class BlockOutline(object):
                     })
             return reversed(block_path)
 
-        def section_url(block):
+        def find_urls(block):
             block_path = []
             while block in child_to_parent:
                 block = child_to_parent[block]
                 block_path.append(block)
-            course, chapter, section = list(reversed(block_path))[:3]
-            return reverse(
+
+            course, chapter, section, unit = list(reversed(block_path))[:4]
+            position = 1
+            unit_name = unit.url_name
+            for block in section.children:
+                if block.name == unit_name:
+                    break
+                position += 1
+
+            kwargs = dict(
+                course_id=course.id.to_deprecated_string(),
+                chapter=chapter.url_name,
+                section=section.url_name
+            )
+            section_url = reverse(
                 "courseware_section",
-                kwargs=dict(
-                    course_id=course.id.to_deprecated_string(),
-                    chapter=chapter.url_name,
-                    section=section.url_name,
-                ),
+                kwargs=kwargs,
                 request=self.request,
             )
+            kwargs['position'] = position
+            unit_url = reverse(
+                "courseware_position",
+                kwargs=kwargs,
+                request=self.request,
+            )
+            return unit_url, section_url
 
         while stack:
             curr_block = stack.pop()
@@ -73,10 +89,12 @@ class BlockOutline(object):
             if curr_block.category in self.categories_to_outliner:
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(block))
+                unit_url, section_url = find_urls(block)
                 yield {
                     "path": block_path,
                     "named_path": [b["name"] for b in block_path[:-1]],
-                    "section_url": section_url(block),
+                    "unit_url": unit_url,
+                    "section_url": section_url,
                     "summary": summary_fn(curr_block, self.request)
                 }
 
