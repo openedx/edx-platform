@@ -68,7 +68,8 @@ def path_to_location(modulestore, usage_key):
             newpath = (next_usage, path)
             queue.append((parent, newpath))
 
-    with modulestore.bulk_operations(usage_key.course_key):
+    # FIXME replace with bulk_operations once it's fixed for old mongo
+    with modulestore.bulk_temp_noop_operations(usage_key.course_key):
         if not modulestore.has_item(usage_key):
             raise ItemNotFoundError(usage_key)
 
