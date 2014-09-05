@@ -62,7 +62,7 @@ if Backbone?
       if event
         event.preventDefault()
       @$el.addClass("expanded")
-      @$el.find(".post-body").html(@model.get("body"))
+      @$el.find(".post-body").text(@model.get("body"))
       @showView.convertMath()
       @$el.find(".forum-thread-expand").hide()
       @$el.find(".forum-thread-collapse").show()
@@ -74,7 +74,7 @@ if Backbone?
       if event
         event.preventDefault()
       @$el.removeClass("expanded")
-      @$el.find(".post-body").html(@getAbbreviatedBody())
+      @$el.find(".post-body").text(@getAbbreviatedBody())
       @showView.convertMath()
       @$el.find(".forum-thread-expand").show()
       @$el.find(".forum-thread-collapse").hide()
