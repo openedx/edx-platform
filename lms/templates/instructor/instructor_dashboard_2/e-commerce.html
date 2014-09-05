@@ -99,7 +99,6 @@
                         <tr class="coupons-headings">
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
-                           <th class="c_course_id">${_("Course_id")}</th>
                            <th class="c_discount">${_("Discount (%)")}</th>
                            <th class="c_count">${_("Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
@@ -114,7 +113,6 @@
                            %endif
                            <td>${coupon.code}</td>
                            <td>${coupon.description}</td>
-                           <td>${coupon.course_id.to_deprecated_string()}</td>
                            <td>${coupon.percentage_discount}</td>
                            <td>
                               ${ coupon.couponredemption_set.all().count() }
