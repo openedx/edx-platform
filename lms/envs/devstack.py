@@ -133,3 +133,13 @@ FEATURES['ADVANCED_SECURITY'] = False
 
 PASSWORD_MIN_LENGTH = None
 PASSWORD_COMPLEXITY = {}
+
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+
+############# Student Gradebook #################
+FEATURES['STUDENT_GRADEBOOK'] = True
+if FEATURES.get('STUDENT_GRADEBOOK', False):
+    INSTALLED_APPS += ('gradebook',)

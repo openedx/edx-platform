@@ -10,7 +10,7 @@ log = logging.getLogger("edx.courseware")
 
 # This is a tuple for holding scores, either from problems or sections.
 # Section either indicates the name of the problem or the name of the section
-Score = namedtuple("Score", "earned possible graded section")
+Score = namedtuple("Score", "earned possible graded section due")
 
 
 def aggregate_scores(scores, section_name="summary"):
@@ -30,12 +30,14 @@ def aggregate_scores(scores, section_name="summary"):
     all_total = Score(total_correct,
                       total_possible,
                       False,
-                      section_name)
+                      section_name,
+                      None)
     #selecting only graded things
     graded_total = Score(total_correct_graded,
                          total_possible_graded,
                          True,
-                         section_name)
+                         section_name,
+                         None)
 
     return all_total, graded_total
 

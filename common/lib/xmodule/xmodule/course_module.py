@@ -957,7 +957,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         for c in self.get_children():
             for s in c.get_children():
-                if s.graded:
+                if hasattr(s, 'graded') and s.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(s))
                     xmoduledescriptors.append(s)
 

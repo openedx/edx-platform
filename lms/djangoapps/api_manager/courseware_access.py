@@ -1,4 +1,5 @@
 """ Centralized access to LMS courseware app """
+from django.utils import timezone
 
 from courseware import courses, module_render
 from courseware.model_data import FieldDataCache
@@ -133,3 +134,49 @@ def get_course_child_content(request, user, course_key, child_descriptor):
         field_data_cache,
         course_key)
     return child_content
+
+
+def calculate_proforma_grade(grade_summary, grading_policy):
+    """
+    Calculates a projected (proforma) final grade based on the current state
+    of grades using the provided grading policy.  Sections equate to grading policy
+    'types' and have values such as 'Homework', 'Lab', 'MidtermExam', and 'FinalExam'
+
+    We invert the concepts here and use the section weights as the possible scores by
+    assuming that the section weights total 100 percent.  So, if a Homework section
+    is worth 15 percent of your overall grade, and you have currently scored 70 percent
+    for that section, the normalized score for the Homework section is 0.105.  Note that
+    we do not take into account dropped assignments/scores, such as lowest-two homeworks.
+
+    After all scored sections are processed we take the remaining weight at its full
+    value as a projection of the user obtaining 100 percent of the section potential.
+
+    Example:
+        - Section: Homework,    Weight: 15%, Totaled Score: 70%,  Normalized Score: 0.105
+        - Section: MidtermExam, Weight: 30%, Totaled Score: 80%,  Normalized Score: 0.240
+        - Section: Final Exam,  Weight: 40%, Totaled Score: 95%,  Normalized Score: 0.380
+        - Remaining Weight: 0.15 (unscored Lab section), assume 100%, of 15% =>     0.150
+        - Proforma Grade = 0.105 + 0.240 + 0.380 + 0.150 = 0.875  (87.5%)
+    """
+    remaining_weight = 1.00
+    proforma_grade = 0.00
+    totaled_scores = grade_summary['totaled_scores']
+    for section in totaled_scores:
+        points_earned = 0.00
+        points_possible = 0.00
+        # totaled_scores is a collection of currently-recored scores for a given section
+        # we need to iterate through and combine the scores to create an overall score for the section
+        # This loop does not take into account dropped assignments (eg, homeworks)
+        for score in totaled_scores[section]:
+            # Only count grades where points have been scored, or where the due date has passed
+            if score.earned or (score.due and score.due < timezone.now()):
+                points_earned = points_earned + score.earned
+                points_possible = points_possible + score.possible
+        grade = points_earned / points_possible
+        section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
+        if section_policy is not None:
+            section_weight = section_policy['weight']
+            proforma_grade = proforma_grade + (section_weight * grade)
+            remaining_weight = remaining_weight - section_weight
+    proforma_grade = proforma_grade + remaining_weight
+    return proforma_grade

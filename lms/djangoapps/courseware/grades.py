@@ -189,6 +189,7 @@ def _grade(student, request, course, keep_raw_scores):
         for section in sections:
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.display_name_with_default
+            section_due = section_descriptor.due
 
             # some problems have state that is updated independently of interaction
             # with the LMS, so they need to always be scored. (E.g. foldit.,
@@ -247,13 +248,13 @@ def _grade(student, request, course, keep_raw_scores):
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default, section_due))
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)
                 if keep_raw_scores:
                     raw_scores += scores
             else:
-                graded_total = Score(0.0, 1.0, True, section_name)
+                graded_total = Score(0.0, 1.0, True, section_name, section_due)
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
@@ -364,6 +365,7 @@ def _progress_summary(student, request, course):
                     continue
 
                 graded = section_module.graded
+                due = section_module.due
                 scores = []
 
                 module_creator = section_module.xmodule_runtime.get_module
@@ -376,7 +378,7 @@ def _progress_summary(student, request, course):
                     if correct is None and total is None:
                         continue
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default, due))
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(

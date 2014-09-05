@@ -888,6 +888,7 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
         )
 
     def test_context_contains_display_name(self, mock_tracker):
+        mock_tracker.reset_mock()
         problem_display_name = u'Option Response Problem'
         actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker, problem_display_name)
         self.assertEquals(problem_display_name, actual_display_name)
@@ -913,12 +914,13 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
             'problem_check',
         )
 
-        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
-        mock_call = mock_tracker.send.mock_calls[0]
-        event = mock_call[1][0]
-
-        self.assertEquals(event['event_type'], 'problem_check')
-        return event['context']['module']['display_name']
+        mock_calls = mock_tracker.send.mock_calls
+        for call in mock_calls:
+            call_data = call[1][0]
+            event_type = call_data.get('event_type')
+            if event_type == 'problem_check':
+                break
+        return call_data['context']['module']['display_name']
 
     def test_missing_display_name(self, mock_tracker):
         actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
