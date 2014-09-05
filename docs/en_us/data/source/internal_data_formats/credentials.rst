@@ -32,16 +32,20 @@ you receive a data package (or other files) from the edX Analytics team, you
 must decrypt the files that it contains before you use them.
 
 The cryptographic processes of encrypting and decrypting data files require
-that you create a pair of keys: the public key in the pair is used to encrypt
-data, and the corresponding private key is used to decrypt any files that have
-been encrypted with the public key.
+that you create a pair of keys: the public key in the pair, which you send to
+the edX Analytics team, is used to encrypt data. You use your corresponding
+private key to decrypt any files that have been encrypted with that public key.
 
 To create the keys needed for this encryption and decryption process, you use
 GNU Privacy Guard (GnuPG or GPG). Essentially, you install a cryptographic
-application on your local computer and supply your email address and a secret
-passphrase (a password). 
+application on your local computer and then supply your email address and a
+secret passphrase (a password).
 
-.. important:: The email address that you supply when you create your keys must be your official email address at your edX partner institution.
+.. important:: The email address that you supply when you create your keys 
+ must be your official email address at your edX partner institution. After you
+ specify the passphrase, be sure to take any steps necessary to assure that you
+ can use it in the future. To minimize security risks, GPG does not provide a
+ mechanism for supplying you with a reminder hint.
 
 The result is the public key that you send to edX to use in encrypting data
 files for your institution, and the private key which you keep secret and use
@@ -73,8 +77,9 @@ Create Keys: Windows
        addresses to encrypt data.
 
    c. When you are prompted for a passphrase, enter a strong passphrase. Be
-      sure to remember your passphrase: you will use it to decrypt your data
-      packages.
+      sure to select a passphrase that you can remember, or use a secure method
+      of retaining it for reuse in the future: you use this passphrase when you
+      decrypt your data packages.
 
 3. When Kleopatra presents the **Key Pair Successfully Created** dialog box,
    click **Send Certificate by EMail** to send the public key (and only the
@@ -106,8 +111,9 @@ Create Keys: Macintosh
 
 #. Click **Generate key**. A dialog box opens to prompt you for a passphrase.
 
-#. Enter a strong passphrase. Be sure to remember your passphrase: you will use
-   it to decrypt your data packages.
+#. Enter a strong passphrase. Be sure to select a passphrase that you can
+   remember, or use a secure method of retaining it for reuse in the future:
+   you use this passphrase when you decrypt your data packages.
 
 #. To send only your public key to your edX program manager, click the key and
    then click **Export**. A dialog box opens.
