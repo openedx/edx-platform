@@ -517,10 +517,11 @@ class VideoComponentPage(VideoPage):
             str: status/error message
 
         """
-        if self.q(css=CLASS_SELECTORS[message_type]).visible:
-            return self.q(css=CLASS_SELECTORS[message_type]).text[0]
-        else:
-            return ''
+        if message_type == 'status':
+            self.wait_for_element_visibility(CLASS_SELECTORS[message_type],
+                                             '{} message is Visible'.format(message_type.title()))
+
+        return self.q(css=CLASS_SELECTORS[message_type]).text[0]
 
     def url_field_status(self, *field_numbers):
         """
