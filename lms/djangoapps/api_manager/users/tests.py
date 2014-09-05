@@ -1282,6 +1282,64 @@ class UsersApiTests(TestCase):
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
             due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
         )
+        points_scored = 1
+        points_possible = 1
+        user = self.user
+        module = self.get_module_for_user(user, course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item2 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring final",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+        points_scored = 95
+        points_possible = 100
+        user = self.user
+        module = self.get_module_for_user(user, course, item2)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item3 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 7
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item3)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item4 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 9
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item4)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item5 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 3",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+        )
+
 
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
