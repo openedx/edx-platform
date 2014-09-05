@@ -11,7 +11,7 @@ Change Log
 
    * - Date
      - Change
-   * - 09/02/14
+   * - 09/04/14
      - Updated the :ref:`Discussion Forums Data` chapter to include the
        ``thread_type`` field for CommentThreads and the ``endorsement`` field
        for Comments.
