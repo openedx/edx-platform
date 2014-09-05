@@ -18,7 +18,7 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 
-from courseware.courses import get_course_about_section, get_course_info_section
+from courseware.courses import get_course_about_section, get_course_info_section, course_image_url
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
@@ -605,6 +605,7 @@ class CoursesDetail(SecureAPIView):
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         base_uri_without_qs = generate_base_uri(request, True)
+        response_data['course_image_url'] = request.build_absolute_uri(course_image_url(course_descriptor))
         response_data['resources'] = []
         resource_uri = '{}/content/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
