@@ -12,7 +12,6 @@ from collections import namedtuple
 from path import path
 from lazy import lazy
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import CourseLocator
 
 from . import STUDIO_BASE_URL
 
@@ -272,7 +271,11 @@ class CourseFixture(StudioApiFixture):
         Return the locator string for the course.
         """
         course_key = CourseKey.from_string(self._course_key)
-        return unicode(course_key.make_usage_key('course', self._course_dict['run']))
+        if getattr(course_key, 'deprecated', False):
+            block_id = self._course_dict['run']
+        else:
+            block_id = 'course'
+        return unicode(course_key.make_usage_key('course', block_id))
 
     @property
     def _assets_url(self):
