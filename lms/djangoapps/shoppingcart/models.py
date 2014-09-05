@@ -40,8 +40,18 @@ from microsite_configuration import microsite
 log = logging.getLogger("shoppingcart")
 
 ORDER_STATUSES = (
+    # The user is selecting what he/she wants to purchase.
     ('cart', 'cart'),
+
+    # The user has been sent to the external payment processor.
+    # At this point, the order should NOT be modified.
+    # If the user returns to the payment flow, he/she will start a new order.
+    ('paying', 'paying'),
+
+    # The user has successfully purchased the items in the order.
     ('purchased', 'purchased'),
+
+    # The user's order has been refunded.
     ('refunded', 'refunded'),
 )
 
@@ -128,6 +138,22 @@ class Order(models.Model):
         Clear out all the items in the cart
         """
         self.orderitem_set.all().delete()
+
+    @transaction.commit_on_success
+    def start_purchase(self):
+        """
+        Start the purchase process.  This will set the order status to "paying",
+        at which point it should no longer be modified.
+
+        Future calls to `Order.get_cart_for_user()` will filter out orders with
+        status "paying", effectively creating a new (empty) cart.
+        """
+        if self.status == 'cart':
+            self.status = 'paying'
+            self.save()
+
+            for item in OrderItem.objects.filter(order=self).select_subclasses():
+                item.start_purchase()
 
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
@@ -267,6 +293,14 @@ class OrderItem(models.Model):
         self.purchased_callback()
         self.status = 'purchased'
         self.fulfilled_time = datetime.now(pytz.utc)
+        self.save()
+
+    def start_purchase(self):
+        """
+        Start the purchase process.  This will set the order item status to "paying",
+        at which point it should no longer be modified.
+        """
+        self.status = 'paying'
         self.save()
 
     def purchased_callback(self):
