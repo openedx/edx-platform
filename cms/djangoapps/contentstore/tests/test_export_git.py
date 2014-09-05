@@ -34,6 +34,28 @@ class TestExportGit(CourseTestCase):
         self.course_module = modulestore().get_course(self.course.id)
         self.test_url = reverse_course_url('export_git', self.course.id)
 
+    def make_bare_repo_with_course(self, repo_name):
+        """
+        Make a local bare repo suitable for exporting to in
+        tests
+        """
+        # Build out local bare repo, and set course git url to it
+        repo_dir = os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR)
+        os.mkdir(repo_dir)
+        self.addCleanup(shutil.rmtree, repo_dir)
+
+        bare_repo_dir = '{0}/{1}.git'.format(
+            os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR),
+            repo_name
+        )
+        os.mkdir(bare_repo_dir)
+        self.addCleanup(shutil.rmtree, bare_repo_dir)
+
+        subprocess.check_output(['git', '--bare', 'init', ], cwd=bare_repo_dir)
+        self.populate_course()
+        self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
+        modulestore().update_item(self.course_module, self.user.id)
+
     def test_giturl_missing(self):
         """
         Test to make sure an appropriate error is displayed
@@ -79,21 +101,15 @@ class TestExportGit(CourseTestCase):
         """
         Test successful course export response.
         """
-        # Build out local bare repo, and set course git url to it
-        repo_dir = os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR)
-        os.mkdir(repo_dir)
-        self.addCleanup(shutil.rmtree, repo_dir)
 
-        bare_repo_dir = '{0}/test_repo.git'.format(
-            os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR))
-        os.mkdir(bare_repo_dir)
-        self.addCleanup(shutil.rmtree, bare_repo_dir)
+        self.make_bare_repo_with_course('test_repo')
+        response = self.client.get('{}?action=push'.format(self.test_url))
+        self.assertIn('Export Succeeded', response.content)
 
-        subprocess.check_output(['git', '--bare', 'init', ], cwd=bare_repo_dir)
-
-        self.populate_course()
-        self.course_module.giturl = 'file://{}'.format(bare_repo_dir)
-        modulestore().update_item(self.course_module, self.user.id)
-
+    def test_repo_with_dots(self):
+        """
+        Regression test for a bad directory pathing of repo's that have dots.
+        """
+        self.make_bare_repo_with_course('test.repo')
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertIn('Export Succeeded', response.content)
