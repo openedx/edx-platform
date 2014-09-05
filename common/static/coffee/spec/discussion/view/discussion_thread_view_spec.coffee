@@ -124,6 +124,32 @@ describe "DiscussionThreadView", ->
                 expect($(".post-body").text()).toEqual(expectedAbbreviation)
                 expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled()
 
+            it "strips script tags appropriately", ->
+                DiscussionViewSpecHelper.setNextResponseContent({resp_total: 0, children: []})
+                longMaliciousBody = new Array(100).join("<script>alert('Until they think warm days will never cease');</script>\n")
+                @thread.set("body", longMaliciousBody)
+                maliciousAbbreviation = DiscussionUtil.abbreviateString(@thread.get('body'), 140)
+
+                # The nodes' html should be different than the strings, but
+                # their texts should be the same, indicating that they've been
+                # properly escaped. To be safe, make sure the string "<script"
+                # isn't present, either
+
+                @view.render()
+                expect($(".post-body").html()).not.toEqual(maliciousAbbreviation)
+                expect($(".post-body").text()).toEqual(maliciousAbbreviation)
+                expect($(".post-body").html()).not.toContain("<script")
+
+                @view.expand()
+                expect($(".post-body").html()).not.toEqual(longMaliciousBody)
+                expect($(".post-body").text()).toEqual(longMaliciousBody)
+                expect($(".post-body").html()).not.toContain("<script")
+
+                @view.collapse()
+                expect($(".post-body").html()).not.toEqual(maliciousAbbreviation)
+                expect($(".post-body").text()).toEqual(maliciousAbbreviation)
+                expect($(".post-body").html()).not.toContain("<script")
+
     describe "for question threads", ->
         beforeEach ->
             @thread.set("thread_type", "question")
