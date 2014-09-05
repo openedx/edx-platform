@@ -101,6 +101,13 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
                                      for key, value in data.iteritems()),
     }
 
+    if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
+        template_context['js_init_parameters'] = json.dumps(frag.json_init_args)
+        template_context['js_pass_parameters'] = True
+    else:
+        template_context['js_init_parameters'] = ""
+        template_context['js_pass_parameters'] = False
+
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
 
