@@ -20,7 +20,8 @@ def has_course_access(user, course_key, role=CourseStaffRole):
         return True
     if OrgStaffRole(org=course_key.org).has_user(user):
         return True
-    return auth.has_access(user, role(course_key))
+    # temporary to ensure we give universal access given a course until we impl branch specific perms
+    return auth.has_access(user, role(course_key.for_branch(None)))
 
 
 def get_user_role(user, course_id):
