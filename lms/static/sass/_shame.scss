@@ -66,7 +66,7 @@
     background: $action-primary-focused-bg;
   }
   &:focus {
-    outline: 2px solid $black;
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
 
   &.current, &.active {
@@ -97,7 +97,7 @@
     background: $action-secondary-focused-bg;
   }
   &:focus {
-    outline: 2px solid $black;
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
 
   &.current, &.active {
