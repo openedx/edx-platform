@@ -12,7 +12,7 @@ September, 2014
 
    * - Date
      - Change
-   * - 09/02/14
+   * - 09/04/14
      - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
        Staff` chapters to include information about choosing the type of post
        and to reflect changes in the user interface.
