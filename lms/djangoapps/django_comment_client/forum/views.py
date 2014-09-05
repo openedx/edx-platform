@@ -12,8 +12,9 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
+from course_groups.cohorts import (is_course_cohorted, get_cohorted_threads_privacy, get_cohort_id,
+                                   is_commentable_cohorted, get_cohorted_commentables,
+                                   get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -97,6 +98,8 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     if not group_id:
         if not cached_has_permission(request.user, "see_all_cohorts", course_key):
             group_id = get_cohort_id(request.user, course_key)
+            if not group_id and get_cohorted_threads_privacy(course_key) == 'cohort-only':
+                default_query_params['exclude_groups'] = True
 
     if group_id:
         default_query_params["group_id"] = group_id
