@@ -363,6 +363,9 @@ class BulkWriteMixin(object):
         """
         Copy the structure and update the history info (edited_by, edited_on, previous_version)
         """
+        if course_key.branch is None:
+            raise InsufficientSpecificationError(course_key)
+
         bulk_write_record = self._get_bulk_write_record(course_key)
 
         # If we have an active bulk write, and it's already been edited, then just use that structure
@@ -1891,16 +1894,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
                 parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
                 parent_block['edit_info']['update_version'] = new_id
 
-            def remove_subtree(block_id):
-                """
-                Remove the subtree rooted at block_id
-                """
-                encoded_block_id = encode_key_for_mongo(block_id)
-                for child in new_blocks[encoded_block_id]['fields'].get('children', []):
-                    remove_subtree(child)
-                del new_blocks[encoded_block_id]
-
-            remove_subtree(usage_locator.block_id)
+            self._remove_subtree(usage_locator.block_id, new_blocks)
 
             # update index if appropriate and structures
             self.update_structure(usage_locator.course_key, new_structure)
@@ -1913,6 +1907,15 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
                 result = CourseLocator(version_guid=new_id)
 
             return result
+
+    def _remove_subtree(self, block_id, blocks):
+        """
+        Remove the subtree rooted at block_id
+        """
+        encoded_block_id = encode_key_for_mongo(block_id)
+        for child in blocks[encoded_block_id]['fields'].get('children', []):
+            self._remove_subtree(child, blocks)
+        del blocks[encoded_block_id]
 
     def delete_course(self, course_key, user_id):
         """

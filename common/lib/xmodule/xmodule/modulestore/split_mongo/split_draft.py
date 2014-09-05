@@ -307,19 +307,45 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         if location.category in DIRECT_ONLY_CATEGORIES:
             return
 
-        if not self.has_item(location, revision=ModuleStoreEnum.RevisionOption.published_only):
-            raise InvalidVersionError(location)
+        draft_course_key = location.course_key.for_branch(ModuleStoreEnum.BranchName.draft)
+        with self.bulk_operations(draft_course_key):
 
-        SplitMongoModuleStore.copy(
-            self,
-            user_id,
-            # Directly using the replace function rather than the for_branch function
-            # because for_branch obliterates the version_guid and will lead to missed version conflicts.
-            # TODO Instead, the for_branch implementation should be fixed in the Opaque Keys library.
-            location.course_key.replace(branch=ModuleStoreEnum.BranchName.published),
-            location.course_key.for_branch(ModuleStoreEnum.BranchName.draft),
-            [location]
-        )
+            # get head version of Published branch
+            published_course_structure = self._lookup_course(
+                location.course_key.for_branch(ModuleStoreEnum.BranchName.published)
+            )['structure']
+            published_block = self._get_block_from_structure(published_course_structure, location.block_id)
+            if published_block is None:
+                raise InvalidVersionError(location)
+
+            # create a new versioned draft structure
+            draft_course_structure = self._lookup_course(draft_course_key)['structure']
+            new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
+
+            # remove the block and its descendants from the new structure
+            self._remove_subtree(location.block_id, new_structure['blocks'])
+
+            # copy over the block and its descendants from the published branch
+            def copy_from_published(root_block_id):
+                """
+                copies root_block_id and its descendants from published_course_structure to new_structure
+                """
+                self._update_block_in_structure(
+                    new_structure,
+                    root_block_id,
+                    self._get_block_from_structure(published_course_structure, root_block_id)
+                )
+                block = self._get_block_from_structure(new_structure, root_block_id)
+                for child_block_id in block.setdefault('fields', {}).get('children', []):
+                    copy_from_published(child_block_id)
+
+            copy_from_published(location.block_id)
+
+            # update course structure and index
+            self.update_structure(draft_course_key, new_structure)
+            index_entry = self._get_index_if_valid(draft_course_key)
+            if index_entry is not None:
+                self._update_head(draft_course_key, index_entry, ModuleStoreEnum.BranchName.draft, new_structure['_id'])
 
     def get_course_history_info(self, course_locator):
         """
