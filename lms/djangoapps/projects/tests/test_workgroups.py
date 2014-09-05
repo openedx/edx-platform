@@ -576,7 +576,7 @@ class WorkgroupsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Confirm the grades for the users
-        course_grades_uri = '{}/{}/grades'.format(self.test_courses_uri, self.test_course_id)
+        course_grades_uri = '{}/{}/metrics/grades/'.format(self.test_courses_uri, self.test_course_id)
         response = self.do_get(course_grades_uri)
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data['grades']), 0)

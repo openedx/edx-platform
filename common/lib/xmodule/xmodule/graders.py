@@ -26,7 +26,7 @@ def aggregate_scores(scores, section_name="summary"):
     total_correct = sum(score.earned for score in scores)
     total_possible = sum(score.possible for score in scores)
 
-    #regardless of whether or not it is graded
+    # regardless of whether or not it is graded
     all_total = Score(
         total_correct,
         total_possible,
@@ -34,7 +34,7 @@ def aggregate_scores(scores, section_name="summary"):
         section_name,
         None
     )
-    #selecting only graded things
+    # selecting only graded things
     graded_total = Score(
         total_correct_graded,
         total_possible_graded,

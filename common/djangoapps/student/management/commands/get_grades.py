@@ -2,9 +2,9 @@
 Management command to generate a list of grades for
 all students that are enrolled in a course.
 """
+from util.request import RequestMock
 from courseware import grades, courses
 from certificates.models import GeneratedCertificate
-from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand, CommandError
 import os
 from opaque_keys import InvalidKeyError
@@ -13,21 +13,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.contrib.auth.models import User
 from optparse import make_option
 import datetime
-from django.core.handlers.base import BaseHandler
 import csv
-
-
-class RequestMock(RequestFactory):
-    def request(self, **request):
-        "Construct a generic request object."
-        request = RequestFactory.request(self, **request)
-        handler = BaseHandler()
-        handler.load_middleware()
-        for middleware_method in handler._request_middleware:
-            if middleware_method(request):
-                raise Exception("Couldn't create request mock object - "
-                                "request middleware returned a response")
-        return request
 
 
 class Command(BaseCommand):

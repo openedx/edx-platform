@@ -1,10 +1,10 @@
 """ Utility functions related to HTTP requests """
-from django.core.handlers.base import BaseHandler
-from django.test import RequestFactory
 import re
 import logging
 
 from django.conf import settings
+from django.core.handlers.base import BaseHandler
+from django.test.client import RequestFactory
 
 from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError

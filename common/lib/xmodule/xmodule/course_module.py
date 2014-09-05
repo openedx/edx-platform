@@ -1326,7 +1326,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         for chapter in self.get_children():
             for section in chapter.get_children():
-                if section.graded:
+                if hasattr(section, 'graded') and section.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(section))
                     xmoduledescriptors.append(section)
 

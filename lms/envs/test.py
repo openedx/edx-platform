@@ -501,20 +501,6 @@ FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
 AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
 
-########################## SECURITY #######################
-
-FEATURES['ENFORCE_PASSWORD_POLICY'] = False
-FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
-FEATURES['SQUELCH_PII_IN_LOGS'] = False
-FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
-FEATURES['ADVANCED_SECURITY'] = False
-<<<<<<< HEAD
-=======
-
-PASSWORD_MIN_LENGTH = None
-PASSWORD_COMPLEXITY = {}
-
-
 ############# Performance Profiler #################
 # Note: We've added profiler support to this configuration in order
 # to enable analysis when running unit tests.  (outputs to console)
@@ -525,4 +511,13 @@ if FEATURES.get('PROFILER'):
         'profiler.middleware.HotshotProfilerMiddleware',
         'profiler.middleware.CProfileProfilerMiddleware',
     )
->>>>>>> a00f851... mattdrayer/api-profiler-middleware: Hotshot/CProfile support
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+
+############# Student Gradebook #################
+FEATURES['STUDENT_GRADEBOOK'] = True
+if FEATURES.get('STUDENT_GRADEBOOK', False):
+    INSTALLED_APPS += ('gradebook',)
+

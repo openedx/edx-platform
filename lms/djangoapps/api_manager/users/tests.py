@@ -10,22 +10,27 @@ from random import randint
 import json
 import uuid
 from urllib import urlencode
-from mock import patch
+import mock
 
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import Client
 from django.test.utils import override_settings
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.tests.factories import StudentModuleFactory
+from courseware import module_render
+from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from instructor.access import allow_access
+from notification_prefs import NOTIFICATION_PREF_KEY
 from projects.models import Project, Workgroup
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from openedx.core.djangoapps.user_api.models import UserPreference
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 TEST_API_KEY = str(uuid.uuid4())
@@ -44,10 +49,24 @@ class SecureClient(Client):
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @override_settings(PASSWORD_MIN_LENGTH=4)
 @override_settings(API_PAGE_SIZE=10)
-@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
+@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class UsersApiTests(ModuleStoreTestCase):
-
     """ Test suite for Users API views """
+
+    def get_module_for_user(self, user, course, problem):
+        """Helper function to get useful module at self.location in self.course_id for user"""
+        mock_request = mock.MagicMock()
+        mock_request.user = user
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, user, course, depth=2)
+        module = module_render.get_module(  # pylint: disable=protected-access
+            user,
+            mock_request,
+            problem.location,
+            field_data_cache,
+            course.id
+        )
+        return module
 
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
@@ -299,6 +318,20 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 409)
         self.assertGreater(response.data['message'], 0)
         self.assertEqual(response.data['field_conflict'], 'username or email')
+
+    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
+    def test_user_list_post_discussion_digest_email(self):
+        test_uri = self.users_base_uri
+        local_username = self.test_username + str(randint(11, 99))
+        data = {'email': self.test_email, 'username': local_username, 'password':
+                self.test_password, 'first_name': self.test_first_name, 'last_name': self.test_last_name}
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertGreater(response.data['id'], 0)
+        confirm_uri = self.test_server_prefix + \
+            test_uri + '/' + str(response.data['id'])
+        user = User.objects.get(id=response.data['id'])
+        self.assertIsNotNone(UserPreference.get_preference(user, NOTIFICATION_PREF_KEY))
 
     def test_user_detail_get(self):
         test_uri = self.users_base_uri
@@ -1135,7 +1168,7 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_course_grades(self):
+    def test_user_courses_grades_list_get(self):
         user_id = self.user.id
 
         course = CourseFactory.create()
@@ -1182,15 +1215,129 @@ class UsersApiTests(ModuleStoreTestCase):
             display_name="test problem 2"
         )
 
-        StudentModuleFactory.create(
-            grade=1,
-            max_grade=1,
-            student=self.user,
-            course_id=course.id,
-            module_state_key=problem.location,
-            state=json.dumps({'attempts': 3}),
-            module_type='mentoring'
+        item = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='foo'),
+            display_name=u"test mentoring midterm",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
         )
+        points_scored = 1
+        points_possible = 1
+        user = self.user
+        module = self.get_module_for_user(user, course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item2 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring final",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+        points_scored = 95
+        points_possible = 100
+        user = self.user
+        module = self.get_module_for_user(user, course, item2)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item3 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 7
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item3)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item4 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 9
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item4)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item5 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 3",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+        )
+        points_scored = 1
+        points_possible = 1
+        user = self.user
+        module = self.get_module_for_user(user, course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item2 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring final",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+        )
+        points_scored = 95
+        points_possible = 100
+        user = self.user
+        module = self.get_module_for_user(user, course, item2)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item3 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 7
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item3)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item4 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 2",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+        )
+        points_scored = 9
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item4)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        item5 = ItemFactory.create(
+            parent_location=chapter2.location,
+            category='mentoring',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name=u"test mentoring homework 3",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+        )
+
+
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
 
@@ -1208,7 +1355,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(sections[0]['graded'], False)
 
         sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 3)
+        self.assertEqual(len(sections), 8)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
 
@@ -1218,8 +1365,8 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
-        self.assertEqual(response.data['current_grade'], 50)
-        self.assertEqual(response.data['pro_forma_grade'], 100)
+        self.assertEqual(response.data['current_grade'], 0.7)
+        self.assertEqual(response.data['proforma_grade'], 0.95)
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
