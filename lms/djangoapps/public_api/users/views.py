@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
+from django.conf import settings
 
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
@@ -66,6 +67,9 @@ def my_user_info(request):
 def password_reset(request):
     form = PasswordResetFormNoActive({"email": request.DATA.get("email")})
     if form.is_valid():
-        form.save()
+        form.save(use_https=request.is_secure(),
+                  from_email=settings.DEFAULT_FROM_EMAIL,
+                  request=request,
+                  domain_override=request.get_host())
         return Response({}, status=200)
     return Response(form.errors, status=400)
