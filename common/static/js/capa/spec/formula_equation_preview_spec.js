@@ -62,7 +62,17 @@ describe("Formula Equation Preview", function () {
         window.MathJax = {Hub: {}};
         MathJax.Hub.getAllJax = jasmine.createSpy('MathJax.Hub.getAllJax')
             .andReturn([this.jax]);
-        MathJax.Hub.Queue = jasmine.createSpy('MathJax.Hub.Queue');
+        MathJax.Hub.Queue = function (callback) {
+            if (typeof (callback) == 'function') {
+                callback();
+            }
+        }
+        spyOn(MathJax.Hub, 'Queue').andCallThrough()
+        MathJax.Hub.Startup = jasmine.createSpy('MathJax.Hub.Startup');
+        MathJax.Hub.Startup.signal = jasmine.createSpy('MathJax.Hub.Startup.signal');
+        MathJax.Hub.Startup.signal.Interest = function (callback) {
+            callback('End');
+        }
     });
 
     it('(the test) is able to swap out the behavior of $', function () {
@@ -245,7 +255,7 @@ describe("Formula Equation Preview", function () {
 
                 // Cannot find MathJax.
                 MathJax.Hub.getAllJax.andReturn([]);
-                spyOn(console, 'warn');
+                spyOn(console, 'log');
 
                 callback({
                     preview: 'THE_FORMULA',
@@ -253,7 +263,7 @@ describe("Formula Equation Preview", function () {
                 });
 
                 // Tests.
-                expect(console.warn).toHaveBeenCalled();
+                expect(console.log).toHaveBeenCalled();
 
                 // We should look in the preview div for the MathJax.
                 var previewElement = $("#input_THE_ID_preview")[0];
