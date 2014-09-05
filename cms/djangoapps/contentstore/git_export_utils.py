@@ -111,6 +111,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             ['git', 'fetch', 'origin'],
             ['git', 'reset', '--hard', 'origin/{0}'.format(branch)],
             ['git', 'pull'],
+            ['git', 'clean', '-d', '-f'],
         ]
     else:
         cmds = [['git', 'clone', repo]]

@@ -113,3 +113,30 @@ class TestExportGit(CourseTestCase):
         self.make_bare_repo_with_course('test.repo')
         response = self.client.get('{}?action=push'.format(self.test_url))
         self.assertIn('Export Succeeded', response.content)
+
+    def test_dirty_repo(self):
+        """
+        Add additional items not in the repo and make sure they aren't
+        there after the export. This allows old content to removed
+        in the repo.
+        """
+        repo_name = 'dirty_repo1'
+        self.make_bare_repo_with_course(repo_name)
+        git_export_utils.export_to_git(self.course.id,
+                                       self.course_module.giturl, self.user)
+
+        # Make arbitrary change to course to make diff
+        self.course_module.matlab_api_key = 'something'
+        modulestore().update_item(self.course_module, self.user.id)
+        # Touch a file in the directory, export again, and make sure
+        # the test file is gone
+        repo_dir = os.path.join(
+            os.path.abspath(git_export_utils.GIT_REPO_EXPORT_DIR),
+            repo_name
+        )
+        test_file = os.path.join(repo_dir, 'test.txt')
+        open(test_file, 'a').close()
+        self.assertTrue(os.path.isfile(test_file))
+        git_export_utils.export_to_git(self.course.id,
+                                       self.course_module.giturl, self.user)
+        self.assertFalse(os.path.isfile(test_file))
