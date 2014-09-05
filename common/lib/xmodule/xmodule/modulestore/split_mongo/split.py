@@ -68,7 +68,7 @@ from opaque_keys.edx.locator import (
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum
+    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, BulkOpsRecord, BulkOperationsMixin
 )
 
 from ..exceptions import ItemNotFoundError
@@ -82,7 +82,7 @@ from types import NoneType
 
 log = logging.getLogger(__name__)
 
-#==============================================================================
+# ==============================================================================
 #
 # Known issue:
 #    Inheritance for cached kvs doesn't work on edits. Use case.
@@ -98,45 +98,19 @@ log = logging.getLogger(__name__)
 #    10) BUG: a.foo < 0!
 #   Local fix wont' permanently work b/c xblock may cache a.foo...
 #
-#==============================================================================
+# ==============================================================================
 
 # When blacklists are this, all children should be excluded
 EXCLUDE_ALL = '*'
 
 
-class BulkWriteRecord(object):
+class SplitBulkWriteRecord(BulkOpsRecord):
     def __init__(self):
-        self._active_count = 0
+        super(SplitBulkWriteRecord, self).__init__()
         self.initial_index = None
         self.index = None
         self.structures = {}
         self.structures_in_db = set()
-
-    @property
-    def active(self):
-        """
-        Return whether this bulk write is active.
-        """
-        return self._active_count > 0
-
-    def nest(self):
-        """
-        Record another level of nesting of this bulk write operation
-        """
-        self._active_count += 1
-
-    def unnest(self):
-        """
-        Record the completion of a level of nesting of the bulk write operation
-        """
-        self._active_count -= 1
-
-    @property
-    def is_root(self):
-        """
-        Return whether the bulk write is at the root (first) level of nesting
-        """
-        return self._active_count == 1
 
     # TODO: This needs to track which branches have actually been modified/versioned,
     # so that copying one branch to another doesn't update the original branch.
@@ -172,7 +146,7 @@ class BulkWriteRecord(object):
         self.structures[structure['_id']] = structure
 
     def __repr__(self):
-        return u"BulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
+        return u"SplitBulkWriteRecord<{!r}, {!r}, {!r}, {!r}, {!r}>".format(
             self._active_count,
             self.initial_index,
             self.index,
@@ -181,7 +155,7 @@ class BulkWriteRecord(object):
         )
 
 
-class BulkWriteMixin(object):
+class SplitBulkWriteMixin(BulkOperationsMixin):
     """
     This implements the :meth:`bulk_operations` modulestore semantics for the :class:`SplitMongoModuleStore`.
 
@@ -194,93 +168,55 @@ class BulkWriteMixin(object):
     If a bulk write operation isn't active, then the changes are immediately written to the underlying
     mongo_connection.
     """
-    def __init__(self, *args, **kwargs):
-        super(BulkWriteMixin, self).__init__(*args, **kwargs)
-        self._active_bulk_writes = threading.local()
+    _bulk_ops_record_type = SplitBulkWriteRecord
 
-    def _get_bulk_write_record(self, course_key, ignore_case=False):
+    def _get_bulk_ops_record(self, course_key, ignore_case=False):
         """
-        Return the :class:`.BulkWriteRecord` for this course.
+        Return the :class:`.SplitBulkWriteRecord` for this course.
         """
+        # handle split specific things and defer to super otherwise
         if course_key is None:
-            return BulkWriteRecord()
+            return self._bulk_ops_record_type()
 
         if not isinstance(course_key, CourseLocator):
             raise TypeError(u'{!r} is not a CourseLocator'.format(course_key))
-        if not hasattr(self._active_bulk_writes, 'records'):
-            self._active_bulk_writes.records = defaultdict(BulkWriteRecord)
+        # handle version_guid based retrieval locally
+        if course_key.org is None or course_key.course is None or course_key.run is None:
+            return self._active_bulk_ops.records[
+                course_key.replace(org=None, course=None, run=None, branch=None)
+            ]
 
-        # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
-        if course_key.org and course_key.course and course_key.run:
-            if ignore_case:
-                for key, record in self._active_bulk_writes.records.iteritems():
-                    if (
-                        key.org.lower() == course_key.org.lower() and
-                        key.course.lower() == course_key.course.lower() and
-                        key.run.lower() == course_key.run.lower()
-                    ):
-                        return record
-                # If nothing matches case-insensitively, fall through to creating a new record with the passed in case
-            return self._active_bulk_writes.records[course_key.replace(branch=None, version_guid=None)]
-        else:
-            # If nothing org/course/run aren't set, use a bulk record that is identified just by the version_guid
-            return self._active_bulk_writes.records[course_key.replace(org=None, course=None, run=None, branch=None)]
+        return super(SplitBulkWriteMixin, self)._get_bulk_ops_record(
+            course_key.replace(branch=None, version_guid=None), ignore_case
+        )
 
-    @property
-    def _active_records(self):
+    def _clear_bulk_ops_record(self, course_key):
         """
-        Yield all active (CourseLocator, BulkWriteRecord) tuples.
+        Clear the record for this course
         """
-        for course_key, record in getattr(self._active_bulk_writes, 'records', {}).iteritems():
-            if record.active:
-                yield (course_key, record)
-
-    def _clear_bulk_write_record(self, course_key):
         if not isinstance(course_key, CourseLocator):
             raise TypeError('{!r} is not a CourseLocator'.format(course_key))
 
-        if not hasattr(self._active_bulk_writes, 'records'):
-            return
-
         if course_key.org and course_key.course and course_key.run:
-            del self._active_bulk_writes.records[course_key.replace(branch=None, version_guid=None)]
+            del self._active_bulk_ops.records[course_key.replace(branch=None, version_guid=None)]
         else:
-            del self._active_bulk_writes.records[course_key.replace(org=None, course=None, run=None, branch=None)]
+            del self._active_bulk_ops.records[
+                course_key.replace(org=None, course=None, run=None, branch=None)
+            ]
 
-    def _begin_bulk_operation(self, course_key):
+    def _start_outermost_bulk_operation(self, bulk_write_record, course_key):
         """
         Begin a bulk write operation on course_key.
         """
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
+        # Ensure that any edits to the index don't pollute the initial_index
+        bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
 
-        # Increment the number of active bulk operations (bulk operations
-        # on the same course can be nested)
-        bulk_write_record.nest()
-
-        # If this is the highest level bulk operation, then initialize it
-        if bulk_write_record.is_root:
-            bulk_write_record.initial_index = self.db_connection.get_course_index(course_key)
-            # Ensure that any edits to the index don't pollute the initial_index
-            bulk_write_record.index = copy.deepcopy(bulk_write_record.initial_index)
-
-    def _end_bulk_operation(self, course_key):
+    def _end_outermost_bulk_operation(self, bulk_write_record, course_key):
         """
         End the active bulk write operation on course_key.
         """
-        # If no bulk write is active, return
-        bulk_write_record = self._get_bulk_write_record(course_key)
-        if not bulk_write_record.active:
-            return
-
-        bulk_write_record.unnest()
-
-        # If this wasn't the outermost context, then don't close out the
-        # bulk write operation.
-        if bulk_write_record.active:
-            return
-
-        # This is the last active bulk write. If the content is dirty,
-        # then update the database
+        # If the content is dirty, then update the database
         for _id in bulk_write_record.structures.viewkeys() - bulk_write_record.structures_in_db:
             self.db_connection.upsert_structure(bulk_write_record.structures[_id])
 
@@ -290,25 +226,17 @@ class BulkWriteMixin(object):
             else:
                 self.db_connection.update_course_index(bulk_write_record.index, from_index=bulk_write_record.initial_index)
 
-        self._clear_bulk_write_record(course_key)
-
-    def _is_in_bulk_write_operation(self, course_key, ignore_case=False):
-        """
-        Return whether a bulk write is active on `course_key`.
-        """
-        return self._get_bulk_write_record(course_key, ignore_case).active
-
     def get_course_index(self, course_key, ignore_case=False):
         """
         Return the index for course_key.
         """
-        if self._is_in_bulk_write_operation(course_key, ignore_case):
-            return self._get_bulk_write_record(course_key, ignore_case).index
+        if self._is_in_bulk_operation(course_key, ignore_case):
+            return self._get_bulk_ops_record(course_key, ignore_case).index
         else:
             return self.db_connection.get_course_index(course_key, ignore_case)
 
     def insert_course_index(self, course_key, index_entry):
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = index_entry
         else:
@@ -322,14 +250,14 @@ class BulkWriteMixin(object):
 
         Does not return anything useful.
         """
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.index = updated_index_entry
         else:
             self.db_connection.update_course_index(updated_index_entry)
 
     def get_structure(self, course_key, version_guid):
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             structure = bulk_write_record.structures.get(version_guid)
 
@@ -352,7 +280,7 @@ class BulkWriteMixin(object):
         (no data will be written to the database if a bulk operation is active.)
         """
         self._clear_cache(structure['_id'])
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
             bulk_write_record.structures[structure['_id']] = structure
         else:
@@ -365,7 +293,7 @@ class BulkWriteMixin(object):
         if course_key.branch is None:
             raise InsufficientSpecificationError(course_key)
 
-        bulk_write_record = self._get_bulk_write_record(course_key)
+        bulk_write_record = self._get_bulk_ops_record(course_key)
 
         # If we have an active bulk write, and it's already been edited, then just use that structure
         if bulk_write_record.active and course_key.branch in bulk_write_record.dirty_branches:
@@ -507,7 +435,7 @@ class BulkWriteMixin(object):
         return structures
 
 
-class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
+class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
@@ -2124,7 +2052,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         if not isinstance(new_id, ObjectId):
             raise TypeError('new_id must be an ObjectId, but is {!r}'.format(new_id))
         index_entry['versions'][branch] = new_id
-        self.insert_course_index(course_key, index_entry)
+        self.update_course_index(course_key, index_entry)
 
     def partition_xblock_fields_by_scope(self, xblock):
         """

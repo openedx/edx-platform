@@ -37,17 +37,19 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             #   - get last error
             #   - load parent
             #   - load inheritable data
-            with check_mongo_calls(10, 6):
+            with check_mongo_calls(7, 4):
                 self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
                 self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
             # For each (4) item created
-            #   - load draft
-            #   - load non-draft
+            #   - try to find draft
+            #   - try to find non-draft
+            #   - retrieve draft of new parent
             #   - get last error
             #   - load parent
             #   - load inheritable data
             #   - load parent
-            with check_mongo_calls(24, 12):
+            # count for updates increased to 16 b/c of edit_info updating
+            with check_mongo_calls(16, 8):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion1',
@@ -92,7 +94,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         # 25-June-2014 find calls are 19. Probably due to inheritance recomputation?
         # 02-July-2014 send calls are 7. 5 from above, plus 2 for updating subtree edit info for Chapter1 and course
         #              find calls are 22. 19 from above, plus 3 for finding the parent of Vert1, Chapter1, and course
-        with check_mongo_calls(25, 7):
+        with check_mongo_calls(20, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status

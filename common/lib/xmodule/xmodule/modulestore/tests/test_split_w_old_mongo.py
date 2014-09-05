@@ -10,6 +10,7 @@ from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.mongo import DraftMongoModuleStore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.tests.test_cross_modulestore_import_export import MemoryCache
 
 
 class SplitWMongoCourseBoostrapper(unittest.TestCase):
@@ -26,7 +27,7 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
     * split_course_key (CourseLocator): of the new course
     * old_course_key: the SlashSpecifiedCourseKey for the course
     """
-        # Snippet of what would be in the django settings envs file
+    # Snippet of what would be in the django settings envs file
     db_config = {
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
@@ -55,7 +56,9 @@ class SplitWMongoCourseBoostrapper(unittest.TestCase):
         self.addCleanup(self.split_mongo.db.connection.close)
         self.addCleanup(self.tear_down_split)
         self.draft_mongo = DraftMongoModuleStore(
-            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred, **self.modulestore_options
+            None, self.db_config, branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
+            metadata_inheritance_cache_subsystem=MemoryCache(),
+            **self.modulestore_options
         )
         self.addCleanup(self.tear_down_mongo)
         self.old_course_key = None
