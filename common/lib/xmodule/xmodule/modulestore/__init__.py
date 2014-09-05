@@ -566,6 +566,14 @@ class ModuleStoreReadBase(ModuleStoreRead):
         finally:
             self._end_bulk_operation(course_id)
 
+    @contextmanager
+    def bulk_temp_noop_operations(self, course_id):
+        """
+        A hotfix noop b/c old mongo does not properly handle nested bulk operations and does unnecessary work
+        if the bulk operation only reads data. Replace with bulk_operations once fixed (or don't merge to master)
+        """
+        yield
+
     def _begin_bulk_operation(self, course_id):
         """
         Begin a bulk write operation on course_id.
