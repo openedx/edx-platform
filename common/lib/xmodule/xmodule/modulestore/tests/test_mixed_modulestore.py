@@ -1,3 +1,7 @@
+# pylint: disable=no-member
+"""
+Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Draft, XML)
+"""
 import datetime
 import ddt
 import itertools
@@ -92,7 +96,7 @@ class TestMixedModuleStore(unittest.TestCase):
         ]
     }
 
-    def _compareIgnoreVersion(self, loc1, loc2, msg=None):
+    def _compare_ignore_version(self, loc1, loc2, msg=None):
         """
         AssertEqual replacement for CourseLocator
         """
@@ -114,8 +118,8 @@ class TestMixedModuleStore(unittest.TestCase):
         self.addCleanup(self.connection.close)
         super(TestMixedModuleStore, self).setUp()
 
-        self.addTypeEqualityFunc(BlockUsageLocator, '_compareIgnoreVersion')
-        self.addTypeEqualityFunc(CourseLocator, '_compareIgnoreVersion')
+        self.addTypeEqualityFunc(BlockUsageLocator, '_compare_ignore_version')
+        self.addTypeEqualityFunc(CourseLocator, '_compare_ignore_version')
         # define attrs which get set in initdb to quell pylint
         self.writable_chapter_location = self.store = self.fake_location = self.xml_chapter_location = None
         self.course_locations = []
@@ -123,7 +127,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.user_id = ModuleStoreEnum.UserID.test
 
     # pylint: disable=invalid-name
-    def _create_course(self, default, course_key):
+    def _create_course(self, course_key):
         """
         Create a course w/ one item in the persistence store using the given course & item location.
         """
@@ -187,6 +191,9 @@ class TestMixedModuleStore(unittest.TestCase):
         ]
 
         def create_sub_tree(parent, block_info):
+            """
+            recursive function that creates the given block and its descendants
+            """
             block = self.store.create_child(
                 self.user_id, parent.location,
                 block_info.category, block_id=block_info.display_name,
@@ -207,6 +214,9 @@ class TestMixedModuleStore(unittest.TestCase):
         return self.course_locations[string].course_key
 
     def _initialize_mixed(self):
+        """
+        initializes the mixed modulestore
+        """
         self.store = MixedModuleStore(None, create_modulestore_instance=create_modulestore_instance, **self.options)
         self.addCleanup(self.store.close_all_connections)
 
@@ -239,7 +249,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.xml_chapter_location = self.course_locations[self.XML_COURSEID1].replace(
             category='chapter', name='Overview'
         )
-        self._create_course(default, self.course_locations[self.MONGO_COURSEID].course_key)
+        self._create_course(self.course_locations[self.MONGO_COURSEID].course_key)
 
     @ddt.data('draft', 'split')
     def test_get_modulestore_type(self, default_ms):
@@ -448,6 +458,9 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertFalse(self.store.has_changes(component))
 
     def _has_changes(self, location):
+        """
+        Helper function that loads the item before calling has_changes
+        """
         return self.store.has_changes(self.store.get_item(location))
 
     def setup_has_changes(self, default_ms):
@@ -706,7 +719,7 @@ class TestMixedModuleStore(unittest.TestCase):
         # create and delete a private vertical with private children
         private_vert = self.store.create_child(
             # don't use course_location as it may not be the repr
-             self.user_id, self.course_locations[self.MONGO_COURSEID], 'vertical', block_id='publish'
+            self.user_id, self.course_locations[self.MONGO_COURSEID], 'vertical', block_id='publish'
         )
         private_leaf = self.store.create_child(
             self.user_id, private_vert.location, 'html', block_id='bug_leaf'
@@ -748,13 +761,12 @@ class TestMixedModuleStore(unittest.TestCase):
             published_courses = self.store.get_courses(remove_branch=True)
         self.assertEquals([c.id for c in draft_courses], [c.id for c in published_courses])
 
-
     def test_xml_get_courses(self):
         """
         Test that the xml modulestore only loaded the courses from the maps.
         """
         self.initdb('draft')
-        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
+        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)  # pylint: disable=protected-access
         courses = xml_store.get_courses()
         self.assertEqual(len(courses), 2)
         course_ids = [course.id for course in courses]
@@ -768,7 +780,7 @@ class TestMixedModuleStore(unittest.TestCase):
         Test that the xml modulestore doesn't allow write ops.
         """
         self.initdb('draft')
-        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)
+        xml_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.xml)  # pylint: disable=protected-access
         # the important thing is not which exception it raises but that it raises an exception
         with self.assertRaises(AttributeError):
             xml_store.create_course("org", "course", "run", self.user_id)
@@ -811,6 +823,9 @@ class TestMixedModuleStore(unittest.TestCase):
         self.assertEqual(parent, self.course_locations[self.XML_COURSEID1])
 
     def verify_get_parent_locations_results(self, expected_results):
+        """
+        Verifies the results of calling get_parent_locations matches expected_results.
+        """
         for child_location, parent_location, revision in expected_results:
             self.assertEqual(
                 parent_location,
@@ -1107,7 +1122,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.publish(self.course.location, self.user_id)
 
         # test that problem "problem_x1a_1" has only one published parent
-        mongo_store = self.store._get_modulestore_for_courseid(course_id)
+        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
             parent = mongo_store.get_parent_location(self.problem_x1a_1)
             self.assertEqual(parent, self.vertical_x1a)
@@ -1353,10 +1368,8 @@ class TestMixedModuleStore(unittest.TestCase):
 
         after_create = datetime.datetime.now(UTC)
         # Verify that all nodes were last edited in the past by create_user
-        [
+        for block in [component, child, sibling]:
             check_node(block.location, None, after_create, self.user_id, None, after_create, self.user_id)
-            for block in [component, child, sibling]
-        ]
 
         # Change the component, then check that there now are changes
         component.display_name = 'Changed Display Name'
@@ -1367,7 +1380,6 @@ class TestMixedModuleStore(unittest.TestCase):
         check_node(component.location, after_create, after_edit, editing_user, after_create, after_edit, editing_user)
         # but child didn't change
         check_node(child.location, None, after_create, self.user_id, None, after_create, self.user_id)
-
 
         # Change the child
         child = self.store.get_item(child.location)
@@ -1642,11 +1654,13 @@ class TestMixedModuleStore(unittest.TestCase):
             assertNumProblems(problem_original_name, 0)
 
     def verify_default_store(self, store_type):
-        # verify default_store property
+        """
+        Verifies the default_store property
+        """
         self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
 
         # verify internal helper method
-        store = self.store._get_modulestore_for_courseid()
+        store = self.store._get_modulestore_for_courseid()  # pylint: disable=protected-access
         self.assertEquals(store.get_modulestore_type(), store_type)
 
         # verify store used for creating a course
