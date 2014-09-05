@@ -26,8 +26,7 @@
   </div>
 </script>
 
-<div class="vert-left">
-<div class="batch-enrollment">
+<section class="batch-enrollment membership-section">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
     <label for="student-ids">
@@ -41,7 +40,7 @@
     <label for="auto-enroll">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
-      <p> 
+      <p>
 	${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
 	${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
 	<br /><br />
@@ -55,7 +54,7 @@
     <label for="email-students">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
-      <p> 
+      <p>
 	${_("If this option is <em>checked</em>, users will receive an email notification.")}
       </p>
     </div>
@@ -67,10 +66,10 @@
   </div>
   <div class="request-response"></div>
   <div class="request-response-error"></div>
-</div>
+</section>
 
 %if section_data['access']['instructor']:
-<div class="batch-beta-testers">
+<section class="batch-beta-testers membership-section">
   <h2> ${_("Batch Beta Tester Addition")} </h2>
   <p>
     <label for="student-ids-for-beta">
@@ -110,11 +109,10 @@
 
   <div class="request-response"></div>
   <div class="request-response-error"></div>
-</div>
+</section>
 %endif
-</div>
 
-<div class="vert-right member-lists-management">
+<section class="member-lists-management membership-section">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
@@ -214,5 +212,4 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-
-</div>
+</section>
