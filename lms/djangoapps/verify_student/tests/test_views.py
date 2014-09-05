@@ -31,8 +31,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from course_modes.models import CourseMode
+from shoppingcart.models import Order, CertificateItem
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
@@ -66,8 +66,8 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestCreateOrderView(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course registration process
     """
@@ -75,7 +75,7 @@ class TestCreateOrderView(TestCase):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(
             course_id=SlashSeparatedCourseKey("Robot", "999", 'Test_Course'),
             mode_slug="verified",
@@ -155,6 +155,14 @@ class TestCreateOrderView(TestCase):
         json_response = json.loads(response.content)
         self.assertTrue(json_response.get('success'))
         self.assertIsNotNone(json_response.get('orderNumber'))
+
+        # Verify that the order exists and is configured correctly
+        order = Order.objects.get(user=self.user)
+        self.assertEqual(order.status, 'paying')
+        item = CertificateItem.objects.get(order=order)
+        self.assertEqual(item.status, 'paying')
+        self.assertEqual(item.course_id, self.course.id)
+        self.assertEqual(item.mode, 'verified')
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)

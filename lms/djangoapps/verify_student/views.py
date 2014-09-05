@@ -227,6 +227,15 @@ def create_order(request):
     enrollment_mode = current_mode.slug
     CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
 
+    # Change the order's status so that we don't accidentally modify it later.
+    # We need to do this to ensure that the parameters we send to the payment system
+    # match what we store in the database.
+    # (Ordinarily we would do this client-side when the user submits the form, but since
+    # the JavaScript on this page does that immediately, we make the change here instead.
+    # This avoids a second AJAX call and some additional complication of the JavaScript.)
+    # If a user later re-enters the verification / payment flow, she will create a new order.
+    cart.start_purchase()
+
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
