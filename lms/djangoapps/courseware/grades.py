@@ -361,6 +361,7 @@ def _calculate_totaled_scores(
         for section_info in sections:
             section = section_info['section_block']
             section_name = block_metadata_utils.display_name_with_default(section)
+            section_due = section_descriptor.due
 
             with outer_atomic():
                 # Check to
@@ -410,15 +411,16 @@ def _calculate_totaled_scores(
                                 total,
                                 graded,
                                 block_metadata_utils.display_name_with_default_escaped(descendant),
-                                descendant.location
+                                descendant.location,
+                                section_due
                             )
                         )
 
-                    __, graded_total = graders.aggregate_scores(scores, section_name)
-                    if keep_raw_scores:
-                        raw_scores += scores
-                else:
-                    graded_total = Score(0.0, 1.0, True, section_name, None)
+                _, graded_total = graders.aggregate_scores(scores, section_name)
+                if keep_raw_scores:
+                    raw_scores += scores
+            else:
+                graded_total = Score(0.0, 1.0, True, section_name, None, section_due)
 
                 # Add the graded total to totaled_scores
                 if graded_total.possible > 0:
@@ -529,6 +531,7 @@ def _progress_summary(student, course, course_structure=None):
             section = course_structure[section_key]
 
             graded = getattr(section, 'graded', False)
+            due = getattr(section, 'due', None)
             scores = []
 
             for descendant_key in course_structure.post_order_traversal(
@@ -551,7 +554,8 @@ def _progress_summary(student, course, course_structure=None):
                     total,
                     graded,
                     block_metadata_utils.display_name_with_default_escaped(descendant),
-                    descendant.location
+                    descendant.location,
+                    due
                 )
 
                 scores.append(weighted_location_score)

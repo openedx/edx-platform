@@ -70,6 +70,7 @@ class ChunkingManager(models.Manager):
         )
         return res
 
+from courseware.signals import score_changed
 
 class StudentModule(models.Model):
     """
@@ -147,6 +148,28 @@ class StudentModule(models.Model):
 
     def __unicode__(self):
         return unicode(repr(self))
+
+
+@receiver(post_save, sender=StudentModule)
+def send_score_changed_signal(sender, instance, **kwargs):
+    """
+    Broadcast the recorded score to connected receivers
+    """
+    if settings.FEATURES.get('SIGNAL_ON_SCORE_CHANGED', False) and instance.grade is not None:
+        previous_entries = StudentModuleHistory.objects.filter(student_module=instance)\
+            .exclude(grade=None)\
+            .exclude(created=instance.modified, state=instance.state)\
+            .order_by('-id')
+        if not len(previous_entries) or\
+            (instance.grade != previous_entries[0].grade) or\
+            (instance.max_grade != previous_entries[0].max_grade):
+            score_changed.send(
+                sender=sender,
+                user=instance.student,
+                course_key=instance.course_id,
+                score=instance.grade,
+                problem=instance.module_state_key
+            )
 
 
 class BaseStudentModuleHistory(models.Model):

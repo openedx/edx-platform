@@ -1071,18 +1071,21 @@ class TestAnswerDistributions(TestSubmittingProblems):
         # We'll submit one problem, and then muck with the student_answers
         # dict inside its state to try different data types (str, int, float,
         # none)
-        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        problem_name = 'p1'
+        self.submit_question_answer(problem_name, {'2_1': u'Correct'})
 
         # Now fetch the state entry for that problem.
-        student_module = StudentModule.objects.get(
+        student_modules = StudentModule.objects.filter(
             course_id=self.course.id,
             student=self.student_user
         )
-        for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
-            state = json.loads(student_module.state)
-            state["student_answers"]['{}_2_1'.format(self.p1_html_id)] = val
-            student_module.state = json.dumps(state)
-            student_module.save()
+        for student_module in student_modules:
+            if student_module.module_state_key.name == problem_name:
+                for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
+                    state = json.loads(student_module.state)
+                    state["student_answers"]['{}_2_1'.format(self.p1_html_id)] = val
+                    student_module.state = json.dumps(state)
+                    student_module.save()
 
             self.assertEqual(
                 grades.answer_distributions(self.course.id),
@@ -1092,40 +1095,64 @@ class TestAnswerDistributions(TestSubmittingProblems):
                     },
                 }
             )
+        for student_module in student_modules:
+            if student_module.module_state_key.name == problem_name:
+                for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
+                    state = json.loads(student_module.state)
+                    state["student_answers"]['i4x-MITx-100-problem-p1_2_1'] = val
+                    student_module.state = json.dumps(state)
+                    student_module.save()
+
+                    self.assertEqual(
+                        grades.answer_distributions(self.course.id),
+                        {
+                            ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                                str(val): 1
+                            },
+                        }
+                    )
 
     def test_missing_content(self):
         # If there's a StudentModule entry for content that no longer exists,
         # we just quietly ignore it (because we can't display a meaningful url
         # or name for it).
-        self.submit_question_answer('p1', {'2_1': 'Incorrect'})
+        problem_name = 'p1'
+        self.submit_question_answer(problem_name, {'2_1': 'Incorrect'})
 
         # Now fetch the state entry for that problem and alter it so it points
         # to a non-existent problem.
-        student_module = StudentModule.objects.get(
+        student_modules = StudentModule.objects.filter(
             course_id=self.course.id,
             student=self.student_user
         )
-        student_module.module_state_key = student_module.module_state_key.replace(
-            name=student_module.module_state_key.name + "_fake"
-        )
-        student_module.save()
+        for student_module in student_modules:
+            if student_module.module_state_key.name == problem_name:
+                student_module.module_state_key = student_module.module_state_key.replace(
+                    name=student_module.module_state_key.name + "_fake"
+                )
+                student_module.save()
 
-        # It should be empty (ignored)
-        empty_distribution = grades.answer_distributions(self.course.id)
-        self.assertFalse(empty_distribution)  # should be empty
+                # It should be empty (ignored)
+                empty_distribution = grades.answer_distributions(self.course.id)
+                self.assertFalse(empty_distribution)  # should be empty
 
     def test_broken_state(self):
         # Missing or broken state for a problem should be skipped without
         # causing the whole answer_distribution call to explode.
 
         # Submit p1
-        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        prb1_name = 'p1'
+        self.submit_question_answer(prb1_name, {'2_1': u'Correct'})
 
         # Now fetch the StudentModule entry for p1 so we can corrupt its state
-        prb1 = StudentModule.objects.get(
+        student_modules = StudentModule.objects.filter(
             course_id=self.course.id,
             student=self.student_user
         )
+        for student_module in student_modules:
+            if student_module.module_state_key.name == prb1_name:
+                prb1 = student_module
+                break
 
         # Submit p2
         self.submit_question_answer('p2', {'2_1': u'Incorrect'})
