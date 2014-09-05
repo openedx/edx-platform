@@ -6,7 +6,7 @@ from requests.exceptions import ConnectionError
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.http import Http404
@@ -17,8 +17,8 @@ from rest_framework.response import Response
 
 from courseware import grades, module_render
 from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
 from lms.lib.comment_client.user import User as CommentUser
@@ -34,7 +34,7 @@ from util.password_policy_validators import (
 )
 
 from api_manager.courses.serializers import CourseModuleCompletionSerializer
-from api_manager.courseware_access import get_course, get_course_child, get_course_total_score, get_course_key, course_exists
+from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists, calculate_proforma_grade
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
@@ -917,36 +917,27 @@ class UsersCoursesGradesDetail(SecureAPIView):
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        courseware_summary = grades.progress_summary(student, request, course_descriptor)  # pylint: disable=W0612
+        progress_summary = grades.progress_summary(student, request, course_descriptor)  # pylint: disable=W0612
         grade_summary = grades.grade(student, request, course_descriptor)
         grading_policy = course_descriptor.grading_policy
-
-        queryset = StudentModule.objects.filter(
-            course_id__exact=course_key,
-            max_grade__isnull=False,
-            max_grade__gt=0
-        )
-
-        total_score = get_course_total_score(courseware_summary)
-        user_queryset = queryset.filter(grade__isnull=False, student=student)
-        comp_modules = user_queryset.aggregate(Sum('grade'))
-        score_of_comp_module = comp_modules['grade__sum'] or 0
-        max_possible_score = user_queryset.aggregate(Sum('max_grade'))
         current_grade = 0
-        pro_forma_grade = 0
-        if total_score:
-            current_grade = score_of_comp_module / float(total_score) * 100
+        proforma_grade = 0
 
-        if max_possible_score['max_grade__sum']:
-            pro_forma_grade = score_of_comp_module / float(max_possible_score['max_grade__sum']) * 100
+        queryset = StudentGradebook.objects.filter(
+            user=student,
+            course_id__exact=course_key,
+        )
+        if len(queryset):
+            current_grade = queryset[0].grade
+            proforma_grade = calculate_proforma_grade(grade_summary, grading_policy)
+
         response_data = {
-            'courseware_summary': courseware_summary,
+            'courseware_summary': progress_summary,
             'grade_summary': grade_summary,
             'grading_policy': grading_policy,
             'current_grade': current_grade,
-            'pro_forma_grade': pro_forma_grade
+            'proforma_grade': proforma_grade
         }
-
         return Response(response_data)
 
 

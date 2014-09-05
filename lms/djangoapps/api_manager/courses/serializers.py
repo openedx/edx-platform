@@ -23,18 +23,12 @@ class GradeSerializer(serializers.Serializer):
 
 class CourseLeadersSerializer(serializers.Serializer):
     """ Serializer for course leaderboard """
-    id = serializers.IntegerField(source='student__id')
-    username = serializers.CharField(source='student__username')
-    title = serializers.CharField(source='student__profile__title')
-    avatar_url = serializers.CharField(source='student__profile__avatar_url')
-    points_scored = serializers.SerializerMethodField('get_points_scored')
-
-    def get_points_scored(self, obj):
-        """
-        formats points_scored to two decimal points
-        """
-        points_scored = obj['points_scored'] or 0
-        return int(round(points_scored))
+    id = serializers.IntegerField(source='user__id')
+    username = serializers.CharField(source='user__username')
+    title = serializers.CharField(source='user__profile__title')
+    avatar_url = serializers.CharField(source='user__profile__avatar_url')
+    # Percentage grade (versus letter grade)
+    grade = serializers.FloatField(source='grade')
 
 
 class CourseCompletionsLeadersSerializer(serializers.Serializer):
