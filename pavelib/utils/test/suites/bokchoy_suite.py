@@ -1,6 +1,8 @@
 """
 Class used for defining and running Bok Choy acceptance test suite
 """
+import os
+
 from paver.easy import sh
 from pavelib.utils.test.suites import TestSuite
 from pavelib.utils.envs import Env
@@ -90,13 +92,32 @@ class BokChoyTestSuite(TestSuite):
         sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
         bokchoy_utils.clear_mongo()
 
+    def _get_spec(self, filename):
+        # provides the test file relative to the root test_dir
+        # for example, discussion/test_discussion.py
+        for root, dirs, files in os.walk(self.test_dir):
+            for file in files:
+                if file.endswith(filename):
+                    return os.path.join(root, file)
+
+    def _find_test_spec(self):
+        # provides the end of the nosetest regex path
+        # for running bok-choy tests
+        if ":" in self.test_spec:
+            filename, which_test = self.test_spec.split(":")
+            return self._get_spec(filename) + ":" + which_test
+        else:
+            return self._get_spec(self.test_spec)
+
     @property
     def cmd(self):
         # Default to running all tests if no specific test is specified
         if not self.test_spec:
             test_spec = self.test_dir
         else:
-            test_spec = self.test_dir / self.test_spec
+            # find where the requested bok-choy test exists in the filesystem
+            # and parse the parameter into the proper path and pattern
+            test_spec = self._find_test_spec()
 
         # Construct the nosetests command, specifying where to save
         # screenshots and XUnit XML reports
