@@ -156,6 +156,7 @@ def _preview_module_system(request, descriptor):
         services={
             "i18n": ModuleI18nService(),
         },
+        platform_settings=settings.EXTRA_XBLOCK_SETTINGS,
     )
 
 

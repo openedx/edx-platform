@@ -1726,3 +1726,6 @@ OPENID_DOMAIN_PREFIX = 'openid:'
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
 ANALYTICS_DASHBOARD_URL = ""
+
+### Platform-wide configuration used to initialize the XBlock runtime
+EXTRA_XBLOCK_SETTINGS = {}
