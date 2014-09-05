@@ -114,12 +114,12 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
                 if new_url:
                     sources[index] = new_url
 
-        for index, source_url in enumerate(sources):
-            if (getattr(self, 'video_link_transience', False) and
-                'amazonaws.com' in source_url):
-                new_url = get_s3_transient_url(source_url, self.video_link_transience)
-                if new_url:
-                    sources[index] = new_url
+        if getattr(self, 'video_link_transience', False):
+            for index, source_url in enumerate(sources):
+                if 'amazonaws.com' in source_url:
+                    new_url = get_s3_transient_url(source_url, self.video_link_transience)
+                    if new_url:
+                        sources[index] = new_url
 
         if self.download_video:
             if self.source:

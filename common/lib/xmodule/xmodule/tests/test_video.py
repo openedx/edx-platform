@@ -583,6 +583,7 @@ class VideoCdnTest(unittest.TestCase):
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
+
 class VideoLinkTransienceTest(unittest.TestCase):
     """
     Tests for temporary video links.
@@ -590,20 +591,18 @@ class VideoLinkTransienceTest(unittest.TestCase):
 
     def test_url_create(self):
         """
-        Test if bucket name and object name is present in transient URL..
+        Test if bucket name and object name is present in transient URL.
         """
-        aws_access_key = "test_key"
-        aws_secret_key = "test_secret"
-        bucket_name = 'bucket'
-        credentials = '{}:{}:{}'.format(bucket_name, aws_access_key, aws_secret_key)
+        credentials = 'bucket:test_key:test_secret'
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/video.mp4",
             "http://bucket.s3.amazonaws.com/video.mp4",
         ]
         for origin_url in origin_video_urls:
             url = get_s3_transient_url(origin_url, credentials)
-            self.assertIn('https://bucket.s3.amazonaws.com/video.mp4', url)
-            self.assertIn('https://bucket.s3.amazonaws.com/video.mp4', url)
+            self.assertIn("https://bucket.s3.amazonaws.com/video.mp4", url)
+            self.assertIn('AWSAccessKeyId=test_key', url)
+            self.assertNotIn('test_secret', url)
 
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/subfolder/video.mp4",
@@ -611,4 +610,15 @@ class VideoLinkTransienceTest(unittest.TestCase):
         ]
         for origin_url in origin_video_urls:
             url = get_s3_transient_url(origin_url, credentials)
-            self.assertIn('https://bucket.s3.amazonaws.com/subfolder/video.mp4', url)
+            self.assertIn("https://bucket.s3.amazonaws.com/subfolder/video.mp4", url)
+            self.assertIn('AWSAccessKeyId=test_key', url)
+            self.assertNotIn('test_secret', url)
+
+    def test_url_create_wrong_credentials(self):
+        """
+        Test if wrong credentials provided.
+        """
+        credentials = ['', 'wo_delimiters', 'one:delimiter']
+        video_url = "http://s3.amazonaws.com/bucket/video.mp4"
+        for credential in credentials:
+            self.assertIsNone(get_s3_transient_url(video_url, credential))

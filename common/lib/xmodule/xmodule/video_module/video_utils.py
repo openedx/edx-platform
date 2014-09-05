@@ -1,7 +1,6 @@
 """
 Module containts utils specific for video_module but not for transcripts.
 """
-import time
 import json
 import logging
 import urllib
@@ -76,7 +75,17 @@ def get_s3_transient_url(video_url, video_link_transience, expires_in=10):
     """
     Get S3 transient video url.
     """
-    bucket_name, access_key, secret_key = [i.strip() for i in video_link_transience.split(':')]
+
+    try:
+        bucket_name, access_key, secret_key = [i.strip() for i in video_link_transience.split(':')]
+    except ValueError:
+        log.info(
+            'Could not parse Video Link Transience Credentials: \
+            %s. Should be "bucket_name:aws_access_key:aws_secret_key" string.',
+            video_link_transience,
+            exc_info=True
+        )
+        return None
 
     conn = S3Connection(access_key, secret_key)
     url = urlparse(video_url)
@@ -90,6 +99,5 @@ def get_s3_transient_url(video_url, video_link_transience, expires_in=10):
         bucket, sep, video_name = url.path.strip('/').partition('/')
     elif bucket_name in url.netloc:
         video_name = url.path.strip('/')
-    else:
-        return None # this needs to be checked. is it possible to not having bucket name in origin_url
+
     return conn.generate_url(expires_in, 'GET', bucket_name, video_name)
