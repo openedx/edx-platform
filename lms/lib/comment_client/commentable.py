@@ -1,6 +1,6 @@
+"""Provides base Commentable model class"""
 import models
 import settings
-
 
 class Commentable(models.Model):
 
