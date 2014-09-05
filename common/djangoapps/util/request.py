@@ -1,6 +1,4 @@
 """ Utility functions related to HTTP requests """
-from django.core.handlers.base import BaseHandler
-from django.test import RequestFactory
 import re
 import logging
 

@@ -15,12 +15,17 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.test.utils import override_settings
+from django.utils import timezone
+
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware import module_render
 from courseware.tests.factories import StudentModuleFactory
+from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from gradebook.models import StudentGradebook
 from instructor.access import allow_access
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -29,7 +34,7 @@ from .content import TEST_COURSE_OVERVIEW_CONTENT, TEST_COURSE_UPDATES_CONTENT, 
 from .content import TEST_STATIC_TAB1_CONTENT, TEST_STATIC_TAB2_CONTENT
 
 TEST_API_KEY = str(uuid.uuid4())
-USER_COUNT = 5
+USER_COUNT = 6
 SAMPLE_GRADE_DATA_COUNT = 4
 
 
@@ -55,6 +60,22 @@ def _fake_get_get_course_social_stats(course_id):
                                                    })
 class CoursesApiTests(TestCase):
     """ Test suite for Courses API views """
+
+    def get_module_for_user(self, user, course, problem):
+        """Helper function to get useful module at self.location in self.course_id for user"""
+        mock_request = mock.MagicMock()
+        mock_request.user = user
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, user, course, depth=2)
+        module = module_render.get_module(  # pylint: disable=protected-access
+            user,
+            mock_request,
+            problem.location,
+            field_data_cache,
+            course.id
+        )
+        return module
+
 
     def setUp(self):
         self.test_server_prefix = 'https://testserver'
@@ -169,38 +190,23 @@ class CoursesApiTests(TestCase):
             user_profile.save()
 
         for i in xrange(SAMPLE_GRADE_DATA_COUNT - 1):
-            category = 'mentoring'
-            module_type = 'mentoring'
+            section = 'Midterm Exam'
             if i % 2 is 0:
-                category = 'group-project'
-                module_type = 'group-project'
-
+                section = "Final Exam"
             self.item = ItemFactory.create(
-                parent_location=self.unit.location,
-                category=category,
-                data=StringResponseXMLFactory().build_xml(answer='foo'),
-                metadata={'rerandomize': 'always'},
-                display_name=u"test problem" + str(i)
+                parent_location=self.chapter.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name='Problem {}'.format(i),
+                metadata={'rerandomize': 'always', 'graded': True, 'format': section}
             )
 
             for j, user in enumerate(self.users):
-                the_grade = j * 0.75
-                StudentModuleFactory.create(
-                    grade=the_grade,
-                    max_grade=1 if i < j else 0.5,
-                    student=user,
-                    course_id=self.course.id,
-                    module_state_key=self.item.location,
-                    state=json.dumps({'attempts': self.attempts}),
-                    module_type=module_type
-                )
-
-            for j, user in enumerate(self.users):
-                StudentModuleFactory.create(
-                    course_id=self.course.id,
-                    module_type='sequential',
-                    module_state_key=self.item.location,
-                )
+                points_scored = (j + 1) * 20
+                points_possible = 100
+                module = self.get_module_for_user(user, self.course, self.item)
+                grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+                module.system.publish(module, 'grade', grade_dict)
 
         self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'i4x://foo/bar/baz'
@@ -330,7 +336,7 @@ class CoursesApiTests(TestCase):
         chapter = response.data['content'][0]
         self.assertEqual(chapter['category'], 'chapter')
         self.assertEqual(chapter['name'], 'Overview')
-        self.assertEqual(len(chapter['children']), 2)
+        self.assertEqual(len(chapter['children']), 5)
 
         sequence = chapter['children'][0]
         self.assertEqual(sequence['category'], 'videosequence')
@@ -1521,7 +1527,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(completion_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_social_metrics(self):
+    def test_courses_metrics_social_get(self):
         test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1541,90 +1547,68 @@ class CoursesApiTests(TestCase):
         self.assertFalse(users.get('1'))
         self.assertTrue(users.get('2'))
 
-    def test_courses_leaders_list_get(self):
+    def test_courses_metrics_grades_leaders_list_get(self):
         # make the last user an observer to asset that its content is being filtered out from
         # the aggregates
+        expected_course_average = 0.398
         allow_access(self.course, self.users[USER_COUNT-1], 'observer')
-        # create another module completion to two users with same points
-        unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
-            category="vertical",
-            metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit",
-        )
 
         item = ItemFactory.create(
-            parent_location=unit.location,
+            parent_location=self.chapter.location,
             category='mentoring',
             data=StringResponseXMLFactory().build_xml(answer='foo'),
-            metadata={'rerandomize': 'always'},
-            display_name=u"test problem same points"
+            display_name=u"test problem smae points",
+            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
         )
 
-        StudentModuleFactory.create(
-            grade=2.25,
-            max_grade=4,
-            student=self.users[USER_COUNT-3],
-            course_id=self.course.id,
-            module_state_key=item.location,
-            state=json.dumps({'attempts': self.attempts}),
-            module_type='mentoring'
-        )
-        StudentModule.objects.filter(student=self.users[USER_COUNT-3]).update(created=datetime.now()-timedelta(days=1))
+        points_scored = 2.25
+        points_possible = 4
+        user = self.users[USER_COUNT - 3]
+        module = self.get_module_for_user(user, self.course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
 
-        test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_course_id)
+        points_scored = 2.25
+        points_possible = 4
+        user = self.users[USER_COUNT - 2]
+        module = self.get_module_for_user(user, self.course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        StudentGradebook.objects.filter(user=user).update(created=timezone.now() - timedelta(days=1))
+        test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['leaders'][0]['username'], 'testuser2')
-        self.assertEqual(response.data['course_avg'], 3.9)
+        self.assertEqual(response.data['leaders'][0]['username'], 'testuser4')
+        self.assertEqual(response.data['course_avg'], expected_course_average)
 
-        test_uri = '{}/{}/metrics/proficiency/leaders/?{}'.format(self.base_courses_uri, self.test_course_id, 'count=4')
-        response = self.do_get(test_uri)
+        count_filter_test_uri = '{}?{}'.format(test_uri, 'count=4')
+        response = self.do_get(count_filter_test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
 
-        # Filter by content_id
-        content_id = {'content_id': self.item.scope_ids.usage_id}
-        content_filter_uri = '{}/{}/metrics/proficiency/leaders/?{}'\
-            .format(self.base_courses_uri, self.test_course_id, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 1.1)
-
         # Filter by user_id
-        user_filter_uri = '{}/{}/metrics/proficiency/leaders/?user_id={}'\
-            .format(self.base_courses_uri, self.test_course_id, self.users[2].id)
+        user_filter_uri = '{}?user_id={}'.format(test_uri, self.users[1].id)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 3.9)
-        self.assertEqual(response.data['position'], 1)
-        self.assertEqual(response.data['points'], 7)
+        self.assertEqual(response.data['course_avg'], expected_course_average)
+        self.assertEqual(response.data['user_position'], 4)
+        self.assertEqual(response.data['user_grade'], 0.28)
 
         # Filter by user who has never accessed a course module
         test_user = UserFactory.create(username="testusernocoursemod")
-        user_filter_uri = '{}/{}/metrics/proficiency/leaders/?user_id={}'\
-            .format(self.base_courses_uri, self.test_course_id, test_user.id)
+        user_filter_uri = '{}?user_id={}'.format(test_uri, test_user.id)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], 3.9)
-        self.assertEqual(response.data['position'], 5)
-        self.assertEqual(response.data['points'], 0)
+        self.assertEqual(response.data['user_grade'], 0)
+        self.assertEqual(response.data['user_position'], 6)
 
         # test with bogus course
-        test_uri = '{}/{}/metrics/proficiency/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(test_uri)
+        bogus_test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
+        response = self.do_get(bogus_test_uri)
         self.assertEqual(response.status_code, 404)
-
-        # test with bogus content filter
-        content_id = {'content_id': self.test_bogus_content_id}
-        content_filter_uri = '{}/{}/metrics/proficiency/leaders/?{}'\
-            .format(self.base_courses_uri, self.test_course_id, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 400)
 
     def test_courses_completions_leaders_list_get(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
@@ -1663,7 +1647,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual(response.data['course_avg'], 24)
+        self.assertEqual(response.data['course_avg'], 20)
 
         # without count filter and user_id
         test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
@@ -1672,57 +1656,52 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
         self.assertEqual(response.data['position'], 2)
-        self.assertEqual(response.data['completions'], 26)
+        self.assertEqual(response.data['completions'], 28)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_courses_grades_list_get(self):
+    def test_courses_metrics_grades_list_get(self):
         # Retrieve the list of grades for this course
         # All the course/item/user scaffolding was handled in Setup
-        test_uri = '{}/{}/grades'.format(self.base_courses_uri, self.test_course_id)
+        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(response.data['average_grade'], 0)
-        self.assertGreater(response.data['points_scored'], 0)
-        self.assertGreater(response.data['points_possible'], 0)
-        self.assertGreater(response.data['course_average_grade'], 0)
-        self.assertGreater(response.data['course_points_scored'], 0)
-        self.assertGreater(response.data['course_points_possible'], 0)
-        self.assertGreater(len(response.data['grades']), 0)
+        self.assertGreater(response.data['grade_average'], 0)
+        self.assertGreater(response.data['grade_maximum'], 0)
+        self.assertGreater(response.data['grade_minimum'], 0)
+        self.assertEqual(response.data['grade_count'], USER_COUNT)
+        self.assertGreater(response.data['course_grade_average'], 0)
+        self.assertGreater(response.data['course_grade_maximum'], 0)
+        self.assertGreater(response.data['course_grade_minimum'], 0)
+        self.assertEqual(response.data['course_grade_count'], USER_COUNT)
+        self.assertEqual(len(response.data['grades']), USER_COUNT)
 
         # Filter by user_id
         user_filter_uri = '{}?user_id=1,3'.format(test_uri)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(response.data['average_grade'], 0)
-        self.assertGreater(response.data['points_scored'], 0)
-        self.assertGreater(response.data['points_possible'], 0)
-        self.assertGreater(response.data['course_average_grade'], 0)
-        self.assertGreater(response.data['course_points_scored'], 0)
-        self.assertGreater(response.data['course_points_possible'], 0)
-        self.assertGreater(len(response.data['grades']), 0)
+        self.assertGreater(response.data['grade_average'], 0)
+        self.assertGreater(response.data['grade_maximum'], 0)
+        self.assertGreater(response.data['grade_minimum'], 0)
+        self.assertEqual(response.data['grade_count'], 2)
+        self.assertGreater(response.data['course_grade_average'], 0)
+        self.assertGreater(response.data['course_grade_maximum'], 0)
+        self.assertGreater(response.data['course_grade_minimum'], 0)
+        self.assertEqual(response.data['course_grade_count'], USER_COUNT)
+        self.assertEqual(len(response.data['grades']), 2)
 
-        # Filter by content_id
-        content_id = {'content_id': self.item.scope_ids.usage_id}
-        content_filter_uri = '{}?{}'.format(test_uri, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
+        # make the last user an observer to asset that its content is being filtered out from
+        # the aggregates
+        user_index = USER_COUNT - 1
+        allow_access(self.course, self.users[user_index], 'observer')
+        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertGreater(response.data['average_grade'], 0)
-        self.assertGreater(response.data['points_scored'], 0)
-        self.assertGreater(response.data['points_possible'], 0)
-        self.assertGreater(response.data['course_average_grade'], 0)
-        self.assertGreater(response.data['course_points_scored'], 0)
-        self.assertGreater(response.data['course_points_possible'], 0)
-        self.assertGreater(len(response.data['grades']), 0)
+        self.assertEqual(len(response.data['grades']), user_index)
 
-        # Filter by invalid content_id
-        content_id = {'content_id': self.test_bogus_content_id}
-        content_filter_uri = '{}?{}'.format(test_uri, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 400)
 
     def test_courses_grades_list_get_invalid_course(self):
         # Retrieve the list of grades for this course
@@ -1879,6 +1858,10 @@ class CoursesApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 1)
         self.assertEqual(response.data['results'][0]['city'], 'Denver')
         self.assertEqual(response.data['results'][0]['count'], 5)
+
+        # Do a get with a bogus course to hit the 404 case
+        response = self.do_get('{}/{}/metrics/cities/'.format(self.base_courses_uri, self.test_bogus_course_id))
+        self.assertEqual(response.status_code, 404)
 
     def test_courses_roles_list_get(self):
         allow_access(self.course, self.users[0], 'staff')

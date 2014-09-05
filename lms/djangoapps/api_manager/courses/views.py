@@ -5,13 +5,13 @@ import logging
 import itertools
 from lxml import etree
 from StringIO import StringIO
-from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum, Count, Max
+from django.db.models import Avg, Count, Max, Min
 from django.http import Http404
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
@@ -22,6 +22,7 @@ from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
+from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, UserBasedRole
@@ -1400,9 +1401,9 @@ class CourseModuleCompletionList(SecureListAPIView):
             return Response({'message': _('Resource already exists')}, status=status.HTTP_409_CONFLICT)
 
 
-class CoursesGradesList(SecureListAPIView):
+class CoursesMetricsGradesList(SecureListAPIView):
     """
-    ### The CoursesGradesList view allows clients to retrieve a list of grades for the specified Course
+    ### The CoursesMetricsGradesList view allows clients to retrieve a list of grades for the specified Course
     - URI: ```/api/courses/{course_id}/grades/```
     - GET: Returns a JSON representation (array) of the set of grade objects
     ### Use Cases/Notes:
@@ -1411,54 +1412,44 @@ class CoursesGradesList(SecureListAPIView):
 
     def get(self, request, course_id):  # pylint: disable=W0221
         """
-        GET /api/courses/{course_id}/grades?user_ids=1,2&content_ids=i4x://1/2/3,i4x://a/b/c
+        GET /api/courses/{course_id}/metrics/grades?user_ids=1,2
         """
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
-        queryset = StudentModule.objects.filter(
-            course_id__exact=course_key,
-            grade__isnull=False,
-            max_grade__isnull=False,
-            max_grade__gt=0
-        )
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        queryset = StudentGradebook.objects.filter(course_id__exact=course_key).exclude(user__in=exclude_users)
 
-        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 200)
         user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         if user_ids:
             user_ids = map(int, user_ids.split(','))[:upper_bound]
-            queryset = queryset.filter(student__in=user_ids)
-
-        content_id = self.request.QUERY_PARAMS.get('content_id', None)
-        if content_id:
-            content_descriptor, content_key, existing_content = get_course_child(request, request.user, course_key, content_id)  # pylint: disable=W0612
-            if not content_descriptor:
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
-            queryset = queryset.filter(module_state_key=content_key)
+            queryset = queryset.filter(user__in=user_ids)
 
         queryset_grade_avg = queryset.aggregate(Avg('grade'))
-        queryset_grade_sum = queryset.aggregate(Sum('grade'))
-        queryset_maxgrade_sum = queryset.aggregate(Sum('max_grade'))
+        queryset_grade_max = queryset.aggregate(Max('grade'))
+        queryset_grade_min = queryset.aggregate(Min('grade'))
+        queryset_grade_count = queryset.aggregate(Count('grade'))
 
-        course_queryset = StudentModule.objects.filter(
-            course_id__exact=course_key,
-            grade__isnull=False,
-            max_grade__isnull=False,
-            max_grade__gt=0
-        )
+        course_queryset = StudentGradebook.objects.filter(course_id__exact=course_key).exclude(user__in=exclude_users)
         course_queryset_grade_avg = course_queryset.aggregate(Avg('grade'))
-        course_queryset_grade_sum = course_queryset.aggregate(Sum('grade'))
-        course_queryset_maxgrade_sum = course_queryset.aggregate(Sum('max_grade'))
+        course_queryset_grade_max = course_queryset.aggregate(Max('grade'))
+        course_queryset_grade_min = course_queryset.aggregate(Min('grade'))
+        course_queryset_grade_count = course_queryset.aggregate(Count('grade'))
 
         response_data = {}
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
-        response_data['average_grade'] = queryset_grade_avg['grade__avg']
-        response_data['points_scored'] = queryset_grade_sum['grade__sum']
-        response_data['points_possible'] = queryset_maxgrade_sum['max_grade__sum']
-        response_data['course_average_grade'] = course_queryset_grade_avg['grade__avg']
-        response_data['course_points_scored'] = course_queryset_grade_sum['grade__sum']
-        response_data['course_points_possible'] = course_queryset_maxgrade_sum['max_grade__sum']
+
+        response_data['grade_average'] = queryset_grade_avg['grade__avg']
+        response_data['grade_maximum'] = queryset_grade_max['grade__max']
+        response_data['grade_minimum'] = queryset_grade_min['grade__min']
+        response_data['grade_count'] = queryset_grade_count['grade__count']
+
+        response_data['course_grade_average'] = course_queryset_grade_avg['grade__avg']
+        response_data['course_grade_maximum'] = course_queryset_grade_max['grade__max']
+        response_data['course_grade_minimum'] = course_queryset_grade_min['grade__min']
+        response_data['course_grade_count'] = course_queryset_grade_count['grade__count']
 
         response_data['grades'] = []
         for row in queryset:
@@ -1482,9 +1473,9 @@ class CoursesProjectList(SecureListAPIView):
         return Project.objects.filter(course_id=course_key)
 
 
-class CourseMetrics(SecureAPIView):
+class CoursesMetrics(SecureAPIView):
     """
-    ### The CourseMetrics view allows clients to retrieve a list of Metrics for the specified Course
+    ### The CoursesMetrics view allows clients to retrieve a list of Metrics for the specified Course
     - URI: ```/api/courses/{course_id}/metrics/```
     - GET: Returns a JSON representation (array) of the set of course metrics
     ### Use Cases/Notes:
@@ -1505,85 +1496,46 @@ class CourseMetrics(SecureAPIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class CoursesLeadersList(SecureListAPIView):
+class CoursesMetricsGradesLeadersList(SecureListAPIView):
     """
-    ### The CoursesLeadersList view allows clients to retrieve top 3 users who are leading
-    in terms of points_scored and course average for the specified Course. If user_id parameter is given
+    ### The CoursesMetricsGradesLeadersList view allows clients to retrieve top 3 users who are leading
+    in terms of grade and course average for the specified Course. If user_id parameter is given
     it would return user's position
-    - URI: ```/api/courses/{course_id}/metrics/proficiency/leaders/?user_id={user_id}```
-    - GET: Returns a JSON representation (array) of the users with points scored
-    Filters can also be applied
-    ```/api/courses/{course_id}/metrics/proficiency/leaders/?content_id={content_id}```
+    - URI: ```/api/courses/{course_id}/metrics/grades/leaders/?user_id={user_id}```
+    - GET: Returns a JSON representation (array) of the users with grades
     To get more than 3 users use count parameter
-    ```/api/courses/{course_id}/metrics/proficiency/leaders/?count=3```
+    ``` /api/courses/{course_id}/metrics/grades/leaders/?count=3```
     ### Use Cases/Notes:
-    * Example: Display proficiency leaderboard of a given course
-    * Example: Display position of a users in a course in terms of proficiency points and course avg
+    * Example: Display grades leaderboard of a given course
+    * Example: Display position of a users in a course in terms of grade and course avg
     """
 
     def get(self, request, course_id):  # pylint: disable=W0613,W0221
         """
-        GET /api/courses/{course_id}/metrics/proficiency/leaders/
+        GET /api/courses/{course_id}/grades/leaders/
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
-        content_id = self.request.QUERY_PARAMS.get('content_id', None)
         count = self.request.QUERY_PARAMS.get('count', 3)
         data = {}
         course_avg = 0
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
+        # Users having certain roles (such as an Observer) are excluded from aggregations
         exclude_users = _get_aggregate_exclusion_user_ids(course_key)
-        queryset = StudentModule.objects.filter(
-            course_id__exact=course_key,
-            grade__isnull=False,
-            max_grade__isnull=False,
-            max_grade__gt=0,
-            student__is_active=True
-        ).exclude(student__in=exclude_users)
-
-        if content_id:
-            content_descriptor, content_key, existing_content = get_course_child(request, request.user, course_key, content_id)  # pylint: disable=W0612
-            if not content_descriptor:
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
-            queryset = queryset.filter(module_state_key=content_key)
-
-        if user_id:
-            user_queryset = StudentModule.objects.filter(course_id__exact=course_key, grade__isnull=False,
-                                                         max_grade__isnull=False,
-                                                         max_grade__gt=0,
-                                                         student__id=user_id)
-            user_points = user_queryset.aggregate(points=Sum('grade'))
-            user_points = user_points['points'] or 0
-            user_points = round(user_points, 2)
-            user_time_scored = user_queryset.aggregate(time_scored=Max('created'))
-            user_time_scored = user_time_scored['time_scored'] or datetime.now()
-            users_above = queryset.values('student__id').annotate(points=Sum('grade'))\
-                .annotate(time_scored=Max('created')).\
-                filter(Q(points__gt=user_points) | Q(points__gte=user_points, time_scored__lt=user_time_scored))\
-                .exclude(student__id=user_id).count()  # excluding user to overcome
-                #  float comparison bug
-            data['position'] = users_above + 1
-            data['points'] = int(round(user_points))
-
-        points = queryset.aggregate(total=Sum('grade'))
-        if points and points['total'] is not None:
-            users_total = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users).count()
-            if users_total:
-                course_avg = round(points['total'] / float(users_total), 1)
-        data['course_avg'] = course_avg
-        queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
-                                                                   'student__profile__title',
-                                                                   'student__profile__avatar_url')\
-            .annotate(points_scored=Sum('grade')).annotate(time_scored=Max('created'))\
-                       .order_by('-points_scored', 'time_scored')[:count]
-        serializer = CourseLeadersSerializer(queryset, many=True)
-
+        leaderboard_data = StudentGradebook.generate_leaderboard(course_key, user_id=user_id, count=count, exclude_users=exclude_users)
+        serializer = CourseLeadersSerializer(leaderboard_data['queryset'], many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
+        data['course_avg'] = leaderboard_data['course_avg']
+        if 'user_position' in leaderboard_data:
+            data['user_position'] = leaderboard_data['user_position']
+        if 'user_grade' in leaderboard_data:
+            data['user_grade'] = leaderboard_data['user_grade']
+
         return Response(data, status=status.HTTP_200_OK)
 
 
-class CoursesCompletionsLeadersList(SecureAPIView):
+class CoursesMetricsCompletionsLeadersList(SecureAPIView):
     """
     ### The CoursesCompletionsLeadersList view allows clients to retrieve top 3 users who are leading
     in terms of course module completions and course average for the specified Course, if user_id parameter is given
@@ -1624,7 +1576,7 @@ class CoursesCompletionsLeadersList(SecureAPIView):
                 .exclude(cat_list)
             user_completions = user_queryset.count()
             user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
-            user_time_completed = user_time_completed['time_completed'] or datetime.now()
+            user_time_completed = user_time_completed['time_completed'] or timezone.now()
             completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
                 .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
                 .filter(Q(completions__gt=user_completions) | Q(completions=user_completions,
@@ -1670,9 +1622,9 @@ class CoursesWorkgroupsList(SecureListAPIView):
         return queryset
 
 
-class CoursesSocialMetrics(SecureListAPIView):
+class CoursesMetricsSocial(SecureListAPIView):
     """
-    ### The CoursesSocialMetrics view allows clients to query about the activity of all users in the
+    ### The CoursesMetricsSocial view allows clients to query about the activity of all users in the
     forums
     - URI: ```/api/users/{course_id}/metrics/social/```
     - GET: Returns a list of social metrics for users in the specified course
@@ -1712,9 +1664,9 @@ class CoursesSocialMetrics(SecureListAPIView):
         return Response(data, http_status)
 
 
-class CoursesCitiesMetrics(SecureListAPIView):
+class CoursesMetricsCities(SecureListAPIView):
     """
-    ### The CoursesCitiesMetrics view allows clients to retrieve ordered list of user
+    ### The CoursesMetricsCities view allows clients to retrieve ordered list of user
     count by city in a particular course
     - URI: ```/api/courses/{course_id}/metrics/cities/```
     - GET: Provides paginated list of user count by cities
