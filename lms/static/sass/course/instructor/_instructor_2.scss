@@ -329,16 +329,12 @@ section.instructor-dashboard-content-2 {
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
   $half_width: $baseline * 20;
 
-  .vert-left,
-  .vert-right {
-    display: inline-block;
-    vertical-align: top;
-    width: 48%;
-    margin-right: 2%;
-  }
+  .membership-section {
+    margin-bottom: $baseline;
 
-  .vert-right {
-    margin-right: 0;
+    &:last-child {
+      margin-bottom: 0; // last child!
+    }
   }
 
   .batch-enrollment, .batch-beta-testers {
