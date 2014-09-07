@@ -14,7 +14,7 @@ from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
-    get_course_by_id, get_cms_course_link, course_image_url, course_video_url
+    get_course_by_id, get_cms_course_link, course_image_url, course_video_url,
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
 from courseware.tests.helpers import get_request_for_user

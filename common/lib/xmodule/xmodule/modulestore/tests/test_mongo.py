@@ -552,7 +552,7 @@ class TestMongoModuleStore(unittest.TestCase):
             assert_false(path(root_dir / 'test_export/static/videos/course_video.mp4').isfile())
             assert_false(path(root_dir / 'test_export/static/videos_course_video.mp4').isfile())
         finally:
-            shutil.rmtree(root_dir) 
+            shutil.rmtree(root_dir)
 
     def _create_test_tree(self, name, user_id=None):
         """
