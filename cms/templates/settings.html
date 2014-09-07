@@ -274,6 +274,8 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <div class="input input-existing">
                     <div class="current current-course-introduction-video">
                       <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
+                      <video id="course-video" width="618" height="350" preload="none" controls
+                      src="${course_video_url}" style="width: 100%; height: 100%;"></video>
                     </div>
                     <div class="actions">
                       <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_("Delete Current Video")}</a>
@@ -282,7 +284,15 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
 
                   <div class="input">
                     <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
-                    <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
+                    <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters) Or,you can try :")}</span>
+
+                  </div>
+                  <div class="wrapper-input">
+                    <div class="input">
+                      <input type="text" class="long new-course-video-url" id="course-video-url" value="" placeholder="Your course video URL" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your course video (Note: only .mp4, .ogg, or .webm format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-video">${_("Upload Course Video")}</button>
                   </div>
                 </li>
                 % endif

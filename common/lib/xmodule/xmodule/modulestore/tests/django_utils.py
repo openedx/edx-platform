@@ -349,6 +349,7 @@ class ModuleStoreTestCase(TestCase):
                      }
                 ],
                 "course_image" : "just_a_test.jpg",
+                "course_video" : "just_a_test.mp4",
             }
         )
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.toy_loc):

@@ -15,7 +15,9 @@ var CourseDetails = Backbone.Model.extend({
         intro_video: null,
         effort: null,	// an int or null,
         course_image_name: '', // the filename
-        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
+        course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
+        course_video_name: '', // the filename
+        course_video_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
     },
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)

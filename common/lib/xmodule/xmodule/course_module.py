@@ -470,6 +470,13 @@ class CourseFields(object):
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
     )
+    course_video = String(
+        display_name=_("Course About Page Video"),
+        help=_("Edit the name of the course video file. You must upload this file on the Files & Uploads page. You can also set the course video on the Settings & Details page."),
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their video
+        default="videos_course_video.mp4"
+    )
 
     ## Course level Certificate Name overrides.
     cert_name_short = String(

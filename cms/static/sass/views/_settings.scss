@@ -429,6 +429,24 @@
         border-top: 1px solid $gray-l5;
         padding-top: ($baseline/2);
       }
+      .wrapper-input {
+        @include clearfix();
+        width: flex-grid(9,9);
+
+        .input {
+          float: left;
+          width: flex-grid(6,9);
+          margin-right: flex-gutter();
+        }
+
+        .action-upload-video {
+          @extend %ui-btn-flat-outline;
+          float: right;
+          width: flex-grid(2,9);
+          margin-top: ($baseline/4);
+          padding: ($baseline/2) $baseline;
+        }
+      }
     }
 
     // specific fields - course image
