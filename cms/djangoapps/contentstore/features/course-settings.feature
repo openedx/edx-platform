@@ -80,6 +80,7 @@ Feature: CMS.Course Settings
     | Course Introduction Video | 4r7wHMg5Yjg       |
     | Course Effort             | 200:00            |
     | Course Image URL          | image.jpg         |
+    | Course Video URL          | video.mp4         |
 
   # Special case because we have to type in code mirror
   Scenario: Changes in Course Overview show a confirmation
@@ -102,3 +103,11 @@ Feature: CMS.Course Settings
     And I upload a new course image
     Then I should see the new course image
     And the image URL should be present in the field
+
+  Scenario: User can upload course video
+    Given I have opened a new course in Studio
+    When I select Schedule and Details
+    And I click the "Upload Course Video" button
+    And I upload a new course video
+    Then I should see the new course video
+    And the video URL should be present in the field

@@ -505,6 +505,55 @@ class TestMongoModuleStore(unittest.TestCase):
         finally:
             shutil.rmtree(root_dir)
 
+    def test_export_course_video(self):
+        """
+        Test to make sure that we have a course video in the contentstore,
+        then export it to ensure it gets copied to both file locations.
+        """
+        course_key = SlashSeparatedCourseKey('edX', 'simple', '2012_Fall')
+        location = course_key.make_asset_key('asset', 'videos_course_video.mp4')
+
+        # This will raise if the course video is missing
+        self.content_store.find(location)
+
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/videos/course_video.mp4').isfile())
+            assert_true(path(root_dir / 'test_export/static/videos_course_video.mp4').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
+    def test_export_course_video_nondefault(self):
+        """
+        Make sure that if a non-default video path is specified that we
+        don't export it to the static default location
+        """
+        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        assert_true(course.course_video, 'just_a_test.mp4')
+
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+            assert_true(path(root_dir / 'test_export/static/just_a_test.mp4').isfile())
+            assert_false(path(root_dir / 'test_export/static/videos/course_video.mp4').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
+    def test_course_without_video(self):
+        """
+        Make sure we elegantly passover our code when there isn't a static
+        video
+        """
+        course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
+        root_dir = path(mkdtemp())
+        try:
+            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+            assert_false(path(root_dir / 'test_export/static/videos/course_video.mp4').isfile())
+            assert_false(path(root_dir / 'test_export/static/videos_course_video.mp4').isfile())
+        finally:
+            shutil.rmtree(root_dir)
+
     def _create_test_tree(self, name, user_id=None):
         """
         Creates and returns a tree with the following structure:

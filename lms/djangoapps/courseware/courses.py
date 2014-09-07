@@ -122,6 +122,25 @@ def course_image_url(course):
     return url
 
 
+def course_video_url(course):
+    """Try to look up the video url for the course.  If it's not found,
+    log an error and return the dead link"""
+    if course.static_asset_path or modulestore().get_modulestore_type(course.id) == ModuleStoreEnum.Type.xml:
+        # If we are a static course with the course_video attribute
+        # set different than the default, return that path so that
+        # courses can use custom course video paths, otherwise just
+        # return the default static path.
+        url = '/static/' + (course.static_asset_path or getattr(course, 'data_dir', ''))
+        if hasattr(course, 'course_video') and course.course_video != course.fields['course_video'].default:
+            url += '/' + course.course_video
+        else:
+            url += '/videos/course_video.mp4'
+    else:
+        loc = StaticContent.compute_location(course.id, course.course_video)
+        url = StaticContent.serialize_asset_key_with_slash(loc)
+    return url
+
+
 def find_file(filesystem, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.

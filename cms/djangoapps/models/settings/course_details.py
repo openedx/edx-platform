@@ -6,7 +6,7 @@ from json.encoder import JSONEncoder
 
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from contentstore.utils import course_image_url
+from contentstore.utils import course_image_url, course_video_url
 from models.settings import course_grading
 from xmodule.fields import Date
 from xmodule.modulestore.django import modulestore
@@ -28,6 +28,8 @@ class CourseDetails(object):
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
+        self.course_video_name = ""
+        self.course_video_asset_path = ""  # URL of the course video
 
     @classmethod
     def fetch(cls, course_key):
@@ -43,6 +45,8 @@ class CourseDetails(object):
         course_details.enrollment_end = descriptor.enrollment_end
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.course_video_name = descriptor.course_video
+        course_details.course_video_asset_path = course_video_url(descriptor)
 
         temploc = course_key.make_usage_key('about', 'syllabus')
         try:
@@ -153,6 +157,11 @@ class CourseDetails(object):
         if 'course_image_name' in jsondict and jsondict['course_image_name'] != descriptor.course_image:
             descriptor.course_image = jsondict['course_image_name']
             dirty = True
+
+        if 'course_video_name' in jsondict and jsondict['course_video_name'] != descriptor.course_video:
+            descriptor.course_video = jsondict['course_video_name']
+            dirty = True
+
 
         if dirty:
             module_store.update_item(descriptor, user.id)

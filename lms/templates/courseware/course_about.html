@@ -193,6 +193,13 @@
           <div class="play-intro"></div>
         </div>
       </a>
+      %elif course.course_video:
+      <a href="#video-modal" class="media" rel="leanModal">
+        <div class="hero">
+          <img src="${course_image_url(course)}" alt="" />
+          <div class="play-intro"></div>
+        </div>
+      </a>
       %else:
       <div class="media">
         <div class="hero">

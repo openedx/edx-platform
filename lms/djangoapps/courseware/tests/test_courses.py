@@ -14,7 +14,7 @@ from xmodule.tests.xml import factories as xml
 from xmodule.tests.xml import XModuleXmlImportTest
 
 from courseware.courses import (
-    get_course_by_id, get_cms_course_link, course_image_url,
+    get_course_by_id, get_cms_course_link, course_image_url, course_video_url,
     get_course_info_section, get_course_about_section, get_cms_block_link
 )
 from courseware.tests.helpers import get_request_for_user
@@ -142,6 +142,80 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
     def test_spaces_in_image_name(self):
         course = self.process_xml(xml.CourseFactory.build(course_image=u'before after.jpg'))
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
+
+
+@override_settings(
+    MODULESTORE=TEST_DATA_MONGO_MODULESTORE, CMS_BASE=CMS_BASE_TEST
+)
+class MongoCourseVideoTestCase(ModuleStoreTestCase):
+    """Tests for course video URLs when using a mongo modulestore."""
+
+    def test_get_video_url(self):
+        """Test video URL formatting."""
+        course = CourseFactory.create(org='edX', course='999')
+        self.assertEquals(course_video_url(course), '/c4x/edX/999/asset/{0}'.format(course.course_video))
+
+    def test_non_ascii_video_name(self):
+        # Verify that non-ascii video names are cleaned
+        course = CourseFactory.create(course_video=u'before_\N{SNOWMAN}_after.mp4')
+        self.assertEquals(
+            course_video_url(course),
+            '/c4x/{org}/{course}/asset/before___after.mp4'.format(
+                org=course.location.org,
+                course=course.location.course
+            )
+        )
+
+    def test_spaces_in_video_name(self):
+        # Verify that video names with spaces in them are cleaned
+        course = CourseFactory.create(course_video=u'before after.mp4')
+        self.assertEquals(
+            course_video_url(course),
+            '/c4x/{org}/{course}/asset/before_after.mp4'.format(
+                org=course.location.org,
+                course=course.location.course
+            )
+        )
+
+    def test_static_asset_path_course_video_default(self):
+        """
+        Test that without course_video being set, but static_asset_path
+        being set that we get the right course_video url.
+        """
+        course = CourseFactory.create(static_asset_path="foo")
+        self.assertEquals(
+            course_video_url(course),
+            '/static/foo/videos/course_video.mp4'
+        )
+
+    def test_static_asset_path_course_video_set(self):
+        """
+        Test that with course_video and static_asset_path both
+        being set, that we get the right course_video url.
+        """
+        course = CourseFactory.create(course_video=u'things_stuff.mp4',
+                                      static_asset_path="foo")
+        self.assertEquals(
+            course_video_url(course),
+            '/static/foo/things_stuff.mp4'
+        )
+
+
+class XmlCourseVideoTestCase(XModuleXmlImportTest):
+    """Tests for course video URLs when using an xml modulestore."""
+
+    def test_get_video_url(self):
+        """Test video URL formatting."""
+        course = self.process_xml(xml.CourseFactory.build())
+        self.assertEquals(course_video_url(course), '/static/xml_test_course/videos/course_video.mp4')
+
+    def test_non_ascii_video_name(self):
+        course = self.process_xml(xml.CourseFactory.build(course_video=u'before_\N{SNOWMAN}_after.mp4'))
+        self.assertEquals(course_video_url(course), u'/static/xml_test_course/before_\N{SNOWMAN}_after.mp4')
+
+    def test_spaces_in_video_name(self):
+        course = self.process_xml(xml.CourseFactory.build(course_video=u'before after.mp4'))
+        self.assertEquals(course_video_url(course), u'/static/xml_test_course/before after.mp4')
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
