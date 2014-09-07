@@ -1,9 +1,14 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 ${_("We received a request to change the e-mail associated with your "
-    "{platform_name} account from {old_email} to {new_email}. "
-    "If this is correct, please confirm your new e-mail address by "
-    "visiting:").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
+    "{platform_name} account from {old_email} to {new_email}."
+    ).format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
+% if needs_activation:
+${_("If this is correct, please confirm your new e-mail address and activate "
+      "your account by visiting:")}
+% else:
+${_("If this is correct, please confirm your new e-mail address by visiting:")}
+% endif
 
 % if is_secure:
  https://${ site }/email_confirm/${ key }

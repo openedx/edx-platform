@@ -103,6 +103,7 @@ AUDIT_LOG = logging.getLogger("audit")
 
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
+
 def csrf_token(context):
     """A csrf token that can be included in a form."""
     csrf_token = context.get('csrf_token', '')
@@ -259,8 +260,8 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
             yield (course, enrollment)
         else:
             log.error("User {0} enrolled in {2} course {1}".format(
-                        user.username, enrollment.course_id, "broken" if course else "non-existent"
-                     ))
+                user.username, enrollment.course_id, "broken" if course else "non-existent"
+            ))
 
 
 def _cert_info(user, course, cert_status):
@@ -1669,35 +1670,25 @@ def auto_auth(request):
 @ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
-    r = Registration.objects.filter(activation_key=key)
-    if len(r) == 1:
+    try:
+        account_activated = _do_account_activation(request.user, key)
+    except Registration.DoesNotExist:
+        return render_to_response(
+            "registration/activation_invalid.html",
+            {'csrf': csrf(request)['csrf_token']},
+        )
+    else:
         user_logged_in = request.user.is_authenticated()
-        already_active = True
-        if not r[0].user.is_active:
-            r[0].activate()
-            already_active = False
-
-        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=r[0].user_id)
-        if student:
-            ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
-            for cea in ceas:
-                if cea.auto_enroll:
-                    CourseEnrollment.enroll(student[0], cea.course_id)
-
+        already_active = not account_activated
         resp = render_to_response(
             "registration/activation_complete.html",
             {
                 'user_logged_in': user_logged_in,
-                'already_active': already_active
+                'already_active': already_active,
             }
         )
         return resp
-    if len(r) == 0:
-        return render_to_response(
-            "registration/activation_invalid.html",
-            {'csrf': csrf(request)['csrf_token']}
-        )
+
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
@@ -1902,7 +1893,8 @@ def change_email_request(request):
     context = {
         'key': pec.activation_key,
         'old_email': user.email,
-        'new_email': pec.new_email
+        'new_email': pec.new_email,
+        'needs_activation': (not user.is_active),
     }
 
     subject = render_to_string('emails/email_change_subject.txt', context)
@@ -1930,7 +1922,8 @@ def change_email_request(request):
 @transaction.commit_manually
 def confirm_email_change(request, key):
     """ User requested a new e-mail. This is called when the activation
-    link is clicked. We confirm with the old e-mail, and update
+    link is clicked. We confirm with the old e-mail, and update.
+    The user account is also activated if it hasn't been already
     """
     try:
         try:
@@ -1979,6 +1972,15 @@ def confirm_email_change(request, key):
         except Exception:
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
+            transaction.rollback()
+            return response
+
+        # Activate user who is not yet active
+        try:
+            address_context['account_activated'] = _do_account_activation(user, None)
+        except Registration.DoesNotExist:
+            log.warning('No matching Registration object for non-activated user', exc_info=True)
+            response = render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
             transaction.rollback()
             return response
 
@@ -2120,3 +2122,38 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+def _do_account_activation(user, key):
+    """
+    Activates the given user if not already activated, and auto enrolls.
+
+    True is returned if the user has been activated, false otherwise.
+    An exception is thrown if no matching Registration object is found.
+    """
+    if key is not None:
+        # If given a registration key, get registration obj with it
+        register_obj = Registration.objects.get(activation_key=key)
+    else:
+        # Otherwise, grab registration obj that matches user
+        register_obj = Registration.objects.get(user=user)
+
+    activated = False
+    if not register_obj.user.is_active:
+        register_obj.activate()
+        activated = True
+    _auto_enroll(register_obj)
+    return activated
+
+
+def _auto_enroll(register_obj):
+    """Enroll in pending courses if auto_enroll enabled"""
+    try:
+        student = User.objects.get(id=register_obj.user_id)
+    except User.DoesNotExist:
+        return
+    else:
+        ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
+        for cea in ceas:
+            if cea.auto_enroll:
+                CourseEnrollment.enroll(student, cea.course_id)

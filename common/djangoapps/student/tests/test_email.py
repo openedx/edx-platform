@@ -5,7 +5,7 @@ import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import reactivation_email_for_user, change_email_request, confirm_email_change
-from student.models import UserProfile, PendingEmailChange
+from student.models import UserProfile, PendingEmailChange, Registration
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
 from django.test.client import RequestFactory
@@ -199,6 +199,7 @@ class EmailChangeRequestTests(TestCase):
 @patch('django.contrib.auth.models.User.email_user')
 @patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views._do_account_activation', Mock(return_value=False))
 class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
     """Test that confirmation of email change requests function even in the face of exceptions thrown while sending email"""
     def setUp(self):
@@ -273,7 +274,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertFailedBeforeEmailing(email_user)
 
     @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
+                     dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_old_email_fails(self, email_user):
         email_user.side_effect = [Exception, None]
@@ -284,23 +285,24 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertChangeEmailSent(email_user)
 
     @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
+                     dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_new_email_fails(self, email_user):
         email_user.side_effect = [None, Exception]
         self.check_confirm_email_change('email_change_failed.html', {
-            'email': self.pending_change_request.new_email
+            'email': self.pending_change_request.new_email,
         })
         self.assertRolledBack()
         self.assertChangeEmailSent(email_user)
 
     @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
+                     dedent("""Skipping Test because CMS has not provided necessary templates for email reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     def test_successful_email_change(self, email_user):
         self.check_confirm_email_change('email_change_successful.html', {
             'old_email': self.user.email,
-            'new_email': self.pending_change_request.new_email
+            'new_email': self.pending_change_request.new_email,
+            'account_activated': False,
         })
         self.assertChangeEmailSent(email_user)
         meta = json.loads(UserProfile.objects.get(user=self.user).meta)
@@ -319,3 +321,89 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
             confirm_email_change(self.request, self.key)
 
         rollback.assert_called_with()
+
+
+@patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
+@patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+@patch('student.views.User.objects.filter', Mock(return_value=[]))
+class EmailChangeAccountActivationTests(EmailTestMixin, TransactionTestCase):
+    """ Test that non-active account gets activated with email change """
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.user.is_active = False
+        self.req_factory = RequestFactory()
+        self.request = self.req_factory.post('unused_url')
+        self.request.user = self.user
+        self.registration = RegistrationFactory.create(user=self.user)
+        self.pending_change_request = PendingEmailChangeFactory.create(user=self.user)
+        self.key = self.pending_change_request.activation_key
+
+    def mock_activate_user(self):
+        """Mimics activation of a user account"""
+        self.user.is_active = True
+
+    def run_request(self, request=None):
+        """
+        Execute request and return result parsed as json.
+
+        If request isn't passed in, use self.request instead.
+        """
+        if request is None:
+            request = self.request
+
+        return confirm_email_change(request, self.key)
+
+    @patch('student.models.Registration.activate')
+    @patch('student.views.PendingEmailChange.objects.get')
+    @patch('student.views.Registration.objects.filter')
+    def test_nonactive_user_gets_activated(self, registration_get, pendingemail_get, activate):
+        """ Ensure that nonactive user gets activated """
+        # User should initially be non-active
+        self.user.is_active = False
+        self.assertFalse(self.user.is_active)
+
+        activate.side_effect = self.mock_activate_user
+        # Patch to return pending email change that matchs our test user
+        pendingemail_get.return_value = self.pending_change_request
+        # Patch to return registration obj that matches our test user
+        registration_get.return_value = [self.registration]
+        response_data = self.run_request()
+
+        self.assertIn("('account_activated', True)", response_data.content)
+        self.assertTrue(self.user.is_active)
+
+    @patch('student.models.Registration.activate')
+    @patch('student.views.PendingEmailChange.objects.get')
+    @patch('student.views.Registration.objects.filter')
+    def test_already_active_user(self, registration_get, pendingemail_get, activate):
+        """ Test that active user isn't activated """
+        self.user.is_active = True
+        self.assertTrue(self.user.is_active)
+
+        activate.side_effect = self.mock_activate_user
+        # Patch to return pending email change that matchs our test user
+        pendingemail_get.return_value = self.pending_change_request
+        # Patch to return registration obj that matches our test user
+        registration_get.return_value = [self.registration]
+        response_data = self.run_request()
+
+        self.assertIn("('account_activated', False)", response_data.content)
+        self.assertTrue(self.user.is_active)
+
+    @patch('student.models.Registration.activate')
+    @patch('student.views.PendingEmailChange.objects.get')
+    @patch('student.views.Registration.objects.get')
+    def test_activation_failure_handled(self, registration_get, pendingemail_get, activate):
+        """ Test that an error activating user is properly handled """
+        self.user.is_active = False
+        self.assertFalse(self.user.is_active)
+
+        activate.side_effect = self.mock_activate_user
+        # Patch to return pending email change that matchs our test user
+        pendingemail_get.return_value = self.pending_change_request
+        # Patch so exception is raised when we try to get registration obj
+        registration_get.side_effect = Registration.DoesNotExist()
+        response_data = self.run_request()
+
+        self.assertIn("registration/activation_invalid.html", response_data.content)
+        self.assertFalse(self.user.is_active)

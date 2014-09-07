@@ -6,12 +6,23 @@
 <section class="container activation">
 
   <section class="message">
-    <h1 class="valid">${_("E-mail change successful!")}</h1>
-    <hr class="horizontal-divider">
+    % if account_activated:
+      <h1 class="valid">${_("E-mail change successful, account activated!")}</h1>
+      <hr class="horizontal-divider">
 
-    <p>${_('You should see your new email in your {link_start}dashboard{link_end}.').format(
-        link_start='<a href="{url}">'.format(url=reverse('dashboard')),
-        link_end='</a>',
-      )}</p>
+      <p>
+        ${_('Thanks for activating your account. Visit your {link_start}dashboard{link_end} '
+        'to see your courses.').format( link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+        link_end='</a>')}
+      </p>
+    % else:
+      <h1 class="valid">${_("E-mail change successful!")}</h1>
+      <hr class="horizontal-divider">
+
+      <p>${_('You should see your new email in your {link_start}dashboard{link_end}.').format(
+          link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+          link_end='</a>',
+        )}</p>
+    % endif
   </section>
 </section>
