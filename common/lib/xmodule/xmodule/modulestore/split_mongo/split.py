@@ -1640,7 +1640,7 @@ class SplitMongoModuleStore(BulkWriteMixin, ModuleStoreWriteBase):
         new_block = runtime.xblock_from_json(
             xblock_class, course_key, block_id, json_data, inherited_settings, **kwargs
         )
-        for field_name, value in fields.iteritems():
+        for field_name, value in (fields or {}).iteritems():
             setattr(new_block, field_name, value)
 
         if parent_xblock is not None:

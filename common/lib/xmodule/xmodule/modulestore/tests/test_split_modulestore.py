@@ -1594,6 +1594,26 @@ class TestInheritance(SplitModuleTest):
         problem = modulestore().get_item(problem.location.version_agnostic())
         self.assertFalse(problem.visible_to_staff_only)
 
+    def test_dynamic_inheritance(self):
+        """
+        Test inheritance for create_item with and without a parent pointer
+        """
+        course_key = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
+        chapter = modulestore().get_item(BlockUsageLocator(course_key, 'chapter', 'chapter3'))
+
+        chapter.visible_to_staff_only = True
+        orphan_problem = modulestore().create_item(self.user_id, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_child(self.user_id, chapter.location.version_agnostic(), 'problem')
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
+        orphan_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem', parent_xblock=chapter)
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
 
 class TestPublish(SplitModuleTest):
     """
