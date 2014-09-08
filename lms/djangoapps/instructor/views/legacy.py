@@ -3,7 +3,7 @@ Instructor Views
 """
 ## NOTE: This is the code for the legacy instructor dashboard
 ## We are no longer supporting this file or accepting changes into it.
-
+# pylint: skip-file
 from contextlib import contextmanager
 import csv
 import json
@@ -1426,6 +1426,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 #-----------------------------------------------------------------------------
 
 # Gradebook has moved to instructor.api.spoc_gradebook #
+
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grade_summary(request, course_key):

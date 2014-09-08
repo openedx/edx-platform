@@ -1,5 +1,5 @@
-# Import other classes here so they can be imported from here.
-# pylint: disable=W0611
+"""Import other classes here so they can be imported from here."""
+# pylint: disable=unused-import
 from .comment import Comment
 from .thread import Thread
 from .user import User

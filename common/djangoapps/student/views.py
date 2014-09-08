@@ -46,8 +46,7 @@ from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
-    create_comments_service_user, PasswordHistory, UserSignupSource,
-    anonymous_id_for_user
+    create_comments_service_user, PasswordHistory, UserSignupSource
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -103,27 +102,29 @@ AUDIT_LOG = logging.getLogger("audit")
 
 ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
+
 def csrf_token(context):
     """A csrf token that can be included in a form."""
-    csrf_token = context.get('csrf_token', '')
-    if csrf_token == 'NOTPROVIDED':
+    token = context.get('csrf_token', '')
+    if token == 'NOTPROVIDED':
         return ''
     return (u'<div style="display:none"><input type="hidden"'
-            ' name="csrfmiddlewaretoken" value="%s" /></div>' % (csrf_token))
+            ' name="csrfmiddlewaretoken" value="%s" /></div>' % (token))
 
 
 # NOTE: This view is not linked to directly--it is called from
 # branding/views.py:index(), which is cached for anonymous users.
 # This means that it should always return the same thing for anon
 # users. (in particular, no switching based on query params allowed)
-def index(request, extra_context={}, user=AnonymousUser()):
+def index(request, extra_context=None, user=AnonymousUser()):
     """
     Render the edX main page.
 
     extra_context is used to allow immediate display of certain modal windows, eg signup,
     as used by external_auth.
     """
-
+    if extra_context is None:
+        extra_context = {}
     # The course selection work is done in courseware.courses.
     domain = settings.FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
@@ -259,8 +260,8 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
             yield (course, enrollment)
         else:
             log.error("User {0} enrolled in {2} course {1}".format(
-                        user.username, enrollment.course_id, "broken" if course else "non-existent"
-                     ))
+                user.username, enrollment.course_id, "broken" if course else "non-existent"
+            ))
 
 
 def _cert_info(user, course, cert_status):
@@ -294,18 +295,20 @@ def _cert_info(user, course, cert_status):
 
     status = template_state.get(cert_status['status'], default_status)
 
-    d = {'status': status,
-         'show_download_url': status == 'ready',
-         'show_disabled_download_button': status == 'generating',
-         'mode': cert_status.get('mode', None)}
+    status_dict = {
+        'status': status,
+        'show_download_url': status == 'ready',
+        'show_disabled_download_button': status == 'generating',
+        'mode': cert_status.get('mode', None)
+    }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
             course.end_of_course_survey_url is not None):
-        d.update({
+        status_dict.update({
             'show_survey_button': True,
             'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
     else:
-        d['show_survey_button'] = False
+        status_dict['show_survey_button'] = False
 
     if status == 'ready':
         if 'download_url' not in cert_status:
@@ -313,7 +316,7 @@ def _cert_info(user, course, cert_status):
                         user.username, course.id)
             return default_info
         else:
-            d['download_url'] = cert_status['download_url']
+            status_dict['download_url'] = cert_status['download_url']
 
     if status in ('generating', 'ready', 'notpassing', 'restricted'):
         if 'grade' not in cert_status:
@@ -322,9 +325,9 @@ def _cert_info(user, course, cert_status):
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
         else:
-            d['grade'] = cert_status['grade']
+            status_dict['grade'] = cert_status['grade']
 
-    return d
+    return status_dict
 
 
 @ensure_csrf_cookie
@@ -446,6 +449,7 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
     return blocked
 
+
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
@@ -510,7 +514,6 @@ def dashboard(request):
 
     block_courses = frozenset(course.id for course, enrollment in course_enrollment_pairs
                               if is_course_blocked(request, CourseRegistrationCode.objects.filter(course_id=course.id, registrationcoderedemption__redeemed_by=request.user), course.id))
-
 
     enrolled_courses_either_paid = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                              if _enrollment.is_paid_course())
@@ -608,8 +611,8 @@ def try_change_enrollment(request):
             # will return redirect_urls.
             if enrollment_response.status_code == 200 and enrollment_response.content != '':
                 return enrollment_response.content
-        except Exception, e:
-            log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
+        except Exception as exc:  # pylint: disable=broad-except
+            log.exception("Exception automatically enrolling after login: %s", exc)
 
 
 @require_POST
@@ -771,7 +774,6 @@ def change_enrollment(request, auto_register=False):
 
             return HttpResponse()
 
-
     elif action == "add_to_cart":
         # Pass the request handling to shoppingcart.views
         # The view in shoppingcart.views performs error handling and logs different errors.  But this elif clause
@@ -885,12 +887,17 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                     username=username, backend_name=backend_name))
             return HttpResponseBadRequest(
                 _("You've successfully logged into your {provider_name} account, but this account isn't linked with an {platform_name} account yet.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME) 
-                  + "<br/><br/>" + _("Use your {platform_name} username and password to log into {platform_name} below, "
+                    platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                )
+                + "<br/><br/>" +
+                _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
-                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME) 
-                  + "<br/><br/>" + _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
-                      platform_name=settings.PLATFORM_NAME),
+                      platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
+                  )
+                + "<br/><br/>" +
+                _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
+                    platform_name=settings.PLATFORM_NAME
+                ),
                 content_type="text/plain",
                 status=401
             )
@@ -1002,7 +1009,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             },
             context={
                 'Google Analytics': {
-                    'clientId': tracking_context.get('client_id') 
+                    'clientId': tracking_context.get('client_id')
                 }
             }
         )
@@ -1018,10 +1025,10 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 log.debug("Setting user session to never expire")
             else:
                 request.session.set_expiry(0)
-        except Exception as e:
+        except Exception as exc:  # pylint: disable=broad-except
             AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
             log.critical("Login failed - Could not create session. Is memcached running?")
-            log.exception(e)
+            log.exception(exc)
             raise
 
         redirect_url = try_change_enrollment(request)
@@ -1170,14 +1177,14 @@ def disable_account_ajax(request):
 def change_setting(request):
     """JSON call to change a profile setting: Right now, location"""
     # TODO (vshnayder): location is no longer used
-    up = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
+    u_prof = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
     if 'location' in request.POST:
-        up.location = request.POST['location']
-    up.save()
+        u_prof.location = request.POST['location']
+    u_prof.save()
 
     return JsonResponse({
         "success": True,
-        "location": up.location,
+        "location": u_prof.location,
     })
 
 
@@ -1226,12 +1233,12 @@ def _do_create_account(post_vars, extended_profile=None):
             raise AccountValidationError(
                 _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username']),
                 field="username"
-                )
+            )
         elif len(User.objects.filter(email=post_vars['email'])) > 0:
             raise AccountValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=post_vars['email']),
                 field="email"
-                )
+            )
         else:
             raise
 
@@ -1263,7 +1270,7 @@ def _do_create_account(post_vars, extended_profile=None):
         profile.year_of_birth = None
     try:
         profile.save()
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
@@ -1295,8 +1302,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
     # unless originally we didn't get a valid email or name from the external auth
-    DoExternalAuth = 'ExternalAuthMap' in request.session
-    if DoExternalAuth:
+    do_external_auth = 'ExternalAuthMap' in request.session
+    if do_external_auth:
         eamap = request.session['ExternalAuthMap']
         try:
             validate_email(eamap.external_email)
@@ -1313,15 +1320,15 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         log.debug(u'In create_account with external_auth: user = %s, email=%s', name, email)
 
     # Confirm we have a properly formed request
-    for a in ['username', 'email', 'password', 'name']:
-        if a not in post_vars:
-            js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
-            js['field'] = a
+    for req_field in ['username', 'email', 'password', 'name']:
+        if req_field not in post_vars:
+            js['value'] = _("Error (401 {field}). E-mail us.").format(field=req_field)
+            js['field'] = req_field
             return JsonResponse(js, status=400)
 
     if extra_fields.get('honor_code', 'required') == 'required' and \
             post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
+        js['value'] = _("To enroll, you must follow the honor code.")
         js['field'] = 'honor_code'
         return JsonResponse(js, status=400)
 
@@ -1329,7 +1336,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     tos_required = (
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
-        not DoExternalAuth or
+        not do_external_auth or
         not eamap.external_domain.startswith(
             external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
         )
@@ -1337,7 +1344,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
     if tos_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
-            js['value'] = _("You must accept the terms of service.").format(field=a)
+            js['value'] = _("You must accept the terms of service.")
             js['field'] = 'terms_of_service'
             return JsonResponse(js, status=400)
 
@@ -1390,8 +1397,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
         if field_name in ('email', 'username') and len(post_vars[field_name]) > max_length:
             error_str = {
-                'username': _('Username cannot be more than {0} characters long').format(max_length),
-                'email': _('Email cannot be more than {0} characters long').format(max_length)
+                'username': _('Username cannot be more than {num} characters long').format(num=max_length),
+                'email': _('Email cannot be more than {num} characters long').format(num=max_length)
             }
             js['value'] = error_str[field_name]
             js['field'] = field_name
@@ -1400,20 +1407,20 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     try:
         validate_email(post_vars['email'])
     except ValidationError:
-        js['value'] = _("Valid e-mail is required.").format(field=a)
+        js['value'] = _("Valid e-mail is required.")
         js['field'] = 'email'
         return JsonResponse(js, status=400)
 
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
-        js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
+        js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.")
         js['field'] = 'username'
         return JsonResponse(js, status=400)
 
     # enforce password complexity as an optional feature
     # but not if we're doing ext auth b/c those pws never get used and are auto-generated so might not pass validation
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False) and not DoExternalAuth:
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False) and not do_external_auth:
         try:
             password = post_vars['password']
 
@@ -1449,8 +1456,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     try:
         with transaction.commit_on_success():
             ret = _do_create_account(post_vars, extended_profile)
-    except AccountValidationError as e:
-        return JsonResponse({'success': False, 'value': e.message, 'field': e.field}, status=400)
+    except AccountValidationError as exc:
+        return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)
 
     (user, profile, registration) = ret
 
@@ -1469,14 +1476,14 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         registration_course_id = request.session.get('registration_course_id')
         analytics.track(
             user.id,
-            "edx.bi.user.account.registered", 
+            "edx.bi.user.account.registered",
             {
                 "category": "conversion",
                 "label": registration_course_id
             },
             context={
                 'Google Analytics': {
-                    'clientId': tracking_context.get('client_id') 
+                    'clientId': tracking_context.get('client_id')
                 }
             }
         )
@@ -1520,17 +1527,17 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
-    login(request, login_user)
+    new_user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login(request, new_user)
     request.session.set_expiry(0)
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
-    if login_user is not None:
-        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(login_user.username))
+    if new_user is not None:
+        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(new_user.username))
 
-    if DoExternalAuth:
-        eamap.user = login_user
+    if do_external_auth:
+        eamap.user = new_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
         AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
@@ -1538,9 +1545,9 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
 
         if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
-            login_user.is_active = True
-            login_user.save()
-            AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
+            new_user.is_active = True
+            new_user.save()
+            AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(new_user.username, new_user.email))
 
     dog_stats_api.increment("common.student.account_created")
     redirect_url = try_change_enrollment(request)
@@ -1623,7 +1630,7 @@ def auto_auth(request):
     # If successful, this will return a tuple containing
     # the new user object.
     try:
-        user, profile, reg = _do_create_account(post_data)
+        user, _profile, reg = _do_create_account(post_data)
     except AccountValidationError:
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
@@ -1669,16 +1676,16 @@ def auto_auth(request):
 @ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
-    r = Registration.objects.filter(activation_key=key)
-    if len(r) == 1:
+    regs = Registration.objects.filter(activation_key=key)
+    if len(regs) == 1:
         user_logged_in = request.user.is_authenticated()
         already_active = True
-        if not r[0].user.is_active:
-            r[0].activate()
+        if not regs[0].user.is_active:
+            regs[0].activate()
             already_active = False
 
         # Enroll student in any pending courses he/she may have if auto_enroll flag is set
-        student = User.objects.filter(id=r[0].user_id)
+        student = User.objects.filter(id=regs[0].user_id)
         if student:
             ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
             for cea in ceas:
@@ -1693,7 +1700,7 @@ def activate_account(request, key):
             }
         )
         return resp
-    if len(r) == 0:
+    if len(regs) == 0:
         return render_to_response(
             "registration/activation_invalid.html",
             {'csrf': csrf(request)['csrf_token']}
@@ -1928,8 +1935,9 @@ def change_email_request(request):
 
 @ensure_csrf_cookie
 @transaction.commit_manually
-def confirm_email_change(request, key):
-    """ User requested a new e-mail. This is called when the activation
+def confirm_email_change(request, key):  # pylint: disable=unused-argument
+    """
+    User requested a new e-mail. This is called when the activation
     link is clicked. We confirm with the old e-mail, and update
     """
     try:
@@ -1954,17 +1962,17 @@ def confirm_email_change(request, key):
         subject = render_to_string('emails/email_change_subject.txt', address_context)
         subject = ''.join(subject.splitlines())
         message = render_to_string('emails/confirm_email_change.txt', address_context)
-        up = UserProfile.objects.get(user=user)
-        meta = up.get_meta()
+        u_prof = UserProfile.objects.get(user=user)
+        meta = u_prof.get_meta()
         if 'old_emails' not in meta:
             meta['old_emails'] = []
         meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
-        up.set_meta(meta)
-        up.save()
+        u_prof.set_meta(meta)
+        u_prof.save()
         # Send it to the old email...
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-        except Exception:
+        except Exception:    # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to old address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': user.email})
             transaction.rollback()
@@ -1976,7 +1984,7 @@ def confirm_email_change(request, key):
         # And send it to the new email...
         try:
             user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             log.warning('Unable to send confirmation email to new address', exc_info=True)
             response = render_to_response("email_change_failed.html", {'email': pec.new_email})
             transaction.rollback()
@@ -1985,7 +1993,7 @@ def confirm_email_change(request, key):
         response = render_to_response("email_change_successful.html", address_context)
         transaction.commit()
         return response
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         # If we get an unexpected exception, be sure to rollback the transaction
         transaction.rollback()
         raise
@@ -2058,27 +2066,31 @@ def reject_name_change(request):
     return JsonResponse({"success": True})
 
 
-def accept_name_change_by_id(id):
+def accept_name_change_by_id(uid):
+    """
+    Accepts the pending name change request for the user represented
+    by user id `uid`.
+    """
     try:
-        pnc = PendingNameChange.objects.get(id=id)
+        pnc = PendingNameChange.objects.get(id=uid)
     except PendingNameChange.DoesNotExist:
         return JsonResponse({
             "success": False,
             "error": _('Invalid ID'),
         })  # TODO: this should be status code 400  # pylint: disable=fixme
 
-    u = pnc.user
-    up = UserProfile.objects.get(user=u)
+    user = pnc.user
+    u_prof = UserProfile.objects.get(user=user)
 
     # Save old name
-    meta = up.get_meta()
+    meta = u_prof.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
-    up.set_meta(meta)
+    meta['old_names'].append([u_prof.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
+    u_prof.set_meta(meta)
 
-    up.name = pnc.new_name
-    up.save()
+    u_prof.name = pnc.new_name
+    u_prof.save()
     pnc.delete()
 
     return JsonResponse({"success": True})

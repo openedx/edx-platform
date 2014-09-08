@@ -24,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
-from student.models import CourseEnrollment, unenroll_done
+from student.models import CourseEnrollment, UNENROLL_DONE
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
 
@@ -639,7 +639,7 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done)
+    @receiver(UNENROLL_DONE)
     def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
