@@ -298,6 +298,16 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+############### XBlock filesystem field config ##########
+if 'XBLOCK-FS-STORAGE-BUCKET' in ENV_TOKENS:
+    DJFS = {
+        'type' : 's3fs',
+        'bucket' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-BUCKET', None),
+        'prefix' : ENV_TOKENS.get('XBLOCK-FS-STORAGE-PREFIX', '/xblock-storage/')
+    }
+    DJFS['aws_access_key_id'] = AUTH_TOKENS.get('AWS_ACCESS_KEY_ID', None)
+    DJFS['aws_secret_access_key'] = AUTH_TOKENS.get('AWS_SECRET_ACCESS_KEY', None)
+
 ############### Module Store Items ##########
 HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', {})
 
