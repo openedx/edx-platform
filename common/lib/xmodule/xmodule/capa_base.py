@@ -298,6 +298,7 @@ class CapaMixin(CapaFields):
             anonymous_student_id=self.runtime.anonymous_student_id,
             cache=self.runtime.cache,
             can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
+            get_python_lib_zip=self.runtime.get_python_lib_zip,
             DEBUG=self.runtime.DEBUG,
             filestore=self.runtime.filestore,
             i18n=self.runtime.service(self, "i18n"),
