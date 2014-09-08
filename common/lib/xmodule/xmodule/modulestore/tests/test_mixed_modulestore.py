@@ -1482,13 +1482,23 @@ class TestMixedModuleStore(unittest.TestCase):
         test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
-        chapter = self.store.create_item(self.user_id, test_course_key, 'chapter', 'Overview')
+        chapter = self.store.create_item(self.user_id, test_course.location, 'chapter', 'Overview')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertIn(
+                chapter.location,
+                self.store.get_item(test_course.location).children,
+            )
         self.assertTrue(self.store.has_published_version(chapter))
 
         chapter_location = chapter.location
 
         # test create_child of direct-only category to make sure we are autopublishing
         sequential = self.store.create_child(self.user_id, chapter_location, 'sequential', 'Sequence')
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertIn(
+                sequential.location,
+                self.store.get_item(chapter_location).children,
+            )
         self.assertTrue(self.store.has_published_version(sequential))
 
         # test update_item of direct-only category to make sure we are autopublishing
@@ -1498,6 +1508,11 @@ class TestMixedModuleStore(unittest.TestCase):
 
         # test delete_item of direct-only category to make sure we are autopublishing
         self.store.delete_item(sequential.location, self.user_id, revision=ModuleStoreEnum.RevisionOption.all)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+            self.assertNotIn(
+                sequential.location,
+                self.store.get_item(chapter_location).children,
+            )
         chapter = self.store.get_item(chapter.location.for_branch(None))
         self.assertTrue(self.store.has_published_version(chapter))
 
