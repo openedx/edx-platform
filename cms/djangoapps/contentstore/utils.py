@@ -150,6 +150,13 @@ def course_image_url(course):
     return path
 
 
+def course_video_url(course):
+    """Returns the video url for the course."""
+    loc = StaticContent.compute_location(course.location.course_key, course.course_video)
+    path = StaticContent.serialize_asset_key_with_slash(loc)
+    return path
+
+
 # pylint: disable=invalid-name
 def is_currently_visible_to_students(xblock):
     """

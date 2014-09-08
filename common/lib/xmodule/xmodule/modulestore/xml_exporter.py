@@ -82,6 +82,25 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
                 with OSFS(output_dir).open('course_image.jpg', 'wb') as course_image_file:
                     course_image_file.write(course_image.data)
 
+        # If we are using the default course video, export it to the
+        # legacy location to support backwards compatibility.
+        if course.course_video == course.fields['course_video'].default:
+            try:
+                course_video = contentstore.find(
+                    StaticContent.compute_location(
+                        course.id,
+                        course.course_video
+                    ),
+                )
+            except NotFoundError:
+                pass
+            else:
+                output_dir = root_dir + '/' + course_dir + '/static/videos/'
+                if not os.path.isdir(output_dir):
+                    os.makedirs(output_dir)
+                with OSFS(output_dir).open('course_video.mp4', 'wb') as course_video_file:
+                    course_video_file.write(course_video.data)
+
     # export the static tabs
     export_extra_content(export_fs, modulestore, xml_centric_course_key, 'static_tab', 'tabs', '.html')
 

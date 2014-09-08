@@ -738,6 +738,7 @@ def settings_handler(request, course_key_string):
             'course_locator': course_key,
             'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
             'course_image_url': utils.course_image_url(course_module),
+            'course_video_url': utils.course_video_url(course_module),
             'details_url': reverse_course_url('settings_handler', course_key),
             'about_page_editable': about_page_editable,
             'short_description_editable': short_description_editable,

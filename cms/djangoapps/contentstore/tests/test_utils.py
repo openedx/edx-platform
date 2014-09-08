@@ -192,6 +192,35 @@ class CourseImageTestCase(TestCase):
         )
 
 
+class CourseVideoTestCase(TestCase):
+    """Tests for course video URLs."""
+
+    def test_get_video_url(self):
+        """Test video URL formatting."""
+        course = CourseFactory.create(org='edX', course='999')
+        url = utils.course_video_url(course)
+        self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_video))
+
+    def test_non_ascii_video_name(self):
+        # Verify that non-ascii video names are cleaned
+        course = CourseFactory.create(course_video=u'before_\N{SNOWMAN}_after.mp4')
+        self.assertEquals(
+            utils.course_video_url(course),
+            '/c4x/{org}/{course}/asset/before___after.mp4'.format(org=course.location.org, course=course.location.course)
+        )
+
+    def test_spaces_in_video_name(self):
+        # Verify that video names with spaces in them are cleaned
+        course = CourseFactory.create(course_video=u'before after.mp4')
+        self.assertEquals(
+            utils.course_video_url(course),
+            '/c4x/{org}/{course}/asset/before_after.mp4'.format(
+                org=course.location.org,
+                course=course.location.course
+            )
+        )
+
+
 class XBlockVisibilityTestCase(TestCase):
     """Tests for xblock visibility for students."""
 

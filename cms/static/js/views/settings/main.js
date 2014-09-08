@@ -16,7 +16,8 @@ var DetailsView = ValidatingView.extend({
         // would love to move to a general superclass, but event hashes don't inherit in backbone :-(
         'focus :input' : "inputFocus",
         'blur :input' : "inputUnfocus",
-        'click .action-upload-image': "uploadImage"
+        'click .action-upload-image': "uploadImage",
+        'click .action-upload-video': "uploadVideo"
     },
 
     initialize : function() {
@@ -35,6 +36,12 @@ var DetailsView = ValidatingView.extend({
             $(this).show();
         });
 
+        this.$el.find('video.course-video').error(function() {
+            $(this).hide();
+        });
+        this.$el.find('video.course-video').load(function() {
+            $(this).show();
+        });
         this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
@@ -52,10 +59,15 @@ var DetailsView = ValidatingView.extend({
         this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
+        if (this.model.has('course_video_asset_path')) {
+            this.$el.find('.current-course-introduction-video iframe').hide();
+            this.$el.find('.current-course-introduction-video video').show();
+        }
+        else this.$el.find('.current-course-introduction-video video').hide();
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
-        if (this.model.has('intro_video')) {
+        if (this.model.has('intro_video') || this.model.has('course_video_asset_path')) {
             this.$el.find('.remove-course-introduction-video').show();
         }
         else this.$el.find('.remove-course-introduction-video').hide();
@@ -65,6 +77,10 @@ var DetailsView = ValidatingView.extend({
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
+
+        var videoURL = this.model.get('course_video_asset_path');
+        this.$el.find('#course-video-url').val(videoURL);
+        this.$el.find('#course-video').attr('src', videoURL);
 
         return this;
     },
@@ -77,7 +93,8 @@ var DetailsView = ValidatingView.extend({
         'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
-        'course_image_asset_path': 'course-image-url'
+        'course_image_asset_path': 'course-image-url',
+        'course_video_asset_path': 'course-video-url'
     },
 
     updateTime : function(e) {
@@ -149,6 +166,17 @@ var DetailsView = ValidatingView.extend({
                 $('#course-image').attr('src', $(event.currentTarget).val());
             }, 1000);
             break;
+        case 'course-video-url':
+            this.setField(event);
+            var url = $(event.currentTarget).val();
+            var video_name = _.last(url.split('/'));
+            this.model.set('course_video_name', video_name);
+            // Wait to set the video src until the user stops typing
+            clearTimeout(this.videoTimer);
+            this.videoTimer = setTimeout(function() {
+                $('#course-video').attr('src', $(event.currentTarget).val());
+            }, 1000);
+            break;
         case 'course-effort':
             this.setField(event);
             break;
@@ -163,7 +191,7 @@ var DetailsView = ValidatingView.extend({
             clearTimeout(this.videoTimer);
             this.videoTimer = setTimeout(_.bind(function() {
                 this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
-                if (this.model.has('intro_video')) {
+                if (this.model.has('intro_video') || this.model.has('course_video_asset_path')) {
                     this.$el.find('.remove-course-introduction-video').show();
                 }
                 else {
@@ -182,6 +210,11 @@ var DetailsView = ValidatingView.extend({
             this.model.set_videosource(null);
             this.$el.find(".current-course-introduction-video iframe").attr("src", "");
             this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val("");
+            this.$el.find('.remove-course-introduction-video').hide();
+        }
+        else if (this.model.has('course_video_asset_path')) {
+            this.$el.find(".current-course-introduction-video video").attr("src", "");
+            this.$el.find('#course-video-url').val("");
             this.$el.find('.remove-course-introduction-video').hide();
         }
     },
@@ -274,6 +307,29 @@ var DetailsView = ValidatingView.extend({
                 self.model.set(options);
                 self.render();
                 $('#course-image').attr('src', self.model.get('course_image_asset_path'));
+            }
+        });
+        modal.show();
+    },
+
+    uploadVideo: function(event) {
+        event.preventDefault();
+        var upload = new FileUploadModel({
+            title: gettext("Upload your course video."),
+            message: gettext("Files must be in .mp4, .ogg, or .webm format."),
+            mimeTypes: ['video/mp4', 'video/ogg', 'video/webm']
+        });
+        var self = this;
+        var modal = new FileUploadDialog({
+            model: upload,
+            onSuccess: function(response) {
+                var options = {
+                    'course_video_name': response.asset.display_name,
+                    'course_video_asset_path': response.asset.url
+                };
+                self.model.set(options);
+                self.render();
+                $('#course-video').attr('src', self.model.get('course_video_asset_path'));
             }
         });
         modal.show();

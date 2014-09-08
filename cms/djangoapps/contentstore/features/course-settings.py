@@ -134,7 +134,7 @@ def test_change_course_overview(_step):
 
 
 @step('I click the "Upload Course Image" button')
-def click_upload_button(_step):
+def click_upload_image_button(_step):
     button_css = '.action-upload-image'
     world.css_click(button_css)
 
@@ -161,6 +161,37 @@ def i_see_new_course_image(_step):
 def image_url_present(_step):
     field_css = '#course-image-url'
     expected_value = '/c4x/MITx/999/asset/image.jpg'
+    assert world.css_value(field_css) == expected_value
+
+
+@step('I click the "Upload Course Video" button')
+def click_upload_video_button(_step):
+    button_css = '.action-upload-video'
+    world.css_click(button_css)
+
+
+@step('I upload a new course video$')
+def upload_new_course_video(_step):
+    upload_file('video.mp4', sub_path="uploads")
+
+
+@step('I should see the new course video$')
+def i_see_new_course_video(_step):
+    v_css = '#course-video'
+    videos = world.css_find(v_css)
+    assert len(videos) == 1
+    v = videos[0]
+    expected_src = '/c4x/MITx/999/asset/video.mp4'
+
+    # Don't worry about the domain in the URL
+    success_func = lambda _: v['src'].endswith(expected_src)
+    world.wait_for(success_func)
+
+
+@step('the video URL should be present in the field')
+def video_url_present(_step):
+    field_css = '#course-video-url'
+    expected_value = '/c4x/MITx/999/asset/video.mp4'
     assert world.css_value(field_css) == expected_value
 
 

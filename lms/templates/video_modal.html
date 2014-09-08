@@ -1,10 +1,16 @@
 <%! 
   from courseware.courses import get_course_about_section
+  from courseware.courses import course_video_url
 %>
 <%namespace name='static' file='static_content.html'/>
 
 <section id="video-modal" class="modal video-modal">
   <div class="inner-wrapper">
-    ${get_course_about_section(course, "video")}
+    %if course.course_video:
+        <video id="course-video" width="618" height="350" preload="none" controls
+        src="${course_video_url(course)}" style="width: 100%; height: 100%;"></video>
+    %else:
+        ${get_course_about_section(course, "video")}
+    %endif
   </div>
 </section>

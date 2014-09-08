@@ -35,6 +35,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(details.course_id, self.course.location.course, "Course_id not copied into")
         self.assertEqual(details.run, self.course.location.name, "Course name not copied into")
         self.assertEqual(details.course_image_name, self.course.course_image)
+        self.assertEqual(details.course_video_name, self.course.course_video)
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
@@ -48,6 +49,7 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertEqual(jsondetails['course_image_name'], self.course.course_image)
+        self.assertEqual(jsondetails['course_video_name'], self.course.course_video)
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
@@ -107,6 +109,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_image_name,
             jsondetails.course_image_name
+        )
+        jsondetails.course_video_name = "an_video.mp4"
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).course_video_name,
+            jsondetails.course_video_name
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -208,6 +215,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.alter_field(url, details, 'intro_video', "intro_video")
         self.alter_field(url, details, 'effort', "effort")
         self.alter_field(url, details, 'course_image_name', "course_image_name")
+        self.alter_field(url, details, 'course_video_name', "course_video_name")
 
     def compare_details_with_encoding(self, encoded, details, context):
         """
@@ -222,6 +230,7 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
         self.assertEqual(details['course_image_name'], encoded['course_image_name'], context + " images not ==")
+        self.assertEqual(details['course_video_name'], encoded['course_video_name'], context + " videos not ==")
 
     def compare_date_fields(self, details, encoded, context, field):
         """
