@@ -71,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: ria1234 <contactpayal@yahoo.com.au>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/edx-platform/language/hi/)\n"
@@ -261,14 +261,23 @@ msgstr "आप इस पाठ्यक्रम में दाखिल न�
 msgid "Enrollment action is invalid"
 msgstr "नामांकन क्रिया अमान्य है"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -1290,7 +1299,6 @@ msgid "Attempted"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Closed"
 msgstr ""
 
@@ -1653,7 +1661,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -7652,8 +7660,8 @@ msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr "हम क्षमा चाहते हैं, {platform_name} के खाते इस वक्त उपलब्ध नहीं हैं।"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "लॉग इन करते दौरान निम्नलिखित त्रुटियां हुई:"
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -8092,7 +8100,8 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr ""
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
+msgid ""
+"We just need a little more information before you start learning with edX."
 msgstr ""
 
 #: lms/templates/register.html
@@ -10134,28 +10143,6 @@ msgstr ""
 msgid "Collapse discussion"
 msgstr ""
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr " इंगित कर दिया गया"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(यह पोस्ट %(courseware_title_linked)s के बारे में है)"
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "पोस्ट में संशोधन हो रहा है"
@@ -10203,6 +10190,11 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr "जवाब में संशोधन हो रहा है"
 
@@ -10233,6 +10225,10 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
 msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr " इंगित कर दिया गया"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
@@ -11246,10 +11242,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -12391,8 +12383,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() इलेक्ट्रॉनिक रसीद"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -13456,6 +13448,7 @@ msgstr ""
 "{a_end} को चुनें।"
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "आपके ऑर्डर प्रोसेसिंग में कुछ गड़बड़ हुई"
 
@@ -13468,6 +13461,13 @@ msgstr ""
 "ओह! कुछ गड़बड़ हो गई। अपने द्वारा दी गई सारी सूचनाओं को ठीक से जांच लें और "
 "भुगतान करने के लिए बटन दबाएं। अगर फिर भी कोई गड़बड़ हो तो, कृपया बाद में "
 "कोशिश करें।"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -13625,7 +13625,7 @@ msgstr "फोटो पहचान दस्तावेज़"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 

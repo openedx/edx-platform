@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:35-0400\n"
+"POT-Creation-Date: 2014-09-08 10:56-0400\n"
 "PO-Revision-Date: 2014-08-28 00:15+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/projects/p/edx-platform/language/az/)\n"
@@ -3202,6 +3202,14 @@ msgstr ""
 msgid "Deleting"
 msgstr ""
 
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr ""
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr ""
@@ -3525,6 +3533,34 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore

@@ -147,7 +147,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -337,18 +337,24 @@ msgstr "Vous n'êtes pas inscrit à ce cours"
 msgid "Enrollment action is invalid"
 msgstr "Action d'inscription invalide"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
 msgstr ""
-"Il n'y a pas de compte sur {platform_name} associé à votre compte "
-"{provider_name}. Veuillez utiliser votre identifiant sur {platform_name} ou "
-"choisir un autre fournisseur."
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -1846,10 +1852,8 @@ msgstr "Passeports LTI"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
-"Entrez les passeports pour les outils LTI de cours dans le format "
-"suivant:\"id\":\"client_key:client_secret\"."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start Date"
@@ -7178,7 +7182,7 @@ msgstr "Admin"
 #: cms/templates/manage_users.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Staff"
-msgstr ""
+msgstr "Équipe pédagogique"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -7422,6 +7426,10 @@ msgid ""
 "Certificate of Achievement to document your accomplishment. A minimum fee "
 "applies."
 msgstr ""
+"Prévoyez-vous d'utiliser votre cursus terminé pour des demandes d'emploi, de"
+" l'avancement de carrière, ou des candidatures à des écoles? Choisissez de "
+"travailler à un certificat de réussite Vérifié pour documenter vos "
+"réalisations. Un tarif minimum s'applique."
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -7429,6 +7437,10 @@ msgid ""
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
 msgstr ""
+"Projetez-vous d'utiliser votre cursus terminé pour des demandes d'emploi, de"
+" l'avancement de carrière, ou des candidatures dans des écoles? Alors "
+"engagez-vous pour un certificat de réussite Vérifié pour accompagner vos "
+"réalisations. Un tarif minimum s'applique."
 
 #: common/templates/course_modes/choose.html
 msgid ""
@@ -7436,10 +7448,13 @@ msgid ""
 "material. If you complete and pass the course you will automatically earn an"
 " Honor Code Certificate free of charge."
 msgstr ""
+"Vous pouvez commenter ce cours et toujours avoir un accès complet aux "
+"contenus du cours. Si vous terminez et réussissez le cours, vous obtiendrez "
+"automatiquement et gratuitement un certificat de code d'honneur."
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
-msgstr ""
+msgstr "Obtenir un certificat de code d'honneur"
 
 #: lms/templates/admin_dashboard.html
 msgid "{platform_name}-wide Summary"
@@ -7611,6 +7626,8 @@ msgid ""
 "The {provider_name} account you selected is already linked to another "
 "{platform_name} account."
 msgstr ""
+"Le compte {provider_name} choisi est déjà lié à un autre compte "
+"{platform_name}."
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7623,29 +7640,29 @@ msgstr "éditer"
 #. their edX account.
 #: lms/templates/dashboard.html
 msgid "Connected Accounts"
-msgstr ""
+msgstr "Comptes connectés"
 
 #: lms/templates/dashboard.html
 msgid "Linked"
-msgstr ""
+msgstr "Lié"
 
 #: lms/templates/dashboard.html
 msgid "Not Linked"
-msgstr ""
+msgstr "Non lié"
 
 #. Translators: clicking on this removes the link between a user's edX account
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
 msgid "Unlink"
-msgstr ""
+msgstr "Supprimer le lien"
 
 #. Translators: clicking on this creates a link between a user's edX account
 #. and their account with an external authentication provider (like Google or
 #. LinkedIn).
 #: lms/templates/dashboard.html
 msgid "Link"
-msgstr ""
+msgstr "Lier"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
@@ -8262,8 +8279,8 @@ msgstr ""
 "pour le moment"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "Les erreurs suivantes se sont produites lors de votre connexion :"
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -8711,11 +8728,11 @@ msgstr "Inscrivez-vous ci-dessous pour créer votre compte sur {platform_name}"
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
 msgid "Sign up with {provider_name}"
-msgstr ""
+msgstr "S'inscrire via {provider_name}"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
-msgstr ""
+msgstr "Créez votre propre compte {platform_name} ci-dessous"
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -8724,10 +8741,9 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr "Votre connexion via {selected_provider} a réussi."
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
+msgid ""
+"We just need a little more information before you start learning with edX."
 msgstr ""
-"Terminez l'enregistrement de votre compte ci-dessous pour commencer votre "
-"cours."
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -8759,7 +8775,7 @@ msgstr "Nom affiché publiquement"
 
 #: lms/templates/register.html
 msgid "Additional Personal Information"
-msgstr ""
+msgstr "Informations  personnelles supplémentaires"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -10508,14 +10524,17 @@ msgid ""
 "received. you can <a href=\"#\">contact the account holder</a> to request "
 "payment, or you can"
 msgstr ""
+"Vous ne pouvez plus accéder à ce cours car le paiement n'a pas encore été "
+"reçu. Vous pouvez <a href=\"#\">contacter le gérant du compte</a> pour "
+"demander le paiement, ou vous pouvez"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "unregister"
-msgstr ""
+msgstr "vous désinscrire"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "for this course."
-msgstr ""
+msgstr "de ce cours."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -10726,23 +10745,23 @@ msgstr "Chercher parmi tous les messages"
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Filter:"
-msgstr ""
+msgstr "Filtre :"
 
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all"
-msgstr ""
+msgstr "Tout montrer"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread"
-msgstr ""
+msgstr "Non lu"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Flagged"
-msgstr ""
+msgstr "Marqué"
 
 #. Translators: This labels a cohort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -10794,28 +10813,6 @@ msgstr "Déplier la discussion"
 msgid "Collapse discussion"
 msgstr "Replier la discussion"
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "Epinglé"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(ce message concerne %(courseware_title_linked)s)"
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Éditer le message"
@@ -10836,7 +10833,7 @@ msgstr "Mettre à jour le message"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Show Comments (%(num_comments)s)"
-msgstr ""
+msgstr "Affichier (%(num_comments)s) Commentaires"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add a comment"
@@ -10848,11 +10845,11 @@ msgstr "Ajouter un commentaire"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
+msgstr "marqué comme réponse %(time_ago)s par %(user)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "marked as answer %(time_ago)s"
-msgstr ""
+msgstr "marqué comme réponse %(time_ago)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "endorsed %(time_ago)s by %(user)s"
@@ -10860,6 +10857,11 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "endorsed %(time_ago)s"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -10872,7 +10874,7 @@ msgstr "Mettre à jour la réponse"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "posté %(time_ago)s par %(author)s"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing comment"
@@ -10884,15 +10886,19 @@ msgstr "Mettre à jour le commentaire"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "discussion"
-msgstr ""
+msgstr "Discussion"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "answered question"
-msgstr ""
+msgstr "Question avec réponse"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
-msgstr ""
+msgstr "Question sans réponse"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr "Epinglé"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
@@ -10993,12 +10999,12 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Topic Area:"
-msgstr ""
+msgstr "Sujet :"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Filter topics"
-msgstr ""
+msgstr "Filtrer les sujets"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Add your post to a relevant topic to help others find it."
@@ -11009,7 +11015,7 @@ msgstr ""
 #. post
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Visible To:"
-msgstr ""
+msgstr "Visible par :"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "All Groups"
@@ -11055,15 +11061,15 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Unendorse"
-msgstr ""
+msgstr "Refuser"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Mark as Answer"
-msgstr ""
+msgstr "Marquer comme Réponse"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Unmark as Answer"
-msgstr ""
+msgstr "Ne plus marquer comme Réponse"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Follow"
@@ -11075,7 +11081,7 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Vote"
-msgstr ""
+msgstr "Voter"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Report abuse"
@@ -11990,10 +11996,6 @@ msgstr "Information sur les bons"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
 msgstr "+ Ajouter un bon de réduction"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
-msgstr "Identifiant du cours"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
@@ -13171,8 +13173,8 @@ msgstr ""
 "aussi obtenu un reçu dans votre courriel."
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() Reçu Électronique"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -14261,6 +14263,7 @@ msgstr ""
 "gratuitement {a_end} et cela, sans vérification."
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "Erreur dans le traitement de votre commande"
 
@@ -14273,6 +14276,13 @@ msgstr ""
 "Oups ! Quelque chose s'est mal passé. Veuillez confirmer de nouveau vos "
 "détails et cliquer sur le bouton pour aller sur la page de payement. Si cela"
 " ne fonctionne toujours pas, veuillez réessayer plus tard."
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -14431,7 +14441,7 @@ msgstr "Un document avec une photo d'identité"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 

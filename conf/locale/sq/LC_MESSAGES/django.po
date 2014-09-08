@@ -44,8 +44,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
-"PO-Revision-Date: 2014-09-03 08:26+0000\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
+"PO-Revision-Date: 2014-09-06 17:10+0000\n"
 "Last-Translator: Faton Nuha <faton11@live.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -87,7 +87,7 @@ msgstr ""
 #: cms/templates/course_outline.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
-msgstr ""
+msgstr "Pjesë"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -125,7 +125,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr ""
+msgstr "Çmimi nuk është zgjedhur ose çmimi i zgjedhur është shumë i ulët."
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -206,7 +206,7 @@ msgstr "ID e kursit nuk është e specifikuar"
 
 #: common/djangoapps/student/views.py lms/djangoapps/dashboard/support.py
 msgid "Invalid course id"
-msgstr ""
+msgstr "ID e kursit jo valide"
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
@@ -229,14 +229,23 @@ msgstr "Ju nuk jeni i regjistruar në këtë kurs"
 msgid "Enrollment action is invalid"
 msgstr ""
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -298,7 +307,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr ""
+msgstr "Një llogari me emër publik '{username}' tashmë ekziston."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
@@ -382,11 +391,11 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
-msgstr ""
+msgstr "Posta elektronike valide është e detyrueshme."
 
 #: common/djangoapps/student/views.py
 msgid "Username should only consist of A-Z and 0-9, with no spaces."
-msgstr ""
+msgstr "Emri i përdoruesit përbëhet nga A-ZH dhe nga 0-9, pa hapësirë."
 
 #: common/djangoapps/student/views.py common/djangoapps/student/views.py
 msgid "Password: "
@@ -442,7 +451,7 @@ msgstr "Fjalëkalimi jo valid"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "Posta elektronike valide e detyrueshme."
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
@@ -451,10 +460,11 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr ""
+"Posta elektronike e vjetër është e njëjtë me postën elektronike të re."
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
-msgstr ""
+msgstr "E pamundur të dërgohet linku aktivizues. Ju lutem provojeni përsëri."
 
 #: common/djangoapps/student/views.py
 msgid "Name required"
@@ -486,14 +496,14 @@ msgstr ""
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr ""
+msgstr "SHORT_DATE_FORMAT"
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "TIME_FORMAT"
-msgstr ""
+msgstr "TIME_FORMAT"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -501,7 +511,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr ""
+msgstr "AM"
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -509,7 +519,7 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr ""
+msgstr "PM"
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -881,7 +891,7 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
-msgstr ""
+msgstr "procesimi"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -958,7 +968,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
-msgstr ""
+msgstr "Shiko XML burimin e rreshtit {sourcenum}."
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Execution of unsafe Javascript code is not allowed."
@@ -1235,7 +1245,6 @@ msgid "Attempted"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Closed"
 msgstr ""
 
@@ -1589,7 +1598,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -6063,6 +6072,9 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"E pamundur tëkrijohet kursi '{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
@@ -6098,7 +6110,7 @@ msgstr "Ngarkimi i fajllit dështoj.Ju lutem provojeni përsëri"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
-msgstr ""
+msgstr "Nuk u gjet fajlli course.xml në paketë."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Empty"
@@ -6126,7 +6138,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
-msgstr ""
+msgstr "Transkriptat mbështetën vetëm për \"video\" modulet."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
@@ -6244,7 +6256,7 @@ msgstr ""
 
 #: cms/templates/html_error.html lms/templates/module-error.html
 msgid "Error:"
-msgstr ""
+msgstr "Problem:"
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -6565,7 +6577,7 @@ msgstr ""
 
 #: lms/templates/contact.html lms/templates/original_edx_footer.html
 msgid "Press"
-msgstr ""
+msgstr "Shtyp"
 
 #: lms/templates/contact.html lms/templates/edx_footer.html
 #: lms/templates/footer.html lms/templates/original_edx_footer.html
@@ -6674,7 +6686,7 @@ msgstr ""
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
 msgid "edit"
-msgstr ""
+msgstr "ndrysho"
 
 #. Translators: this section lists all the third-party authentication
 #. providers
@@ -6682,7 +6694,7 @@ msgstr ""
 #. their edX account.
 #: lms/templates/dashboard.html
 msgid "Connected Accounts"
-msgstr ""
+msgstr "Llogaritë e lidhura"
 
 #: lms/templates/dashboard.html
 msgid "Linked"
@@ -6704,11 +6716,11 @@ msgstr ""
 #. LinkedIn).
 #: lms/templates/dashboard.html
 msgid "Link"
-msgstr ""
+msgstr "Link"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
-msgstr ""
+msgstr "Reseto fjalëkalimin"
 
 #: lms/templates/dashboard.html
 msgid "Current Courses"
@@ -6720,7 +6732,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Find courses now!"
-msgstr ""
+msgstr "Gjej kurset tani!"
 
 #: lms/templates/dashboard.html
 msgid "Looks like you haven't been enrolled in any courses yet."
@@ -6740,7 +6752,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Save Settings"
-msgstr ""
+msgstr "Ruaj konfigurimet"
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
@@ -6751,10 +6763,12 @@ msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
 msgstr ""
+"Një mesazh është dërguar tek {email}. Ndjekeni linkun tek posta elektronike "
+"që të e ndryshoni fjalëkalimin tuaj."
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Change Email"
-msgstr ""
+msgstr "Ndrysho postën elektronike"
 
 #: lms/templates/dashboard.html
 msgid "Please enter your new email address:"
@@ -6762,13 +6776,15 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Please confirm your password:"
-msgstr ""
+msgstr "Ju lutem konfirmojeni fjalëkalimin tuaj:"
 
 #: lms/templates/dashboard.html
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr ""
+"Ne do të ju dërgojm konfirmimin tek të dyja tek {email} dhe tek posta juaj e"
+" re elektronike si pjesë e procesit."
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -6799,13 +6815,15 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Change My Name"
-msgstr ""
+msgstr "Ndrysho emrin tim"
 
 #: lms/templates/dashboard.html
 msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
 "info\"></span>"
 msgstr ""
+"<span id=\"track-info\"></span> {course_number}? <span id=\"refund-"
+"info\"></span>"
 
 #: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -6857,26 +6875,26 @@ msgstr ""
 
 #: lms/templates/edx_footer.html lms/templates/footer.html
 msgid "News"
-msgstr ""
+msgstr "Lajmet"
 
 #: lms/templates/edx_footer.html lms/templates/footer.html
 #: lms/templates/original_edx_footer.html
 #: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ"
 
 #: lms/templates/edx_footer.html
 msgid "edX Blog"
-msgstr ""
+msgstr "edX Blog"
 
 #: lms/templates/edx_footer.html
 msgid "Donate to edX"
-msgstr ""
+msgstr "Dhuro tek edX"
 
 #: lms/templates/edx_footer.html
 msgid "Jobs at edX"
-msgstr ""
+msgstr "Punët në edX"
 
 #: lms/templates/edx_footer.html
 msgid "Follow Us"
@@ -6884,11 +6902,11 @@ msgstr ""
 
 #: lms/templates/edx_footer.html
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #: lms/templates/edx_footer.html
 msgid "Facebook"
-msgstr ""
+msgstr "Facebook"
 
 #: lms/templates/edx_footer.html
 msgid "Meetup"
@@ -6896,29 +6914,29 @@ msgstr ""
 
 #: lms/templates/edx_footer.html
 msgid "LinkedIn"
-msgstr ""
+msgstr "LinkedIn"
 
 #: lms/templates/edx_footer.html
 msgid "Google+"
-msgstr ""
+msgstr "Google+"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
-msgstr ""
+msgstr "Ndryshimi i postës elektronike dështoi"
 
 #: lms/templates/email_change_failed.html
 msgid "We were unable to send a confirmation email to {email}"
-msgstr ""
+msgstr "Ne e kemi të pamundur të dërgojm nje konfirmim tek {email}"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 #: lms/templates/invalid_email_key.html
 msgid "Go back to the {link_start}home page{link_end}."
-msgstr ""
+msgstr "Shko prapa tek {link_start}ballina{link_end}"
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
-msgstr ""
+msgstr "Posta elektronike u ndryshua sukseshëm!"
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
@@ -6935,11 +6953,11 @@ msgstr ""
 
 #: lms/templates/enroll_students.html
 msgid "Course: "
-msgstr ""
+msgstr "Kursi:"
 
 #: lms/templates/enroll_students.html
 msgid "Add new students"
-msgstr ""
+msgstr "Shto student të ri"
 
 #: lms/templates/enroll_students.html
 msgid "Existing students:"
@@ -6983,7 +7001,7 @@ msgstr ""
 
 #: lms/templates/folditbasic.html
 msgid "Level"
-msgstr ""
+msgstr "Nivel"
 
 #: lms/templates/folditbasic.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -7022,11 +7040,13 @@ msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 msgid "Your E-mail Address"
-msgstr ""
+msgstr "Posta e juaj elektronike"
 
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
 msgid "This is the e-mail address you used to register with {platform}"
 msgstr ""
+"Kjo është posta elektronike që ju e keni përdorur të regjistroheni me "
+"{platform}"
 
 #: lms/templates/forgot_password_modal.html
 msgid "Reset My Password"
@@ -7034,11 +7054,11 @@ msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
-msgstr ""
+msgstr "Posta elektronike është gabim."
 
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 msgid "{platform_name} Help"
-msgstr ""
+msgstr "{platform_name} Ndhimë"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -7066,11 +7086,11 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Make a suggestion"
-msgstr ""
+msgstr "Bëj një syrgjerim"
 
 #: lms/templates/help_modal.html
 msgid "Ask a question"
-msgstr ""
+msgstr "Bëj një pyetje"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -7105,7 +7125,7 @@ msgstr "Paraqit"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
-msgstr ""
+msgstr "Faleminderit!"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -7117,11 +7137,11 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "problem"
-msgstr ""
+msgstr "problem"
 
 #: lms/templates/help_modal.html
 msgid "Report a Problem"
-msgstr ""
+msgstr "Raporto një problem"
 
 #: lms/templates/help_modal.html
 msgid "Brief description of the problem"
@@ -7141,7 +7161,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Make a Suggestion"
-msgstr ""
+msgstr "Bëj një sugjerim"
 
 #: lms/templates/help_modal.html
 msgid "Brief description of your suggestion"
@@ -7150,7 +7170,7 @@ msgstr ""
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
 msgid "Details"
-msgstr ""
+msgstr "Detajet"
 
 #: lms/templates/help_modal.html
 msgid "question"
@@ -7174,7 +7194,7 @@ msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Please try again later."
-msgstr ""
+msgstr "Ju lutem provojeni përsëri më vonë."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -7277,7 +7297,7 @@ msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr ""
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
+msgid "We couldn't log you in."
 msgstr ""
 
 #: lms/templates/login.html
@@ -7690,7 +7710,8 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr ""
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
+msgid ""
+"We just need a little more information before you start learning with edX."
 msgstr ""
 
 #: lms/templates/register.html
@@ -9611,28 +9632,6 @@ msgstr ""
 msgid "Collapse discussion"
 msgstr ""
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr ""
@@ -9680,6 +9679,11 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr ""
 
@@ -9709,6 +9713,10 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -10697,10 +10705,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11733,7 +11737,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12690,6 +12694,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr ""
 
@@ -12698,6 +12703,13 @@ msgid ""
 "Oops! Something went wrong. Please confirm your details again and click the "
 "button to move on to payment. If you are still having trouble, please try "
 "again later."
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
@@ -12837,7 +12849,7 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 
@@ -12961,7 +12973,7 @@ msgstr "Nëse problemi përsëritet, ju lutem na kontaktoni tek {email_link}."
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
 msgid "Studio Account Activation"
-msgstr ""
+msgstr "Llogaria e Studio Aktivizimi"
 
 #: cms/templates/activation_active.html
 msgid "Your account is already active"
@@ -13013,7 +13025,7 @@ msgstr "Kontakto mbështetjen e edX"
 #: cms/templates/asset_index.html cms/templates/asset_index.html
 #: cms/templates/widgets/header.html
 msgid "Files &amp; Uploads"
-msgstr ""
+msgstr "Fajllat &amp; Ngarkimet"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
@@ -13121,6 +13133,8 @@ msgid ""
 "Any changes you make to these checklists are saved automatically and are "
 "immediately visible to other course team members."
 msgstr ""
+"Çdo ndryshim që ju e bëni në këto lista ruhet automatikisht dhe menjeherë "
+"shfaqen tek antarët e tjerë të kursit."
 
 #: cms/templates/checklists.html
 msgid "Studio checklists"
@@ -13273,6 +13287,7 @@ msgstr ""
 #: cms/templates/course-create-rerun.html
 msgid "The new course is set to start on January 1, 2030 at midnight (UTC)."
 msgstr ""
+"Kursi i ri është përcaktuar të filloj me 1 Janar, 2030 në mesnatë (UTC)."
 
 #: cms/templates/course-create-rerun.html
 msgid "What transfers from the original course?"
@@ -13335,7 +13350,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Click to add a new section"
-msgstr ""
+msgstr "Kliko të e shtosh një pjesë"
 
 #: cms/templates/course_outline.html
 msgid "New Section"
@@ -13382,7 +13397,7 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Reorganizing your course"
-msgstr ""
+msgstr "Riorganizo kursin tuaj"
 
 #: cms/templates/course_outline.html
 msgid "Drag sections, subsections, and units to new locations in the outline."
@@ -13591,7 +13606,7 @@ msgstr "Struktura e kursit"
 
 #: cms/templates/export.html
 msgid "Individual Problems"
-msgstr ""
+msgstr "Probleme individuale"
 
 #: cms/templates/export.html
 msgid "Course Assets"
@@ -13647,7 +13662,7 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid "Opening the downloaded file"
-msgstr ""
+msgstr "Hape fajllin e shkarkuar"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -13664,11 +13679,11 @@ msgstr ""
 #: cms/templates/export_git.html cms/templates/export_git.html
 #: cms/templates/widgets/header.html
 msgid "Export to Git"
-msgstr ""
+msgstr "Eksporto në Git"
 
 #: cms/templates/export_git.html
 msgid "About Export to Git"
-msgstr ""
+msgstr "Rreth eksportimit tek Git"
 
 #: cms/templates/export_git.html
 msgid "Use this to export your course to its git repository."
@@ -13711,7 +13726,7 @@ msgstr ""
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
 #: cms/templates/widgets/header.html
 msgid "Group Configurations"
-msgstr ""
+msgstr "Konfigurimet e grupit"
 
 #: cms/templates/group_configurations.html
 msgid "New Group Configuration"
@@ -13723,7 +13738,7 @@ msgstr ""
 
 #: cms/templates/group_configurations.html
 msgid "You can create, edit, and delete group configurations."
-msgstr ""
+msgstr "Ju mund të krijoni, ndryshoni dhe fshini konfigurimet e grupit."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -13772,7 +13787,7 @@ msgstr ""
 #: cms/templates/settings_advanced.html cms/templates/settings_advanced.html
 #: cms/templates/settings_graders.html cms/templates/widgets/header.html
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Konfigurimet e avancuara"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -13786,6 +13801,8 @@ msgstr "Mirë se erdhët tek"
 msgid ""
 "Studio helps manage your online courses, so you can focus on teaching them"
 msgstr ""
+"Studio ndihmon menaxhimin kurset tuaja online, kështu ju mund të fokusoheni "
+"që të i mësoni ato"
 
 #: cms/templates/howitworks.html
 msgid "Studio's Many Features"
@@ -13857,6 +13874,8 @@ msgid ""
 "Help your students understand one concept at a time with multimedia, HTML, "
 "and exercises."
 msgstr ""
+"Ndihmoni studentat tuaj të e kuptojnë një koncept në kohë me multimedia, "
+"HTML, dhe detyra."
 
 #: cms/templates/howitworks.html
 msgid "Work Visually, Organize Quickly"
@@ -13917,7 +13936,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
-msgstr ""
+msgstr "Puno në ekip"
 
 #: cms/templates/howitworks.html
 msgid ""
@@ -13935,7 +13954,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid "Already have a Studio Account? Sign In"
-msgstr ""
+msgstr "Tashmë kam llogari në Studio? Kyçu"
 
 #: cms/templates/howitworks.html
 msgid "Outlining Your Course"
@@ -15298,7 +15317,7 @@ msgstr "Mbyll artikullin"
 
 #: wiki/forms.py
 msgid "Deny all users access to edit this article."
-msgstr ""
+msgstr "Blloko të gjithë përdoruesve akcesin në editimin e këtij artikulli."
 
 #: wiki/forms.py
 msgid "Permissions"
@@ -15491,7 +15510,7 @@ msgstr ""
 
 #: wiki/models/urlpath.py
 msgid "(root)"
-msgstr ""
+msgstr "(root)"
 
 #: wiki/models/urlpath.py
 msgid "URL path"
@@ -15667,7 +15686,7 @@ msgstr ""
 
 #: wiki/plugins/images/views.py
 msgid "%(file)s has been saved."
-msgstr ""
+msgstr "%(file)s është ruajtur."
 
 #: wiki/plugins/images/wiki_plugin.py
 msgid "Images"
@@ -15675,7 +15694,7 @@ msgstr "Imazhe"
 
 #: wiki/plugins/images/wiki_plugin.py
 msgid "An image was added: %s"
-msgstr ""
+msgstr "Një imazh është shtuar: %s"
 
 #: wiki/plugins/links/wiki_plugin.py
 msgid "Links"
@@ -15687,7 +15706,7 @@ msgstr "Njoftimet"
 
 #: wiki/plugins/notifications/forms.py
 msgid "When this article is edited"
-msgstr ""
+msgstr "Kur ky artikull është ndryshuar"
 
 #: wiki/plugins/notifications/forms.py
 msgid "Also receive emails about article edits"
@@ -15707,15 +15726,15 @@ msgstr ""
 
 #: wiki/plugins/notifications/models.py
 msgid "Article deleted: %s"
-msgstr ""
+msgstr "Artikulli i fshirë: %s"
 
 #: wiki/plugins/notifications/models.py
 msgid "Article modified: %s"
-msgstr ""
+msgstr "Artikulli i modifikuar: %s"
 
 #: wiki/plugins/notifications/models.py
 msgid "New article created: %s"
-msgstr ""
+msgstr "Artikull i ri u krijua: %s"
 
 #: wiki/views/accounts.py
 msgid "You are now sign up... and now you can sign in!"
@@ -15727,11 +15746,11 @@ msgstr ""
 
 #: wiki/views/accounts.py
 msgid "You are now logged in! Have fun!"
-msgstr ""
+msgstr "Ju tani jeni i kyçur! Kënaquni!"
 
 #: wiki/views/article.py
 msgid "New article '%s' created."
-msgstr ""
+msgstr "Artikulli i ri '%s' u krijua."
 
 #: wiki/views/article.py
 msgid "There was an error creating this article: %s"
@@ -15759,7 +15778,7 @@ msgstr ""
 
 #: wiki/views/article.py
 msgid "Your changes were saved."
-msgstr ""
+msgstr "Ndryshimet e juaja janë ruajtur."
 
 #: wiki/views/article.py
 msgid "A new revision of the article was succesfully added."

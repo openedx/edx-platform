@@ -115,7 +115,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Minh Tue Vo <mvo@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -291,6 +291,7 @@ msgid "Course id is invalid"
 msgstr "Mã số khóa học không đúng"
 
 #: common/djangoapps/student/views.py
+#: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "Khóa học đã đầy"
 
@@ -306,14 +307,23 @@ msgstr "Bạn chưa được ghi danh vào khóa học này"
 msgid "Enrollment action is invalid"
 msgstr "Hành động ghi danh không hợp lệ"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
 msgstr ""
 
 #: common/djangoapps/student/views.py
@@ -974,7 +984,7 @@ msgstr ""
 #. Translators: '<choice>' is a tag name and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a <choice> tag; got {given_tag} instead"
-msgstr ""
+msgstr "Dự kiến ​​một tag <choice>; nhận được {given_tag}"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -1681,7 +1691,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3699,7 +3709,7 @@ msgstr "Tổng số thành viên"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
-msgstr "Những khóa học được tải trong modulestore"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/djangoapps/dashboard/sysadmin.py
 #: lms/templates/tracking_log.html
@@ -4701,11 +4711,6 @@ msgid ""
 "        Please check back later for this.\n"
 "        "
 msgstr ""
-"\n"
-"        Lỗi khi khởi động học viên chấm cho nhau.\n"
-"        Chưa có một học phần nào yêu cầu học viên chấm cho nhau được tạo ra trong chương trình học để cho phép bạn chấm người khác.\n"
-"        Xin vui lòng kiểm tra lại sau.\n"
-"        "
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
@@ -6082,7 +6087,7 @@ msgid ""
 "The following files are available for this article. Copy the markdown tag to"
 " directly refer to a file from the article text."
 msgstr ""
-"Các tập tin dưới đây có thể sử dụng cho bài viết này. Sao chép các thẻ định "
+"Các tập tin dưới đây có thể sử dụng cho bài viết này. Sao chép các tag định "
 "dạng để trực tiếp trỏ tới tập tin từ bài viết."
 
 #: lms/templates/wiki/plugins/attachments/index.html
@@ -6143,12 +6148,16 @@ msgid ""
 "GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
 "configure a different path with GIT_REPO_EXPORT_DIR"
 msgstr ""
+"GIT_REPO_EXPORT_DIR không được cài đặt hoặc đường dẫn {0} không tồn tại, "
+"phải tạo nó, hoặc cấu hình một đường dẫn khác bằng IT_REPO_EXPORT_DIR"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Non writable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
 msgstr ""
+"Không có đường dẫn git được phép ghi. Cần đường dẫn kiểu như: \n"
+"git@github.com:mitocw/edx4edx_lite.git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -6160,31 +6169,35 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to determine branch, repo in detached HEAD mode"
-msgstr ""
+msgstr "Không thể xác định nhánh và kho trong chế độ detached HEAD"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to update or clone git repository."
-msgstr ""
+msgstr "Không thể cập nhật hoặc sao kho git."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to export course to xml."
-msgstr ""
+msgstr "Không thể xuất khóa học thành dạng xml."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Unable to configure git username and password"
-msgstr ""
+msgstr "Không thể cấu hình tên đăng nhập và mật khẩu git"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to commit changes. This is usually because there are no changes to be"
 " committed"
 msgstr ""
+"Không thể thực hiện thay đổi. Điều này thường là bởi vì không có thay đổi "
+"gì."
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
 "Unable to push changes.  This is usually because the remote repository "
 "cannot be contacted"
 msgstr ""
+"Không thể cập nhật thay đổi. Điều này thường là bởi vì không thể liên lạc "
+"được với remote repository "
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Bad course location provided"
@@ -6192,15 +6205,15 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Missing branch on fresh clone"
-msgstr ""
+msgstr "Thiếu nhánh trên fresh clone"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr ""
+msgstr "Lệnh là {0!r}. Thư mục đang chạy là: {1!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid "Command output was: {0!r}"
-msgstr ""
+msgstr "Đầu ra lệnh là: {0!r}"
 
 #: cms/djangoapps/contentstore/git_export_utils.py
 msgid ""
@@ -6212,7 +6225,7 @@ msgstr ""
 msgid "My Notes"
 msgstr ""
 "#-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#\n"
-"Ghi Chú của tôi\n"
+"Ghi Chú Của Tôi\n"
 "#-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#\n"
 "Các Ghi Chú Của Tôi"
 
@@ -6221,6 +6234,8 @@ msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
 ". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
 msgstr ""
+"Lấy khoá học và xuất vào kho git\n"
+". Thư mục của khóa học phải là một kho git. Cách sử dụng: git_export <course_loc> <git_url>"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -6228,15 +6243,15 @@ msgstr "Tải lên hoàn tất"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
-msgstr ""
+msgstr "Trống "
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
@@ -6254,9 +6269,6 @@ msgid ""
 " and course run. Please change either organization or course number to be "
 "unique."
 msgstr ""
-"Đã có khóa học được định nghĩa với cùng tổ chức, số khóa học, và khóa học "
-"đang hoạt động. Vui lòng đổi tên tổ chức hoặc số khóa học để trở thành duy "
-"nhất."
 
 #: cms/djangoapps/contentstore/views/course.py
 #: cms/djangoapps/contentstore/views/course.py
@@ -6270,14 +6282,17 @@ msgid ""
 "\n"
 "{err}"
 msgstr ""
+"Không thể tạo khóa học '{name}'.\n"
+"\n"
+"{err}"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
-msgstr ""
+msgstr "JSON không hợp lệ."
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "must have name of the configuration"
-msgstr ""
+msgstr "phải có tên của cấu hình"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "must have at least one group"
@@ -6289,7 +6304,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/export_git.py
 msgid "Course successfully exported to git repository"
-msgstr ""
+msgstr "Xuất thành công khoá học vào kho git"
 
 #: cms/djangoapps/contentstore/views/helpers.py
 msgid "Vertical"
@@ -6301,7 +6316,7 @@ msgstr "Chúng tôi chỉ hỗ trợ tải lên tập tin .tar.gz"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "File upload corrupted. Please try again"
-msgstr ""
+msgstr "Tập tin tải lên bị hỏng. Vui lòng thử lại"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "Could not find the course.xml file in the package."
@@ -6309,27 +6324,27 @@ msgstr "Không thể tìm thấy tập tin course.xml trong gói."
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Empty"
-msgstr ""
+msgstr "Rỗng"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
-msgstr ""
+msgstr "Sao chép của {0}"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of '{0}'"
-msgstr ""
+msgstr "Sao chép của '{0}'"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "{section_or_subsection} \"{display_name}\""
-msgstr ""
+msgstr "{section_or_subsection} \"{display_name}\""
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Incoming video data is empty."
-msgstr ""
+msgstr "Không có dữ liệu video vào."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Can't find item by locator."
-msgstr ""
+msgstr "Không thể tìm thấy mục bằng định vị."
 
 #: cms/djangoapps/contentstore/views/transcripts_ajax.py
 msgid "Transcripts are supported only for \"video\" modules."
@@ -6337,7 +6352,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Insufficient permissions"
-msgstr ""
+msgstr "Không đủ quyền"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Could not find user by email address '{email}'."
@@ -6345,11 +6360,11 @@ msgstr "Không tìm thấy người dùng với địa chỉ email '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "User {email} has registered but has not yet activated his/her account."
-msgstr ""
+msgstr "Người dùng {email} đã đăng ký nhưng vẫn chưa kích hoạt tài khoản."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "`role` is required"
-msgstr ""
+msgstr "yêu cầu `vai trò`"
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Only instructors may create other instructors"
@@ -6357,7 +6372,7 @@ msgstr "Chỉ người hướng dẫn mới có thể tạo thêm người hư�
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "You may not remove the last instructor from a course"
-msgstr "Bạn không thể xóa bỏ người hướng dẫn cuối cùng khỏi khóa học"
+msgstr "Bạn không thể xóa người hướng dẫn trước khỏi khóa học"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
@@ -6365,23 +6380,23 @@ msgstr "chưa yêu cầu"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "pending"
-msgstr ""
+msgstr "đang đợi"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "granted"
-msgstr ""
+msgstr "đã chấp thuận"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "denied"
-msgstr ""
+msgstr "bị từ chối"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Studio user"
-msgstr ""
+msgstr "Người dùng Studio"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "The date when state was last updated"
-msgstr "Thời gian khi trạng thái được cập nhật lần cuối"
+msgstr "Thời gian trạng thái được cập nhật lần cuối"
 
 #: cms/djangoapps/course_creators/models.py
 msgid "Current course creator state"
@@ -6397,7 +6412,7 @@ msgstr ""
 
 #: cms/djangoapps/models/settings/course_metadata.py
 msgid "Incorrect format for field '{name}'. {detailed_message}"
-msgstr ""
+msgstr "Định dạng không đúng cho '{name}'. {detailed_message}"
 
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
@@ -6504,7 +6519,7 @@ msgstr "Quản Trị"
 #: cms/templates/manage_users.html
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Staff"
-msgstr ""
+msgstr "Nhân viên"
 
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
@@ -6847,6 +6862,14 @@ msgid ""
 "as screenshots or other pertinent details. If you find a bug or other "
 "issues, you can reach us at the following: {bugs_email}."
 msgstr ""
+"Nếu bạn có bất cứ đề xuất/phản hồi nào về nền tảng {platform_name}, hoặc "
+"đang gặp phải các vấn đề kĩ thuật với nền tảng đó (ví dụ: vấn đề với các "
+"email và mật khẩu), bạn có thể liên hệ với chúng tôi tại {tech_email}. Với "
+"những câu hỏi liên quan đến kĩ thuật, hãy kiểm tra xem bạn có đang sử dụng "
+"phiên bản mới nhất của Firefox hoặc Chrome, cung cấp thông tin về trình "
+"duyệt và phiên bản của chúng trong email, cũng như là những ảnh màn hình hay"
+" những thông tin chi tiết cần thiết khác. Nếu bạn tìm thấy một lỗi hoặc các "
+"vấn đề khác, bạn có thể liên hệ với chúng tôi tại: {bugs_email}."
 
 #: lms/templates/contact.html
 msgid "Media"
@@ -7127,27 +7150,27 @@ msgstr ""
 
 #: lms/templates/edx_footer.html
 msgid "Follow Us"
-msgstr ""
+msgstr "Theo Dõi "
 
 #: lms/templates/edx_footer.html
 msgid "Twitter"
-msgstr ""
+msgstr "Twitter"
 
 #: lms/templates/edx_footer.html
 msgid "Facebook"
-msgstr ""
+msgstr "Facebook"
 
 #: lms/templates/edx_footer.html
 msgid "Meetup"
-msgstr ""
+msgstr "Meetup"
 
 #: lms/templates/edx_footer.html
 msgid "LinkedIn"
-msgstr ""
+msgstr "LinkedIn"
 
 #: lms/templates/edx_footer.html
 msgid "Google+"
-msgstr ""
+msgstr "Google+"
 
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
@@ -7165,7 +7188,7 @@ msgstr "Quay trở lại {link_start}trang chủ{link_end}."
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "E-mail change successful!"
-msgstr "Thay đổi E-mail thành công!"
+msgstr "Thay đổi e-mail thành công!"
 
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
@@ -7206,7 +7229,7 @@ msgstr "Sửa lỗi:"
 
 #: lms/templates/extauth_failure.html lms/templates/extauth_failure.html
 msgid "External Authentication failed"
-msgstr "Đăng Nhập Qua Tài Khoản Bên Ngoài thất bại"
+msgstr "Đăng Nhập Qua Tài Khoản Ngoài thất bại"
 
 #: lms/templates/folditbasic.html
 msgid "Due:"
@@ -7253,7 +7276,7 @@ msgstr "Việc làm"
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
-msgstr ""
+msgstr "&copy; 2014 {platform_name}, một số quyền được bảo hộ"
 
 #: lms/templates/forgot_password_modal.html
 #: lms/templates/forgot_password_modal.html
@@ -7396,7 +7419,7 @@ msgstr "Bao gồm các thông báo lỗi, các bước dẫn đến vấn đề 
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
-msgstr "gợi ý"
+msgstr "đề xuất"
 
 #: lms/templates/help_modal.html
 msgid "Make a Suggestion"
@@ -7404,7 +7427,7 @@ msgstr "Đề xuất"
 
 #: lms/templates/help_modal.html
 msgid "Brief description of your suggestion"
-msgstr "Tóm tắt ngắn gọn gợi ý của bạn"
+msgstr "Tóm tắt ngắn gọn đề xuất của bạn"
 
 #: lms/templates/help_modal.html lms/templates/help_modal.html
 #: lms/templates/module-error.html
@@ -7413,11 +7436,11 @@ msgstr "Chi tiết"
 
 #: lms/templates/help_modal.html
 msgid "question"
-msgstr "câu hỏi"
+msgstr "Câu Hỏi"
 
 #: lms/templates/help_modal.html
 msgid "Ask a Question"
-msgstr "Đặt câu hỏi"
+msgstr "Đặt Câu Hỏi"
 
 #: lms/templates/help_modal.html
 msgid "Brief summary of your question"
@@ -7425,7 +7448,7 @@ msgstr "Tóm tắt ngắn gọn câu hỏi của bạn"
 
 #: lms/templates/help_modal.html
 msgid "An error has occurred."
-msgstr "Có lỗi xảy ra"
+msgstr "Có lỗi xảy ra."
 
 #: lms/templates/help_modal.html
 msgid "Please {link_start}send us e-mail{link_end}."
@@ -7437,7 +7460,7 @@ msgstr "Vui lòng thử lại sau."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
-msgstr ""
+msgstr "Lưu ý: chỉ các giáo viên hướng dẫn được quyền chú thích."
 
 #: lms/templates/index.html
 msgid "Free courses from <strong>{university_name}</strong>"
@@ -7511,8 +7534,7 @@ msgstr ""
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
 msgstr ""
-"Xem phần trợ giúp của chúng tôi để có câu trả lời cho các câu hỏi thường "
-"gặp."
+"Xem mục trợ giúp của chúng tôi để có câu trả lời cho các câu hỏi thường gặp."
 
 #: lms/templates/login.html
 msgid "Log into your {platform_name} Account"
@@ -7543,8 +7565,8 @@ msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr "Rất Tiếc, tài khoản trên {platform_name} hiện không thể truy xuất"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "Các lỗi sau đây xảy ra trong khi bạn đăng nhập:"
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -7562,7 +7584,7 @@ msgstr ""
 
 #: lms/templates/login.html
 msgid "Account Preferences"
-msgstr "Tuỳ Chọn Tài Khoản"
+msgstr "Tuỳ Chỉnh Tài Khoản"
 
 #: lms/templates/login.html
 msgid "Remember me"
@@ -7590,7 +7612,7 @@ msgstr "{points} / {total_points} điểm"
 #. this LTI unit
 #: lms/templates/lti.html
 msgid "{total_points} points possible"
-msgstr ""
+msgstr "có thể đạt {total_points} "
 
 #: lms/templates/lti.html
 msgid "View resource in a new window"
@@ -7609,23 +7631,23 @@ msgstr "Nhận xét của người chấm về bài làm của bạn:"
 
 #: lms/templates/lti_form.html
 msgid "Press to Launch"
-msgstr "Nhấn để kích hoạt"
+msgstr "Nhấn để Kích Hoạt"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable or Reenable student accounts"
-msgstr "cửa sổ mở"
+msgstr "Khóa hoặc Mở Lại các tài khoản của học viên"
 
 #: lms/templates/manage_user_standing.html
 msgid "Username:"
-msgstr "Tên:"
+msgstr "Tên đăng nhập:"
 
 #: lms/templates/manage_user_standing.html
 msgid "Disable Account"
-msgstr "Khóa tài khoản"
+msgstr "Khóa Tài Khoản"
 
 #: lms/templates/manage_user_standing.html
 msgid "Reenable Account"
-msgstr "Mở lại tài khoản"
+msgstr "Mở Lại Tài Khoản"
 
 #: lms/templates/manage_user_standing.html
 msgid "Students whose accounts have been disabled"
@@ -7662,7 +7684,7 @@ msgstr ""
 #: lms/templates/module-error.html
 #: lms/templates/courseware/courseware-error.html
 msgid "There has been an error on the {platform_name} servers"
-msgstr ""
+msgstr "Hiện đã có một lỗi trên các máy chủ {platform_name} "
 
 #: lms/templates/module-error.html
 msgid ""
@@ -7689,11 +7711,11 @@ msgstr "Đang chờ đổi tên"
 
 #: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
 msgid "Confirm"
-msgstr "Xác Nhận"
+msgstr "Xác nhận"
 
 #: lms/templates/name_changes.html
 msgid "Reject"
-msgstr "Loại bỏ"
+msgstr "Từ chối"
 
 #: lms/templates/navigation.html lms/templates/original_navigation.html
 msgid "Global Navigation"
@@ -7726,12 +7748,12 @@ msgstr "Phương Thức Hoạt Động"
 
 #: lms/templates/navigation.html
 msgid "Schools & Partners"
-msgstr ""
+msgstr "Các Trường & Đối Tác"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 #: lms/templates/register.html
 msgid "Register"
-msgstr "Đăng Ký"
+msgstr "Đăng ký"
 
 #: lms/templates/navigation.html lms/templates/navigation.html
 #: lms/templates/original_navigation.html
@@ -7744,6 +7766,8 @@ msgid ""
 "<strong>Warning:</strong> Your browser is not fully supported. We strongly "
 "recommend using {chrome_link} or {ff_link}."
 msgstr ""
+"<strong>Cảnh báo:</strong> Trình duyệt của bạn không được hỗ trợ đầy đủ. "
+"Chúng tôi khuyên bạn nên sử dụng {chrome_link} hoặc {ff_link}."
 
 #: lms/templates/notes.html lms/templates/textannotation.html
 #: lms/templates/videoannotation.html
@@ -7752,7 +7776,7 @@ msgstr "Bạn không có bất kỳ ghi chú nào."
 
 #: lms/templates/original_edx_footer.html
 msgid "edX Logo"
-msgstr "edX Logo"
+msgstr "Logo edX "
 
 #: lms/templates/original_edx_footer.html
 msgid ""
@@ -7765,7 +7789,7 @@ msgstr ""
 
 #: lms/templates/original_edx_footer.html
 msgid "&copy; 2014 edX, some rights reserved."
-msgstr ""
+msgstr "&copy; 2014 edX, một số quyền được bảo hộ."
 
 #: lms/templates/original_navigation.html
 #: lms/templates/sysadmin_dashboard.html
@@ -7820,11 +7844,11 @@ msgstr "Quay Lại %s"
 
 #: lms/templates/register-shib.html
 msgid "Preferences for {platform_name}"
-msgstr "Ưu đãi dành cho {platform_name}"
+msgstr "Tùy chỉnh dành cho {platform_name}"
 
 #: lms/templates/register-shib.html
 msgid "Update my {platform_name} Account"
-msgstr "Cập nhật  {platform_name}tài khoản của tôi"
+msgstr "Cập nhật Tài Khoản {platform_name} của tôi"
 
 #: lms/templates/register-shib.html
 msgid "Processing your account information …"
@@ -7833,7 +7857,7 @@ msgstr "Đang xử lý thông tin tài khoản..."
 #: lms/templates/register-shib.html
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
-"Chào mừng {username}! Xin vui lòng thiết lập sở thích của bạn dưới đây"
+"Chào mừng {username}! Xin vui lòng thiết lập tùy chỉnh của bạn dưới đây"
 
 #: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
@@ -7884,7 +7908,7 @@ msgstr "Tôi đồng ý với {link_start}Cam Kết Danh Dự{link_end}"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
-msgstr "Cập nhật tài khoản của tôi"
+msgstr "Cập Nhật Tài Khoản Của Tôi"
 
 #: lms/templates/register-sidebar.html
 msgid "Registration Help"
@@ -7947,7 +7971,7 @@ msgstr "Đăng ký tài khoản {platform_name}"
 
 #: lms/templates/register.html
 msgid "Create My {platform_name} Account"
-msgstr "Tạo tài khoản {platform_name} của tôi"
+msgstr "Tạo Tài Khoản {platform_name} Của Tôi"
 
 #: lms/templates/register.html
 msgid "Welcome!"
@@ -7961,25 +7985,26 @@ msgstr "Đăng ký tài khoản {platform_name} của bạn"
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
 msgid "Sign up with {provider_name}"
-msgstr ""
+msgstr "Đăng ký qua {provider_name}"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
-msgstr ""
+msgstr "Tạo tài khoản của bạn trên {platform_name} "
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
 msgid "You've successfully signed in with {selected_provider}."
-msgstr "Bạn đã đăn nhập thành công với {selected_provider}."
+msgstr "Bạn đã đăng nhập thành công qua {selected_provider}."
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
+msgid ""
+"We just need a little more information before you start learning with edX."
 msgstr ""
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
-msgstr ""
+msgstr "Vui lòng điền vào những mục sau để đăng ký tài khoản."
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
@@ -7987,7 +8012,7 @@ msgstr "ví dụ: Jane Doe"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
-msgstr "cần thiết để ghi vào chứng chỉ của bạn."
+msgstr "Cần thiết để ghi vào chứng chỉ của bạn"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
@@ -8007,7 +8032,7 @@ msgstr "Tên Hiển Thị Công Khai"
 
 #: lms/templates/register.html
 msgid "Additional Personal Information"
-msgstr ""
+msgstr "Thông Tin Cá Nhân Bổ Sung"
 
 #: lms/templates/register.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -8057,7 +8082,7 @@ msgstr "Trước"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 msgid "Section Navigation"
-msgstr "Danh Mục các Phần Mục"
+msgstr "Danh Mục "
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -8066,7 +8091,7 @@ msgstr "Sau"
 
 #: lms/templates/signup_modal.html
 msgid "Sign Up for {platform_name}"
-msgstr "Đăng Ký cho {platform_name}"
+msgstr "Đăng Ký {platform_name}"
 
 #: lms/templates/signup_modal.html lms/templates/signup_modal.html
 msgid "e.g. yourname@domain.com"
@@ -8102,7 +8127,7 @@ msgstr "Địa chỉ thư"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
-msgstr ""
+msgstr "Mục đích đăng ký {platform_name}"
 
 #: lms/templates/signup_modal.html
 msgid "Already have an account?"
@@ -8120,11 +8145,11 @@ msgstr ""
 
 #: lms/templates/split_test_author_view.html
 msgid "Active Groups"
-msgstr "Nhóm hoạt động"
+msgstr "Nhóm Đang Hoạt Động"
 
 #: lms/templates/split_test_author_view.html
 msgid "Inactive Groups"
-msgstr "Nhóm không hoạt động"
+msgstr "Nhóm Không Hoạt Động"
 
 #: lms/templates/staff_problem_info.html
 msgid "Staff Debug Info"
@@ -8187,7 +8212,7 @@ msgstr "Chấm Lại Bài Làm của Học Viên"
 
 #: lms/templates/staff_problem_info.html lms/templates/staff_problem_info.html
 msgid "Module Fields"
-msgstr "Thông Tin về Các Học Phần"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "XML attributes"
@@ -8371,6 +8396,10 @@ msgid ""
 "you did not mean to do this, click {undo_link_start}here{link_end} to re-"
 "subscribe."
 msgstr ""
+"Bạn sẽ không nhận email thông báo từ diễn đàn {platform_name} nữa. Nhấn vào "
+"{dashboard_link_start}đây{link_end} để trở lại bảng điều khiển của bạn. Nếu "
+"không muốn thực hiện thao tác này, nhấn vào {undo_link_start}đây{link_end} "
+"để tái đăng ký."
 
 #: lms/templates/using.html
 msgid "Using the system"
@@ -8422,7 +8451,7 @@ msgstr "Phát"
 
 #: lms/templates/video.html
 msgid "Speeds"
-msgstr "tốc độ"
+msgstr "Tốc độ"
 
 #: lms/templates/video.html
 msgid "Speed"
@@ -8437,6 +8466,8 @@ msgid ""
 "Click on this button to mute or unmute this video or press UP or DOWN "
 "buttons to increase or decrease volume level."
 msgstr ""
+"Kích vào nút này để tắt hoặc bật tiếng video hoặc ấn phím LÊN hoặc XUỐNG để "
+"tăng hoặc giảm âm lượng."
 
 #: lms/templates/video.html
 msgid "Fill browser"
@@ -8444,7 +8475,7 @@ msgstr ""
 
 #: lms/templates/video.html
 msgid "HD off"
-msgstr ""
+msgstr "Tắt chất lượng HD"
 
 #: lms/templates/video.html lms/templates/video.html
 msgid "Turn off captions"
@@ -8452,7 +8483,7 @@ msgstr "Tắt phụ đề"
 
 #: lms/templates/video.html
 msgid "Skip to end of transcript."
-msgstr ""
+msgstr "Bỏ qua và đi đến cuối phụ đề."
 
 #: lms/templates/video.html
 msgid ""
@@ -8495,11 +8526,11 @@ msgstr "Đánh giá:"
 #: lms/templates/combinedopenended/combined_open_ended.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 msgid "Hide Question"
-msgstr "Câu hỏi ẩn"
+msgstr "Ẩn Câu Hỏi"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "New Submission"
-msgstr "thông tin mới "
+msgstr "Bài Nộp Mới"
 
 #: lms/templates/combinedopenended/combined_open_ended.html
 msgid "Next Step"
@@ -8691,7 +8722,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "You are registered for this course"
-msgstr ""
+msgstr "Bạn đã đăng ký khóa học này."
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -8705,6 +8736,8 @@ msgstr ""
 msgid ""
 "Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})"
 msgstr ""
+"Thêm {course.display_number_with_default} vào Giỏ Hàng "
+"({currency_symbol}{cost})"
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment in this course is by invitation only"
@@ -8712,7 +8745,7 @@ msgstr "Chỉ có thể ghi danh vào khóa học này qua thư mời."
 
 #: lms/templates/courseware/course_about.html
 msgid "Enrollment is Closed"
-msgstr "Ghi danh đã đóng."
+msgstr " Đã Đóng Ghi Danh."
 
 #: lms/templates/courseware/course_about.html
 msgid "Register for {course.display_number_with_default}"
@@ -8734,15 +8767,15 @@ msgstr "Chia sẻ với bạn bè và gia đình!"
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {account}: {url}"
-msgstr ""
+msgstr "Tôi vừa đăng kí cho {number} {title} bằng tài khoản {account}: {url}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Take a course with {platform} online"
-msgstr ""
+msgstr "Tham gia một khoá học với {platform} online"
 
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
-msgstr ""
+msgstr "Tôi vừa đang kí {number} {title} thông qua {platform} {url}"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -8808,7 +8841,7 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
-msgstr ""
+msgstr "Chưa có nội dung nào được thêm vào khóa học này."
 
 #: lms/templates/courseware/courseware.html
 msgid "Open Calculator"
@@ -9902,28 +9935,6 @@ msgstr ""
 msgid "Collapse discussion"
 msgstr ""
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr ""
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr ""
@@ -9971,6 +9982,11 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr ""
 
@@ -10000,6 +10016,10 @@ msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -10988,10 +11008,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -12031,8 +12047,8 @@ msgid ""
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() Biên Lai Điện Tử"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -12993,6 +13009,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "Có lỗi khi xử lý yêu cầu"
 
@@ -13001,6 +13018,13 @@ msgid ""
 "Oops! Something went wrong. Please confirm your details again and click the "
 "button to move on to payment. If you are still having trouble, please try "
 "again later."
+msgstr ""
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
 msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
@@ -13085,7 +13109,7 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Register for {}"
-msgstr ""
+msgstr "Đăng ký {}"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "You need to activate your edX account before proceeding"
@@ -13140,7 +13164,7 @@ msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 
@@ -15526,7 +15550,7 @@ msgstr ""
 
 # empty
 msgid "This is a key string."
-msgstr "Đây là một chuỗi khóa."
+msgstr ""
 
 #: wiki/admin.py wiki/models/article.py
 msgid "created"

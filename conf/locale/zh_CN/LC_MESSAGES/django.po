@@ -139,6 +139,7 @@
 # Yufei Xue <cmouse@163.com>, 2013
 # focusheart <focusheart@gmail.com>, 2014
 # natop <golfeng@gmail.com>, 2014
+# GoodLuck <1833447072@qq.com>, 2014
 # Wentao Han <wentao.han@gmail.com>, 2013
 # 李莉 <happylily0516@foxmail.com>, 2013
 # Harry Li <harry75369@gmail.com>, 2014
@@ -191,7 +192,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: wuqiong <wuqiong417@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -374,17 +375,24 @@ msgstr "您还没有注册本课程"
 msgid "Enrollment action is invalid"
 msgstr "注册操作无效"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
 msgstr ""
-"未找到与{provider_name}相关联的 {platform_name}账户，请使用您在 {platform_name} "
-"的正确身份或选用其他身份提供方。"
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -1386,7 +1394,6 @@ msgid "Attempted"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Closed"
 msgstr ""
 
@@ -1738,7 +1745,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -7568,8 +7575,8 @@ msgid "We're Sorry, {platform_name} accounts are unavailable currently"
 msgstr "我们很遗憾，{platform_name} 账户现在无法使用"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "下面这些错误发生在您登录的时候："
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -7992,8 +7999,9 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr "您已成功地以{selected_provider}登陆。"
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
-msgstr "完成您的账户注册开始学习"
+msgid ""
+"We just need a little more information before you start learning with edX."
+msgstr ""
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -9932,28 +9940,6 @@ msgstr "展开讨论"
 msgid "Collapse discussion"
 msgstr "折叠讨论"
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "置顶"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(这是关于%(courseware_title_linked)s的讨论)"
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "编辑讨论帖"
@@ -10001,6 +9987,11 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr "编辑回复"
 
@@ -10031,6 +10022,10 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
 msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr "置顶"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
@@ -11042,10 +11037,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -12095,8 +12086,8 @@ msgid ""
 msgstr "请打印本收据以为凭证。您还将通过电子邮件收到一份收据。"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() 电子收据"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -13059,6 +13050,7 @@ msgid ""
 msgstr "没有检测到有效摄像头。重复确认你的摄像头已经连接而且正在工作，或者选择 {a_start} 免费观看课程 {a_end}而 不认证."
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "处理你的订单时出现错误"
 
@@ -13068,6 +13060,13 @@ msgid ""
 "button to move on to payment. If you are still having trouble, please try "
 "again later."
 msgstr "哎呀！发生错误了！请确认你的信息并再次点击按钮进行支付。如果仍有问题，请稍后再试。"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -13206,7 +13205,7 @@ msgstr "一张身份信息照片文档"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 

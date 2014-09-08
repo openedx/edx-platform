@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-04 12:40-0400\n"
-"PO-Revision-Date: 2014-09-04 16:40:37.576012\n"
+"POT-Creation-Date: 2014-09-08 11:11-0400\n"
+"PO-Revision-Date: 2014-09-08 15:11:43.407878\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1346,7 +1346,6 @@ msgid "Attempted"
 msgstr "Àttémptéd #"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#: lms/templates/discussion/_underscore_templates.html
 msgid "Closed"
 msgstr "Çlöséd Ⱡ'σяєм ιρѕ#"
 
@@ -1764,10 +1763,10 @@ msgstr "LTÌ Pässpörts Ⱡ'#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 "Éntér thé pässpörts för çöürsé LTÌ tööls ïn thé föllöwïng förmät: "
-"\"ïd\":\"çlïént_kéý:çlïént_séçrét\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+"\"ïd:çlïént_kéý:çlïént_séçrét\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Advertised Start Date"
@@ -10991,28 +10990,6 @@ msgstr "Éxpänd dïsçüssïön Ⱡ'σ#"
 msgid "Collapse discussion"
 msgstr "Çölläpsé dïsçüssïön Ⱡ'σя#"
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr "{post_type} pöstéd {time_ago} ßý {author} Ⱡ'σя#"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr "Répörtéd #"
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Édïtïng pöst Ⱡ#"
@@ -11060,6 +11037,11 @@ msgid "endorsed %(time_ago)s"
 msgstr "éndörséd %(time_ago)s Ⱡ#"
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr "Répörtéd #"
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr "Édïtïng réspönsé Ⱡ'σ#"
 
@@ -11090,6 +11072,10 @@ msgstr "änswéréd qüéstïön Ⱡ'σ#"
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
 msgstr "ünänswéréd qüéstïön Ⱡ'σя#"
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
@@ -12255,10 +12241,6 @@ msgstr "Çöüpöns Ìnförmätïön Ⱡ'σя#"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
 msgstr "+ Àdd Çöüpön Ⱡ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
-msgstr "Çöürsé_ïd #"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
@@ -13467,8 +13449,8 @@ msgstr ""
 "réçéïvéd ä réçéïpt ïn ýöür émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr " () Éléçtrönïç Réçéïpt Ⱡ'σяє#"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr "{platform_name} ({site_name}) Éléçtrönïç Réçéïpt Ⱡ'σяєм #"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -14576,6 +14558,7 @@ msgstr ""
 "¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕ#"
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "Érrör pröçéssïng ýöür ördér Ⱡ'σяєм#"
 
@@ -14588,6 +14571,16 @@ msgstr ""
 "Ööps! Söméthïng wént wröng. Pléäsé çönfïrm ýöür détäïls ägäïn änd çlïçk thé "
 "ßüttön tö mövé ön tö päýmént. Ìf ýöü äré stïll hävïng tröüßlé, pléäsé trý "
 "ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιη#"
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
+"Wé'ré sörrý, théré häs ßéén än érrör ön thïs pägé. Pléäsé réfrésh thé pägé "
+"änd rétäké ýöür phötös. Ìf ýöü äré stïll hävïng tröüßlé, pléäsé çöntäçt üs "
+"ät {email_address} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -14750,10 +14743,10 @@ msgstr "À phötö ïdéntïfïçätïön döçümént Ⱡ'σяєм ι#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
-"ä drïvér's lïçénsé, pässpört, ör öthér gövérnmént ör sçhööl-ïssüéd ÌD wïth "
+"À drïvér's lïçénsé, pässpört, ör öthér gövérnmént ör sçhööl-ïssüéd ÌD wïth "
 "ýöür nämé änd pïçtüré ön ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/verify_student/show_requirements.html

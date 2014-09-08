@@ -14,6 +14,7 @@
 # Heitor Althmann <heitoralthmann@gmail.com>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
 # JhonatannSilva <jhonatannpereiradasilva@hotmail.com>, 2014
+# katia04 <katia.csmiao@gmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Kevin Grist <kgrist@localconcept.com>, 2014
@@ -148,7 +149,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:36-0400\n"
+"POT-Creation-Date: 2014-09-08 10:58-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: javiercencig <javier@jecnet.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -338,17 +339,24 @@ msgstr "Você não está inscrito neste curso"
 msgid "Enrollment action is invalid"
 msgstr "Ação de inscrição inválida"
 
-#. Translators: provider_name is the name of an external, third-party user
-#. authentication service (like
-#. Google or LinkedIn).
 #: common/djangoapps/student/views.py
 msgid ""
-"There is no {platform_name} account associated with your {provider_name} "
-"account. Please use your {platform_name} credentials or pick another "
-"provider."
+"You've successfully logged into your {provider_name} account, but this "
+"account isn't linked with an {platform_name} account yet."
 msgstr ""
-"Não há uma conta {platform_name} associada ao {provider_name}. Por favor, "
-"use os seus dados de acesso do {platform_name} ou escolha outra opção."
+
+#: common/djangoapps/student/views.py
+msgid ""
+"Use your {platform_name} username and password to log into {platform_name} "
+"below, and then link your {platform_name} account with {provider_name} from "
+"your dashboard."
+msgstr ""
+
+#: common/djangoapps/student/views.py
+msgid ""
+"If you don't have an {platform_name} account yet, click <strong>Register "
+"Now</strong> at the top of the page."
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
@@ -1797,7 +1805,7 @@ msgstr "Passaportes LTI"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
-"\"id\":\"client_key:client_secret\"."
+"\"id:client_key:client_secret\"."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -8053,8 +8061,8 @@ msgstr ""
 "Lamentamos, as contas de {platform_name} não estão disponíveis atualmente"
 
 #: lms/templates/login.html
-msgid "The following errors occurred while logging you in:"
-msgstr "Os seguintes erros ocorreram durante a sua tentativa de acesso:"
+msgid "We couldn't log you in."
+msgstr ""
 
 #: lms/templates/login.html
 msgid "Your email or password is incorrect"
@@ -8506,8 +8514,9 @@ msgid "You've successfully signed in with {selected_provider}."
 msgstr "Você entrou com {selected_provider}."
 
 #: lms/templates/register.html
-msgid "Finish your account registration below to start learning."
-msgstr "Finalize o registro da sua conta abaixo para começar a aprender."
+msgid ""
+"We just need a little more information before you start learning with edX."
+msgstr ""
 
 #: lms/templates/register.html
 msgid "Please complete the following fields to register for an account. "
@@ -10574,28 +10583,6 @@ msgstr "Ampliar discussão"
 msgid "Collapse discussion"
 msgstr "Ocultar discussão"
 
-#. Translators: post_type describes the kind of post this is
-#. (e.g. "question" or "discussion"); time_ago is how much time
-#. has passed since the post was created (e.g. "4 hours ago")
-#: lms/templates/discussion/_underscore_templates.html
-msgid "{post_type} posted {time_ago} by {author}"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Pinned"
-msgstr "Fixado"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/_underscore_templates.html
-msgid "Reported"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-msgid "(this post is about %(courseware_title_linked)s)"
-msgstr "(esta publicação é sobre %(courseware_title_linked)s)"
-
 #: lms/templates/discussion/_underscore_templates.html
 msgid "Editing post"
 msgstr "Editar publicação"
@@ -10643,6 +10630,11 @@ msgid "endorsed %(time_ago)s"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Reported"
+msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
 msgid "Editing response"
 msgstr "Editar resposta"
 
@@ -10673,6 +10665,10 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 msgid "unanswered question"
 msgstr ""
+
+#: lms/templates/discussion/_underscore_templates.html
+msgid "Pinned"
+msgstr "Fixado"
 
 #: lms/templates/discussion/_underscore_templates.html
 msgid "By: Staff"
@@ -11776,10 +11772,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "+ Add Coupon"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Course_id"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -12942,8 +12934,8 @@ msgstr ""
 "recebido um recibo por e-mail."
 
 #: lms/templates/shoppingcart/receipt.html
-msgid " () Electronic Receipt"
-msgstr "() Recibo Eletrônico"
+msgid "{platform_name} ({site_name}) Electronic Receipt"
+msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Order #"
@@ -14021,6 +14013,7 @@ msgstr ""
 "para fazer este curso como ouvinte gratuitamente {a_end} sem verificação."
 
 #: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
 msgid "Error processing your order"
 msgstr "Ocorreu um erro ao processar o seu pedido"
 
@@ -14033,6 +14026,13 @@ msgstr ""
 "Ocorreu um erro! Por favor, confirme os seus detalhes novamente e clique no "
 "botão para prosseguir com o pagamento. Se ainda estiver com problemas, por "
 "favor, tente novamente mais tarde."
+
+#: lms/templates/verify_student/photo_verification.html
+msgid ""
+"We're sorry, there has been an error on this page. Please refresh the page "
+"and retake your photos. If you are still having trouble, please contact us "
+"at {email_address}"
+msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
@@ -14192,7 +14192,7 @@ msgstr "um documento de identificação com foto"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"a driver's license, passport, or other government or school-issued ID with "
+"A driver's license, passport, or other government or school-issued ID with "
 "your name and picture on it"
 msgstr ""
 

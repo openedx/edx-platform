@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-04 12:39-0400\n"
-"PO-Revision-Date: 2014-09-04 16:40:37.623421\n"
+"POT-Creation-Date: 2014-09-08 11:10-0400\n"
+"PO-Revision-Date: 2014-09-08 15:11:43.450602\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3414,6 +3414,14 @@ msgstr ""
 msgid "Deleting"
 msgstr "Délétïng #"
 
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr "Çhöösé néw fïlé Ⱡ'#"
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr "Érrör ïmpörtïng çöürsé Ⱡ'σяє#"
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "Théré wäs än érrör wïth thé üplöäd Ⱡ'σяєм ιρ#"
@@ -3773,6 +3781,34 @@ msgstr "Zööm Ìn #"
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Zööm Öüt #"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr "Thïs pöst ïs vïsïßlé önlý tö %(group_name)s. Ⱡ'σяєм ι#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr "Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ι#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr "%(post_type)s pöstéd %(time_ago)s ßý %(author)s Ⱡ'σя#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr "Répörtéd #"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr "Çlöséd Ⱡ'σяєм ιρѕ#"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"

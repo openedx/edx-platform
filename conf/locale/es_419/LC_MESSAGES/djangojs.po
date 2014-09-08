@@ -7,6 +7,7 @@
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Salamea <ovnicraft@gmail.com>, 2013-2014
+# morsoinferno <cristobal.acosta@usach.cl>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
@@ -58,7 +59,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:35-0400\n"
+"POT-Creation-Date: 2014-09-08 10:56-0400\n"
 "PO-Revision-Date: 2014-08-28 20:51+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -3403,6 +3404,14 @@ msgstr ""
 msgid "Deleting"
 msgstr "Borrando"
 
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
+msgstr ""
+
 #: cms/static/js/views/import.js
 msgid "There was an error with the upload"
 msgstr "Hubo un error con la subida del archivo"
@@ -3753,6 +3762,34 @@ msgstr "Acercar"
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Alejar"
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"

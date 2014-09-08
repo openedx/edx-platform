@@ -31,8 +31,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-03 09:35-0400\n"
-"PO-Revision-Date: 2014-09-03 08:38+0000\n"
+"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"PO-Revision-Date: 2014-09-04 21:13+0000\n"
 "Last-Translator: Faton Nuha <faton11@live.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -361,7 +361,7 @@ msgstr "Radhitja"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
-msgstr ""
+msgstr "Burimi alternativ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -610,7 +610,7 @@ msgstr "Fshije rreshtin"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
-msgstr ""
+msgstr "Fshije tabelën"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -943,7 +943,7 @@ msgstr "Shto një rresht para"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
-msgstr ""
+msgstr "Shto tabelë"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3034,7 +3034,7 @@ msgstr "Grupi B"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
-msgstr ""
+msgstr "Emërtimi i konfigurimit të grupit është i detrueshëm."
 
 #: cms/static/js/models/group_configuration.js
 msgid "There must be at least one group."
@@ -3049,6 +3049,8 @@ msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"Vetëm fajllat <%= fileTypes %> mund të ngarkohen. Ju lutem zgjedhni një "
+"fajllë i cili ka prapashtesën <%= fileExtensions %> të e ngarkoni."
 
 #: cms/static/js/models/uploads.js
 msgid "or"
@@ -3067,6 +3069,8 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
+"Data e fillimit të kursit nuk mund të jetë para datës së fillimit të "
+"regjistrimit."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
@@ -3151,7 +3155,7 @@ msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Ky veprim nuk mund të rikthehet."
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -3185,7 +3189,7 @@ msgstr[1] ""
 
 #: cms/static/js/views/group_configuration_details.js
 msgid "Not in Use"
-msgstr ""
+msgstr "Nuk është në përdorim"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
@@ -3218,6 +3222,14 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
+msgstr ""
+
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
 msgstr ""
 
 #: cms/static/js/views/import.js
@@ -3254,11 +3266,10 @@ msgstr ""
 msgid "Edit section release date"
 msgstr ""
 
-#: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
-msgstr ""
+msgstr "E pa graduar"
 
 #. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
 #. Added ascending"
@@ -3320,7 +3331,7 @@ msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "Ju keni bërë disa ndryshime por këtu janë disa probleme"
 
 #: cms/static/js/views/validation.js
 msgid ""
@@ -3359,7 +3370,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for %(display_name)s"
-msgstr ""
+msgstr "Ndrysho konfigurimet për %(display_name)s"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish %(display_name)s"
@@ -3367,7 +3378,7 @@ msgstr "Publiko %(display_name)s"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this %(item)s?"
-msgstr ""
+msgstr "Publiko të gjjitha ndryshimet e pa publikuara për këtë %(item)s?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish"
@@ -3432,7 +3443,7 @@ msgstr ""
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
-msgstr ""
+msgstr "Bëre të dukshme tek Studentët"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid ""
@@ -3448,6 +3459,8 @@ msgstr ""
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
+"Ju keni ndryshime të pa ruajtura. Dëshironi vërtet të largoheni nga kjo "
+"faqe?"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -3472,7 +3485,7 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgstr "Fajllat mund të jenë në formatin JPEG ose PNG."
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid "Required field."
@@ -3507,11 +3520,11 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
-msgstr ""
+msgstr "Po, fshije këtë %(xblock_type)s"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr ""
+msgstr "pjesë"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
@@ -3543,6 +3556,34 @@ msgstr "Zmadhoje"
 msgid "Zoom Out"
 msgstr ""
 
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr ""
+
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Common Problem Types"
 msgstr ""
@@ -3557,7 +3598,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr ""
+msgstr "Lista e fajllave dhe aseteve të ngarkuara në këtë kurs"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Embed URL"
@@ -3574,7 +3615,7 @@ msgstr "Veprimet"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
-msgstr ""
+msgstr "Ju nuk keni shtuar asnjë aset në këtë kurs."
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
@@ -3594,7 +3635,7 @@ msgstr "Fshije këtë aset"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock this asset"
-msgstr ""
+msgstr "Mbyll këtë aset"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock/unlock file"
@@ -3841,7 +3882,7 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration information"
-msgstr ""
+msgstr "Konfigurimi i grupit informacione"
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration Name"
@@ -3865,7 +3906,7 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Optional long description"
-msgstr ""
+msgstr "Përshkrim i gjatë opcional"
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group information"
@@ -3924,7 +3965,7 @@ msgstr "Shkarko"
 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "You haven't created any group configurations yet."
-msgstr ""
+msgstr "Ju nuk keni krijuar asnjë konfigurimet e grupit deri tani."
 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "Add your first Group Configuration"
@@ -3954,14 +3995,14 @@ msgstr ""
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Last published %(last_published_date)s by %(publish_username)s"
-msgstr ""
+msgstr "Publikimi i fundit %(last_published_date)s nga %(publish_username)s"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
-msgstr ""
+msgstr "mesazhi"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -3974,7 +4015,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Visible to Staff Only"
-msgstr ""
+msgstr "Bëre të dukshëm vetëm për stafin"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Published and Live"
@@ -3986,7 +4027,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Draft (Unpublished changes)"
-msgstr ""
+msgstr "Draft (Ndryshimet e pa publikuara)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Release:"
@@ -3998,7 +4039,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
-msgstr ""
+msgstr "Drafti u ruajt në %(last_saved_date)s nga  %(edit_username)s"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Is Visible To:"
@@ -4010,16 +4051,16 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff Only"
-msgstr ""
+msgstr "Vetëm Stafi"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Students"
-msgstr ""
+msgstr "Stafi dhe Studentët"
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from students"
-msgstr ""
+msgstr "Fshehe nga studentët"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -4090,11 +4131,11 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"
-msgstr ""
+msgstr "Ndrysho emrin"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit %(display_name)s (required)"
-msgstr ""
+msgstr "Ndrysho %(display_name)s (e detyrueshme)"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
@@ -4120,7 +4161,7 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Group Configurations"
-msgstr ""
+msgstr "Konfigurimet e grupit"
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Page Actions"
@@ -4198,7 +4239,7 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Upload New Transcript"
-msgstr ""
+msgstr "Ngarko transkript të re"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -4248,7 +4289,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
-msgstr ""
+msgstr "Dëshironi të e zëvendësoni transkriptën edx me transkriptën YouTube?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
