@@ -120,7 +120,9 @@ if Backbone?
           )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
-        error: (xhr) =>
+        error: (xhr, textStatus) =>
+          return if textStatus == 'abort'
+
           if xhr.status == 404
             DiscussionUtil.discussionAlert(
               gettext("Sorry"),
