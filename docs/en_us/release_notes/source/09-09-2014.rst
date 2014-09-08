@@ -1,0 +1,106 @@
+###################################
+September 9, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of
+September 9,
+2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+
+***************************************
+edX Website
+***************************************
+
+* To make accessing edX courses faster and easier, students can now both
+  register and log in to edX.org and edX Edge with their existing Google or
+  Facebook accounts.
+
+  .. image:: images/login-auth.png
+   :alt: The login screen, with Google and Facebook login buttons
+
+*******************************
+edX Learning Management System
+*******************************
+
+* The styling of LTI components is updated to better show links to external
+  resources, as shown in the following example:
+
+  .. image:: images/LTI-link.png
+   :alt: The external resource link in an LTI component
+
+
+* When a user flagged a post in a closed discussion thread, an error message
+  was displayed. This problem is now fixed. (TNL-151)
+
+* When submitting a numerical answer in Internet Explorer 9, students received
+  a warning message that MathJax could not be read. This problem is now fixed.
+  (BLD-1199)
+
+*******************************
+edX Studio
+*******************************
+
+* When you import a course, a progress bar now shows the import progress.
+  (STUD-2017)
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce the following upcoming change:
+
+* Course teams will soon be able to access data about their courses on a
+  dedicated dashboard for course-specific data. By providing insights into who
+  your students are, and what they do while interacting with your course, the
+  data available on this dashboard can validate choices you’ve made, reveal
+  unexpected patterns, and inform plans for changes to the course.
+
+
+**************************
+edX Documentation
+**************************
+
+All guides now include a section that lists browsers supported for use with the
+edX platform.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Click **Help** in the upper-right corner of any page in the edX Studio
+  user interface to access relevant sections in this guide. You can also
+  download the entire guide as a PDF.
+
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

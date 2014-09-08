@@ -32,6 +32,7 @@ email message when we have updated the edX Course Staff Release Notes.
    read_me
    preface
    browsers
+   09-09-2014
    09-04-2014
    08-28-2014
    08-12-2014
