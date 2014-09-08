@@ -584,7 +584,7 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
                 'id': self.item_descriptor.location.html_id(),
             })
             expected_context.update(data['result'])
-            import ipdb; ipdb.set_trace()
+
             self.assertEqual(
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
