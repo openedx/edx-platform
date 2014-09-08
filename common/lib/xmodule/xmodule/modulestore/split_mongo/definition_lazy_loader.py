@@ -28,6 +28,6 @@ class DefinitionLazyLoader(object):
 
     def as_son(self):
         return SON((
-            ('category', self.definition_locator.block_type),
+            ('block_type', self.definition_locator.block_type),
             ('definition', self.definition_locator.definition_id)
         ))

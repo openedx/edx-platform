@@ -187,7 +187,7 @@ class BulkAssertionManager(object):
 
     def assertEqual(self, expected, actual, description=None):
         if description is None:
-            description = "{!r} does not equal {!r}".format(expected, actual)
+            description = u"{!r} does not equal {!r}".format(expected, actual)
         if expected != actual:
             self._equal_expected.append((description, expected))
             self._equal_actual.append((description, actual))
@@ -291,8 +291,11 @@ class CourseComparisonTest(BulkAssertionTest):
         with self.bulk_assertions():
             self.assertEqual(len(expected_items), len(actual_items))
 
+            def map_key(usage_key):
+                return (usage_key.block_type, usage_key.block_id)
+
             actual_item_map = {
-                item.location.block_id: item
+                map_key(item.location): item
                 for item in actual_items
             }
 
@@ -302,12 +305,12 @@ class CourseComparisonTest(BulkAssertionTest):
                 # modulestore actual's come from here; so, assume old mongo and if that fails, assume split
                 if expected_item.location.category == 'course':
                     actual_item_location = actual_item_location.replace(name=actual_item_location.run)
-                actual_item = actual_item_map.get(actual_item_location.block_id)
+                actual_item = actual_item_map.get(map_key(actual_item_location))
                 # must be split
                 if actual_item is None and expected_item.location.category == 'course':
                     actual_item_location = actual_item_location.replace(name='course')
-                    actual_item = actual_item_map.get(actual_item_location.block_id)
-                self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(actual_item_location, actual_item_map))
+                    actual_item = actual_item_map.get(map_key(actual_item_location))
+                self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(map_key(actual_item_location), actual_item_map))
 
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
