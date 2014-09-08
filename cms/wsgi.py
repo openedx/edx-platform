@@ -1,3 +1,7 @@
+# Disable PyContract contract checking when running as a webserver
+import contracts
+contracts.disable_all()
+
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cms.envs.aws")
