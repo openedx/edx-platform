@@ -121,16 +121,29 @@ def _count_pep8_violations(report_file):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
-def run_quality():
+@cmdopts([
+    ("percentage=", "p", "fail if diff-quality is below this percentage"),
+])
+def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.
+    :param: p, diff-quality will fail if the quality percentage calculated is
+        below this percentage. For example, if p is set to 80, and diff-quality finds
+        quality of the branch vs master is less than 80%, then this task will fail.
+        This threshold would be applied to both pep8 and pylint.
     """
 
     # Directory to put the diff reports in.
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
 
-    # Generage diff-quality html report for pep8, and print to console
+    # Set the string, if needed, to be used for the diff-quality --fail-under switch.
+    diff_threshold = int(getattr(options, 'percentage', -1))
+    threshold_string = ''
+    if diff_threshold > -1:
+        threshold_string = '--fail-under={0}'.format(diff_threshold)
+
+    # Generate diff-quality html report for pep8, and print to console
     # If pep8 reports exist, use those
     # Otherwise, `diff-quality` will call pep8 itself
 
@@ -149,8 +162,8 @@ def run_quality():
     )
 
     sh(
-        "diff-quality --violations=pep8 {pep8_reports}".format(
-            pep8_reports=pep8_reports)
+        "diff-quality --violations=pep8 {pep8_reports} {threshold_string}".format(
+            pep8_reports=pep8_reports, threshold_string=threshold_string)
     )
 
     # Generage diff-quality html report for pylint, and print to console
@@ -180,8 +193,9 @@ def run_quality():
     )
 
     sh(
-        "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports}".format(
+        "{pythonpath_prefix} diff-quality --violations=pylint {pylint_reports} {threshold_string}".format(
             pythonpath_prefix=pythonpath_prefix,
-            pylint_reports=pylint_reports
+            pylint_reports=pylint_reports,
+            threshold_string=threshold_string
         )
     )
