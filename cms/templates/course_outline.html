@@ -135,9 +135,11 @@ from contentstore.utils import reverse_usage_url
                 <h3 class="title-3">${_("Changing the content students see")}</h3>
                 <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
                 <p>${_("To hide content from students, select the Configure icon for a section, subsection, or unit, then select {em_start}Hide from students{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
-
-                <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Learn More")}</a></p>
             </div>
+            <div class="bit external-help">
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>
+            </div>
+             
         </aside>
     </section>
 </div>
