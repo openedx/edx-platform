@@ -442,6 +442,7 @@ code {
 .CodeMirror {
   @extend %t-copy-sub1;
   background: #fff;
+  font-family: $f-monospace;
 }
 
 .text-editor {
