@@ -1482,7 +1482,7 @@ class TestMixedModuleStore(unittest.TestCase):
         test_course_key = test_course.id
 
         # test create_item of direct-only category to make sure we are autopublishing
-        chapter = self.store.create_item(self.user_id, test_course.location, 'chapter', 'Overview')
+        chapter = self.store.create_child(self.user_id, test_course.location, 'chapter', 'Overview')
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
             self.assertIn(
                 chapter.location,
