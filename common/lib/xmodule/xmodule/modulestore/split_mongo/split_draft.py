@@ -129,6 +129,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 user_id, parent_usage_key, block_type, block_id=block_id,
                 fields=fields, **kwargs
             )
+            # Publish both the child and the parent, if the child is a direct-only category
+            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
