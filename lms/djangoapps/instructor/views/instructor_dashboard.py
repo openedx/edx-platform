@@ -110,8 +110,9 @@ def instructor_dashboard_2(request, course_id):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
         link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
-        analytics_dashboard_message = _("To gain insights into student enrollment and participation, {link_start}visit the new dashboard for course analytics{link_end}.")
-        analytics_dashboard_message = analytics_dashboard_message.format(link_start=link_start, link_end="</a>")
+        analytics_dashboard_message = _("To gain insights into student enrollment and participation {link_start}visit {analytics_dashboard_name}, our new dashboard for course analytics{link_end}.")
+        analytics_dashboard_message = analytics_dashboard_message.format(
+            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
 
     context = {
         'course': course,
