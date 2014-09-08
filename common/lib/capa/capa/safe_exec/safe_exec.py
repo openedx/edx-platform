@@ -71,7 +71,16 @@ def update_hash(hasher, obj):
 
 
 @dog_stats_api.timed('capa.safe_exec.time')
-def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None, slug=None, unsafely=False):
+def safe_exec(
+    code,
+    globals_dict,
+    random_seed=None,
+    python_path=None,
+    extra_files=None,
+    cache=None,
+    slug=None,
+    unsafely=False,
+):
     """
     Execute python code safely.
 
@@ -81,7 +90,12 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
 
     `random_seed` will be used to see the `random` module available to the code.
 
-    `python_path` is a list of directories to add to the Python path before execution.
+    `python_path` is a list of filenames or directories to add to the Python
+    path before execution.  If the name is not in `extra_files`, then it will
+    also be copied into the sandbox.
+
+    `extra_files` is a list of (filename, contents) pairs.  These files are
+    created in the sandbox.
 
     `cache` is an object with .get(key) and .set(key, value) methods.  It will be used
     to cache the execution, taking into account the code, the values of the globals,
@@ -123,7 +137,7 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     try:
         exec_fn(
             code_prolog + LAZY_IMPORTS + code, globals_dict,
-            python_path=python_path, slug=slug,
+            python_path=python_path, extra_files=extra_files, slug=slug,
         )
     except SafeExecException as e:
         emsg = e.message

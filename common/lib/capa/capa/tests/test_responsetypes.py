@@ -3,15 +3,19 @@
 Tests of responsetypes
 """
 
+from cStringIO import StringIO
 from datetime import datetime
 import json
 import os
 import pyparsing
 import random
-import unittest
 import textwrap
-import requests
+import unittest
+import zipfile
+
 import mock
+from pytz import UTC
+import requests
 
 from . import new_loncapa_problem, test_capa_system, load_fixture
 import calc
@@ -22,8 +26,6 @@ from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.util import compare_with_tolerance
 from capa.xqueue_interface import dateformat
-
-from pytz import UTC
 
 
 class ResponseTest(unittest.TestCase):
@@ -1711,6 +1713,28 @@ class CustomResponseTest(ResponseTest):
 
             except ResponseError:
                 self.fail("Could not use name '{0}s' in custom response".format(module_name))
+
+    def test_python_lib_zip_is_available(self):
+        # Prove that we can import code from a zipfile passed down to us.
+
+        # Make a zipfile with one module in it with one function.
+        zipstring = StringIO()
+        zipf = zipfile.ZipFile(zipstring, "w")
+        zipf.writestr("my_helper.py", textwrap.dedent("""\
+            def seventeen():
+                return 17
+            """))
+        zipf.close()
+
+        # Use that module in our Python script.
+        script = textwrap.dedent("""
+            import my_helper
+            num = my_helper.seventeen()
+            """)
+        capa_system = test_capa_system()
+        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()
+        problem = self.build_problem(script=script, capa_system=capa_system)
+        self.assertEqual(problem.context['num'], 17)
 
 
 class SchematicResponseTest(ResponseTest):
