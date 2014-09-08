@@ -26,7 +26,7 @@
   </div>
 </script>
 
-<section class="batch-enrollment membership-section">
+<div class="batch-enrollment membership-section">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
     <label for="student-ids">
@@ -66,10 +66,12 @@
   </div>
   <div class="request-response"></div>
   <div class="request-response-error"></div>
-</section>
+</div>
+
+<hr class="divider" />
 
 %if section_data['access']['instructor']:
-<section class="batch-beta-testers membership-section">
+<div class="batch-beta-testers membership-section">
   <h2> ${_("Batch Beta Tester Addition")} </h2>
   <p>
     <label for="student-ids-for-beta">
@@ -109,10 +111,12 @@
 
   <div class="request-response"></div>
   <div class="request-response-error"></div>
-</section>
+</div>
+
+<hr class="divider" />
 %endif
 
-<section class="member-lists-management membership-section">
+<div class="member-lists-management membership-section">
   ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
   <h2> ${_("Administration List Management")} </h2>
 
@@ -213,7 +217,7 @@
     ></div>
   %endif
 
-</section>
+</div>
 
 %if course.is_cohorted:
 <hr class="divider" />
