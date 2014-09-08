@@ -151,3 +151,8 @@ class VideoFields(object):
         display_name=_("Upload Handout"),
         scope=Scope.settings,
     )
+    video_link_transience = String(
+        help=_("Enter the AWS access key, secret key and bucket name used for creating a transient video URLs in the following format: \"bucket_name\":\"access_key:secret_key\"."),
+        display_name=_("Video Link Transience Credentials"),
+        scope=Scope.settings
+    )

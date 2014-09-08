@@ -2,8 +2,13 @@
 """Video xmodule tests in mongo."""
 import json
 import unittest
+import mock
+import boto
+
 from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
+from urlparse import urlparse, urlunparse, parse_qs
+from urllib import urlencode
 
 from django.conf import settings
 
@@ -464,6 +469,127 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
+
+class TestS3GetHtmlMethod(BaseTestXmodule):
+    '''
+    Make sure that `get_html` works correctly when creating S3 temporary URLs.
+    '''
+    CATEGORY = "video"
+    DATA = SOURCE_XML
+    METADATA = {}
+
+    def setUp(self):
+        self.setup_course()
+
+        original_generate = boto.s3.connection.S3Connection.generate_url
+
+        def mocked_generate_url(self, *args, **kwargs):
+            """
+            Mocked boto.s3.connection.S3Connection.generate_url.
+            """
+            original_generate_url = original_generate(self, *args, **kwargs)
+            # Replace expire and signature here:
+            original_url = urlparse(original_generate_url)
+            query = parse_qs(original_url.query)
+            query['Expires'] = ['test_expire']
+            query['Signature'] = ['test_signature']
+            return urlunparse(original_url._replace(query=urlencode(query)))
+
+        patcher = mock.patch.object(boto.s3.connection.S3Connection, "generate_url", mocked_generate_url)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+
+    @patch('xmodule.video_module.video_module.VideoModule.video_link_transience', new_callable=PropertyMock)
+    def test_get_html_s3_source(self, mocked_transience):
+        """
+        Test if sources got from S3.
+        """
+        mocked_transience.return_value = 'bucket:test_key:test_secret'
+
+        SOURCE_XML = """
+            <video show_captions="true"
+            display_name="A Name"
+            sub="a_sub_file.srt.sjson" source="{source}"
+            download_video="{download_video}"
+            start_time="01:00:03" end_time="01:00:10"
+            >
+                {sources}
+            </video>
+        """
+        cases = [
+            {
+                'download_video': 'true',
+                'source': 'example_source.mp4',
+                'sources': """
+                    <source src="http://bucket-name.s3.amazonaws.com/example.mp4"/>
+                    <source src="http://example.com/example.webm"/>
+                """,
+                'result': {
+                    'download_video_link': u'example_source.mp4',
+                    'sources': json.dumps(
+                        [
+                            u'https://bucket.s3.amazonaws.com/example.mp4?Expires=%5B%27test_expire%27%5D&AWSAccessKeyId=%5B%27test_key%27%5D&Signature=%5B%27test_signature%27%5D',
+                            u'http://example.com/example.webm'
+                        ]
+                    ),
+                },
+            },
+        ]
+
+        initial_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'show_captions': 'true',
+            'handout': None,
+            'display_name': u'A Name',
+            'download_video_link': None,
+            'end': 3610.0,
+            'id': None,
+            'sources': '[]',
+            'speed': 'null',
+            'general_speed': 1.0,
+            'start': 3603.0,
+            'saved_video_position': 0.0,
+            'sub': u'a_sub_file.srt.sjson',
+            'track': None,
+            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_api_url': 'www.youtube.com/iframe_api',
+            'yt_test_url': 'gdata.youtube.com/feeds/api/videos/',
+            'transcript_download_format': 'srt',
+            'transcript_download_formats_list': [{'display_name': 'SubRip (.srt) file', 'value': 'srt'}, {'display_name': 'Text (.txt) file', 'value': 'txt'}],
+            'transcript_language': u'en',
+            'transcript_languages': '{"en": "English"}',
+        }
+
+        for data in cases:
+            DATA = SOURCE_XML.format(
+                download_video=data['download_video'],
+                source=data['source'],
+                sources=data['sources']
+            )
+            self.initialize_module(data=DATA)
+            context = self.item_descriptor.render('student_view').content
+
+            expected_context = dict(initial_context)
+            expected_context.update({
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript', 'translation'
+                ).rstrip('/?'),
+                'transcript_available_translations_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript', 'available_translations'
+                ).rstrip('/?'),
+                'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+                'id': self.item_descriptor.location.html_id(),
+            })
+            expected_context.update(data['result'])
+            import ipdb; ipdb.set_trace()
+            self.assertEqual(
+                context,
+                self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
+            )
+
 
 class TestVideoDescriptorInitialization(BaseTestXmodule):
     """
