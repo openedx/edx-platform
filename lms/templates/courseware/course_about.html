@@ -102,7 +102,7 @@
           location.href = xhr.responseText;
         }
       } else if (xhr.status == 403) {
-        location.href = "${reverse('register_user')}?course_id=${course.id.to_deprecated_string()}&enrollment_action=enroll";
+          location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
             (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
