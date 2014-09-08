@@ -9,6 +9,13 @@ class @DiscussionSpecHelper
     @makeModerator = () ->
         DiscussionUtil.roleIds["Moderator"].push(parseInt(window.user.id))
 
+    @makeAjaxSpy = (fakeAjax) ->
+        spyOn($, "ajax").andCallFake(
+            (params) ->
+                fakeAjax(params)
+                {always: ->}
+        )
+
     @setUnderscoreFixtures = ->
         for templateName in ['thread-show']
             templateFixture = readFixtures('templates/discussion/' + templateName + '.underscore')

@@ -13,7 +13,8 @@ if Backbone?
       "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
 
-    initialize: ->
+    initialize: (options) ->
+      @courseSettings = options.courseSettings
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
       @discussionIds=""
@@ -121,7 +122,12 @@ if Backbone?
 
     render: ->
       @timer = 0
-      @$el.html(@template())
+      @$el.html(
+        @template({
+          isCohorted: @courseSettings.get("is_cohorted"),
+          isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
+        })
+      )
       @$(".forum-nav-sort-control").val(@collection.sort_preference)
 
       $(window).bind "load", @updateSidebar
