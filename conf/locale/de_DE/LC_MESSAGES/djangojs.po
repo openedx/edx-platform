@@ -56,8 +56,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 11:23-0400\n"
-"PO-Revision-Date: 2014-08-21 20:10+0000\n"
+"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"PO-Revision-Date: 2014-09-02 09:22+0000\n"
 "Last-Translator: Alexander L. <alexander.lohberg@paluno.uni-due.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
@@ -498,8 +498,6 @@ msgstr "Lösche Formatierung"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "Close"
 msgstr "Schließen"
 
@@ -1666,6 +1664,7 @@ msgstr "Diskussion anzeigen"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1718,29 +1717,72 @@ msgid "…"
 msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr "Öffnen"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr "Stimme löschen"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr "Stimme ab"
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
-msgstr[0] "Stimme (Klicken um eigene Stimme zu entfernen)"
-msgstr[1] "Stimmen (Klicken um eigene Stimme zu entfernen)"
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
-msgstr[0] "Stimme (klicke um abzustimmen)"
-msgstr[1] "Stimmen (klicke um abzustimmen)"
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1786,44 +1828,6 @@ msgstr "Es stimmen keine Diskussionsstränge mit deiner Suche überein."
 msgid "Show posts by %(username)s."
 msgstr "Beiträge von %(username)s anzeigen."
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr "Klicke um den Bericht zu löschen"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-"Missbrauch gemeldet %(start_sr_span)s, klicke um Bericht zu entfernen "
-"%(end_span)s"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr "Missbrauch melden"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr "%(start_sr_span)s festgesteckt, klicke um %(end_span)s loszuheften"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr "Klicke zum Losheften"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr "Festgesteckt"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr "Hefte Diskussionsstrang fest"
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -1841,6 +1845,12 @@ msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
 "Es gab Probleme beim Laden weiterer Antworten. Bitte versuche es noch "
 "einmal."
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1879,22 +1889,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr "Anonym"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr "Mitarbeiter"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr "Community TA"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
-msgstr "Missbrauch gemeldet, klicke um den Bericht zu löschen"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
@@ -2302,7 +2296,6 @@ msgstr "Beitragsrumpf"
 #. message appears when there is an error getting the data on grade
 #. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Error fetching distribution."
 msgstr "Fehler beim Holen des Notenspiegels"
 
@@ -2374,12 +2367,6 @@ msgstr "Benutzernamen oder E-Mail-Adresse eingeben"
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "Bitte gib einen Benutzernamen oder eine E-Mail-Adresse ein."
-
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr "Fehler beim Holen der Liste dieser Rolle"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2598,9 +2585,6 @@ msgid ""
 "Error getting student progress url for '<%= student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
-"Es ist ein Fehler beim Aufrufen der Teilnehmerfortschritts-URL für "
-"'<%=student_id %>' aufgetreten. Vergewissere dich, ob der Teilnehmercode "
-"richtig geschrieben wurde."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
@@ -3094,7 +3078,7 @@ msgstr ""
 #: cms/static/js/views/utils/xblock_utils.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Saving&hellip;"
-msgstr ""
+msgstr "Speichere&hellip;"
 
 #: cms/static/coffee/src/views/tabs.js
 msgid "Delete Page Confirmation"
@@ -3129,14 +3113,14 @@ msgstr ""
 
 #: cms/static/js/collections/group.js
 msgid "Group %s"
-msgstr ""
+msgstr "Gruppe %s"
 
 #. Translators: Dictionary used for creation ids that are used in
 #. default group names. For example: A, B, AA in Group A,
 #. Group B, ..., Group AA, etc.
 #: cms/static/js/collections/group.js
 msgid "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-msgstr ""
+msgstr "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
@@ -3148,23 +3132,23 @@ msgstr ""
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group A"
-msgstr ""
+msgstr "Gruppe A"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group B"
-msgstr ""
+msgstr "Gruppe B"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
-msgstr ""
+msgstr "Name der Gruppenkonfiguration wird benötigt"
 
 #: cms/static/js/models/group_configuration.js
 msgid "There must be at least one group."
-msgstr ""
+msgstr "Es ist wenigstens eine Gruppe erforderlich."
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a name."
-msgstr ""
+msgstr "Alle Gruppen benötigen einen Namen."
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -3174,7 +3158,7 @@ msgstr ""
 
 #: cms/static/js/models/uploads.js
 msgid "or"
-msgstr ""
+msgstr "oder"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The course must have an assigned start date."
@@ -3239,23 +3223,21 @@ msgstr ""
 msgid "Your file has been deleted."
 msgstr ""
 
-#: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+#: cms/static/js/views/assets.js
 msgid "Date Added"
-msgstr ""
+msgstr "Datum hinzugefügt"
 
 #: cms/static/js/views/assets.js
 msgid "Uploading…"
 msgstr ""
 
 #: cms/static/js/views/assets.js
-#: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
-msgstr ""
+msgstr "Datei auswählen"
 
 #: cms/static/js/views/assets.js
-#: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
-msgstr ""
+msgstr "Neue Datei hochladen"
 
 #: cms/static/js/views/assets.js
 msgid "Load Another File"
@@ -3271,7 +3253,7 @@ msgstr ""
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
-msgstr ""
+msgstr "Erstelle Wiederholungslauf"
 
 #: cms/static/js/views/course_rerun.js
 msgid "Processing Re-run Request"
@@ -3334,6 +3316,14 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
+msgstr ""
+
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
 msgstr ""
 
 #: cms/static/js/views/import.js
@@ -3500,6 +3490,18 @@ msgstr ""
 msgid "Editing: %(title)s"
 msgstr ""
 
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
+msgstr ""
+
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr ""
@@ -3526,20 +3528,20 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Hiding from Students&hellip;"
-msgstr ""
+msgstr "Verstecke vor den Teilnehmern&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students&hellip;"
-msgstr ""
+msgstr "Verstecke gezielt vor den Teilnehmern&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Inheriting Student Visibility&hellip;"
-msgstr ""
+msgstr "Vererbe Sichtbarkeit für Teilnehmer&hellip;"
 
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
-msgstr ""
+msgstr "Für die Teilnehmer anzeigen lassen"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid ""
@@ -3550,7 +3552,7 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Making Visible to Students&hellip;"
-msgstr ""
+msgstr "Mache für die Teilnehmer sichtbar&hellip;"
 
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
@@ -3583,7 +3585,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid "Required field."
-msgstr ""
+msgstr "Erforderliches Feld."
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid "Please do not use any spaces in this field."
@@ -3617,15 +3619,15 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr ""
+msgstr "Abschnitt"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
-msgstr ""
+msgstr "Unterabschnitt"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "unit"
-msgstr ""
+msgstr "Lerneinheit"
 
 #: cms/static/js/views/video/translations_editor.js
 msgid ""
@@ -3647,6 +3649,34 @@ msgstr ""
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -4179,6 +4209,18 @@ msgstr ""
 
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
 msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore

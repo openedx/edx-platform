@@ -31,9 +31,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 11:23-0400\n"
-"PO-Revision-Date: 2014-08-19 15:50+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"PO-Revision-Date: 2014-09-04 21:13+0000\n"
+"Last-Translator: Faton Nuha <faton11@live.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -361,7 +361,7 @@ msgstr "Radhitja"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
-msgstr ""
+msgstr "Burimi alternativ"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -494,8 +494,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "Mbylle"
@@ -612,7 +610,7 @@ msgstr "Fshije rreshtin"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Delete table"
-msgstr ""
+msgstr "Fshije tabelën"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -630,7 +628,7 @@ msgstr "Dimenzionet"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Disc"
-msgstr ""
+msgstr "Disk"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -849,19 +847,19 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Height"
-msgstr ""
+msgstr "Lartësia"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal line"
-msgstr ""
+msgstr "Viza horizontale"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Horizontal space"
-msgstr ""
+msgstr "Hapësira horizontale"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -945,7 +943,7 @@ msgstr "Shto një rresht para"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert table"
-msgstr ""
+msgstr "Shto tabelë"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1098,7 +1096,7 @@ msgstr "List e numëruar"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
-msgstr ""
+msgstr "Në rregull"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1308,7 +1306,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Source"
-msgstr ""
+msgstr "Burimi"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1380,7 +1378,7 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Target"
-msgstr ""
+msgstr "Targeti"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1474,13 +1472,13 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Vertical space"
-msgstr ""
+msgstr "Hapësirë vertikale"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "View"
-msgstr ""
+msgstr "Shiko"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1600,11 +1598,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD on"
-msgstr ""
+msgstr "HD aktive"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "HD off"
-msgstr ""
+msgstr "HD jo aktive"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
@@ -1661,6 +1659,7 @@ msgstr "Shfaq Diskutimin"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1704,29 +1703,72 @@ msgid "…"
 msgstr "..."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr "Hape"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr "fshije votën"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr "voto"
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
-msgstr[0] "vota (kliko të e fshish votën tënde)"
-msgstr[1] "votat(kliko të e fshish votën tënde)"
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
-msgstr[0] "vota (kliko të votosh)"
-msgstr[1] "votat (kliko të klikosh)"
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1770,42 +1812,6 @@ msgstr ""
 msgid "Show posts by %(username)s."
 msgstr "Shfaq postimet nga %(username)s."
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr "Kliko të e fshish raportin"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr ""
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr ""
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr ""
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -1820,6 +1826,12 @@ msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
 msgid_plural "%(numResponses)s responses"
 msgstr[0] "%(numResponses)s përgjigjje"
@@ -1832,12 +1844,12 @@ msgstr "Shfaqi të gjitha përgjigjjet"
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first %(numResponses)s responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Shfaq përgjigjjen e parë"
+msgstr[1] "Shfaq %(numResponses)s përgjigjjet e para"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr ""
+msgstr "Ngarko të gjitha përgjigjjet"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "Load next %(numResponses)s responses"
@@ -1855,22 +1867,6 @@ msgstr ""
 msgid "anonymous"
 msgstr ""
 
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr "stafi"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr "Komuniteti TA"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
-msgstr ""
-
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
 msgstr "A jeni i sigurtë që dëshironi të e fshini këtë koment?"
@@ -1881,7 +1877,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr ""
+msgstr "A jeni i sigurtë që dëshironi të e fshini këtë përgjigjje?"
 
 #: common/static/js/capa/drag_and_drop/base_image.js
 msgid "Drop target image"
@@ -1924,8 +1920,8 @@ msgstr ""
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuta"
+msgstr[1] "%d minuta"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -1934,8 +1930,8 @@ msgstr "rreth një orë"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "rreth %d ore"
+msgstr[1] "rreth %d ore"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -1944,8 +1940,8 @@ msgstr ""
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ditë"
+msgstr[1] "%d ditë"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -1954,8 +1950,8 @@ msgstr "rreth një muaj"
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d muaj"
+msgstr[1] "%d muaj"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -1964,8 +1960,8 @@ msgstr ""
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d vit"
+msgstr[1] "%d vite"
 
 #. Translators: please note that this is not a literal flag, but rather a
 #. report
@@ -2031,7 +2027,7 @@ msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Date posted"
-msgstr ""
+msgstr "Data e postimit"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "More"
@@ -2040,7 +2036,7 @@ msgstr "Më shumë"
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
-msgstr ""
+msgstr "Shënimet e mia"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Instructor"
@@ -2268,7 +2264,6 @@ msgstr ""
 #. message appears when there is an error getting the data on grade
 #. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Error fetching distribution."
 msgstr ""
 
@@ -2285,7 +2280,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 #: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Last Updated: <%= timestamp %>"
-msgstr ""
+msgstr "Freskimi i fundit: <%= timestamp %>"
 
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
 #: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
@@ -2340,12 +2335,6 @@ msgstr ""
 msgid "Please enter a username or email."
 msgstr ""
 
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr ""
-
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
@@ -2364,7 +2353,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
-msgstr ""
+msgstr "Problem: Ju nuk mund të e largoni veten nga grupi i Instruktorëve!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
@@ -2373,12 +2362,12 @@ msgstr ""
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
-msgstr ""
+msgstr "Këta përdorues sukseshëm u shtuan si beta testues:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
-msgstr ""
+msgstr "Këta përdorues sukseshëm u larguan si beta testues:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -2465,7 +2454,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
-msgstr ""
+msgstr "Mesazhi juaj duhet të ketë një temë."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
@@ -2523,7 +2512,7 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
-msgstr ""
+msgstr "Ju lutem shtypni email adresën ose pseudonimin e studentit."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid ""
@@ -2658,7 +2647,7 @@ msgstr ""
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Submitted"
-msgstr ""
+msgstr "Paraqitur"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
@@ -2694,15 +2683,15 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Unknown"
-msgstr ""
+msgstr "I panjohur"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject"
-msgstr ""
+msgstr "Tema"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By"
-msgstr ""
+msgstr "Dërguar nga"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent"
@@ -2718,11 +2707,11 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Subject:"
-msgstr ""
+msgstr "Tema:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent By:"
-msgstr ""
+msgstr "Dërguar nga:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent:"
@@ -2734,7 +2723,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Message:"
-msgstr ""
+msgstr "Mesazhi:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "No tasks currently running."
@@ -3033,7 +3022,7 @@ msgstr ""
 
 #: cms/static/js/models/group.js
 msgid "Group name is required"
-msgstr ""
+msgstr "Emri i grupit është i detyrueshëm"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group A"
@@ -3045,7 +3034,7 @@ msgstr "Grupi B"
 
 #: cms/static/js/models/group_configuration.js
 msgid "Group Configuration name is required."
-msgstr ""
+msgstr "Emërtimi i konfigurimit të grupit është i detrueshëm."
 
 #: cms/static/js/models/group_configuration.js
 msgid "There must be at least one group."
@@ -3053,13 +3042,15 @@ msgstr ""
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a name."
-msgstr ""
+msgstr "Të gjitha grupet mund të kenë një emër."
 
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
 "<%= fileExtensions %> to upload."
 msgstr ""
+"Vetëm fajllat <%= fileTypes %> mund të ngarkohen. Ju lutem zgjedhni një "
+"fajllë i cili ka prapashtesën <%= fileExtensions %> të e ngarkoni."
 
 #: cms/static/js/models/uploads.js
 msgid "or"
@@ -3078,14 +3069,20 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
+"Data e fillimit të kursit nuk mund të jetë para datës së fillimit të "
+"regjistrimit."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
+"Data e fillimit të regjistrimit nuk mund të jetë pas datës së përfundimit të"
+" regjistrimit."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
+"Data e fundit e regjistrimit nuk mund të jetë pas datës të përfundimit të "
+"kursit."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Key should only contain letters, numbers, _, or -"
@@ -3097,11 +3094,11 @@ msgstr ""
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer between 0 and 100."
-msgstr ""
+msgstr "Shtyp një numër të plotë mes 0 dhe 100."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter an integer greater than 0."
-msgstr ""
+msgstr "Ju lutem shtypni një numër të plotë më të madh se 0."
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "Please enter non-negative integer."
@@ -3158,7 +3155,7 @@ msgstr ""
 
 #: cms/static/js/views/course_info_update.js
 msgid "This action cannot be undone."
-msgstr ""
+msgstr "Ky veprim nuk mund të rikthehet."
 
 #: cms/static/js/views/course_rerun.js
 msgid "Create Re-run"
@@ -3192,7 +3189,7 @@ msgstr[1] ""
 
 #: cms/static/js/views/group_configuration_details.js
 msgid "Not in Use"
-msgstr ""
+msgstr "Nuk është në përdorim"
 
 #. Translators: 'count' is number of units that the group
 #. configuration is used in.
@@ -3225,6 +3222,14 @@ msgstr ""
 #: cms/static/js/views/group_configuration_item.js
 #: cms/static/js/views/show_textbook.js
 msgid "Deleting"
+msgstr ""
+
+#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+msgid "Choose new file"
+msgstr ""
+
+#: cms/static/js/views/import.js
+msgid "Error importing course"
 msgstr ""
 
 #: cms/static/js/views/import.js
@@ -3261,11 +3266,10 @@ msgstr ""
 msgid "Edit section release date"
 msgstr ""
 
-#: cms/static/js/views/overview_assignment_grader.js
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/grading-editor.underscore
 msgid "Not Graded"
-msgstr ""
+msgstr "E pa graduar"
 
 #. Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date
 #. Added ascending"
@@ -3327,7 +3331,7 @@ msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "You've made some changes, but there are some errors"
-msgstr ""
+msgstr "Ju keni bërë disa ndryshime por këtu janë disa probleme"
 
 #: cms/static/js/views/validation.js
 msgid ""
@@ -3336,7 +3340,7 @@ msgstr ""
 
 #: cms/static/js/views/validation.js
 msgid "Save Changes"
-msgstr ""
+msgstr "Ruaj ndryshimet"
 
 #: cms/static/js/views/validation.js
 msgid "Your changes have been saved."
@@ -3366,22 +3370,19 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for %(display_name)s"
-msgstr ""
+msgstr "Ndrysho konfigurimet për %(display_name)s"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish %(display_name)s"
-msgstr ""
+msgstr "Publiko %(display_name)s"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this %(item)s?"
-msgstr ""
+msgstr "Publiko të gjjitha ndryshimet e pa publikuara për këtë %(item)s?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
-msgstr ""
+msgstr "Publiko"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
@@ -3389,6 +3390,18 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr ""
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
 msgstr ""
 
 #: cms/static/js/views/pages/container.js
@@ -3430,7 +3443,7 @@ msgstr ""
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
-msgstr ""
+msgstr "Bëre të dukshme tek Studentët"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid ""
@@ -3446,6 +3459,8 @@ msgstr ""
 #: cms/static/js/views/pages/group_configurations.js
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
+"Ju keni ndryshime të pa ruajtura. Dëshironi vërtet të largoheni nga kjo "
+"faqe?"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -3470,7 +3485,7 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "Files must be in JPEG or PNG format."
-msgstr ""
+msgstr "Fajllat mund të jenë në formatin JPEG ose PNG."
 
 #: cms/static/js/views/utils/create_course_utils.js
 msgid "Required field."
@@ -3497,7 +3512,7 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this %(xblock_type)s?"
-msgstr ""
+msgstr "Fshije këtë %(xblock_type)s?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
@@ -3505,11 +3520,11 @@ msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Yes, delete this %(xblock_type)s"
-msgstr ""
+msgstr "Po, fshije këtë %(xblock_type)s"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
-msgstr ""
+msgstr "pjesë"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "subsection"
@@ -3527,7 +3542,7 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
-msgstr ""
+msgstr "Ngarko përkthimin"
 
 #: common/templates/js/image-modal.underscore
 msgid "Large"
@@ -3539,6 +3554,34 @@ msgstr "Zmadhoje"
 
 #: common/templates/js/image-modal.underscore
 msgid "Zoom Out"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible only to %(group_name)s."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Reported"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "Closed"
+msgstr ""
+
+#: common/templates/js/discussion/thread-show.underscore
+msgid "(this post is about %(courseware_title_linked)s)"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -3555,7 +3598,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "List of uploaded files and assets in this course"
-msgstr ""
+msgstr "Lista e fajllave dhe aseteve të ngarkuara në këtë kurs"
 
 #: cms/templates/js/asset-library.underscore
 msgid "Embed URL"
@@ -3572,11 +3615,11 @@ msgstr "Veprimet"
 
 #: cms/templates/js/asset-library.underscore
 msgid "You haven't added any assets to this course yet."
-msgstr ""
+msgstr "Ju nuk keni shtuar asnjë aset në këtë kurs."
 
 #: cms/templates/js/asset-library.underscore
 msgid "Upload your first asset"
-msgstr ""
+msgstr "Ngarkoni asetin tuaj të parë"
 
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "close"
@@ -3592,7 +3635,7 @@ msgstr "Fshije këtë aset"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock this asset"
-msgstr ""
+msgstr "Mbyll këtë aset"
 
 #: cms/templates/js/asset.underscore
 msgid "Lock/unlock file"
@@ -3839,7 +3882,7 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration information"
-msgstr ""
+msgstr "Konfigurimi i grupit informacione"
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group Configuration Name"
@@ -3863,7 +3906,7 @@ msgstr ""
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Optional long description"
-msgstr ""
+msgstr "Përshkrim i gjatë opcional"
 
 #: cms/templates/js/group-configuration-edit.underscore
 msgid "Group information"
@@ -3922,7 +3965,7 @@ msgstr "Shkarko"
 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "You haven't created any group configurations yet."
-msgstr ""
+msgstr "Ju nuk keni krijuar asnjë konfigurimet e grupit deri tani."
 
 #: cms/templates/js/no-group-configurations.underscore
 msgid "Add your first Group Configuration"
@@ -3952,14 +3995,14 @@ msgstr ""
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Last published %(last_published_date)s by %(publish_username)s"
-msgstr ""
+msgstr "Publikimi i fundit %(last_published_date)s nga %(publish_username)s"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
-msgstr ""
+msgstr "mesazhi"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -3972,7 +4015,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Visible to Staff Only"
-msgstr ""
+msgstr "Bëre të dukshëm vetëm për stafin"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Published and Live"
@@ -3984,7 +4027,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Draft (Unpublished changes)"
-msgstr ""
+msgstr "Draft (Ndryshimet e pa publikuara)"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Release:"
@@ -3996,7 +4039,7 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Draft saved on %(last_saved_date)s by %(edit_username)s"
-msgstr ""
+msgstr "Drafti u ruajt në %(last_saved_date)s nga  %(edit_username)s"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Is Visible To:"
@@ -4008,16 +4051,16 @@ msgstr ""
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff Only"
-msgstr ""
+msgstr "Vetëm Stafi"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Students"
-msgstr ""
+msgstr "Stafi dhe Studentët"
 
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from students"
-msgstr ""
+msgstr "Fshehe nga studentët"
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -4073,14 +4116,26 @@ msgstr ""
 msgid "File upload succeeded"
 msgstr ""
 
-#: cms/templates/js/xblock-string-field-editor.underscore
-#: cms/templates/js/xblock-string-field-editor.underscore
-msgid "Edit the name"
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
 msgstr ""
 
 #: cms/templates/js/xblock-string-field-editor.underscore
+#: cms/templates/js/xblock-string-field-editor.underscore
+msgid "Edit the name"
+msgstr "Ndrysho emrin"
+
+#: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit %(display_name)s (required)"
-msgstr ""
+msgstr "Ndrysho %(display_name)s (e detyrueshme)"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "formLabel"
@@ -4106,7 +4161,7 @@ msgstr ""
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Group Configurations"
-msgstr ""
+msgstr "Konfigurimet e grupit"
 
 #: cms/templates/js/mock/mock-group-configuration-page.underscore
 msgid "Page Actions"
@@ -4184,7 +4239,7 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Upload New Transcript"
-msgstr ""
+msgstr "Ngarko transkript të re"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
@@ -4234,7 +4289,7 @@ msgstr ""
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
-msgstr ""
+msgstr "Dëshironi të e zëvendësoni transkriptën edx me transkriptën YouTube?"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
