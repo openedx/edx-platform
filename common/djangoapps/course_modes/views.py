@@ -141,7 +141,9 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode in ("audit", "honor"):
-            CourseEnrollment.enroll(user, course_key, requested_mode)
+            # TODO (ECOM-16): Skip enrollment if we're in the experimental branch
+            if not request.session.get('auto_register', False):
+                CourseEnrollment.enroll(user, course_key, requested_mode)
             return redirect('dashboard')
 
         mode_info = allowed_modes[requested_mode]
