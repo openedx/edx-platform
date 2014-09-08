@@ -288,17 +288,6 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                     if (_.isFunction(refresh)) { refresh(collapsed); }
 
                 };
-                // If the parent has changed, update the children of the old parent.
-                if (newParentLocator !== oldParentLocator) {
-                    // Find the old parent element.
-                    oldParentEle = $(parentSelector).filter(function () {
-                        return $(this).data('locator') === oldParentLocator;
-                    });
-                    this.saveItem(oldParentEle, childrenSelector, function () {
-                        element.data('parent', newParentLocator);
-                        refreshParent(oldParentEle);
-                    });
-                }
                 saving = new NotificationView.Mini({
                     title: gettext('Saving&hellip;')
                 });
@@ -310,7 +299,18 @@ define(["jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notif
                 }, 1000);
                 this.saveItem(newParentEle, childrenSelector, function () {
                     saving.hide();
+
+                    // Refresh new parent.
                     refreshParent(newParentEle);
+
+                    // Refresh old parent.
+                    if (newParentLocator !== oldParentLocator) {
+                        oldParentEle = $(parentSelector).filter(function () {
+                            return $(this).data('locator') === oldParentLocator;
+                        });
+                        refreshParent(oldParentEle);
+                        element.data('parent', newParentLocator);
+                    }
                 });
             },
 
