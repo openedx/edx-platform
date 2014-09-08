@@ -275,7 +275,8 @@ $(document).ready(function() {
           % endif
 
           %if not upgrade:
-
+## TODO (ECOM-16): For the duration of the experiment, audit track enrollment is skipped 
+## to keep the user on the honor track
             % if "audit" in modes:
             <span class="deco-divider">
               <span class="copy">${_("or")}</span>
