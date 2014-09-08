@@ -204,6 +204,9 @@ OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
+############################## OAUTH2 Provider ################################
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
+
 ######################## MIT Certificates SSL Auth ############################
 
 FEATURES['AUTH_USE_CERTIFICATES'] = False
