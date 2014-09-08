@@ -7,12 +7,15 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
+from monkey_patch import django_utils_translation
 
 
 def run():
     """
     Executed during django startup
     """
+    django_utils_translation.patch()
+
     autostartup()
 
     add_mimetypes()

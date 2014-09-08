@@ -13,6 +13,8 @@ the course outline:
 * `View the Course Organization as a Student`_
 * `Navigate the Course Outline`_
 * `Add Content in the Course Outline`_
+* `Modify Settings for Objects in the Course Outline`_
+* `Publish Content from the Course Outline`_
 * `Reorganize the Course Outline`_
 * `Delete Content in the Course Outline`_
   
@@ -126,6 +128,60 @@ Unit**:
  :alt: The outline with the New Subsection button circled
 
 The :ref:`unit<Developing Course Units>` page opens.
+
+
+.. _Modify Settings for Objects in the Course Outline:
+
+***************************************************
+Modify Settings for Objects in the Course Outline
+***************************************************
+
+You modify settings for sections, subsections, and units in the course outline.
+Specifically, you can complete the following tasks:
+
+* :ref:`Set a Section Release Date`
+* :ref:`Hide a Section from Students`
+* :ref:`Set a Subsection Release Date`
+* :ref:`Set the Assignment Type and Due Date for a Subsection`
+* :ref:`Hide a Subsection from Students`
+* :ref:`Hide a Unit from Students`
+
+To modify settings for a section, subsection, or unit, click the settings icon
+for that object. In the following example, the settings icon is circled for a
+section, a subsection, and two units:
+
+.. image:: ../Images/settings-icons.png
+ :alt: Settings icons in the course outline
+
+For more information, see the links above.
+
+
+.. _Publish Content from the Course Outline:
+
+************************************************
+Publish Content from the Course Outline
+************************************************
+
+You can publish new and changed units for an entire section or subsection. You
+can also publish individual units.
+
+To publish new and changed units, click the publish icon for a section,
+subsection, or unit. In the following example, the publish icon is circled for
+a section, subsection, and unit:
+
+.. image:: ../Images/outline-publish-icons.png
+ :alt: Publishing icons in the course outline
+
+.. note:: 
+ The publish icon only appears when there is new or changed content within the
+ object.
+
+For more information, see:
+
+* :ref:`Unit Publishing Status`
+* :ref:`Publish all Units in a Section`
+* :ref:`Publish all Units in a Subsection`
+* :ref:`Publish a Unit`
 
 .. _Reorganize the Course Outline:
 

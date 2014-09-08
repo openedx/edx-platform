@@ -1,5 +1,5 @@
-define(["js/views/validation", "jquery", "underscore", "gettext", "codemirror"],
-    function(ValidatingView, $, _, gettext, CodeMirror) {
+define(["js/views/validation", "jquery", "underscore", "gettext", "codemirror", "js/views/modals/validation_error_modal"],
+    function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal) {
 
 var AdvancedView = ValidatingView.extend({
     error_saving : "error_saving",
@@ -51,8 +51,8 @@ var AdvancedView = ValidatingView.extend({
         var self = this;
         var oldValue = $(textarea).val();
         var cm = CodeMirror.fromTextArea(textarea, {
-            mode: "application/json", 
-            lineNumbers: false, 
+            mode: "application/json",
+            lineNumbers: false,
             lineWrapping: false});
         cm.on('change', function(instance, changeobj) {
                 instance.save();
@@ -115,7 +115,24 @@ var AdvancedView = ValidatingView.extend({
                     'course': course_location_analytics
                 });
             },
-            silent: true
+            silent: true,
+            error: function(model, response, options) {
+                var json_response, reset_callback, err_modal;
+
+                /* Check that the server came back with a bad request error*/
+                if (response.status === 400) {
+                    json_response = $.parseJSON(response.responseText);
+                    reset_callback = function() {
+                        self.revertView();
+                    };
+
+                    /* initialize and show validation error modal */
+                    err_modal = new ValidationErrorModal();
+                    err_modal.setContent(json_response);
+                    err_modal.setResetCallback(reset_callback);
+                    err_modal.show();
+                }
+            }
         });
     },
     revertView: function() {

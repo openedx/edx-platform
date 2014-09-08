@@ -38,6 +38,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 
+from util.json_request import JsonResponse
+
 log = logging.getLogger(__name__)
 
 EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverify.started'
@@ -82,7 +84,7 @@ class VerifyView(View):
         if not current_mode:
             return redirect(reverse('dashboard'))
         if course_id.to_deprecated_string() in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id.to_deprecated_string()]
+            chosen_price = request.session["donation_for_course"][unicode(course_id)]
         else:
             chosen_price = current_mode.min_price
 
@@ -114,6 +116,7 @@ class VerifyView(View):
 
             # TODO (ECOM-16): Remove once the AB test completes
             "autoreg": request.session.get('auto_register', False),
+            "retake": request.GET.get('retake', False),
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -145,7 +148,7 @@ class VerifiedView(View):
         if not current_mode:
             return redirect(reverse('dashboard'))
         if course_id.to_deprecated_string() in request.session.get("donation_for_course", {}):
-            chosen_price = request.session["donation_for_course"][course_id.to_deprecated_string()]
+            chosen_price = request.session["donation_for_course"][unicode(course_id)]
         else:
             chosen_price = current_mode.min_price
 
@@ -177,9 +180,14 @@ def create_order(request):
     """
     if not SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         attempt = SoftwareSecurePhotoVerification(user=request.user)
-        b64_face_image = request.POST['face_image'].split(",")[1]
-        b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
-
+        try:
+            b64_face_image = request.POST['face_image'].split(",")[1]
+            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
+        except IndexError:
+            context = {
+                'success': False,
+            }
+            return JsonResponse(context)
         attempt.upload_face_image(b64_face_image.decode('base64'))
         attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
         attempt.mark_ready()
@@ -189,26 +197,26 @@ def create_order(request):
     course_id = request.POST['course_id']
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
-    current_donation = donation_for_course.get(course_id, decimal.Decimal(0))
-    contribution = request.POST.get("contribution", donation_for_course.get(course_id, 0))
+    current_donation = donation_for_course.get(unicode(course_id), decimal.Decimal(0))
+    contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
     try:
         amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
     except decimal.InvalidOperation:
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
     if amount != current_donation:
-        donation_for_course[course_id] = amount
+        donation_for_course[unicode(course_id)] = amount
         request.session['donation_for_course'] = donation_for_course
 
     # prefer professional mode over verified_mode
     current_mode = CourseMode.verified_mode_for_course(course_id)
 
-    if current_mode.slug == 'professional':
-        amount = current_mode.min_price
-
     # make sure this course has a verified mode
     if not current_mode:
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
+
+    if current_mode.slug == 'professional':
+        amount = current_mode.min_price
 
     if amount < current_mode.min_price:
         return HttpResponseBadRequest(_("No selected price or selected price is below minimum."))
@@ -225,7 +233,7 @@ def create_order(request):
     params = get_signed_purchase_params(
         cart, callback_url=callback_url
     )
-
+    params['success'] = True
     return HttpResponse(json.dumps(params), content_type="text/json")
 
 
@@ -484,8 +492,7 @@ def midcourse_reverify_dash(request):
         try:
             course_enrollment_pairs.append((modulestore().get_course(enrollment.course_id), enrollment))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+            log.error("User {0} enrolled in non-existent course {1}".format(user.username, enrollment.course_id))
 
     statuses = ["approved", "pending", "must_reverify", "denied"]
 

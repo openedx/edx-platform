@@ -9,17 +9,14 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.xml_importer import import_from_xml
 from student.models import Registration
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from contentstore.utils import reverse_url
-from xmodule.modulestore.mongo.draft import DraftModuleStore
-from xblock.fields import Scope
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 
 
@@ -98,17 +95,23 @@ class CourseTestCase(ModuleStoreTestCase):
             nonstaff.is_authenticated = True
         return client, nonstaff
 
-    def populate_course(self):
+    def populate_course(self, branching=2):
         """
-        Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
+        Add k chapters, k^2 sections, k^3 verticals, k^4 problems to self.course (where k = branching)
         """
         user_id = self.user.id
+        self.populated_usage_keys = {}
+
         def descend(parent, stack):
-            xblock_type = stack.pop(0)
-            for _ in range(2):
+            if not stack:
+                return
+
+            xblock_type = stack[0]
+            for _ in range(branching):
                 child = ItemFactory.create(category=xblock_type, parent_location=parent.location, user_id=user_id)
-                if stack:
-                    descend(child, stack)
+                print child.location
+                self.populated_usage_keys.setdefault(xblock_type, []).append(child.location)
+                descend(child, stack[1:])
 
         descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])
 
@@ -151,16 +154,16 @@ class CourseTestCase(ModuleStoreTestCase):
         # create a Draft vertical
         vertical = self.store.get_item(course_id.make_usage_key('vertical', self.TEST_VERTICAL), depth=1)
         draft_vertical = self.store.convert_to_draft(vertical.location, self.user.id)
-        self.assertEqual(self.store.compute_publish_state(draft_vertical), PublishState.draft)
+        self.assertTrue(self.store.has_published_version(draft_vertical))
 
         # create a Private (draft only) vertical
         private_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PRIVATE_VERTICAL)
-        self.assertEqual(self.store.compute_publish_state(private_vertical), PublishState.private)
+        self.assertFalse(self.store.has_published_version(private_vertical))
 
         # create a Published (no draft) vertical
         public_vertical = self.store.create_item(self.user.id, course_id, 'vertical', self.PUBLISHED_VERTICAL)
         public_vertical = self.store.publish(public_vertical.location, self.user.id)
-        self.assertEqual(self.store.compute_publish_state(public_vertical), PublishState.public)
+        self.assertTrue(self.store.has_published_version(public_vertical))
 
         # add the new private and new public as children of the sequential
         sequential = self.store.get_item(course_id.make_usage_key('sequential', self.SEQUENTIAL))
@@ -197,11 +200,7 @@ class CourseTestCase(ModuleStoreTestCase):
 
         def verify_item_publish_state(item, publish_state):
             """Verifies the publish state of the item is as expected."""
-            if publish_state in (PublishState.private, PublishState.draft):
-                self.assertTrue(getattr(item, 'is_draft', False))
-            else:
-                self.assertFalse(getattr(item, 'is_draft', False))
-            self.assertEqual(self.store.compute_publish_state(item), publish_state)
+            self.assertEqual(self.store.has_published_version(item), publish_state)
 
         def get_and_verify_publish_state(item_type, item_name, publish_state):
             """Gets the given item from the store and verifies the publish state of the item is as expected."""
@@ -210,18 +209,18 @@ class CourseTestCase(ModuleStoreTestCase):
             return item
 
         # verify that the draft vertical is draft
-        vertical = get_and_verify_publish_state('vertical', self.TEST_VERTICAL, PublishState.draft)
+        vertical = get_and_verify_publish_state('vertical', self.TEST_VERTICAL, True)
         for child in vertical.get_children():
-            verify_item_publish_state(child, PublishState.draft)
+            verify_item_publish_state(child, True)
 
         # make sure that we don't have a sequential that is not in draft mode
-        sequential = get_and_verify_publish_state('sequential', self.SEQUENTIAL, PublishState.public)
+        sequential = get_and_verify_publish_state('sequential', self.SEQUENTIAL, True)
 
         # verify that we have the private vertical
-        private_vertical = get_and_verify_publish_state('vertical', self.PRIVATE_VERTICAL, PublishState.private)
+        private_vertical = get_and_verify_publish_state('vertical', self.PRIVATE_VERTICAL, False)
 
         # verify that we have the public vertical
-        public_vertical = get_and_verify_publish_state('vertical', self.PUBLISHED_VERTICAL, PublishState.public)
+        public_vertical = get_and_verify_publish_state('vertical', self.PUBLISHED_VERTICAL, True)
 
         # verify verticals are children of sequential
         for vert in [vertical, private_vertical, public_vertical]:
@@ -266,22 +265,11 @@ class CourseTestCase(ModuleStoreTestCase):
                 course2_item_loc = course2_item_loc.replace(name=new_name)
             course2_item = self.store.get_item(course2_item_loc)
 
-            try:
-                # compare published state
-                self.assertEqual(
-                    self.store.compute_publish_state(course1_item),
-                    self.store.compute_publish_state(course2_item)
-                )
-            except AssertionError:
-                c1_state = self.compute_real_state(course1_item)
-                c2_state = self.compute_real_state(course2_item)
-                self.assertEqual(
-                    c1_state,
-                    c2_state,
-                    "Publish states not equal: course item {} in state {} != course item {} in state {}".format(
-                        course1_item_loc, c1_state, course2_item.location, c2_state
-                    )
-                )
+            # compare published state
+            self.assertEqual(
+                self.store.has_published_version(course1_item),
+                self.store.has_published_version(course2_item)
+            )
 
             # compare data
             self.assertEqual(hasattr(course1_item, 'data'), hasattr(course2_item, 'data'))
@@ -331,37 +319,6 @@ class CourseTestCase(ModuleStoreTestCase):
                 pass
             else:
                 self.assertEqual(value, course2_asset_attrs[key])
-
-    def compute_real_state(self, item):
-        """
-        In draft mongo, compute_published_state can return draft when the draft == published, but in split,
-        it'll return public in that case
-        """
-        supposed_state = self.store.compute_publish_state(item)
-        if supposed_state == PublishState.draft and isinstance(item.runtime.modulestore, DraftModuleStore):
-            # see if the draft differs from the published
-            published = self.store.get_item(item.location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            if item.get_explicitly_set_fields_by_scope() != published.get_explicitly_set_fields_by_scope():
-                # checking content: if published differs from item, return draft
-                return supposed_state
-            if item.get_explicitly_set_fields_by_scope(Scope.settings) != published.get_explicitly_set_fields_by_scope(Scope.settings):
-                # checking settings: if published differs from item, return draft
-                return supposed_state
-            if item.has_children and item.children != published.children:
-                # checking children: if published differs from item, return draft
-                return supposed_state
-            # published == item in all respects, so return public
-            return PublishState.public
-        elif supposed_state == PublishState.public and item.location.category in DIRECT_ONLY_CATEGORIES:
-            if not all([
-                self.store.has_item(child_loc, revision=ModuleStoreEnum.RevisionOption.draft_only)
-                for child_loc in item.children
-            ]):
-                return PublishState.draft
-            else:
-                return supposed_state
-        else:
-            return supposed_state
 
 
 def get_url(handler_name, key_value, key_name='usage_key_string', kwargs=None):

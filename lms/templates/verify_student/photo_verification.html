@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-
+<%! from lms.envs.common import TECH_SUPPORT_EMAIL %>
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -52,6 +52,25 @@
       <h3 class="title">${_("Error processing your order")}</h3>
       <div class="copy">
         <p>${_("Oops! Something went wrong. Please confirm your details again and click the button to move on to payment. If you are still having trouble, please try again later.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="photo-error" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("Error processing your order")}</h3>
+      <div class="copy">
+        <p>${_("We're sorry, there has been an error on this page. Please refresh the page and retake your photos. "
+               "If you are still having trouble, please contact us at "
+               "{email_address}").format(
+                    email_address='<a href="mailto:{technical_email}">{technical_email}</a>'.format(
+                        technical_email=TECH_SUPPORT_EMAIL
+                    )
+               )}
+        </p>
       </div>
     </div>
   </div>

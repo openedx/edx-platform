@@ -458,6 +458,69 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
 
+    def test_validate_and_update_from_json_correct_inputs(self):
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "advertised_start": {"value": "start A"},
+                "days_early_for_beta": {"value": 2},
+                "advanced_modules": {"value": ['combinedopenended']},
+            },
+            user=self.user
+        )
+        self.assertTrue(is_valid)
+        self.assertTrue(len(errors) == 0)
+        self.update_check(test_model)
+
+        # fresh fetch to ensure persistence
+        fresh = modulestore().get_course(self.course.id)
+        test_model = CourseMetadata.fetch(fresh)
+        self.update_check(test_model)
+
+        # Tab gets tested in test_advanced_settings_munge_tabs
+        self.assertIn('advanced_modules', test_model, 'Missing advanced_modules')
+        self.assertEqual(test_model['advanced_modules']['value'], ['combinedopenended'], 'advanced_module is not updated')
+
+    def test_validate_and_update_from_json_wrong_inputs(self):
+        # input incorrectly formatted data
+        is_valid, errors, test_model = CourseMetadata.validate_and_update_from_json(
+            self.course,
+            {
+                "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
+                "days_early_for_beta": {"value": "supposed to be an integer",
+                                        "display_name": "Days Early for Beta Users", },
+                "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
+            },
+            user=self.user
+        )
+
+        # Check valid results from validate_and_update_from_json
+        self.assertFalse(is_valid)
+        self.assertEqual(len(errors), 3)
+        self.assertFalse(test_model)
+
+        error_keys = set([error_obj['model']['display_name'] for error_obj in errors])
+        test_keys = set(['Advanced Module List', 'Course Advertised Start Date', 'Days Early for Beta Users'])
+        self.assertEqual(error_keys, test_keys)
+
+        # try fresh fetch to ensure no update happened
+        fresh = modulestore().get_course(self.course.id)
+        test_model = CourseMetadata.fetch(fresh)
+
+        self.assertNotEqual(test_model['advertised_start']['value'], 1, 'advertised_start should not be updated to a wrong value')
+        self.assertNotEqual(test_model['days_early_for_beta']['value'], "supposed to be an integer",
+                            'days_early_for beta should not be updated to a wrong value')
+
+    def test_correct_http_status(self):
+        json_data = json.dumps({
+                        "advertised_start": {"value": 1, "display_name": "Course Advertised Start Date", },
+                        "days_early_for_beta": {"value": "supposed to be an integer",
+                                        "display_name": "Days Early for Beta Users", },
+                        "advanced_modules": {"value": 1, "display_name": "Advanced Module List", },
+                    })
+        response = self.client.ajax_post(self.course_setting_url, json_data)
+        self.assertEqual(400, response.status_code)
+
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(
             self.course,
@@ -487,6 +550,9 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['advertised_start']['value'], 'start B', "advertised_start not expected value")
 
     def update_check(self, test_model):
+        """
+        checks that updates were made
+        """
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')

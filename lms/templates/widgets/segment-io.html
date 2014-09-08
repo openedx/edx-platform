@@ -12,18 +12,8 @@
     // Access the query string, stripping the leading "?"
     var queryString = window.location.search.substring(1);
 
-    if (queryString != "") {
-      // Convert the query string to a key/value object
-      var parameters = window.parseQueryString(queryString);
+    window.identifyUser("${user.id}", "${user.email}", "${user.username}");
 
-      if ("signin" in parameters) {
-        window.assessUserSignIn(parameters, "${user.id}", "${user.email}", "${user.username}");
-      } else {
-        window.identifyUser("${user.id}", "${user.email}", "${user.username}");
-      }
-    } else {
-      window.identifyUser("${user.id}", "${user.email}", "${user.username}");
-    }
   % endif
 
   // Get current page URL

@@ -51,7 +51,7 @@ Create a Discussion Component
    course content. The values in the **Category** and **Subcategory** fields
    appear in the list of discussion topics on the **Discussion** page. To
    uniquely identify the discussion in your course, each **Category** /
-   **Subcategory** pair that you supply should be unique.
+   **Subcategory** pair that you supply must be unique.
 
    .. image:: ../Images/Discussion_category_subcategory.png
     :alt: The list of discussions with the "Answering More Than Once" topic indented under "Getting Graded"

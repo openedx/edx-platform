@@ -24,7 +24,7 @@ from xblock.fragment import Fragment
 
 import xmodule
 from xmodule.tabs import StaticTab, CourseTabList
-from xmodule.modulestore import ModuleStoreEnum, PublishState, EdxJSONEncoder
+from xmodule.modulestore import ModuleStoreEnum, EdxJSONEncoder
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
@@ -387,8 +387,7 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
     # then this item should be republished. This is used by staff locking to ensure that changing the draft
     # value of the staff lock will also update the published version, but only at the unit level.
     if publish == 'republish' and xblock.category not in DIRECT_ONLY_CATEGORIES:
-        published = modulestore().compute_publish_state(xblock) != PublishState.private
-        if published:
+        if modulestore().has_published_version(xblock):
             publish = 'make_public'
 
     # Make public after updating the xblock, in case the caller asked for both an update and a publish.
@@ -571,7 +570,7 @@ def _get_xblock(usage_key, user):
     """
     store = modulestore()
     try:
-        return store.get_item(usage_key)
+        return store.get_item(usage_key, depth=None)
     except ItemNotFoundError:
         if usage_key.category in CREATE_IF_NOT_FOUND:
             # Create a new one for certain categories only. Used for course info handouts.
@@ -595,6 +594,9 @@ def _get_module_info(xblock, rewrite_static_links=True):
             None,
             course_id=xblock.location.course_key
         )
+
+    # Pre-cache has changes for the entire course because we'll need it for the ancestor info
+    modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
 
     # Note that children aren't being returned until we have a use case.
     return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
@@ -659,7 +661,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = _compute_visibility_state(xblock, child_info, is_xblock_unit and has_changes)
     else:
         visibility_state = None
-    published = modulestore().compute_publish_state(xblock) != PublishState.private
+    published = modulestore().has_published_version(xblock)
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -667,7 +669,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "category": xblock.category,
         "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
         "published": published,
-        "published_on": get_default_time_display(xblock.published_date) if xblock.published_date else None,
+        "published_on": get_default_time_display(xblock.published_on) if xblock.published_on else None,
         "studio_url": xblock_studio_url(xblock, parent_xblock),
         "released_to_students": datetime.now(UTC) > xblock.start,
         "release_date": release_date,
@@ -756,7 +758,7 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes):
         return VisibilityState.needs_attention
     is_unscheduled = xblock.start == DEFAULT_START_DATE
     is_live = datetime.now(UTC) > xblock.start
-    children = child_info and child_info['children']
+    children = child_info and child_info.get('children', [])
     if children and len(children) > 0:
         all_staff_only = True
         all_unscheduled = True

@@ -45,7 +45,7 @@ See:
 Unit Publishing Status
 ***********************
 
-You publish units to make them visible to students.  Students see the last
+You publish units to make them visible to students. Students see the last
 published version of a unit if the section and subsection it is in are
 released.
 
@@ -56,15 +56,40 @@ experience.
 
 For more information, see :ref:`Unit Publishing Status`.
 
+You can publish all changes in a section or subsection at once, or publish
+changes to individual units.  See:
+
+* :ref:`Publish all Units in a Section`
+* :ref:`Publish all Units in a Subsection`
+* :ref:`Publish a Unit`
+
+
 .. _Content Hidden from Students:
 
 *****************************
 Content Hidden from Students
 *****************************
 
-You can :ref:`hide any unit from students<Hide a Unit from Students>`,
-regardless of the parent section and subsection's release dates.
+You can hide content from students. Such content is never visible to students,
+regardless of the release and publishing status.
 
 You might hide a unit from students, for example, when that unit contains an
-answer to a problem in that subsection. After the problem due date, you could
-make the unit with the answer visible.
+answer to a problem in another unit of that subsection. After the problem's due
+date, you could make the unit with the answer visible.
+
+You could also hide a unit from students if you wanted to use that unit to
+provide instructions or guidance meant only for course staff. Only course staff
+would see that unit in the course.
+
+You can hide content at different levels:
+
+* :ref:`Sections<Hide a Section from Students>`
+* :ref:`Subsections<Hide a Subsection from Students>`
+* :ref:`Units<Hide a Unit from Students>`
+
+.. warning::
+ When you make a previously hidden section or subsection visible to students,
+ not all content in the section or subsection is necessarily made visible to
+ students. If you also explicitly set a child subsection or unit to be hidden
+ from students, it remains hidden from students. Unpublished units remain
+ unpublished, and changes to published units remain unpublished.

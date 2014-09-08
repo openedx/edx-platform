@@ -127,27 +127,31 @@ formulaEquationPreview.enable = function () {
         }
 
         function display(latex) {
-            // Load jax if it failed before.
-            var previewElement = inputData.$preview[0];
-            if (!inputData.jax) {
-                inputData.jax = MathJax.Hub.getAllJax(previewElement)[0];
-            }
+            MathJax.Hub.Startup.signal.Interest(function (message) {
+                if(message === "End") {
+                    var previewElement = inputData.$preview[0];
+                    MathJax.Hub.Queue(function () {
+                        inputData.jax = MathJax.Hub.getAllJax(previewElement)[0];
+                    });
 
-            // MathJax might not be loaded yet (still).
-            if (inputData.jax) {
-                // Set the text as the latex code, and then update the MathJax.
-                MathJax.Hub.Queue(
-                    ['Text', inputData.jax, latex],
-                    ['Reprocess', inputData.jax]
-                );
-            }
-            else if (latex) {
-                console.warn("[FormulaEquationInput] Oops no mathjax for ", latex);
-                // Fall back to modifying the actual element.
-                var textNode = previewElement.childNodes[0];
-                textNode.data = "\\[" + latex + "\\]";
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, previewElement]);
-            }
+                    MathJax.Hub.Queue(function () {
+                        // Check if MathJax is loaded
+                        if (inputData.jax) {
+                            // Set the text as the latex code, and then update the MathJax.
+                            MathJax.Hub.Queue(
+                                ['Text', inputData.jax, latex],
+                                ['Reprocess', inputData.jax]
+                            );
+                        } else if (latex) {
+                            console.log("[FormulaEquationInput] Oops no mathjax for ", latex);
+                            // Fall back to modifying the actual element.
+                            var textNode = previewElement.childNodes[0];
+                            textNode.data = "\\[" + latex + "\\]";
+                            MathJax.Hub.Queue(["Typeset", MathJax.Hub, previewElement]);
+                        }
+                    });
+                }
+            });
         }
 
         if (response.error) {

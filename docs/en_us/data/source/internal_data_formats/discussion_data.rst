@@ -4,21 +4,34 @@
 Discussion Forums Data
 ######################
 
-EdX discussion data is stored as collections of JSON documents in a MongoDB database. MongoDB is a document-oriented, NoSQL database system. Documentation can be found at the mongodb_ web site.
+EdX discussion data is stored as collections of JSON documents in a MongoDB
+database. MongoDB is a document-oriented, NoSQL database system. Documentation
+can be found at the mongodb_ web site.
 
 ..  _mongodb: http://docs.mongodb.org/manual/
 
-In the data package, discussion data is delivered in a .mongo file, identified by organization and course, in this format: edX-*organization*-*course*-*source*.mongo. 
+In the data package, discussion data is delivered in a .mongo file, identified
+by organization and course, in this format:
+edX-*organization*-*course*-*source*.mongo.
 
-The primary collection that holds all of the discussion posts written by users is "contents". Two different types of objects are stored, representing the three levels of interactions that users can have in a discussion. 
+The primary collection that holds all of the discussion posts written by users
+is "contents". Two different types of objects are stored, representing the
+three levels of interactions that users can have in a discussion.
 
-* A ``CommentThread`` represents the first level of interaction: a post that opens a new thread, often a student question of some sort. 
+* A ``CommentThread`` represents the first level of interaction: a post that
+  opens a new thread, often a student question of some sort.
 
-* A ``Comment`` represents both the second and third levels of interaction: a response made directly to the conversation started by a ``CommentThread`` is a ``Comment``. Any further contributions made to a specific response are also in ``Comment`` objects.
+* A ``Comment`` represents both the second and third levels of interaction: a
+  response made directly to the conversation started by a ``CommentThread`` is
+  a ``Comment``. Any further contributions made to a specific response are also
+  in ``Comment`` objects.
 
-A sample of the field/value pairs that are in the mongo file, and descriptions of the attributes that these two types of objects share and that are specific to each type, follow.
+A sample of the field/value pairs that are in the mongo file, and descriptions
+of the attributes that these two types of objects share and that are specific
+to each type, follow.
 
-In addition to these collections, events are also emitted to track specific user activities. See :ref:`forum_events`.
+In addition to these collections, events are also emitted to track specific
+user activities. See :ref:`forum_events`.
 
 *********
 Samples
@@ -36,68 +49,72 @@ machine-readable format that can be difficult to read at a glance.
 
 .. code-block:: json
 
- { "_id" : { "$oid" : "50f1dd4ae05f6d2600000001" }, "_type" : "CommentThread", "anonymous" : 
- false, "anonymous_to_peers" : false, "at_position_list" : [], "author_id" : "NNNNNNN", 
- "author_username" : "AAAAAAAAAA", "body" : "Welcome to the edX101 forum!\n\nThis forum will 
- be regularly monitored by edX. Please post your questions and comments here. When asking a 
- question, don't forget to search the forum to check whether your question has already been 
- answered.\n\n", "closed" : false, "comment_count" : 0, "commentable_id" : "i4x-edX-edX101-
- course-How_to_Create_an_edX_Course", "course_id" : "edX/edX101/How_to_Create_an_edX_Course", 
- "created_at" : { "$date" : 1358028106904 }, "last_activity_at" : { "$date" : 1358134464424 }, 
- "tags_array" : [], "title" : "Welcome to the edX101 forum!", "updated_at" : { "$date" : 
- 1358134453862 }, "votes" : { "count" : 1, "down" : [], "down_count" : 0, "point" : 1, "up" : 
- [ "48" ], "up_count" : 1 } }
+ { "_id" : { "$oid" : "50f1dd4ae05f6d2600000001" }, "_type" : "CommentThread",
+ "anonymous" :false, "anonymous_to_peers" : false, "at_position_list" : [],
+ "author_id" : "NNNNNNN","author_username" : "AAAAAAAAAA", "body" : "Welcome to
+ the edX101 forum!\n\nThis forum willbe regularly monitored by edX. Please post
+ your questions and comments here. When asking aquestion, don't forget to
+ search the forum to check whether your question has already
+ beenanswered.\n\n", "closed" : false, "comment_count" : 0, "commentable_id" :
+ "i4x-edX-edX101-course-How_to_Create_an_edX_Course", "course_id" :
+ "edX/edX101/How_to_Create_an_edX_Course","created_at" : { "$date" :
+ 1358028106904 }, "last_activity_at" : { "$date" : 1358134464424 },"tags_array"
+ : [], "thread_type": "discussion", "title" : "Welcome to the edX101 forum!",
+ "updated_at" : { "$date" :1358134453862 }, "votes" : { "count" : 1, "down" :
+ [], "down_count" : 0, "point" : 1, "up" :[ "48" ], "up_count" : 1 } }
 
 If you use a JSON formatter to "pretty print" this document, a version that is
 more readable is produced.
 
 .. code-block:: json
 
-  {
-    "_id": {
-      "$oid": "50f1dd4ae05f6d2600000001"
-    },
-    "_type": "CommentThread",
-    "anonymous": false,
-    "anonymous_to_peers": false,
-    "at_position_list": [
-    
+ {
+  "_id": {
+    "$oid": "50f1dd4ae05f6d2600000001"
+  },
+  "_type": "CommentThread",
+  "anonymous": false,
+  "anonymous_to_peers": false,
+  "at_position_list": [
+ 
+  ],
+  "author_id": "NNNNNNN",
+  "author_username": "AAAAAAAAAA",
+  "body": "Welcome to the edX101 forum!\n\nThis forum will be regularly 
+  monitored by edX. Please post your questions and comments here. When 
+  asking a question, don't forget to search the forum to check whether 
+  your question has already been answered.\n\n",
+  "closed": false,
+  "comment_count": 0,
+  "commentable_id": "i4x-edX-edX101-course-How_to_Create_an_edX_Course",
+  "course_id": "edX\/edX101\/How_to_Create_an_edX_Course",
+  "created_at": {
+    "$date": 1358028106904
+  },
+  "last_activity_at": {
+    "$date": 1358134464424
+  },
+  "tags_array": [
+ 
+  ],
+  "thread_type": "discussion",
+  "title": "Welcome to the edX101 forum!",
+  "updated_at": {
+    "$date": 1358134453862
+  },
+  "votes": {
+    "count": 1,
+    "down": [
+ 
     ],
-    "author_id": "NNNNNNN",
-    "author_username": "AAAAAAAAAA",
-    "body": "Welcome to the edX101 forum!\n\nThis forum will be regularly monitored by edX. Please 
-    post your questions and comments here. When asking a question, don't forget to search the  
-    forum to check whether your question has already been answered.\n\n",
-    "closed": false,
-    "comment_count": 0,
-    "commentable_id": "i4x-edX-edX101-course-How_to_Create_an_edX_Course",
-    "course_id": "edX\/edX101\/How_to_Create_an_edX_Course",
-    "created_at": {
-      "$date": 1358028106904
-    },
-    "last_activity_at": {
-      "$date": 1358134464424
-    },
-    "tags_array": [
-    
+    "down_count": 0,
+    "point": 1,
+    "up": [
+      "48"
     ],
-    "title": "Welcome to the edX101 forum!",
-    "updated_at": {
-      "$date": 1358134453862
-    },
-    "votes": {
-      "count": 1,
-      "down": [
-      
-      ],
-      "down_count": 0,
-      "point": 1,
-      "up": [
-        "48"
-      ],
-      "up_count": 1
-    }
+    "up_count": 1
   }
+}
 
 ----------------------------------------
 Comment Document Example
@@ -105,71 +122,82 @@ Comment Document Example
 
 .. code-block:: json
 
- { "_id" : { "$oid" : "52e54fdd801eb74c33000070" }, "votes" : { "up" : [], "down" : [], 
- "up_count" : 0, "down_count" : 0, "count" : 0, "point" : 0 }, "visible" : true, 
- "abuse_flaggers" : [], "historical_abuse_flaggers" : [], "parent_ids" : [], "at_position_list" : 
- [], "body" : "I'm hoping this Demonstration course will help me figure out how to take the 
- course I registered for. I am just auditing the course, but I want to benefit from it as much 
- as possible, as I am extremely interested in it.\n", "course_id" : "edX/DemoX/Demo_Course", 
- "_type" : "Comment", "endorsed" : false, "anonymous" : false, "anonymous_to_peers" : false, 
- "author_id" : "NNNNNNN", "comment_thread_id" : { "$oid" : "52e4e880c0df1fa59600004d" }, 
- "author_username" : "AAAAAAAAAA", "sk" : "52e54fdd801eb74c33000070", "updated_at" : 
- { "$date" : 1390759901966 }, "created_at" : { "$date" : 1390759901966 } }
+ { "_id" : { "$oid" : "52e54fdd801eb74c33000070" }, "votes" : { "up" : [],
+ "down" : [], "up_count" : 0, "down_count" : 0, "count" : 0, "point" : 0 },
+ "visible" : true, "abuse_flaggers" : [], "historical_abuse_flaggers" : [],
+ "parent_ids" : [], "at_position_list" : [], "body" : "I'm hoping this
+ Demonstration course will help me figure out how to take the course I
+ registered for. I am just auditing the course, but I want to benefit from it
+ as much as possible, as I am extremely interested in it.\n", "course_id" :
+ "edX/DemoX/Demo_Course", "_type" : "Comment", "endorsed" : true, "endorsement"
+ : { "user_id" : "9", "time" : ISODate("2014-08-29T15:11:49.442Z") },
+ "anonymous" : false, "anonymous_to_peers" : false, "author_id" : "NNNNNNN",
+ "comment_thread_id" : { "$oid" : "52e4e880c0df1fa59600004d" },
+ "author_username" : "AAAAAAAAAA", "sk" : "52e54fdd801eb74c33000070",
+ updated_at" : { "$date" : 1390759901966 }, "created_at" : { "$date" :
+ 1390759901966 } }
 
 When pretty printed, this comment looks like this:
 
 .. code-block:: json
 
-  {
-    "_id": {
-      "$oid": "52e54fdd801eb74c33000070"
-    },
-    "votes": {
-      "up": [
-      
-      ],
-      "down": [
-      
-      ],
-      "up_count": 0,
-      "down_count": 0,
-      "count": 0,
-      "point": 0
-    },
-    "visible": true,
-    "abuse_flaggers": [
-    
+ {
+  "_id": {
+    "$oid": "52e54fdd801eb74c33000070"
+  },
+  "votes": {
+    "up": [
+ 
     ],
-    "historical_abuse_flaggers": [
-    
+    "down": [
+ 
     ],
-    "parent_ids": [
-    
-    ],
-    "at_position_list": [
-    
-    ],
-    "body": "I'm hoping this Demonstration course will help me figure out how to take the 
-    course I registered for. I am just auditing the course, but I want to benefit from it 
-    as much as possible, as I am extremely interested in it.\n",
-    "course_id": "edX\/DemoX\/Demo_Course",
-    "_type": "Comment",
-    "endorsed": false,
-    "anonymous": false,
-    "anonymous_to_peers": false,
-    "author_id": "NNNNNNN",
-    "comment_thread_id": {
-      "$oid": "52e4e880c0df1fa59600004d"
-    },
-    "author_username": "AAAAAAAAAA",
-    "sk": "52e54fdd801eb74c33000070",
-    "updated_at": {
-      "$date": 1390759901966
-    },
-    "created_at": {
-      "$date": 1390759901966
+    "up_count": 0,
+    "down_count": 0,
+    "count": 0,
+    "point": 0
+  },
+  "visible": true,
+  "abuse_flaggers": [
+ 
+  ],
+  "historical_abuse_flaggers": [
+ 
+  ],
+  "parent_ids": [
+ 
+  ],
+  "at_position_list": [
+ 
+  ],
+  "body": "I'm hoping this Demonstration course will help me figure out how 
+  to take the course I registered for. I am just auditing the course, but I 
+  want to benefit from it as much as possible, as I am extremely interested 
+  in it.\n",
+  "course_id": "edX\/DemoX\/Demo_Course",
+  "_type": "Comment",
+  "endorsed": true,
+  "endorsement": {
+    "user_id": "9",
+    "time": {
+      "$date": 1390759911966
     }
   }
+  "anonymous": false,
+  "anonymous_to_peers": false,
+  "author_id": "NNNNNNN",
+  "comment_thread_id": {
+    "$oid": "52e4e880c0df1fa59600004d"
+  },
+  "author_username": "AAAAAAAAAA",
+  "sk": "52e54fdd801eb74c33000070",
+  "updated_at": {
+    "$date": 1390759901966
+  },
+  "created_at": {
+    "$date": 1390759901966
+  }
+}
 
 *****************
 Shared Fields
@@ -300,6 +328,13 @@ title
 --------------------
   Title of the thread. UTF-8 string.
 
+--------------------
+thread_type
+--------------------
+  Identifies the type of post as a "question" or "discussion".  
+
+  **History**: Added 4 Sep 2014.
+
 ********************
 Comment Fields
 ********************
@@ -326,7 +361,24 @@ historical_abuse_flaggers
 --------------------
 endorsed
 --------------------
-  Boolean value, true if a forum moderator or instructor has marked that this ``Comment`` is a correct answer for whatever question the thread was asking. Exists for Comments that are replies to other Comments, but in that case ``endorsed`` is always false because there's no way to endorse such comments through the UI.
+  Boolean value. True if a forum moderator has marked this response to a
+  ``CommentThread`` with a ``thread_type`` of "discussion" as a valuable
+  contribution, or if a forum moderator or the originator of a
+  ``CommentThread`` with a ``thread_type`` of "question" has marked this
+  response as the correct answer.
+
+  The ``endorsed`` field is present for comments that are made as replies to
+  responses, but in these cases the value is always false: the user interface
+  does not offer a way to endorse comments.
+
+--------------------
+endorsement
+--------------------
+  Contains ``time`` and ``user_id`` fields for the date and time that this
+  response to a post was endorsed and the numeric user ID (from
+  ``auth_user.id``) of the person who endorsed it.
+
+  **History**: Added 4 Sep 2014.
 
 --------------------
 comment_thread_id

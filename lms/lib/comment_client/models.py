@@ -35,7 +35,7 @@ class Model(object):
             return self.__getattr__(name)
 
     def __setattr__(self, name, value):
-        if name == 'attributes' or name not in self.accessible_fields:
+        if name == 'attributes' or name not in (self.accessible_fields + self.updatable_fields):
             super(Model, self).__setattr__(name, value)
         else:
             self.attributes[name] = value
@@ -46,7 +46,7 @@ class Model(object):
         return self.attributes.get(key)
 
     def __setitem__(self, key, value):
-        if key not in self.accessible_fields:
+        if key not in (self.accessible_fields + self.updatable_fields):
             raise KeyError("Field {0} does not exist".format(key))
         self.attributes.__setitem__(key, value)
 

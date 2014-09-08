@@ -17,6 +17,7 @@ import sys
 import logging
 import copy
 import re
+import threading
 from uuid import uuid4
 
 from bson.son import SON
@@ -43,6 +44,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from xmodule.exceptions import HeartbeatFailure
+from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +138,7 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
             return False
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem):
+class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
@@ -232,25 +234,16 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     metadata_to_inherit = self.cached_metadata.get(unicode(non_draft_loc), {})
                     inherit_metadata(module, metadata_to_inherit)
 
-                edit_info = json_data.get('edit_info')
+                module._edit_info = json_data.get('edit_info')
 
-                # migrate published_by and published_date if edit_info isn't present
-                if not edit_info:
-                    module.edited_by = module.edited_on = module.subtree_edited_on = \
-                        module.subtree_edited_by = module.published_date = None
+                # migrate published_by and published_on if edit_info isn't present
+                if module._edit_info is None:
+                    module._edit_info = {}
                     raw_metadata = json_data.get('metadata', {})
-                    # published_date was previously stored as a list of time components instead of a datetime
+                    # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module.published_date = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
-                    module.published_by = raw_metadata.get('published_by')
-                # otherwise restore the stored editing information
-                else:
-                    module.edited_by = edit_info.get('edited_by')
-                    module.edited_on = edit_info.get('edited_on')
-                    module.subtree_edited_on = edit_info.get('subtree_edited_on')
-                    module.subtree_edited_by = edit_info.get('subtree_edited_by')
-                    module.published_date = edit_info.get('published_date')
-                    module.published_by = edit_info.get('published_by')
+                        module._edit_info['published_date'] = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                    module._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 # decache any computed pending field settings
                 module.save()
@@ -314,6 +307,42 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             self.module_data[location] = json
 
         return json
+
+    def get_edited_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('edited_by')
+
+    def get_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('edited_on')
+
+    def get_subtree_edited_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('subtree_edited_by')
+
+    def get_subtree_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('subtree_edited_on')
+
+    def get_published_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('published_by')
+
+    def get_published_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edit_info.get('published_date')
 
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
@@ -414,7 +443,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         # performance optimization to prevent updating the meta-data inheritance tree during
         # bulk write operations
-        self.ignore_write_events_on_courses = set()
+        self.ignore_write_events_on_courses = threading.local()
         self._course_run_cache = {}
 
     def close_connections(self):
@@ -435,27 +464,36 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         connection.drop_database(self.collection.database)
         connection.close()
 
-    def _begin_bulk_write_operation(self, course_id):
+    def _begin_bulk_operation(self, course_id):
         """
         Prevent updating the meta-data inheritance cache for the given course
         """
-        self.ignore_write_events_on_courses.add(course_id)
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            self.ignore_write_events_on_courses.courses = set()
 
-    def _end_bulk_write_operation(self, course_id):
+        self.ignore_write_events_on_courses.courses.add(course_id)
+
+    def _end_bulk_operation(self, course_id):
         """
         Restart updating the meta-data inheritance cache for the given course.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.
         """
-        if course_id in self.ignore_write_events_on_courses:
-            self.ignore_write_events_on_courses.remove(course_id)
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            return
+
+        if course_id in self.ignore_write_events_on_courses.courses:
+            self.ignore_write_events_on_courses.courses.remove(course_id)
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
     def _is_bulk_write_in_progress(self, course_id):
         """
         Returns whether a bulk write operation is in progress for the given course.
         """
+        if not hasattr(self.ignore_write_events_on_courses, 'courses'):
+            return False
+
         course_id = course_id.for_branch(None)
-        return course_id in self.ignore_write_events_on_courses
+        return course_id in self.ignore_write_events_on_courses.courses
 
     def fill_in_run(self, course_key):
         """
@@ -1143,15 +1181,20 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             payload = {
                 'definition.data': definition_data,
                 'metadata': self._serialize_scope(xblock, Scope.settings),
-                'edit_info.edited_on': now,
-                'edit_info.edited_by': user_id,
-                'edit_info.subtree_edited_on': now,
-                'edit_info.subtree_edited_by': user_id,
+                'edit_info': {
+                    'edited_on': now,
+                    'edited_by': user_id,
+                    'subtree_edited_on': now,
+                    'subtree_edited_by': user_id,
+                }
             }
 
             if isPublish:
-                payload['edit_info.published_date'] = now
-                payload['edit_info.published_by'] = user_id
+                payload['edit_info']['published_date'] = now
+                payload['edit_info']['published_by'] = user_id
+            elif 'published_date' in getattr(xblock, '_edit_info', {}):
+                payload['edit_info']['published_date'] = xblock._edit_info['published_date']
+                payload['edit_info']['published_by'] = xblock._edit_info['published_by']
 
             if xblock.has_children:
                 children = self._serialize_scope(xblock, Scope.children)
@@ -1171,17 +1214,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 self._update_ancestors(xblock.scope_ids.usage_id, ancestor_payload)
 
             # update the edit info of the instantiated xblock
-            xblock.edited_on = now
-            xblock.edited_by = user_id
-            xblock.subtree_edited_on = now
-            xblock.subtree_edited_by = user_id
-            if not hasattr(xblock, 'published_date'):
-                xblock.published_date = None
-            if not hasattr(xblock, 'published_by'):
-                xblock.published_by = None
-            if isPublish:
-                xblock.published_date = now
-                xblock.published_by = user_id
+            xblock._edit_info = payload['edit_info']
 
             # recompute (and update) the metadata inheritance tree which is cached
             self.refresh_cached_metadata_inheritance_tree(xblock.scope_ids.usage_id.course_key, xblock.runtime)
@@ -1218,6 +1251,38 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     jsonfields[field_name] = field.read_json(xblock)
         return jsonfields
 
+    def _get_non_orphan_parents(self, location, parents, revision):
+        """
+        Extract non orphan parents by traversing the list of possible parents and remove current location
+        from orphan parents to avoid parents calculation overhead next time.
+        """
+        non_orphan_parents = []
+        for parent in parents:
+            parent_loc = Location._from_deprecated_son(parent['_id'], location.course_key.run)
+
+            # travel up the tree for orphan validation
+            ancestor_loc = parent_loc
+            while ancestor_loc is not None:
+                current_loc = ancestor_loc
+                ancestor_loc = self._get_raw_parent_location(current_loc, revision)
+                if ancestor_loc is None:
+                    # The parent is an orphan, so remove all the children including
+                    # the location whose parent we are looking for from orphan parent
+                    self.collection.update(
+                        {'_id': parent_loc.to_deprecated_son()},
+                        {'$set': {'definition.children': []}},
+                        multi=False,
+                        upsert=True,
+                        safe=self.collection.safe
+                    )
+                elif ancestor_loc.category == 'course':
+                    # once we reach the top location of the tree and if the location is not an orphan then the
+                    # parent is not an orphan either
+                    non_orphan_parents.append(parent_loc)
+                    break
+
+        return non_orphan_parents
+
     def _get_raw_parent_location(self, location, revision=ModuleStoreEnum.RevisionOption.published_only):
         '''
         Helper for get_parent_location that finds the location that is the parent of this location in this course,
@@ -1244,10 +1309,18 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         if revision == ModuleStoreEnum.RevisionOption.published_only:
             if parents.count() > 1:
-                # should never have multiple PUBLISHED parents
-                raise ReferentialIntegrityError(
-                    u"{} parents claim {}".format(parents.count(), location)
-                )
+                non_orphan_parents = self._get_non_orphan_parents(location, parents, revision)
+                if len(non_orphan_parents) == 0:
+                    # no actual parent found
+                    return None
+
+                if len(non_orphan_parents) > 1:
+                    # should never have multiple PUBLISHED parents
+                    raise ReferentialIntegrityError(
+                        u"{} parents claim {}".format(parents.count(), location)
+                    )
+                else:
+                    return non_orphan_parents[0]
             else:
                 # return the single PUBLISHED parent
                 return Location._from_deprecated_son(parents[0]['_id'], location.course_key.run)
@@ -1255,9 +1328,20 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             # there could be 2 different parents if
             #   (1) the draft item was moved or
             #   (2) the parent itself has 2 versions: DRAFT and PUBLISHED
+            #  if there are multiple parents with version PUBLISHED then choose from non-orphan parents
+            all_parents = []
+            published_parents = 0
+            for parent in parents:
+                if parent['_id']['revision'] is None:
+                    published_parents += 1
+                all_parents.append(parent)
 
             # since we sorted by SORT_REVISION_FAVOR_DRAFT, the 0'th parent is the one we want
-            found_id = parents[0]['_id']
+            if published_parents > 1:
+                non_orphan_parents = self._get_non_orphan_parents(location, all_parents, revision)
+                return non_orphan_parents[0]
+
+            found_id = all_parents[0]['_id']
             # don't disclose revision outside modulestore
             return Location._from_deprecated_son(found_id, location.course_key.run)
 

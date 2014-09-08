@@ -42,6 +42,9 @@ $very-light-text: #fff;
 
 // ====================
 
+// COLORS - utility
+$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
+
 // COLORS
 $black: rgb(0,0,0);
 $black-t0: rgba($black, 0.125);

@@ -16,7 +16,6 @@ from edxmako.shortcuts import render_to_response
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -92,7 +91,7 @@ class ChooseModeView(View):
             )
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(course_key, None)
+        chosen_price = donation_for_course.get(unicode(course_key), None)
 
         course = modulestore().get_course(course_key)
         context = {
@@ -164,7 +163,7 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_key] = amount_value
+            donation_for_course[unicode(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             return redirect(

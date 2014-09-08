@@ -9,7 +9,6 @@ if Backbone?
     actions:
       editable: '.admin-edit'
       can_reply: '.discussion-reply'
-      can_endorse: '.admin-endorse'
       can_delete: '.admin-delete'
       can_openclose: '.admin-openclose'
 
@@ -20,6 +19,9 @@ if Backbone?
 
     can: (action) ->
       (@get('ability') || {})[action]
+
+    # Default implementation
+    canBeEndorsed: -> false
 
     updateInfo: (info) ->
       if info
@@ -106,13 +108,21 @@ if Backbone?
       @get("abuse_flaggers").pop(window.user.get('id'))
       @trigger "change", @
 
+    isFlagged: ->
+      user = DiscussionUtil.getUser()
+      flaggers = @get("abuse_flaggers")
+      user and (user.id in flaggers or (DiscussionUtil.isPrivilegedUser(user.id) and flaggers.length > 0))
+
+    incrementVote: (increment) ->
+      newVotes = _.clone(@get("votes"))
+      newVotes.up_count = newVotes.up_count + increment
+      @set("votes", newVotes)
+
     vote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
-      @trigger "change", @
+      @incrementVote(1)
 
     unvote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
-      @trigger "change", @
+      @incrementVote(-1)
     
   class @Thread extends @Content
     urlMappers:
@@ -186,6 +196,13 @@ if Backbone?
       @get('comments').each (comment) ->
         count += comment.getCommentsCount() + 1
       count
+
+    canBeEndorsed: =>
+      user_id = window.user.get("id")
+      user_id && (
+        DiscussionUtil.isPrivilegedUser(user_id) ||
+        (@get('thread').get('thread_type') == 'question' && @get('thread').get('user_id') == user_id)
+      )
 
   class @Comments extends Backbone.Collection
 

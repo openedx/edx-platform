@@ -2,95 +2,56 @@
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
 
+<%namespace name='static' file='../static_content.html'/>
+
+## IMPORTANT: In order to keep js tests valid and relevant, please be sure to update the appropriate HTML in
+## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <div class="thread-content-wrapper"></div>
-        <div class="response-count"/>
-        <div class="add-response">
-            <button class="button add-response-btn">
-                <i class="icon icon-reply"></i>
-                <span class="add-response-btn-text">${_('Add A Response')}</span>
-            </button>
-        </div>
-        <ol class="responses"/>
-        <div class="response-pagination"/>
-        <div class="post-status-closed bottom-post-status" style="display: none">
-          ${_("This thread is closed.")}
-        </div>
-        % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
-        <form class="discussion-reply-new" data-id="${'<%- id %>'}">
-            <h4>${_("Post a response:")}</h4>
-            <ul class="discussion-errors"></ul>
-            <div class="reply-body" data-id="${'<%- id %>'}"></div>
-            <div class="reply-post-control">
-                <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
+        <div class="thread-wrapper">
+            <div class="forum-thread-main-wrapper">
+                <div class="thread-content-wrapper"></div>
+                <div class="post-extended-content">
+                    <ol class="responses js-marked-answer-list"></ol>
+                </div>
             </div>
-        </form>
-        % endif
+            <div class="post-extended-content">
+                <div class="response-count"/>
+                <div class="add-response">
+                    <button class="button add-response-btn">
+                        <i class="icon icon-reply"></i>
+                        <span class="add-response-btn-text">${_('Add A Response')}</span>
+                    </button>
+                </div>
+                <ol class="responses js-response-list"/>
+                <div class="response-pagination"/>
+                <div class="post-status-closed bottom-post-status" style="display: none">
+                  ${_("This thread is closed.")}
+                </div>
+                % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
+                <form class="discussion-reply-new" data-id="${'<%- id %>'}">
+                    <h4>${_("Post a response:")}</h4>
+                    <ul class="discussion-errors"></ul>
+                    <div class="reply-body" data-id="${'<%- id %>'}"></div>
+                    <div class="reply-post-control">
+                        <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
+                    </div>
+                </form>
+                % endif
+            </div>
+        </div>
+        <div class="post-tools">
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> ${_("Expand discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> ${_("Collapse discussion")}</a>
+        </div>
     </article>
 </script>
 
-<script aria-hidden="true" type="text/template" id="thread-show-template">
-  <div class="discussion-post">
-      <header>
-      ${"<% if (obj.group_id) { %>"}
-      <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}
-
-          <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
-          <h1>${'<%- title %>'}</h1>
-          <p class="posted-details">
-              ${"<% if (obj.username) { %>"}
-              <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-              ${"<% } else { %>"}
-              ${_('anonymous') | h}
-              ${"<% } %>"}
-              <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
-
-              <span class="post-status-closed top-post-status" style="display: none">
-                ${_("&bull; This thread is closed.")}
-              </span>
-          </p>
-          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="${_('follow') | h}" role="checkbox" aria-checked="false">
-            <span class="sr">${_("Follow this post")}</span>
-          </a>
-      </header>
-
-      <div class="post-body">${'<%- body %>'}</div>
-      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
-
-
-      % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
-
-      %else:
-      ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned">
-      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pinned")}</span></div>
-      ${"<% }  %>"}
-      % endif
-
-      <%  js_block = u"""
-          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
-          print(interpolate('{}', {{'courseware_title_linked': courseware_link}}, true));
-          """.format(
-                  ## Translators: 'courseware_title_linked' is a placeholder for the title of the courseware unit referenced by this discussion thread.
-                  escapejs(_("(this post is about %(courseware_title_linked)s)"))
-              )
-      %>
-      ${'<% if (obj.courseware_url) { %>'}
-          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
-      ${'<% } %>'}
-
-      <ul class="moderator-actions">
-          <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
-          <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
-          <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
-      </ul>
-  </div>
+% for template_name in ['thread-show']:
+<script aria-hidden="true" type="text/template" id="${template_name}-template">
+    <%static:include path="js/discussion/${template_name}.underscore" />
 </script>
+% endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
   <div class="discussion-post edit-post-form">
@@ -110,8 +71,12 @@
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
+    <a href="#" class="action-show-comments">
+        ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(escapejs(_("Show Comments (%(num_comments)s)")))}
+        <i class="icon icon-caret-down"></i>
+    </a>
     <ol class="comments">
-        <li class="new-comment response-local">
+        <li class="new-comment">
             % if course is UNDEFINED or has_permission(user, 'create_sub_comment', course.id):
             <form class="comment-form" data-id="${'<%- wmdId %>'}">
                 <ul class="discussion-errors"></ul>
@@ -128,25 +93,59 @@
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-show-template">
-    <header class="response-local">
-        <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
-        <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
-        ${"<% if (obj.username) { %>"}
-        <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
-        ${"<% } else { %>"}
-        <span class="anonymous"><em>${_('anonymous')}</em></span>
-        ${"<% } %>"}
-        <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
+    <header>
+      <div class="response-header-content">
+        ${'<%= author_display %>'}
+        <p class="posted-details">
+            <span class="timeago" title="${'<%= created_at %>'}">${'<%= created_at %>'}</span>
+            <%
+            js_block = u"""
+                interpolate(
+                    thread.get("thread_type") == "question" ?
+                      (endorsement.username ? "{question_user_fmt_str}" : "{question_anon_fmt_str}") :
+                      (endorsement.username ? "{discussion_user_fmt_str}" : "{discussion_anon_fmt_str}"),
+                    {{
+                        'time_ago': '<span class="timeago" title="' + endorsement.time + '">' + endorsement.time + '</span>',
+                        'user': endorser_display
+                    }},
+                    true
+                )""".format(
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    question_user_fmt_str=escapejs(_("marked as answer %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    question_anon_fmt_str=escapejs(_("marked as answer %(time_ago)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_user_fmt_str=escapejs(_("endorsed %(time_ago)s by %(user)s")),
+                    ## Translators: time_ago is a placeholder for a fuzzy, relative timestamp
+                    ## like "4 hours ago" or "about a month ago"
+                    discussion_anon_fmt_str=escapejs(_("endorsed %(time_ago)s")),
+                )
+            %>
+              ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
+          </p>
+          <div class="post-labels">
+              <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+          </div>
+          </div>
+          <div class="response-header-actions">
+            ${"""<%=
+                _.template(
+                    $('#forum-actions').html(),
+                    {
+                        contentId: cid,
+                        contentType: 'response',
+                        primaryActions: ['vote', thread.get('thread_type') == 'question' ? 'answer' : 'endorse'],
+                        secondaryActions: ['edit', 'delete', 'report']
+                    }
+                )
+            %>"""}
+          </div>
     </header>
-    <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
-    </div>
-    <ul class="moderator-actions response-local">
-        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
-        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
-        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
-    </ul>
+
+    <div class="response-body">${"<%- body %>"}</div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-edit-template">
@@ -164,31 +163,34 @@
 <script aria-hidden="true" type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse') | h}" role="button" aria-pressed="false" tabindex="0">
-      <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
-    <div style="display: none" class="discussion-delete-comment action-delete" data-tooltip="${_('Delete Comment') | h}" role="button" tabindex="0">
-      <i class="icon icon-remove"></i><span class="sr">${_("Delete Comment")}</span></div>
-    <div class="discussion-edit-comment action-edit" data-tooltip="${_('Edit') | h}" role="button" tabindex="0">
-      <i class="icon icon-pencil"></i><span class="sr">${_("Edit")}</span></div>
-      <%
-      js_block = u"""
-        interpolate(
-          '{}',
-          {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
-          true
-          )""".format(
-                 ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
-                 escapejs(_('-posted %(time_ago)s by'))
-               )
-             %>
-      <p class="posted-details">
-      ${'<%='}${js_block}${'%>'}
-      ${"<% if (obj.username) { %>"}
-      <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
-      ${"<% } else { %>"}
-      ${_('anonymous')}
-      ${"<% } %>"}
+    ${"""<%=
+        _.template(
+            $('#forum-actions').html(),
+            {
+                contentId: cid,
+                contentType: 'comment',
+                primaryActions: [],
+                secondaryActions: ['edit', 'delete', 'report']
+            }
+        )
+    %>"""}
+    <%
+    js_block = u"""
+      interpolate(
+        '{}',
+        {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>', 'author': author_display}},
+        true
+      )""".format(
+        ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago)
+        escapejs(_('posted %(time_ago)s by %(author)s'))
+      )
+    %>
+    <p class="posted-details">
+    ${'<%='}${js_block}${'%>'}
     </p>
+    <div class="post-labels">
+      <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+    </div>
   </div>
 </script>
 
@@ -207,22 +209,45 @@
 <script aria-hidden="true" type="text/template" id="thread-list-item-template">
   <li data-id="${'<%- id %>'}" class="forum-nav-thread${'<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>'}">
     <a href="#" class="forum-nav-thread-link">
-      <div class="forum-nav-thread-wrapper-1">
+      <div class="forum-nav-thread-wrapper-0">
+        ${u"""<%
+        var icon_class, sr_text;
+        if (thread_type == "discussion") {{
+            icon_class = "icon-comments";
+            sr_text = "{discussion}";
+        }} else if (endorsed) {{
+            icon_class = "icon-ok";
+            sr_text = "{answered_question}";
+        }} else {{
+            icon_class = "icon-question";
+            sr_text = "{unanswered_question}";
+        }}
+        %>""".format(
+            ## Translators: This is a label for a Discussion forum thread
+            discussion=escapejs(_("discussion")),
+            ## Translators: This is a label for a Question forum thread with a marked answer
+            answered_question=escapejs(_("answered question")),
+            ## Translators: This is a label for a Question forum thread without a marked answer
+            unanswered_question=escapejs(_("unanswered question"))
+        )}
+        <span class="sr">${"<%= sr_text %>"}</span>
+        <i class="icon ${"<%= icon_class %>"}"></i>
+      </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
         js_block = u"""
         var labels = "";
         if (pinned) {{
-            labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
         }}
         if (typeof(subscribed) != "undefined" && subscribed) {{
-            labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+            labels += '<li class="post-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
         }}
         if (staff_authored) {{
-            labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
         }}
         if (community_ta_authored) {{
-            labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
         }}
         if (labels != "") {{
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -240,10 +265,6 @@
          %>
         ${"<%"}${js_block}${"%>"}
       </div><div class="forum-nav-thread-wrapper-2">
-        ${"<% if (endorsed) { %>"}
-          ## Translators: This is a label for a forum thread with a response that was endorsed by the course staff
-          <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">${_("Endorsed response")}</span></span>
-        ${"<% } %>"}
         <%
         js_block = u"""
             interpolate(
@@ -257,7 +278,7 @@
             )
         %>
         <span class="forum-nav-thread-votes-count">+${'<%='}${js_block}${'%>'}</span>
-        <% 
+        <%
         js_block =  u"""
         var fmt;
         // Counts in data do not include the post itself, but the UI should
@@ -345,8 +366,7 @@
           </tr>
         </table>
       % endif
-
-  </div>
+     </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="search-alert-template">
@@ -361,107 +381,222 @@
     </div>
 </script>
 
-<script aria-hidden="true" type="text/template" id="new-post-tab-template">
-    <div class="inner-wrapper">
-        <form class="new-post-form">
-            <div class="left-column">
-                <!-- BEGIN topic dropdown -->
-                ${'<%= topic_dropdown_html %>'}
-                <!-- END topic dropdown -->
-                <!-- BEGIN options -->
-                ${'<%= options_html %>'}
-                <!-- END options -->
-            </div>
-            <div class="right-column">
-                <!-- BEGIN errors display -->
-                <ul class="new-post-form-errors"></ul>
-                <!-- END errors display -->
-                <!-- BEGIN content editor -->
-                ${'<%= editor_html %>'}
-                <!-- END content editor -->
-            </div>
-        </form>
-    </div>
-</script>
-
-<script aria-hidden="true" type="text/template" id="new-post-inline-template">
-    <div class="inner-wrapper">
-        <!-- BEGIN errors display -->
-        <div class="new-post-form-errors">
+<script aria-hidden="true" type="text/template" id="new-post-template">
+    <form class="forum-new-post-form">
+        <ul class="post-errors" style="display: none"></ul>
+        <div class="post-field">
+            <div class="field-label">
+                <span class="field-label-text">
+                    ## Translators: This is the label for a control to
+                    ## select a forum post type
+                    ${_("Post type:")}
+                </span><fieldset class="field-input">
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
+                    <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                        <i class="icon icon-question"></i>
+                        ## Translators: This is a forum post type
+                        ${_("Question")}
+                    </label>
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
+                    <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                        <i class="icon icon-comments"></i>
+                        ## Translators: This is a forum post type
+                        ${_("Discussion")}
+                    </label>
+                </fieldset>
+            </div><span class="field-help">
+                ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
+            </span>
         </div>
-        <!-- END errors display -->
-        <form class="new-post-form">
-            <!-- BEGIN content editor -->
-            ${'<%= editor_html %>'}
-            <!-- END content editor -->
-            <!-- BEGIN options -->
-            ${'<%= options_html %>'}
-            <!-- END options -->
-        </form>
-    </div>
+        ${'<% if (mode=="tab") { %>'}
+        <div class="post-field">
+            ## Using div here instead of label because we are using a non-native control
+            <div class="field-label">
+                <span class="field-label-text">
+                    ${_("Topic Area:")}
+                </span><div class="field-input post-topic">
+                    <a href="#" class="post-topic-button">
+                        <span class="sr">${_("Discussion topics; current selection is: ")}</span>
+                        <span class="js-selected-topic"></span>
+                        <span class="drop-arrow" aria-hidden="true">▾</span>
+                    </a>
+                    <div class="topic-menu-wrapper">
+                        <label class="topic-filter-label">
+                            <span class="sr">${_("Filter topics")}</span>
+                            <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                        </label>
+                        <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
+                   </div>
+               </div>
+            </div><span class="field-help">
+                ${_("Add your post to a relevant topic to help others find it.")}
+            </span>
+        </div>
+        ${'<% } %>'}
+        ${'<% if (cohort_options) { %>'}
+        <div class="post-field">
+            <label class="field-label">
+                <span class="field-label-text">
+                    ## Translators: This labels the selector for which group of students can view a post
+                    ${_("Visible To:")}
+                </span><select class="field-input js-group-select" name="group_id">
+                    <option value="">${_("All Groups")}</option>
+                    ${'<% _.each(cohort_options, function(opt) { %>'}
+                    <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
+                    ${'<% }); %>'}
+                 </select>
+            </label><div class="field-help">
+                ${_("Instructors can set whether a post in a cohorted topic is visible to all cohorts or only to a specific cohort.")}
+            </div>
+        </div>
+        ${'<% } %>'}
+        <div class="post-field">
+            <label class="field-label">
+                <span class="sr">${_("Title:")}</span>
+                <input type="text" class="field-input js-post-title" name="title" placeholder="${_('Title')}">
+            </label><span class="field-help">
+                ${_("Add a clear and descriptive title to encourage participation.")}
+            </span>
+        </div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="${_(u'Enter your question or comment…')}"></div>
+        <div class="post-options">
+            <label class="post-option is-enabled">
+                <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
+                <i class="icon icon-star"></i>${_("follow this post")}
+            </label>
+            ${'<% if (allow_anonymous) { %>'}
+            <label class="post-option">
+                <input type="checkbox" name="anonymous" class="post-option-input js-anon">
+                ${_("post anonymously")}
+            </label>
+            ${'<% } %>'}
+            ${'<% if (allow_anonymous_to_peers) { %>'}
+            <label class="post-option">
+                <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
+                ${_("post anonymously to classmates")}
+            </label>
+            ${'<% } %>'}
+        </div>
+        <div>
+            <input type="submit" class="submit" value="${_('Add Post')}">
+            <a href="#" class="cancel">${_('Cancel')}</a>
+        </div>
+    </form>
 </script>
 
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">
-    <li role="menuitem"><a href="#" class="topic" data-discussion_id="${'<%- id %>'}" aria-describedby="topic-name-span-${'<%- id %>'}" cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a></li>
-</script>
-
-<script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
-    <li role="menuitem">
-        <a href="#"><span class="category-menu-span">${'<%- text %>'}</span></a>
-        <ul role="menu">${'<%= entries %>'}</ul>
+    <li role="menuitem" class="topic-menu-item">
+        <a href="#" class="topic-title" data-discussion-id="${'<%- id %>'}" data-cohorted="${'<%- is_cohorted %>'}">${'<%- text %>'}</a>
     </li>
 </script>
 
-<script aria-hidden="true" type="text/template" id="new-post-topic-dropdown-template">
-    <span class="topic-dropdown-label" id="topic-dropdown-label">${_("Create new post about:")}</span>
-    <div class="form-topic-drop">
-        <a href="#" aria-labelledby="topic-dropdown-label" class="topic_dropdown_button">${_("Show All Discussions")}<span class="drop-arrow" aria-hidden="true">▾</span></a>
-        <div class="topic_menu_wrapper">
-            <div class="topic_menu_search" role="menu">
-                <label class="sr" for="browse-topic-newpost">${_("Filter List")}</label>
-                <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="${_('Filter discussion areas')}">
+<script aria-hidden="true" type="text/template" id="new-post-menu-category-template">
+    <li role="menuitem" class="topic-menu-item">
+        <span class="topic-title">${'<%- text %>'}</span>
+        <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
+    </li>
+</script>
+
+<%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-button action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                </span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${primaryAction("endorse", "ok", _("Endorse"), _("Endorse"), _("Unendorse"))}
+${primaryAction("answer", "ok", _("Mark as Answer"), _("Mark as Answer"), _("Unmark as Answer"))}
+${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
+
+<script type="text/template" id="forum-action-vote">
+    <li class="actions-item">
+        <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
+            ## Vote counts are populated by JS
+            <span class="sr">${_("Vote")}</span>
+            <span class="sr js-sr-vote-count"></span>
+
+            <span class="action-label" aria-hidden="true">
+              <span class="js-visual-vote-count"></span>
+            </span>
+
+            <span class="action-icon" aria-hidden="true">
+                <i class="icon icon-plus"></i>
+            </span>
+        </a>
+    </li>
+</script>
+
+<%def name="secondaryStateAction(action_class, icon, sr_label, unchecked_label, checked_label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="checkbox" aria-checked="false">
+                <span class="sr">${sr_label}</span>
+                <span class="action-label" aria-hidden="true">
+                    <span class="label-unchecked">${unchecked_label}</span>
+                    <span class="label-checked">${checked_label}</span>
+                </span>
+                <span class="action-icon">
+                  <i class="icon icon-${icon}"></i>
+                </span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Unreport"))}
+${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Unpin"))}
+${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
+
+<%def name="secondaryAction(action_class, icon, label)">
+    <script type="text/template" id="forum-action-${action_class}">
+        <li class="actions-item">
+            <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="button">
+                <span class="action-label">${label}</span>
+                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+            </a>
+        </li>
+    </script>
+</%def>
+
+${secondaryAction("edit", "pencil", _("Edit"))}
+${secondaryAction("delete", "remove", _("Delete"))}
+
+<script type="text/template" id="forum-actions">
+    <ul class="${"<%= contentType %>"}-actions-list">
+        ${"<% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+        <li class="actions-item is-visible">
+            <div class="more-wrapper">
+                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
+                    <span class="action-label">${_("More")}</span>
+                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                </a>
+                <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
+                  <ul class="actions-dropdown-list">
+                    ${"<% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html(), {})) }) %>"}
+                  </ul>
+                </div>
             </div>
-            <ul class="topic_menu" role="menu">${'<%= topics_html %>'}</ul>
-        </div>
-    </div>
+        </li>
+    </ul>
 </script>
 
-<script aria-hidden="true" type="text/template" id="new-post-options-template">
-    <div class="options">
-        <input type="checkbox" name="follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">${_("follow this post")}</label>
-        ${'<% if (allow_anonymous) { %>'}
-        <br>
-        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous">
-        <label for="new-post-anonymous">${_("post anonymously")}</label>
-        ${'<% } %>'}
-        ${'<% if (allow_anonymous_to_peers) { %>'}
-        <br>
-        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers">
-        <label for="new-post-anonymous-to-peers">${_("post anonymously to classmates")}</label>
-        ${'<% } %>'}
-        ${'<% if (cohort_options) { %>'}
-        <div class="form-group-label choose-cohort">
-            ## Translators: This labels the selector for which group of students can view a post
-            ${_("Make visible to:")}
-            <select class="group-filter-select new-post-group" name="group_id">
-                <option value="">${_("All Groups")}</option>
-                ${'<% _.each(cohort_options, function(opt) { %>'}
-                    <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
-                ${'<% }); %>'}
-            </select>
-        </div>
-        ${'<% } %>'}
-    </div>
-</script>
-
-<script aria-hidden="true" type="text/template" id="new-post-editor-template">
-    <div class="form-row">
-        <label class="sr" for="new-post-title">${_("new post title")}</label>
-        <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="${_('Title')}">
-    </div>
-    <div class="form-row">
-        <div class="new-post-body" name="body" placeholder="${_(u'Enter your question or comment…')}"></div>
-    </div>
-    <input type="submit" id="new-post-submit" class="submit" value="${_('Add post')}">
-    <a href="#" class="new-post-cancel">${_('Cancel')}</a>
+<script aria-hidden="true" type="text/template" id="post-user-display-template">
+    ${"<% if (username) { %>"}
+    <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
+        ${"<% if (is_community_ta) { %>"}
+        <span class="user-label-community-ta">${_("Community TA")}</span>
+        ${"<% } else if (is_staff) { %>"}
+        <span class="user-label-staff">${_("Staff")}</span>
+        ${"<% } %>"}
+    ${"<% } else { %>"}
+    ${_('anonymous') | h}
+    ${"<% } %>"}
 </script>

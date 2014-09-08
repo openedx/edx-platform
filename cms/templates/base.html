@@ -35,6 +35,8 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
+  <%block name="view_notes"></%block>
+
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
@@ -82,7 +84,7 @@
             "URI": "js/vendor/URI.min",
             "ieshim": "js/src/ie_shim",
             "tooltip_manager": "js/src/tooltip_manager",
-            
+
             // Files needed for Annotations feature
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",

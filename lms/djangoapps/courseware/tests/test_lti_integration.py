@@ -89,6 +89,9 @@ class TestLTI(BaseTestXmodule):
             'module_score': None,
             'comment': u'',
             'weight': 1.0,
+            'request_username': self.item_descriptor.request_username,
+            'request_email': self.item_descriptor.request_email,
+            'text_box': self.item_descriptor.text_box,
         }
 
         def mocked_sign(self, *args, **kwargs):
@@ -188,7 +191,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
         """tests that the draft lti module is part of the endpoint response"""
         request = mock.Mock()
         request.method = 'GET'
-        response = get_course_lti_endpoints(request, self.course.id.to_deprecated_string())
+        response = get_course_lti_endpoints(request, course_id=self.course.id.to_deprecated_string())
 
         self.assertEqual(200, response.status_code)
         self.assertEqual('application/json', response['Content-Type'])

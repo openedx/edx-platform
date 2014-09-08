@@ -91,75 +91,7 @@ window.parseQueryString = function(queryString) {
     return parameters
 };
 
-// Check if the user recently enrolled in a course by looking at a referral URL
-window.checkRecentEnrollment = function(referrer) {
-    var enrolledIn = null;
-    
-    // Check if the referrer URL contains a query string
-    if (referrer.indexOf("?") > -1) {
-        referrerQueryString = referrer.split("?")[1];
-    } else {
-        referrerQueryString = "";
-    }
-
-    if (referrerQueryString != "") {
-        // Convert a non-empty query string into a key/value object
-        var referrerParameters = window.parseQueryString(referrerQueryString);
-        if ("course_id" in referrerParameters && "enrollment_action" in referrerParameters) {
-            if (referrerParameters.enrollment_action == "enroll") {
-                enrolledIn = referrerParameters.course_id;
-            }
-        }
-    }
-
-    return enrolledIn
-};
-
-window.assessUserSignIn = function(parameters, userID, email, username) {
-    // Check if the user has logged in to enroll in a course - designed for when "Register" button registers users on click (currently, this could indicate a course registration when there may not have yet been one)
-    var enrolledIn = window.checkRecentEnrollment(document.referrer);
-
-    // Check if the user has just registered
-    if (parameters.signin == "initial") {
-        window.trackAccountRegistration(enrolledIn, userID, email, username);
-    } else {
-        window.trackReturningUserSignIn(enrolledIn, userID, email, username);
-    }
-};
-
-window.trackAccountRegistration = function(enrolledIn, userID, email, username) {
-    // Alias the user's anonymous history with the user's new identity (for Mixpanel)
-    analytics.alias(userID);
-
-    // Map the user's activity to their newly assigned ID
-    analytics.identify(userID, {
-        email: email,
-        username: username
-    });
-
-    // Track the user's account creation
-    analytics.track("edx.bi.user.account.registered", {
-        category: "conversion",
-        label: enrolledIn != null ? enrolledIn : "none"
-    });
-};
-
-window.trackReturningUserSignIn = function(enrolledIn, userID, email, username) {
-    // Map the user's activity to their assigned ID
-    analytics.identify(userID, {
-        email: email,
-        username: username
-    });
-
-    // Track the user's sign in
-    analytics.track("edx.bi.user.account.authenticated", {
-        category: "conversion",
-        label: enrolledIn != null ? enrolledIn : "none"
-    });
-};
-
 window.identifyUser = function(userID, email, username) {
-    // If the signin parameter isn't present but the query string is non-empty, map the user's activity to their assigned ID
     analytics.identify(userID, {
         email: email,
         username: username

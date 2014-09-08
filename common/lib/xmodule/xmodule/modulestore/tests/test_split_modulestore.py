@@ -2,12 +2,12 @@
     Test split modulestore w/o using any django stuff.
 """
 import datetime
+import random
+import re
 import unittest
 import uuid
 from importlib import import_module
 from path import path
-import re
-import random
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import ModuleStoreEnum
@@ -23,6 +23,7 @@ from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -45,7 +46,7 @@ class SplitModuleTest(unittest.TestCase):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
-        'xblock_mixins': (InheritanceMixin, XModuleMixin)
+        'xblock_mixins': (InheritanceMixin, XModuleMixin, EditInfoMixin)
     }
 
     MODULESTORE = {
@@ -492,13 +493,14 @@ class SplitModuleTest(unittest.TestCase):
                     new_ele_dict[spec['id']] = child
                 course = split_store.persist_xblock_dag(course, revision['user_id'])
         # publish "testx.wonderful"
+        source_course = CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_DRAFT)
         to_publish = BlockUsageLocator(
-            CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_DRAFT),
+            source_course,
             block_type='course',
             block_id="head23456"
         )
         destination = CourseLocator(org="testx", course="wonderful", run="run", branch=BRANCH_NAME_PUBLISHED)
-        split_store.copy("test@edx.org", to_publish, destination, [to_publish], None)
+        split_store.copy("test@edx.org", source_course, destination, [to_publish], None)
 
     def setUp(self):
         self.user_id = random.getrandbits(32)
@@ -606,13 +608,6 @@ class SplitModuleCourseTests(SplitModuleTest):
                              "children")
 
         _verify_published_course(modulestore().get_courses(branch=BRANCH_NAME_PUBLISHED))
-
-    def test_search_qualifiers(self):
-        # query w/ search criteria
-        courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT, qualifiers={'org': 'testx'})
-        self.assertEqual(len(courses), 2)
-        self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
-        self.assertIsNotNone(self.findByIdInResult(courses, "head23456"))
 
     def test_has_course(self):
         '''
@@ -985,7 +980,7 @@ class TestItemCrud(SplitModuleTest):
         # grab link to course to ensure new versioning works
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         premod_course = modulestore().get_course(locator)
-        premod_history = modulestore().get_course_history_info(premod_course.location)
+        premod_history = modulestore().get_course_history_info(locator)
         # add minimal one w/o a parent
         category = 'sequential'
         new_module = modulestore().create_item(
@@ -999,7 +994,7 @@ class TestItemCrud(SplitModuleTest):
         current_course = modulestore().get_course(locator)
         self.assertEqual(new_module.location.version_guid, current_course.location.version_guid)
 
-        history_info = modulestore().get_course_history_info(current_course.location)
+        history_info = modulestore().get_course_history_info(current_course.location.course_key)
         self.assertEqual(history_info['previous_version'], premod_course.location.version_guid)
         self.assertEqual(history_info['original_version'], premod_history['original_version'])
         self.assertEqual(history_info['edited_by'], "user123")
@@ -1112,84 +1107,82 @@ class TestItemCrud(SplitModuleTest):
         chapter = modulestore().get_item(chapter_locator)
         self.assertIn(problem_locator, version_agnostic(chapter.children))
 
-    def test_create_continue_version(self):
+    def test_create_bulk_operations(self):
         """
-        Test create_item using the continue_version flag
+        Test create_item using bulk_operations
         """
         # start transaction w/ simple creation
         user = random.getrandbits(32)
-        new_course = modulestore().create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
-        new_course_locator = new_course.id
-        index_history_info = modulestore().get_course_history_info(new_course.location)
-        course_block_prev_version = new_course.previous_version
-        course_block_update_version = new_course.update_version
-        self.assertIsNotNone(new_course_locator.version_guid, "Want to test a definite version")
-        versionless_course_locator = new_course_locator.version_agnostic()
+        course_key = CourseLocator('test_org', 'test_transaction', 'test_run')
+        with modulestore().bulk_operations(course_key):
+            new_course = modulestore().create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
+            new_course_locator = new_course.id
+            index_history_info = modulestore().get_course_history_info(new_course.location.course_key)
+            course_block_prev_version = new_course.previous_version
+            course_block_update_version = new_course.update_version
+            self.assertIsNotNone(new_course_locator.version_guid, "Want to test a definite version")
+            versionless_course_locator = new_course_locator.version_agnostic()
 
-        # positive simple case: no force, add chapter
-        new_ele = modulestore().create_child(
-            user, new_course.location, 'chapter',
-            fields={'display_name': 'chapter 1'},
-            continue_version=True
-        )
-        # version info shouldn't change
-        self.assertEqual(new_ele.update_version, course_block_update_version)
-        self.assertEqual(new_ele.update_version, new_ele.location.version_guid)
-        refetch_course = modulestore().get_course(versionless_course_locator)
-        self.assertEqual(refetch_course.location.version_guid, new_course.location.version_guid)
-        self.assertEqual(refetch_course.previous_version, course_block_prev_version)
-        self.assertEqual(refetch_course.update_version, course_block_update_version)
-        refetch_index_history_info = modulestore().get_course_history_info(refetch_course.location)
-        self.assertEqual(refetch_index_history_info, index_history_info)
-        self.assertIn(new_ele.location.version_agnostic(), version_agnostic(refetch_course.children))
-
-        # try to create existing item
-        with self.assertRaises(DuplicateItemError):
-            _fail = modulestore().create_child(
+            # positive simple case: no force, add chapter
+            new_ele = modulestore().create_child(
                 user, new_course.location, 'chapter',
-                block_id=new_ele.location.block_id,
-                fields={'display_name': 'chapter 2'},
-                continue_version=True
+                fields={'display_name': 'chapter 1'},
             )
+            # version info shouldn't change
+            self.assertEqual(new_ele.update_version, course_block_update_version)
+            self.assertEqual(new_ele.update_version, new_ele.location.version_guid)
+            refetch_course = modulestore().get_course(versionless_course_locator)
+            self.assertEqual(refetch_course.location.version_guid, new_course.location.version_guid)
+            self.assertEqual(refetch_course.previous_version, course_block_prev_version)
+            self.assertEqual(refetch_course.update_version, course_block_update_version)
+            refetch_index_history_info = modulestore().get_course_history_info(refetch_course.location.course_key)
+            self.assertEqual(refetch_index_history_info, index_history_info)
+            self.assertIn(new_ele.location.version_agnostic(), version_agnostic(refetch_course.children))
+
+            # try to create existing item
+            with self.assertRaises(DuplicateItemError):
+                _fail = modulestore().create_child(
+                    user, new_course.location, 'chapter',
+                    block_id=new_ele.location.block_id,
+                    fields={'display_name': 'chapter 2'},
+                )
 
         # start a new transaction
-        new_ele = modulestore().create_child(
-            user, new_course.location, 'chapter',
-            fields={'display_name': 'chapter 2'},
-            continue_version=False
-        )
-        transaction_guid = new_ele.location.version_guid
-        # ensure force w/ continue gives exception
-        with self.assertRaises(VersionConflictError):
-            _fail = modulestore().create_child(
+        with modulestore().bulk_operations(course_key):
+            new_ele = modulestore().create_child(
                 user, new_course.location, 'chapter',
                 fields={'display_name': 'chapter 2'},
-                force=True, continue_version=True
             )
+            transaction_guid = new_ele.location.version_guid
+            # ensure force w/ continue gives exception
+            with self.assertRaises(VersionConflictError):
+                _fail = modulestore().create_child(
+                    user, new_course.location, 'chapter',
+                    fields={'display_name': 'chapter 2'},
+                    force=True
+                )
 
-        # ensure trying to continue the old one gives exception
-        with self.assertRaises(VersionConflictError):
-            _fail = modulestore().create_child(
-                user, new_course.location, 'chapter',
-                fields={'display_name': 'chapter 3'},
-                continue_version=True
+            # ensure trying to continue the old one gives exception
+            with self.assertRaises(VersionConflictError):
+                _fail = modulestore().create_child(
+                    user, new_course.location, 'chapter',
+                    fields={'display_name': 'chapter 3'},
+                )
+
+            # add new child to old parent in continued (leave off version_guid)
+            course_module_locator = new_course.location.version_agnostic()
+            new_ele = modulestore().create_child(
+                user, course_module_locator, 'chapter',
+                fields={'display_name': 'chapter 4'},
             )
+            self.assertNotEqual(new_ele.update_version, course_block_update_version)
+            self.assertEqual(new_ele.location.version_guid, transaction_guid)
 
-        # add new child to old parent in continued (leave off version_guid)
-        course_module_locator = new_course.location.version_agnostic()
-        new_ele = modulestore().create_child(
-            user, course_module_locator, 'chapter',
-            fields={'display_name': 'chapter 4'},
-            continue_version=True
-        )
-        self.assertNotEqual(new_ele.update_version, course_block_update_version)
-        self.assertEqual(new_ele.location.version_guid, transaction_guid)
-
-        # check children, previous_version
-        refetch_course = modulestore().get_course(versionless_course_locator)
-        self.assertIn(new_ele.location.version_agnostic(), version_agnostic(refetch_course.children))
-        self.assertEqual(refetch_course.previous_version, course_block_update_version)
-        self.assertEqual(refetch_course.update_version, transaction_guid)
+            # check children, previous_version
+            refetch_course = modulestore().get_course(versionless_course_locator)
+            self.assertIn(new_ele.location.version_agnostic(), version_agnostic(refetch_course.children))
+            self.assertEqual(refetch_course.previous_version, course_block_update_version)
+            self.assertEqual(refetch_course.update_version, transaction_guid)
 
     def test_update_metadata(self):
         """
@@ -1221,7 +1214,7 @@ class TestItemCrud(SplitModuleTest):
         current_course = modulestore().get_course(locator.course_key)
         self.assertEqual(updated_problem.location.version_guid, current_course.location.version_guid)
 
-        history_info = modulestore().get_course_history_info(current_course.location)
+        history_info = modulestore().get_course_history_info(current_course.location.course_key)
         self.assertEqual(history_info['previous_version'], pre_version_guid)
         self.assertEqual(history_info['edited_by'], self.user_id)
 
@@ -1396,16 +1389,13 @@ class TestCourseCreation(SplitModuleTest):
         )
         new_locator = new_course.location
         # check index entry
-        index_info = modulestore().get_course_index_info(new_locator)
+        index_info = modulestore().get_course_index_info(new_locator.course_key)
         self.assertEqual(index_info['org'], 'test_org')
         self.assertEqual(index_info['edited_by'], 'create_user')
         # check structure info
-        structure_info = modulestore().get_course_history_info(new_locator)
-        # TODO LMS-11098 "Implement bulk_write in Split"
-        # Right now, these assertions will not pass because create_course calls update_item,
-        #   resulting in two versions. Bulk updater will fix this.
-        # self.assertEqual(structure_info['original_version'], index_info['versions'][BRANCH_NAME_DRAFT])
-        # self.assertIsNone(structure_info['previous_version'])
+        structure_info = modulestore().get_course_history_info(new_locator.course_key)
+        self.assertEqual(structure_info['original_version'], index_info['versions'][BRANCH_NAME_DRAFT])
+        self.assertIsNone(structure_info['previous_version'])
 
         self.assertEqual(structure_info['edited_by'], 'create_user')
         # check the returned course object
@@ -1433,7 +1423,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(new_draft.edited_by, 'test@edx.org')
         self.assertEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
         # however the edited_by and other meta fields on course_index will be this one
-        new_index = modulestore().get_course_index_info(new_draft_locator)
+        new_index = modulestore().get_course_index_info(new_draft_locator.course_key)
         self.assertEqual(new_index['edited_by'], 'leech_master')
 
         new_published_locator = new_draft_locator.course_key.for_branch(BRANCH_NAME_PUBLISHED)
@@ -1483,7 +1473,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(new_draft.edited_by, 'leech_master')
         self.assertNotEqual(new_draft_locator.version_guid, original_index['versions'][BRANCH_NAME_DRAFT])
         # however the edited_by and other meta fields on course_index will be this one
-        new_index = modulestore().get_course_index_info(new_draft_locator)
+        new_index = modulestore().get_course_index_info(new_draft_locator.course_key)
         self.assertEqual(new_index['edited_by'], 'leech_master')
         self.assertEqual(new_draft.display_name, fields['display_name'])
         self.assertDictEqual(
@@ -1504,13 +1494,13 @@ class TestCourseCreation(SplitModuleTest):
         head_course = modulestore().get_course(locator)
         versions = course_info['versions']
         versions[BRANCH_NAME_DRAFT] = head_course.previous_version
-        modulestore().update_course_index(course_info)
+        modulestore().update_course_index(None, course_info)
         course = modulestore().get_course(locator)
         self.assertEqual(course.location.version_guid, versions[BRANCH_NAME_DRAFT])
 
         # an allowed but not recommended way to publish a course
         versions[BRANCH_NAME_PUBLISHED] = versions[BRANCH_NAME_DRAFT]
-        modulestore().update_course_index(course_info)
+        modulestore().update_course_index(None, course_info)
         course = modulestore().get_course(locator.for_branch(BRANCH_NAME_PUBLISHED))
         self.assertEqual(course.location.version_guid, versions[BRANCH_NAME_DRAFT])
 
@@ -1715,6 +1705,7 @@ class TestPublish(SplitModuleTest):
                 dest_cursor += 1
         self.assertEqual(dest_cursor, len(dest_children))
 
+
 class TestSchema(SplitModuleTest):
     """
     Test the db schema (and possibly eventually migrations?)
@@ -1735,6 +1726,7 @@ class TestSchema(SplitModuleTest):
                 0,
                 "{0.name} has records with wrong schema_version".format(collection)
             )
+
 
 #===========================================
 def modulestore():

@@ -8,14 +8,14 @@ Tests for import_from_xml using the mongo modulestore.
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
+import ddt
 import copy
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.exceptions import DuplicateCourseError
-from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls, CourseFactory
+from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.exceptions import NotFoundError
@@ -25,6 +25,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
+@ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreImportTest(ModuleStoreTestCase):
     """
@@ -33,11 +34,11 @@ class ContentStoreImportTest(ModuleStoreTestCase):
     """
     def setUp(self):
         password = super(ContentStoreImportTest, self).setUp()
-        
+
         self.client = Client()
         self.client.login(username=self.user.username, password=password)
 
-    def load_test_import_course(self):
+    def load_test_import_course(self, target_course_id=None, create_new_course_if_not_present=False):
         '''
         Load the standard course used to test imports
         (for do_import_static=False behavior).
@@ -52,6 +53,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             static_content_store=content_store,
             do_import_static=False,
             verbose=True,
+            target_course_id=target_course_id,
+            create_new_course_if_not_present=create_new_course_if_not_present,
         )
         course_id = SlashSeparatedCourseKey('edX', 'test_import_course', '2012_Fall')
         course = module_store.get_course(course_id)
@@ -157,16 +160,22 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         # we try to refresh the inheritance tree for each update_item in the import
-        with check_exact_number_of_calls(store, store.refresh_cached_metadata_inheritance_tree, 28):
+        with check_exact_number_of_calls(store, 'refresh_cached_metadata_inheritance_tree', 28):
 
             # _get_cached_metadata_inheritance_tree should be called only once
-            with check_exact_number_of_calls(store, store._get_cached_metadata_inheritance_tree, 1):
+            with check_exact_number_of_calls(store, '_get_cached_metadata_inheritance_tree', 1):
 
                 # with bulk-edit in progress, the inheritance tree should be recomputed only at the end of the import
                 # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
                 #       Locally, without memcache, the number of calls is actually 2 (once more during the publish step)
-                with check_number_of_calls(store, store._compute_metadata_inheritance_tree, 2):
+                with check_number_of_calls(store, '_compute_metadata_inheritance_tree', 2):
                     self.load_test_import_course()
+
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_reimport(self, default_ms_type):
+        with modulestore().default_store(default_ms_type):
+            __, __, course = self.load_test_import_course(create_new_course_if_not_present=True)
+            self.load_test_import_course(target_course_id=course.id)
 
     def test_rewrite_reference_list(self):
         module_store = modulestore()

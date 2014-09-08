@@ -367,6 +367,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
 
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.open_source_footer_context_processor',
+
+    # TODO: Used for header and footer feature flags. Remove as part of ECOM-136
+    'edxmako.shortcuts.header_footer_context_processor',
+
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
 )
@@ -1764,4 +1770,22 @@ WS_CONFIG = {
     'method_query_title': "consultaTitulo",
     'identity': '0103893954'
     }
+
+# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
+AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
+    "HarvardX/SW12.2x/1T2014",
+    "HarvardX/SW12.3x/1T2014",
+    "HarvardX/SW12.4x/1T2014",
+    "HarvardX/SW12.5x/2T2014",
+    "HarvardX/SW12.6x/2T2014",
+    "HarvardX/HUM2.1x/3T2014",
+    "HarvardX/SW12x/2013_SOND",
+    "LinuxFoundationX/LFS101x/2T2014",
+    "HarvardX/CS50x/2014_T1",
+    "HarvardX/AmPoX.1/2014_T3",
+    "HarvardX/SW12.7x/3T2014",
+    "HarvardX/SW12.10x/1T2015",
+    "HarvardX/SW12.9x/3T2014",
+    "HarvardX/SW12.8x/3T2014",
+])
 

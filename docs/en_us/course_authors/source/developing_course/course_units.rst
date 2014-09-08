@@ -73,7 +73,7 @@ To a student using the edX Learning Management System, each unit in the
 subsection appears as a link on the course ribbon at the top of the page. The
 active unit is open beneath the course ribbon.
 
-The following image shows a subsection that has seven units, which are circled
+The following image shows a subsection that has five units, which are circled
 in the ribbon above the video, with the first unit open:
 
 .. image:: ../Images/Units_LMS.png
@@ -144,16 +144,16 @@ Unit Publishing Status
 
 As an course author, you work with units with the following statuses:
 
-* `Draft (Never Published)`_
+* `Draft (Never published)`_
 * `Published and Live`_
-* `Published Not Yet Released`_
-* `Draft (Unpublished Changes)`_
+* `Published (not yet released)`_
+* `Draft (Unpublished changes)`_
 * `Visible to Staff Only`_
 
 .. _Draft (Never Published):
 
 ========================
-Draft (Never Published)
+Draft (Never published)
 ========================
 
 When you create a new unit and add components to it, the unit's publishing
@@ -187,7 +187,7 @@ current version of the unit.
 .. _Published Not Yet Released:
 
 ====================================
-Published Not Yet Released
+Published (not yet released)
 ====================================
 
 You've published the unit, but the release date hasn't passed. Students cannot
@@ -199,7 +199,7 @@ see this unit until the release date passes.
 .. _Draft (Unpublished Changes):
 
 ===========================
-Draft (Unpublished Changes)
+Draft (Unpublished changes)
 =========================== 
 
 When you edit a published unit, whether or not it is released, the unit's
@@ -227,6 +227,10 @@ Visible to Staff Only
 
 When you :ref:`hide a unit from students<Hide a Unit from Students>`, the
 unit's publishing status changes to **Visible to Staff Only**.
+
+The publishing status of a unit can be **Visible to Staff Only** if you hid the
+parent :ref:`section<Hide a Section from Students>` or :ref:`subsection<Hide a
+Subsection from Students>` from students.
 
 Students never see a unit with this status, even if it has been published and
 the release date has passed.
@@ -361,11 +365,31 @@ You publish a unit that has a status of `Draft (Never Published)`_ or `Draft
 (Unpublished Changes)`_. When you publish a unit, the status changes to
 `Published and Live`_ or `Published Not Yet Released`_.
 
+You can publish a unit from the unit page or the course outline.
+
+=======================================
+Use the Unit Page to Publish a Unit
+=======================================
+
 To publish the unit, click **Publish** in the status panel:
 
 .. image:: ../Images/unit-publish-button.png
  :alt: Unit status panel with Publish button circled
 
+
+=======================================
+Use the Outline to Publish a Unit
+=======================================
+
+To publish a unit from the outline, click the publish icon in the box for the
+unit:
+
+.. image:: ../Images/outline-publish-icon-unit.png
+ :alt: Publishing icon for a unit
+
+.. note:: 
+ The publish icon only appears when there is new or changed content in the
+ unit.
 
 .. _Discard Changes to a Unit:
 
@@ -419,9 +443,17 @@ Hide a Unit from Students
 ****************************
 
 You can prevent students from seeing a unit regardless of the unit status or
-the release schedules of the section and subsection.
+the release schedules of the section and subsection. 
 
-To do this, select the **Hide from students** checkbox in the status panel:
+For more information, see :ref:`Controlling Content Visibility`.
+
+You can hide a unit from students using the course outline or the unit page.
+
+=======================================
+Use the Unit Page to Hide a Unit
+=======================================
+
+Select the **Hide from students** checkbox in the status panel:
 
 .. image:: ../Images/unit-hide.png
  :alt: Unit status panel with Hide from Students checked
@@ -429,18 +461,43 @@ To do this, select the **Hide from students** checkbox in the status panel:
 For more information, see :ref:`Controlling Content Visibility`.
 
 =======================================
+Use the Outline to Hide a Unit
+=======================================
+
+#. Click the Settings icon in the unit box:
+   
+   .. image:: ../Images/outline-unit-settings.png
+    :alt: The unit settings icon circled
+
+   The **Settings** dialog box opens.
+
+#. Check **Hide from students**.
+
+   .. image:: ../Images/outline-unit-settings-dialog.png
+    :alt: The unit hide from students setting
+
+#. Click **Save**.
+
+=======================================
 Make a Hidden Unit Visible to Students
 =======================================
 
-To make a hidden unit visible to students, clear the **Hide from students**
+Before you make a hidden unit visible to students, be aware that course content
+will immediately be visible to students, as follows:
+
+* For a hidden unit that previously was published, clearing the check box
+  publishes the current content for the unit. If you made changes to the unit
+  while is was hidden, those draft changes are published.
+
+* When you make a section or subsection that was previously hidden visible to
+  students, draft content in units is *not* published. Changes you made since
+  last publishing units are not made visible to students.
+
+You can make a hidden unit visible to students from the unit page or the course
+outline. Follow the instructions above and clear the **Hide from students**
 checkbox.
 
 You are prompted to confirm that you want to make the unit visible to students.
-
-.. caution::
- When you make a hidden unit that was previously published visible to
- students, the current content in the unit is published. Any changes you made
- to the unit when it was hidden from students will now be visible to students.
 
 ********************************
 Delete a Unit

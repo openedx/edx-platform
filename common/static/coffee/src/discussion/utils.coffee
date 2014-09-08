@@ -21,15 +21,14 @@ class @DiscussionUtil
   @setUser: (user) ->
     @user = user
 
+  @getUser: () ->
+    @user
+
   @loadRoles: (roles)->
     @roleIds = roles
 
-  @loadFlagModerator: (what)->
-    @isFlagModerator = ((what=="True") or (what == 1))
-
   @loadRolesFromContainer: ->
     @loadRoles($("#discussion-container").data("roles"))
-    @loadFlagModerator($("#discussion-container").data("flag-moderator"))
 
   @isStaff: (user_id) ->
     user_id ?= @user?.id
@@ -40,6 +39,9 @@ class @DiscussionUtil
     user_id ?= @user?.id
     ta = _.union(@roleIds['Community TA'])
     _.include(ta, parseInt(user_id))
+
+  @isPrivilegedUser: (user_id) ->
+    @isStaff(user_id) || @isTA(user_id)
 
   @bulkUpdateContentInfo: (infos) ->
     for id, info of infos
@@ -159,6 +161,13 @@ class @DiscussionUtil
           params["$loading"].loaded()
     return request
 
+  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg) ->
+    if errorMsg
+      safeAjaxParams.error = => @discussionAlert(gettext("Sorry"), errorMsg)
+    undo = _.pick(model.attributes, _.keys(updates))
+    model.set(updates)
+    @safeAjax(safeAjaxParams).fail(() -> model.set(undo))
+
   @bindLocalEvents: ($local, eventsHandler) ->
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
@@ -167,7 +176,7 @@ class @DiscussionUtil
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->
       makeErrorElem = (message) ->
-        $("<li>").addClass("new-post-form-error").html(message)
+        $("<li>").addClass("post-error").html(message)
       errorsField.empty().show()
       if xhr.status == 400
         response = JSON.parse(xhr.responseText)

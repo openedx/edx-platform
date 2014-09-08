@@ -23,7 +23,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore import PublishState, ModuleStoreEnum
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES
 
@@ -287,9 +287,9 @@ class CourseComparisonTest(unittest.TestCase):
             self.assertEqual(expected_item.has_children, actual_item.has_children)
             if expected_item.has_children:
                 expected_children = [
-                    (course1_item_child.location.block_type, course1_item_child.location.block_id)
+                    (expected_item_child.location.block_type, expected_item_child.location.block_id)
                     # get_children() rather than children to strip privates from public parents
-                    for course1_item_child in expected_item.get_children()
+                    for expected_item_child in expected_item.get_children()
                 ]
                 actual_children = [
                     (item_child.location.block_type, item_child.location.block_id)

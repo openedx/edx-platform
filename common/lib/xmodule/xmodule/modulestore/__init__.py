@@ -24,6 +24,7 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.runtime import Mixologist
 from xblock.core import XBlock
+import functools
 
 log = logging.getLogger('edx.modulestore')
 
@@ -88,16 +89,6 @@ class ModuleStoreEnum(object):
 
         # user ID to use for tests that do not have a django user available
         test = -3
-
-
-class PublishState(object):
-    """
-    The legacy publish state for a given xblock-- either 'draft', 'private', or 'public'. These states
-    are no longer used in Studio, but they are still referenced in a few places in LMS.
-    """
-    draft = 'draft'
-    private = 'private'
-    public = 'public'
 
 
 class ModuleStoreRead(object):
@@ -307,15 +298,9 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns whether this xblock is draft, public, or private.
-
-        Returns:
-            PublishState.draft - content is in the process of being edited, but still has a previous
-                version deployed to LMS
-            PublishState.public - content is locked and deployed to LMS
-            PublishState.private - content is editable and not deployed to LMS
+        Returns true if this xblock exists in the published course regardless of whether it's up to date
         """
         pass
 
@@ -325,6 +310,13 @@ class ModuleStoreRead(object):
         Closes any open connections to the underlying databases
         """
         pass
+
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+        """
+        yield
 
 
 class ModuleStoreWrite(ModuleStoreRead):
@@ -529,11 +521,11 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 None
             )
 
-    def compute_publish_state(self, xblock):
+    def has_published_version(self, xblock):
         """
-        Returns PublishState.public since this is a read-only store.
+        Returns True since this is a read-only store.
         """
-        return PublishState.public
+        return True
 
     def heartbeat(self):
         """
@@ -559,6 +551,71 @@ class ModuleStoreReadBase(ModuleStoreRead):
             raise ValueError(u"Cannot set default store to type {}".format(store_type))
         yield
 
+    @contextmanager
+    def bulk_operations(self, course_id):
+        """
+        A context manager for notifying the store of bulk operations. This affects only the current thread.
+
+        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
+        until the bulk operation is completed.
+        """
+        # TODO: Make this multi-process-safe if future operations need it.
+        try:
+            self._begin_bulk_operation(course_id)
+            yield
+        finally:
+            self._end_bulk_operation(course_id)
+
+    @contextmanager
+    def bulk_temp_noop_operations(self, course_id):
+        """
+        A hotfix noop b/c old mongo does not properly handle nested bulk operations and does unnecessary work
+        if the bulk operation only reads data. Replace with bulk_operations once fixed (or don't merge to master)
+        """
+        yield
+
+    def _begin_bulk_operation(self, course_id):
+        """
+        Begin a bulk write operation on course_id.
+        """
+        pass
+
+    def _end_bulk_operation(self, course_id):
+        """
+        End the active bulk write operation on course_id.
+        """
+        pass
+
+    @staticmethod
+    def memoize_request_cache(func):
+        """
+        Memoize a function call results on the request_cache if there's one. Creates the cache key by
+        joining the unicode of all the args with &; so, if your arg may use the default &, it may
+        have false hits
+        """
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self.request_cache:
+                cache_key = '&'.join([hashvalue(arg) for arg in args])
+                if cache_key in self.request_cache.data.setdefault(func.__name__, {}):
+                    return self.request_cache.data[func.__name__][cache_key]
+
+                result = func(self, *args, **kwargs)
+
+                self.request_cache.data[func.__name__][cache_key] = result
+                return result
+            else:
+                return func(self, *args, **kwargs)
+        return wrapper
+
+def hashvalue(arg):
+    """
+    If arg is an xblock, use its location. otherwise just turn it into a string
+    """
+    if isinstance(arg, XBlock):
+        return unicode(arg.location)
+    else:
+        return unicode(arg)
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
@@ -658,29 +715,6 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         parent = self.get_item(parent_usage_key)
         parent.children.append(item.location)
         self.update_item(parent, user_id)
-
-    @contextmanager
-    def bulk_write_operations(self, course_id):
-        """
-        A context manager for notifying the store of bulk write events.
-
-        In the case of Mongo, it temporarily disables refreshing the metadata inheritance tree
-        until the bulk operation is completed.
-        """
-        # TODO
-        # Make this multi-process-safe if future operations need it.
-        # Right now, only Import Course, Clone Course, and Delete Course use this, so
-        # it's ok if the cached metadata in the memcache is invalid when another
-        # request comes in for the same course.
-        try:
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._begin_bulk_write_operation(course_id)
-            yield
-        finally:
-            # check for the begin method here,
-            # since it's an error if an end method is not defined when a begin method is
-            if hasattr(self, '_begin_bulk_write_operation'):
-                self._end_bulk_write_operation(course_id)
 
 
 def only_xmodules(identifier, entry_points):

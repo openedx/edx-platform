@@ -10,6 +10,7 @@ from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore import ModuleStoreEnum
 import datetime
 import pytz
+from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
@@ -275,6 +276,8 @@ class ModuleStoreTestCase(TestCase):
         # the next time they are accessed.
         # We do this at *both* setup and teardown just to be safe.
         clear_existing_modulestores()
+        # clear RequestCache to emulate its clearance after each http request.
+        RequestCache().clear_request_cache()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
@@ -287,7 +290,7 @@ class ModuleStoreTestCase(TestCase):
             course_loc: the CourseKey for the created course
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-#             with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#             with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
                 course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
                 self.course_loc = course.location
 
@@ -314,7 +317,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Create an equivalent to the toy xml course
         """
-#        with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#        with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
         self.toy_loc = self.create_sample_course(
             org, course, run, TOY_BLOCK_INFO_TREE,
             {
