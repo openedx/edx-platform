@@ -7,6 +7,7 @@ from django.http import Http404
 
 import logging
 import random
+from django.utils.translation import ugettext as _
 
 from courseware import courses
 from student.models import get_user_by_username_or_email
@@ -212,7 +213,7 @@ def add_cohort(course_key, name):
     if CourseUserGroup.objects.filter(course_id=course_key,
                                       group_type=CourseUserGroup.COHORT,
                                       name=name).exists():
-        raise ValueError("Can't create two cohorts with the same name")
+        raise ValueError(_("Cohort with name {name} already exists.".format(name=name)))
 
     try:
         course = courses.get_course_by_id(course_key)
@@ -258,9 +259,9 @@ def add_user_to_cohort(cohort, username_or_email):
     )
     if course_cohorts.exists():
         if course_cohorts[0] == cohort:
-            raise ValueError("User {0} already present in cohort {1}".format(
-                user.username,
-                cohort.name))
+            raise ValueError(_("User {username} already present in cohort {cohort_name}").format(
+                username=user.username,
+                cohort_name=cohort.name))
         else:
             previous_cohort = course_cohorts[0].name
             course_cohorts[0].users.remove(user)
@@ -283,7 +284,7 @@ def delete_empty_cohort(course_key, name):
     cohort = get_cohort_by_name(course_key, name)
     if cohort.users.exists():
         raise ValueError(
-            "Can't delete non-empty cohort {0} in course {1}".format(
-                name, course_key))
+            _("Can't delete non-empty cohort {cohort_name} in course {course_name}").format(
+                cohort_name=name, course_name=course_key))
 
     cohort.delete()
