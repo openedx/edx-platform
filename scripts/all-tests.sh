@@ -103,8 +103,8 @@ SHARD=${SHARD:="all"}
 case "$TEST_SUITE" in
 
     "quality")
-        paver run_pep8 > pep8.log || { cat pep8.log ; exit 1; }
-        paver run_pylint > pylint.log || { cat pylint.log; exit 1; }
+        paver run_pep8 -l 725 > pep8.log || { cat pep8.log; EXIT=1; }
+        paver run_pylint -l 4800 > pylint.log || { cat pylint.log; EXIT=1; }
         paver run_quality
 
         # Need to create an empty test result so the post-build
@@ -116,6 +116,7 @@ case "$TEST_SUITE" in
 <testcase classname="quality" name="quality" time="0.604"></testcase>
 </testsuite>
 END
+        exit $EXIT
         ;;
 
     "unit")
