@@ -46,9 +46,23 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
         """
             Makes sure that the Module is declared and mocked with the sample xml above.
         """
+        # return anything except None to test LMS
+        def test_real_user(useless):
+            useless_user = Mock(email='fake@fake.com', id=useless)
+            return useless_user
+
+        # test to make sure that role is checked in LMS
+        def test_user_role():
+            return 'staff'
+
+        self.system = get_test_system()
+        self.system.get_real_user = test_real_user
+        self.system.get_user_role = test_user_role
+        self.system.anonymous_student_id = None
+
         self.mod = ImageAnnotationModule(
             Mock(),
-            get_test_system(),
+            self.system,
             DictFieldData({'data': self.sample_xml}),
             ScopeIds(None, None, None, None)
         )
@@ -74,5 +88,5 @@ class ImageAnnotationModuleTestCase(unittest.TestCase):
         Tests the function that passes in all the information in the context that will be used in templates/textannotation.html
         """
         context = self.mod.student_view({}).content
-        for key in ['display_name', 'instructions_html', 'annotation_storage', 'token', 'tag', 'openseadragonjson']:
+        for key in ['display_name', 'instructions_html', 'annotation_storage', 'token', 'tag', 'openseadragonjson', 'default_tab', 'instructor_email', 'annotation_mode', 'is_course_staff']:
             self.assertIn(key, context)

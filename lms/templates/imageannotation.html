@@ -72,7 +72,7 @@
     var unit_id = $('#sequence-list').find('.active').attr("data-element");
         uri += unit_id;
     var pagination = 100,
-     is_staff = ('${user.email}'=='${instructor_email}'),
+     is_staff = '${is_course_staff}' === 'True',
         options = {
         optionsAnnotator: {
             permissions:{

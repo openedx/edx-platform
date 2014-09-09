@@ -64,7 +64,7 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
 	var unit_id = $('#sequence-list').find('.active').attr("data-element");
     uri += unit_id;
 	var pagination = 100,
-	 is_staff = !('${user.is_staff}'=='False'),
+	 is_staff = '${is_course_staff}' === 'True',
         options = {
         optionsAnnotator: {
             permissions:{
