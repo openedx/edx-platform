@@ -3,12 +3,41 @@ describe 'ThreadResponseView', ->
         DiscussionSpecHelper.setUpGlobals()
         DiscussionSpecHelper.setUnderscoreFixtures()
 
+        @thread = new Thread({"thread_type": "discussion"})
         @response = new Comment {
-            children: [{}, {}]
+            children: [{}, {}],
+            thread: @thread,
         }
         @view = new ThreadResponseView({model: @response, el: $("#fixture-element")})
         spyOn(ThreadResponseShowView.prototype, "render")
         spyOn(ResponseCommentView.prototype, "render")
+
+    describe 'closed and open Threads', ->
+        checkCommentForm = (closed) ->
+            thread = new Thread({"thread_type": "discussion", "closed": closed})
+            commentData = {
+                id: "dummy",
+                user_id: "567",
+                course_id: "TestOrg/TestCourse/TestRun",
+                body: "this is a comment",
+                created_at: "2013-04-03T20:08:39Z",
+                abuse_flaggers: [],
+                type: "comment",
+                children: [],
+                thread: thread,
+            }
+            comment = new Comment(commentData)
+            view = new ThreadResponseView({
+                model: comment, el: $("#fixture-element"),
+            })
+            view.render()
+            expect(view.$('.comment-form').closest('li').is(":visible")).toBe(not closed)
+
+        it 'hides comment form when thread is closed', ->
+            checkCommentForm(true)
+
+        it 'show comment form when thread is open', ->
+            checkCommentForm(false)
 
     describe 'renderComments', ->
         it 'hides "show comments" link if collapseComments is not set', ->
@@ -17,7 +46,7 @@ describe 'ThreadResponseView', ->
             expect(@view.$(".action-show-comments")).not.toBeVisible()
 
         it 'hides "show comments" link if collapseComments is set but response has no comments', ->
-            @response = new Comment { children: [] }
+            @response = new Comment { children: [], thread: @thread }
             @view = new ThreadResponseView({
                 model: @response, el: $("#fixture-element"),
                 collapseComments: true

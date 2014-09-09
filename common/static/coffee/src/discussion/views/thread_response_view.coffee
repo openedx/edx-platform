@@ -28,6 +28,8 @@ if Backbone?
 
       @renderShowView()
       @renderAttrs()
+      if @model.get("thread").get("closed")
+        @hideCommentForm()
 
       @renderComments()
       @

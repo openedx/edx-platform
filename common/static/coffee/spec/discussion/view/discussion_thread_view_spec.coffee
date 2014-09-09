@@ -40,6 +40,32 @@ describe "DiscussionThreadView", ->
         else
             expect(view.$el.find(".load-response-button").length).toEqual(0)
 
+    describe "closed and open Threads", ->
+        checkCommentForm = (originallyClosed, mode) ->
+            threadData = DiscussionViewSpecHelper.makeThreadWithProps({closed: originallyClosed})
+            thread = new Thread(threadData)
+            view = new DiscussionThreadView({ model: thread, el: $("#fixture-element"), mode: mode})
+            renderWithContent(view, {resp_total: 1, children: [{}]})
+            if mode == "inline"
+              view.expand()
+            spyOn(DiscussionUtil, "updateWithUndo").andCallFake(
+              (model, updates, safeAjaxParams, errorMsg) ->
+                model.set(updates)
+            )
+            expect(view.$('.comment-form').closest('li').is(":visible")).toBe(not originallyClosed)
+            expect(view.$(".discussion-reply-new").is(":visible")).toBe(not originallyClosed)
+            view.$(".action-close").click()
+            expect(view.$('.comment-form').closest('li').is(":visible")).toBe(originallyClosed)
+            expect(view.$(".discussion-reply-new").is(":visible")).toBe(originallyClosed)
+
+        _.each(["tab", "inline"], (mode) =>
+                it 'Test that in #{mode} mode when a closed thread is opened the comment form is displayed', ->
+                        checkCommentForm(true, mode)
+
+                it 'Test that in #{mode} mode when a open thread is closed the comment form is hidden', ->
+                        checkCommentForm(false, mode)
+        )
+
     describe "tab mode", ->
         beforeEach ->
             @view = new DiscussionThreadView({ model: @thread, el: $("#fixture-element"), mode: "tab"})
