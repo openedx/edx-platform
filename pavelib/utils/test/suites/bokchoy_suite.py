@@ -40,10 +40,7 @@ class BokChoyTestSuite(TestSuite):
 
         # Ensure that we have a directory to put logs and reports
         self.log_dir.makedirs_p()
-
-        if self.ptests:
-            self.har_dir.makedirs_p()
-
+        self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()
 
@@ -113,7 +110,7 @@ class BokChoyTestSuite(TestSuite):
         cmd = [
             "DEFAULT_STORE={}".format(self.default_store),
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
-            "HAR_DIR='{}'".format(self.har_dir),
+            "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
             "nosetests",
             test_spec,

@@ -1,12 +1,13 @@
 """
 Single page performance tests for Studio.
 """
-from bok_choy.performance import WebAppPerfReport, with_cache
+from bok_choy.web_app_test import WebAppTest, with_cache
 from ..pages.studio.auto_auth import AutoAuthPage
 from ..pages.studio.overview import CourseOutlinePage
+from nose.plugins.attrib import attr
 
-
-class StudioPagePerformanceTest(WebAppPerfReport):
+@attr(har_mode='explicit')
+class StudioPagePerformanceTest(WebAppTest):
     """
     Base class to capture studio performance with HTTP Archives.
 
@@ -33,9 +34,9 @@ class StudioPagePerformanceTest(WebAppPerfReport):
             org=self.course_org,
             course=self.course_num
         )
-        self.new_page(har_name)
+        self.har_capturer.add_page(self.browser, har_name)
         course_outline_page.visit()
-        self.save_har(har_name)
+        self.har_capturer.save_har(self.browser, har_name)
 
     def record_visit_unit(self, section_title, subsection_title, unit_title):
         """
@@ -47,9 +48,9 @@ class StudioPagePerformanceTest(WebAppPerfReport):
             org=self.course_org,
             course=self.course_num
         )
-        self.new_page(har_name)
+        self.har_capturer.add_page(self.browser, har_name)
         course_outline_unit.go_to()
-        self.save_har(har_name)
+        self.har_capturer.save_har(self.browser, har_name)
 
 
 class StudioJusticePerformanceTest(StudioPagePerformanceTest):
