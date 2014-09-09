@@ -145,15 +145,19 @@ Annotator.Plugin.Grouping = (function(_super) {
         $.each(lineAnnDict, function(key, val) {
             if (val.length > self.groupthreshold) {
                 val.forEach(function(anno){
-                    $.each(anno.highlights, function(key, anno) {
-                       $(anno).css("background-color", "inherit");   
-                    });
+                    if (anno.highlights !== undefined) {
+                        $.each(anno.highlights, function(key, anno) {
+                           $(anno).css("background-color", "inherit");   
+                        });
+                    }
                 });
             } else {
                 val.forEach(function(anno) {
-                    $.each(anno.highlights, function(key, anno) {
-                       $(anno).css("background-color", "rgba(255, 255, 10, .3)");   
-                    });
+                    if (anno.highlights !== undefined) {
+                        $.each(anno.highlights, function(key, anno) {
+                           $(anno).css("background-color", "rgba(255, 255, 10, .3)");   
+                        });
+                    }
                 });
             }
         });
@@ -187,14 +191,18 @@ Annotator.Plugin.Grouping = (function(_super) {
                 $(newdiv).click(function(evt){
                     if($(evt.srcElement).attr("data-selected") === '0') {
                         annotations.forEach(function(annot){
-                            $.each(annot.highlights, function(key, ann) {
-                                $(ann).css("background-color", "inherit");
-                            });
+                            if (annot.highlights !== undefined) {
+                                $.each(annot.highlights, function(key, ann) {
+                                    $(ann).css("background-color", "inherit");
+                                });
+                            }
                         });
                         self.groupedAnnotations[$(evt.srcElement).css("top").replace("px", "")].forEach(function(item) {
-                            $.each(item.highlights, function(key, ann) {
-                                $(ann).css("background-color", "rgba(255, 255, 10, 0.3)");
-                            });
+                            if (item.highlights !== undefined) {
+                                $.each(item.highlights, function(key, ann) {
+                                    $(ann).css("background-color", "rgba(255, 255, 10, 0.3)");
+                                });
+                            }
                         });
                         $(evt.srcElement).attr("data-selected", '1');
                     } else {
@@ -237,9 +245,11 @@ Annotator.Plugin.Grouping = (function(_super) {
             $(".onOffGroupButton").html("Annotation Grouping: OFF");
             $(".onOffGroupButton").addClass("buttonOff");
             this.annotator.plugins.Store.annotations.forEach(function(annot) {
-                $.each(annot.highlights, function(key, ann) {
-                $(ann).css("background-color", "");
-                });
+                if (annot.highlights !== undefined) {
+                    $.each(annot.highlights, function(key, ann) {
+                        $(ann).css("background-color", "");
+                    });
+                }
             });
             
             // deals with the HighlightTags Plug-In

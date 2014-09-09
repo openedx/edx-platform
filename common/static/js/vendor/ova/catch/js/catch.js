@@ -546,9 +546,11 @@ CatchAnnotation.prototype = {
             // public or is equal to the person with update access, then we leave it alone,
             // otherwise we need to clean them up (i.e. disable them).
             if (self.options.userId !== '' && self.options.userId !== value.permissions.update[0]) {
-                $.each(value.highlights, function(key1, value1){
-                    $(value1).removeClass('annotator-hl');
-                });
+                if (value.highlights !== undefined) {
+                    $.each(value.highlights, function(key1, value1){
+                        $(value1).removeClass('annotator-hl');
+                    });
+                }
             }
         });
     },
@@ -1196,11 +1198,11 @@ CatchAnnotation.prototype = {
         
         annotations.forEach(function(ann){
             var child, h, _i, _len, _ref;
-            if (ann.highlights !== null) {
+            if (ann.highlights !== undefined) {
                 _ref = ann.highlights;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                     h = _ref[_i];
-                    if (!(h.parentNode !== null)) {
+                    if (!(h.parentNode !== undefined)) {
                         continue;
                     }
                     child = h.childNodes[0];
