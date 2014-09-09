@@ -43,7 +43,7 @@ site_status_msg = get_site_status_msg(course_id)
     % if user.is_authenticated():
     <a href="${marketing_link('ROOT')}">
     % else:
-    <a href="https://courses.ionis-group.com">
+    <a href="${settings.IONISX_AUTH.get('ROOT_URL')}">
     % endif
       <%block name="navigation_logo">
           <img src="${static.url(branding.get_logo_url())}" alt="
