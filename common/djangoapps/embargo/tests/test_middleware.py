@@ -8,6 +8,7 @@ import unittest
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.db import connection, transaction
 from django.test.utils import override_settings
 import ddt
 
@@ -266,6 +267,24 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
         # the database to check the user's profile only once
         with self.assertNumQueries(12):
             self.client.get(self.embargoed_page)
+
+    def test_embargo_profile_country_db_null(self):
+        # Django country fields treat NULL values inconsistently.
+        # When saving a profile with country set to None, Django saves an empty string to the database.
+        # However, when the country field loads a NULL value from the database, it sets
+        # `country.code` to `None`.  This caused a bug in which country values created by
+        # the original South schema migration -- which defaulted to NULL -- caused a runtime
+        # exception when the embargo middleware treated the value as a string.
+        # In order to simulate this behavior, we can't simply set `profile.country = None`.
+        # (because when we save it, it will set the database field to an empty string instead of NULL)
+        query = "UPDATE auth_userprofile SET country = NULL WHERE id = %s"
+        connection.cursor().execute(query, [str(self.user.profile.id)])
+        transaction.commit_unless_managed()
+
+        # Attempt to access an embargoed course
+        # Verify that the student can access the page without an error
+        response = self.client.get(self.embargoed_page)
+        self.assertEqual(response.status_code, 200)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False})
     def test_countries_embargo_off(self):
