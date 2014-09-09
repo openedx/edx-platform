@@ -1564,6 +1564,56 @@ class TestInheritance(SplitModuleTest):
         # overridden
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=4))
 
+    def test_inheritance_not_saved(self):
+        """
+        Was saving inherited settings with updated blocks causing inheritance to be sticky
+        """
+        # set on parent, retrieve child, verify setting
+        chapter = modulestore().get_item(
+            BlockUsageLocator(
+                CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'chapter', 'chapter3'
+            )
+        )
+        problem = modulestore().get_item(
+            BlockUsageLocator(
+                CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT), 'problem', 'problem3_2'
+            )
+        )
+        self.assertFalse(problem.visible_to_staff_only)
+
+        chapter.visible_to_staff_only = True
+        modulestore().update_item(chapter, self.user_id)
+        problem = modulestore().get_item(problem.location.version_agnostic())
+        self.assertTrue(problem.visible_to_staff_only)
+
+        # unset on parent, retrieve child, verify unset
+        chapter = modulestore().get_item(chapter.location.version_agnostic())
+        chapter.fields['visible_to_staff_only'].delete_from(chapter)
+        modulestore().update_item(chapter, self.user_id)
+
+        problem = modulestore().get_item(problem.location.version_agnostic())
+        self.assertFalse(problem.visible_to_staff_only)
+
+    def test_dynamic_inheritance(self):
+        """
+        Test inheritance for create_item with and without a parent pointer
+        """
+        course_key = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
+        chapter = modulestore().get_item(BlockUsageLocator(course_key, 'chapter', 'chapter3'))
+
+        chapter.visible_to_staff_only = True
+        orphan_problem = modulestore().create_item(self.user_id, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_child(self.user_id, chapter.location.version_agnostic(), 'problem')
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
+        orphan_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem')
+        self.assertFalse(orphan_problem.visible_to_staff_only)
+        parented_problem = modulestore().create_xblock(chapter.runtime, course_key, 'problem', parent_xblock=chapter)
+        # FIXME LMS-11376
+#         self.assertTrue(parented_problem.visible_to_staff_only)
+
 
 class TestPublish(SplitModuleTest):
     """
@@ -1732,7 +1782,7 @@ class TestSchema(SplitModuleTest):
             )
 
 
-#===========================================
+# ===========================================
 def modulestore():
     """
     Mock the django dependent global modulestore function to disentangle tests from django

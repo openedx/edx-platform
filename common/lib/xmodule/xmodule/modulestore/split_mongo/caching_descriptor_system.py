@@ -30,7 +30,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         modulestore: the module store that can be used to retrieve additional
         modules
 
-        course_entry: the originally fetched enveloped course_structure w/ branch and course id info.
+        course_entry: the originally fetched enveloped course_structure w/ branch and course id info
+        plus a dictionary of cached inherited_settings indexed by (block_type, block_id) tuple.
         Callers to _load_item provide an override but that function ignores the provided structure and
         only looks at the branch and course id
 
@@ -47,7 +48,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
             load_item=self._load_item,
-            resources_fs = OSFS(root),
+            resources_fs=OSFS(root),
             **kwargs
         )
         self.modulestore = modulestore
@@ -57,9 +58,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
-            course_entry['structure'].get('blocks', {}).get(
-                encode_key_for_mongo(course_entry['structure'].get('root'))
-            )
+            encode_key_for_mongo(course_entry['structure'].get('root')),
+            course_entry.setdefault('inherited_settings', {}),
         )
         self.default_class = default_class
         self.local_modules = {}
@@ -93,7 +93,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         json_data = self.get_module_data(block_id, course_key)
 
         class_ = self.load_block_type(json_data.get('category'))
-        new_item = self.xblock_from_json(class_, course_key, block_id, json_data, course_entry_override, **kwargs)
+        # pass None for inherited_settings to signal that it should get the settings from cache
+        new_item = self.xblock_from_json(class_, course_key, block_id, json_data, None, course_entry_override, **kwargs)
         return new_item
 
     def get_module_data(self, block_id, course_key):
@@ -124,7 +125,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
-    def xblock_from_json(self, class_, course_key, block_id, json_data, course_entry_override=None, **kwargs):
+    def xblock_from_json(
+        self, class_, course_key, block_id, json_data, inherited_settings, course_entry_override=None, **kwargs
+    ):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
@@ -136,6 +139,13 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
         definition_id = json_data.get('definition')
         block_type = json_data['category']
+        if block_id is not None:
+            if inherited_settings is None:
+                # see if there's a value in course_entry
+                if (block_type, block_id) in self.course_entry['inherited_settings']:
+                    inherited_settings = self.course_entry['inherited_settings'][(block_type, block_id)]
+            elif (block_type, block_id) not in self.course_entry['inherited_settings']:
+                self.course_entry['inherited_settings'][(block_type, block_id)] = inherited_settings
 
         if definition_id is not None and not json_data.get('definition_loaded', False):
             definition_loader = DefinitionLazyLoader(
@@ -168,7 +178,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         kvs = SplitMongoKVS(
             definition_loader,
             converted_fields,
-            json_data.get('_inherited_settings'),
+            inherited_settings,
             **kwargs
         )
         field_data = KvsFieldData(kvs)
