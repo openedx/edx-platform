@@ -111,6 +111,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
             ['git', 'fetch', 'origin'],
             ['git', 'reset', '--hard', 'origin/{0}'.format(branch)],
             ['git', 'pull'],
+            ['git', 'clean', '-d', '-f'],
         ]
     else:
         cmds = [['git', 'clone', repo]]
@@ -126,7 +127,7 @@ def export_to_git(course_id, repo, user='', rdir=None):
 
     # export course as xml before commiting and pushing
     root_dir = os.path.dirname(rdirp)
-    course_dir = os.path.splitext(os.path.basename(rdirp))[0]
+    course_dir = os.path.basename(rdirp).rsplit('.git', 1)[0]
     try:
         export_to_xml(modulestore(), contentstore(), course_id,
                       root_dir, course_dir)
