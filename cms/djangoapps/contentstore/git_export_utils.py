@@ -57,9 +57,9 @@ def cmd_log(cmd, cwd):
     command doesn't return 0, and returns the command's output.
     """
     output = subprocess.check_output(cmd, cwd=cwd, stderr=subprocess.STDOUT)
-    log.debug(_('Command was: {0!r}. '
-                'Working directory was: {1!r}'.format(' '.join(cmd), cwd)))
-    log.debug(_('Command output was: {0!r}'.format(output)))
+    log.debug('Command was: {0!r}. '
+              'Working directory was: {1!r}'.format(' '.join(cmd), cwd))
+    log.debug('Command output was: {0!r}'.format(output))
     return output
 
 
@@ -95,8 +95,8 @@ def export_to_git(course_id, repo, user='', rdir=None):
     rdirp = '{0}/{1}'.format(GIT_REPO_EXPORT_DIR, rdir)
     branch = None
     if os.path.exists(rdirp):
-        log.info(_('Directory already exists, doing a git reset and pull '
-                   'instead of git clone.'))
+        log.info('Directory already exists, doing a git reset and pull '
+                 'instead of git clone.')
         cwd = rdirp
         # Get current branch
         cmd = ['git', 'symbolic-ref', '--short', 'HEAD']
