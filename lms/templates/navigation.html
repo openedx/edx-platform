@@ -39,7 +39,11 @@ site_status_msg = get_site_status_msg(course_id)
   <header class="${"global slim" if course else "global-new"}" aria-label="${_('Global Navigation')}">
     <nav>
     <h1 class="logo">
+      % if user.is_authenticated():
       <a href="${marketing_link('ROOT')}">
+      % else:
+      <a href="${settings.IONISX_AUTH.get('ROOT_URL')}">
+      % endif
         <%block name="navigation_logo">
             <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}"/>
         </%block>
