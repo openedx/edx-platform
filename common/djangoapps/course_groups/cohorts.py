@@ -45,6 +45,16 @@ def is_course_cohorted(course_key):
     return courses.get_course_by_id(course_key).is_cohorted
 
 
+def get_cohorted_threads_privacy(course_key):
+    """
+    Given a course key, return the cohorted threads privacy setting.
+
+    Raises:
+       Http404 if the course doesn't exist.
+    """
+    return courses.get_course_by_id(course_key).cohorted_threads_privacy
+
+
 def get_cohort_id(user, course_key):
     """
     Given a course key and a user, return the id of the cohort that user is

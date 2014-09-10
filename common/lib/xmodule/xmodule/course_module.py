@@ -816,6 +816,18 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return set(config.get("cohorted_discussions", []))
 
     @property
+    def cohorted_threads_privacy(self):
+        """
+        Return whether the course cohorted threads pricacy. If the privacy is set to 'cohort-only',
+        a user that is not in a cohort will only see threads that are not cohorted.
+        """
+        config = self.cohort_config
+        if config is None:
+            return 'public'
+
+        return config.get("cohorted_threads_privacy", 'public')
+
+    @property
     def is_newish(self):
         """
         Returns if the course has been flagged as new. If
