@@ -59,6 +59,8 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 
 import random
 import string  # pylint: disable-msg=deprecated-module
+import analytics
+from eventtracking import tracker
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -322,6 +324,10 @@ def parse_query_params(strategy, response, *args, **kwargs):
     if not (auth_entry and auth_entry in _AUTH_ENTRY_CHOICES):
         raise AuthEntryError(strategy.backend, 'auth_entry missing or invalid')
 
+    # Note: We expect only one member of this dictionary to be `True` at any
+    # given time. If something changes this convention in the future, please look
+    # at the `login_analytics` function in this file as well to ensure logging
+    # is still done properly
     return {
         # Whether the auth pipeline entered from /dashboard.
         'is_dashboard': auth_entry == AUTH_ENTRY_DASHBOARD,
@@ -360,3 +366,36 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
     if is_register and user_unset:
         return redirect('/register', name='register_user')
+
+@partial.partial
+def login_analytics(*args, **kwargs):
+    event_name = None
+
+    action_to_event_name = {
+        'is_login': 'edx.bi.user.account.authenticated',
+        'is_dashboard': 'edx.bi.user.account.linked'
+    }
+
+    # Note: we assume only one of the `action` kwargs (is_dashboard, is_login) to be
+    # `True` at any given time
+    for action in action_to_event_name.keys():
+        if kwargs.get(action):
+            event_name = action_to_event_name[action]
+
+    if event_name is not None:
+        registration_course_id = kwargs['request'].session.get('registration_course_id')
+        tracking_context = tracker.get_tracker().resolve_context()
+        analytics.track(
+            kwargs['user'].id,
+            event_name,
+            {
+                'category': "conversion",
+                'label': registration_course_id,
+                'provider': getattr(kwargs['backend'], 'name')
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id') 
+                }
+            }
+        )
