@@ -205,9 +205,21 @@ class CyberSource2Test(TestCase):
         self.assertFalse(result['success'])
         self.assertIn(u"did not return a required parameter", result['error_html'])
 
+    @patch.object(OrderItem, 'purchased_callback')
+    def test_sign_then_verify_unicode(self, purchased_callback):
+        params = self._signed_callback_params(
+            self.order.id, self.COST, self.COST,
+            first_name=u'\u2699'
+        )
+
+        # Verify that this executes without a unicode error
+        result = process_postpay_callback(params)
+        self.assertTrue(result['success'])
+
     def _signed_callback_params(
         self, order_id, order_amount, paid_amount,
-        accepted=True, signature=None, card_number='xxxxxxxxxxxx1111'
+        accepted=True, signature=None, card_number='xxxxxxxxxxxx1111',
+        first_name='John'
     ):
         """
         Construct parameters that could be returned from CyberSource
@@ -227,6 +239,7 @@ class CyberSource2Test(TestCase):
             accepted (bool): Whether the payment was accepted or rejected.
             signature (string): If provided, use this value instead of calculating the signature.
             card_numer (string): If provided, use this value instead of the default credit card number.
+            first_name (string): If provided, the first name of the user.
 
         Returns:
             dict
@@ -306,7 +319,7 @@ class CyberSource2Test(TestCase):
             "req_transaction_uuid": "ddd9935b82dd403f9aa4ba6ecf021b1f",
             "auth_trans_ref_no": "85080648RYI23S6I",
             "req_bill_to_surname": "Doe",
-            "req_bill_to_forename": "John",
+            "req_bill_to_forename": first_name,
             "req_bill_to_email": "john@example.com",
             "req_override_custom_receipt_page": "http://localhost:8000/shoppingcart/postpay_callback/",
             "req_access_key": "abcd12345",
@@ -335,8 +348,8 @@ class CyberSource2Test(TestCase):
         """
         return processor_hash(
             ",".join([
-                "{0}={1}".format(signed_field, params[signed_field])
+                u"{0}={1}".format(signed_field, params[signed_field])
                 for signed_field
-                in params['signed_field_names'].split(",")
+                in params['signed_field_names'].split(u",")
             ])
         )
