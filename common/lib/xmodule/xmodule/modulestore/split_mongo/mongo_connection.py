@@ -244,4 +244,20 @@ class MongoConnection(object):
         """
         self.definitions.insert(definition)
 
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        self.course_index.create_index(
+            [
+                ('org', pymongo.ASCENDING),
+                ('course', pymongo.ASCENDING),
+                ('run', pymongo.ASCENDING)
+            ],
+            unique=True
+        )
 
