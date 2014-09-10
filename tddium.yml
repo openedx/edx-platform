@@ -52,7 +52,14 @@ tddium:
       - "reports/javascript/javascript_xunit.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_acceptance -s lms
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_1"
+      :invocation: single
+      :output: exit-status
+      :report_files:
+      - "reports/acceptance/lms.xml"
+    - :type: junit
+      :mode: basic
+      :command: paver test_acceptance -s lms --extra_args="-v 3 --tag shard_2"
       :invocation: single
       :output: exit-status
       :report_files:
@@ -66,14 +73,7 @@ tddium:
       - "reports/acceptance/cms.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_2"
-      :invocation: single
-      :output: exit-status
-      :report_files:
-      - "reports/acceptance/cms.xml"
-    - :type: junit
-      :mode: basic
-      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_3"
+      :command: paver test_acceptance -s cms --extra_args="-v 3 --tag shard_2 --tag shard_3"
       :invocation: single
       :output: exit-status
       :report_files:
