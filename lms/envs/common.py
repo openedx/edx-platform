@@ -287,7 +287,15 @@ FEATURES = {
     'ENABLE_NEW_EDX_HEADER': False,
 
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
-    'MARK_PROGRESS_ON_GRADING_EVENT': False
+    'MARK_PROGRESS_ON_GRADING_EVENT': False,
+
+    # Broadcast score changes to the rest of the system
+    'SIGNAL_ON_SCORE_CHANGED': False,
+
+    # Enable the Student Gradebook, which is essentially a cache of calculated grades
+    # In order to use the gradebook, you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_GRADEBOOK': False,
 }
 
 # Ignore static asset files on import which match this pattern

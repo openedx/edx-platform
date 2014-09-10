@@ -401,5 +401,5 @@ FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
 
 ############# Student Gradebook #################
 FEATURES['STUDENT_GRADEBOOK'] = True
-if FEATURES.get('STUDENT_GRADEBOOK', False):
+if FEATURES.get('STUDENT_GRADEBOOK', False) and "'gradebook'" not in INSTALLED_APPS:
     INSTALLED_APPS += ('gradebook',)

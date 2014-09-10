@@ -81,3 +81,15 @@ class RequestMock(RequestFactory):
                 raise Exception("Couldn't create request mock object - "
                                 "request middleware returned a response")
         return request
+
+
+class RequestMockWithoutMiddleware(RequestMock):
+    """
+    RequestMockWithoutMiddleware is used to create generic/dummy request
+    objects in scenarios where a regular request might not be available for use.
+    It's similiar to its parent except for the fact that it skips the loading
+    of middleware.
+    """
+    def request(self, **request):
+        "Construct a generic request object."
+        return RequestFactory.request(self, **request)

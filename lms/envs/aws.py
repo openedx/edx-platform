@@ -483,3 +483,10 @@ REGISTRATION_CODE_LENGTH = ENV_TOKENS.get('REGISTRATION_CODE_LENGTH', 8)
 
 # TODO (ECOM-16): Remove once the A/B test of auto-registration completes
 AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set(ENV_TOKENS.get('AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES', AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES))
+
+MIDDLEWARE_CLASSES = tuple(_class for _class in MIDDLEWARE_CLASSES if _class not in EXCLUDE_MIDDLEWARE_CLASSES)
+
+
+############# Student Gradebook #################
+if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('gradebook',)
