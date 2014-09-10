@@ -310,7 +310,13 @@ class CourseComparisonTest(BulkAssertionTest):
                 if actual_item is None and expected_item.location.category == 'course':
                     actual_item_location = actual_item_location.replace(name='course')
                     actual_item = actual_item_map.get(map_key(actual_item_location))
-                self.assertIsNotNone(actual_item, u'cannot find {} in {}'.format(map_key(actual_item_location), actual_item_map))
+
+                # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
+                if actual_item is None:
+                    msg = u'cannot find {} in {}'.format(map_key(actual_item_location), actual_item_map)
+                else:
+                    msg = None
+                self.assertIsNotNone(actual_item, msg)
 
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
@@ -328,17 +334,18 @@ class CourseComparisonTest(BulkAssertionTest):
 
                     exp_value = map_references(field.read_from(expected_item), field, actual_course_key)
                     actual_value = field.read_from(actual_item)
-                    self.assertEqual(
-                        exp_value,
-                        actual_value,
-                        "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
+                    # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
+                    if exp_value != actual_value:
+                        msg = "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
                             field_name,
                             expected_item.scope_ids.usage_id,
                             actual_item.scope_ids.usage_id,
                             exp_value,
                             actual_value,
                         )
-                    )
+                    else:
+                        msg = None
+                    self.assertEqual(exp_value, actual_value, msg)
 
                 # compare children
                 self.assertEqual(expected_item.has_children, actual_item.has_children)
