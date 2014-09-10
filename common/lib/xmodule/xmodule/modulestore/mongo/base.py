@@ -1463,3 +1463,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         # Because lms calls get_parent_locations frequently (for path generation):
         self.collection.create_index('definition.children', sparse=True)
+
+        # To allow prioritizing draft vs published material
+        self.collection.create_index('_id.revision')
