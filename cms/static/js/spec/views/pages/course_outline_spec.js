@@ -1,12 +1,14 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/utils/view_utils",
-        "js/views/pages/course_outline", "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers"],
-    function ($, create_sinon, view_helpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, edit_helpers) {
+define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils", "js/views/pages/course_outline",
+        "js/models/xblock_outline_info", "js/utils/date_utils", "js/spec_helpers/edit_helpers",
+        "js/common_helpers/template_helpers"],
+    function($, AjaxHelpers, ViewUtils, CourseOutlinePage, XBlockOutlineInfo, DateUtils, EditHelpers, TemplateHelpers) {
 
         describe("CourseOutlinePage", function() {
             var createCourseOutlinePage, displayNameInput, model, outlinePage, requests,
-                getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState, collapseItemsAndVerifyState,
-                createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON, verifyTypePublishable,
-                mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON, createMockVerticalJSON,
+                getItemsOfType, getItemHeaders, verifyItemsExpanded, expandItemsAndVerifyState,
+                collapseItemsAndVerifyState, createMockCourseJSON, createMockSectionJSON, createMockSubsectionJSON,
+                verifyTypePublishable, mockCourseJSON, mockEmptyCourseJSON, mockSingleSectionCourseJSON,
+                createMockVerticalJSON,
                 mockOutlinePage = readFixtures('mock/mock-course-outline-page.underscore'),
                 mockRerunNotification = readFixtures('mock/mock-course-rerun-notification.underscore');
 
@@ -114,7 +116,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             };
 
             createCourseOutlinePage = function(test, courseJSON, createOnly) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockOutlineInfo(courseJSON, { parse: true });
                 outlinePage = new CourseOutlinePage({
                     model: model,
@@ -148,12 +150,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePageAndShowUnit(this, mockCourseJSON);
                     getItemHeaders(type).find('.publish-button').click();
                     $(".wrapper-modal-window .action-publish").click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-' + type, {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-' + type, {
                         publish : 'make_public'
                     });
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
-                    create_sinon.respondWithJson(requests, {});
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                    AjaxHelpers.respondWithJson(requests, {});
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
                 });
 
                 it('should show publish button if it is not published and not changed', function() {
@@ -191,9 +193,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             };
 
             beforeEach(function () {
-                view_helpers.installMockAnalytics();
-                view_helpers.installViewTemplates();
-                view_helpers.installTemplates([
+                EditHelpers.installMockAnalytics();
+                EditHelpers.installViewTemplates();
+                TemplateHelpers.installTemplates([
                     'course-outline', 'xblock-string-field-editor', 'modal-button',
                     'basic-modal', 'course-outline-modal', 'release-date-editor',
                     'due-date-editor', 'grading-editor', 'publish-editor',
@@ -214,8 +216,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             });
 
             afterEach(function () {
-                view_helpers.removeMockAnalytics();
-                edit_helpers.cancelModalIfShowing();
+                EditHelpers.removeMockAnalytics();
+                EditHelpers.cancelModalIfShowing();
                 // Clean up after the $.datepicker
                 $("#start_date").datepicker( "destroy" );
                 $("#due_date").datepicker( "destroy" );
@@ -250,8 +252,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     expect($('.wrapper-alert-announcement')).not.toHaveClass('is-hidden');
                     $('.dismiss-button').click();
-                    create_sinon.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
-                    create_sinon.respondToDelete(requests);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', 'dummy_dismiss_url');
+                    AjaxHelpers.respondToDelete(requests);
                     expect($('.wrapper-alert-announcement')).toHaveClass('is-hidden');
                 });
             });
@@ -260,17 +262,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can add a section', function() {
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     outlinePage.$('.nav-actions .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
                         'parent_locator': 'mock-course'
                     });
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         "locator": 'mock-section',
                         "courseKey": 'slashes:MockCourse'
                     });
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
-                    create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
+                    AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
                     expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
@@ -279,18 +281,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     var sectionElements;
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     outlinePage.$('.nav-actions .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
                         'parent_locator': 'mock-course'
                     });
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         "locator": 'mock-section-2',
                         "courseKey": 'slashes:MockCourse'
                     });
                     // Expect the UI to just fetch the new section and repaint it
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section-2');
-                    create_sinon.respondWithJson(requests,
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section-2');
+                    AjaxHelpers.respondWithJson(requests,
                         createMockSectionJSON({id: 'mock-section-2', display_name: 'Mock Section 2'}));
                     sectionElements = getItemsOfType('section');
                     expect(sectionElements.length).toBe(2);
@@ -318,17 +320,17 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can add a section', function() {
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     $('.no-content .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
                         'parent_locator': 'mock-course'
                     });
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         "locator": "mock-section",
                         "courseKey": "slashes:MockCourse"
                     });
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
-                    create_sinon.respondWithJson(requests, mockSingleSectionCourseJSON);
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
+                    AjaxHelpers.respondWithJson(requests, mockSingleSectionCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toExist();
                     expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
@@ -337,13 +339,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     var requestCount;
                     createCourseOutlinePage(this, mockEmptyCourseJSON);
                     $('.no-content .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'chapter',
                         'display_name': 'Section',
                         'parent_locator': 'mock-course'
                     });
                     requestCount = requests.length;
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
                     expect(requests.length).toBe(requestCount); // No additional requests should be made
                     expect(outlinePage.$('.no-content')).not.toHaveClass('is-hidden');
                     expect(outlinePage.$('.no-content .button-new')).toExist();
@@ -358,43 +360,43 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 };
 
                 it('can be deleted', function() {
-                    var promptSpy = view_helpers.createPromptSpy(), requestCount;
+                    var promptSpy = EditHelpers.createPromptSpy(), requestCount;
                     createCourseOutlinePage(this, createMockCourseJSON({}, [
                         createMockSectionJSON(),
                         createMockSectionJSON({id: 'mock-section-2', display_name: 'Mock Section 2'})
                     ]));
                     getItemHeaders('section').find('.delete-button').first().click();
-                    view_helpers.confirmPrompt(promptSpy);
+                    EditHelpers.confirmPrompt(promptSpy);
                     requestCount = requests.length;
-                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
-                    create_sinon.respondWithJson(requests, {});
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
+                    AjaxHelpers.respondWithJson(requests, {});
                     expect(requests.length).toBe(requestCount); // No fetch should be performed
                     expect(outlinePage.$('[data-locator="mock-section"]')).not.toExist();
                     expect(outlinePage.$('[data-locator="mock-section-2"]')).toExist();
                 });
 
                 it('can be deleted if it is the only section', function() {
-                    var promptSpy = view_helpers.createPromptSpy();
+                    var promptSpy = EditHelpers.createPromptSpy();
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     getItemHeaders('section').find('.delete-button').click();
-                    view_helpers.confirmPrompt(promptSpy);
-                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
-                    create_sinon.respondWithJson(requests, {});
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
-                    create_sinon.respondWithJson(requests, mockEmptyCourseJSON);
+                    EditHelpers.confirmPrompt(promptSpy);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
+                    AjaxHelpers.respondWithJson(requests, {});
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-course');
+                    AjaxHelpers.respondWithJson(requests, mockEmptyCourseJSON);
                     expect(outlinePage.$('.no-content')).not.toHaveClass('is-hidden');
                     expect(outlinePage.$('.no-content .button-new')).toExist();
                 });
 
                 it('remains visible if its deletion fails', function() {
-                    var promptSpy = view_helpers.createPromptSpy(),
+                    var promptSpy = EditHelpers.createPromptSpy(),
                         requestCount;
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     getItemHeaders('section').find('.delete-button').click();
-                    view_helpers.confirmPrompt(promptSpy);
-                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
+                    EditHelpers.confirmPrompt(promptSpy);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-section');
                     requestCount = requests.length;
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
                     expect(requests.length).toBe(requestCount); // No additional requests should be made
                     expect(outlinePage.$('.list-sections li.outline-section').data('locator')).toEqual('mock-section');
                 });
@@ -402,18 +404,18 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 it('can add a subsection', function() {
                     createCourseOutlinePage(this, mockCourseJSON);
                     getItemsOfType('section').find('> .outline-content > .add-subsection .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'sequential',
                         'display_name': 'Subsection',
                         'parent_locator': 'mock-section'
                     });
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         "locator": "new-mock-subsection",
                         "courseKey": "slashes:MockCourse"
                     });
                     // Note: verification of the server response and the UI's handling of it
                     // is handled in the acceptance tests.
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
 
                 });
 
@@ -423,13 +425,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         sectionModel;
                     createCourseOutlinePage(this, mockCourseJSON);
                     displayNameWrapper = getDisplayNameWrapper();
-                    displayNameInput = view_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
+                    displayNameInput = EditHelpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, { });
+                    AjaxHelpers.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
-                    create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
-                    view_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
+                    AjaxHelpers.respondWithJson(requests, {"display_name":  updatedDisplayName});
+                    EditHelpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     sectionModel = outlinePage.model.get('child_info').children[0];
                     expect(sectionModel.get('display_name')).toBe(updatedDisplayName);
                 });
@@ -455,7 +457,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     // Staff lock controls are always visible
                     expect($("#staff_lock")).toExist();
                     $(".wrapper-modal-window .action-save").click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-section', {
                         "metadata":{
                             "start":"2015-01-02T00:00:00.000Z"
                         }
@@ -463,7 +465,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
 
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, {});
+                    AjaxHelpers.respondWithJson(requests, {});
                     var mockResponseSectionJSON = createMockSectionJSON({
                             release_date: 'Jan 02, 2015 at 00:00 UTC'
                         }, [
@@ -474,10 +476,10 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                                 })
                             ])
                         ]);
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section')
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
                     expect(requests.length).toBe(2);
                     // This is the response for the subsequent fetch operation for the section.
-                    create_sinon.respondWithJson(requests, mockResponseSectionJSON);
+                    AjaxHelpers.respondWithJson(requests, mockResponseSectionJSON);
 
                     expect($(".outline-section .status-release-value")).toContainText("Jan 02, 2015 at 00:00 UTC");
                 });
@@ -507,7 +509,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                             ]),
                             createMockSectionJSON({has_changes: true}, [
                                 createMockSubsectionJSON({has_changes: true}, [
-                                    createMockVerticalJSON({has_changes: true}),
+                                    createMockVerticalJSON({has_changes: true})
                                 ])
                             ])
                         ]), modalWindow;
@@ -518,7 +520,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect(modalWindow.find('.outline-unit').length).toBe(3);
                     expect(_.compact(_.map(modalWindow.find('.outline-unit').text().split("\n"), $.trim))).toEqual(
                         ['Unit 100', 'Unit 50', 'Unit 1']
-                    )
+                    );
                     expect(modalWindow.find('.outline-subsection').length).toBe(2);
                 });
             });
@@ -538,7 +540,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 };
 
                 // Contains hard-coded dates because dates are presented in different formats.
-                var mockServerValuesJson = createMockSectionJSON({
+                mockServerValuesJson = createMockSectionJSON({
                         release_date: 'Jan 01, 2970 at 05:00 UTC'
                     }, [
                         createMockSubsectionJSON({
@@ -559,15 +561,15 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     ]);
 
                 it('can be deleted', function() {
-                    var promptSpy = view_helpers.createPromptSpy();
+                    var promptSpy = EditHelpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
                     getItemHeaders('subsection').find('.delete-button').click();
-                    view_helpers.confirmPrompt(promptSpy);
-                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-subsection');
-                    create_sinon.respondWithJson(requests, {});
+                    EditHelpers.confirmPrompt(promptSpy);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-subsection');
+                    AjaxHelpers.respondWithJson(requests, {});
                     // Note: verification of the server response and the UI's handling of it
                     // is handled in the acceptance tests.
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
                 });
 
                 it('can add a unit', function() {
@@ -575,12 +577,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     createCourseOutlinePage(this, mockCourseJSON);
                     redirectSpy = spyOn(ViewUtils, 'redirect');
                     getItemsOfType('subsection').find('> .outline-content > .add-unit .button-new').click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                         'category': 'vertical',
                         'display_name': 'Unit',
                         'parent_locator': 'mock-subsection'
                     });
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         "locator": "new-mock-unit",
                         "courseKey": "slashes:MockCourse"
                     });
@@ -593,12 +595,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                         subsectionModel;
                     createCourseOutlinePage(this, mockCourseJSON);
                     displayNameWrapper = getDisplayNameWrapper();
-                    displayNameInput = view_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
+                    displayNameInput = EditHelpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, { });
+                    AjaxHelpers.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation for the section.
-                    create_sinon.respondWithJson(requests,
+                    AjaxHelpers.respondWithJson(requests,
                         createMockSectionJSON({}, [
                             createMockSubsectionJSON({
                                 display_name: updatedDisplayName
@@ -607,7 +609,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     );
                     // Find the display name again in the refreshed DOM and verify it
                     displayNameWrapper = getItemHeaders('subsection').find('.wrapper-xblock-field');
-                    view_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
+                    EditHelpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     subsectionModel = outlinePage.model.get('child_info').children[0].get('child_info').children[0];
                     expect(subsectionModel.get('display_name')).toBe(updatedDisplayName);
                 });
@@ -625,7 +627,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     outlinePage.$('.outline-subsection .configure-button').click();
                     setEditModalValues("7/9/2014", "7/10/2014", "Lab", true);
                     $(".wrapper-modal-window .action-save").click();
-                    create_sinon.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/mock-subsection', {
                         "graderType":"Lab",
                         "publish": "republish",
                         "metadata":{
@@ -637,16 +639,24 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect(requests[0].requestHeaders['X-HTTP-Method-Override']).toBe('PATCH');
 
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, {});
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section')
+                    AjaxHelpers.respondWithJson(requests, {});
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
                     expect(requests.length).toBe(2);
                     // This is the response for the subsequent fetch operation for the section.
-                    create_sinon.respondWithJson(requests, mockServerValuesJson);
+                    AjaxHelpers.respondWithJson(requests, mockServerValuesJson);
 
-                    expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
-                    expect($(".outline-subsection .status-message-copy")).toContainText("Contains staff only content");
+                    expect($(".outline-subsection .status-release-value")).toContainText(
+                        "Jul 09, 2014 at 00:00 UTC"
+                    );
+                    expect($(".outline-subsection .status-grading-date")).toContainText(
+                        "Due: Jul 10, 2014 at 00:00 UTC"
+                    );
+                    expect($(".outline-subsection .status-grading-value")).toContainText(
+                        "Lab"
+                    );
+                    expect($(".outline-subsection .status-message-copy")).toContainText(
+                        "Contains staff only content"
+                    );
 
                     expect($(".outline-item .outline-subsection .status-grading-value")).toContainText("Lab");
                     outlinePage.$('.outline-item .outline-subsection .configure-button').click();
@@ -663,14 +673,22 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     $(".wrapper-modal-window .action-save").click();
 
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, {});
+                    AjaxHelpers.respondWithJson(requests, {});
                     // This is the response for the subsequent fetch operation.
-                    create_sinon.respondWithJson(requests, mockServerValuesJson);
+                    AjaxHelpers.respondWithJson(requests, mockServerValuesJson);
 
-                    expect($(".outline-subsection .status-release-value")).toContainText("Jul 09, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .status-grading-date")).toContainText("Due: Jul 10, 2014 at 00:00 UTC");
-                    expect($(".outline-subsection .status-grading-value")).toContainText("Lab");
-                    expect($(".outline-subsection .status-message-copy")).toContainText("Contains staff only content");
+                    expect($(".outline-subsection .status-release-value")).toContainText(
+                        "Jul 09, 2014 at 00:00 UTC"
+                    );
+                    expect($(".outline-subsection .status-grading-date")).toContainText(
+                        "Due: Jul 10, 2014 at 00:00 UTC"
+                    );
+                    expect($(".outline-subsection .status-grading-value")).toContainText(
+                        "Lab"
+                    );
+                    expect($(".outline-subsection .status-message-copy")).toContainText(
+                        "Contains staff only content"
+                    );
 
                     outlinePage.$('.outline-subsection .configure-button').click();
                     expect($("#start_date").val()).toBe('7/9/2014');
@@ -689,15 +707,19 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     $(".wrapper-modal-window .action-save").click();
 
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, {});
+                    AjaxHelpers.respondWithJson(requests, {});
                     // This is the response for the subsequent fetch operation.
-                    create_sinon.respondWithJson(requests,
+                    AjaxHelpers.respondWithJson(requests,
                         createMockSectionJSON({}, [createMockSubsectionJSON()])
                     );
-                    expect($(".outline-subsection .status-release-value")).not.toContainText("Jul 09, 2014 at 00:00 UTC");
+                    expect($(".outline-subsection .status-release-value")).not.toContainText(
+                        "Jul 09, 2014 at 00:00 UTC"
+                    );
                     expect($(".outline-subsection .status-grading-date")).not.toExist();
                     expect($(".outline-subsection .status-grading-value")).not.toExist();
-                    expect($(".outline-subsection .status-message-copy")).not.toContainText("Contains staff only content");
+                    expect($(".outline-subsection .status-message-copy")).not.toContainText(
+                        "Contains staff only content"
+                    );
                 });
 
                 verifyTypePublishable('subsection', function (options) {
@@ -731,7 +753,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                     expect(modalWindow.find('.outline-unit').length).toBe(2);
                     expect(_.compact(_.map(modalWindow.find('.outline-unit').text().split("\n"), $.trim))).toEqual(
                         ['Unit 100', 'Unit 50']
-                    )
+                    );
                     expect(modalWindow.find('.outline-subsection')).not.toExist();
                 });
             });
@@ -739,16 +761,16 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
             // Note: most tests for units can be found in Bok Choy
             describe("Unit", function() {
                 it('can be deleted', function() {
-                    var promptSpy = view_helpers.createPromptSpy();
+                    var promptSpy = EditHelpers.createPromptSpy();
                     createCourseOutlinePage(this, mockCourseJSON);
                     expandItemsAndVerifyState('subsection');
                     getItemHeaders('unit').find('.delete-button').click();
-                    view_helpers.confirmPrompt(promptSpy);
-                    create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/mock-unit');
-                    create_sinon.respondWithJson(requests, {});
+                    EditHelpers.confirmPrompt(promptSpy);
+                    AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/mock-unit');
+                    AjaxHelpers.respondWithJson(requests, {});
                     // Note: verification of the server response and the UI's handling of it
                     // is handled in the acceptance tests.
-                    create_sinon.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/outline/mock-section');
                 });
 
                 it('has a link to the unit page', function() {

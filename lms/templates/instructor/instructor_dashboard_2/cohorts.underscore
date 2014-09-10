@@ -7,22 +7,9 @@
 <% if (cohorts.length > 0) { %>
     <div class="cohort-management-nav">
         <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
-
             <div class="cohort-management-nav-form-select field field-select">
                 <label for="cohort-select" class="label sr">${_("Select a cohort to manage")}</label>
-
                 <select class="input cohort-select" name="cohort-select" id="cohort-select">
-                    <option value=""><%- gettext('Select a cohort') %></option>
-                    <% _.each(cohorts, function(cohort) { %>
-                        <%
-                        var label = interpolate(
-                            gettext('%(cohort_name)s (%(user_count)s)'),
-                            { cohort_name: cohort.get('name'), user_count: cohort.get('user_count') },
-                            true
-                        );
-                        %>
-                        <option value="<%- cohort.get('id') %>"><%- label %></option>
-                    <% }); %>
                 </select>
             </div>
 

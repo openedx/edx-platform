@@ -1,5 +1,6 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/spec_helpers/edit_helpers", "js/models/xblock_info", "js/views/xblock_string_field_editor"],
-       function ($, create_sinon, view_helpers, edit_helpers, XBlockInfo, XBlockStringFieldEditor) {
+define(["jquery", "js/common_helpers/ajax_helpers", "js/common_helpers/template_helpers",
+        "js/spec_helpers/edit_helpers", "js/models/xblock_info", "js/views/xblock_string_field_editor"],
+       function ($, AjaxHelpers, TemplateHelpers, EditHelpers, XBlockInfo, XBlockStringFieldEditor) {
            describe("XBlockStringFieldEditorView", function () {
                var initialDisplayName, updatedDisplayName, getXBlockInfo, getFieldEditorView;
 
@@ -26,11 +27,13 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                beforeEach(function () {
                    initialDisplayName = "Default Display Name";
                    updatedDisplayName = "Updated Display Name";
-                   view_helpers.installTemplate('xblock-string-field-editor');
+                   TemplateHelpers.installTemplate('xblock-string-field-editor');
                    appendSetFixtures(
                            '<div class="wrapper-xblock-field incontext-editor is-editable"' +
                            'data-field="display_name" data-field-display-name="Display Name">' +
-                           '<h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">' + initialDisplayName + '</span></h1>' +
+                           '<h1 class="page-header-title xblock-field-value incontext-editor-value">' +
+                           '<span class="title-value">' + initialDisplayName + '</span>' +
+                           '</h1>' +
                            '</div>'
                    );
                });
@@ -39,7 +42,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                    var expectPostedNewDisplayName, expectEditCanceled;
 
                    expectPostedNewDisplayName = function (requests, displayName) {
-                       create_sinon.expectJsonRequest(requests, 'POST', '/xblock/my_xblock', {
+                       AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/my_xblock', {
                            metadata: {
                                display_name: displayName
                            }
@@ -48,9 +51,9 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
 
                    expectEditCanceled = function (test, fieldEditorView, options) {
                        var requests, initialRequests, displayNameInput;
-                       requests = create_sinon.requests(test);
+                       requests = AjaxHelpers.requests(test);
                        initialRequests = requests.length;
-                       displayNameInput = edit_helpers.inlineEdit(fieldEditorView.$el, options.newTitle);
+                       displayNameInput = EditHelpers.inlineEdit(fieldEditorView.$el, options.newTitle);
                        if (options.pressEscape) {
                            displayNameInput.simulate("keydown", { keyCode: $.simulate.keyCode.ESCAPE });
                            displayNameInput.simulate("keyup", { keyCode: $.simulate.keyCode.ESCAPE });
@@ -61,51 +64,51 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                        }
                        // No requests should be made when the edit is cancelled client-side
                        expect(initialRequests).toBe(requests.length);
-                       edit_helpers.verifyInlineEditChange(fieldEditorView.$el, initialDisplayName);
+                       EditHelpers.verifyInlineEditChange(fieldEditorView.$el, initialDisplayName);
                        expect(fieldEditorView.model.get('display_name')).toBe(initialDisplayName);
                    };
 
                    it('can inline edit the display name', function () {
                        var requests, fieldEditorView;
-                       requests = create_sinon.requests(this);
+                       requests = AjaxHelpers.requests(this);
                        fieldEditorView = getFieldEditorView().render();
-                       edit_helpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
+                       EditHelpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
                        fieldEditorView.$('button[name=submit]').click();
                        expectPostedNewDisplayName(requests, updatedDisplayName);
                        // This is the response for the change operation.
-                       create_sinon.respondWithJson(requests, { });
+                       AjaxHelpers.respondWithJson(requests, { });
                        // This is the response for the subsequent fetch operation.
-                       create_sinon.respondWithJson(requests, {display_name:  updatedDisplayName});
-                       edit_helpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName);
+                       AjaxHelpers.respondWithJson(requests, {display_name:  updatedDisplayName});
+                       EditHelpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName);
                    });
 
                    it('does not change the title when a display name update fails', function () {
                        var requests, fieldEditorView, initialRequests;
-                       requests = create_sinon.requests(this);
+                       requests = AjaxHelpers.requests(this);
                        initialRequests = requests.length;
                        fieldEditorView = getFieldEditorView().render();
-                       edit_helpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
+                       EditHelpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
                        fieldEditorView.$('button[name=submit]').click();
                        expectPostedNewDisplayName(requests, updatedDisplayName);
-                       create_sinon.respondWithError(requests);
+                       AjaxHelpers.respondWithError(requests);
                        // No fetch operation should occur.
                        expect(initialRequests + 1).toBe(requests.length);
-                       edit_helpers.verifyInlineEditChange(fieldEditorView.$el, initialDisplayName, updatedDisplayName);
+                       EditHelpers.verifyInlineEditChange(fieldEditorView.$el, initialDisplayName, updatedDisplayName);
                    });
 
                    it('trims whitespace from the display name', function () {
                        var requests, fieldEditorView;
-                       requests = create_sinon.requests(this);
+                       requests = AjaxHelpers.requests(this);
                        fieldEditorView = getFieldEditorView().render();
                        updatedDisplayName += ' ';
-                       edit_helpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
+                       EditHelpers.inlineEdit(fieldEditorView.$el, updatedDisplayName);
                        fieldEditorView.$('button[name=submit]').click();
                        expectPostedNewDisplayName(requests, updatedDisplayName.trim());
                        // This is the response for the change operation.
-                       create_sinon.respondWithJson(requests, { });
+                       AjaxHelpers.respondWithJson(requests, { });
                        // This is the response for the subsequent fetch operation.
-                       create_sinon.respondWithJson(requests, {display_name:  updatedDisplayName.trim()});
-                       edit_helpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName.trim());
+                       AjaxHelpers.respondWithJson(requests, {display_name:  updatedDisplayName.trim()});
+                       EditHelpers.verifyInlineEditChange(fieldEditorView.$el, updatedDisplayName.trim());
                    });
 
                    it('does not change the title when input is the empty string', function () {

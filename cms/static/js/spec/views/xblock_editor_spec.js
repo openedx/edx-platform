@@ -1,6 +1,6 @@
-define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define([ "jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
     "js/views/xblock_editor", "js/models/xblock_info"],
-    function ($, _, create_sinon, edit_helpers, XBlockEditorView, XBlockInfo) {
+    function ($, _, AjaxHelpers, EditHelpers, XBlockEditorView, XBlockInfo) {
 
         describe("XBlockEditorView", function() {
             var model, editor, testDisplayName, mockSaveResponse;
@@ -14,7 +14,7 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
             };
 
             beforeEach(function () {
-                edit_helpers.installEditTemplates();
+                EditHelpers.installEditTemplates();
                 model = new XBlockInfo({
                     id: 'testCourse/branch/draft/block/verticalFFF',
                     display_name: 'Test Unit',
@@ -29,19 +29,19 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                 var mockXBlockEditorHtml;
 
                 beforeEach(function () {
-                    edit_helpers.installMockXBlock();
+                    EditHelpers.installMockXBlock();
                 });
 
                 afterEach(function() {
-                    edit_helpers.uninstallMockXBlock();
+                    EditHelpers.uninstallMockXBlock();
                 });
 
                 mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore');
 
                 it('can render itself', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     editor.render();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []
                     });
@@ -57,17 +57,17 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 beforeEach(function() {
-                    edit_helpers.installMockXModule(mockSaveResponse);
+                    EditHelpers.installMockXModule(mockSaveResponse);
                 });
 
                 afterEach(function () {
-                    edit_helpers.uninstallMockXModule();
+                    EditHelpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     editor.render();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
                         resources: []
                     });
@@ -77,9 +77,9 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                 });
 
                 it('saves any custom metadata', function() {
-                    var requests = create_sinon.requests(this), request, response;
+                    var requests = AjaxHelpers.requests(this), request, response;
                     editor.render();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
                         resources: []
                     });
@@ -93,11 +93,11 @@ define([ "jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helper
                 });
 
                 it('can render a module with only settings', function() {
-                    var requests = create_sinon.requests(this), mockXModuleEditorHtml;
+                    var requests = AjaxHelpers.requests(this), mockXModuleEditorHtml;
                     mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
 
                     editor.render();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXModuleEditorHtml,
                         resources: []
                     });

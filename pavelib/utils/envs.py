@@ -88,6 +88,7 @@ class Env(object):
     # reason. See issue TE-415.
     JS_TEST_ID_FILES = [
         REPO_ROOT / 'lms/static/js_test.yml',
+        REPO_ROOT / 'lms/static/js_test_coffee.yml',
         REPO_ROOT / 'cms/static/js_test.yml',
         REPO_ROOT / 'cms/static/js_test_squire.yml',
         REPO_ROOT / 'common/lib/xmodule/xmodule/js/js_test.yml',
@@ -96,6 +97,7 @@ class Env(object):
 
     JS_TEST_ID_KEYS = [
         'lms',
+        'lms-coffee',
         'cms',
         'cms-squire',
         'xmodule',

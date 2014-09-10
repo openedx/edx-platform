@@ -1,5 +1,5 @@
 ---
-# LMS JavaScript tests (using RequireJS).
+# LMS CoffeeScript tests that are not yet using RequireJS.
 #
 #
 # To run all the tests and print results to the console:
@@ -14,9 +14,9 @@
 #   js-test-tool dev TEST_SUITE
 #
 
-test_suite_name: lms
+test_suite_name: lms-coffee
 
-test_runner: jasmine_requirejs
+test_runner: jasmine
 
 # Path prepended to source files in the coverage report (optional)
 # For example, if the source path
@@ -46,19 +46,14 @@ lib_paths:
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
-    - xmodule_js/common_static/js/vendor/underscore-min.js
-    - xmodule_js/common_static/js/vendor/backbone-min.js
 
 # Paths to source JavaScript files
 src_paths:
-    - js
-    - js/common_helpers
-    - xmodule_js
-    - xmodule_js/common_static
+    - coffee/src
 
 # Paths to spec (test) JavaScript files
 spec_paths:
-    - js/spec
+    - coffee/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -70,13 +65,22 @@ spec_paths:
 #   loadFixtures('path/to/fixture/fixture.html');
 #
 fixture_paths:
-    - templates/instructor/instructor_dashboard_2
+    - coffee/fixtures
 
-requirejs:
-  paths:
-    main: js/spec/main
+# Regular expressions used to exclude *.js files from
+# appearing in the test runner page.
+# Files are included by default, which means that they
+# are loaded using a <script> tag in the test runner page.
+# When loading many files, this can be slow, so
+# exclude any files you don't need.
+#exclude_from_page:
+#    - path/to/lib/exclude/*
 
-# Because require.js is responsible for loading all dependencies, we exclude
-# all files from being included in <script> tags
-exclude_from_page:
-    - .*
+# Regular expression used to guarantee that a *.js file
+# is included in the test runner page.
+# If a file name matches both `exclude_from_page` and
+# `include_in_page`, the file WILL be included.
+# You can use this to exclude all files in a directory,
+# but make an exception for particular files.
+#include_in_page:
+#    - path/to/lib/include/*

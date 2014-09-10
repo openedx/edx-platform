@@ -1,6 +1,6 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "js/views/asset", "js/views/assets",
+define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views/assets",
     "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers" ],
-    function ($, create_sinon, AssetView, AssetsView, AssetModel, AssetCollection, view_helpers) {
+    function ($, AjaxHelpers, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse,
@@ -64,18 +64,18 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/views/asset", "js/views/a
                 var setup;
                 setup = function() {
                     var requests;
-                    requests = create_sinon.requests(this);
+                    requests = AjaxHelpers.requests(this);
                     assetsView.setPage(0);
-                    create_sinon.respondWithJson(requests, mockEmptyAssetsResponse);
+                    AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
                     return requests;
                 };
 
                 beforeEach(function () {
-                    view_helpers.installMockAnalytics();
+                    ViewHelpers.installMockAnalytics();
                 });
 
                 afterEach(function () {
-                    view_helpers.removeMockAnalytics();
+                    ViewHelpers.removeMockAnalytics();
                 });
 
                 it('shows the upload modal when clicked on "Upload your first asset" button', function () {
