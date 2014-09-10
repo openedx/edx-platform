@@ -1,3 +1,8 @@
+import json
+import re
+
+from course_groups.models import CourseUserGroup
+
 class GroupIdAssertionMixin(object):
     def _data_or_params_cs_request(self, mock_request):
         """
@@ -16,6 +21,31 @@ class GroupIdAssertionMixin(object):
     def _assert_comments_service_called_without_group_id(self, mock_request):
         self.assertTrue(mock_request.called)
         self.assertNotIn("group_id", self._data_or_params_cs_request(mock_request))
+
+    def _assert_html_response_contains_group_info(self, response):
+        group_info = {"group_id": None, "group_name": None}
+        match = re.search(r'&quot;group_id&quot;: ([\d]*)', response.content)
+        if match and match.group(1) != '':
+            group_info["group_id"] = int(match.group(1))
+        match = re.search(r'&quot;group_name&quot;: &quot;([^&]*)&quot;', response.content)
+        if match:
+            group_info["group_name"] = match.group(1)
+        self._assert_thread_contains_group_info(group_info)
+
+    def _assert_json_response_contains_group_info(self, response, extract_thread=None):
+        """
+        :param extract_thread: a function which accepts a dictionary (complete
+            json response payload) and returns another dictionary (first
+            occurrence of a thread model within that payload).  if None is
+            passed, the identity function is assumed.
+        """
+        payload = json.loads(response.content)
+        thread = extract_thread(payload) if extract_thread else payload
+        self._assert_thread_contains_group_info(thread)
+
+    def _assert_thread_contains_group_info(self, thread):
+        self.assertEqual(thread['group_id'], self.student_cohort.id)
+        self.assertEqual(thread['group_name'], self.student_cohort.name)
 
 
 class CohortedTopicGroupIdTestMixin(GroupIdAssertionMixin):
