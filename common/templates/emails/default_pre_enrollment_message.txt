@@ -14,7 +14,7 @@ for more information, such as when the course will start, and what topics will
 be covered in the course.
 
 Have more questions?  Please visit the Help Center at
-https://stanfordonline.zendesk.com/hc/en-us, or send the Stanford Online course
+https://stanfordonline.zendesk.com, or send the Stanford Online course
 support team a message by clicking on the Help tab that displays on all
 https://class.stanford.edu pages.
 
