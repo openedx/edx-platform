@@ -1,7 +1,7 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "URI",
+define([ "jquery", "js/common_helpers/ajax_helpers", "URI",
     "js/views/paging", "js/views/paging_header", "js/views/paging_footer",
     "js/models/asset", "js/collections/asset" ],
-    function ($, create_sinon, URI, PagingView, PagingHeader, PagingFooter, AssetModel, AssetCollection) {
+    function ($, AjaxHelpers, URI, PagingView, PagingHeader, PagingFooter, AssetModel, AssetCollection) {
 
         var createMockAsset = function(index) {
             var id = 'asset_' + index;
@@ -50,7 +50,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
             var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
             var page = queryParameters.page;
             var response = page === "0" ? mockFirstPage : mockSecondPage;
-            create_sinon.respondWithJson(requests, response, requestIndex);
+            AjaxHelpers.respondWithJson(requests, response, requestIndex);
         };
 
         var MockPagingView = PagingView.extend({
@@ -77,7 +77,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
             describe("PagingView", function () {
                 describe("setPage", function () {
                     it('can set the current page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingView.collection.currentPage).toBe(0);
@@ -87,7 +87,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should not change page after a server error', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingView.setPage(1);
@@ -98,7 +98,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
 
                 describe("nextPage", function () {
                     it('does not move forward after a server error', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingView.nextPage();
@@ -107,7 +107,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can move to the next page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingView.nextPage();
@@ -116,7 +116,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can not move forward from the final page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingView.nextPage();
@@ -127,7 +127,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                 describe("previousPage", function () {
 
                     it('can move back a page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingView.previousPage();
@@ -136,7 +136,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can not move back from the first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingView.previousPage();
@@ -144,7 +144,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('does not move back after a server error', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingView.previousPage();
@@ -156,7 +156,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                 describe("toggleSortOrder", function () {
 
                     it('can toggle direction of the current sort', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         expect(pagingView.collection.sortDirection).toBe('desc');
                         pagingView.toggleSortOrder('date-col');
                         respondWithMockAssets(requests);
@@ -167,7 +167,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('sets the correct default sort direction for a column', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.toggleSortOrder('name-col');
                         respondWithMockAssets(requests);
                         expect(pagingView.sortDisplayName()).toBe('Name');
@@ -214,7 +214,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('does not move forward if a server error occurs', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingHeader.$('.next-page-link').click();
@@ -223,7 +223,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can move to the next page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingHeader.$('.next-page-link').click();
@@ -232,23 +232,23 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should be enabled when there is at least one more page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.next-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on the final page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.next-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on an empty page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingHeader.$('.next-page-link')).toHaveClass('is-disabled');
                     });
                 });
@@ -261,7 +261,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('does not move back if a server error occurs', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingHeader.$('.previous-page-link').click();
@@ -270,7 +270,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can go back a page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingHeader.$('.previous-page-link').click();
@@ -279,30 +279,30 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should be disabled on the first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be enabled on the second page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.previous-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled for an empty page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingHeader.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
                 });
 
                 describe("Page metadata section", function() {
                     it('shows the correct metadata for the current page', function () {
-                        var requests = create_sinon.requests(this),
+                        var requests = AjaxHelpers.requests(this),
                             message;
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
@@ -313,7 +313,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('shows the correct metadata when sorted ascending', function () {
-                        var requests = create_sinon.requests(this),
+                        var requests = AjaxHelpers.requests(this),
                             message;
                         pagingView.setPage(0);
                         pagingView.toggleSortOrder('name-col');
@@ -327,60 +327,60 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
 
                 describe("Asset count label", function () {
                     it('should show correct count on first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.count-current-shown')).toHaveHtml('1-3');
                     });
 
                     it('should show correct count on second page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.count-current-shown')).toHaveHtml('4-4');
                     });
 
                     it('should show correct count for an empty collection', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingHeader.$('.count-current-shown')).toHaveHtml('0-0');
                     });
                 });
 
                 describe("Asset total label", function () {
                     it('should show correct total on the first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.count-total')).toHaveText('4 total');
                     });
 
                     it('should show correct total on the second page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.count-total')).toHaveText('4 total');
                     });
 
                     it('should show zero total for an empty collection', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingHeader.$('.count-total')).toHaveText('0 total');
                     });
                 });
 
                 describe("Sort order label", function () {
                     it('should show correct initial sort order', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.sort-order')).toHaveText('Date');
                     });
 
                     it('should show updated sort order', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.toggleSortOrder('name-col');
                         respondWithMockAssets(requests);
                         expect(pagingHeader.$('.sort-order')).toHaveText('Name');
@@ -405,7 +405,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('does not move forward if a server error occurs', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.next-page-link').click();
@@ -414,7 +414,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can move to the next page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.next-page-link').click();
@@ -423,23 +423,23 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should be enabled when there is at least one more page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.next-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on the final page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.next-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be disabled on an empty page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingFooter.$('.next-page-link')).toHaveClass('is-disabled');
                     });
                 });
@@ -452,7 +452,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('does not move back if a server error occurs', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.previous-page-link').click();
@@ -461,7 +461,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('can go back a page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.previous-page-link').click();
@@ -470,62 +470,62 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should be disabled on the first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
 
                     it('should be enabled on the second page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.previous-page-link')).not.toHaveClass('is-disabled');
                     });
 
                     it('should be disabled for an empty page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingFooter.$('.previous-page-link')).toHaveClass('is-disabled');
                     });
                 });
 
                 describe("Current page label", function () {
                     it('should show 1 on the first page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.current-page')).toHaveText('1');
                     });
 
                     it('should show 2 on the second page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.current-page')).toHaveText('2');
                     });
 
                     it('should show 1 for an empty collection', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingFooter.$('.current-page')).toHaveText('1');
                     });
                 });
 
                 describe("Page total label", function () {
                     it('should show the correct value with more than one page', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.total-pages')).toHaveText('2');
                     });
 
                     it('should show page 1 when there are no assets', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
-                        create_sinon.respondWithJson(requests, mockEmptyPage);
+                        AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingFooter.$('.total-pages')).toHaveText('1');
                     });
                 });
@@ -538,14 +538,14 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should initially have a blank page input', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         expect(pagingFooter.$('.page-number-input')).toHaveValue('');
                     });
 
                     it('should handle invalid page requests', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.page-number-input').val('abc');
@@ -555,18 +555,18 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI",
                     });
 
                     it('should switch pages via the input field', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.page-number-input').val('2');
                         pagingFooter.$('.page-number-input').trigger('change');
-                        create_sinon.respondWithJson(requests, mockSecondPage);
+                        AjaxHelpers.respondWithJson(requests, mockSecondPage);
                         expect(pagingView.collection.currentPage).toBe(1);
                         expect(pagingFooter.$('.page-number-input')).toHaveValue('');
                     });
 
                     it('should handle AJAX failures when switching pages via the input field', function () {
-                        var requests = create_sinon.requests(this);
+                        var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(0);
                         respondWithMockAssets(requests);
                         pagingFooter.$('.page-number-input').val('2');

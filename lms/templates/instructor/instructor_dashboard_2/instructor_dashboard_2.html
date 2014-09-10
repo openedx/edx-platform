@@ -50,17 +50,20 @@
   <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
   <%static:js group='module-descriptor-js'/>
   <%static:js group='instructor_dash'/>
+  <%static:js group='application'/>
 
   ## Backbone classes declared explicitly until RequireJS is supported
+  <script type="text/javascript" src="${static.url('js/models/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/cohort.js')}"></script>
   <script type="text/javascript" src="${static.url('js/collections/cohort.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/cohort_editor.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/cohorts.js')}"></script>
 </%block>
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "cohort-editor"]:
+% for template_name in ["cohorts", "cohort-editor", "cohort-selector", "notification"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
