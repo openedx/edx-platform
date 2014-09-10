@@ -62,10 +62,17 @@ class RandomizeModule(RandomizeFields, XModule):
         choices = self.get_choices(no_repeats=no_repeats, suspended=suspended)
         all_choices = self.get_choices()
         current_child = all_choices.get(self.choice)
-        if current_child and self.choice not in choices:
-            if current_child.location.name not in suspended:
-                # Children changed. Reset.
+        if current_child:
+            cloc = current_child.location
+            if cloc.url() not in choices and cloc.name not in (suspended or []):
+                # child exists but is not in the list of choices. dont
+                # reset suspended problems otherwise students that passed will
+                # lose their grade.
                 self.choice = None
+        elif self.choice is not None:
+            log.warn("Problem removed from course XML: %s" % self.choice)
+            # current choice no longer exists in course XML - reset
+            self.choice = None
 
         if self.choice is None:
             num_choices = len(choices)
