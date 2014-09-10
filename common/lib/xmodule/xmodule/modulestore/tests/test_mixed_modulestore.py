@@ -916,7 +916,7 @@ class TestMixedModuleStore(unittest.TestCase):
     # TODO: LMS-11220: Document why draft send count is 5
     # TODO: LMS-11220: Document why draft find count is [19, 6]
     # TODO: LMS-11220: Document why split find count is [2, 2]
-    @ddt.data(('draft', [20, 5], 0), ('split', [17, 6], 0))  # FIXME, replace w/ above when bulk reenabled
+    @ddt.data(('draft', [20, 5], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """

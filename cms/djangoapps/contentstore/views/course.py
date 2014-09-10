@@ -423,7 +423,7 @@ def course_index(request, course_key):
     """
     # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
-    with modulestore().bulk_temp_noop_operations(course_key):  # FIXME
+    with modulestore().bulk_operations(course_key):
         course_module = _get_course_module(course_key, request.user, depth=None)
         lms_link = get_lms_link_for_item(course_module.location)
         sections = course_module.get_children()
