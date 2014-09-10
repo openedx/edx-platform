@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-08-22 12:00-0400\n"
-"PO-Revision-Date: 2014-08-22 16:02:07.802910\n"
+"POT-Creation-Date: 2014-09-04 12:39-0400\n"
+"PO-Revision-Date: 2014-09-04 16:40:37.623421\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -500,8 +500,6 @@ msgstr "Çléär förmättïng Ⱡ'σ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
 #: common/templates/js/image-modal.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ι#"
@@ -1687,6 +1685,7 @@ msgstr "Shöw Dïsçüssïön Ⱡ'#"
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/utils.js
+#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
@@ -1739,29 +1738,97 @@ msgid "…"
 msgstr "… #"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-#: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "Open"
-msgstr "Öpén Ⱡ'σяєм#"
+msgid "currently %(numVotes)s vote"
+msgid_plural "currently %(numVotes)s votes"
+msgstr[0] "çürréntlý %(numVotes)s vöté Ⱡ'σ#"
+msgstr[1] "çürréntlý %(numVotes)s vötés Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "remove vote"
-msgstr "rémövé vöté Ⱡ#"
+msgid "%(numVotes)s Vote"
+msgid_plural "%(numVotes)s Votes"
+msgstr[0] "%(numVotes)s Vöté #"
+msgstr[1] "%(numVotes)s Vötés #"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote"
-msgstr "vöté Ⱡ'σяєм#"
+msgid "We had some trouble subscribing you to this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé süßsçrïßïng ýöü tö thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to remove your vote)"
-msgid_plural "votes (click to remove your vote)"
-msgstr[0] "vöté (çlïçk tö rémövé ýöür vöté) Ⱡ'σяєм ι#"
-msgstr[1] "vötés (çlïçk tö rémövé ýöür vöté) Ⱡ'σяєм ι#"
+msgid ""
+"We had some trouble unsubscribing you from this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé ünsüßsçrïßïng ýöü fröm thïs thréäd. Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
-msgid "vote (click to vote)"
-msgid_plural "votes (click to vote)"
-msgstr[0] "vöté (çlïçk tö vöté) Ⱡ'σя#"
-msgstr[1] "vötés (çlïçk tö vöté) Ⱡ'σя#"
+msgid ""
+"We had some trouble marking this response as an answer.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé märkïng thïs réspönsé äs än änswér.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing this response as an answer.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng thïs réspönsé äs än änswér.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble marking this response endorsed.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé märkïng thïs réspönsé éndörséd.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble removing this endorsement.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng thïs éndörsémént.  Pléäsé trý ägäïn. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble saving your vote.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé sävïng ýöür vöté.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble pinning this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé pïnnïng thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble unpinning this thread. Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé ünpïnnïng thïs thréäd. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid ""
+"We had some trouble removing your flag on this post.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé rémövïng ýöür fläg ön thïs pöst.  Pléäsé trý ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reporting this post.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé répörtïng thïs pöst.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble closing this thread.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé çlösïng thïs thréäd.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: common/static/coffee/src/discussion/views/discussion_content_view.js
+msgid "We had some trouble reopening this thread.  Please try again."
+msgstr ""
+"Wé häd sömé tröüßlé réöpénïng thïs thréäd.  Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1807,44 +1874,6 @@ msgstr "Nö thréäds mätçhéd ýöür qüérý. Ⱡ'σяєм #"
 msgid "Show posts by %(username)s."
 msgstr "Shöw pösts ßý %(username)s. Ⱡ'σ#"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to remove report"
-msgstr "Çlïçk tö rémövé répört Ⱡ'σяє#"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported%(start_sr_span)s, click to remove report%(end_span)s"
-msgstr ""
-"Mïsüsé Répörtéd%(start_sr_span)s, çlïçk tö rémövé répört%(end_span)s Ⱡ'σяєм "
-"ιρѕυм#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Report Misuse"
-msgstr "Répört Mïsüsé Ⱡ'#"
-
-#. Translators: The text between start_sr_span and end_span is not shown
-#. in most browsers but will be read by screen readers.
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned%(start_sr_span)s, click to unpin%(end_span)s"
-msgstr "Pïnnéd%(start_sr_span)s, çlïçk tö ünpïn%(end_span)s Ⱡ'σяєм #"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Click to unpin"
-msgstr "Çlïçk tö ünpïn Ⱡ'#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pinned"
-msgstr "Pïnnéd Ⱡ'σяєм ιρѕ#"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js
-msgid "Pin Thread"
-msgstr "Pïn Thréäd Ⱡ#"
-
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -1863,6 +1892,12 @@ msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
 "Wé häd sömé tröüßlé löädïng möré réspönsés. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_view.js
+msgid "%(numResponses)s other response"
+msgid_plural "%(numResponses)s other responses"
+msgstr[0] "%(numResponses)s öthér réspönsé Ⱡ'σ#"
+msgstr[1] "%(numResponses)s öthér réspönsés Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -1901,22 +1936,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr "änönýmöüs #"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "staff"
-msgstr "stäff Ⱡ'σяєм ι#"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Community TA"
-msgstr "Çömmünïtý TÀ Ⱡ#"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js
-msgid "Misuse Reported, click to remove report"
-msgstr "Mïsüsé Répörtéd, çlïçk tö rémövé répört Ⱡ'σяєм ιρѕ#"
 
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 msgid "Are you sure you want to delete this comment?"
@@ -2338,7 +2357,6 @@ msgstr "Pöst ßödý #"
 #. message appears when there is an error getting the data on grade
 #. distribution.;
 #: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
 msgid "Error fetching distribution."
 msgstr "Érrör fétçhïng dïstrïßütïön. Ⱡ'σяєм #"
 
@@ -2411,12 +2429,6 @@ msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяє#"
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "Pléäsé éntér ä üsérnämé ör émäïl. Ⱡ'σяєм ι#"
-
-#. Translators: A rolename appears this sentence. A rolename is something like
-#. "staff" or "beta tester".;
-#: lms/static/coffee/src/instructor_dashboard/membership.js
-msgid "Error fetching list for role"
-msgstr "Érrör fétçhïng lïst för rölé Ⱡ'σяєм #"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
@@ -3579,6 +3591,18 @@ msgstr "Çömpönént #"
 msgid "Editing: %(title)s"
 msgstr "Édïtïng: %(title)s Ⱡ#"
 
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Validation Error While Saving"
+msgstr "Välïdätïön Érrör Whïlé Sävïng Ⱡ'σяєм #"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Undo Changes"
+msgstr "Ûndö Çhängés Ⱡ#"
+
+#: cms/static/js/views/modals/validation_error_modal.js
+msgid "Change Manually"
+msgstr "Çhängé Mänüällý Ⱡ'#"
+
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating&hellip;"
 msgstr "Düplïçätïng&hellip; Ⱡ'#"
@@ -4313,6 +4337,23 @@ msgstr ""
 #: cms/templates/js/upload-dialog.underscore
 msgid "File upload succeeded"
 msgstr "Fïlé üplöäd süççéédéd Ⱡ'σя#"
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"There were {strong_start}{num_errors} validation error(s){strong_end} while "
+"trying to save the course setting(s) in the database."
+msgstr ""
+"Théré wéré {strong_start}{num_errors} välïdätïön érrör(s){strong_end} whïlé "
+"trýïng tö sävé thé çöürsé séttïng(s) ïn thé dätäßäsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σ#"
+
+#: cms/templates/js/validation-error-modal.underscore
+msgid ""
+"Please check the following validation feedbacks and reflect them in your "
+"course settings:"
+msgstr ""
+"Pléäsé çhéçk thé föllöwïng välïdätïön féédßäçks änd réfléçt thém ïn ýöür "
+"çöürsé séttïngs: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore

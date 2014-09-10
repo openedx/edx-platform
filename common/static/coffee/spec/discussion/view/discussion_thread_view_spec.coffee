@@ -172,11 +172,7 @@ describe "DiscussionThreadView", ->
             expect(view.$(".js-response-list .discussion-response").length).toEqual(numNonEndorsed)
             assertResponseCountAndPaginationCorrect(
                 view,
-                ngettext(
-                    "#{numNonEndorsed} #{if numEndorsed then "other " else ""}response",
-                    "#{numNonEndorsed} #{if numEndorsed then "other " else ""}responses",
-                    numNonEndorsed
-                )
+                "#{numNonEndorsed} #{if numEndorsed then "other " else ""}#{if numNonEndorsed == 1 then "response" else "responses"}",
                 if numNonEndorsed then "Showing all responses" else null,
                 null
             )
