@@ -102,9 +102,18 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
-# Third-party auth is enabled in lms/envs/test.py for unittests, but we don't
-# yet want it for acceptance tests.
-FEATURES['ENABLE_THIRD_PARTY_AUTH'] = False
+# Enable third-party authentication
+FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test"
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_FACEBOOK_KEY": "test",
+        "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
+    }
+}
 
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
