@@ -1074,7 +1074,7 @@ class CourseAccessRole(models.Model):
         convenience function to make eq overrides easier and clearer. arbitrary decision
         that role is primary, followed by org, course, and then user
         """
-        return (self.role, self.org, self.course_id, self.user)
+        return (self.role, self.org, self.course_id, self.user_id)
 
     def __eq__(self, other):
         """
