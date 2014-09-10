@@ -6,7 +6,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from third_party_auth import provider, pipeline %>
 
-<%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
+<%block name="pagetitle">${_("Log into your {platform_name} account").format(platform_name=platform_name)}</%block>
 
 <%block name="bodyclass">view-login</%block>
 
@@ -136,13 +136,13 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=platform_name)}</h3>
+        <h3 class="message-title">${_("We're sorry, {platform_name} accounts are currently unavailable.").format(platform_name=platform_name)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
         <h3 class="message-title">${_("We couldn't log you in.")} </h3>
         <ul class="message-copy">
-          <li>${_("Your email or password is incorrect")}</li>
+          <li>${_("Your email or password is incorrect.")}</li>
         </ul>
       </div>
 
@@ -151,7 +151,7 @@
       </div>
 
       <p class="instructions sr">
-        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
+        ${_('Please provide the following information to log into your {platform_name} account. Required fields are denoted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
       </p>
 
       <div class="group group-form group-form-requiredinformation">
