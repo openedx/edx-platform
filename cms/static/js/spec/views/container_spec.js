@@ -1,7 +1,7 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define([ "jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
     "js/views/container", "js/models/xblock_info", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, edit_helpers, ContainerView, XBlockInfo) {
+    function ($, AjaxHelpers, EditHelpers, ContainerView, XBlockInfo) {
 
         describe("Container View", function () {
 
@@ -30,14 +30,14 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
 
                 respondWithMockXBlockFragment = function (requests, response) {
                     var requestIndex = requests.length - 1;
-                    create_sinon.respondWithJson(requests, response, requestIndex);
+                    AjaxHelpers.respondWithJson(requests, response, requestIndex);
                 };
 
                 beforeEach(function () {
-                    edit_helpers.installMockXBlock();
-                    edit_helpers.installViewTemplates();
+                    EditHelpers.installMockXBlock();
+                    EditHelpers.installViewTemplates();
                     appendSetFixtures('<div class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="' + rootLocator + '"></div>');
-                    notificationSpy = edit_helpers.createNotificationSpy();
+                    notificationSpy = EditHelpers.createNotificationSpy();
                     model = new XBlockInfo({
                         id: rootLocator,
                         display_name: 'Test AB Test',
@@ -52,12 +52,12 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                 });
 
                 afterEach(function () {
-                    edit_helpers.uninstallMockXBlock();
+                    EditHelpers.uninstallMockXBlock();
                     containerView.remove();
                 });
 
                 init = function (caller) {
-                    var requests = create_sinon.requests(caller);
+                    var requests = AjaxHelpers.requests(caller);
                     containerView.render();
 
                     respondWithMockXBlockFragment(requests, {
@@ -188,11 +188,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 200);
-                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 1, 200);
-                        edit_helpers.verifyNotificationHidden(notificationSpy);
+                        EditHelpers.verifyNotificationHidden(notificationSpy);
                     });
 
                     it('does not hide saving message if failure', function () {
@@ -200,9 +200,9 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
 
                         // Drag the first component in Group B to the first group.
                         dragComponentAbove(groupBComponent1, groupAComponent1);
-                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
                         respondToRequest(requests, 0, 500);
-                        edit_helpers.verifyNotificationShowing(notificationSpy, 'Saving');
+                        EditHelpers.verifyNotificationShowing(notificationSpy, 'Saving');
 
                         // Since the first reorder call failed, the removal will not be called.
                         verifyNumReorderCalls(requests, 1);

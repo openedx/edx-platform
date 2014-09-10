@@ -209,6 +209,7 @@ We use Jasmine to run JavaScript unit tests.  To run all the JavaScript tests:
 To run a specific set of JavaScript tests and print the results to the console:
 
     paver test_js_run -s lms
+    paver test_js_run -s lms-coffee
     paver test_js_run -s cms
     paver test_js_run -s cms-squire
     paver test_js_run -s xmodule
@@ -217,6 +218,7 @@ To run a specific set of JavaScript tests and print the results to the console:
 To run JavaScript tests in your default browser:
 
     paver test_js_dev -s lms
+    paver test_js_dev -s lms-coffee
     paver test_js_dev -s cms
     paver test_js_dev -s cms-squire
     paver test_js_dev -s xmodule

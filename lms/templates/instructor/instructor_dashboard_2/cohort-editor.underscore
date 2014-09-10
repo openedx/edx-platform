@@ -1,7 +1,17 @@
 <header class="cohort-management-group-header">
     <h3 class="group-header-title">
         <span class="title-value"><%- cohort.get('name') %></span>
-        <span class="group-count"><%- cohort.get('user_count') %></span>
+        <span class="group-count"><%-
+            interpolate(
+                ngettext(
+                    '(contains 1 student)',
+                    '(contains %(student_count)s students)',
+                    cohort.get('user_count')
+                ),
+                { student_count: cohort.get('user_count') },
+                true
+            )
+        %></span>
     </h3>
     <div class="cohort-management-group-setup">
         <div class="setup-value">
@@ -19,3 +29,38 @@
         </div>
     </div>
 </header>
+
+<!-- individual group - form -->
+<div class="cohort-management-group-add">
+    <form action="" method="post" id="cohort-management-group-add-form" class="cohort-management-group-add-form">
+
+        <h4 class="form-title"><%- gettext('Add students to this cohort group') %></h4>
+
+        <div class="form-introduction">
+            <p><%- gettext('Note: Students can only be in one cohort group. Adding students to this group overrides any previous group assignment.') %></p>
+        </div>
+
+        <div class="cohort-confirmations"></div>
+        <div class="cohort-errors"></div>
+
+        <div class="form-fields">
+            <div class="field field-textarea is-required">
+                <label for="cohort-management-group-add-students" class="label">
+                    <%- gettext('Enter email addresses and/or usernames separated by new lines or commas for students to add. *') %>
+                    <span class="sr"><%- gettext('(Required Field)') %></span>
+                </label>
+                <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students"
+                          class="input cohort-management-group-add-students"
+                          placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"></textarea>
+
+                <span class="tip"><%- gettext('You will not get notification for emails that bounce, so please double-check spelling.') %></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-view">
+                <i class="button-icon icon icon-plus"></i> <%- gettext('Add Students') %>
+            </button>
+        </div>
+    </form>
+</div>

@@ -4,7 +4,7 @@ Tests related to the cohorting feature.
 from uuid import uuid4
 
 from .helpers import BaseDiscussionMixin
-from ..lms.helpers import CohortTestMixin
+from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...fixtures.course import (CourseFixture, XBlockFixtureDesc)
