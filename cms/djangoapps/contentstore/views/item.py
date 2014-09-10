@@ -595,9 +595,6 @@ def _get_module_info(xblock, rewrite_static_links=True):
             course_id=xblock.location.course_key
         )
 
-    # Pre-cache has changes for the entire course because we'll need it for the ancestor info
-    modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
-
     # Note that children aren't being returned until we have a use case.
     return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
@@ -638,7 +635,8 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         return None
 
     is_xblock_unit = is_unit(xblock, parent_xblock)
-    has_changes = modulestore().has_changes(xblock)
+    # this should not be calculated for Sections and Subsections on Unit page
+    has_changes = modulestore().has_changes(xblock) if (is_xblock_unit or course_outline) else None
 
     if graders is None:
         graders = CourseGradingModel.fetch(xblock.location.course_key).graders

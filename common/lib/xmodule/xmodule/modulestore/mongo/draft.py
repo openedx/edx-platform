@@ -590,7 +590,6 @@ class DraftModuleStore(MongoModuleStore):
         _internal([root_usage.to_deprecated_son() for root_usage in root_usages])
         self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
-    @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
         """
         Check if the subtree rooted at xblock has any drafts and thus may possibly have changes
