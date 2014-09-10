@@ -1118,6 +1118,8 @@ def logout_user(request):
         user_mail = request.user.email
 
     logout(request)
+    if user_mail:
+        logout_portal(user_mail)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:
@@ -1127,8 +1129,6 @@ def logout_user(request):
         settings.EDXMKTG_COOKIE_NAME,
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,
     )
-    if user_mail:
-        logout_portal(user_mail)
     return response
 
 
