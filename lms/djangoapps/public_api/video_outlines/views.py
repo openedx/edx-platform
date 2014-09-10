@@ -19,6 +19,7 @@ from public_api import get_mobile_course
 
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
 from xmodule.video_module.video_module import get_transcripts
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
@@ -99,6 +100,7 @@ class BlockOutline(object):
                 }
 
             if curr_block.has_children:
+
                 for block in reversed(curr_block.get_children()):
                     stack.append(block)
                     child_to_parent[block] = curr_block
@@ -153,7 +155,11 @@ class VideoSummaryList(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
+
         course = get_mobile_course(course_id)
+        # this will cache all course assets so that subsequent calls (loading transcripts)
+        # will hit the cache instead of mongo.
+        contentstore().get_all_content_for_course(course.id)
 
         video_outline = BlockOutline(
             course, {"video": partial(video_summary, course)}, request

@@ -42,6 +42,7 @@ class MongoContentStore(ContentStore):
         self.fs = gridfs.GridFS(_db, bucket)
 
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
+        self._course_cache = {}
 
     def close_connections(self):
         """
@@ -87,6 +88,9 @@ class MongoContentStore(ContentStore):
         self.fs.delete(location_or_id)
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
+        if location in self._course_cache:
+            return self._course_cache[location]
+
         content_id, __ = self.asset_db_key(location)
 
         try:
@@ -217,14 +221,16 @@ class MongoContentStore(ContentStore):
             items = self.fs_files.find(
                 query_for_course(course_key, "asset" if not get_thumbnails else "thumbnail"), sort=sort
             )
-        count = items.count()
         assets = list(items)
+        count = len(assets)
 
         # We're constructing the asset key immediately after retrieval from the database so that
         # callers are insulated from knowing how our identifiers are stored.
         for asset in assets:
             asset_id = asset.get('content_son', asset['_id'])
             asset['asset_key'] = course_key.make_asset_key(asset_id['category'], asset_id['name'])
+            self._course_cache[asset['asset_key']] = asset
+
         return assets, count
 
     def set_attr(self, asset_key, attr, value=True):

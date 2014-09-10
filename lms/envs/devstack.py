@@ -48,7 +48,7 @@ ANALYTICS_DASHBOARD_URL = None
 
 ################################ DEBUG TOOLBAR ################################
 
-INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS += ('debug_toolbar','debug_toolbar_mongo',)
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
                        'debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
@@ -62,6 +62,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
 
     #  Enabling the profiler has a weird bug as of django-debug-toolbar==0.9.4 and
     #  Django=1.3.1/1.4 where requests to views get duplicated (your method gets
