@@ -97,7 +97,9 @@ class RandomizeModule(RandomizeFields, XModule):
             self.child_descriptor = all_choices.get(self.choice)
             # Now get_children() should return a list with one element
             children = self.get_children()
-            assert len(children) == 1
+            if len(children) != 1:
+                raise Exception("self.get_children() returned %d elements:\n%s"
+                                % (len(children), str(children)))
             self.child = children[0]
         else:
             self.child_descriptor = None
