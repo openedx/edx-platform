@@ -1,5 +1,5 @@
 define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/modals/validation_error_modal'],
-    function ($, _, validation_helpers, ValidationErrorModal) {
+    function ($, _, ValidationHelpers, ValidationErrorModal) {
 
         describe('ValidationErrorModal', function() {
             var modal, showModal;
@@ -14,24 +14,24 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
             /* Before each, install templates required for the base modal
                and validation error modal. */
             beforeEach(function () {
-                validation_helpers.installValidationTemplates();
+                ValidationHelpers.installValidationTemplates();
             });
 
             afterEach(function() {
-                validation_helpers.hideModalIfShowing(modal);
+                ValidationHelpers.hideModalIfShowing(modal);
             });
 
             it('is visible after show is called', function () {
                 showModal([]);
-                expect(validation_helpers.isShowingModal(modal)).toBeTruthy();
+                expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
             });
 
             it('displays none if no error given', function () {
                 var errorObjects = [];
 
                 showModal(errorObjects);
-                expect(validation_helpers.isShowingModal(modal)).toBeTruthy();
-                validation_helpers.checkErrorContents(modal, errorObjects);
+                expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
+                ValidationHelpers.checkErrorContents(modal, errorObjects);
             });
 
             it('correctly displays json error message objects', function () {
@@ -47,8 +47,8 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
                 ];
 
                 showModal(errorObjects);
-                expect(validation_helpers.isShowingModal(modal)).toBeTruthy();
-                validation_helpers.checkErrorContents(modal, errorObjects);
+                expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
+                ValidationHelpers.checkErrorContents(modal, errorObjects);
             });
 
             it('run callback when undo changes button is clicked', function () {
@@ -69,8 +69,8 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
 
                 // Show Modal and click undo changes
                 showModal(errorObjects, callback);
-                expect(validation_helpers.isShowingModal(modal)).toBeTruthy();
-                validation_helpers.undoChanges(modal);
+                expect(ValidationHelpers.isShowingModal(modal)).toBeTruthy();
+                ValidationHelpers.undoChanges(modal);
 
                 // Wait for the callback to be fired
                 waitsFor(function () {
@@ -79,7 +79,7 @@ define(['jquery', 'underscore', 'js/spec_helpers/validation_helpers', 'js/views/
 
                 // After checking callback fire, check modal hide
                 runs(function () {
-                    expect(validation_helpers.isShowingModal(modal)).toBe(false);
+                    expect(ValidationHelpers.isShowingModal(modal)).toBe(false);
                 });
             });
         });

@@ -1,6 +1,6 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js/models/xblock_info",
+define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/xblock", "js/models/xblock_info",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, URI, XBlockView, XBlockInfo) {
+    function ($, AjaxHelpers, URI, XBlockView, XBlockInfo) {
 
         describe("XBlockView", function() {
             var model, xblockView, mockXBlockHtml, respondWithMockXBlockFragment;
@@ -20,11 +20,11 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
 
             respondWithMockXBlockFragment = function(requests, response) {
                 var requestIndex = requests.length - 1;
-                create_sinon.respondWithJson(requests, response, requestIndex);
+                AjaxHelpers.respondWithJson(requests, response, requestIndex);
             };
 
             it('can render a nested xblock', function() {
-                var requests = create_sinon.requests(this);
+                var requests = AjaxHelpers.requests(this);
                 xblockView.render();
                 respondWithMockXBlockFragment(requests, {
                     html: mockXBlockHtml,
@@ -57,12 +57,12 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
                 };
 
                 it('can render an xblock with no CSS or JavaScript', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     postXBlockRequest(requests, []);
                 });
 
                 it('can render an xblock with required CSS', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         mockCssText = "// Just a comment",
                         mockCssUrl = "mock.css",
                         headHtml;
@@ -76,7 +76,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
                 });
 
                 it('can render an xblock with required JavaScript', function() {
-                    var requests = create_sinon.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     postXBlockRequest(requests, [
                         ["hash3", { mimetype: "application/javascript", kind: "text", data: "window.test = 100;" }]
                     ]);
@@ -84,7 +84,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
                 });
 
                 it('can render an xblock with required HTML', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         mockHeadTag = "<title>Test Title</title>";
                     postXBlockRequest(requests, [
                         ["hash4", { mimetype: "text/html", placement: "head", data: mockHeadTag }]
@@ -93,7 +93,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "URI", "js/views/xblock", "js
                 });
 
                 it('aborts rendering when a dependent script fails to load', function() {
-                    var requests = create_sinon.requests(this),
+                    var requests = AjaxHelpers.requests(this),
                         mockJavaScriptUrl = "mock.js",
                         promise;
                     spyOn($, 'getScript').andReturn($.Deferred().reject().promise());
