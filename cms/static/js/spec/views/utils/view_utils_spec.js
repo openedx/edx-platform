@@ -1,5 +1,5 @@
 define(["jquery", "underscore", "js/views/baseview", "js/views/utils/view_utils", "js/spec_helpers/edit_helpers"],
-    function ($, _, BaseView, ViewUtils, view_helpers) {
+    function ($, _, BaseView, ViewUtils, ViewHelpers) {
 
         describe("ViewUtils", function() {
             describe("disabled element while running", function() {
@@ -22,22 +22,22 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/utils/view_utils"
                     var testMessage = "Testing...",
                         deferred = new $.Deferred(),
                         promise = deferred.promise(),
-                        notificationSpy = view_helpers.createNotificationSpy();
+                        notificationSpy = ViewHelpers.createNotificationSpy();
                     ViewUtils.runOperationShowingMessage(testMessage, function() { return promise; });
-                    view_helpers.verifyNotificationShowing(notificationSpy, /Testing/);
+                    ViewHelpers.verifyNotificationShowing(notificationSpy, /Testing/);
                     deferred.resolve();
-                    view_helpers.verifyNotificationHidden(notificationSpy);
+                    ViewHelpers.verifyNotificationHidden(notificationSpy);
                 });
 
                 it("shows progress notification and leaves it showing upon failure", function() {
                     var testMessage = "Testing...",
                         deferred = new $.Deferred(),
                         promise = deferred.promise(),
-                        notificationSpy = view_helpers.createNotificationSpy();
+                        notificationSpy = ViewHelpers.createNotificationSpy();
                     ViewUtils.runOperationShowingMessage(testMessage, function() { return promise; });
-                    view_helpers.verifyNotificationShowing(notificationSpy, /Testing/);
+                    ViewHelpers.verifyNotificationShowing(notificationSpy, /Testing/);
                     deferred.fail();
-                    view_helpers.verifyNotificationShowing(notificationSpy, /Testing/);
+                    ViewHelpers.verifyNotificationShowing(notificationSpy, /Testing/);
                 });
             });
         });
