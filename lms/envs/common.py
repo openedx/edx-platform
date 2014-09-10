@@ -709,6 +709,8 @@ LANGUAGES = (
     ('sl', u'Slovenščina'),  # Slovenian
     ('sq', u'shqip'),  # Albanian
     ('sr', u'Српски'),  # Serbian
+    ('sv', u'svenska'),  # Swedish
+    ('sw', u'Kiswahili'),  # Swahili
     ('ta', u'தமிழ்'),  # Tamil
     ('te', u'తెలుగు'),  # Telugu
     ('th', u'ไทย'),  # Thai
