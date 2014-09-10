@@ -12,6 +12,7 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.models import CourseEnrollment
 
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
@@ -221,3 +222,30 @@ class CourseModeViewTest(ModuleStoreTestCase):
         actual_amount = self.client.session['donation_for_course'][unicode(self.course.id)]
         expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
         self.assertEqual(actual_amount, expected_amount)
+
+    def test_enrollment_skipped_if_autoreg(self):
+        # TODO (ECOM-16): Remove once we complete the auto-reg AB test.
+        session = self.client.session
+        session['auto_register'] = True
+        session.save()
+
+        # Create the course modes
+        for mode in ('audit', 'honor', 'verified'):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+
+        # Now enroll in the course
+        CourseEnrollmentFactory(
+            user=self.user,
+            is_active=True,
+            mode="honor",
+            course_id=unicode(self.course.id),
+        )
+
+        # Choose the mode (POST request)
+        choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['audit'])
+
+        # Verify that enrollment mode is still honor
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
+        self.assertEqual(mode, "honor")
+        self.assertEqual(is_active, True)
