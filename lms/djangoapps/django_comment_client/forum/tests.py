@@ -10,7 +10,13 @@ from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
+from django_comment_client.tests.group_id import (
+    GroupIdAssertionMixin,
+    CohortedTopicGroupIdTestMixin,
+    NonCohortedTopicGroupIdTestMixin
+)
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.forum import views
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -267,17 +273,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('requests.request')
-class SingleCohortedThreadTestCase(ModuleStoreTestCase):
-    def setUp(self):
-        self.course = CourseFactory.create()
-        self.student = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
-        self.student_cohort = CourseUserGroup.objects.create(
-            name="student_cohort",
-            course_id=self.course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-
+class SingleCohortedThreadTestCase(CohortedContentTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
@@ -331,6 +327,197 @@ class SingleCohortedThreadTestCase(ModuleStoreTestCase):
 
         # Verify that the group name is correctly included in the HTML
         self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class SingleThreadAccessTestCase(CohortedContentTestCase):
+    def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl("dummy context", thread_id, group_id=thread_group_id)
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = user
+        return views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            commentable_id,
+            thread_id
+        )
+
+    def test_student_non_cohorted(self, mock_request):
+        resp = self.call_view(mock_request, "non_cohorted_topic", self.student, self.student_cohort.id)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_student_same_cohort(self, mock_request):
+        resp = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=self.student_cohort.id
+        )
+        self.assertEqual(resp.status_code, 200)
+
+    def test_student_different_cohort(self, mock_request):
+        self.assertRaises(
+            Http404,
+            lambda: self.call_view(
+                mock_request,
+                "cohorted_topic",
+                self.student,
+                self.student_cohort.id,
+                thread_group_id=self.moderator_cohort.id
+            )
+        )
+
+    def test_moderator_non_cohorted(self, mock_request):
+        resp = self.call_view(mock_request, "non_cohorted_topic", self.moderator, self.moderator_cohort.id)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_moderator_same_cohort(self, mock_request):
+        resp = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id,
+            thread_group_id=self.moderator_cohort.id
+        )
+        self.assertEqual(resp.status_code, 200)
+
+    def test_moderator_different_cohort(self, mock_request):
+        resp = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.moderator,
+            self.moderator_cohort.id,
+            thread_group_id=self.student_cohort.id
+        )
+        self.assertEqual(resp.status_code, 200)
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+    cs_endpoint = "/threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        mock_request.side_effect = make_mock_request_impl("dummy context", group_id=self.student_cohort.id)
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+        return views.single_thread(
+            request,
+            self.course.id.to_deprecated_string(),
+            "dummy_discussion_id",
+            "dummy_thread_id"
+        )
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class InlineDiscussionGroupIdTestCase(
+        CohortedContentTestCase,
+        CohortedTopicGroupIdTestMixin,
+        NonCohortedTopicGroupIdTestMixin
+):
+    cs_endpoint = "/threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        mock_request.side_effect = make_mock_request_impl("dummy content")
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data
+        )
+        request.user = user
+        return views.inline_discussion(
+            request,
+            self.course.id.to_deprecated_string(),
+            commentable_id
+        )
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+    cs_endpoint = "/threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        mock_request.side_effect = make_mock_request_impl("dummy content")
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+        return views.forum_form_discussion(
+            request,
+            self.course.id.to_deprecated_string()
+        )
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+    cs_endpoint = "/active_threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        mock_request.side_effect = make_mock_request_impl("dummy content")
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data
+        )
+        request.user = user
+        mako_middleware_process_request(request)
+        return views.user_profile(
+            request,
+            self.course.id.to_deprecated_string(),
+            user.id
+        )
+
+
+@patch('lms.lib.comment_client.utils.requests.request')
+class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+    cs_endpoint = "/subscribed_threads"
+
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+        mock_request.side_effect = make_mock_request_impl("dummy content")
+
+        request_data = {}
+        if pass_group_id:
+            request_data["group_id"] = group_id
+        request = RequestFactory().get(
+            "dummy_url",
+            data=request_data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = user
+        return views.followed_threads(
+            request,
+            self.course.id.to_deprecated_string(),
+            user.id
+        )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

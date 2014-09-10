@@ -3,7 +3,6 @@ from collections import defaultdict
 import logging
 from datetime import datetime
 
-from course_groups.cohorts import get_cohort_by_id
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -15,6 +14,8 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 import pystache_custom as pystache
 
+from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
+from course_groups.models import CourseUserGroup
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
 from opaque_keys.edx.locations import i4xEncoder
@@ -420,3 +421,38 @@ def add_thread_group_name(thread_info, course_key):
     """
     if thread_info.get('group_id') is not None:
         thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
+
+
+def get_group_id_for_comments_service(request, course_key, commentable_id=None):
+    """
+    Given a user requesting content within a `commentable_id`, determine the
+    group_id which should be passed to the comments service.
+
+    Returns:
+        int: the group_id to pass to the comments service or None if nothing
+        should be passed
+
+    Raises:
+        ValueError if the requested group_id is invalid
+    """
+    if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
+        if request.method == "GET":
+            requested_group_id = request.GET.get('group_id')
+        elif request.method == "POST":
+            requested_group_id = request.POST.get('group_id')
+        if cached_has_permission(request.user, "see_all_cohorts", course_key):
+            if not requested_group_id:
+                return None
+            try:
+                group_id = int(requested_group_id)
+                get_cohort_by_id(course_key, group_id)
+            except CourseUserGroup.DoesNotExist:
+                raise ValueError
+        else:
+            # regular users always query with their own id.
+            group_id = get_cohort_id(request.user, course_key)
+        return group_id
+    else:
+        # Never pass a group_id to the comments service for a non-cohorted
+        # commentable
+        return None

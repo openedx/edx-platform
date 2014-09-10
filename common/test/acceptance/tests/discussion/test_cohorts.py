@@ -62,6 +62,8 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin):
         self.cohort_1_id = self.add_cohort(self.cohort_1_name)
 
     def test_cohort_visibility_label(self):
+        # Must be moderator to view content in a cohort other than your own
+        AutoAuthPage(self.browser, course_id=self.course_id, roles="Moderator").visit()
         self.setup_thread(1, group_id=self.cohort_1_id)
         self.assertEquals(
             self.thread_page.get_group_visibility_label(),
@@ -128,13 +130,11 @@ class InlineDiscussionTest(UniqueCourseTest):
 
         self.user_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
 
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-        self.courseware_page.visit()
-        self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
-
     def setup_thread_page(self, thread_id):
-        self.discussion_page.expand_discussion()
-        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
+        CoursewarePage(self.browser, self.course_id).visit()
+        discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        discussion_page.expand_discussion()
+        self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
         self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint:disable=W0201
         self.thread_page.expand()
 
