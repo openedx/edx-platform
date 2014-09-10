@@ -6,6 +6,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from logging import getLogger
 logger = getLogger(__name__)
 
+import time
+
 
 @step(u'the course "([^"]*)" has all enrollment modes$')
 def add_enrollment_modes_to_course(_step, course):
@@ -43,6 +45,7 @@ def honor_code_upgrade(_step):
     """ Simulates choosing the honor code mode on the upgrade page """
     honor_code_link = world.browser.find_by_css('.title-expand')
     honor_code_link.click()
+    time.sleep(1)
     honor_code_checkbox = world.browser.find_by_css('#honor-code')
     honor_code_checkbox.click()
     upgrade_button = world.browser.find_by_name("certificate_mode")
