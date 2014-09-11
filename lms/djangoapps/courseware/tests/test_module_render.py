@@ -919,8 +919,8 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
             call_data = call[1][0]
             event_type = call_data.get('event_type')
             if event_type == 'problem_check':
-                break
-        return call_data['context']['module']['display_name']
+                return call_data['context']['module']['display_name']
+            self.fail('Event type "problem_check" not found in call list.')
 
     def test_missing_display_name(self, mock_tracker):
         actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
