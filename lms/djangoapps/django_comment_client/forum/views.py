@@ -11,8 +11,7 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
+from course_groups.cohorts import is_course_cohorted, get_cohort_id, get_course_cohorts, is_commentable_cohorted
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -52,7 +51,7 @@ def make_course_settings(course, include_category_map=False):
         'is_cohorted': is_course_cohorted(course.id),
         'allow_anonymous': course.allow_anonymous,
         'allow_anonymous_to_peers': course.allow_anonymous_to_peers,
-        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course.id)],
+        'cohorts': [{"id": str(g.id), "name": g.name} for g in get_course_cohorts(course)],
     }
 
     if include_category_map:
