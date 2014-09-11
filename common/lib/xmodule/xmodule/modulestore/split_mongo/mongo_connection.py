@@ -82,7 +82,6 @@ class MongoConnection(object):
                 host=host,
                 port=port,
                 tz_aware=tz_aware,
-                document_class=son.SON,
                 **kwargs
             ),
             db
@@ -167,10 +166,10 @@ class MongoConnection(object):
         """
         case_regex = ur"(?i)^{}$" if ignore_case else ur"{}"
         return self.course_index.find_one(
-            son.SON([
-                (key_attr, re.compile(case_regex.format(getattr(key, key_attr))))
+            {
+                key_attr: re.compile(case_regex.format(getattr(key, key_attr)))
                 for key_attr in ('org', 'course', 'run')
-            ])
+            }
         )
 
     def find_matching_course_indexes(self, branch=None, search_targets=None):
@@ -182,7 +181,7 @@ class MongoConnection(object):
             search_targets: If specified, this must be a dictionary specifying field values
                 that must exist in the search_targets of the returned courses
         """
-        query = son.SON()
+        query = {}
         if branch is not None:
             query['versions.{}'.format(branch)] = {'$exists': True}
 
@@ -206,11 +205,11 @@ class MongoConnection(object):
             from_index: If set, only update an index if it matches the one specified in `from_index`.
         """
         self.course_index.update(
-            from_index or son.SON([
-                ('org', course_index['org']),
-                ('course', course_index['course']),
-                ('run', course_index['run'])
-            ]),
+            from_index or {
+                'org': course_index['org'],
+                'course': course_index['course'],
+                'run': course_index['run'],
+            },
             course_index,
             upsert=False,
         )
@@ -219,11 +218,11 @@ class MongoConnection(object):
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        return self.course_index.remove(son.SON([
-            ('org', course_index['org']),
-            ('course', course_index['course']),
-            ('run', course_index['run'])
-        ]))
+        return self.course_index.remove({
+            'org': course_index['org'],
+            'course': course_index['course'],
+            'run': course_index['run'],
+        })
 
     def get_definition(self, key):
         """
@@ -244,4 +243,20 @@ class MongoConnection(object):
         """
         self.definitions.insert(definition)
 
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        self.course_index.create_index(
+            [
+                ('org', pymongo.ASCENDING),
+                ('course', pymongo.ASCENDING),
+                ('run', pymongo.ASCENDING)
+            ],
+            unique=True
+        )
 

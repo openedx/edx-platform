@@ -486,6 +486,16 @@ class ModuleStoreRead(object):
         """
         yield
 
+    def ensure_indexes(self):
+        """
+        Ensure that all appropriate indexes are created that are needed by this modulestore, or raise
+        an exception if unable to.
+
+        This method is intended for use by tests and administrative commands, and not
+        to be run during server startup.
+        """
+        pass
+
 
 class ModuleStoreWrite(ModuleStoreRead):
     """
