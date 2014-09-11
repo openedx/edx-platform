@@ -1,7 +1,6 @@
 """Generates common contexts"""
 import logging
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from util.request import COURSE_REGEX
@@ -21,7 +20,7 @@ def course_context_from_url(url):
     if match:
         course_id_string = match.group('course_id')
         try:
-            course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id_string)
+            course_id = CourseKey.from_string(course_id_string)
         except InvalidKeyError:
             log.warning(
                 'unable to parse course_id "{course_id}"'.format(
@@ -40,8 +39,26 @@ def course_context_from_course_id(course_id):
     Example Returned Context::
 
         {
-            'course_id': 'org/course/run',
-            'org_id': 'org'
+            'course_id': 'FooX/Bar/1T2014',
+            'org_id': 'FooX',
+            'course_key': {
+                'org': 'FooX',
+                'course': 'Bar',
+                'run': '1T2014'
+            }
+        }
+
+    Another Example::
+
+        {
+            'course_id': 'course-v1:FooX+Bar+1T2014+branch@draft',
+            'org_id': 'FooX',
+            'course_key': {
+                'org': 'FooX',
+                'course': 'Bar',
+                'run': '1T2014',
+                'branch': 'draft'
+            }
         }
 
     """
@@ -50,7 +67,19 @@ def course_context_from_course_id(course_id):
 
     # TODO: Make this accept any CourseKey, and serialize it using .to_string
     assert(isinstance(course_id, CourseKey))
+    course_id_detail = {
+        'org': course_id.org,
+        'course': course_id.course,
+        'run': course_id.run,
+    }
+
+    for optional_key in ['branch', 'version_guid']:
+        value = getattr(course_id, optional_key, None)
+        if value:
+            course_id_detail[optional_key] = value
+
     return {
-        'course_id': course_id.to_deprecated_string(),
+        'course_id': unicode(course_id),
         'org_id': course_id.org,
+        'course_key': course_id_detail,
     }
