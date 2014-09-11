@@ -90,7 +90,10 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             params = urlparse(self.path)
             youtube_id = params.path.split('/').pop()
 
-            self._send_video_response(youtube_id, "I'm youtube.")
+            if self.server.config.get('youtube_api_private_video'):
+                self._send_private_video_response(youtube_id, "I'm youtube private video.")
+            else:
+                self._send_video_response(youtube_id, "I'm youtube.")
 
         elif 'get_youtube_api' in self.path:
             if self.server.config.get('youtube_api_blocked'):
@@ -123,6 +126,30 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 'id': youtube_id,
                 'message': message,
                 'duration': youtube_metadata['data']['duration'],
+            })
+        })
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
+
+        self.send_response(200, content=response, headers={'Content-type': 'text/html'})
+        self.log_message("Youtube: sent response {}".format(message))
+
+    def _send_private_video_response(self, message):
+        """
+        Send private video error message back to the client for video player requests.
+        """
+        # Construct the response content
+        callback = self.get_params['callback']
+        data = OrderedDict({
+            "error": OrderedDict({
+                "code": 403,
+                "errors": [
+                    {
+                        "code": "ServiceForbiddenException",
+                        "domain": "GData",
+                        "internalReason": "Private video"
+                    }
+                ],
+                "message": message,
             })
         })
         response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
