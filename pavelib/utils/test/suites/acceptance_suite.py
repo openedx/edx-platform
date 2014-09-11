@@ -79,7 +79,7 @@ class AcceptanceTestSuite(TestSuite):
         else:
             # TODO fix Acceptance tests with Split (LMS-11300)
             # stores = ['split', 'draft']
-            stores = ['draft']
+            stores = ['split']
 
         self.subsuites = []
         for system in systems:
