@@ -1250,12 +1250,24 @@
     .register-choice-audit {
       border-color: $m-blue-d1;
 
+      .deco-ribbon {
+        position: relative;
+        top: -($baseline*2.5);
+        right: -($baseline*0.35);
+        float: right;
+        display: block;
+        width: ($baseline*2.9);
+        height: ($baseline*4.2);
+        background: transparent url('../images/honor-ribbon.png') no-repeat 0 0;
+      }
+
       .wrapper-copy {
         width: flex-grid(8,8);
       }
 
       .list-actions {
         width: flex-grid(8,8);
+        margin: ($baseline/3) 0;
       }
 
       .action-select input {
@@ -1278,8 +1290,7 @@
       }
 
       .list-actions {
-        margin: ($baseline/2) 0;
-        border-top: ($baseline/10) solid $m-gray-t1;
+        margin: ($baseline/3) 0;
       }
 
       .action-intro, .action-select {
