@@ -25,7 +25,7 @@ from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import reverification_info
 from shoppingcart.models import Order, CertificateItem
-from shoppingcart.processors.CyberSource import (
+from shoppingcart.processors import (
     get_signed_purchase_params, get_purchase_endpoint
 )
 from verify_student.models import (
@@ -213,7 +213,12 @@ def create_order(request):
     enrollment_mode = current_mode.slug
     CertificateItem.add_to_order(cart, course_id, amount, enrollment_mode)
 
-    params = get_signed_purchase_params(cart)
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+    params = get_signed_purchase_params(
+        cart, callback_url=callback_url
+    )
 
     return HttpResponse(json.dumps(params), content_type="text/json")
 
