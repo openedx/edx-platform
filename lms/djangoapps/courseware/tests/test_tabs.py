@@ -95,4 +95,3 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
-

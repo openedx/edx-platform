@@ -90,22 +90,42 @@ class TabTestCase(unittest.TestCase):
         deserialized_tab = tab.from_json(serialized_tab)
         self.assertEquals(serialized_tab, deserialized_tab)
 
-    def check_can_display_results(self, tab, expected_value=True, for_authenticated_users_only=False, for_staff_only=False):
+    def check_can_display_results(
+        self,
+        tab,
+        expected_value=True,
+        for_authenticated_users_only=False,
+        for_staff_only=False,
+        for_enrolled_users_only=False
+    ):
         """Checks can display results for various users"""
         if for_staff_only:
             self.assertEquals(
                 expected_value,
-                tab.can_display(self.course, self.settings, is_user_authenticated=False, is_user_staff=True)
+                tab.can_display(
+                    self.course, self.settings, is_user_authenticated=True, is_user_staff=True, is_user_enrolled=True
+                )
             )
         if for_authenticated_users_only:
             self.assertEquals(
                 expected_value,
-                tab.can_display(self.course, self.settings, is_user_authenticated=True, is_user_staff=False)
+                tab.can_display(
+                    self.course, self.settings, is_user_authenticated=True, is_user_staff=False, is_user_enrolled=False
+                )
             )
-        if not for_staff_only and not for_authenticated_users_only:
+        if not for_staff_only and not for_authenticated_users_only and not for_enrolled_users_only:
             self.assertEquals(
                 expected_value,
-                tab.can_display(self.course, self.settings, is_user_authenticated=False, is_user_staff=False)
+                tab.can_display(
+                    self.course, self.settings, is_user_authenticated=False, is_user_staff=False, is_user_enrolled=False
+                )
+            )
+        if for_enrolled_users_only:
+            self.assertEquals(
+                expected_value,
+                tab.can_display(
+                    self.course, self.settings, is_user_authenticated=True, is_user_staff=False, is_user_enrolled=True
+                )
             )
 
     def check_get_and_set_methods(self, tab):
@@ -147,11 +167,15 @@ class ProgressTestCase(TabTestCase):
 
         self.course.hide_progress_tab = False
         tab = self.check_progress_tab()
-        self.check_can_display_results(tab, for_authenticated_users_only=True)
+        self.check_can_display_results(
+            tab, for_staff_only=True, for_enrolled_users_only=True
+        )
 
         self.course.hide_progress_tab = True
         self.check_progress_tab()
-        self.check_can_display_results(tab, for_authenticated_users_only=True, expected_value=False)
+        self.check_can_display_results(
+            tab, for_staff_only=True, for_enrolled_users_only=True, expected_value=False
+        )
 
 
 class WikiTestCase(TabTestCase):
@@ -167,12 +191,24 @@ class WikiTestCase(TabTestCase):
             invalid_dict_tab=self.fake_dict_tab,
         )
 
-    def test_wiki_enabled(self):
-        """Test wiki tab when Enabled setting is True"""
-
+    def test_wiki_enabled_and_public(self):
+        """
+        Test wiki tab when Enabled setting is True and the wiki is open to
+        the public.
+        """
         self.settings.WIKI_ENABLED = True
+        self.course.allow_public_wiki_access = True
         tab = self.check_wiki_tab()
         self.check_can_display_results(tab)
+
+    def test_wiki_enabled_and_not_public(self):
+        """
+        Test wiki when it is enabled but not open to the public
+        """
+        self.settings.WIKI_ENABLED = True
+        self.course.allow_public_wiki_access = False
+        tab = self.check_wiki_tab()
+        self.check_can_display_results(tab, for_enrolled_users_only=True, for_staff_only=True)
 
     def test_wiki_enabled_false(self):
         """Test wiki tab when Enabled setting is False"""
@@ -611,7 +647,14 @@ class DiscussionLinkTestCase(TabTestCase):
                 return "default_discussion_link"
         return reverse_discussion_link
 
-    def check_discussion(self, tab_list, expected_discussion_link, expected_can_display_value, discussion_link_in_course=""):
+    def check_discussion(
+        self, tab_list,
+        expected_discussion_link,
+        expected_can_display_value,
+        discussion_link_in_course="",
+        is_staff=True,
+        is_enrolled=True,
+    ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list
         self.course.discussion_link = discussion_link_in_course
@@ -619,7 +662,7 @@ class DiscussionLinkTestCase(TabTestCase):
         self.assertEquals(
             (
                 discussion is not None and
-                discussion.can_display(self.course, self.settings, True, True) and
+                discussion.can_display(self.course, self.settings, True, is_staff, is_enrolled) and
                 (discussion.link_func(self.course, self._reverse(self.course)) == expected_discussion_link)
             ),
             expected_can_display_value
@@ -661,4 +704,26 @@ class DiscussionLinkTestCase(TabTestCase):
             tab_list=self.tabs_without_discussion,
             expected_discussion_link=not None,
             expected_can_display_value=False,
+        )
+
+    def test_tabs_enrolled_or_staff(self):
+        self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+        for is_enrolled, is_staff in [(True, False), (False, True)]:
+            self.check_discussion(
+                tab_list=self.tabs_with_discussion,
+                expected_discussion_link="default_discussion_link",
+                expected_can_display_value=True,
+                is_enrolled=is_enrolled,
+                is_staff=is_staff
+            )
+
+    def test_tabs_not_enrolled_or_staff(self):
+        self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+        is_enrolled = is_staff = False
+        self.check_discussion(
+            tab_list=self.tabs_with_discussion,
+            expected_discussion_link="default_discussion_link",
+            expected_can_display_value=False,
+            is_enrolled=is_enrolled,
+            is_staff=is_staff
         )

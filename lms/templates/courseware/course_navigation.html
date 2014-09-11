@@ -18,12 +18,16 @@ def url_class(is_active):
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.views import notification_image_for_tab %>
+<%! from student.models import CourseEnrollment%>
+<%
+  user_is_enrolled = user.is_authenticated() and CourseEnrollment.is_enrolled(user, course.id)
+%>
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
-      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id)):
+      % for tab in CourseTabList.iterate_displayable(course, settings, user.is_authenticated(), has_access(user, 'staff', course, course.id), user_is_enrolled):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)
