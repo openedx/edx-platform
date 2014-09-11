@@ -13,6 +13,24 @@
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 
+% if show_enroll_banner:
+  <div class="wrapper-msg urgency-low" id="failed-verification-banner">
+    <div class="msg msg-reverify is-dismissable">
+      <div class="msg-content">
+        <h2 class="title">${_("You are not enrolled yet")}</h2>
+        <div class="copy">
+          <p class='enroll-message'>
+            ${_(u"You are not currently enrolled in this course. Sign up for it {link_start}here{link_end}!").format(
+            link_start=u"<a href={}>".format(url_to_enroll),
+            link_end=u"</a>"
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+% endif
+
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
 <%block name="js_extra">
@@ -36,7 +54,7 @@ $(document).ready(function(){
           </div>
         % endif
       % endif
-      
+
       <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
     </section>

@@ -20,12 +20,19 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             data="OOGIE BLOOGIE", display_name="updates"
         )
 
-    def test_logged_in(self):
+    def test_logged_in_unenrolled(self):
         self.setup_user()
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+        self.assertIn("You are not currently enrolled in this course", resp.content)
+
+    def test_logged_in_enrolled(self):
+        self.enroll(self.course)
+        url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        self.assertNotIn("You are not currently enrolled in this course", resp.content)
 
     def test_anonymous_user(self):
         url = reverse('info', args=[self.course.id.to_deprecated_string()])
