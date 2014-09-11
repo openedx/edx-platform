@@ -194,7 +194,7 @@
       </div>
     </form>
 
-    % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
 
       <span class="deco-divider">
         ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.

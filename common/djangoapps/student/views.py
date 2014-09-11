@@ -401,7 +401,7 @@ def register_user(request, extra_context=None):
 
     # If third-party auth is enabled, prepopulate the form with data from the
     # selected provider.
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
         overrides = current_provider.get_register_form_data(running_pipeline.get('kwargs'))
@@ -580,7 +580,7 @@ def dashboard(request):
         'provider_states': [],
     }
 
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
         context['duplicate_provider'] = pipeline.get_duplicate_provider(messages.get_messages(request))
         context['provider_user_states'] = pipeline.get_provider_user_states(user)
 
@@ -863,7 +863,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     redirect_url = None
     response = None
     running_pipeline = None
-    third_party_auth_requested = settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request)
+    third_party_auth_requested = microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request)
     third_party_auth_successful = False
     trumped_by_first_party_auth = bool(request.POST.get('email')) or bool(request.POST.get('password'))
     user = None
@@ -1295,7 +1295,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
     )
 
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
         post_vars = dict(post_vars.items())
         post_vars.update({'password': pipeline.make_random_password()})
 
@@ -1553,7 +1553,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     redirect_url = try_change_enrollment(request)
 
     # Resume the third-party-auth pipeline if necessary.
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+    if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')) and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
 
