@@ -210,6 +210,18 @@ class Thread(models.Model):
         self._update_from_response(response)
 
 
+def get_course_thread_stats(course_id):
+    """
+    Helper method to get threads stats by course
+    """
+    url = _url_for_course_thread_stats(course_id)
+    response = perform_request(
+        'get',
+        url
+    )
+    return response
+
+
 def _url_for_flag_abuse_thread(thread_id):
     return "{prefix}/threads/{thread_id}/abuse_flag".format(prefix=settings.PREFIX, thread_id=thread_id)
 
@@ -224,3 +236,7 @@ def _url_for_pin_thread(thread_id):
 
 def _url_for_un_pin_thread(thread_id):
     return "{prefix}/threads/{thread_id}/unpin".format(prefix=settings.PREFIX, thread_id=thread_id)
+
+
+def _url_for_course_thread_stats(course_id):
+    return "{prefix}/courses/{course_id}/stats".format(prefix=settings.PREFIX, course_id=course_id)
