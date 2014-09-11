@@ -20,6 +20,11 @@ def run():
     """
     Executed during django startup
     """
+
+    # Patch the xml libs.
+    from safe_lxml import defuse_xml_libs
+    defuse_xml_libs()
+
     django_utils_translation.patch()
 
     autostartup()
