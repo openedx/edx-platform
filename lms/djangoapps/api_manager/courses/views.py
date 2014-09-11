@@ -29,7 +29,8 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 
 from xmodule.modulestore.django import modulestore
 
-from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, course_exists, get_modulestore
+from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
+    course_exists, get_modulestore
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -41,6 +42,7 @@ from .serializers import CourseModuleCompletionSerializer, CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
 from lms.lib.comment_client.user import get_course_social_stats
+from lms.lib.comment_client.thread import get_course_thread_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
 
 from opaque_keys.edx.keys import CourseKey
@@ -1476,8 +1478,9 @@ class CoursesProjectList(SecureListAPIView):
 class CoursesMetrics(SecureAPIView):
     """
     ### The CoursesMetrics view allows clients to retrieve a list of Metrics for the specified Course
-    - URI: ```/api/courses/{course_id}/metrics/```
+    - URI: ```/api/courses/{course_id}/metrics/?organization={organization_id}```
     - GET: Returns a JSON representation (array) of the set of course metrics
+    - metrics can be filtered by organization by adding organization parameter to GET request
     ### Use Cases/Notes:
     * Example: Display number of users enrolled in a given course
     """
@@ -1488,11 +1491,31 @@ class CoursesMetrics(SecureAPIView):
         """
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_key = get_course_key(course_id)
-        users_enrolled = CourseEnrollment.num_enrolled_in(course_key)
+        course_descriptor, course_key, course_content = get_course(request, request.user, course_id)
+        slash_course_id = get_course_key(course_id, slashseparated=True)
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        users_enrolled_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        organization = request.QUERY_PARAMS.get('organization', None)
+        if organization:
+            users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
+
+        users_started_qs = CourseModuleCompletion.objects.filter(course_id=course_id).exclude(user_id__in=exclude_users)
+        if organization:
+            users_started_qs = users_started_qs.filter(user__organizations=organization)
         data = {
-            'users_enrolled': users_enrolled
+            'users_enrolled': users_enrolled_qs.count(),
+            'users_started': users_started_qs.values('user').distinct().count(),
+            'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
+        thread_stats = {}
+        try:
+            thread_stats = get_course_thread_stats(slash_course_id)
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data.update(thread_stats)
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -1633,18 +1656,10 @@ class CoursesMetricsSocial(SecureListAPIView):
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
-            # be robust to the try of course_id we get from caller
-            try:
-                # assume new style
-                course_key = CourseKey.from_string(course_id)
-                slash_course_id = course_key.to_deprecated_string()
-            except:
-                # assume course_id passed in is legacy format
-                slash_course_id = course_id
-
+            slash_course_id = get_course_key(course_id, slashseparated=True)
             # the forum service expects the legacy slash separated string format
             data = get_course_social_stats(slash_course_id)
-
+            course_key = get_course_key(course_id)
             # remove any excluded users from the aggregate
 
             exclude_users = _get_aggregate_exclusion_user_ids(course_key)
