@@ -1,0 +1,90 @@
+## mako
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<div class="wrapper wrapper-footer edx-footer edx-footer-new">
+  <footer id="footer-global" class="footer-global" role="contentinfo">
+
+    <div class="footer-about">
+      <h2 class="sr footer-about-title">${_("About edX")}</h2>
+
+      <div class="footer-about-logo">
+        <img alt="edX logo" src="${static.url('images/header-logo.png')}">
+      </div>
+
+      <div class="footer-about-copy">
+        <p>
+          ${_(
+            "{EdX} offers interactive online classes and MOOCs from the world's best universities. "
+            "Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and many other universities. "
+            "Topics include biology, business, chemistry, computer science, economics, finance, "
+            "electronics, engineering, food and nutrition, history, humanities, law, literature, "
+            "math, medicine, music, philosophy, physics, science, statistics and more. {EdX} is a "
+            "non-profit online initiative created by founding partners {Harvard} and {MIT}."
+            ).format(
+            EdX="EdX", Harvard="Harvard", MIT="MIT", HarvardX="HarvardX", MITx="MITx",
+            BerkeleyX="BerkeleyX", UTx="UTx"
+          )}
+        </p>
+      </div>
+
+      <div class="footer-about-copyright">
+        <p>${_("&copy; 2014 edX, some rights reserved.")}</p>
+      </div>
+
+      <div class="footer-about-links">
+        <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
+        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span> <span class="note">${_("(Revised 4/16/2014)")}</span></a>
+      </div>
+    </div>
+
+    <div class="footer-nav">
+      <h2 class="footer-nav-title">${_("About & Company Info")}</h2>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('ABOUT')}"><span class="copy">${_("About")}</span></a>
+        <a href="${marketing_link('NEWS')}"><span class="copy">${_("News")}</span></a>
+        <a href="${marketing_link('CONTACT')}"><span class="copy">${_("Contact")}</span></a>
+      </div>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('FAQ')}"><span class="copy">${_("FAQ")}</span></a>
+        <a href="${marketing_link('BLOG')}"><span class="copy">${_("edX Blog")}</span></a>
+      </div>
+
+      <div class="footer-nav-links">
+        <a href="${marketing_link('DONATE')}" class="has-emphasis"><span class="copy">${_("Donate to edX")}</span></a>
+        <a href="${marketing_link('JOBS')}" class="has-emphasis"><span class="copy">${_("Jobs at edX")}</span></a>
+      </div>
+    </div>
+
+    <div class="footer-follow">
+      <h2 class="footer-follow-title">${_("Follow Us")}</h2>
+
+      <div class="footer-follow-links">
+        <a href="${settings.PLATFORM_TWITTER_URL}" title="Twitter">
+          <i class="icon icon-twitter"></i>
+          <span class="copy">${_("Twitter")}</span>
+        </a>
+        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="Facebook">
+          <i class="icon icon-facebook-sign"></i>
+          <span class="copy">${_("Facebook")}</span>
+        </a>
+        <a href="${settings.PLATFORM_MEETUP_URL}" title="Meetup">
+          <i class="icon icon-calendar"></i>
+          <span class="copy">${_("Meetup")}</span>
+        </a>
+        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="LinkedIn">
+          <i class="icon icon-linkedin-sign"></i>
+          <span class="copy">${_("LinkedIn")}</span>
+        </a>
+        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="Google+">
+          <i class="icon icon-google-plus-sign"></i>
+          <span class="copy">${_("Google+")}</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+</div>

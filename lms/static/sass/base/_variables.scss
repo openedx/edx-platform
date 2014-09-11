@@ -12,15 +12,6 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
-// Card Sizes
-// breakpoints for course cards
-$bp-xl-min: 1180px;
-$bp-l-min: 980px;
-$bp-m-min: 768px;
-$bp-s-min: 320px;
-$bp-s-max: 320px;
-$bp-m-max: 768px;
-
 // ====================
 
 // FONTS
@@ -39,6 +30,17 @@ $baseFontColor: rgb(60,60,60);
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: #fff;
+
+// ====================
+
+// TIMING - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
 
 // ====================
 
