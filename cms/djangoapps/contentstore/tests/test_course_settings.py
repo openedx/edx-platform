@@ -41,6 +41,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
+        self.assertIsNone(details.intro_video_tudou, "intro_video_tudou somehow initialized" + str(details.intro_video_tudou))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
     def test_encoder(self):
@@ -53,6 +54,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
+        self.assertIsNone(jsondetails['intro_video_tudou'], "intro_video_tudou somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
     def test_ooc_encoder(self):
@@ -92,6 +94,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).intro_video,
             jsondetails.intro_video, "After set intro_video"
+        )
+        jsondetails.intro_video_tudou = "intro_video_tudou"
+        self.assertEqual(
+            CourseDetails.update_from_json(self.course.id, jsondetails.__dict__, self.user).intro_video_tudou,
+            jsondetails.intro_video_tudou, "After set intro_video_tudou"
         )
         jsondetails.effort = "effort"
         self.assertEqual(

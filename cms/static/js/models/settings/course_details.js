@@ -13,6 +13,7 @@ var CourseDetails = Backbone.Model.extend({
         short_description: "",
         overview: "",
         intro_video: null,
+        intro_video_tudou: null,
         effort: null,	// an int or null,
         course_image_name: '', // the filename
         course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
@@ -60,24 +61,41 @@ var CourseDetails = Backbone.Model.extend({
             }
             // TODO check if key points to a real video using google's youtube api
         }
+        if (newattrs.intro_video_tudou && newattrs.intro_video_tudou !== this.get('intro_video_tudou')) {
+            if (this._videokey_illegal_chars.exec(newattrs.intro_video_tudou)) {
+                errors.intro_video_tudou = gettext("Key should only contain letters, numbers, _, or -");
+            }
+            // TODO check if key points to a real video using tudou's api
+        }
         if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state
     },
 
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
-    set_videosource: function(newsource) {
+    set_videosource: function(newsource, provider) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-        if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({'intro_video': null}, {validate: true});
-        // TODO remove all whitespace w/in string
-        else {
-            if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
-        }
 
+        if (provider == 'tudou') {
+            if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video_tudou'))) this.set({'intro_video_tudou': null}, {validate: true});
+            // TODO remove all whitespace w/in string
+            else {
+                if (this.get('intro_video_tudou') !== newsource) this.set('intro_video_tudou', newsource, {validate: true});
+            }
+        }
+        else {
+            if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({'intro_video': null}, {validate: true});
+            // TODO remove all whitespace w/in string
+            else {
+                if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
+            }
+        }
         return this.videosourceSample();
     },
     videosourceSample : function() {
         if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
+        //tudou url looks like : www.tudou.com/programs/view/html5embed.action?code=kbPzDzCIeBE
+        else if (this.has('intro_video_tudou')) return "//www.tudou.com/programs/view/html5embed.action?code=" + this.get('intro_video_tudou');
         else return "";
     }
 });

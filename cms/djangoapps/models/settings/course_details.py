@@ -25,6 +25,7 @@ class CourseDetails(object):
         self.short_description = ""
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
+        self.intro_video_tudou = None  # anonter video pointer
         self.effort = None  # int hours/week
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
@@ -71,7 +72,11 @@ class CourseDetails(object):
         temploc = course_key.make_usage_key('about', 'video')
         try:
             raw_video = modulestore().get_item(temploc).data
-            course_details.intro_video = CourseDetails.parse_video_tag(raw_video)
+            video, provider = CourseDetails.parse_video_tag(raw_video)
+            if provider == 'tudou':
+                course_details.intro_video_tudou = video
+            else:
+                course_details.intro_video = video
         except ItemNotFoundError:
             pass
 
@@ -162,8 +167,12 @@ class CourseDetails(object):
         for about_type in ['syllabus', 'overview', 'effort', 'short_description']:
             cls.update_about_item(course_key, about_type, jsondict[about_type], descriptor, user)
 
-        recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
-        cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)
+        if jsondict['intro_video_tudou']:
+            recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video_tudou'], "tudou")
+            cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)
+        else:
+            recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'], "youtube")
+            cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)
 
         # Could just return jsondict w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
@@ -178,25 +187,39 @@ class CourseDetails(object):
         """
         if not raw_video:
             return None
-
         keystring_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
+        keystring_matcher_tudou = re.search(r'(?<=code=)[a-zA-Z0-9_-]+', raw_video)
         if keystring_matcher is None:
             keystring_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', raw_video)
 
         if keystring_matcher:
-            return keystring_matcher.group(0)
+            provider = 'youtube'
+            return keystring_matcher.group(0), provider
+        elif keystring_matcher_tudou is not None:
+            provider = 'tudou'
+            return keystring_matcher_tudou.group(0), provider
         else:
             logging.warn("ignoring the content because it doesn't not conform to expected pattern: " + raw_video)
             return None
 
     @staticmethod
-    def recompose_video_tag(video_key):
+    def recompose_video_tag(video_key, provider):
+        """
+        :param video_key:
+        :param provider: default 'youtube'
+        :return:
+
+        """
         # TODO should this use a mako template? Of course, my hope is that this is a short-term workaround for the db not storing
         # the right thing
         result = None
         if video_key:
-            result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
-                video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
+            if provider == "tudou":
+                result = '<iframe width="560" height="315" src="//www.tudou.com/programs/view/html5embed.action?code=' + \
+                    video_key + '" frameborder="0" allowfullscreen=""></iframe>'
+            else:
+                result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
+                    video_key + '?rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 
 
