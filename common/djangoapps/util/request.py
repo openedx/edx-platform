@@ -99,4 +99,3 @@ class RequestMockWithoutMiddleware(RequestMock):
         if not hasattr(request, 'session'):
             request.session = {}
         return request
-
