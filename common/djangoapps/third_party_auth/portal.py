@@ -17,17 +17,23 @@ class PortalOAuth2(BaseOAuth2):
     USER_DATA_URL = auth_settings['USER_DATA_URL']
 
     def get_user_id(self, details, response):
-        """Use portal email as unique id"""
+        """Use portal mongo user id as unique id"""
         if self.setting('USE_UNIQUE_USER_ID', False):
             return response['id']
         else:
-            return details['email']
+            return details['id']
 
     def get_user_details(self, response):
         """Return user details from Portal account"""
+        emails = response.get('emails', '')
+        for email in emails:
+            if email['primary'] is True:
+                email = email['email']
+                break
         return {'username': response.get('username', ''),
-                'email': response.get('emails', '')[0]['email'],
-                'fullname': response.get('name')}
+                'email': email or None,
+                'fullname': response.get('name', ''),
+                'id': response.get('_id', '')}
 
     def user_data(self, access_token, *args, **kwargs):
         """Loads user data from service"""

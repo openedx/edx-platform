@@ -34,10 +34,9 @@ class PortalSynchronizerMiddleware(object):
     def process_request(self, request):
         if not isinstance(request.user, AnonymousUser):
             try:
-                email = request.user.email
-                user = models.DjangoStorage.user.objects.get(uid=email)
+                social_user = models.DjangoStorage.user.objects.get(user_id=request.user.id)
                 response = requests.request('POST', settings.IONISX_AUTH['SYNC_USER_URL'],
-                                    params={ 'access_token': user.extra_data['access_token'] })
+                                    params={ 'access_token': social_user.extra_data['access_token'], 'id': social_user.uid })
                 response = response.json()
                 if response is None:
                     logout(request)
@@ -48,15 +47,23 @@ class PortalSynchronizerMiddleware(object):
                     )
                     return response
                 if response['updated'] is True:
-                    log.warning('need update !')
                     user = request.user
-                    user.email = response['emails'][0]['email']
-                    user.username = response['username']
+
+                    emails = response.get('emails', '')
+                    for email in emails:
+                        if email['primary'] is True:
+                            email = email['email']
+                            break
+                    user.email = email or None
+                    user.username = response.get('username', '')
                     user.save()
 
                     profile = UserProfile.objects.get(user=request.user)
-                    profile.name = response['name']
+                    profile.name = response.get('name', '')
                     profile.save()
+
+                    social_user.uid = response.get('_id', '')
+                    social_user.save()
             except requests.ConnectionError as err:
                 log.warning(err)
             except Exception as err:

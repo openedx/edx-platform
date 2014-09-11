@@ -932,11 +932,11 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
     })  # TODO: this should be status code 400  # pylint: disable=fixme
 
 
-def logout_portal(user_mail):
+def logout_portal(user_id):
     try:
-        user = models.DjangoStorage.user.objects.get(uid=user_mail)
+        social_user = models.DjangoStorage.user.objects.get(user_id=user_id)
         response = request('POST', settings.IONISX_AUTH['SYNC_LOGOUT_URL'],
-            params={ 'access_token': user.extra_data['access_token'] })
+            params={ 'access_token': social_user.extra_data['access_token'], 'id': social_user.uid })
     except ConnectionError as err:
         log.warning(err)
     except Exception as err:
@@ -953,13 +953,13 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     if isinstance(request.user, AnonymousUser):
-        user_mail = None
+        user_id = None
     else:
-        user_mail = request.user.email
+        user_id = request.user.id
 
+    if user_id:
+        logout_portal(user_id)
     logout(request)
-    if user_mail:
-        logout_portal(user_mail)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:
