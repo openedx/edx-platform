@@ -72,21 +72,16 @@ def show_cart(request):
     total_cost = cart.total_cost
     cart_items = cart.orderitem_set.all()
 
-    # add the request protocol, domain, and port to the cart object so that any specific
-    # CC_PROCESSOR implementation can construct callback URLs, if necessary
-    cart.context = {
-        'request_domain': '{0}://{1}'.format(
-            'https' if request.is_secure() else 'http',
-            request.get_host()
-        )
+    callback_url = request.build_absolute_uri(
+        reverse("shoppingcart.views.postpay_callback")
+    )
+    form_html = render_purchase_form_html(cart, callback_url=callback_url)
+    context = {
+        'shoppingcart_items': cart_items,
+        'amount': total_cost,
+        'form_html': form_html,
     }
-
-    form_html = render_purchase_form_html(cart)
-    return render_to_response("shoppingcart/list.html",
-                              {'shoppingcart_items': cart_items,
-                               'amount': total_cost,
-                               'form_html': form_html,
-                               })
+    return render_to_response("shoppingcart/list.html", context)
 
 
 @login_required

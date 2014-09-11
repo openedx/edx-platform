@@ -20,6 +20,7 @@
     <input id="start_date" type="text" value="${start_date}" name="start_date"/>
     <label for="end_date">${_("End Date: ")}</label>
     <input id="end_date" type="text" value="${end_date}" name="end_date"/>
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
     <br/>
 
     %if "itemized_purchase_report" in settings.FEATURES['ENABLED_PAYMENT_REPORTS']:
