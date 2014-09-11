@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
@@ -569,6 +569,14 @@ def course_info(request, course_id):
     reverifications = fetch_reverify_banner_info(request, course_key)
     studio_url = get_studio_url(course, 'course_info')
 
+    # link to where the student should go to enroll in the course:
+    # about page if there is not marketing site, SITE_NAME if there is
+    url_to_enroll = reverse(course_about, args=[course_id])
+    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        url_to_enroll = marketing_link('COURSES')
+
+    show_enroll_banner = request.user.is_authenticated() and not CourseEnrollment.is_enrolled(request.user, course.id)
+
     context = {
         'request': request,
         'course_id': course_key.to_deprecated_string(),
@@ -578,6 +586,8 @@ def course_info(request, course_id):
         'masquerade': masq,
         'studio_url': studio_url,
         'reverifications': reverifications,
+        'show_enroll_banner': show_enroll_banner,
+        'url_to_enroll': url_to_enroll,
     }
 
     return render_to_response('courseware/info.html', context)
@@ -806,7 +816,7 @@ def _progress(request, course_key, student_id):
 
     Course staff are allowed to see the progress of students in their class.
     """
-    course = get_course_with_access(request.user, 'load', course_key, depth=None)
+    course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
     staff_access = has_access(request.user, 'staff', course)
 
     if student_id is None or student_id == request.user.id:
