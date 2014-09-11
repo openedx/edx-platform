@@ -5,7 +5,6 @@
 
 <%!
   from django.core.urlresolvers import reverse
-  import waffle
 %>
 
 <%
@@ -31,6 +30,12 @@
         (e).preventDefault();
 
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
+
+        course = $("#upgrade-to-verified").data("course-id");
+        analytics.track('edx.bi.dashboard.upsell_copy.clicked', {
+          category: 'user-engagement',
+          label: course
+        });
     }
 
     $("#failed-verification-button-dismiss").click(function(event) {
@@ -45,15 +50,6 @@
       user = $(event.target).data("user");
       course = $(event.target).data("course-id");
       Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
-      % if waffle.flag_is_active(request, 'alternate_upsell_copy'):
-      analytics.track("Clicked on Alternate Upsell Copy", {
-        course: course
-      });
-      % else:
-      analytics.track("Clicked on Regular Upsell Copy", {
-        course: course
-      });
-      % endif
     });
 
     $(".email-settings").click(function(event) {
