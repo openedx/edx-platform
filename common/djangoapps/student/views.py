@@ -1005,7 +1005,8 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             "edx.bi.user.account.authenticated",
             {
                 'category': "conversion",
-                'label': registration_course_id
+                'label': registration_course_id,
+                'provider': None
             },
             context={
                 'Google Analytics': {
@@ -1469,17 +1470,25 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         tracking_context = tracker.get_tracker().resolve_context()
         analytics.identify(user.id, {
-            email: email,
-            username: username,
+            'email': email,
+            'username': username,
         })
+
+        # If the user is registering via 3rd party auth, track which provider they use
+        provider_name = None
+        if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and pipeline.running(request):
+            running_pipeline = pipeline.get(request)
+            current_provider = provider.Registry.get_by_backend_name(running_pipeline.get('backend'))
+            provider_name = current_provider.NAME
 
         registration_course_id = request.session.get('registration_course_id')
         analytics.track(
             user.id,
             "edx.bi.user.account.registered",
             {
-                "category": "conversion",
-                "label": registration_course_id
+                'category': 'conversion',
+                'label': registration_course_id,
+                'provider': provider_name
             },
             context={
                 'Google Analytics': {
