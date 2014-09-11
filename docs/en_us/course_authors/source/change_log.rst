@@ -16,7 +16,10 @@ September, 2014
      - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
        Staff` chapters to include information about choosing the type of post
        and to reflect changes in the user interface.
-
+   * - 09/11/14
+     - Added info about possible problem types to :ref:`Problem with Adaptive Hint`.
+   * - 
+     - Removed "These problems only allow integers and a few select constants" from table of problem types in :ref:`Create Exercises`.
 
 **************
 August, 2014
