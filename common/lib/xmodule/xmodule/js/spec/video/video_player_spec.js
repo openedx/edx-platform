@@ -395,9 +395,21 @@ function (VideoPlayer) {
                     }, 'currentTime is less than 2 seconds', WAIT_TIMEOUT);
 
                     runs(function () {
-                        var args = state.videoPlayer.log.calls[0].args;
+                        // Depending on the browser, the object of arrays may list the
+                        // arrays in a different order. Find the array that is relevent
+                        // to onSeek. Fail if that is not found.
+                        var seekVideoArgIndex
+                        for(var i = 0; i < state.videoPlayer.log.calls.length; i++){
+                            if (state.videoPlayer.log.calls[i].args[0] == 'seek_video') {
+                                seekVideoArgIndex = i
+                                break;
+                            }
+                        }
 
-                        expect(args[0]).toBe('seek_video');
+                        expect(seekVideoArgIndex).toBeDefined;
+
+                        var args = state.videoPlayer.log.calls[seekVideoArgIndex].args;
+
                         expect(args[1].old_time).toBeLessThan(2);
                         expect(args[1].new_time).toBe(2);
                         expect(args[1].type).toBe('onSlideSeek');
