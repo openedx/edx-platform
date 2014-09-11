@@ -6,6 +6,7 @@ import random
 import re
 import unittest
 import uuid
+from contracts import contract
 from importlib import import_module
 from path import path
 
@@ -22,6 +23,7 @@ from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date, Timedelta
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
+from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.edit_info import EditInfoMixin
 
@@ -129,7 +131,7 @@ class SplitModuleTest(unittest.TestCase):
             "revisions": [{
                 "user_id": "testassist@edx.org",
                 "update": {
-                    "head12345": {
+                    ("course", "head12345"): {
                         "end": _date_field.from_json("2013-04-13T04:30"),
                         "tabs": [
                             {
@@ -198,7 +200,7 @@ class SplitModuleTest(unittest.TestCase):
             },
                 {"user_id": "testassist@edx.org",
                  "update":
-                    {"head12345": {
+                    {("course", "head12345"): {
                         "end": _date_field.from_json("2013-06-13T04:30"),
                         "grading_policy": {
                             "GRADER": [
@@ -243,6 +245,7 @@ class SplitModuleTest(unittest.TestCase):
                      {
                          "id": "chapter1",
                          "parent": "head12345",
+                         "parent_type": "course",
                          "category": "chapter",
                          "fields": {
                              "display_name": "Hercules"
@@ -251,6 +254,7 @@ class SplitModuleTest(unittest.TestCase):
                      {
                          "id": "chapter2",
                          "parent": "head12345",
+                         "parent_type": "course",
                          "category": "chapter",
                          "fields": {
                              "display_name": "Hera heckles Hercules"
@@ -259,6 +263,7 @@ class SplitModuleTest(unittest.TestCase):
                      {
                          "id": "chapter3",
                          "parent": "head12345",
+                         "parent_type": "course",
                          "category": "chapter",
                          "fields": {
                              "display_name": "Hera cuckolds Zeus"
@@ -267,6 +272,7 @@ class SplitModuleTest(unittest.TestCase):
                      {
                          "id": "problem1",
                          "parent": "chapter3",
+                         "parent_type": "chapter",
                          "category": "problem",
                          "fields": {
                              "display_name": "Problem 3.1",
@@ -276,6 +282,7 @@ class SplitModuleTest(unittest.TestCase):
                      {
                          "id": "problem3_2",
                          "parent": "chapter3",
+                         "parent_type": "chapter",
                          "category": "problem",
                          "fields": {
                              "display_name": "Problem 3.2"
@@ -350,7 +357,7 @@ class SplitModuleTest(unittest.TestCase):
             "revisions": [{
                 "user_id": "test@edx.org",
                 "update": {
-                    "head23456": {
+                    ("course", "head23456"): {
                         "display_name": "The most wonderful course",
                         "grading_policy": {
                             "GRADER": [
@@ -466,13 +473,13 @@ class SplitModuleTest(unittest.TestCase):
                 root_block_id=course_spec['root_block_id']
             )
             for revision in course_spec.get('revisions', []):
-                for block_id, fields in revision.get('update', {}).iteritems():
+                for (block_type, block_id), fields in revision.get('update', {}).iteritems():
                     # cheat since course is most frequent
                     if course.location.block_id == block_id:
                         block = course
                     else:
                         # not easy to figure out the category but get_item won't care
-                        block_usage = BlockUsageLocator.make_relative(course.location, '', block_id)
+                        block_usage = BlockUsageLocator.make_relative(course.location, block_type, block_id)
                         block = split_store.get_item(block_usage)
                     for key, value in fields.iteritems():
                         setattr(block, key, value)
@@ -484,7 +491,7 @@ class SplitModuleTest(unittest.TestCase):
                     elif spec['parent'] == course.location.block_id:
                         parent = course
                     else:
-                        block_usage = BlockUsageLocator.make_relative(course.location, '', spec['parent'])
+                        block_usage = BlockUsageLocator.make_relative(course.location, spec['parent_type'], spec['parent'])
                         parent = split_store.get_item(block_usage)
                     block_id = LocalId(spec['id'])
                     child = split_store.create_xblock(
@@ -680,10 +687,10 @@ class SplitModuleCourseTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         course = modulestore().get_course(locator)
         block_map = modulestore().cache_items(
-            course.system, [child.block_id for child in course.children], course.id, depth=3
+            course.system, [BlockKey.from_usage_key(child) for child in course.children], course.id, depth=3
         )
-        self.assertIn('chapter1', block_map)
-        self.assertIn('problem3_2', block_map)
+        self.assertIn(BlockKey('chapter', 'chapter1'), block_map)
+        self.assertIn(BlockKey('problem', 'problem3_2'), block_map)
 
     def test_course_successors(self):
         """
@@ -903,10 +910,6 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         self.assertEqual(len(matches), 2)
 
-        matches = modulestore().get_items(locator, qualifiers={'children': 'chapter2'})
-        self.assertEqual(len(matches), 1)
-        self.assertEqual(matches[0].location.block_id, 'head12345')
-
     def test_get_parents(self):
         '''
         get_parent_location(locator): BlockUsageLocator
@@ -920,8 +923,9 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(parent.block_id, 'head12345')
         self.assertEqual(parent.org, "testx")
         self.assertEqual(parent.course, "GreekHero")
-        locator = locator.course_key.make_usage_key('Chapter', 'chapter2')
+        locator = locator.course_key.make_usage_key('chapter', 'chapter2')
         parent = modulestore().get_parent_location(locator)
+        self.assertIsNotNone(parent)
         self.assertEqual(parent.block_id, 'head12345')
         locator = locator.course_key.make_usage_key('garbage', 'nosuchblock')
         parent = modulestore().get_parent_location(locator)
@@ -1243,7 +1247,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
         self.assertEqual(version_agnostic(updated_problem.children), version_agnostic(block.children))
         self.assertNotIn(moved_child, version_agnostic(updated_problem.children))
-        locator = locator.course_key.make_usage_key('Chapter', "chapter1")
+        locator = locator.course_key.make_usage_key('chapter', "chapter1")
         other_block = modulestore().get_item(locator)
         other_block.children.append(moved_child)
         other_updated = modulestore().update_item(other_block, self.user_id)
@@ -1524,9 +1528,9 @@ class TestCourseCreation(SplitModuleTest):
             new_course.location.as_object_id(new_course.location.version_guid)
         )
         self.assertIsNotNone(db_structure, "Didn't find course")
-        self.assertNotIn('course', db_structure['blocks'])
-        self.assertIn('top', db_structure['blocks'])
-        self.assertEqual(db_structure['blocks']['top']['category'], 'chapter')
+        self.assertNotIn(BlockKey('course', 'course'), db_structure['blocks'])
+        self.assertIn(BlockKey('chapter', 'top'), db_structure['blocks'])
+        self.assertEqual(db_structure['blocks'][BlockKey('chapter', 'top')]['block_type'], 'chapter')
 
     def test_create_id_dupe(self):
         """
@@ -1636,23 +1640,27 @@ class TestPublish(SplitModuleTest):
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         chapter3 = source_course.make_usage_key('chapter', 'chapter3')
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2, chapter3])
-        expected = [head.block_id, chapter1.block_id]
-        self._check_course(
-            source_course, dest_course, expected, [chapter2.block_id, chapter3.block_id, "problem1", "problem3_2"]
-        )
+        expected = [BlockKey.from_usage_key(head), BlockKey.from_usage_key(chapter1)]
+        unexpected = [
+            BlockKey.from_usage_key(chapter2),
+            BlockKey.from_usage_key(chapter3),
+            BlockKey("problem", "problem1"),
+            BlockKey("problem", "problem3_2")
+        ]
+        self._check_course(source_course, dest_course, expected, unexpected)
         # add a child under chapter1
         new_module = modulestore().create_child(
             self.user_id, chapter1, "sequential",
             fields={'display_name': 'new sequential'},
         )
         # remove chapter1 from expected b/c its pub'd version != the source anymore since source changed
-        expected.remove(chapter1.block_id)
+        expected.remove(BlockKey.from_usage_key(chapter1))
         # check that it's not in published course
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(new_module.location.map_into_course(dest_course))
         # publish it
         modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(new_module.location.block_id)
+        expected.append(BlockKey.from_usage_key(new_module.location))
         # check that it is in the published course and that its parent is the chapter
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
         self.assertEqual(
@@ -1664,12 +1672,10 @@ class TestPublish(SplitModuleTest):
         )
         # publish it
         modulestore().copy(self.user_id, source_course, dest_course, [new_module.location], None)
-        expected.append(new_module.location.block_id)
+        expected.append(BlockKey.from_usage_key(new_module.location))
         # check that it is in the published course (no error means it worked)
         pub_module = modulestore().get_item(new_module.location.map_into_course(dest_course))
-        self._check_course(
-            source_course, dest_course, expected, [chapter2.block_id, chapter3.block_id, "problem1", "problem3_2"]
-        )
+        self._check_course(source_course, dest_course, expected, unexpected)
 
     def test_exceptions(self):
         """
@@ -1702,8 +1708,14 @@ class TestPublish(SplitModuleTest):
         chapter2 = source_course.make_usage_key('chapter', 'chapter2')
         problem1 = source_course.make_usage_key('problem', 'problem1')
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
-        expected = ["head12345", "chapter1", "chapter3", "problem1", "problem3_2"]
-        self._check_course(source_course, dest_course, expected, ["chapter2"])
+        expected = [
+            BlockKey("course", "head12345"),
+            BlockKey("chapter", "chapter1"),
+            BlockKey("chapter", "chapter3"),
+            BlockKey("problem", "problem1"),
+            BlockKey("problem", "problem3_2"),
+        ]
+        self._check_course(source_course, dest_course, expected, [BlockKey("chapter", "chapter2")])
         # now move problem1 and delete problem3_2
         chapter1 = modulestore().get_item(source_course.make_usage_key("chapter", "chapter1"))
         chapter3 = modulestore().get_item(source_course.make_usage_key("chapter", "chapter3"))
@@ -1711,9 +1723,15 @@ class TestPublish(SplitModuleTest):
         chapter3.children.remove(problem1.map_into_course(chapter3.location.course_key))
         modulestore().delete_item(source_course.make_usage_key("problem", "problem3_2"), self.user_id)
         modulestore().copy(self.user_id, source_course, dest_course, [head], [chapter2])
-        expected = ["head12345", "chapter1", "chapter3", "problem1"]
-        self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
+        expected = [
+            BlockKey("course", "head12345"),
+            BlockKey("chapter", "chapter1"),
+            BlockKey("chapter", "chapter3"),
+            BlockKey("problem", "problem1")
+        ]
+        self._check_course(source_course, dest_course, expected, [BlockKey("chapter", "chapter2"), BlockKey("problem", "problem3_2")])
 
+    @contract(expected_blocks="list(BlockKey)", unexpected_blocks="list(BlockKey)")
     def _check_course(self, source_course_loc, dest_course_loc, expected_blocks, unexpected_blocks):
         """
         Check that the course has the expected blocks and does not have the unexpected blocks
@@ -1721,9 +1739,8 @@ class TestPublish(SplitModuleTest):
         history_info = modulestore().get_course_history_info(dest_course_loc)
         self.assertEqual(history_info['edited_by'], self.user_id)
         for expected in expected_blocks:
-            # since block_type has no impact on identity, we can just provide an empty string
-            source = modulestore().get_item(source_course_loc.make_usage_key("", expected))
-            pub_copy = modulestore().get_item(dest_course_loc.make_usage_key("", expected))
+            source = modulestore().get_item(source_course_loc.make_usage_key(expected.type, expected.id))
+            pub_copy = modulestore().get_item(dest_course_loc.make_usage_key(expected.type, expected.id))
             # everything except previous_version & children should be the same
             self.assertEqual(source.category, pub_copy.category)
             self.assertEqual(
@@ -1743,21 +1760,28 @@ class TestPublish(SplitModuleTest):
                     self.assertEqual(field.read_from(source), field.read_from(pub_copy))
         for unexp in unexpected_blocks:
             with self.assertRaises(ItemNotFoundError):
-                modulestore().get_item(dest_course_loc.make_usage_key("", unexp))
+                modulestore().get_item(dest_course_loc.make_usage_key(unexp.type, unexp.id))
 
+    @contract(
+        source_children="list(BlockUsageLocator)",
+        dest_children="list(BlockUsageLocator)",
+        unexpected="list(BlockKey)"
+    )
     def _compare_children(self, source_children, dest_children, unexpected):
         """
         Ensure dest_children == source_children minus unexpected
         """
-        dest_cursor = 0
-        for child in source_children:
-            child = child.version_agnostic()
-            if child.block_id in unexpected:
-                self.assertNotIn(child.block_id, [dest.block_id for dest in dest_children])
-            else:
-                self.assertEqual(child.block_id, dest_children[dest_cursor].block_id)
-                dest_cursor += 1
-        self.assertEqual(dest_cursor, len(dest_children))
+        source_block_keys = [
+            src_key
+            for src_key
+            in (BlockKey.from_usage_key(src) for src in source_children)
+            if src_key not in unexpected
+        ]
+        dest_block_keys = [BlockKey.from_usage_key(dest) for dest in dest_children]
+        for unexp in unexpected:
+            self.assertNotIn(unexp, dest_block_keys)
+
+        self.assertEqual(source_block_keys, dest_block_keys)
 
 
 class TestSchema(SplitModuleTest):

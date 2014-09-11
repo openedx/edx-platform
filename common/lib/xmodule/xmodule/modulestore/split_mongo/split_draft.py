@@ -10,6 +10,7 @@ from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 )
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.split_mongo import BlockKey
 
 
 class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleStore):
@@ -129,6 +130,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 user_id, parent_usage_key, block_type, block_id=block_id,
                 fields=fields, **kwargs
             )
+            # Publish both the child and the parent, if the child is a direct-only category
+            self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
             self._auto_publish_no_children(parent_usage_key, item.location.category, user_id, **kwargs)
             return item
 
@@ -239,15 +242,15 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
         def get_course(branch_name):
             return self._lookup_course(xblock.location.course_key.for_branch(branch_name))['structure']
 
-        def get_block(course_structure, block_id):
-            return self._get_block_from_structure(course_structure, block_id)
+        def get_block(course_structure, block_key):
+            return self._get_block_from_structure(course_structure, block_key)
 
         draft_course = get_course(ModuleStoreEnum.BranchName.draft)
         published_course = get_course(ModuleStoreEnum.BranchName.published)
 
-        def has_changes_subtree(block_id):
-            draft_block = get_block(draft_course, block_id)
-            published_block = get_block(published_course, block_id)
+        def has_changes_subtree(block_key):
+            draft_block = get_block(draft_course, block_key)
+            published_block = get_block(published_course, block_key)
             if not published_block:
                 return True
 
@@ -263,7 +266,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
             return False
 
-        return has_changes_subtree(xblock.location.block_id)
+        return has_changes_subtree(BlockKey.from_usage_key(xblock.location))
 
     def publish(self, location, user_id, blacklist=None, **kwargs):
         """
@@ -314,7 +317,10 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             published_course_structure = self._lookup_course(
                 location.course_key.for_branch(ModuleStoreEnum.BranchName.published)
             )['structure']
-            published_block = self._get_block_from_structure(published_course_structure, location.block_id)
+            published_block = self._get_block_from_structure(
+                published_course_structure,
+                BlockKey.from_usage_key(location)
+            )
             if published_block is None:
                 raise InvalidVersionError(location)
 
@@ -323,7 +329,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             new_structure = self.version_structure(draft_course_key, draft_course_structure, user_id)
 
             # remove the block and its descendants from the new structure
-            self._remove_subtree(location.block_id, new_structure['blocks'])
+            self._remove_subtree(BlockKey.from_usage_key(location), new_structure['blocks'])
 
             # copy over the block and its descendants from the published branch
             def copy_from_published(root_block_id):
@@ -339,7 +345,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 for child_block_id in block.setdefault('fields', {}).get('children', []):
                     copy_from_published(child_block_id)
 
-            copy_from_published(location.block_id)
+            copy_from_published(BlockKey.from_usage_key(location))
 
             # update course structure and index
             self.update_structure(draft_course_key, new_structure)
@@ -387,7 +393,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
 
     def _get_head(self, xblock, branch):
         course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch))['structure']
-        return self._get_block_from_structure(course_structure, xblock.location.block_id)
+        return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
     def _get_version(self, block):
         """
@@ -427,7 +433,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             partitioned_fields = self.partition_fields_by_scope(block_type, fields)
             course_key = self._map_revision_to_branch(course_key)  # cast to branch_setting
             return self._update_item_from_fields(
-                user_id, course_key, block_type, block_id, partitioned_fields, None, allow_not_found=True, force=True
+                user_id, course_key, BlockKey(block_type, block_id), partitioned_fields, None, allow_not_found=True, force=True
             ) or self.get_item(new_usage_key)
 
     def compute_published_info_internal(self, xblock):

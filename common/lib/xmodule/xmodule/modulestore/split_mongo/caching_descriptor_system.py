@@ -1,19 +1,23 @@
 import sys
 import logging
+from contracts import contract, new_contract
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, DefinitionLocator
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xmodule.modulestore.split_mongo import encode_key_for_mongo
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from fs.osfs import OSFS
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.split_mongo import BlockKey
 
 log = logging.getLogger(__name__)
+
+new_contract('BlockUsageLocator', BlockUsageLocator)
+new_contract('BlockKey', BlockKey)
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
@@ -58,30 +62,31 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
-            encode_key_for_mongo(course_entry['structure'].get('root')),
+            course_entry['structure'].get('root'),
             course_entry.setdefault('inherited_settings', {}),
         )
         self.default_class = default_class
         self.local_modules = {}
 
+    @contract(usage_key="BlockUsageLocator | BlockKey")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
-        # usage_key is either a UsageKey or just the block_id. if a usage_key,
+        # usage_key is either a UsageKey or just the block_key. if a usage_key,
         if isinstance(usage_key, BlockUsageLocator):
+
+            # trust the passed in key to know the caller's expectations of which fields are filled in.
+            # particularly useful for strip_keys so may go away when we're version aware
+            course_key = usage_key.course_key
+
             if isinstance(usage_key.block_id, LocalId):
                 try:
                     return self.local_modules[usage_key]
                 except KeyError:
                     raise ItemNotFoundError
             else:
-                block_id = usage_key.block_id
+                block_key = BlockKey.from_usage_key(usage_key)
         else:
-            block_id = usage_key
+            block_key = usage_key
 
-        if isinstance(usage_key, BlockUsageLocator):
-            # trust the passed in key to know the caller's expectations of which fields are filled in.
-            # particularly useful for strip_keys so may go away when we're version aware
-            course_key = usage_key.course_key
-        else:
             course_info = course_entry_override or self.course_entry
             course_key = CourseLocator(
                 version_guid=course_info['structure']['_id'],
@@ -90,27 +95,29 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 run=course_info.get('run'),
                 branch=course_info.get('branch'),
             )
-        json_data = self.get_module_data(block_id, course_key)
 
-        class_ = self.load_block_type(json_data.get('category'))
+        json_data = self.get_module_data(block_key, course_key)
+
+        class_ = self.load_block_type(json_data.get('block_type'))
         # pass None for inherited_settings to signal that it should get the settings from cache
-        new_item = self.xblock_from_json(class_, course_key, block_id, json_data, None, course_entry_override, **kwargs)
+        new_item = self.xblock_from_json(class_, course_key, block_key, json_data, None, course_entry_override, **kwargs)
         return new_item
 
-    def get_module_data(self, block_id, course_key):
+    @contract(block_key=BlockKey, course_key=CourseLocator)
+    def get_module_data(self, block_key, course_key):
         """
         Get block from module_data adding it to module_data if it's not already there but is in the structure
 
         Raises:
             ItemNotFoundError if block is not in the structure
         """
-        json_data = self.module_data.get(block_id)
+        json_data = self.module_data.get(block_key)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
-            json_data = self.module_data.get(block_id)
+            self.modulestore.cache_items(self, [block_key], course_key, lazy=self.lazy)
+            json_data = self.module_data.get(block_key)
             if json_data is None:
-                raise ItemNotFoundError(block_id)
+                raise ItemNotFoundError(block_key)
 
         return json_data
 
@@ -125,8 +132,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
+    @contract(block_key="BlockKey | None")
     def xblock_from_json(
-        self, class_, course_key, block_id, json_data, inherited_settings, course_entry_override=None, **kwargs
+        self, class_, course_key, block_key, json_data, inherited_settings, course_entry_override=None, **kwargs
     ):
         if course_entry_override is None:
             course_entry_override = self.course_entry
@@ -138,20 +146,23 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             self.course_entry['run'] = course_entry_override['run']
 
         definition_id = json_data.get('definition')
-        block_type = json_data['category']
-        if block_id is not None:
+
+        # If no usage id is provided, generate an in-memory id
+        if block_key is None:
+            block_key = BlockKey(json_data['block_type'], LocalId())
+        else:
             if inherited_settings is None:
                 # see if there's a value in course_entry
-                if (block_type, block_id) in self.course_entry['inherited_settings']:
-                    inherited_settings = self.course_entry['inherited_settings'][(block_type, block_id)]
-            elif (block_type, block_id) not in self.course_entry['inherited_settings']:
-                self.course_entry['inherited_settings'][(block_type, block_id)] = inherited_settings
+                if block_key in self.course_entry['inherited_settings']:
+                    inherited_settings = self.course_entry['inherited_settings'][block_key]
+            elif block_key not in self.course_entry['inherited_settings']:
+                self.course_entry['inherited_settings'][block_key] = inherited_settings
 
         if definition_id is not None and not json_data.get('definition_loaded', False):
             definition_loader = DefinitionLazyLoader(
-                self.modulestore, block_type, definition_id,
+                self.modulestore, block_key.type, definition_id,
                 lambda fields: self.modulestore.convert_references_to_keys(
-                    course_key, self.load_block_type(block_type),
+                    course_key, self.load_block_type(block_key.type),
                     fields, self.course_entry['structure']['blocks'],
                 )
             )
@@ -162,14 +173,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if definition_id is None:
             definition_id = LocalId()
 
-        # If no usage id is provided, generate an in-memory id
-        if block_id is None:
-            block_id = LocalId()
-
         block_locator = BlockUsageLocator(
             course_key,
-            block_type=block_type,
-            block_id=block_id,
+            block_type=block_key.type,
+            block_id=block_key.id,
         )
 
         converted_fields = self.modulestore.convert_references_to_keys(
@@ -186,7 +193,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         try:
             module = self.construct_xblock_from_class(
                 class_,
-                ScopeIds(None, block_type, definition_id, block_locator),
+                ScopeIds(None, block_key.type, definition_id, block_locator),
                 field_data,
             )
         except Exception:
@@ -197,7 +204,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 BlockUsageLocator(
                     CourseLocator(version_guid=course_entry_override['structure']['_id']),
                     block_type='error',
-                    block_id=block_id
+                    block_id=block_key.id
                 ),
                 error_msg=exc_info_to_str(sys.exc_info())
             )
@@ -208,7 +215,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
         module.source_version = edit_info.get('source_version', None)
-        module.definition_locator = DefinitionLocator(block_type, definition_id)
+        module.definition_locator = DefinitionLocator(block_key.type, definition_id)
         # decache any pending field settings
         module.save()
 
@@ -235,7 +242,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
         """
         if not hasattr(xblock, '_subtree_edited_by'):
-            json_data = self.module_data[xblock.location.block_id]
+            json_data = self.module_data[BlockKey.from_usage_key(xblock.location)]
             if '_subtree_edited_by' not in json_data.setdefault('edit_info', {}):
                 self._compute_subtree_edited_internal(
                     xblock.location.block_id, json_data, xblock.location.course_key
@@ -249,7 +256,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
         """
         if not hasattr(xblock, '_subtree_edited_on'):
-            json_data = self.module_data[xblock.location.block_id]
+            json_data = self.module_data[BlockKey.from_usage_key(xblock.location)]
             if '_subtree_edited_on' not in json_data.setdefault('edit_info', {}):
                 self._compute_subtree_edited_internal(
                     xblock.location.block_id, json_data, xblock.location.course_key
@@ -284,7 +291,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         max_by = json_data['edit_info']['edited_by']
 
         for child in json_data.get('fields', {}).get('children', []):
-            child_data = self.get_module_data(child, course_key)
+            child_data = self.get_module_data(BlockKey(*child), course_key)
             if '_subtree_edited_on' not in json_data.setdefault('edit_info', {}):
                 self._compute_subtree_edited_internal(child, child_data, course_key)
             if child_data['edit_info']['_subtree_edited_on'] > max_date:
