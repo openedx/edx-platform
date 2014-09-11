@@ -59,6 +59,8 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 
 import random
 import string  # pylint: disable-msg=deprecated-module
+import analytics
+from eventtracking import tracker
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -360,3 +362,36 @@ def redirect_to_supplementary_form(strategy, details, response, uid, is_dashboar
 
     if is_register and user_unset:
         return redirect('/register', name='register_user')
+
+@partial.partial
+def login_analytics(*args, **kwargs):
+    event_name = None
+
+    action_to_event_name = {
+        "is_register": "edx.bi.user.account.ugh",
+        "is_login": "edx.bi.user.account.authenticated",
+        "is_dashboard": "edx.bi.user.account.linked"
+    }
+
+    for action in action_to_event_name.keys():
+        if kwargs[action]:
+            event_name = action_to_event_name[action]
+
+    from nose.tools import set_trace; set_trace()
+
+    registration_course_id = kwargs['request'].session.get('registration_course_id')
+    tracking_context = tracker.get_tracker().resolve_context()
+    analytics.track(
+        kwargs['user'].id,
+        event_name,
+        {
+            'category': "conversion",
+            'label': registration_course_id,
+            'provider': getattr(kwargs['backend'],'name')
+        },
+        context={
+            'Google Analytics': {
+                'clientId': tracking_context.get('client_id') 
+            }
+        }
+    )
