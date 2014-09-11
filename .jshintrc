@@ -27,7 +27,7 @@
     "unused"          : true,      // Warns when you define and never use your variables.
     "strict"          : true,      // Requires all functions to run in ECMAScript 5's strict mode.
     "trailing"        : true,      // Makes it an error to leave a trailing whitespace in your code.
-    "maxlen"          : 120,       // Lets you set the maximum length of a line.
+    "maxlen"          : 80,       // Lets you set the maximum length of a line.
     //"maxparams"     : 4,         // Lets you set the max number of formal parameters allowed per function.
     //"maxdepth"      : 4,         // Lets you control how nested do you want your blocks to be.
     //"maxstatements" : 4,         // Lets you set the max number of statements allowed per function.
