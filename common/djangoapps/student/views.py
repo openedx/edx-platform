@@ -419,6 +419,8 @@ def register_user(request, extra_context=None):
         if request.user.is_authenticated():
             if 'course_id' in request.GET:
                 return redirect("/courses/{0}/about".format(request.GET.get('course_id')))
+            else:
+                return redirect('/')
         else:
             return redirect("/auth/login/portal-oauth2/?auth_entry=login&next={0}".format(urlquote(request.get_full_path())))
 
