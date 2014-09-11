@@ -531,6 +531,9 @@ urlpatterns = patterns(*urlpatterns)
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+    # in debug mode, allow any template to be rendered (most useful for UX reference templates)
+    urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
+
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
