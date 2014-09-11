@@ -4,7 +4,6 @@
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
-  import waffle
 %>
 
 <%
@@ -107,11 +106,7 @@
             <div class="wrapper-tip">
               <h4 class="message-title">
                 <i class="icon-caret-down ui-toggle-expansion"></i>
-                % if waffle.flag_is_active(request, 'alternate_upsell_copy'):
-                  <span class="value">${_("Document your accomplishment!")}</span>
-                % else:
                   <span class="value">${_("Challenge Yourself!")}</span>
-                % endif
               </h4>
               <p class="message-copy">${_("Take this course as an ID-verified student.")}</p>
             </div>
