@@ -67,7 +67,7 @@ def get_course_leaf_nodes(course_key, detached_categories):
     return nodes
 
 
-def get_course_key(course_id):
+def get_course_key(course_id, slashseparated=False):
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
@@ -75,6 +75,11 @@ def get_course_key(course_id):
             course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         except InvalidKeyError:
             course_key = None
+    if slashseparated:
+        try:
+            course_key = course_key.to_deprecated_string()
+        except:
+            course_key = course_id
     return course_key
 
 

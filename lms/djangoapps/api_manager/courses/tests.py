@@ -51,7 +51,16 @@ def _fake_get_get_course_social_stats(course_id):
         '2': {'one': 'two'}
     }
 
-@mock.patch("lms.lib.comment_client.user.get_course_social_stats", _fake_get_get_course_social_stats)
+
+def _fake_get_course_thread_stats(course_id):
+    return {
+        'num_threads': 5,
+        'num_active_threads': 3
+    }
+
+
+@mock.patch("api_manager.courses.views.get_course_social_stats", _fake_get_get_course_social_stats)
+@mock.patch("api_manager.courses.views.get_course_thread_stats", _fake_get_course_thread_stats)
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
@@ -207,6 +216,13 @@ class CoursesApiTests(TestCase):
                 module = self.get_module_for_user(user, self.course, self.item)
                 grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
                 module.system.publish(module, 'grade', grade_dict)
+
+            for j, user in enumerate(self.users):
+                StudentModuleFactory.create(
+                    course_id=self.course.id,
+                    module_type='sequential',
+                    module_state_key=self.item.location,
+                )
 
         self.test_course_id = unicode(self.course.id)
         self.test_bogus_course_id = 'i4x://foo/bar/baz'
@@ -1736,6 +1752,7 @@ class CoursesApiTests(TestCase):
 
     def test_courses_data_metrics(self):
         test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
         test_user_uri = self.base_users_uri
         users_to_add = 5
         for i in xrange(0, users_to_add):
@@ -1753,11 +1770,44 @@ class CoursesApiTests(TestCase):
             response = self.do_post(test_uri, post_data)
             self.assertEqual(response.status_code, 201)
 
+        #create an organization
+        data = {
+            'name': 'Test Organization',
+            'display_name': 'Test Org Display Name',
+            'users': [created_user_id]
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        org_id = response.data['id']
+
+        for i in xrange(1, 5):
+            local_content_name = 'Video_Sequence{}'.format(i)
+            local_content = ItemFactory.create(
+                category="videosequence",
+                parent_location=self.chapter.location,
+                data=self.test_data,
+                display_name=local_content_name
+            )
+            content_id = unicode(local_content.scope_ids.usage_id)
+            completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': None}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+
         # get course metrics
         course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(course_metrics_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
+        self.assertEqual(response.data['users_started'], 1)
+        self.assertIsNotNone(response.data['grade_cutoffs'])
+
+        # get course metrics by organization
+        course_metrics_uri = '{}/{}/metrics/?organization={}'.format(self.base_courses_uri, self.test_course_id, org_id)
+        response = self.do_get(course_metrics_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['users_enrolled'], 1)
+        self.assertEqual(response.data['users_started'], 1)
 
         # test with bogus course
         course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_bogus_course_id)
