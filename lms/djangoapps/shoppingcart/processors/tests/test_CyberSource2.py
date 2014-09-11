@@ -94,7 +94,8 @@ class CyberSource2Test(TestCase):
                 'unsigned_field_names',
                 'transaction_uuid',
                 'payment_method',
-                'override_custom_receipt_page'
+                'override_custom_receipt_page',
+                'override_custom_cancel_page',
             ])
         )
         self.assertEqual(params['unsigned_field_names'], '')
@@ -168,6 +169,16 @@ class CyberSource2Test(TestCase):
         # Expect an error
         self.assertFalse(result['success'])
         self.assertIn(u"badly-typed value", result['error_html'])
+
+    def test_process_user_cancelled(self):
+        # Change the payment amount to a non-decimal
+        params = self._signed_callback_params(self.order.id, self.COST, "abcd")
+        params['decision'] = u'CANCEL'
+        result = process_postpay_callback(params)
+
+        # Expect an error
+        self.assertFalse(result['success'])
+        self.assertIn(u"you have cancelled this transaction", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
     def test_process_no_credit_card_digits(self, callback):
