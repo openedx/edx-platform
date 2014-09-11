@@ -1779,6 +1779,7 @@ class TestModuleTrackingContext(SharedModuleStoreTestCase):
             event_type = call_data.get('event_type')
             if event_type == 'problem_check':
                 break
+            self.fail('Event type "problem_check" not found in call list.')
 
         return call_data['context']['module']['display_name']
 
