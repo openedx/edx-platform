@@ -161,6 +161,7 @@ def calculate_proforma_grade(grade_summary, grading_policy):
     remaining_weight = 1.00
     proforma_grade = 0.00
     totaled_scores = grade_summary['totaled_scores']
+    grade = 0.00
     for section in totaled_scores:
         points_earned = 0.00
         points_possible = 0.00
@@ -172,7 +173,8 @@ def calculate_proforma_grade(grade_summary, grading_policy):
             if score.earned or (score.due and score.due < timezone.now()):
                 points_earned = points_earned + score.earned
                 points_possible = points_possible + score.possible
-        grade = points_earned / points_possible
+        if points_possible:
+            grade = points_earned / points_possible
         section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
         if section_policy is not None:
             section_weight = section_policy['weight']
