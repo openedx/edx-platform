@@ -19,6 +19,7 @@ __test__ = False  # do not collect
 )
 @cmdopts([
     ("system=", "s", "System to act on"),
+    ("default_store=", "m", "Default modulestore to use for course creation"),
     ("fasttest", "a", "Run without collectstatic"),
     ("extra_args=", "e", "adds as extra args to the test command"),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
@@ -32,6 +33,7 @@ def test_acceptance(options):
     opts = {
         'fasttest': getattr(options, 'fasttest', False),
         'system': getattr(options, 'system', None),
+        'default_store': getattr(options, 'default_store', None),
         'verbosity': getattr(options, 'verbosity', 3),
         'extra_args': getattr(options, 'extra_args', ''),
     }
@@ -40,6 +42,12 @@ def test_acceptance(options):
         msg = colorize(
             'red',
             'No system specified, running tests for both cms and lms.'
+        )
+        print(msg)
+    if opts['default_store'] not in ['draft', 'split']:
+        msg = colorize(
+            'red',
+            'No modulestore specified, running tests for both draft and split.'
         )
         print(msg)
 

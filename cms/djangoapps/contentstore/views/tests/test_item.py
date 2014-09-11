@@ -480,9 +480,15 @@ class TestEditItem(ItemTest):
         display_name = 'chapter created'
         resp = self.create_xblock(display_name=display_name, category='chapter')
         chap_usage_key = self.response_usage_key(resp)
+
+        # create 2 sequentials
         resp = self.create_xblock(parent_usage_key=chap_usage_key, category='sequential')
         self.seq_usage_key = self.response_usage_key(resp)
         self.seq_update_url = reverse_usage_url("xblock_handler", self.seq_usage_key)
+
+        resp = self.create_xblock(parent_usage_key=chap_usage_key, category='sequential')
+        self.seq2_usage_key = self.response_usage_key(resp)
+        self.seq2_update_url = reverse_usage_url("xblock_handler", self.seq2_usage_key)
 
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
@@ -557,11 +563,8 @@ class TestEditItem(ItemTest):
         self.assertIn(chapter2_usage_key, course.children)
 
         # Remove one child from the course.
-        resp = self.client.ajax_post(
-            self.course_update_url,
-            data={'children': [unicode(chapter2_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
+        resp = self.client.delete(reverse_usage_url("xblock_handler", chapter1_usage_key))
+        self.assertEqual(resp.status_code, 204)
 
         # Verify that the child is removed.
         course = self.get_item_from_modulestore(self.usage_key)
@@ -596,6 +599,79 @@ class TestEditItem(ItemTest):
         self.assertEqual(self.problem_usage_key, children[0])
         self.assertEqual(unit1_usage_key, children[2])
         self.assertEqual(unit2_usage_key, children[1])
+
+    def test_move_parented_child(self):
+        """
+        Test moving a child from one Section to another
+        """
+        unit_1_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq_usage_key, category='vertical', display_name='unit 1')
+        )
+        unit_2_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 2')
+        )
+
+        # move unit 1 from sequential1 to sequential2
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key), unicode(unit_2_key)]}
+        )
+        self.assertEqual(resp.status_code, 200)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            [unit_1_key, unit_2_key],
+        )
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq_usage_key).children,
+            [self.problem_usage_key],  # problem child created in setUp
+        )
+
+    def test_move_orphaned_child_error(self):
+        """
+        Test moving an orphan returns an error
+        """
+        unit_1_key = self.store.create_item(self.user.id, self.course_key, 'vertical', 'unit1').location
+
+        # adding orphaned unit 1 should return an error
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key)]}
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            []
+        )
+
+    def test_move_child_creates_orphan_error(self):
+        """
+        Test creating an orphan returns an error
+        """
+        unit_1_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 1')
+        )
+        unit_2_key = self.response_usage_key(
+            self.create_xblock(parent_usage_key=self.seq2_usage_key, category='vertical', display_name='unit 2')
+        )
+
+        # remove unit 2 should return an error
+        resp = self.client.ajax_post(
+            self.seq2_update_url,
+            data={'children': [unicode(unit_1_key)]}
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Invalid data, possibly caused by concurrent authors", resp.content)
+
+        # verify children
+        self.assertListEqual(
+            self.get_item_from_modulestore(self.seq2_usage_key).children,
+            [unit_1_key, unit_2_key]
+        )
 
     def _is_location_published(self, location):
         """
@@ -953,44 +1029,6 @@ class TestEditSplitModule(ItemTest):
         split_test = self._update_partition_id(-50)
         self.assertEqual(2, len(split_test.children))
         self.assertEqual(initial_group_id_to_child, split_test.group_id_to_child)
-
-    def test_delete_children(self):
-        """
-        Test that deleting a child in the group_id_to_child map updates the map.
-
-        Also test that deleting a child not in the group_id_to_child_map behaves properly.
-        """
-        # Set to first group configuration.
-        self._update_partition_id(0)
-        split_test = self._assert_children(2)
-        vertical_1_usage_key = split_test.children[1]
-
-        # Add an extra child to the split_test
-        resp = self.create_xblock(category='html', parent_usage_key=self.split_test_usage_key)
-        extra_child_usage_key = self.response_usage_key(resp)
-        self._assert_children(3)
-
-        # Remove the first child (which is part of the group configuration).
-        resp = self.client.ajax_post(
-            self.split_test_update_url,
-            data={'children': [unicode(vertical_1_usage_key), unicode(extra_child_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
-        split_test = self._assert_children(2)
-
-        # Check that group_id_to_child was updated appropriately
-        group_id_to_child = split_test.group_id_to_child
-        self.assertEqual(1, len(group_id_to_child))
-        self.assertEqual(vertical_1_usage_key, group_id_to_child['1'])
-
-        # Remove the "extra" child and make sure that group_id_to_child did not change.
-        resp = self.client.ajax_post(
-            self.split_test_update_url,
-            data={'children': [unicode(vertical_1_usage_key)]}
-        )
-        self.assertEqual(resp.status_code, 200)
-        split_test = self._assert_children(1)
-        self.assertEqual(group_id_to_child, split_test.group_id_to_child)
 
     def test_add_groups(self):
         """

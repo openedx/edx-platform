@@ -50,7 +50,8 @@ update_module_store_settings(
     },
     module_store_options={
         'fs_root': TEST_ROOT / "data",
-    }
+    },
+    default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',

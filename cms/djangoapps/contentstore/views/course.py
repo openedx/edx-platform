@@ -567,7 +567,11 @@ def _create_new_course(request, org, number, run, fields):
     fields.update(definition_data)
 
     store = modulestore()
-    with store.default_store(settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE', 'mongo')):
+    store_for_new_course = (
+        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
+        store.default_modulestore.get_modulestore_type()
+    )
+    with store.default_store(store_for_new_course):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
         new_course = store.create_course(
             org,
@@ -584,7 +588,8 @@ def _create_new_course(request, org, number, run, fields):
     initialize_permissions(new_course.id, request.user)
 
     return JsonResponse({
-        'url': reverse_course_url('course_handler', new_course.id)
+        'url': reverse_course_url('course_handler', new_course.id),
+        'course_key': unicode(new_course.id),
     })
 
 

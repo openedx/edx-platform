@@ -274,6 +274,14 @@ To put a debugging breakpoint in a test use:
 
     from nose.tools import set_trace; set_trace()
 
+By default, all bokchoy tests are run with the 'split' ModuleStore.
+To override the modulestore that is used, use the default_store option.  The currently supported stores are:
+    'split' (xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore) and
+    'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore).
+For example:
+
+    paver test_bokchoy --default_store='draft'
+
 
 ### Running Lettuce Acceptance Tests
 
@@ -308,6 +316,14 @@ To start the debugger on failure, add the `--pdb` option to extra_args:
 
 To run tests faster by not collecting static files, you can use
 `paver test_acceptance -s lms --fasttest` and `paver test_acceptance -s cms --fasttest`.
+
+By default, all acceptance tests are run with the 'draft' ModuleStore.
+To override the modulestore that is used, use the default_store option. Currently, the possible stores for acceptance tests are:
+    'split' (xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore) and
+    'draft' (xmodule.modulestore.mongo.DraftMongoModuleStore).
+For example:
+    paver test_acceptance --default_store='draft'
+Note, however, all acceptance tests currently do not pass with 'split'.
 
 Acceptance tests will run on a randomized port and can be run in the background of paver cms and lms or unit tests.
 To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
