@@ -92,4 +92,7 @@ class RequestMockWithoutMiddleware(RequestMock):
     """
     def request(self, **request):
         "Construct a generic request object."
-        return RequestFactory.request(self, **request)
+        request = RequestFactory.request(self, **request)
+        if not hasattr(request, 'session'):
+            request.session = {}
+        return request
