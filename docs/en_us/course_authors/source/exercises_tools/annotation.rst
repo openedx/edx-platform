@@ -4,6 +4,7 @@
 Annotation Problem
 ###################
 
+.. note:: Annotation problems are currently in limited release. If you want to include an annotation problem in your course, talk with your edX program manager.
 
 In an annotation problem, the instructor highlights specific text inside a larger text block and then asks questions about that text. The questions appear when students hover the mouse over the highlighted text. The questions also appear in a section below the text block, along with space for students' responses.
 
