@@ -8,12 +8,12 @@
    <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
       <div class="wrap">
-         <h2>Registration Codes</h2>
+         <h2>${_('Registration Codes')}</h2>
          <div>
-            <span class="code_tip">Click to generate Registration Codes
-            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">Generate Registration Codes</a>
+            <span class="code_tip">${_('Click to generate Registration Codes')}
+            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
             </span>
-            <p>Click to generate a CSV file of all Course Registrations Codes:</p>
+            <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -21,7 +21,7 @@
                <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
             </form>
             </p>
-            <p>Click to generate a CSV file of all Active Course Registrations Codes:</p>
+            <p>${_('Click to generate a CSV file of all Active Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -29,7 +29,7 @@
                <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
             </form>
             </p>
-            <p>Click to generate a CSV file of all Spent Course Registrations Codes:</p>
+            <p>${_('Click to generate a CSV file of all Spent Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -37,6 +37,7 @@
                <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
             </form>
             </p>
+           <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
          </div>
       </div>
       <!-- end wrap -->
@@ -45,7 +46,7 @@
          <div>
             <span class="tip">${_("Course Price: ")}<span>$${section_data['course_price']}</span>
             %if section_data['access']['finance_admin'] is True:
-            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ Set Price</a>
+            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ ${_('Set Price')}</a>
             %endif
             </span>
          </div>
@@ -90,7 +91,7 @@
             </span>
 
             <span class="tip">${_("Coupons Information")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
-               class="add blue-button">${_("+ Add Coupon")}</a></span>
+               class="add blue-button">+ ${_("Add Coupon")}</a></span>
             <div class="wrapper-content wrapper">
                <section class="content">
                   %if len(section_data['coupons']):
@@ -111,20 +112,19 @@
                            %else:
                         <tr class="coupons-items">
                            %endif
-                           <td>${coupon.code}</td>
-                           <td>${coupon.description}</td>
-                           <td>${coupon.percentage_discount}</td>
+                            <td>${_('{code}').format(code=coupon.code)}</td>
+                            <td>${_('{description}').format(description=coupon.description)}</td>
+                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
                            <td>
                               ${ coupon.couponredemption_set.all().count() }
                            </td>
                            <!--<td>${coupon.is_active}</td>-->
-                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">Edit</a></td>
+                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
                         %endfor
                      </tbody>
                   </table>
                   <a id="edit-modal-trigger" href="#edit-coupon-modal" rel="leanModal"></a>
-                  <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
                   %endif
                </section>
             </div>
