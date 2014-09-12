@@ -131,7 +131,7 @@ rednose==0.3
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
-PyContracts==1.6.4
+PyContracts==1.6.5
 
 # Used for Segment.io analytics
 analytics-python==0.4.4
