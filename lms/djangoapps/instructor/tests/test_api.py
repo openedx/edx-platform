@@ -1350,6 +1350,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     """
 
     def setUp(self):
+        super(TestInstructorAPILevelsDataDump, self).setUp()
         self.course = CourseFactory.create()
         self.course_mode = CourseMode(course_id=self.course.id,
                                       mode_slug="honor",
@@ -1613,6 +1614,20 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    def test_get_students_features_cohorted(self):
+        """
+        Test that get_students_features includes cohort info when the course is
+        cohorted, and does not when the course is not cohorted.
+        """
+        self.course.cohort_config = {'cohorted': True}
+        self.store.update_item(self.course, self.instructor.id)
+
+        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('cohort', res_json['feature_names'])
+
+
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
@@ -1625,9 +1640,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(
             '"User ID","Anonymized User ID","Course Specific Anonymized User ID"'
-            '\n"2","41","42"\n'
+            '\n"3","41","42"\n'
         ))
-        self.assertTrue(body.endswith('"7","41","42"\n'))
+        self.assertTrue(body.endswith('"8","41","42"\n'))
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})

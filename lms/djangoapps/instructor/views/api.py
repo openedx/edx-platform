@@ -690,7 +690,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
 
@@ -721,10 +722,16 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'goals': _('Goals'),
     }
 
+    if course.is_cohorted:
+        query_features.append('cohort')
+        query_features_names['cohort'] = _('Cohort')
+
+    student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
+
     if not csv:
-        student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
+        student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': course_id,
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -734,7 +741,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         return JsonResponse(response_payload)
     else:
         try:
-            instructor_task.api.submit_calculate_students_features_csv(request, course_id, query_features)
+            instructor_task.api.submit_calculate_students_features_csv(request, course_key, query_features)
             success_status = _("Your CSV is being generated! blah blah doc review.")
             return JsonResponse({"status": success_status})
         except AlreadyRunningError:
