@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
 
+from course_groups import cohorts
+
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
@@ -117,11 +119,11 @@ def purchase_transactions(course_id, features):
     return [purchase_transactions_info(purchased_course, features) for purchased_course in purchased_courses]
 
 
-def enrolled_students_features(course_id, features):
+def enrolled_students_features(course_key, features):
     """
     Return list of student features as dictionaries.
 
-    enrolled_students_features(course_id, ['username, first_name'])
+    enrolled_students_features(course_key, ['username', 'first_name'])
     would return [
         {'username': 'username1', 'first_name': 'firstname1'}
         {'username': 'username2', 'first_name': 'firstname2'}
@@ -129,9 +131,9 @@ def enrolled_students_features(course_id, features):
     ]
     """
     students = User.objects.filter(
-        courseenrollment__course_id=course_id,
+        courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
-    ).order_by('username').select_related('profile')
+    ).order_by('username').select_related('profile').prefetch_related('course_groups')
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -145,6 +147,13 @@ def enrolled_students_features(course_id, features):
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
+
+        if 'cohort' in features:
+            if cohort is not None:
+                student_dict['cohort'] = cohorts.get_cohort(student, course_key, auto_cohort=False).name
+            else:
+                student_dict['cohort'] = '[unassigned]'
+
         return student_dict
 
     return [extract_student(student, features) for student in students]

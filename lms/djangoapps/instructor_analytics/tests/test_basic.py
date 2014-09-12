@@ -13,6 +13,7 @@ from instructor_analytics.basic import (
     sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features,
     AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
+from course_groups.models import CourseUserGroup
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -46,6 +47,36 @@ class TestAnalyticsBasic(TestCase):
             self.assertIn(userreport['username'], [user.username for user in self.users])
             self.assertIn(userreport['email'], [user.email for user in self.users])
             self.assertIn(userreport['name'], [user.profile.name for user in self.users])
+
+    def test_enrolled_students_features_keys_cohorted(self):
+        cohorted_course = CourseFactory.create(
+            org="foo",
+            number="bar",
+            display_name="baz",
+            cohort_config={'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
+        )
+        cohort = CourseUserGroup.objects.create(
+            name='cohort',
+            course_id=cohorted_course.id,
+            group_type=CourseUserGroup.COHORT
+        )
+        cohorted_student = UserFactory.create()
+        non_cohorted_student = UserFactory.create()
+        cohort.users.add(cohorted_student)
+        CourseEnrollment.enroll(cohorted_student, cohorted_course.id)
+        CourseEnrollment.enroll(non_cohorted_student, cohorted_course.id)
+        instructor = InstructorFactory(course_key=cohorted_course.id)
+        self.client.login(username=instructor.username, password='test')
+
+        query_features = ('username', 'cohort')
+        userreports = enrolled_students_features(cohorted_course.id, query_features)
+        self.assertEqual(len(userreports), 2)
+        for userreport in userreports:
+            self.assertEqual(set(userreport.keys()), set(query_features))
+            if userreport['username'] == cohorted_student.username:
+                self.assertEqual(userreport['cohort'], cohort.name)
+            else:
+                self.assertEqual(userreport['cohort'], '[unassigned]')
 
     def test_available_features(self):
         self.assertEqual(len(AVAILABLE_FEATURES), len(STUDENT_FEATURES + PROFILE_FEATURES))
