@@ -116,6 +116,9 @@ class Timedelta(JSONField):
         return datetime.timedelta(**time_params)
 
     def to_json(self, value):
+        if value is None:
+            return None
+
         values = []
         for attr in ('days', 'hours', 'minutes', 'seconds'):
             cur_value = getattr(value, attr, 0)

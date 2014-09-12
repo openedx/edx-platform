@@ -13,7 +13,9 @@ import pprint
 import unittest
 
 from contextlib import contextmanager
+from lazy import lazy
 from mock import Mock
+from operator import attrgetter
 from path import path
 
 from xblock.field_data import DictFieldData
@@ -227,6 +229,26 @@ class BulkAssertionTest(unittest.TestCase):
     assertEquals = assertEqual
 
 
+class LazyFormat(object):
+    """
+    An stringy object that delays formatting until it's put into a string context.
+    """
+    __slots__ = ('template', 'args', 'kwargs', '_message')
+
+    def __init__(self, template, *args, **kwargs):
+        self.template = template
+        self.args = args
+        self.kwargs = kwargs
+        self._message = None
+
+    def __unicode__(self):
+        if self._message is None:
+            self._message = self.template.format(*self.args, **self.kwargs)
+        return self._message
+
+    def __repr__(self):
+        return unicode(self)
+
 class CourseComparisonTest(BulkAssertionTest):
     """
     Mixin that has methods for comparing courses for equality.
@@ -255,6 +277,65 @@ class CourseComparisonTest(BulkAssertionTest):
             key_name: The name of the key to ignore.
         """
         self.ignored_asset_keys.add(key_name)
+
+    def assertReferenceRelativelyEqual(self, reference_field, expected_block, actual_block):
+        """
+        Assert that the supplied reference field is identical on the expected_block and actual_block,
+        assoming that the references are only relative (that is, comparing only on block_type and block_id,
+        not course_key).
+        """
+        def extract_key(usage_key):
+            if usage_key is None:
+                return None
+            else:
+                return (usage_key.block_type, usage_key.block_id)
+        expected = reference_field.read_from(expected_block)
+        actual = reference_field.read_from(actual_block)
+        if isinstance(reference_field, Reference):
+            expected = extract_key(expected)
+            actual = extract_key(actual)
+        elif isinstance(reference_field, ReferenceList):
+            expected = [extract_key(key) for key in expected]
+            actual = [extract_key(key) for key in actual]
+        elif isinstance(reference_field, ReferenceValueDict):
+            expected = {key: extract_key(val) for (key, val) in expected.iteritems()}
+            actual = {key: extract_key(val) for (key, val) in actual.iteritems()}
+        self.assertEqual(
+            expected,
+            actual,
+            LazyFormat(
+                "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                reference_field.name,
+                expected_block.scope_ids.usage_id,
+                actual_block.scope_ids.usage_id,
+                expected,
+                actual
+            )
+        )
+
+    def assertBlocksEqualByFields(self, expected_block, actual_block):
+        self.assertEqual(expected_block.fields, actual_block.fields)
+        for field in expected_block.fields.values():
+            self.assertFieldEqual(field, expected_block, actual_block)
+
+    def assertFieldEqual(self, field, expected_block, actual_block):
+        if isinstance(field, (Reference, ReferenceList, ReferenceValueDict)):
+            self.assertReferenceRelativelyEqual(field, expected_block, actual_block)
+        else:
+            expected = field.read_from(expected_block)
+            actual = field.read_from(actual_block)
+            self.assertEqual(
+                expected,
+                actual,
+                LazyFormat(
+                    "Field {} doesn't match between usages {} and {}: {!r} != {!r}",
+                    field.name,
+                    expected_block.scope_ids.usage_id,
+                    actual_block.scope_ids.usage_id,
+                    expected,
+                    actual
+                )
+            )
 
     def assertCoursesEqual(self, expected_store, expected_course_key, actual_store, actual_course_key):
         """
@@ -313,11 +394,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     actual_item = actual_item_map.get(map_key(actual_item_location))
 
                 # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                if actual_item is None:
-                    msg = u'cannot find {} in {}'.format(map_key(actual_item_location), actual_item_map)
-                else:
-                    msg = None
-                self.assertIsNotNone(actual_item, msg)
+                self.assertIsNotNone(actual_item, LazyFormat(u'cannot find {} in {}', map_key(actual_item_location), actual_item_map))
 
                 # compare fields
                 self.assertEqual(expected_item.fields, actual_item.fields)
@@ -333,20 +410,7 @@ class CourseComparisonTest(BulkAssertionTest):
                     if field_name == 'children':
                         continue
 
-                    exp_value = map_references(field.read_from(expected_item), field, actual_course_key)
-                    actual_value = field.read_from(actual_item)
-                    # Formatting the message slows down tests of large courses significantly, so only do it if it would be used
-                    if exp_value != actual_value:
-                        msg = "Field {!r} doesn't match between usages {} and {}: {!r} != {!r}".format(
-                            field_name,
-                            expected_item.scope_ids.usage_id,
-                            actual_item.scope_ids.usage_id,
-                            exp_value,
-                            actual_value,
-                        )
-                    else:
-                        msg = None
-                    self.assertEqual(exp_value, actual_value, msg)
+                    self.assertFieldEqual(field, expected_item, actual_item)
 
                 # compare children
                 self.assertEqual(expected_item.has_children, actual_item.has_children)
