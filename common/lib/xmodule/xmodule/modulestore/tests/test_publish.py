@@ -89,11 +89,21 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         """
         vert_location = self.old_course_key.make_usage_key('vertical', block_id='Vert1')
         item = self.draft_mongo.get_item(vert_location, 2)
-        # Vert1 has 3 children; so, publishes 4 nodes which may mean 4 inserts & 1 bulk remove
-        # TODO: LMS-11220: Document why find count is 25
-        # 25-June-2014 find calls are 19. Probably due to inheritance recomputation?
-        # 02-July-2014 send calls are 7. 5 from above, plus 2 for updating subtree edit info for Chapter1 and course
-        #              find calls are 22. 19 from above, plus 3 for finding the parent of Vert1, Chapter1, and course
+        # Finds:
+        #   1 get draft vert,
+        #   2-10 for each child: (3 children x 3 queries each)
+        #      get draft and then published child
+        #      compute inheritance
+        #   11 get published vert
+        #   12-15 get each ancestor (count then get): (2 x 2),
+        #   16 then fail count of course parent (1)
+        #   17 compute inheritance
+        #   18 get last error
+        #   19-20 get draft and published vert
+        # Sends:
+        #   delete the subtree of drafts (1 call),
+        #   update the published version of each node in subtree (4 calls),
+        #   update the ancestors up to course (2 calls)
         with check_mongo_calls(20, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
