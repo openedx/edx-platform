@@ -1,0 +1,202 @@
+<%inherit file="shopping_cart_flow.html" />
+<%block name="review_highlight">class="active"</%block>
+
+<%!
+from courseware.courses import course_image_url, get_course_about_section
+from django.core.urlresolvers import reverse
+from edxmako.shortcuts import marketing_link
+from django.utils.translation import ugettext as _
+
+%>
+
+<%block name="custom_content">
+
+<div class="container">
+  % if shoppingcart_items:
+  <section class="wrapper confirm-enrollment shopping-cart">
+    % for item, course in shoppingcart_items:
+    <div class="user-data">
+      <div class="clearfix">
+      <div class="image">
+
+           <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
+                alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image" />
+
+      </div>
+      <div class="data-input">
+        <h3>${_('Registration for:')} <span class="pull-right">${_('Course Dates:')}</span></h3>
+        <h1>${ course.display_name }<span class="pull-right">${course.start_date_text} -  ${course.end_date_text}</span></h1>
+        <hr />
+        <div class="three-col">
+            <div class="col-1">
+                % if item.list_price != None:
+                <div class="price">${_('Price per student:')} <span class="line-through">  $${"{0:0.2f}".format(item.list_price)}</span></div>
+                <div class="price green">${_('Discount Applied:')} <span>  $${"{0:0.2f}".format(item.unit_cost)} </span></div>
+                % else:
+                <div class="price">${_('Price per student:')} <span>  $${"{0:0.2f}".format(item.unit_cost)}</span></div>
+                % endif
+            </div>
+            <div class="col-2">
+              <div class="numbers-row">
+                <label for="students">${_('Students:')}</label>
+                <div class="counter">
+                    <input type="text" name="students" value="1" maxlength="4">
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
+               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
+            </div>
+        </div>
+      </div>
+          </div>
+
+  </div>
+    % endfor
+      <div class="discount">
+
+          <div class="code-text">
+            % if item.list_price == None:
+           <a id="enter_code">${_('enter code')}</a>
+           <div class="code-input hidden">
+              <input type="text" placeholder="discount or activation code" id="input_code">
+              <input type="submit" value="Apply" class="blue" id="submit-code">
+              <span class="error-text hidden" ></span>
+           </div>
+           % else:
+           <div class="code-applied">
+              <span class="green"><i class="icon-ok"></i>${_('code has been applied')}</span>
+              <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
+           </div>
+            %endif
+              <span class="pull-right">${_('Total:')} <b>$${"{0:0.2f}".format(amount)} USD</b></span>
+          </div>
+      </div>
+      <div class="col-two">
+          <div class="col-1">
+              ${_('Purchase type:')} <span class="radio-group blue"><input type="radio" name="purchase" checked="true" id="personal"> <label for="personal">${_('Personal')}</label></span>
+              <span class="radio-group"><input disabled="true" type="radio" name="purchase" id="business"> <label for="business">${_('Business')}</label></span>
+          </div>
+          <div class="col-2">
+             % if amount == 0:
+                <input type="submit" value = "Register" id="register" >
+             % else:
+               ${form_html}
+             %endif
+          </div>
+      </div>
+
+   </section>
+    % else:
+      <div class="empty-cart" >
+        <h2>${_('Your Shopping cart is currently empty.')}</h2>
+          <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
+      </div>
+    % endif
+
+</div>
+</%block>
+<script>
+
+$(function() {
+
+   $('a.btn-remove').click(function(event) {
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.remove_item')}";
+      $.post(post_url, {id:$(this).data('item-id')})
+        .always(function(data){
+        location.reload(true);
+      });
+    });
+
+   $('#submit-code').click(function(event){
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.use_code')}";
+      $.post(post_url,{
+                  "code" :  $('#input_code').val(),
+                  beforeSend: function(xhr, options){
+                      if($('#input_code').val() == "") {
+                          showErrorMsgs('Must enter a valid code')
+                          xhr.abort();
+                      }
+                  }
+              }
+      )
+      .success(function(data) {
+                  location.reload(true);
+              })
+      .error(function(data,status) {
+                  if(status=="parsererror"){
+                       location.reload(true);
+                  }else{
+                        showErrorMsgs(data.responseText)
+                      }
+              })
+   });
+
+   $('#submit-reset-redemption').click(function(event){
+       event.preventDefault();
+       var post_url = "${reverse('shoppingcart.views.reset_code_redemption')}";
+       $.post(post_url)
+       .success(function(data) {
+                   location.reload(true);
+              })
+       .error(function(data,status) {
+                   if(status=="parsererror"){
+                       location.reload(true);
+                  }else{
+                        showErrorMsgs(data.responseText)
+                      }
+               })
+   });
+
+   $('#register').click(function(event){
+       event.preventDefault();
+       var post_url = "${reverse('shoppingcart.views.register_courses')}";
+       $.post(post_url)
+       .success(function(data) {
+                   window.location.href = "${reverse('dashboard')}";
+               })
+       .error(function(data,status) {
+                   if(status=="parsererror"){
+                       location.reload(true);
+                   }else{
+                        showErrorMsgs(data.responseText)
+                      }
+               })
+   });
+
+  $(".numbers-row").append('<div class="inc button"><i class="icon-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>');
+
+  $(".button").on("click", function() {
+
+    var $button = $(this);
+    var oldValue = $button.parent().find("input").val();
+    var newVal = 1; // initialize with 1.
+
+    if ($.isNumeric(oldValue)){
+
+        if ($button.text() == "+") {
+           newVal = parseFloat(oldValue) + 1;
+        } else {
+           // Don't allow decrementing below one
+          if (oldValue > 1) {
+            newVal = parseFloat(oldValue) - 1;
+            }
+          }
+    }
+    $button.parent().find("input").val(newVal);
+  });
+  $("#enter_code").click(function(){
+      $(this).addClass('hidden');
+      $( "div.code-input" ).removeClass("hidden");
+  });
+
+  function showErrorMsgs(msg){
+      $( "span.error-text" ).removeClass("hidden");
+      $( "span.error-text" ).html(msg).show();
+      $("#input_code").addClass('error');
+  }
+
+});
+</script>
