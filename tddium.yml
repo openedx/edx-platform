@@ -7,7 +7,6 @@ tddium:
       :version: "1.8.5.5"
   :hooks:
     :pre_setup: "virtualenv $HOME/python-env && $HOME/python-env/bin/pip install -r requirements/edx/paver.txt && $HOME/python-env/bin/pip install -r requirements/edx/pre.txt && $HOME/python-env/bin/pip install -r requirements/edx/base.txt && $HOME/python-env/bin/pip install -r requirements/edx/github.txt && $HOME/python-env/bin/pip install -r requirements/edx/local.txt && $HOME/python-env/bin/pip install -r requirements/edx/post.txt"
-    # :post_build: "paver coverage; paver bokchoy_coverage; for i in $(find reports -name cover); do cp -R $i $HOME/results/$TDDIUM_SESSION_ID/session/; done"
     :post_worker: 'python ./scripts/post_worker.py'
   :cache:
     :key_paths:
@@ -37,7 +36,7 @@ tddium:
       - "reports/diff_quality/diff_quality_pylint.html"
     - :type: junit
       :mode: basic
-      :command: "mkdir -p jscover-dist && wget http://files.edx.org/testeng/JSCover-1.0.2.zip -P jscover-dist && unzip jscover-dist/JSCover-1.0.2.zip -d jscover-dist/ && cp jscover-dist/target/dist/JSCover-all.jar jscover-dist && export JSCOVER_JAR=$PWD/jscover-dist/JSCover-all.jar && paver test"
+      :command: bash ./scripts/run_ut.sh && python ./scripts/cov_merge.py unit
       :invocation: single
       :output: exit-status
       :report_files:
@@ -80,21 +79,21 @@ tddium:
       - "reports/acceptance/cms.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_bokchoy --extra_args="-a shard_1"
+      :command: paver test_bokchoy --extra_args="-a shard_1" && bash ./scripts/coverage.sh shard1
       :invocation: single
       :output: exit-status
       :report_files:
       - "reports/bok_choy/xunit.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_bokchoy --extra_args="-a shard_2"
+      :command: paver test_bokchoy --extra_args="-a shard_2" && bash ./scripts/coverage.sh shard2
       :invocation: single
       :output: exit-status
       :report_files:
       - "reports/bok_choy/xunit.xml"
     - :type: junit
       :mode: basic
-      :command: paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False"
+      :command: paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False" && bash ./scripts/coverage.sh shard3
       :invocation: single
       :output: exit-status
       :report_files:
