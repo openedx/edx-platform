@@ -661,13 +661,16 @@ class TestMixedModuleStore(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             self.store.delete_item(self.xml_chapter_location, self.user_id)
 
-        with check_mongo_calls(max_find, max_send):
-            self.store.delete_item(self.writable_chapter_location, self.user_id)
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, self.writable_chapter_location.course_key):
+            with check_mongo_calls(max_find, max_send):
+                self.store.delete_item(self.writable_chapter_location, self.user_id)
 
-        # verify it's gone
-        # FIXME check both published and draft branches
+            # verify it's gone
+            with self.assertRaises(ItemNotFoundError):
+                self.store.get_item(self.writable_chapter_location)
+        # verify it's gone from published too
         with self.assertRaises(ItemNotFoundError):
-            self.store.get_item(self.writable_chapter_location)
+            self.store.get_item(self.writable_chapter_location, revision=ModuleStoreEnum.RevisionOption.published_only)
 
     # Draft:
     #    queries: find parent (definition.children), count versions of item, get parent, count grandparents,
