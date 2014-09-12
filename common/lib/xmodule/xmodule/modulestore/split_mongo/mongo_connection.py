@@ -6,6 +6,9 @@ import pymongo
 from contracts import check
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
+from datetime import tzinfo
+import datetime
+import pytz
 
 
 def structure_from_mongo(structure):
@@ -187,6 +190,7 @@ class MongoConnection(object):
         """
         Create the course_index in the db
         """
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
         self.course_index.insert(course_index)
 
     def update_course_index(self, course_index, from_index=None):
@@ -196,15 +200,20 @@ class MongoConnection(object):
         Arguments:
             from_index: If set, only update an index if it matches the one specified in `from_index`.
         """
-        self.course_index.update(
-            from_index or {
+        if from_index:
+            query = {"_id": from_index["_id"]}
+            # last_update not only tells us when this course was last updated but also helps
+            # prevent collisions
+            if 'last_update' in from_index:
+                query['last_update'] = from_index['last_update']
+        else:
+            query = {
                 'org': course_index['org'],
                 'course': course_index['course'],
                 'run': course_index['run'],
-            },
-            course_index,
-            upsert=False,
-        )
+            }
+        course_index['last_update'] = datetime.datetime.now(pytz.utc)
+        self.course_index.update(query, course_index, upsert=False,)
 
     def delete_course_index(self, course_index):
         """
