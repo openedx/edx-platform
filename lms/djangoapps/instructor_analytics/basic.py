@@ -122,21 +122,26 @@ def purchase_transactions(course_id, features):
     return [purchase_transactions_info(purchased_course, features) for purchased_course in purchased_courses]
 
 
-def enrolled_students_features(course_id, features):
+def enrolled_students_features(course_key, features):
     """
     Return list of student features as dictionaries.
 
-    enrolled_students_features(course_id, ['username, first_name'])
+    enrolled_students_features(course_key, ['username', 'first_name'])
     would return [
         {'username': 'username1', 'first_name': 'firstname1'}
         {'username': 'username2', 'first_name': 'firstname2'}
         {'username': 'username3', 'first_name': 'firstname3'}
     ]
     """
+    include_cohort_column = 'cohort' in features
+
     students = User.objects.filter(
-        courseenrollment__course_id=course_id,
+        courseenrollment__course_id=course_key,
         courseenrollment__is_active=1,
     ).order_by('username').select_related('profile')
+
+    if include_cohort_column:
+        students = students.prefetch_related('course_groups')
 
     def extract_student(student, features):
         """ convert student to dictionary """
@@ -151,6 +156,13 @@ def enrolled_students_features(course_id, features):
                                 for feature in profile_features)
             student_dict.update(profile_dict)
 
+        if include_cohort_column:
+            # Note that we use student.course_groups.all() here instead of
+            # student.course_groups.filter(). The latter creates a fresh query,
+            # therefore negating the performance gain from prefetch_related().
+            student_dict['cohort'] = {
+                cohort.course_id: cohort.name for cohort in student.course_groups.all()
+            }.get(course_key, "[unassigned]")
         return student_dict
 
     return [extract_student(student, features) for student in students]
