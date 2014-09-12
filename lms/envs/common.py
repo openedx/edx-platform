@@ -1807,7 +1807,6 @@ ALL_LANGUAGES = (
 
 ### Apps only installed in some instances
 OPTIONAL_APPS = (
-    'edx_jsdraw',
     'mentoring',
 
     # edx-ora2
