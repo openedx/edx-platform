@@ -233,6 +233,7 @@ def get_course_about_section(course, section_key):
 
     raise KeyError("Invalid about key " + str(section_key))
 
+
 def get_course_license_section(course):
     """
     This returns the snippet of html to be rendered on the course about page unde the license section,
@@ -241,8 +242,8 @@ def get_course_license_section(course):
     license = parse_license(course.license, course.license_version)
 
     html = "<h2>{title}</h2>{content}".format(
-        title   = _("License"),
-        content = license.html
+        title=_("License"),
+        content=license.html
     )
 
     return html

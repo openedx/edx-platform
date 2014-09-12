@@ -335,6 +335,13 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.source_visible = True
                 if not download_video['explicitly_set']:
                     self.download_video = True
+        
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        if not(self.license):
+            course = self.system.modulestore._get_course_for_item(self.scope_ids.usage_id)
+
+            self.license = course.license
+            self.license_version = course.license_version
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
