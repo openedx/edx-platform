@@ -412,7 +412,6 @@ class XBlockAcidChildTest(XBlockAcidBase):
         super(XBlockAcidChildTest, self).validate_acid_block_view()
         self.assertTrue(acid_block.child_tests_passed)
 
-    @skip('This will fail until we fix support of children in pure XBlocks')
     def test_acid_block(self):
         super(XBlockAcidChildTest, self).test_acid_block()
 
