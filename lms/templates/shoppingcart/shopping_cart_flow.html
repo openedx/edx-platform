@@ -1,0 +1,27 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="pagetitle">${_("Shopping cart")}</%block>
+
+
+
+<%block name="bodyextra">
+
+<div class="container">
+  <section class="wrapper confirm-enrollment shopping-cart">
+  <h1> ${_("{site_name} -  Shopping Cart").format(site_name=site_name)}</h1>
+      % if shoppingcart_items:
+      <ul class="steps">
+          <li <%block name="review_highlight"/>>${_('Review')}</li>
+          <%block name="billing_details_highlight"/>
+          <li <%block name="payment_highlight"/>>${_('Payment')}</li>
+          <li <%block name="confirmation_highlight"/>>${_('Confirmation')}</li>
+      </ul>
+      %endif
+  </section>
+</div>
+<%block name="custom_content"/>
+
+</%block>

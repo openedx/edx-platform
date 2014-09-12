@@ -307,6 +307,36 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
 
     @patch('shoppingcart.views.log.info')
+    def test_reset_redemption_for_coupon(self, info_log):
+
+        self.add_coupon(self.course_key, True)
+        reg_item = self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        resp = self.client.post(reverse('shoppingcart.views.reset_code_redemption', args=[]))
+
+        self.assertEqual(resp.status_code, 200)
+        info_log.assert_called_with(
+            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+
+    @patch('shoppingcart.views.log.info')
+    def test_reset_redemption_for_registration_code(self, info_log):
+
+        self.add_reg_code(self.course_key)
+        reg_item = self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
+        self.assertEqual(resp.status_code, 200)
+
+        resp = self.client.post(reverse('shoppingcart.views.reset_code_redemption', args=[]))
+
+        self.assertEqual(resp.status_code, 200)
+        info_log.assert_called_with(
+            'Registration code redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+
+    @patch('shoppingcart.views.log.info')
     def test_existing_reg_code_redemption_on_removing_item(self, info_log):
 
         self.add_reg_code(self.course_key)
@@ -468,7 +498,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(len(purchase_form_arg_cart_items), 2)
 
         ((template, context), _) = render_mock.call_args
-        self.assertEqual(template, 'shoppingcart/list.html')
+        self.assertEqual(template, 'shoppingcart/shopping_cart.html')
         self.assertEqual(len(context['shoppingcart_items']), 2)
         self.assertEqual(context['amount'], 80)
         self.assertIn("80.00", context['form_html'])
@@ -613,7 +643,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
-        self.assertIn('Check Out', resp.content)
+        self.assertIn('Payment', resp.content)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
