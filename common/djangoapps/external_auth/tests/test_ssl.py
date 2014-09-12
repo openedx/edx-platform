@@ -200,24 +200,17 @@ class SSLClientTest(ModuleStoreTestCase):
         This tests to make sure when immediate signup is on that
         the user doesn't get presented with the registration page.
         """
-        # Expect an InvalidKeyError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
-        ):
-            self.client.get(
-                reverse('signup'), follow=True,
-                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
-            )
+        response = self.client.get(
+            reverse('signup'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
+        )
+        self.assertEqual(response.status_code, 404)
         # assert that we are logged in
         self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(
-                InvalidKeyError,
-                "<class 'opaque_keys.edx.keys.CourseKey'>: None"
-        ):
-            self.client.get(reverse('signup'), follow=True)
+        response = self.client.get(reverse('signup'), follow=True)
+        self.assertEqual(response.status_code, 404)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
