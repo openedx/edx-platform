@@ -18,7 +18,6 @@ def url_class(is_active):
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.views import notification_image_for_tab %>
-<% import waffle %>
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
 <nav class="${active_page} course-material">
@@ -29,11 +28,7 @@ def url_class(is_active):
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
             tab_image = notification_image_for_tab(tab, user, course)
         %>
-        % if waffle.flag_is_active(request, 'visual_treatment'):
-          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
-        % else:
           <li>
-        % endif
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
                  ${_(tab.name) | h}
                  % if tab_is_active:
