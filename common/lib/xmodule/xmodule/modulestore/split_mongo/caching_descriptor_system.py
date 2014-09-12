@@ -1,6 +1,7 @@
 import sys
 import logging
 from contracts import contract, new_contract
+from lazy import lazy
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, DefinitionLocator
@@ -12,6 +13,7 @@ from .split_mongo_kvs import SplitMongoKVS
 from fs.osfs import OSFS
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
+from xmodule.modulestore.inheritance import inheriting_field_data, InheritanceMixin
 from xmodule.modulestore.split_mongo import BlockKey
 
 log = logging.getLogger(__name__)
@@ -34,8 +36,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         modulestore: the module store that can be used to retrieve additional
         modules
 
-        course_entry: the originally fetched enveloped course_structure w/ branch and course id info
-        plus a dictionary of cached inherited_settings indexed by (block_type, block_id) tuple.
+        course_entry: the originally fetched enveloped course_structure w/ branch and course id info.
         Callers to _load_item provide an override but that function ignores the provided structure and
         only looks at the branch and course id
 
@@ -59,14 +60,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.course_entry = course_entry
         self.lazy = lazy
         self.module_data = module_data
-        # Compute inheritance
-        modulestore.inherit_settings(
-            course_entry['structure'].get('blocks', {}),
-            course_entry['structure'].get('root'),
-            course_entry.setdefault('inherited_settings', {}),
-        )
         self.default_class = default_class
         self.local_modules = {}
+
+    @lazy
+    @contract(returns="dict(BlockKey: BlockKey)")
+    def _parent_map(self):
+        parent_map = {}
+        for block_key, block in self.course_entry['structure']['blocks'].iteritems():
+            for child in block['fields'].get('children', []):
+                parent_map[child] = block_key
+        return parent_map
 
     @contract(usage_key="BlockUsageLocator | BlockKey")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
@@ -96,12 +100,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 branch=course_info.get('branch'),
             )
 
+        if course_entry_override:
+            structure_id = course_entry_override.get('_id')
+        else:
+            structure_id = self.course_entry.get('_id')
+
         json_data = self.get_module_data(block_key, course_key)
 
         class_ = self.load_block_type(json_data.get('block_type'))
-        # pass None for inherited_settings to signal that it should get the settings from cache
-        new_item = self.xblock_from_json(class_, course_key, block_key, json_data, None, course_entry_override, **kwargs)
-        return new_item
+        return self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
 
     @contract(block_key=BlockKey, course_key=CourseLocator)
     def get_module_data(self, block_key, course_key):
@@ -134,7 +141,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
     @contract(block_key="BlockKey | None")
     def xblock_from_json(
-        self, class_, course_key, block_key, json_data, inherited_settings, course_entry_override=None, **kwargs
+        self, class_, course_key, block_key, json_data, course_entry_override=None, **kwargs
     ):
         if course_entry_override is None:
             course_entry_override = self.course_entry
@@ -150,13 +157,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         # If no usage id is provided, generate an in-memory id
         if block_key is None:
             block_key = BlockKey(json_data['block_type'], LocalId())
-        else:
-            if inherited_settings is None:
-                # see if there's a value in course_entry
-                if block_key in self.course_entry['inherited_settings']:
-                    inherited_settings = self.course_entry['inherited_settings'][block_key]
-            elif block_key not in self.course_entry['inherited_settings']:
-                self.course_entry['inherited_settings'][block_key] = inherited_settings
 
         if definition_id is not None and not json_data.get('definition_loaded', False):
             definition_loader = DefinitionLazyLoader(
@@ -182,13 +182,22 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         converted_fields = self.modulestore.convert_references_to_keys(
             block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry['structure']['blocks'],
         )
+        if block_key in self._parent_map:
+            parent_key = self._parent_map[block_key]
+            parent = course_key.make_usage_key(parent_key.type, parent_key.id)
+        else:
+            parent = None
         kvs = SplitMongoKVS(
             definition_loader,
             converted_fields,
-            inherited_settings,
-            **kwargs
+            parent=parent,
+            field_decorator=kwargs.get('field_decorator')
         )
-        field_data = KvsFieldData(kvs)
+
+        if InheritanceMixin in self.modulestore.xblock_mixins:
+            field_data = inheriting_field_data(kvs)
+        else:
+            field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(

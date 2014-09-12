@@ -1582,7 +1582,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             course_key,
             BlockKey(block_type, block_id) if block_id else None,
             json_data,
-            inherited_settings,
             **kwargs
         )
         for field_name, value in (fields or {}).iteritems():

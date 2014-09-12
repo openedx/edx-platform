@@ -33,11 +33,11 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
-from xmodule.tests import DATA_DIR
+from xmodule.tests import DATA_DIR, CourseComparisonTest
 
 
 @ddt.ddt
-class TestMixedModuleStore(unittest.TestCase):
+class TestMixedModuleStore(CourseComparisonTest):
     """
     Quasi-superclass which tests Location based apps against both split and mongo dbs (Locator and
     Location-based dbs)
@@ -1047,7 +1047,7 @@ class TestMixedModuleStore(unittest.TestCase):
         self.store.revert_to_published(self.vertical_x1a, self.user_id)
         reverted_parent = self.store.get_item(self.vertical_x1a)
         self.assertEqual(vertical_children_num, len(published_parent.children))
-        self.assertEqual(reverted_parent, published_parent)
+        self.assertBlocksEqualByFields(reverted_parent, published_parent)
         self.assertFalse(self._has_changes(self.vertical_x1a))
 
     @ddt.data('draft', 'split')
@@ -1082,7 +1082,8 @@ class TestMixedModuleStore(unittest.TestCase):
         orig_vertical = self.store.get_item(self.vertical_x1a)
         self.store.revert_to_published(self.vertical_x1a, self.user_id)
         reverted_vertical = self.store.get_item(self.vertical_x1a)
-        self.assertEqual(orig_vertical, reverted_vertical)
+
+        self.assertBlocksEqualByFields(orig_vertical, reverted_vertical)
 
     @ddt.data('draft', 'split')
     def test_revert_to_published_no_published(self, default_ms):

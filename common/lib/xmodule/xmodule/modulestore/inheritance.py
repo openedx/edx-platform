@@ -214,11 +214,19 @@ class InheritingFieldData(KvsFieldData):
         """
         The default for an inheritable name is found on a parent.
         """
-        if name in self.inheritable_names and block.parent is not None:
-            parent = block.get_parent()
-            if parent:
-                return getattr(parent, name)
-        super(InheritingFieldData, self).default(block, name)
+        if name in self.inheritable_names:
+            # Walk up the content tree to find the first ancestor
+            # that this field is set on. Use the field from the current
+            # block so that if it has a different default than the root
+            # node of the tree, the block's default will be used.
+            field = block.fields[name]
+            ancestor = block.get_parent()
+            while ancestor is not None:
+                if field.is_set_on(ancestor):
+                    return field.read_json(ancestor)
+                else:
+                    ancestor = ancestor.get_parent()
+        return super(InheritingFieldData, self).default(block, name)
 
 
 def inheriting_field_data(kvs):
