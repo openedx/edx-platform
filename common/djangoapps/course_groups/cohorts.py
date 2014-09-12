@@ -45,12 +45,15 @@ def is_course_cohorted(course_key):
     return courses.get_course_by_id(course_key).is_cohorted
 
 
-def get_cohort_id(user, course_key):
+def get_cohort_id(user, course_key, auto_cohort=True):
     """
     Given a course key and a user, return the id of the cohort that user is
     assigned to in that course.  If they don't have a cohort, return None.
+
+    Iff `auto_cohort` is True, attempt to automatically cohort `user` if they
+    aren't currently in a cohort.
     """
-    cohort = get_cohort(user, course_key)
+    cohort = get_cohort(user, course_key, auto_cohort)
     return None if cohort is None else cohort.id
 
 
@@ -101,7 +104,7 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
-def get_cohort(user, course_key):
+def get_cohort(user, course_key, auto_cohort=True):
     """
     Given a django User and a CourseKey, return the user's cohort in that
     cohort.
@@ -109,6 +112,10 @@ def get_cohort(user, course_key):
     Arguments:
         user: a Django User object.
         course_key: CourseKey
+        auto_cohort: Automatically cohort the user if they don't already
+            belong to a cohort within the course, and if the course is
+            auto-cohorted.  (Will assign to the default cohort if the course
+            is not auto-cohorted post-TNL-160)
 
     Returns:
         A CourseUserGroup object if the course is cohorted and the User has a
@@ -128,14 +135,13 @@ def get_cohort(user, course_key):
         return None
 
     try:
-        return CourseUserGroup.objects.get(course_id=course_key,
-                                            group_type=CourseUserGroup.COHORT,
-                                            users__id=user.id)
+        return user.course_groups.get(course_id=course_key,
+                                      group_type=CourseUserGroup.COHORT)
     except CourseUserGroup.DoesNotExist:
         # Didn't find the group.  We'll go on to create one if needed.
         pass
 
-    if not course.auto_cohort:
+    if not auto_cohort or not course.auto_cohort:
         return None
 
     choices = course.auto_cohort_groups

@@ -1613,6 +1613,31 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
 
+    def test_get_students_features_cohorted(self):
+        """
+        Test that get_students_features includes cohort info when the course is
+        cohorted, and does not when the course is not cohorted.
+        """
+        url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertNotIn('cohort', res_json['feature_names'])
+
+        cohorted_course = CourseFactory.create(
+            org="foo",
+            number="bar",
+            display_name="baz",
+            cohort_config={'cohorted': True}
+        )
+        instructor = InstructorFactory(course_key=cohorted_course.id)
+        self.client.login(username=instructor.username, password='test')
+
+        url = reverse('get_students_features', kwargs={'course_id': cohorted_course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        res_json = json.loads(response.content)
+        self.assertIn('cohort', res_json['feature_names'])
+
+
     @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
     @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):

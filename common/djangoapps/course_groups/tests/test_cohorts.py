@@ -115,6 +115,7 @@ class TestCohorts(django.test.TestCase):
         user1 = User.objects.create(username="test", email="a@b.com")
         user2 = User.objects.create(username="test2", email="a2@b.com")
         user3 = User.objects.create(username="test3", email="a3@b.com")
+        user4 = User.objects.create(username="test4", email="a4@b.com")
 
         cohort = CourseUserGroup.objects.create(name="TestCohort",
                                                 course_id=course.id,
@@ -157,6 +158,8 @@ class TestCohorts(django.test.TestCase):
                           "New list->new group")
         self.assertEquals(cohorts.get_cohort(user2, course.id).name, "AutoGroup",
                           "user2 should still be in originally placed cohort")
+        self.assertIsNone(cohorts.get_cohort(user4, course.id, auto_cohort=False),
+                          "shouldn't create cohort when auto_cohort=False")
 
     def test_auto_cohorting_randomization(self):
         """
