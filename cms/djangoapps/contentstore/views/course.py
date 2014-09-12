@@ -374,7 +374,7 @@ def course_listing(request):
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
             'run': course.location.run,
-			'license' : parse_license(course.license, course.license_version)
+            'license': parse_license(course.license, course.license_version)
         }
 
     def format_in_process_course_view(uca):

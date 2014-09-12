@@ -119,7 +119,7 @@ class CourseDetails(object):
         date = Date()
 
         if 'license' in jsondict and jsondict['license'] != str(descriptor.license):
-            descriptor.license =jsondict['license']
+            descriptor.license = jsondict['license']
             descriptor.license_version = None
             dirty = True
 

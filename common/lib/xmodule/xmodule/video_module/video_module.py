@@ -315,7 +315,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.source_visible = True
                 if not download_video['explicitly_set']:
                     self.download_video = True
-        
+
         # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
         if not(self.license):
             course = self.system.modulestore._get_course_for_item(self.scope_ids.usage_id)
@@ -433,8 +433,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         xml.set('url_name', self.url_name)
         attrs = {
             'display_name': self.display_name,
-            'license' : self.license,
-            'license_version' : self.license_version,
+            'license': self.license,
+            'license_version': self.license_version,
             'show_captions': json.dumps(self.show_captions),
             'start_time': self.start_time,
             'end_time': self.end_time,
