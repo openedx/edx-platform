@@ -132,6 +132,15 @@ class Order(models.Model):
                     return True
             return False
 
+    def reset_cart_items_prices(self):
+        """
+        Reset the items price state in the user cart
+        """
+        for item in self.orderitem_set.all():  # pylint: disable=E1101
+            item.unit_cost = item.list_price
+            item.list_price = None
+            item.save()
+
     def clear(self):
         """
         Clear out all the items in the cart
@@ -417,6 +426,16 @@ class RegistrationCodeRedemption(models.Model):
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
 
     @classmethod
+    def delete_registration_redemption(cls, user, cart):
+        """
+        This method delete registration redemption
+        """
+        reg_code_redemption = cls.objects.filter(redeemed_by=user, order=cart)
+        if reg_code_redemption:
+            reg_code_redemption.delete()
+            log.info('Registration code redemption entry removed for user {0} for order {1}'.format(user, cart.id))
+
+    @classmethod
     def add_reg_code_redemption(cls, course_reg_code, order):
         """
         add course registration code info into RegistrationCodeRedemption model
@@ -497,6 +516,16 @@ class CouponRedemption(models.Model):
     order = models.ForeignKey(Order, db_index=True)
     user = models.ForeignKey(User, db_index=True)
     coupon = models.ForeignKey(Coupon, db_index=True)
+
+    @classmethod
+    def delete_coupon_redemption(cls, user, cart):
+        """
+        This method delete coupon redemption
+        """
+        coupon_redemption = cls.objects.filter(user=user, order=cart)
+        if coupon_redemption:
+            coupon_redemption.delete()
+            log.info('Coupon redemption entry removed for user {0} for order {1}'.format(user, cart.id))
 
     @classmethod
     def get_discount_price(cls, percentage_discount, value):

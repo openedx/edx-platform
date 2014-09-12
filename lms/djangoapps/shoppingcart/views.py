@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from microsite_configuration import microsite
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from django.contrib.auth.decorators import login_required
+from microsite_configuration import microsite
+from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_by_id
@@ -78,17 +80,29 @@ def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
     cart_items = cart.orderitem_set.all()
+    shoppingcart_items = []
+    for cart_item in cart_items:
+        if hasattr(cart_item, 'paidcourseregistration'):
+            course_key = cart_item.paidcourseregistration.course_id
+        else:
+            course_key = cart_item.certificateitem.course_id
+
+        course = get_course_by_id(course_key, depth=None)
+        shoppingcart_items.append((cart_item, course))
+
+    site_name = microsite.get_value('SITE_NAME', 'localhost')
 
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
     )
     form_html = render_purchase_form_html(cart, callback_url=callback_url)
     context = {
-        'shoppingcart_items': cart_items,
+        'shoppingcart_items': shoppingcart_items,
         'amount': total_cost,
+        'site_name': site_name,
         'form_html': form_html,
     }
-    return render_to_response("shoppingcart/list.html", context)
+    return render_to_response("shoppingcart/shopping_cart.html", context)
 
 
 @login_required
@@ -153,6 +167,18 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
                 log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
                          .format(reg_code_redemption.registration_code.code, user, item_id))
 
+
+
+@login_required
+def reset_code_redemption(request):
+    """
+    This method reset the code redemption from user cart items.
+    """
+    cart = Order.get_cart_for_user(request.user)
+    cart.reset_cart_items_prices()
+    CouponRedemption.delete_coupon_redemption(request.user, cart)
+    RegistrationCodeRedemption.delete_registration_redemption(request.user, cart)
+    return HttpResponse('reset')
 
 @login_required
 def use_code(request):
