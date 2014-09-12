@@ -1433,11 +1433,7 @@ class CoursesMetricsGradesList(SecureListAPIView):
         queryset_grade_min = queryset.aggregate(Min('grade'))
         queryset_grade_count = queryset.aggregate(Count('grade'))
 
-        course_queryset = StudentGradebook.objects.filter(course_id__exact=course_key).exclude(user__in=exclude_users)
-        course_queryset_grade_avg = course_queryset.aggregate(Avg('grade'))
-        course_queryset_grade_max = course_queryset.aggregate(Max('grade'))
-        course_queryset_grade_min = course_queryset.aggregate(Min('grade'))
-        course_queryset_grade_count = course_queryset.aggregate(Count('grade'))
+        course_metrics = StudentGradebook.generate_leaderboard(course_key, exclude_users=exclude_users)
 
         response_data = {}
         base_uri = generate_base_uri(request)
@@ -1448,10 +1444,10 @@ class CoursesMetricsGradesList(SecureListAPIView):
         response_data['grade_minimum'] = queryset_grade_min['grade__min']
         response_data['grade_count'] = queryset_grade_count['grade__count']
 
-        response_data['course_grade_average'] = course_queryset_grade_avg['grade__avg']
-        response_data['course_grade_maximum'] = course_queryset_grade_max['grade__max']
-        response_data['course_grade_minimum'] = course_queryset_grade_min['grade__min']
-        response_data['course_grade_count'] = course_queryset_grade_count['grade__count']
+        response_data['course_grade_average'] = course_metrics['course_avg']
+        response_data['course_grade_maximum'] = course_metrics['course_max']
+        response_data['course_grade_minimum'] = course_metrics['course_min']
+        response_data['course_grade_count'] = course_metrics['course_count']
 
         response_data['grades'] = []
         for row in queryset:
