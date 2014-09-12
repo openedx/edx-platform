@@ -366,7 +366,16 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content, course_id, is_staff=False):
+def prepare_content(content, course_key, is_staff=False):
+    """
+    This function is used to pre-process thread and comment models in various
+    ways before adding them to the HTTP response.  This includes fixing empty
+    attribute fields, enforcing author anonymity, and enriching metadata around
+    group ownership and response endorsement.
+
+    @TODO: not all response pre-processing steps are currently integrated into
+    this function.
+    """
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
@@ -407,20 +416,16 @@ def safe_content(content, course_id, is_staff=False):
 
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
-            safe_children = [
-                safe_content(child, course_id, is_staff) for child in content[child_content_key]
+            children = [
+                prepare_content(child, course_key, is_staff) for child in content[child_content_key]
             ]
-            content[child_content_key] = safe_children
+            content[child_content_key] = children
+
+    # Augment the specified thread info to include the group name if a group id is present.
+    if content.get('group_id') is not None:
+        content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
 
     return content
-
-
-def add_thread_group_name(thread_info, course_key):
-    """
-    Augment the specified thread info to include the group name if a group id is present.
-    """
-    if thread_info.get('group_id') is not None:
-        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
 
 
 def get_group_id_for_comments_service(request, course_key, commentable_id=None):

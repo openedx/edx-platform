@@ -20,7 +20,6 @@ from django_comment_client.utils import (
     extract,
     strip_none,
     add_courseware_context,
-    add_thread_group_name,
     get_group_id_for_comments_service
 )
 import django_comment_client.utils as utils
@@ -114,10 +113,7 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
-    #now add the group name if the thread has a group id
     for thread in threads:
-        add_thread_group_name(thread, course_key)
-
         #patch for backward compatibility to comments service
         if not 'pinned' in thread:
             thread['pinned'] = False
@@ -135,27 +131,27 @@ def inline_discussion(request, course_id, discussion_id):
     Renders JSON for DiscussionModules
     """
     nr_transaction = newrelic.agent.current_transaction()
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    course = get_course_with_access(request.user, 'load_forum', course_id)
+    course = get_course_with_access(request.user, 'load_forum', course_key)
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
     try:
-        threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+        threads, query_params = get_threads(request, course_key, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
     except ValueError:
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
     return utils.JsonResponse({
-        'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
+        'discussion_data': [utils.prepare_content(thread, course_key, is_staff) for thread in threads],
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],
         'num_pages': query_params['num_pages'],
-        'roles': utils.get_role_ids(course_id),
+        'roles': utils.get_role_ids(course_key),
         'course_settings': make_course_settings(course)
     })
 
@@ -164,19 +160,19 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_id)
+    course = get_course_with_access(request.user, 'load_forum', course_key)
     course_settings = make_course_settings(course, include_category_map=True)
 
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
     try:
-        unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
+        unsafethreads, query_params = get_threads(request, course_key)   # This might process a search query
         is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
-        threads = [utils.safe_content(thread, course_id, is_staff) for thread in unsafethreads]
+        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
@@ -184,7 +180,7 @@ def forum_form_discussion(request, course_id):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
     with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
         add_courseware_context(threads, course)
@@ -199,7 +195,7 @@ def forum_form_discussion(request, course_id):
         })
     else:
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-            user_cohort_id = get_cohort_id(request.user, course_id)
+            user_cohort_id = get_cohort_id(request.user, course_key)
 
         context = {
             'csrf': csrf(request)['csrf_token'],
@@ -212,11 +208,11 @@ def forum_form_discussion(request, course_id):
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
             'annotated_content_info': _attr_safe_json(annotated_content_info),
             'course_id': course.id.to_deprecated_string(),
-            'roles': _attr_safe_json(utils.get_role_ids(course_id)),
-            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_id),
+            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id, # read from container in NewPostView
-            'is_course_cohorted': is_course_cohorted(course_id),  # still needed to render _thread_list_template
+            'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': _attr_safe_json(course_settings)
@@ -262,8 +258,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_key, thread, request.user, user_info=user_info)
-        content = utils.safe_content(thread.to_dict(), course_key, is_staff)
-        add_thread_group_name(content, course_key)
+        content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
@@ -282,13 +277,11 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            add_thread_group_name(thread, course_key)
-
             #patch for backward compatibility with comments service
             if not "pinned" in thread:
                 thread["pinned"] = False
 
-        threads = [utils.safe_content(thread, course_key, is_staff) for thread in threads]
+        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
@@ -323,13 +316,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
 @require_GET
 @login_required
 def user_profile(request, course_id, user_id):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
-    course = get_course_with_access(request.user, 'load_forum', course_id)
+    course = get_course_with_access(request.user, 'load_forum', course_key)
     try:
-        profiled_user = cc.User(id=user_id, course_id=course_id)
+        profiled_user = cc.User(id=user_id, course_id=course_key)
 
         query_params = {
             'page': request.GET.get('page', 1),
@@ -337,7 +330,7 @@ def user_profile(request, course_id, user_id):
         }
 
         try:
-            group_id = get_group_id_for_comments_service(request, course_id)
+            group_id = get_group_id_for_comments_service(request, course_key)
         except ValueError:
             return HttpResponseBadRequest("Invalid group_id")
         if group_id is not None:
@@ -349,12 +342,13 @@ def user_profile(request, course_id, user_id):
         user_info = cc.User.from_django_user(request.user).to_dict()
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
 
+        is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
+        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
         if request.is_ajax():
-            is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
-                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
+                'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
@@ -370,7 +364,6 @@ def user_profile(request, course_id, user_id):
                 'annotated_content_info': _attr_safe_json(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-#                'content': content,
             }
 
             return render_to_response('discussion/user_profile.html', context)
@@ -380,12 +373,12 @@ def user_profile(request, course_id, user_id):
 
 @login_required
 def followed_threads(request, course_id, user_id):
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_id)
+    course = get_course_with_access(request.user, 'load_forum', course_key)
     try:
-        profiled_user = cc.User(id=user_id, course_id=course_id)
+        profiled_user = cc.User(id=user_id, course_id=course_key)
 
         default_query_params = {
             'page': 1,
@@ -412,7 +405,7 @@ def followed_threads(request, course_id, user_id):
         )
 
         try:
-            group_id = get_group_id_for_comments_service(request, course_id)
+            group_id = get_group_id_for_comments_service(request, course_key)
         except ValueError:
             return HttpResponseBadRequest("Invalid group_id")
         if group_id is not None:
@@ -424,17 +417,17 @@ def followed_threads(request, course_id, user_id):
         user_info = cc.User.from_django_user(request.user).to_dict()
 
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-            annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
         if request.is_ajax():
             is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
             return utils.JsonResponse({
                 'annotated_content_info': annotated_content_info,
-                'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
+                'discussion_data': [utils.prepare_content(thread, course_key, is_staff) for thread in threads],
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
             })
+        #TODO remove non-AJAX support, it does not appear to be used and does not appear to work.
         else:
-
             context = {
                 'course': course,
                 'user': request.user,

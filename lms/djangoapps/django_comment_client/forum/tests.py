@@ -122,7 +122,7 @@ def make_mock_request_impl(text, thread_id="dummy_thread_id", group_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
         data = None
-        if url.endswith("threads"):
+        if url.endswith("threads") or url.endswith("user_profile"):
             data = {
                 "collection": [make_mock_thread_data(text, thread_id, False, group_id=group_id)]
             }
@@ -406,15 +406,19 @@ class SingleThreadAccessTestCase(CohortedContentTestCase):
 class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
         mock_request.side_effect = make_mock_request_impl("dummy context", group_id=self.student_cohort.id)
 
         request_data = {}
         if pass_group_id:
             request_data["group_id"] = group_id
+        headers = {}
+        if is_ajax:
+            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
         request = RequestFactory().get(
             "dummy_url",
-            data=request_data
+            data=request_data,
+            **headers
         )
         request.user = user
         mako_middleware_process_request(request)
@@ -423,6 +427,28 @@ class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdT
             self.course.id.to_deprecated_string(),
             "dummy_discussion_id",
             "dummy_thread_id"
+        )
+
+    def test_group_info_in_html_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=False
+        )
+        self._assert_html_response_contains_group_info(response)
+
+    def test_group_info_in_ajax_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=True
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['content']
         )
 
 
@@ -435,7 +461,17 @@ class InlineDiscussionGroupIdTestCase(
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        mock_request.side_effect = make_mock_request_impl("dummy content")
+        kwargs = {}
+        if group_id:
+            # avoid causing a server error when the LMS chokes attempting
+            # to find a group name for the group_id, when we're testing with
+            # an invalid one.
+            try:
+                CourseUserGroup.objects.get(id=group_id)
+                kwargs['group_id'] = group_id
+            except CourseUserGroup.DoesNotExist:
+                pass
+        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -451,20 +487,38 @@ class InlineDiscussionGroupIdTestCase(
             commentable_id
         )
 
+    def test_group_info_in_ajax_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['discussion_data'][0]
+        )
+
 
 @patch('lms.lib.comment_client.utils.requests.request')
 class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        mock_request.side_effect = make_mock_request_impl("dummy content")
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+        kwargs = {}
+        if group_id:
+            kwargs['group_id'] = group_id
+        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
             request_data["group_id"] = group_id
+        headers = {}
+        if is_ajax:
+            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
         request = RequestFactory().get(
             "dummy_url",
-            data=request_data
+            data=request_data,
+            **headers
         )
         request.user = user
         mako_middleware_process_request(request)
@@ -473,20 +527,47 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
             self.course.id.to_deprecated_string()
         )
 
+    def test_group_info_in_html_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id
+        )
+        self._assert_html_response_contains_group_info(response)
+
+    def test_group_info_in_ajax_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=True
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['discussion_data'][0]
+        )
 
 @patch('lms.lib.comment_client.utils.requests.request')
 class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
-    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        mock_request.side_effect = make_mock_request_impl("dummy content")
+    def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
+        kwargs = {}
+        if group_id:
+            kwargs['group_id'] = group_id
+        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
             request_data["group_id"] = group_id
+        headers = {}
+        if is_ajax:
+            headers['HTTP_X_REQUESTED_WITH'] = "XMLHttpRequest"
         request = RequestFactory().get(
             "dummy_url",
-            data=request_data
+            data=request_data,
+            **headers
         )
         request.user = user
         mako_middleware_process_request(request)
@@ -496,13 +577,38 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
             user.id
         )
 
+    def test_group_info_in_html_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=False
+        )
+        self._assert_html_response_contains_group_info(response)
+
+    def test_group_info_in_ajax_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            is_ajax=True
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['discussion_data'][0]
+        )
+
 
 @patch('lms.lib.comment_client.utils.requests.request')
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/subscribed_threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        mock_request.side_effect = make_mock_request_impl("dummy content")
+        kwargs = {}
+        if group_id:
+            kwargs['group_id'] = group_id
+        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -517,6 +623,17 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, Cohorted
             request,
             self.course.id.to_deprecated_string(),
             user.id
+        )
+
+    def test_group_info_in_ajax_response(self, mock_request):
+        response = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id
+        )
+        self._assert_json_response_contains_group_info(
+            response, lambda d: d['discussion_data'][0]
         )
 
 
