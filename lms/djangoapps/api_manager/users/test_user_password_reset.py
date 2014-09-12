@@ -393,6 +393,62 @@ class UserPasswordResetTest(TestCase):
         self._assert_response(response, status=201)
 
     @override_settings(
+        MINIMUM_PASSWORD_COMPLEXITY_SCORE=5, PASSWORD_MIN_LENGTH=8, PASSWORD_MAX_LENGTH=None,
+        PASSWORD_COMPLEXITY={
+            'UPPER': 1, 'LOWER': 1, 'PUNCTUATION': 1, 'DIGITS': 1,
+            'UPPER_SCORE': 2, 'LOWER_SCORE': 2, 'PUNCTUATION_SCORE': 1, 'DIGITS_SCORE': 1
+        })
+    def test_password_complexity_score_less_than_password_complexity_levels_total_score2(self):
+        """Test to set (a different set of weightings) the minimum score of password complexity < all the complexity
+        level scores. Total score of the password complexity levels is 6 and minimum password
+        complexity score is 5
+        """
+
+        # try a few successful combinations
+        password = "Testpassw0rd"
+        response = self._do_post_request(
+            self.user_url, 'test', password, email='test@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=201)
+
+        password = "tESTPASSW0RD"
+        response = self._do_post_request(
+            self.user_url, 'test2', password, email='test2@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=201)
+
+        password = "tESTPA$SWORD"
+        response = self._do_post_request(
+            self.user_url, 'test3', password, email='test3@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=201)
+
+        # test failure cases
+        password = "testpassword"
+        response = self._do_post_request(
+            self.user_url, 'test4', password, email='test4@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=400)
+
+        password = "t1234%^&*"
+        response = self._do_post_request(
+            self.user_url, 'test5', password, email='test5@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=400)
+
+        password = "T1234%^&*"
+        response = self._do_post_request(
+            self.user_url, 'test6', password, email='test6@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=400)
+
+    @override_settings(
         MINIMUM_PASSWORD_COMPLEXITY_SCORE=4, PASSWORD_MIN_LENGTH=8, PASSWORD_MAX_LENGTH=None,
         PASSWORD_COMPLEXITY={
             'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2,
