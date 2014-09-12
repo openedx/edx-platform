@@ -17,6 +17,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.conf import settings
+from util.json_request import JsonResponse
 
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
@@ -158,6 +159,7 @@ def _section_e_commerce(course, access):
         'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_purchase_transaction_url': reverse('get_purchase_transaction', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_sale_order_records_url': reverse('get_sale_order_records', kwargs={'course_id': course_key.to_deprecated_string()}),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
@@ -183,15 +185,19 @@ def set_course_mode_price(request, course_id):
     try:
         course_price = int(request.POST['course_price'])
     except ValueError:
-        return HttpResponseNotFound(_("Please Enter the numeric value for the course price"))
+        return JsonResponse(
+            {'message': _("Please Enter the numeric value for the course price")},
+            status=400)  # status code 400: Bad Request
+
     currency = request.POST['currency']
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     course_honor_mode = CourseMode.objects.filter(mode_slug='honor', course_id=course_key)
     if not course_honor_mode:
-        return HttpResponseNotFound(
-            _("CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')
-        )
+        return JsonResponse(
+            {'message': _("CourseMode with the mode slug({mode_slug}) DoesNotExist").format(mode_slug='honor')},
+            status=400)  # status code 400: Bad Request
+
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
         min_price=getattr(course_honor_mode[0], 'min_price'), currency=getattr(course_honor_mode[0], 'currency'),
@@ -201,7 +207,7 @@ def set_course_mode_price(request, course_id):
         min_price=course_price,
         currency=currency
     )
-    return HttpResponse(_("CourseMode price updated successfully"))
+    return JsonResponse({'message': _("CourseMode price updated successfully")})
 
 
 def _section_course_info(course, access):

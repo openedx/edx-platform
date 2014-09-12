@@ -19,15 +19,17 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from shoppingcart.models import (
     Order, OrderItem, CertificateItem,
-    InvalidCartItem, PaidCourseRegistration,
+    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
     Donation, OrderItemSubclassPK
 )
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from shoppingcart.exceptions import PurchasedCallbackException, CourseDoesNotExistException
+from shoppingcart.exceptions import (PurchasedCallbackException, CourseDoesNotExistException,
+                                     ItemAlreadyInCartException, AlreadyEnrolledInCourseException)
 
 from opaque_keys.edx.locator import CourseLocator
 
@@ -63,21 +65,21 @@ class OrderTest(ModuleStoreTestCase):
         item = OrderItem(order=cart, user=self.user)
         item.save()
         self.assertTrue(Order.user_cart_has_items(self.user))
-        self.assertFalse(Order.user_cart_has_items(self.user, CertificateItem))
-        self.assertFalse(Order.user_cart_has_items(self.user, PaidCourseRegistration))
+        self.assertFalse(Order.user_cart_has_items(self.user, [CertificateItem]))
+        self.assertFalse(Order.user_cart_has_items(self.user, [PaidCourseRegistration]))
 
     def test_user_cart_has_paid_course_registration_items(self):
         cart = Order.get_cart_for_user(self.user)
         item = PaidCourseRegistration(order=cart, user=self.user)
         item.save()
-        self.assertTrue(Order.user_cart_has_items(self.user, PaidCourseRegistration))
-        self.assertFalse(Order.user_cart_has_items(self.user, CertificateItem))
+        self.assertTrue(Order.user_cart_has_items(self.user, [PaidCourseRegistration]))
+        self.assertFalse(Order.user_cart_has_items(self.user, [CertificateItem]))
 
     def test_user_cart_has_certificate_items(self):
         cart = Order.get_cart_for_user(self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        self.assertTrue(Order.user_cart_has_items(self.user, CertificateItem))
-        self.assertFalse(Order.user_cart_has_items(self.user, PaidCourseRegistration))
+        self.assertTrue(Order.user_cart_has_items(self.user, [CertificateItem]))
+        self.assertFalse(Order.user_cart_has_items(self.user, [PaidCourseRegistration]))
 
     def test_cart_clear(self):
         cart = Order.get_cart_for_user(user=self.user)
@@ -189,7 +191,7 @@ class OrderTest(ModuleStoreTestCase):
     def test_purchase_item_email_smtp_failure(self, error_logger):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+        with patch('shoppingcart.models.EmailMessage.send', side_effect=smtplib.SMTPException):
             cart.purchase()
             self.assertTrue(error_logger.called)
 
@@ -326,6 +328,15 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         self.assertEqual(self.cart.total_cost, self.cost)
 
+    def test_cart_type_business(self):
+        self.cart.order_type = 'business'
+        self.cart.save()
+        item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        self.cart.purchase()
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+        # check that the registration codes are generated against the order
+        self.assertEqual(len(CourseRegistrationCode.objects.filter(order=self.cart)), item.qty)
+
     def test_add_with_default_mode(self):
         """
         Tests add_to_cart where the mode specified in the argument is NOT in the database
@@ -340,6 +351,31 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.status, "cart")
         self.assertEqual(self.cart.total_cost, 0)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
+
+        course_reg_code_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2, mode_slug="DNE")
+
+        self.assertEqual(course_reg_code_item.unit_cost, 0)
+        self.assertEqual(course_reg_code_item.line_cost, 0)
+        self.assertEqual(course_reg_code_item.mode, "honor")
+        self.assertEqual(course_reg_code_item.user, self.user)
+        self.assertEqual(course_reg_code_item.status, "cart")
+        self.assertEqual(self.cart.total_cost, 0)
+        self.assertTrue(CourseRegCodeItem.contained_in_order(self.cart, self.course_key))
+
+    def test_add_course_reg_item_with_no_course_item(self):
+        fake_course_id = CourseLocator(org="edx", course="fake", run="course")
+        with self.assertRaises(CourseDoesNotExistException):
+            CourseRegCodeItem.add_to_order(self.cart, fake_course_id, 2)
+
+    def test_course_reg_item_already_in_cart(self):
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        with self.assertRaises(ItemAlreadyInCartException):
+            CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+
+    def test_course_reg_item_already_enrolled_in_course(self):
+        CourseEnrollment.enroll(self.user, self.course_key)
+        with self.assertRaises(AlreadyEnrolledInCourseException):
+            CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
 
     def test_purchased_callback(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -381,6 +417,12 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         with self.assertRaises(PurchasedCallbackException):
             reg1.purchased_callback()
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+
+        course_reg_code_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        course_reg_code_item.course_id = CourseLocator(org="changed1", course="forsome1", run="reason1")
+        course_reg_code_item.save()
+        with self.assertRaises(PurchasedCallbackException):
+            course_reg_code_item.purchased_callback()
 
     def test_user_cart_has_both_items(self):
         """

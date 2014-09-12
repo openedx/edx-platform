@@ -23,6 +23,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_user_invoice_preference', name="get_user_invoice_preference"),
     url(r'^get_sale_records(?P<csv>/csv)?$',
         'instructor.views.api.get_sale_records', name="get_sale_records"),
+    url(r'^get_sale_order_records$',
+        'instructor.views.api.get_sale_order_records', name="get_sale_order_records"),
     url(r'^sale_validation_url$',
         'instructor.views.api.sale_validation', name="sale_validation"),
     url(r'^get_anon_ids$',

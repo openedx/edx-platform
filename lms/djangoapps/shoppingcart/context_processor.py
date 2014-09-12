@@ -21,6 +21,6 @@ def user_has_cart_context_processor(request):
         settings.FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
         shoppingcart.models.Order.user_cart_has_items(
             request.user,
-            shoppingcart.models.PaidCourseRegistration
+            [shoppingcart.models.PaidCourseRegistration, shoppingcart.models.CourseRegCodeItem]
         )  # user's cart has PaidCourseRegistrations
     )}

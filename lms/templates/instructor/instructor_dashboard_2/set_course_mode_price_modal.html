@@ -21,7 +21,7 @@
           ${_("Please enter Course Mode detail below")}</p>
       </div>
 
-      <form id="set_price_form" action="${section_data['set_course_mode_url']}" method="post" data-remote="true">
+      <form id="set_price_form">
         <div id="course_form_error" class="modal-form-error"></div>
         <fieldset class="group group-form group-form-requiredinformation">
           <legend class="is-hidden">${_("Required Information")}</legend>
@@ -40,7 +40,7 @@
           </ol>
         </fieldset>
         <div class="submit">
-          <input name="submit" type="submit" id="set_course_button" value="${_('Set Price')}"/>
+          <input name="submit" type="button" id="set_course_button" value="${_('Set Price')}"/>
         </div>
       </form>
     </div>

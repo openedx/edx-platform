@@ -68,8 +68,12 @@
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
-            <span class="csv_tip">${_("Click to generate a CSV file for all sales records in this course")}
-                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p></td>
+            <span class="csv_tip">
+              <div >
+              ${_("Click to generate a CSV file for all sales records in this course")}
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoice Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Order Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+              </div>
             </span>
              <hr>
              <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
@@ -384,8 +388,28 @@
       modal_overLay.hide();
      });
 
-     $('#edit_coupon_form').submit(function () {
+     $('#update_coupon_button').click(function () {
        $("#update_coupon_button").attr('disabled', true);
+       var coupon_id = $.trim($('#coupon_id').val());
+       var description = $.trim($('#edit_coupon_description').val());
+
+       $.ajax({
+         type: "POST",
+         data: {
+           "coupon_id"  : coupon_id,
+           "description": description
+         },
+         url: "${section_data['ajax_update_coupon']}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $("#update_coupon_button").removeAttr('disabled');
+            $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+            $('#edit_coupon_form #coupon_form_error').text(data.message);
+         }
+       });
      });
      $('#course_price_link').click(function () {
        reset_input_fields();
@@ -397,7 +421,7 @@
         reset_input_fields();
         $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
      });
-     $('#set_price_form').submit(function () {
+     $('#set_course_button').click(function () {
        $("#set_course_button").attr('disabled', true);
        // Get the Code and Discount value and trim it
        var course_price = $.trim($('#mode_price').val());
@@ -422,12 +446,31 @@
          $("#set_course_button").removeAttr('disabled');
          return false;
        }
+       $.ajax({
+         type: "POST",
+         data: {
+           "course_price"  : course_price,
+           "currency": currency
+         },
+         url: "${section_data['set_course_mode_url']}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $("#set_course_button").removeAttr('disabled');
+            $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+            $('#set_price_form #course_form_error').text(data.message);
+         }
+       });
      });
-     $('#add_coupon_form').submit(function () {
+     $('#add_coupon_button').click(function () {
        $("#add_coupon_button").attr('disabled', true);
        // Get the Code and Discount value and trim it
        var code = $.trim($('#coupon_code').val());
        var coupon_discount = $.trim($('#coupon_discount').val());
+       var course_id = $.trim($('#coupon_course_id').val());
+       var description = $.trim($('#coupon_description').val());
 
        // Check if empty of not
        if (code === '') {
@@ -448,36 +491,25 @@
          $('#add_coupon_form #coupon_form_error').text("${_('Please enter the numeric value for discount')}");
          return false;
        }
-     });
-
-     $('#set_price_form').on('ajax:complete', function (event, xhr) {
-       if (xhr.status == 200) {
-         location.reload(true);
-       } else {
-         $("#set_course_button").removeAttr('disabled');
-         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
-         $('#set_price_form #course_form_error').text(xhr.responseText);
-       }
-     });
-
-     $('#add_coupon_form').on('ajax:complete', function (event, xhr) {
-       if (xhr.status == 200) {
-         location.reload(true);
-       } else {
-         $("#add_coupon_button").removeAttr('disabled');
-         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#add_coupon_form #coupon_form_error').text(xhr.responseText);
-       }
-     });
-
-     $('#edit_coupon_form').on('ajax:complete', function (event, xhr) {
-       if (xhr.status == 200) {
-         location.reload(true);
-       } else {
-         $("#update_coupon_button").removeAttr('disabled');
-         $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
-         $('#edit_coupon_form #coupon_form_error').text(xhr.responseText);
-       }
+       $.ajax({
+         type: "POST",
+         data: {
+           "code"  : code,
+           "discount": coupon_discount,
+           "course_id": course_id,
+           "description": description
+         },
+         url: "${section_data['ajax_add_coupon']}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+            $('#add_coupon_form #coupon_form_error').text(data.message);
+            $("#add_coupon_button").removeAttr('disabled');
+         }
+       });
      });
      // removing close link's default behavior
      $('.close-modal').click(function (e) {
