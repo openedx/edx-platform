@@ -260,12 +260,12 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
         profile.save()
 
         # Warm the cache
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(14):
             self.client.get(self.embargoed_page)
 
         # Access the page multiple times, but expect that we hit
         # the database to check the user's profile only once
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(8):
             self.client.get(self.embargoed_page)
 
     def test_embargo_profile_country_db_null(self):
