@@ -3,7 +3,10 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 """
 import re
 import pymongo
+import time
 from contracts import check
+from functools import wraps
+from pymongo.errors import AutoReconnect
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
 from datetime import tzinfo
@@ -62,6 +65,32 @@ def structure_to_mongo(structure):
     return new_structure
 
 
+def autoretry_read(wait=0.1, retries=5):
+    """
+    Automatically retry a read-only method in the case of a pymongo
+    AutoReconnect exception.
+
+    See http://emptysqua.re/blog/save-the-monkey-reliably-writing-to-mongodb/
+    for a discussion of this technique.
+    """
+    def decorate(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for attempt in xrange(retries):
+                try:
+                    return fn(*args, **kwargs)
+                    break
+                except AutoReconnect:
+                    # Reraise if we failed on our last attempt
+                    if attempt == retries - 1:
+                        raise
+
+                    if wait:
+                        time.sleep(wait)
+        return wrapper
+    return decorate
+
+
 class MongoConnection(object):
     """
     Segregation of pymongo functions from the data modeling mechanisms for split modulestore.
@@ -106,12 +135,14 @@ class MongoConnection(object):
         else:
             raise HeartbeatFailure("Can't connect to {}".format(self.database.name))
 
+    @autoretry_read()
     def get_structure(self, key):
         """
         Get the structure from the persistence mechanism whose id is the given key
         """
         return structure_from_mongo(self.structures.find_one({'_id': key}))
 
+    @autoretry_read()
     def find_structures_by_id(self, ids):
         """
         Return all structures that specified in ``ids``.
@@ -121,6 +152,7 @@ class MongoConnection(object):
         """
         return [structure_from_mongo(structure) for structure in self.structures.find({'_id': {'$in': ids}})]
 
+    @autoretry_read()
     def find_structures_derived_from(self, ids):
         """
         Return all structures that were immediately derived from a structure listed in ``ids``.
@@ -130,6 +162,7 @@ class MongoConnection(object):
         """
         return [structure_from_mongo(structure) for structure in self.structures.find({'previous_version': {'$in': ids}})]
 
+    @autoretry_read()
     def find_ancestor_structures(self, original_version, block_key):
         """
         Find all structures that originated from ``original_version`` that contain ``block_key``.
@@ -155,6 +188,7 @@ class MongoConnection(object):
         """
         self.structures.update({'_id': structure['_id']}, structure_to_mongo(structure), upsert=True)
 
+    @autoretry_read()
     def get_course_index(self, key, ignore_case=False):
         """
         Get the course_index from the persistence mechanism whose id is the given key
@@ -167,6 +201,7 @@ class MongoConnection(object):
             }
         )
 
+    @autoretry_read()
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
         Find the course_index matching particular conditions.
@@ -225,12 +260,14 @@ class MongoConnection(object):
             'run': course_index['run'],
         })
 
+    @autoretry_read()
     def get_definition(self, key):
         """
         Get the definition from the persistence mechanism whose id is the given key
         """
         return self.definitions.find_one({'_id': key})
 
+    @autoretry_read()
     def find_matching_definitions(self, query):
         """
         Find the definitions matching the query. Right now the query must be a legal mongo query
