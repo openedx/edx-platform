@@ -4,7 +4,7 @@ define(["jquery"], function($) {
      * Note though that the class "is-fixed" on the modal cover
      * prevents the closing operation.
      */
-    var hideModal = function(e,selector) {
+    var hideModal = function(e, selector) {
         if (e) {
             e.preventDefault();
         }
@@ -72,7 +72,7 @@ define(["jquery"], function($) {
 
     var getModal = function (selector) {
         if (selector) {
-            return $(".modal"+selector+", .showAsModal"+selector);
+            return $(".modal" + selector + ", .showAsModal" + selector);
         }
         else {
             return $(".modal, .showAsModal");
