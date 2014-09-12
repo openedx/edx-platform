@@ -15,10 +15,17 @@ from .models import CourseUserGroup
 log = logging.getLogger(__name__)
 
 
+# A "default cohort" is an auto-cohort that is automatically created for a course if it doesn't already exist.
+# It is intended to be used in a cohorted-course for users who have yet to be assigned to a cohort. If an administrator
+# chooses to configure a cohort with the same name, the said cohort will also be used as the "default cohort".
+DEFAULT_COHORT_NAME = "Default Cohort Group"
+
+
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
 # if and when that's fixed, it's a good idea to have a local generator to avoid any other
 # code that messes with the global random module.
 _local_random = None
+
 
 def local_random():
     """
@@ -135,27 +142,19 @@ def get_cohort(user, course_key):
         # Didn't find the group.  We'll go on to create one if needed.
         pass
 
-    if not course.auto_cohort:
-        return None
-
     choices = course.auto_cohort_groups
-    n = len(choices)
-    if n == 0:
-        # Nowhere to put user
-        log.warning("Course %s is auto-cohorted, but there are no"
-                    " auto_cohort_groups specified",
-                    course_key)
-        return None
+    if len(choices) > 0:
+        # Randomly choose one of the auto_cohort_groups, creating it if needed.
+        group_name = local_random().choice(choices)
+    else:
+        # Use the "default cohort".
+        group_name = DEFAULT_COHORT_NAME
 
-    # Put user in a random group, creating it if needed
-    group_name = local_random().choice(choices)
-
-    group, created = CourseUserGroup.objects.get_or_create(
+    group, _ = CourseUserGroup.objects.get_or_create(
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
         name=group_name
     )
-
     user.course_groups.add(group)
     return group
 
@@ -172,15 +171,13 @@ def get_course_cohorts(course):
         A list of CourseUserGroup objects.  Empty if there are no cohorts. Does
         not check whether the course is cohorted.
     """
-    # TODO: remove auto_cohort check with TNL-160
-    if course.auto_cohort:
-        # Ensure all auto cohorts are created.
-        for group_name in course.auto_cohort_groups:
-            CourseUserGroup.objects.get_or_create(
-                course_id=course.location.course_key,
-                group_type=CourseUserGroup.COHORT,
-                name=group_name
-            )
+    # Ensure all auto cohorts are created.
+    for group_name in course.auto_cohort_groups:
+        CourseUserGroup.objects.get_or_create(
+            course_id=course.location.course_key,
+            group_type=CourseUserGroup.COHORT,
+            name=group_name
+        )
 
     return list(CourseUserGroup.objects.filter(
         course_id=course.location.course_key,

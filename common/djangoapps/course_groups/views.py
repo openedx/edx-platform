@@ -48,7 +48,7 @@ def list_cohorts(request, course_key_string):
 
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    all_cohorts = [{'name': c.name, 'id': c.id, 'user_count': c.users.count()}
+    all_cohorts = [{'name': c.name, 'id': c.id, 'user_count': c.users.count(), 'rule_type': c.rule_type}
                    for c in cohorts.get_course_cohorts(course)]
 
     return json_http_response({'success': True,
