@@ -1573,7 +1573,7 @@ class CoursesApiTests(TestCase):
             parent_location=self.chapter.location,
             category='mentoring',
             data=StringResponseXMLFactory().build_xml(answer='foo'),
-            display_name=u"test problem smae points",
+            display_name=u"test problem same points",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
         )
 
@@ -1591,7 +1591,6 @@ class CoursesApiTests(TestCase):
         grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
         module.system.publish(module, 'grade', grade_dict)
 
-        StudentGradebook.objects.filter(user=user).update(created=timezone.now() - timedelta(days=1))
         test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
@@ -1615,11 +1614,16 @@ class CoursesApiTests(TestCase):
 
         # Filter by user who has never accessed a course module
         test_user = UserFactory.create(username="testusernocoursemod")
+        CourseEnrollmentFactory.create(user=test_user, course_id=self.course.id)
         user_filter_uri = '{}?user_id={}'.format(test_uri, test_user.id)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['user_grade'], 0)
         self.assertEqual(response.data['user_position'], 6)
+        # Also, with this new user now added the course average should be different
+        self.assertNotEqual(response.data['course_avg'], expected_course_average)
+        rounded_avg = float("{0:.2f}".format(response.data['course_avg']))
+        self.assertEqual(rounded_avg, 0.33)
 
         # test with bogus course
         bogus_test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
