@@ -103,7 +103,7 @@
                 </thead>
 
                 <tbody>
-                  % for item in order_items:
+                  % for item, course in shoppingcart_items:
                   <tr>
                     <td>${item.line_desc}</td>
                     <td>
@@ -158,7 +158,7 @@
                 </thead>
 
                 <tbody>
-                  % for item in order_items:
+                  % for item, course in shoppingcart_items:
                   <tr>
                     % if item.status == "purchased":
                     <td>${order.id}</td>
