@@ -5,11 +5,12 @@ from django.utils import timezone
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Max, Min, Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
+from student.models import CourseEnrollment
 from xmodule_django.models import CourseKeyField
 
 
@@ -48,19 +49,34 @@ class StudentGradebook(TimeStampedModel):
             'user_position': 4,
             'user_grade': 0.89
         }
+
+        If there is a discrepancy between the number of gradebook entries and the overall number of enrolled
+        users (excluding any users who should be excluded), then we modify the course average to account for
+        those users who currently lack gradebook entries.  We assume zero grades for these users because they
+        have not yet submitted a response to a scored assessment which means no grade has been calculated.
         """
         data = {}
+        total_user_count = CourseEnrollment.users_enrolled_in(course_key).count()
         queryset = StudentGradebook.objects.select_related('user')\
             .filter(course_id__exact=course_key, user__is_active=True)
-        if exclude_users:
-            queryset = queryset.exclude(user__in=exclude_users)
+        gradebook_user_count = len(queryset)
 
-        # print StudentGradebook.objects.select_related('user')\
-        #     .filter(course_id__exact=course_key, user__is_active=True).query
-        # assert 0
+        if exclude_users:
+            total_user_count = total_user_count - len(exclude_users)
+            queryset = queryset.exclude(user__in=exclude_users)
+            gradebook_user_count = len(queryset)
+
+        # Calculate the class average
+        course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
+        if gradebook_user_count < total_user_count:
+            # Take into account any ungraded students (assumes zeros for grades...)
+            course_avg = course_avg / total_user_count * gradebook_user_count
+        data['course_avg'] = course_avg
+        data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
+        data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
+        data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
 
         # Construct the leaderboard as a queryset
-        data['course_avg'] = queryset.aggregate(Avg('grade'))['grade__avg']
         data['queryset'] = queryset.values(
             'user__id',
             'user__username',
