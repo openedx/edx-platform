@@ -1,10 +1,24 @@
 """
 Helper methods for testing cohorts.
 """
+from factory import post_generation, Sequence
+from factory.django import DjangoModelFactory
+from course_groups.models import CourseUserGroup
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from course_groups.models import CourseUserGroup
-from course_groups.cohorts import DEFAULT_COHORT_NAME
+
+
+class CohortFactory(DjangoModelFactory):
+    FACTORY_FOR = CourseUserGroup
+
+    name = Sequence("cohort{}".format)
+    course_id = "dummy_id"
+    group_type = CourseUserGroup.COHORT
+
+    @post_generation
+    def users(self, create, extracted, **kwargs):  # pylint: disable=W0613
+        if extracted:
+            self.users.add(*extracted)
 
 
 def topic_name_to_id(course, name):
@@ -17,29 +31,6 @@ def topic_name_to_id(course, name):
         run=course.url_name,
         name=name
     )
-
-
-def get_default_cohort(course):
-    """
-    Returns the default cohort for a course.
-    Returns None if the default cohort hasn't yet been created.
-    """
-    return get_cohort_in_course(DEFAULT_COHORT_NAME, course)
-
-
-def get_cohort_in_course(cohort_name, course):
-    """
-    Returns the cohort with the name `cohort_name` in the given `course`.
-    Returns None if it doesn't exist.
-    """
-    try:
-        return CourseUserGroup.objects.get(
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT,
-            name=cohort_name
-        )
-    except CourseUserGroup.DoesNotExist:
-        return None
 
 
 def config_course_cohorts(
