@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_groups.views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
-from course_groups.cohorts import get_cohort
+from course_groups.cohorts import get_cohort, CohortRuleType
 
 class CohortFactory(DjangoModelFactory):
     FACTORY_FOR = CourseUserGroup
@@ -114,18 +114,18 @@ class ListCohortsTestCase(CohortViewsTestCase):
         self.assertItemsEqual(
             response_dict.get("cohorts"),
             [
-                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count}
+                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count, "rule_type": cohort.rule_type}
                 for cohort in expected_cohorts
             ]
         )
 
     @staticmethod
-    def create_expected_cohort(cohort, user_count):
+    def create_expected_cohort(cohort, user_count, rule_type=CohortRuleType.none):
         """
         Create a tuple storing the expected cohort information.
         """
-        cohort_tuple = namedtuple("Cohort", "name id user_count")
-        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count)
+        cohort_tuple = namedtuple("Cohort", "name id user_count rule_type")
+        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count, rule_type=rule_type)
 
     def test_non_staff(self):
         """
@@ -169,8 +169,8 @@ class ListCohortsTestCase(CohortViewsTestCase):
             ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
             ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
             ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0, CohortRuleType.random),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0, CohortRuleType.random),
         ]
         self.verify_lists_expected_cohorts(expected_cohorts, actual_cohorts)
 
@@ -199,7 +199,7 @@ class ListCohortsTestCase(CohortViewsTestCase):
         actual_cohorts = self.request_list_cohorts(self.course)
         default_cohort = get_default_cohort(self.course)
         self.verify_lists_expected_cohorts(
-            [ListCohortsTestCase.create_expected_cohort(default_cohort, len(unassigned_users))],
+            [ListCohortsTestCase.create_expected_cohort(default_cohort, len(unassigned_users), CohortRuleType.default)],
             actual_cohorts,
         )
 
