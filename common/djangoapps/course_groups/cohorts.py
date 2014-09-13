@@ -15,13 +15,40 @@ from .models import CourseUserGroup
 log = logging.getLogger(__name__)
 
 
-# A 'default cohort' is an auto-cohort that is automatically created for a course if no auto-cohorts have been
+# A 'default cohort' is an auto-cohort that is automatically created for a course if no auto_cohort_groups have been
 # specified. It is intended to be used in a cohorted-course for users who have yet to be assigned to a cohort.
-# If an administrator chooses to configure a cohort with the same name, the said cohort will also be used as
-# the "default cohort".
+# Note 1: If an administrator chooses to configure a cohort with the same name, the said cohort will be used as
+#         the "default cohort".
+# Note 2: If auto_cohort_groups are configured after the 'default cohort' has been created and populated, the
+#         stagnant 'default cohort' will still remain (now as a manual cohort) with its previously assigned students.
 # Translation Note: We are NOT translating this string since it is the constant identifier for the "default group"
-# and needed across product boundaries.
-DEFAULT_COHORT_NAME = "Default Cohort Group"
+#                   and needed across product boundaries.
+DEFAULT_COHORT_NAME = "Default Group"
+
+
+class CohortAssignmentType(object):
+    """
+    The various types of rule-based cohorts
+    """
+    # No automatic rules are applied to this cohort; users must be manually added.
+    NONE = "none"
+
+    # One of (possibly) multiple cohort groups to which users are randomly assigned.
+    # Note: The 'default cohort' group is included in this category iff it exists and
+    # there are no other random groups. (Also see Note 2 above.)
+    RANDOM = "random"
+
+    @staticmethod
+    def get(cohort, course):
+        """
+        Returns the assignment type of the given cohort for the given course
+        """
+        if cohort.name in course.auto_cohort_groups:
+            return CohortAssignmentType.RANDOM
+        elif len(course.auto_cohort_groups) == 0 and cohort.name == DEFAULT_COHORT_NAME:
+            return CohortAssignmentType.RANDOM
+        else:
+            return CohortAssignmentType.NONE
 
 
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
