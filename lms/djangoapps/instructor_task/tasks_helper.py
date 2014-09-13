@@ -547,7 +547,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # possible for a student to have a 0.0 show up in their row but
             # still have 100% for the course.
             row_percents = [percents.get(label, 0.0) for label in header]
-            rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
+            rows.append([student.id, unicode(student.email).encode('utf-8'), student.username, gradeset['percent']] + row_percents)
         else:
             # An empty gradeset means we failed to grade a student.
             num_failed += 1
