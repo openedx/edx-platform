@@ -48,8 +48,10 @@ def list_cohorts(request, course_key_string):
 
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    all_cohorts = [{'name': c.name, 'id': c.id, 'user_count': c.users.count()}
-                   for c in cohorts.get_course_cohorts(course)]
+    all_cohorts = [
+        {'name': c.name, 'id': c.id, 'user_count': c.users.count(), 'rule_type': cohorts.CohortRuleType.get(c, course)}
+        for c in cohorts.get_course_cohorts(course)
+    ]
 
     return json_http_response({'success': True,
                                'cohorts': all_cohorts})

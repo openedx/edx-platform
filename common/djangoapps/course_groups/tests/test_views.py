@@ -4,7 +4,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from factory import post_generation, Sequence
 from factory.django import DjangoModelFactory
-from course_groups.tests.helpers import config_course_cohorts
+from course_groups.tests.helpers import config_course_cohorts, get_cohort_in_course, get_default_cohort
 from collections import namedtuple
 
 from django.http import Http404
@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_groups.views import list_cohorts, add_cohort, users_in_cohort, add_users_to_cohort, remove_user_from_cohort
+from course_groups.cohorts import get_cohort, CohortRuleType
 
 class CohortFactory(DjangoModelFactory):
     FACTORY_FOR = CourseUserGroup
@@ -61,22 +62,6 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         self.cohort2 = CohortFactory.create(course_id=self.course.id, users=self.cohort2_users)
         self.cohort3 = CohortFactory.create(course_id=self.course.id, users=self.cohort3_users)
 
-    def _cohort_in_course(self, cohort_name, course):
-        """
-        Returns true iff `course` contains a cohort with the name
-        `cohort_name`.
-        """
-        try:
-            CourseUserGroup.objects.get(
-                course_id=course.id,
-                group_type=CourseUserGroup.COHORT,
-                name=cohort_name
-            )
-        except CourseUserGroup.DoesNotExist:
-            return False
-        else:
-            return True
-
     def _user_in_cohort(self, username, cohort):
         """
         Return true iff a user with `username` exists in `cohort`.
@@ -117,26 +102,30 @@ class ListCohortsTestCase(CohortViewsTestCase):
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
-    def verify_lists_expected_cohorts(self, response_dict, expected_cohorts):
+    def verify_lists_expected_cohorts(self, expected_cohorts, response_dict=None):
         """
         Verify that the server response contains the expected_cohorts.
+        If response_dict is None, the list of cohorts is requested from the server.
         """
+        if response_dict is None:
+            response_dict = self.request_list_cohorts(self.course)
+
         self.assertTrue(response_dict.get("success"))
         self.assertItemsEqual(
             response_dict.get("cohorts"),
             [
-                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count}
+                {"name": cohort.name, "id": cohort.id, "user_count": cohort.user_count, "rule_type": cohort.rule_type}
                 for cohort in expected_cohorts
             ]
         )
 
     @staticmethod
-    def create_expected_cohort(cohort, user_count):
+    def create_expected_cohort(cohort, user_count, rule_type=CohortRuleType.none):
         """
         Create a tuple storing the expected cohort information.
         """
-        cohort_tuple = namedtuple("Cohort", "name id user_count")
-        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count)
+        cohort_tuple = namedtuple("Cohort", "name id user_count rule_type")
+        return cohort_tuple(name=cohort.name, id=cohort.id, user_count=user_count, rule_type=rule_type)
 
     def test_non_staff(self):
         """
@@ -148,7 +137,7 @@ class ListCohortsTestCase(CohortViewsTestCase):
         """
         Verify that no cohorts are in response for a course with no cohorts.
         """
-        self.verify_lists_expected_cohorts(self.request_list_cohorts(self.course), [])
+        self.verify_lists_expected_cohorts([])
 
     def test_some_cohorts(self):
         """
@@ -160,13 +149,13 @@ class ListCohortsTestCase(CohortViewsTestCase):
             ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
             ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
         ]
-        self.verify_lists_expected_cohorts(self.request_list_cohorts(self.course), expected_cohorts)
+        self.verify_lists_expected_cohorts(expected_cohorts)
 
     def test_auto_cohorts(self):
         """
         Verify that auto cohorts are included in the response.
         """
-        config_course_cohorts(self.course, [], cohorted=True, auto_cohort=True,
+        config_course_cohorts(self.course, [], cohorted=True,
                               auto_cohort_groups=["AutoGroup1", "AutoGroup2"])
 
         # Will create cohort1, cohort2, and cohort3. Auto cohorts remain uncreated.
@@ -174,24 +163,45 @@ class ListCohortsTestCase(CohortViewsTestCase):
         # Get the cohorts from the course, which will cause auto cohorts to be created.
         actual_cohorts = self.request_list_cohorts(self.course)
         # Get references to the created auto cohorts.
-        auto_cohort_1 = CourseUserGroup.objects.get(
-            course_id=self.course.location.course_key,
-            group_type=CourseUserGroup.COHORT,
-            name="AutoGroup1"
-        )
-        auto_cohort_2 = CourseUserGroup.objects.get(
-            course_id=self.course.location.course_key,
-            group_type=CourseUserGroup.COHORT,
-            name="AutoGroup2"
-        )
+        auto_cohort_1 = get_cohort_in_course("AutoGroup1", self.course)
+        auto_cohort_2 = get_cohort_in_course("AutoGroup2", self.course)
         expected_cohorts = [
             ListCohortsTestCase.create_expected_cohort(self.cohort1, 3),
             ListCohortsTestCase.create_expected_cohort(self.cohort2, 2),
             ListCohortsTestCase.create_expected_cohort(self.cohort3, 2),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0),
-            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_1, 0, CohortRuleType.random),
+            ListCohortsTestCase.create_expected_cohort(auto_cohort_2, 0, CohortRuleType.random),
         ]
-        self.verify_lists_expected_cohorts(actual_cohorts, expected_cohorts)
+        self.verify_lists_expected_cohorts(expected_cohorts, actual_cohorts)
+
+    def test_default_cohort(self):
+        """
+        Verify that the default cohort is not created and included in the response until students are assigned to it.
+        """
+        # verify the default cohort is not created when the course is not cohorted
+        self.verify_lists_expected_cohorts([])
+
+        # create a cohorted course without any auto_cohort_groups
+        config_course_cohorts(self.course, [], cohorted=True)
+
+        # verify the default cohort is not yet created until a user is assigned
+        self.verify_lists_expected_cohorts([])
+
+        # create enrolled users
+        unassigned_users = [UserFactory.create() for _ in range(3)]
+        self._enroll_users(unassigned_users, self.course.id)
+
+        # mimic users accessing the discussion forum
+        for user in unassigned_users:
+            get_cohort(user, self.course.id)
+
+        # verify the default cohort is automatically created
+        actual_cohorts = self.request_list_cohorts(self.course)
+        default_cohort = get_default_cohort(self.course)
+        self.verify_lists_expected_cohorts(
+            [ListCohortsTestCase.create_expected_cohort(default_cohort, len(unassigned_users), CohortRuleType.default)],
+            actual_cohorts,
+        )
 
 
 class AddCohortTestCase(CohortViewsTestCase):
@@ -208,7 +218,7 @@ class AddCohortTestCase(CohortViewsTestCase):
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
-    def verify_contains_added_cohort(self, response_dict, cohort_name, course, expected_error_msg=None):
+    def verify_contains_added_cohort(self, response_dict, cohort_name, expected_error_msg=None):
         """
         Check that `add_cohort`'s response correctly returns the newly added
         cohort (or error) in the response.  Also verify that the cohort was
@@ -226,7 +236,7 @@ class AddCohortTestCase(CohortViewsTestCase):
                 response_dict.get("cohort").get("name"),
                 cohort_name
             )
-        self.assertTrue(self._cohort_in_course(cohort_name, course))
+        self.assertIsNotNone(get_cohort_in_course(cohort_name, self.course))
 
     def test_non_staff(self):
         """
@@ -242,7 +252,6 @@ class AddCohortTestCase(CohortViewsTestCase):
         self.verify_contains_added_cohort(
             self.request_add_cohort(cohort_name, self.course),
             cohort_name,
-            self.course
         )
 
     def test_no_cohort(self):
@@ -263,7 +272,6 @@ class AddCohortTestCase(CohortViewsTestCase):
         self.verify_contains_added_cohort(
             self.request_add_cohort(cohort_name, self.course),
             cohort_name,
-            self.course,
             expected_error_msg="Can't create two cohorts with the same name"
         )
 

@@ -34,7 +34,6 @@
   }
 
   // system feedback - messages
-
   .wrapper-msg {
     margin-bottom: ($baseline*1.5);
   }
@@ -121,6 +120,8 @@
   }
 }
 
+// instructor dashboard 2
+// ====================
 section.instructor-dashboard-content-2 {
   @extend .content;
   // position: relative;
@@ -210,35 +211,123 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+}
 
-  section.idash-section {
+// elements - general
+// --------------------
+.idash-section {
+
+  // messages
+  .message {
+    margin-bottom: $baseline;
     display: none;
-    margin-top: ($baseline*1.5);
-    // background-color: #0f0;
+    border-radius: ($baseline/$baseline);
+    padding: ($baseline*0.75) $baseline;
 
-    &.active-section {
+    &.is-shown {
       display: block;
-      // background-color: #ff0;
+    }
+  }
+
+  .message-title {
+    @extend %t-title6;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/4);
+  }
+
+  .message-copy {
+    @extend %t-copy-sub1;
+  }
+
+  .message-actions {
+    margin-top: ($baseline/2);
+
+    .action-primary {
+      @include idashbutton($gray-l4);
+    }
+  }
+
+  // type - error
+  .message-error {
+    border-top: 2px solid $error-color;
+    background: tint($error-color,95%);
+
+    .message-title {
+      color: $error-color;
     }
 
-    .basic-data {
-      padding: 6px;
+    .message-copy {
+      color: $base-font-color;
+    }
+  }
+
+  // type - confirmation
+  .message-confirmation {
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+
+    .message-title {
+      color: $confirm-color;
     }
 
-    .running-tasks-section {
-      display: none;
+    .message-copy {
+      color: $base-font-color;
+    }
+  }
+
+  // type - error
+  .message-warning {
+    border-top: 2px solid $warning-color;
+    background: tint($warning-color,95%);
+  }
+
+  // grandfathered
+  display: none;
+  margin-top: ($baseline*1.5);
+
+  &.active-section {
+    display: block;
+  }
+
+  .basic-data {
+    padding: 6px;
+  }
+
+  .running-tasks-section {
+    display: none;
+  }
+
+  .no-pending-tasks-message {
+    display: none;
+
+    p {
+      color: #a2a2a2;
+      font-style: italic;
+    }
+  }
+
+  .section-title {
+    @include clearfix();
+    margin-bottom: ($baseline/2);
+
+    .value {
+      float: left;
     }
 
-    .no-pending-tasks-message {
-      display: none;
-      p {
-        color: #a2a2a2;
-        font-style: italic;
-      }
+    .description {
+      @extend %t-title7;
+      float: right;
+      text-transform: none;
+      letter-spacing: 0;
+      text-align: right;
+      color: $gray;
     }
   }
 }
 
+
+// view - course info
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#course_info {
   .course-errors-wrapper {
     margin-top: 2em;
@@ -301,6 +390,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
+// view - bulk email
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#send_email {
   // form fields
   .list-fields {
@@ -325,21 +416,137 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - membership
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
   $half_width: $baseline * 20;
 
-  .vert-left,
-  .vert-right {
-    display: inline-block;
-    vertical-align: top;
-    width: 48%;
-    margin-right: 2%;
+  .membership-section {
+    margin-bottom: ($baseline*1.5);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  .vert-right {
-    margin-right: 0;
+  // cohort management
+  .cohort-management {
+
   }
+
+  .cohort-management-nav {
+    margin-bottom: $baseline;
+
+    .cohort-select {
+      width: 100%;
+    }
+  }
+
+  .cohort-management-group {
+    border: 1px solid $gray-l5;
+  }
+
+  .cohort-management-group-header {
+    border-bottom: ($baseline/10) solid $gray-l4;
+    background: $gray-l5;
+    padding: $baseline;
+
+    .group-header-title {
+      margin-bottom: ($baseline/2);
+      border-bottom: 1px solid $gray-l4;
+      padding-bottom: ($baseline/2);
+
+      .title-value, .group-count {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .title-value {
+        @extend %t-title5;
+        @extend %t-weight4;
+        margin-right: ($baseline/4);
+      }
+
+      .group-count {
+        @extend %t-title7;
+        @extend %t-weight4;
+      }
+    }
+  }
+
+  .cohort-management-group-setup {
+    @include clearfix();
+    @extend %t-copy-sub1;
+    color: $gray-l2;
+
+    .setup-value {
+      float: left;
+    }
+
+    .setup-actions {
+      float: right;
+    }
+  }
+
+  .cohort-management-group-add {
+    padding: $baseline;
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-title {
+      @extend %t-title6;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/4);
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+
+    .form-fields {
+      margin-bottom: $baseline;
+
+      .label, .input {
+        display: block;
+      }
+
+      .label {
+        @extend %t-title7;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    .cohort-management-group-add-students {
+      min-height: ($baseline*10);
+      width: 100%;
+      padding: ($baseline/2) ($baseline*0.75);
+    }
+
+    .form-submit {
+      @include idashbutton($blue);
+      margin-bottom: 0;
+    }
+  }
+
+
+  .cohort-management-supplemental {
+    @extend %t-copy-sub1;
+    margin-top: ($baseline/2);
+
+    .icon {
+      margin-right: ($baseline/4);
+      color: $gray-l1;
+    }
+  }
+
 
   .batch-enrollment, .batch-beta-testers {
     textarea {
@@ -535,7 +742,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - student admin
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
   .action-type-container{
     margin-bottom: $baseline * 2;
@@ -570,7 +778,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - data download
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   input {
     // display: block;
@@ -600,7 +809,8 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-
+// view - metrics
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#metrics {
 
   .metrics-container, .metrics-header-container {
