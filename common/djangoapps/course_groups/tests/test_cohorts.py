@@ -6,9 +6,10 @@ from django.http import Http404
 from django.test.utils import override_settings
 
 from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 from course_groups.models import CourseUserGroup
 from course_groups import cohorts
-from course_groups.tests.helpers import topic_name_to_id, config_course_cohorts, get_default_cohort
+from course_groups.tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
 
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -59,15 +60,11 @@ class TestCohorts(django.test.TestCase):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
-        user = User.objects.create(username="test", email="a@b.com")
+        user = UserFactory(username="test", email="a@b.com")
         self.assertIsNone(cohorts.get_cohort_id(user, course.id))
 
         config_course_cohorts(course, discussions=[], cohorted=True)
-        cohort = CourseUserGroup.objects.create(
-            name="TestCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        cohort = CohortFactory(course_id=course.id, name="TestCohort")
         cohort.users.add(user)
         self.assertEqual(cohorts.get_cohort_id(user, course.id), cohort.id)
 
@@ -84,17 +81,12 @@ class TestCohorts(django.test.TestCase):
         self.assertEqual(course.id, self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
-        user = User.objects.create(username="test", email="a@b.com")
-        other_user = User.objects.create(username="test2", email="a2@b.com")
+        user = UserFactory(username="test", email="a@b.com")
+        other_user = UserFactory(username="test2", email="a2@b.com")
 
         self.assertIsNone(cohorts.get_cohort(user, course.id), "No cohort created yet")
 
-        cohort = CourseUserGroup.objects.create(
-            name="TestCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-
+        cohort = CohortFactory(course_id=course.id, name="TestCohort")
         cohort.users.add(user)
 
         self.assertIsNone(
@@ -112,7 +104,7 @@ class TestCohorts(django.test.TestCase):
         )
         self.assertEquals(
             cohorts.get_cohort(other_user, course.id).id,
-            get_default_cohort(course).id,
+            cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "other_user should be assigned to the default cohort"
         )
 
@@ -123,16 +115,12 @@ class TestCohorts(django.test.TestCase):
         course = modulestore().get_course(self.toy_course_key)
         self.assertFalse(course.is_cohorted)
 
-        user1 = User.objects.create(username="test", email="a@b.com")
-        user2 = User.objects.create(username="test2", email="a2@b.com")
-        user3 = User.objects.create(username="test3", email="a3@b.com")
-        user4 = User.objects.create(username="test4", email="a4@b.com")
+        user1 = UserFactory(username="test", email="a@b.com")
+        user2 = UserFactory(username="test2", email="a2@b.com")
+        user3 = UserFactory(username="test3", email="a3@b.com")
+        user4 = UserFactory(username="test4", email="a4@b.com")
 
-        cohort = CourseUserGroup.objects.create(
-            name="TestCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        cohort = CohortFactory(course_id=course.id, name="TestCohort")
 
         # user1 manually added to a cohort
         cohort.users.add(user1)
@@ -159,7 +147,7 @@ class TestCohorts(django.test.TestCase):
 
         self.assertEquals(
             cohorts.get_cohort(user3, course.id).id,
-            get_default_cohort(course).id,
+            cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "No groups->default cohort"
         )
 
@@ -182,7 +170,7 @@ class TestCohorts(django.test.TestCase):
         )
         self.assertEquals(
             cohorts.get_cohort(user3, course.id).name,
-            get_default_cohort(course).name,
+            cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).name,
             "user3 should still be in the default cohort"
         )
 
@@ -200,7 +188,7 @@ class TestCohorts(django.test.TestCase):
 
         # Assign 100 users to cohorts
         for i in range(100):
-            user = User.objects.create(
+            user = UserFactory(
                 username="test_{0}".format(i),
                 email="a@b{0}.com".format(i)
             )
@@ -235,17 +223,8 @@ class TestCohorts(django.test.TestCase):
         )
 
         # add manual cohorts to course 1
-        CourseUserGroup.objects.create(
-            name="ManualCohort",
-            course_id=course.location.course_key,
-            group_type=CourseUserGroup.COHORT
-        )
-
-        CourseUserGroup.objects.create(
-            name="ManualCohort2",
-            course_id=course.location.course_key,
-            group_type=CourseUserGroup.COHORT
-        )
+        CohortFactory(course_id=course.id, name="ManualCohort")
+        CohortFactory(course_id=course.id, name="ManualCohort2")
 
         cohort_set = {c.name for c in cohorts.get_course_cohorts(course)}
         self.assertEqual(cohort_set, {"AutoGroup1", "AutoGroup2", "ManualCohort", "ManualCohort2"})
@@ -349,11 +328,7 @@ class TestCohorts(django.test.TestCase):
             lambda: cohorts.get_cohort_by_name(course.id, "CohortDoesNotExist")
         )
 
-        cohort = CourseUserGroup.objects.create(
-            name="MyCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        cohort = CohortFactory(course_id=course.id, name="MyCohort")
 
         self.assertEqual(cohorts.get_cohort_by_name(course.id, "MyCohort"), cohort)
 
@@ -368,11 +343,7 @@ class TestCohorts(django.test.TestCase):
         course.
         """
         course = modulestore().get_course(self.toy_course_key)
-        cohort = CourseUserGroup.objects.create(
-            name="MyCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        cohort = CohortFactory(course_id=course.id, name="MyCohort")
 
         self.assertEqual(cohorts.get_cohort_by_id(course.id, cohort.id), cohort)
 
@@ -406,20 +377,12 @@ class TestCohorts(django.test.TestCase):
         Make sure cohorts.add_user_to_cohort() properly adds a user to a cohort and
         handles errors.
         """
-        course_user = User.objects.create(username="Username", email="a@b.com")
-        User.objects.create(username="RandomUsername", email="b@b.com")
+        course_user = UserFactory(username="Username", email="a@b.com")
+        UserFactory(username="RandomUsername", email="b@b.com")
         course = modulestore().get_course(self.toy_course_key)
         CourseEnrollment.enroll(course_user, self.toy_course_key)
-        first_cohort = CourseUserGroup.objects.create(
-            name="FirstCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-        second_cohort = CourseUserGroup.objects.create(
-            name="SecondCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        first_cohort = CohortFactory(course_id=course.id, name="FirstCohort")
+        second_cohort = CohortFactory(course_id=course.id, name="SecondCohort")
 
         # Success cases
         # We shouldn't get back a previous cohort, since the user wasn't in one
@@ -452,17 +415,9 @@ class TestCohorts(django.test.TestCase):
         for a given course.
         """
         course = modulestore().get_course(self.toy_course_key)
-        user = User.objects.create(username="Username", email="a@b.com")
-        empty_cohort = CourseUserGroup.objects.create(
-            name="EmptyCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
-        nonempty_cohort = CourseUserGroup.objects.create(
-            name="NonemptyCohort",
-            course_id=course.id,
-            group_type=CourseUserGroup.COHORT
-        )
+        user = UserFactory(username="Username", email="a@b.com")
+        empty_cohort = CohortFactory(course_id=course.id, name="EmptyCohort")
+        nonempty_cohort = CohortFactory(course_id=course.id, name="NonemptyCohort")
         nonempty_cohort.users.add(user)
 
         cohorts.delete_empty_cohort(course.id, "EmptyCohort")
@@ -470,11 +425,7 @@ class TestCohorts(django.test.TestCase):
         # Make sure we cannot access the deleted cohort
         self.assertRaises(
             CourseUserGroup.DoesNotExist,
-            lambda: CourseUserGroup.objects.get(
-                course_id=course.id,
-                group_type=CourseUserGroup.COHORT,
-                id=empty_cohort.id
-            )
+            lambda: cohorts.get_cohort_by_id(course.id, empty_cohort.id)
         )
         self.assertRaises(
             ValueError,
