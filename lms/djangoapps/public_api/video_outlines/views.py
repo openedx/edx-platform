@@ -25,6 +25,7 @@ from opaque_keys.edx.locator import BlockUsageLocator
 
 from student.models import CourseEnrollment, User
 from courseware.model_data import FieldDataCache
+from courseware.access import has_access
 
 
 class BlockOutline(object):
@@ -83,10 +84,16 @@ class BlockOutline(object):
             )
             return unit_url, section_url
 
+        user = self.request.user
+        course_id = self.start_block.id
+
         while stack:
             curr_block = stack.pop()
 
             if curr_block.category in self.categories_to_outliner:
+                if not has_access(user, 'load', curr_block, course_key=course_id):
+                    continue
+
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(block))
                 unit_url, section_url = find_urls(block)
@@ -105,20 +112,13 @@ class BlockOutline(object):
 
 
 def video_summary(course, video_descriptor, request):
-    video_url = video_descriptor.html5_sources[0] if video_descriptor.html5_sources else video_descriptor.source
-    #track_url, transcript_language, sorted_languages = get_transcripts(video_descriptor)
-    #trans_url = video_descriptor.runtime.handler_url(video_descriptor, 'transcript', 'translation').rstrip('/?')
-    #transcripts = {
-    #    lang: request.build_absolute_uri(trans_url + '/' + lang)
-    #    for lang in sorted_languages
-    #}
-    transcripts = {
-        video_descriptor.transcript_language: video_descriptor
-    }
+    if video_descriptor.html5_sources:
+        video_url = video_descriptor.html5_sources[0]
+    else:
+        video_url = video_descriptor.source
 
-    # this will be in a different format, so should it be included?
-    # if track_url:
-    #     transcripts["download"] = request.build_absolute_uri(track_url)
+    usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
+
     return {
         "video_url": video_url,
         "video_thumbnail_url": None,
@@ -143,7 +143,7 @@ def video_summary(course, video_descriptor, request):
         },
         "language": video_descriptor.transcript_language,
         "category": video_descriptor.category,
-        "id": video_descriptor.scope_ids.usage_id._to_string()
+        "id": usage_id_str
     }
 
 
@@ -154,11 +154,9 @@ class VideoSummaryList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course = get_mobile_course(course_id)
-
         video_outline = BlockOutline(
             course, {"video": partial(video_summary, course)}, request
         )
-
         return Response(video_outline)
 
 
