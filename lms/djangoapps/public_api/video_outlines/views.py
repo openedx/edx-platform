@@ -8,6 +8,7 @@ general XBlock representation in this rather specialized formatting.
 """
 from functools import partial
 
+from django.core.cache import cache
 from django.http import HttpResponse
 
 from rest_framework import generics, permissions
@@ -30,11 +31,15 @@ from courseware.access import has_access
 
 class BlockOutline(object):
 
-    def __init__(self, start_block, categories_to_outliner, request):
-        """How to specify the kind of outline that'll be generated? Method?"""
+    def __init__(self, start_block, categories_to_outliner, request, local_cache):
+        """Create a BlockOutline using `start_block` as a starting point.
+
+        `local_cache`
+        """
         self.start_block = start_block
         self.categories_to_outliner = categories_to_outliner
         self.request = request # needed for making full URLS
+        self.local_cache = local_cache
 
     def __iter__(self):
         child_to_parent = {}
@@ -102,7 +107,7 @@ class BlockOutline(object):
                     "named_path": [b["name"] for b in block_path[:-1]],
                     "unit_url": unit_url,
                     "section_url": section_url,
-                    "summary": summary_fn(curr_block, self.request)
+                    "summary": summary_fn(curr_block, self.request, self.local_cache)
                 }
 
             if curr_block.has_children:
@@ -111,13 +116,20 @@ class BlockOutline(object):
                     child_to_parent[block] = curr_block
 
 
-def video_summary(course, video_descriptor, request):
+def video_summary(course, video_descriptor, request, local_cache):
     if video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
     else:
         video_url = video_descriptor.source
 
     usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
+    transcripts_langs_cache = local_cache['transcripts_langs']
+
+    if usage_id_str in transcripts_langs_cache:
+        transcript_langs = transcripts_langs_cache[usage_id_str]
+    else:
+        transcript_langs = video_descriptor.available_translations()
+        transcripts_langs_cache[usage_id_str] = transcript_langs
 
     return {
         "video_url": video_url,
@@ -139,7 +151,7 @@ def video_summary(course, video_descriptor, request):
                 },
                 request=request,
             )
-            for lang in video_descriptor.available_translations()
+            for lang in transcript_langs
         },
         "language": video_descriptor.transcript_language,
         "category": video_descriptor.category,
@@ -154,9 +166,23 @@ class VideoSummaryList(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
         course = get_mobile_course(course_id)
-        video_outline = BlockOutline(
-            course, {"video": partial(video_summary, course)}, request
+
+        transcripts_cache_key = "VideoSummaryList.trans.langs.v0.{}".format(course_id)
+        original_transcripts_langs_cache = cache.get(transcripts_cache_key, {})
+        local_cache = {'transcripts_langs': dict(original_transcripts_langs_cache)}
+
+        video_outline = list(
+            BlockOutline(
+                course,
+                {"video": partial(video_summary, course)},
+                request,
+                local_cache,
+            )
         )
+        # If we added any entries, renew the cache...
+        if local_cache['transcripts_langs'] != original_transcripts_langs_cache:
+            cache.set(transcripts_cache_key, local_cache['transcripts_langs'])
+
         return Response(video_outline)
 
 
