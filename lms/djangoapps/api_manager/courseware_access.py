@@ -180,10 +180,10 @@ def calculate_proforma_grade(grade_summary, grading_policy):
                 points_possible = points_possible + score.possible
         if points_possible:
             grade = points_earned / points_possible
-        section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
-        if section_policy is not None:
-            section_weight = section_policy['weight']
-            proforma_grade = proforma_grade + (section_weight * grade)
-            remaining_weight = remaining_weight - section_weight
+            section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
+            if section_policy is not None:
+                section_weight = section_policy['weight']
+                proforma_grade = proforma_grade + (section_weight * grade)
+                remaining_weight = remaining_weight - section_weight
     proforma_grade = proforma_grade + remaining_weight
     return proforma_grade
