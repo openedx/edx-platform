@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url, include
 from django.conf import settings
-
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 

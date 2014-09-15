@@ -31,15 +31,17 @@ from courseware.access import has_access
 
 class BlockOutline(object):
 
-    def __init__(self, start_block, categories_to_outliner, request, local_cache):
+    def __init__(self, course_id, start_block, categories_to_outliner, request, local_cache):
         """Create a BlockOutline using `start_block` as a starting point.
 
         `local_cache`
         """
         self.start_block = start_block
         self.categories_to_outliner = categories_to_outliner
+        self.course_id = course_id
         self.request = request # needed for making full URLS
         self.local_cache = local_cache
+
 
     def __iter__(self):
         child_to_parent = {}
@@ -90,13 +92,12 @@ class BlockOutline(object):
             return unit_url, section_url
 
         user = self.request.user
-        course_id = self.start_block.id
 
         while stack:
             curr_block = stack.pop()
 
             if curr_block.category in self.categories_to_outliner:
-                if not has_access(user, 'load', curr_block, course_key=course_id):
+                if not has_access(user, 'load', curr_block, course_key=self.course_id):
                     continue
 
                 summary_fn = self.categories_to_outliner[curr_block.category]
@@ -107,7 +108,7 @@ class BlockOutline(object):
                     "named_path": [b["name"] for b in block_path[:-1]],
                     "unit_url": unit_url,
                     "section_url": section_url,
-                    "summary": summary_fn(curr_block, self.request, self.local_cache)
+                    "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
                 }
 
             if curr_block.has_children:
@@ -116,7 +117,7 @@ class BlockOutline(object):
                     child_to_parent[block] = curr_block
 
 
-def video_summary(course, video_descriptor, request, local_cache):
+def video_summary(course, course_id, video_descriptor, request, local_cache):
     if video_descriptor.html5_sources:
         video_url = video_descriptor.html5_sources[0]
     else:
@@ -131,6 +132,8 @@ def video_summary(course, video_descriptor, request, local_cache):
         transcript_langs = video_descriptor.available_translations()
         transcripts_langs_cache[usage_id_str] = transcript_langs
 
+    # import pdb; pdb.set_trace()
+
     return {
         "video_url": video_url,
         "video_thumbnail_url": None,
@@ -141,11 +144,7 @@ def video_summary(course, video_descriptor, request, local_cache):
             lang: reverse(
                 'video-transcripts-detail',
                 kwargs={
-                    # This is horrible, terrible, no-good, very bad code, but it's
-                    # 12:15AM and I need to push something to the sandbox tonight.
-                    # Seriously, am I hashed or did key serialization behavior change
-                    # again?
-                    'course_id': course.id.to_deprecated_string().replace("/", "+"),
+                    'course_id': unicode(course_id),
                     'block_id': video_descriptor.scope_ids.usage_id.block_id,
                     'lang': lang
                 },
@@ -164,15 +163,16 @@ class VideoSummaryList(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
-        course_id = CourseKey.from_string("course-v1:" + kwargs['course_id'])
+        course_id = CourseKey.from_string(kwargs['course_id'])
         course = get_mobile_course(course_id)
 
-        transcripts_cache_key = "VideoSummaryList.trans.langs.v0.{}".format(course_id)
+        transcripts_cache_key = "VideoSummaryList.transcripts.langs.{}".format(course_id)
         original_transcripts_langs_cache = cache.get(transcripts_cache_key, {})
         local_cache = {'transcripts_langs': dict(original_transcripts_langs_cache)}
 
         video_outline = list(
             BlockOutline(
+                course_id,
                 course,
                 {"video": partial(video_summary, course)},
                 request,
@@ -191,7 +191,7 @@ class VideoTranscripts(generics.RetrieveAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        course_key = CourseKey.from_string("course-v1:" + kwargs['course_id'])
+        course_key = CourseKey.from_string(kwargs['course_id'])
         block_id = kwargs['block_id']
         lang = kwargs['lang']
 
