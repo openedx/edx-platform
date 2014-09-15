@@ -32,11 +32,7 @@ class CouponDoesNotExistException(InvalidCartItem):
     pass
 
 
-class CouponAlreadyExistException(InvalidCartItem):
-    pass
-
-
-class ItemDoesNotExistAgainstCouponException(InvalidCartItem):
+class MultipleCouponsNotAllowedException(InvalidCartItem):
     pass
 
 
