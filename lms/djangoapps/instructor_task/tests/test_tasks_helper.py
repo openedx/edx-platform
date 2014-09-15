@@ -48,10 +48,8 @@ class TestInstructorGradeReport(TestCase):
         """
         Test that students with unicode characters in emails is handled.
         """
-        i = 0
-        for email in emails:
+        for i, email in enumerate(emails):
             self.create_student('student{0}'.format(i), email)
-            i += 1
 
         self.current_task = Mock()
         self.current_task.update_state = Mock()
