@@ -67,7 +67,7 @@ def i_add_a_section(step):
     add_section()
 
 
-@step(u'I press the "section" delete icon')
+@step(u'I press the section delete icon')
 def i_press_the_section_delete_icon(step):
     delete_locator = 'section .outline-section > .section-header a.delete-button'
     world.css_click(delete_locator)

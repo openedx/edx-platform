@@ -30,6 +30,12 @@ Feature: CMS.Problem Editor
     Then I can revert the display name to unset
     And my display name is unset on save
 
+  Scenario: User can specify html in display name and it will be escaped
+    Given I have created a Blank Common Problem
+    When I edit and select Settings
+    Then I can specify html in the display name and save
+    And the problem display name is "<script>alert('test')</script>"
+
   # IE will not click the revert button properly
   @skip_internetexplorer
   Scenario: User can select values in a Select
