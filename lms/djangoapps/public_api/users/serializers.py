@@ -8,14 +8,10 @@ from student.models import CourseEnrollment, User
 
 
 class CourseField(serializers.RelatedField):
-    """Custom field to wrap a CourseModule object. Read-only.
-
-    To invoke this from a model, you have to add a property to the model (say
-    `course`) that returns an instance of the appropriate `CourseModule` object.
-    """
+    """Custom field to wrap a CourseDescriptor object. Read-only."""
 
     def to_native(self, course):
-        course_id = course.id._to_string()
+        course_id = unicode(course.id)
         request = self.context.get('request', None)
         if request:
             video_outline_url = reverse(

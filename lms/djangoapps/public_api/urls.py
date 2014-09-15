@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url, include
 from rest_framework import routers
 
-from users.views import my_user_info, password_reset
+from users.views import my_user_info
 
 # Additionally, we include login URLs for the browseable API.
 urlpatterns = patterns('',
