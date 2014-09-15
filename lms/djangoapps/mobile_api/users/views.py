@@ -11,6 +11,7 @@ from student.forms import PasswordResetFormNoActive
 from student.models import CourseEnrollment, User
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
+from mobile_api import mobile_course_enrollments
 
 
 class IsUser(permissions.BasePermission):
@@ -46,8 +47,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         qset = self.queryset.filter(
             user__username=self.kwargs['username'], is_active=True
         ).order_by('created')
-        # return the courses that are enabled for mobile
-        return (ce for ce in qset if ce.course.mobile_available)
+        return mobile_course_enrollments(qset, self.request.user)
 
     def get(self, request, *args, **kwargs):
         if request.user.username != kwargs['username']:
