@@ -1817,7 +1817,6 @@ class CoursesApiTests(TestCase):
             response = self.do_post(completion_uri, completions_data)
             self.assertEqual(response.status_code, 201)
 
-
         # get course metrics
         course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_course_id)
         response = self.do_get(course_metrics_uri)
@@ -1825,6 +1824,9 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
         self.assertEqual(response.data['users_started'], 1)
         self.assertIsNotNone(response.data['grade_cutoffs'])
+        # TODO: (mattdrayer) Uncomment after comment service has been updated
+        # self.assertEqual(response.data['num_threads'], 5)
+        # self.assertEqual(response.data['num_active_threads'], 3)
 
         # get course metrics by organization
         course_metrics_uri = '{}/{}/metrics/?organization={}'.format(self.base_courses_uri, self.test_course_id, org_id)
