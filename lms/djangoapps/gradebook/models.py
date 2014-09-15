@@ -78,7 +78,7 @@ class StudentGradebook(TimeStampedModel):
 
             # Calculate the class average
             course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
-            if gradebook_user_count < total_user_count:
+            if course_avg is not None and gradebook_user_count < total_user_count:
                 # Take into account any ungraded students (assumes zeros for grades...)
                 course_avg = course_avg / total_user_count * gradebook_user_count
 
