@@ -56,52 +56,64 @@ class StudentGradebook(TimeStampedModel):
         have not yet submitted a response to a scored assessment which means no grade has been calculated.
         """
         data = {}
-        total_user_count = CourseEnrollment.users_enrolled_in(course_key).count()
-        queryset = StudentGradebook.objects.select_related('user')\
-            .filter(course_id__exact=course_key, user__is_active=True)
-        gradebook_user_count = len(queryset)
+        data['course_avg'] = 0
+        data['course_max'] = 0
+        data['course_min'] = 0
+        data['course_count'] = 0
+        data['queryset'] = []
 
-        if exclude_users:
-            total_user_count = total_user_count - len(exclude_users)
-            queryset = queryset.exclude(user__in=exclude_users)
+        total_user_count = CourseEnrollment.users_enrolled_in(course_key).count()
+        if total_user_count:
+
+            # Generate the base data set we're going to work with
+            queryset = StudentGradebook.objects.select_related('user')\
+                .filter(course_id__exact=course_key, user__is_active=True)
             gradebook_user_count = len(queryset)
 
-        # Calculate the class average
-        course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
-        if gradebook_user_count < total_user_count:
-            # Take into account any ungraded students (assumes zeros for grades...)
-            course_avg = course_avg / total_user_count * gradebook_user_count
-        data['course_avg'] = course_avg
-        data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
-        data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
-        data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
+            # Remove any users who should not be considered for the statistics
+            if exclude_users:
+                total_user_count = total_user_count - len(exclude_users)
+                queryset = queryset.exclude(user__in=exclude_users)
+                gradebook_user_count = len(queryset)
 
-        # Construct the leaderboard as a queryset
-        data['queryset'] = queryset.values(
-            'user__id',
-            'user__username',
-            'user__profile__title',
-            'user__profile__avatar_url',
-            'grade',
-            'created')\
-            .order_by('-grade', 'created')[:count]
+            # Calculate the class average
+            course_avg = queryset.aggregate(Avg('grade'))['grade__avg']
+            if gradebook_user_count < total_user_count:
+                # Take into account any ungraded students (assumes zeros for grades...)
+                course_avg = course_avg / total_user_count * gradebook_user_count
 
-        # If a user_id value was provided, we need to provide some additional user-specific data to the caller
-        if user_id:
-            user_grade = 0
-            user_time_scored = timezone.now()
-            try:
-                user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
-            except StudentGradebook.DoesNotExist:
-                user_queryset = None
-            if user_queryset:
-                user_grade = user_queryset.grade
-                user_time_scored = user_queryset.created
-            users_above = queryset.filter(grade__gte=user_grade)\
-                .exclude(user__id=user_id)\
-                .exclude(grade=user_grade, created__lt=user_time_scored)
-            data['user_position'] = len(users_above) + 1
-            data['user_grade'] = user_grade
+            # Fill up the response container
+            data['course_avg'] = course_avg
+            data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
+            data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
+            data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
+
+            # Construct the leaderboard as a queryset
+            data['queryset'] = queryset.values(
+                'user__id',
+                'user__username',
+                'user__profile__title',
+                'user__profile__avatar_url',
+                'grade',
+                'created')\
+                .order_by('-grade', 'created')[:count]
+
+            # If a user_id value was provided, we need to provide some additional user-specific data to the caller
+            if user_id:
+                user_grade = 0
+                user_time_scored = timezone.now()
+                try:
+                    user_queryset = StudentGradebook.objects.get(course_id__exact=course_key, user__id=user_id)
+                except StudentGradebook.DoesNotExist:
+                    user_queryset = None
+                if user_queryset:
+                    user_grade = user_queryset.grade
+                    user_time_scored = user_queryset.created
+                users_above = queryset.filter(grade__gte=user_grade)\
+                    .exclude(user__id=user_id)\
+                    .exclude(grade=user_grade, created__lt=user_time_scored)
+                data['user_position'] = len(users_above) + 1
+                data['user_grade'] = user_grade
 
         return data
 
