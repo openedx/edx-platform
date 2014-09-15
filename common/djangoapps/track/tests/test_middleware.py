@@ -92,6 +92,11 @@ class TrackMiddlewareTestCase(TestCase):
         expected_context_subset = {
             'course_id': 'test_org/test_course/test_run',
             'org_id': 'test_org',
+            'course_key': {
+                'org': 'test_org',
+                'course': 'test_course',
+                'run': 'test_run'
+            }
         }
         self.assert_dict_subset(captured_context, expected_context_subset)
 

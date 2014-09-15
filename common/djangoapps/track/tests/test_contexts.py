@@ -7,18 +7,26 @@ from track import contexts
 
 class TestContexts(TestCase):
 
-    COURSE_ID = 'test/course_name/course_run'
     ORG_ID = 'test'
+    COURSE = 'course_name'
+    RUN = 'course_run'
+    COURSE_ID = '/'.join((ORG_ID, COURSE, RUN))
+    COURSE_KEY = 'course-v1:' + '+'.join((ORG_ID, COURSE, RUN))
 
     def test_course_id_from_url(self):
         self.assert_parses_course_id_from_url('http://foo.bar.com/courses/{course_id}/more/stuff')
 
-    def assert_parses_course_id_from_url(self, format_string):
+    def assert_parses_course_id_from_url(self, format_string, course_id=COURSE_ID):
         self.assertEquals(
-            contexts.course_context_from_url(format_string.format(course_id=self.COURSE_ID)),
+            contexts.course_context_from_url(format_string.format(course_id=course_id)),
             {
-                'course_id': self.COURSE_ID,
-                'org_id': self.ORG_ID
+                'course_id': course_id,
+                'org_id': self.ORG_ID,
+                'course_key': {
+                    'org': self.ORG_ID,
+                    'course': self.COURSE,
+                    'run': self.RUN
+                },
             }
         )
 
@@ -42,3 +50,9 @@ class TestContexts(TestCase):
 
     def test_no_url(self):
         self.assert_empty_context_for_url(None)
+
+    def test_course_v1(self):
+        self.assert_parses_course_id_from_url('http://foo.bar.com/courses/{course_id}/other/stuff', course_id=self.COURSE_KEY)
+
+    def test_course_v1_later_in_url(self):
+        self.assert_parses_course_id_from_url('http://foo.bar.com/x/y/z/courses/{course_id}/other/stuff', course_id=self.COURSE_KEY)

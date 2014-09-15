@@ -54,6 +54,11 @@ class TestTrackViews(TestCase):
             'context': {
                 'course_id': 'foo/bar/baz',
                 'org_id': 'foo',
+                'course_key': {
+                    'org': 'foo',
+                    'course': 'bar',
+                    'run': 'baz'
+                }
             },
         }
         self.mock_tracker.send.assert_called_once_with(expected_event)
@@ -85,6 +90,11 @@ class TestTrackViews(TestCase):
                     'course_id': 'foo/bar/baz',
                     'org_id': 'foo',
                     'user_id': '',
+                    'course_key': {
+                        'org': 'foo',
+                        'course': 'bar',
+                        'run': 'baz'
+                    },
                     'path': u'/event'
                 },
             }
@@ -136,6 +146,11 @@ class TestTrackViews(TestCase):
                     'user_id': '',
                     'course_id': u'foo/bar/baz',
                     'org_id': 'foo',
+                    'course_key': {
+                        'org': 'foo',
+                        'course': 'bar',
+                        'run': 'baz'
+                    },
                     'path': u'/courses/foo/bar/baz/xmod/'
                 },
             }
@@ -169,6 +184,11 @@ class TestTrackViews(TestCase):
                     'user_id': '',
                     'course_id': u'foo/bar/baz',
                     'org_id': 'foo',
+                    'course_key': {
+                        'org': 'foo',
+                        'course': 'bar',
+                        'run': 'baz'
+                    },
                     'path': u'/courses/foo/bar/baz/xmod/'
                 },
             }
