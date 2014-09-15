@@ -286,6 +286,7 @@ class ProctorModule(ProctorFields, XModule):
                 status.append(dict(location=e.student_module.module_state_key,
                                    attempt=state['attempts'],
                                    created=str(e.created),
+                                   submission_time=state['last_submission_time'],
                                    grade=e.grade,
                                    max_grade=e.max_grade,
                                    answers=state['student_answers']))

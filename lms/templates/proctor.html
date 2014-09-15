@@ -48,6 +48,35 @@
   </div>
 </section>
 
+<script id="sub_history_tmpl" type="text/x-handlebars-template">
+<h3>Submission history for <b>{{ user }}</b>:</h3>
+<p><b>NOTE</b>: Clicking a row shows/hides the student's answers for that attempt.
+
+<input class="check Check" type="button" onclick="$('.sh_tr_answers').show();" value="${_("Show All")}"/><input class="check Check" type="button" onclick="$('.sh_tr_answers').hide();" value="${_("Hide All")}"/>
+<table border="1" id="submission_history_table_${element_id}">
+<tr>
+<th style='width:70px'>Attempt</th>
+<th>Location</th>
+<th style='width:50px'>Score</th>
+</tr>
+{{#each history_entries}}
+<tr>
+  <td colspan=3>Submissions on {{ @key }}</td>
+</tr>
+{{#this}}
+<tr onclick='$("#sh_tr_{{id}}").toggle();' class="sh_tr" grade={{grade}} max_grade={{max_grade}}>
+  <td>{{ attempt }}</td>
+  <td>{{ location }}</td>
+  <td>{{ grade }}/{{ max_grade }}</td>
+</tr>
+<tr id="sh_tr_{{id}}" class="sh_tr_answers" grade={{grade}} max_grade={{max_grade}}>
+  <td colspan=3><b>Submitted</b>: {{ submission_time }}<br><b>Answers</b>:<ol>{{#each answers}}<li>{{this}}</li>{{/each}}</ol></td>
+</tr>
+{{/this}}
+{{/each}}
+</table></p>
+</script>
+
 <script type="text/javascript">
 proctor_override = function(){
     var data = {enabled: "${not staff_release}"};
@@ -112,11 +141,47 @@ hist_success = function(data) {
     var msg = '';
     if ('error' in data) {
         msg = "ERROR: " + data['error'];
+        text_el.html(msg);
     } else {
-        var uname = uname_el.val();
-        msg = "Submission history for " + uname + ":\n" + JSON.stringify(data, undefined, 2);
+        var group_by_date = function(el) {
+            return $.datepicker.formatDate('yy-mm-dd', el.submission_time);
+        }
+        var format_history_entries = function(el) {
+            //el.answers = JSON.stringify(el.answers, undefined, 2);
+            el.answers = _.map(_.sortBy(_.pairs(el.answers), function(el) {
+                return el[0];
+            }), function(el) { return el[1]; });
+            el.submission_time = new Date(el.submission_time);
+            $(el).uniqueId();
+            return el;
+        }
+        var colorize = function(index, el){
+            var el = $(el);
+            var grade = el.attr('grade');
+            var max_grade = el.attr('max_grade');
+            if (grade != max_grade) {
+                el.css('background-color', '#FFD5D1');
+            } else {
+                el.css('background-color', '#CCFFCC');
+            }
+        };
+        var history_entries = _.map(data, format_history_entries);
+        var history_entries = _.groupBy(data, group_by_date);
+        var ctx = {
+          user: uname_el.val(),
+          history_entries: history_entries,
+        }
+        var raw_template = $('#sub_history_tmpl').html();
+        var template = Handlebars.compile(raw_template);
+        text_el.html(template(ctx));
+        var tbl = $("#submission_history_table_${element_id}");
+        tbl.width(tbl.width() + 20);
+        var trs = $(".sh_tr");
+        trs.each(colorize);
+        var tr_answers = $(".sh_tr_answers");
+        tr_answers.each(colorize);
+        tr_answers.toggle();
     }
-    text_el.html(msg);
 }
 
 setup_form('${ajax_url}/submission_history',
