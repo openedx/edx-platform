@@ -496,7 +496,7 @@ function (VideoPlayer) {
                     state.speed = '2.0';
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate)
-                        .toHaveBeenCalledWith('2.0');
+                        .toHaveBeenCalledWith('2.0', true);
                     state.videoPlayer.onPlay();
                     expect(state.videoPlayer.setPlaybackRate.calls.length)
                         .toEqual(1);
