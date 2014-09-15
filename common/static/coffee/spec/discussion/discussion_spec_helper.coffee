@@ -109,6 +109,7 @@ browser and pasting the output.  When that file changes, this one should be rege
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="Update post">
     <a href="#" class="post-cancel">Cancel</a>
+  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
