@@ -187,6 +187,11 @@ class CoursesApiTests(TestCase):
             display_name=u"test unit 2",
         )
 
+        self.empty_course = CourseFactory.create(
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2015, 1, 16),
+            org="MTD"
+        )
 
         self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(USER_COUNT)]
 
@@ -1630,6 +1635,13 @@ class CoursesApiTests(TestCase):
         response = self.do_get(bogus_test_uri)
         self.assertEqual(response.status_code, 404)
 
+    def test_courses_metrics_grades_leaders_list_get_empty_course(self):
+        test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, unicode(self.empty_course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['course_avg'], 0)
+        self.assertEqual(len(response.data['leaders']), 0)
+
     def test_courses_completions_leaders_list_get(self):
         completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
         # Make last user as observer to make sure that data is being filtered out
@@ -1722,6 +1734,14 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['grades']), user_index)
 
+    def test_courses_metrics_grades_list_get_empty_course(self):
+        # Retrieve the list of grades for this course
+        # All the course/item/user scaffolding was handled in Setup
+        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, unicode(self.empty_course.id))
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['grade_count'], 0)
+        self.assertEqual(response.data['course_grade_maximum'], 0)
 
     def test_courses_grades_list_get_invalid_course(self):
         # Retrieve the list of grades for this course
