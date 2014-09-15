@@ -21,6 +21,8 @@
                     <%- gettext('Student ID or Email Address of Students to be added (one per line or comma-separated)') %>
                 </label>
 
+                <div class="cohort-messages"></div>
+
                 <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students"
                           class="input cohort-management-group-add-students"
                           placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"></textarea>
