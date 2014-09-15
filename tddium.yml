@@ -30,7 +30,7 @@ tddium:
   :test_pattern: 'none'
   :tests:
     - :type: custom
-      :command: paver run_quality
+      :command: paver run_quality && bash ./scripts/post_quality_build.sh
       :invocation: single
       :output: exit-status
       :report_files:
