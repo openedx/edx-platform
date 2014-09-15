@@ -123,7 +123,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:58-0400\n"
+"POT-Creation-Date: 2014-09-15 09:20-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -476,12 +476,12 @@ msgid "You are missing one or more required fields"
 msgstr "No ha llenado uno o más campos requeridos"
 
 #: common/djangoapps/student/views.py
-msgid "Username cannot be more than {0} characters long"
-msgstr "El nombre de usuario no puede tener más de {0} caracteres"
+msgid "Username cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
-msgid "Email cannot be more than {0} characters long"
-msgstr "El correo electrónico no puede tener más de {0} caracteres"
+msgid "Email cannot be more than {num} characters long"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail is required."
@@ -3188,12 +3188,12 @@ msgstr "Esta configuración actualmente no está soportada"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the secret string for annotation storage. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this string."
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
 msgstr ""
-"Ingrese la cadena de texto secreta para el almacenamiento de anotaciones. "
-"Los módulos avanzados de textannotation, videoannotation, y imageannotation "
-"requieren de esta información."
+"Ingrese la ubicación del servidor de anotaciones. Esta configuración es "
+"requerida por los módulos de textannotation, videoannotation, y "
+"imageannotation."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "URL for Annotation Storage"
@@ -3201,12 +3201,12 @@ msgstr "URL para el almacenamiento de anotaciones."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
-"Enter the location of the annotation storage server. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this setting."
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
 msgstr ""
-"Ingrese la ubicación del servidor de anotaciones. Esta configuración es "
-"requerida por los módulos de textannotation, videoannotation, y "
-"imageannotation."
+"Ingrese la cadena de texto secreta para el almacenamiento de anotaciones. "
+"Los módulos avanzados de textannotation, videoannotation, y imageannotation "
+"requieren de esta información."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -4492,12 +4492,10 @@ msgstr "el cupón con el id ({coupon_id}) fue actualizado exitósamente"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
-"To gain insights into student enrollment and participation, "
-"{link_start}visit the new dashboard for course analytics{link_end}."
+"To gain insights into student enrollment and participation {link_start}visit"
+" {analytics_dashboard_name}, our new dashboard for course "
+"analytics{link_end}."
 msgstr ""
-"Para comprender mas sobre las inscripciones y participación de los "
-"estudiatnes {link_start}visite en nuevo panel de analiticas del "
-"curso{link_end}."
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
@@ -6445,6 +6443,7 @@ msgstr "Está a punto de borrar un artículo. Favor confirmar."
 #: lms/templates/wiki/edit.html cms/templates/component.html
 #: cms/templates/container.html cms/templates/studio_xblock_wrapper.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/wiki/includes/article_menu.html
 msgid "Edit"
 msgstr "Editar"
@@ -6881,21 +6880,6 @@ msgstr "Ubicación de curso erronea"
 msgid "Missing branch on fresh clone"
 msgstr "No se encuentra la rama en el nuevo clon"
 
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command was: {0!r}. Working directory was: {1!r}"
-msgstr "El comando usado fue: {0!r}. El directorio de trabajo es: {1!r}"
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid "Command output was: {0!r}"
-msgstr "La salida del comando fue: {0!r}"
-
-#: cms/djangoapps/contentstore/git_export_utils.py
-msgid ""
-"Directory already exists, doing a git reset and pull instead of git clone."
-msgstr ""
-"El directorio ya existe, se realizara un reset y una petición o git pull en "
-"lugar de una clonación o git clone."
-
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mis Anotaciones"
@@ -7242,8 +7226,8 @@ msgstr "Visite su {link_start}Panel de control{link_end} para ver sus cursos."
 msgid "Terms of Service"
 msgstr "Términos del servicio"
 
-#: cms/templates/widgets/footer.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
@@ -7506,12 +7490,12 @@ msgstr "Visión"
 msgid "Faq"
 msgstr "Preguntas frecuentes"
 
-#: lms/templates/contact.html lms/templates/original_edx_footer.html
+#: lms/templates/contact.html lms/templates/footer-edx.html
 msgid "Press"
 msgstr "Prensa"
 
-#: lms/templates/contact.html lms/templates/edx_footer.html
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: lms/templates/contact.html lms/templates/footer-edx-new.html
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/contact.html
 #: lms/templates/static_templates/contact.html
 msgid "Contact"
@@ -7806,91 +7790,6 @@ msgstr "Borrar su inscripción"
 msgid "View Unit in Studio"
 msgstr "Ver la Unidad en Studio"
 
-#: lms/templates/edx_footer.html
-msgid ""
-"{EdX} offers interactive online classes and MOOCs from the world's best "
-"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
-" many other universities. Topics include biology, business, chemistry, "
-"computer science, economics, finance, electronics, engineering, food and "
-"nutrition, history, humanities, law, literature, math, medicine, music, "
-"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
-"online initiative created by founding partners {Harvard} and {MIT}."
-msgstr ""
-"{EdX} ofrece clases y MOOCs interactivos en línea de las mejores "
-"universidades del mundo como {MITx}, {HarvardX}, {BerkeleyX}, {UTx} y muchas"
-" otras. Los temas incluyen la biología, negocios, química, ciencias de la "
-"computación, economía, finanzas, electrónica, ingeniería, alimentación y "
-"nutrición, historia, humanidades, derecho, literatura, matemáticas, "
-"medicina, música, filosofía, física, ciencia, estadísticas y mucho más. "
-"{EdX} es una iniciativa en línea sin fines de lucro creado por los socios "
-"fundadores {Harvard} y {MIT}."
-
-#. Translators: The © symbol appears directly before this line.
-#: lms/templates/edx_footer.html
-msgid "2014 edX, except where noted, all rights reserved."
-msgstr "2014 edX, excepto donde se observa, todos los derechos reservados."
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-msgid "Terms of Service and Honor Code"
-msgstr "Términos del Servicio y Código de Honor"
-
-#: lms/templates/edx_footer.html
-msgid "About & Company Info"
-msgstr "Acerca de & Info de Compañía"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-msgid "About"
-msgstr "Acerca de"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-msgid "News"
-msgstr "Noticias"
-
-#: lms/templates/edx_footer.html lms/templates/footer.html
-#: lms/templates/original_edx_footer.html
-#: lms/templates/static_templates/faq.html
-#: lms/templates/static_templates/faq.html
-msgid "FAQ"
-msgstr "Preguntas Frecuentes"
-
-#: lms/templates/edx_footer.html
-msgid "edX Blog"
-msgstr "Blog edX"
-
-#: lms/templates/edx_footer.html
-msgid "Donate to edX"
-msgstr "Donar a edX"
-
-#: lms/templates/edx_footer.html
-msgid "Jobs at edX"
-msgstr "Trabajos en edX"
-
-#: lms/templates/edx_footer.html
-msgid "Follow Us"
-msgstr "Síguenos"
-
-#: lms/templates/edx_footer.html
-msgid "Twitter"
-msgstr "Twitter"
-
-#: lms/templates/edx_footer.html
-msgid "Facebook"
-msgstr "Facebook"
-
-#: lms/templates/edx_footer.html
-msgid "Meetup"
-msgstr "Meetup"
-
-#: lms/templates/edx_footer.html
-msgid "LinkedIn"
-msgstr "LinkedIn"
-
-#: lms/templates/edx_footer.html
-msgid "Google+"
-msgstr "Google+"
-
 #: lms/templates/email_change_failed.html lms/templates/email_exists.html
 msgid "E-mail change failed"
 msgstr "El cambio de su correo electrónico falló."
@@ -7990,11 +7889,121 @@ msgstr "Tablero de puntuación para acertijos"
 msgid "User"
 msgstr "Usuario"
 
-#: lms/templates/footer.html lms/templates/original_edx_footer.html
+#: lms/templates/footer-edx-new.html
+msgid "About edX"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid ""
+"{EdX} offers interactive online classes and MOOCs from the world's best "
+"universities. Online courses from {MITx}, {HarvardX}, {BerkeleyX}, {UTx} and"
+" many other universities. Topics include biology, business, chemistry, "
+"computer science, economics, finance, electronics, engineering, food and "
+"nutrition, history, humanities, law, literature, math, medicine, music, "
+"philosophy, physics, science, statistics and more. {EdX} is a non-profit "
+"online initiative created by founding partners {Harvard} and {MIT}."
+msgstr ""
+"{EdX} ofrece clases y MOOCs interactivos en línea de las mejores "
+"universidades del mundo como {MITx}, {HarvardX}, {BerkeleyX}, {UTx} y muchas"
+" otras. Los temas incluyen la biología, negocios, química, ciencias de la "
+"computación, economía, finanzas, electrónica, ingeniería, alimentación y "
+"nutrición, historia, humanidades, derecho, literatura, matemáticas, "
+"medicina, música, filosofía, física, ciencia, estadísticas y mucho más. "
+"{EdX} es una iniciativa en línea sin fines de lucro creado por los socios "
+"fundadores {Harvard} y {MIT}."
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+msgid "&copy; 2014 edX, some rights reserved."
+msgstr "&copy; 2014 edX, Algunos derechos reservados."
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "Terms of Service and Honor Code"
+msgstr "Términos del Servicio y Código de Honor"
+
+#: lms/templates/footer-edx-new.html
+msgid "(Revised 4/16/2014)"
+msgstr ""
+
+#: lms/templates/footer-edx-new.html
+msgid "About & Company Info"
+msgstr "Acerca de & Info de Compañía"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html
+msgid "About"
+msgstr "Acerca de"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+msgid "News"
+msgstr "Noticias"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx.html
+#: lms/templates/footer.html lms/templates/static_templates/faq.html
+#: lms/templates/static_templates/faq.html
+msgid "FAQ"
+msgstr "Preguntas Frecuentes"
+
+#: lms/templates/footer-edx-new.html
+msgid "edX Blog"
+msgstr "Blog edX"
+
+#: lms/templates/footer-edx-new.html
+msgid "Donate to edX"
+msgstr "Donar a edX"
+
+#: lms/templates/footer-edx-new.html
+msgid "Jobs at edX"
+msgstr "Trabajos en edX"
+
+#: lms/templates/footer-edx-new.html
+msgid "Follow Us"
+msgstr "Síguenos"
+
+#: lms/templates/footer-edx-new.html
+msgid "Twitter"
+msgstr "Twitter"
+
+#: lms/templates/footer-edx-new.html
+msgid "Facebook"
+msgstr "Facebook"
+
+#: lms/templates/footer-edx-new.html
+msgid "Meetup"
+msgstr "Meetup"
+
+#: lms/templates/footer-edx-new.html
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#: lms/templates/footer-edx-new.html
+msgid "Google+"
+msgstr "Google+"
+
+#: lms/templates/footer-edx.html lms/templates/footer.html
 #: lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "Trabajos"
+
+#: lms/templates/footer-edx.html
+msgid "edX Logo"
+msgstr "Logo de edX"
+
+#: lms/templates/footer-edx.html
+msgid ""
+"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
+" mission is to bring the best of higher education to students of all ages "
+"anywhere in the world, wherever there is Internet access. {EdX}'s free "
+"online MOOCs are interactive and subjects include computer science, public "
+"health, and artificial intelligence."
+msgstr ""
+"{EdX} es un proyecto sin animo de lucro creado por los fundadores asociados "
+"{Harvard} y {MIT} cuya misión es llevar lo mejor de la educación superior a "
+"estudiantes de todas las edades en cualquier parte del mundo a través de "
+"Internet. Los cursos en línea masivos de {EdX} son interactivos y sus temas "
+"incluyen ciencias de la computación, salud pública e inteligencia "
+"artificial."
 
 #: lms/templates/footer.html
 msgid "&copy; 2014 {platform_name}, some rights reserved"
@@ -8513,29 +8522,6 @@ msgstr ""
 #: lms/templates/videoannotation.html
 msgid "You do not have any notes."
 msgstr "Usted no tiene ninguna anotación."
-
-#: lms/templates/original_edx_footer.html
-msgid "edX Logo"
-msgstr "Logo de edX"
-
-#: lms/templates/original_edx_footer.html
-msgid ""
-"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
-" mission is to bring the best of higher education to students of all ages "
-"anywhere in the world, wherever there is Internet access. {EdX}'s free "
-"online MOOCs are interactive and subjects include computer science, public "
-"health, and artificial intelligence."
-msgstr ""
-"{EdX} es un proyecto sin animo de lucro creado por los fundadores asociados "
-"{Harvard} y {MIT} cuya misión es llevar lo mejor de la educación superior a "
-"estudiantes de todas las edades en cualquier parte del mundo a través de "
-"Internet. Los cursos en línea masivos de {EdX} son interactivos y sus temas "
-"incluyen ciencias de la computación, salud pública e inteligencia "
-"artificial."
-
-#: lms/templates/original_edx_footer.html
-msgid "&copy; 2014 edX, some rights reserved."
-msgstr "&copy; 2014 edX, Algunos derechos reservados."
 
 #: lms/templates/original_navigation.html
 #: lms/templates/sysadmin_dashboard.html
@@ -10524,10 +10510,6 @@ msgid "Course Starts - {start_date}"
 msgstr "Inicio del curso - {start_date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Document your accomplishment!"
-msgstr "Documente sus logros!"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
 msgstr "Plantee un desafío personal!"
 
@@ -11746,6 +11728,7 @@ msgstr "Omitir"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Add Coupon"
 msgstr "Añadir cupón"
 
@@ -11969,12 +11952,38 @@ msgstr ""
 "los vínculos expirarán en un tiempo de 5 minutos."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate Registration Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Generate Registration Codes"
+msgstr "Generar códigos de registro"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Course Registrations Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download Registration Codes"
 msgstr "Descargar códigos de registro"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Active Course Registrations Codes:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Active Registration Codes"
 msgstr "Activar códigos de registro"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Click to generate a CSV file of all Spent Course Registrations Codes:"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Spent Registration Codes"
@@ -11988,6 +11997,11 @@ msgstr "Precio del curso"
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Course Price: "
 msgstr "Precio del curso:"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Set Price"
+msgstr "Definir precio"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Transactions"
@@ -12053,16 +12067,24 @@ msgid "Coupons Information"
 msgstr "Información del cupón"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "+ Add Coupon"
-msgstr "+ Añadir cupón"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
 msgstr "Descuento (%)"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Count"
 msgstr "Cantidad"
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{code}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{description}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{discount}"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Invoice number should not be empty."
@@ -12108,6 +12130,10 @@ msgstr "Actualizar cupón"
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Update Coupon Information"
 msgstr "Actualizar la información del cupón"
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "example: A123DS"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
 msgid "Individual due date extensions"
@@ -12207,11 +12233,6 @@ msgstr "Reiniciar la fecha límite para un estudiante"
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Generate Registration Code Modal"
 msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Generate Registration Codes"
-msgstr "Generar códigos de registro"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Please enter the details below"
@@ -12737,10 +12758,6 @@ msgstr "Definir el precio para la modalidad del curso"
 msgid "Please enter Course Mode detail below"
 msgstr ""
 "Por favor ingrese los detalles de la modalidad del curso a continuación"
-
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Set Price"
-msgstr "Definir precio"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Gradebook"

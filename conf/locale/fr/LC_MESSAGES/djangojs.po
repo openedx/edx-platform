@@ -61,6 +61,7 @@
 # 
 # Translators:
 # Françoise Docq, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -75,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"POT-Creation-Date: 2014-09-15 09:18-0400\n"
 "PO-Revision-Date: 2014-09-02 12:50+0000\n"
 "Last-Translator: laurentFUN <laurent.at.fun@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -1789,70 +1790,96 @@ msgstr "…"
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "currently %(numVotes)s vote"
 msgid_plural "currently %(numVotes)s votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "pour le moment %(numVotes)s vote"
+msgstr[1] "pour le moment %(numVotes)s votes"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "%(numVotes)s Vote"
 msgid_plural "%(numVotes)s Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(numVotes)s Vote"
+msgstr[1] "%(numVotes)s votes"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour vous abonner à ce fil de discussion. "
+"Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble unsubscribing you from this thread. Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour vous désabonner de ce fil de "
+"discussion. Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble marking this response as an answer.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour traiter cette contribution comme une "
+"réponse. Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing this response as an answer.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour supprimer cette contribution en tant "
+"que réponse. Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble marking this response endorsed.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour approuver cette réponse. Veuillez "
+"essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble removing this endorsement.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour supprimer cette approbation. Veuillez "
+"essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble saving your vote.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour enregistrer votre vote. Veuillez "
+"essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble pinning this thread. Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour épingler ce fil. Veuillez essayer à "
+"nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble unpinning this thread. Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour supprimer l'épingle de ce fil. "
+"Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing your flag on this post.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour enlever votre drapeau sur ce message. "
+"Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble reporting this post.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour signaler le problème de ce message. "
+"Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble closing this thread.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour fermer ce fil de discussion. Veuillez "
+"essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js
 msgid "We had some trouble reopening this thread.  Please try again."
 msgstr ""
+"Nous avons eu quelques problèmes pour ré-ouvrir ce fil de discussion. "
+"Veuillez essayer à nouveau."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 msgid "Load more"
@@ -1920,8 +1947,8 @@ msgstr ""
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s other response"
 msgid_plural "%(numResponses)s other responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(numResponses)s autre réponse"
+msgstr[1] "%(numResponses)s autres réponses"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 msgid "%(numResponses)s response"
@@ -2657,6 +2684,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
 msgstr ""
+"Il y a eu une erreur lors de l'obtention de l'historique du contenu des "
+"e-mails pour ce cours."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js

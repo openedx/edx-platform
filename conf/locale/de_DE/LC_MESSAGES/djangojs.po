@@ -40,6 +40,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2014
 # trajan, 2014
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -56,8 +57,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:56-0400\n"
-"PO-Revision-Date: 2014-09-02 09:22+0000\n"
+"POT-Creation-Date: 2014-09-15 09:18-0400\n"
+"PO-Revision-Date: 2014-09-10 14:00+0000\n"
 "Last-Translator: Alexander L. <alexander.lohberg@paluno.uni-due.de>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
 "MIME-Version: 1.0\n"
