@@ -9,37 +9,6 @@ from courseware.courses import get_course_about_section
 from opaque_keys.edx.keys import CourseKey
 
 from student.models import CourseEnrollment, User
-from public_api import get_mobile_course
-
-
-def get_course_info_module(request, course_id, section_key):
-    """Return the appropriate course info module (updates or handouts).
-
-    Args:
-        request: Django Request object
-        course_id (CourseKey): The CourseKey for the course.
-        section_key (str): Either "updates" or "handouts"
-
-    """
-    course = get_mobile_course(course_id)
-    usage_key = course_id.make_usage_key('course_info', section_key)
-
-    # Empty cache
-    field_data_cache = FieldDataCache([], course_id, request.user)
-
-    return get_module(
-        request.user,
-        request,
-        usage_key,
-        field_data_cache,
-
-        # We're not running JS on this page, so no need to wrap it in a div
-        wrap_xmodule_display=False,
-
-        # Needed because section modules aren't children of Course and don't
-        # automatically inherit this value.
-        static_asset_path=course.static_asset_path
-    )
 
 
 class CourseUpdatesList(generics.ListAPIView):
@@ -76,10 +45,40 @@ class CourseAboutDetail(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         course_id = CourseKey.from_string(kwargs['course_id'])
-        course = get_mobile_course(course_id)
+        course = modulestore().get_course(course_id)
 
         # There are other fields, but they don't seem to be in use.
         # see courses.py:get_course_about_section
         return Response(
             {"overview": get_course_about_section(course, "overview").strip()}
         )
+
+
+def get_course_info_module(request, course_id, section_key):
+    """Return the appropriate course info module (updates or handouts).
+
+    Args:
+        request: Django Request object
+        course_id (CourseKey): The CourseKey for the course.
+        section_key (str): Either "updates" or "handouts"
+
+    """
+    course = modulestore().get_course(course_id)
+    usage_key = course_id.make_usage_key('course_info', section_key)
+
+    # Empty cache
+    field_data_cache = FieldDataCache([], course_id, request.user)
+
+    return get_module(
+        request.user,
+        request,
+        usage_key,
+        field_data_cache,
+
+        # We're not running JS on this page, so no need to wrap it in a div
+        wrap_xmodule_display=False,
+
+        # Needed because section modules aren't children of Course and don't
+        # automatically inherit this value.
+        static_asset_path=course.static_asset_path
+    )
