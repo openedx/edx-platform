@@ -100,6 +100,8 @@ class TreeNodeSet(list):
                 # preserve it so leaving it commented for now
                 # if 'position' in old_state:
                 #     state['position'] = old_state['position']
+                if 'extended_due' in old_state:
+                    state['extended_due'] = old_state['extended_due']
                 module.smstate.state = json.dumps(state)
                 module.smstate.grade = None
                 module.smstate.save()
