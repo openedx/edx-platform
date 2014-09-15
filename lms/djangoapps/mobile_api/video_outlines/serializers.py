@@ -2,6 +2,9 @@ from rest_framework.reverse import reverse
 
 from courseware.access import has_access
 
+from edxval.api import get_videos_for_course, get_video_info, ValInternalError, ValVideoNotFoundError
+
+
 class BlockOutline(object):
 
     def __init__(self, course_id, start_block, categories_to_outliner, request, local_cache):
@@ -19,6 +22,8 @@ class BlockOutline(object):
     def __iter__(self):
         child_to_parent = {}
         stack = [self.start_block]
+
+        self.local_cache['course_videos'] = {v['edx_video_id']: v for v in get_videos_for_course(self.course_id)}
 
         # path should be optional
         def path(block):
@@ -91,29 +96,40 @@ class BlockOutline(object):
 
 
 def video_summary(course, course_id, video_descriptor, request, local_cache):
-    if video_descriptor.html5_sources:
-        video_url = video_descriptor.html5_sources[0]
-    else:
-        video_url = video_descriptor.source
+    duration = None
+    size = 200000000
+    video_url = ''
 
-    usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
-    transcripts_langs_cache = local_cache['transcripts_langs']
+    if video_descriptor.edx_video_id:
+        try:
+            video_info = local_cache['course_videos'][video_descriptor.edx_video_id]
+        except KeyError:
+            print 'could not find', video_descriptor.edx_video_id
+        else:
+            for enc in video_info['encoded_videos']:
+                video_url = enc['url']
+                size = enc['file_size']
+                if enc['profile'] == 'mobile':
+                    break
+            transcripts = {sub['lang']: sub['content_url'] for sub in video_info['subtitles']}
+            duration = video_info['duration']
 
-    if usage_id_str in transcripts_langs_cache:
-        transcript_langs = transcripts_langs_cache[usage_id_str]
-    else:
-        transcript_langs = video_descriptor.available_translations()
-        transcripts_langs_cache[usage_id_str] = transcript_langs
+    if not video_url:
+        if video_descriptor.html5_sources:
+            video_url = video_descriptor.html5_sources[0]
+        else:
+            video_url = video_descriptor.source
 
-    # import pdb; pdb.set_trace()
+        usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
+        transcripts_langs_cache = local_cache['transcripts_langs']
 
-    return {
-        "video_url": video_url,
-        "video_thumbnail_url": None,
-        "duration": None,
-        "size": 200000000,
-        "name": video_descriptor.display_name,
-        "transcripts": {
+        if usage_id_str in transcripts_langs_cache:
+            transcript_langs = transcripts_langs_cache[usage_id_str]
+        else:
+            transcript_langs = video_descriptor.available_translations()
+            transcripts_langs_cache[usage_id_str] = transcript_langs
+
+        transcripts = {
             lang: reverse(
                 'video-transcripts-detail',
                 kwargs={
@@ -124,7 +140,16 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
                 request=request,
             )
             for lang in transcript_langs
-        },
+        }
+    # import pdb; pdb.set_trace()
+
+    return {
+        "video_url": video_url,
+        "video_thumbnail_url": None,
+        "duration": duration,
+        "size": size,
+        "name": video_descriptor.display_name,
+        "transcripts": transcripts,
         "language": video_descriptor.transcript_language,
         "category": video_descriptor.category,
         "id": usage_id_str
