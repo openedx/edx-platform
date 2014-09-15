@@ -4,7 +4,7 @@
 Acceptance tests for CMS Video Module.
 """
 from nose.plugins.attrib import attr
-from unittest import skipIf
+from unittest import skipIf, skip
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.video.video import VideoComponentPage
@@ -227,6 +227,7 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.assertFalse(self.video.is_captions_visible())
 
+    @skip('TNL-392')
     def test_video_controls_shown_correctly(self):
         """
         Scenario: Video controls for all videos show correctly
