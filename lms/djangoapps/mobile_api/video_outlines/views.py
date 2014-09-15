@@ -22,7 +22,7 @@ from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment, User
 
 from .serializers import BlockOutline, video_summary
-from public_api import get_mobile_course
+from mobile_api import get_mobile_course
 
 
 class VideoSummaryList(generics.ListAPIView):

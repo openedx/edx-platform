@@ -6,7 +6,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from .views import CourseAboutDetail, CourseUpdatesList, CourseHandoutsList
 
 urlpatterns = patterns(
-    'public_api.course_info.views',
+    'mobile_api.course_info.views',
     url(
         r'^{}/about$'.format(settings.COURSE_ID_PATTERN),
         CourseAboutDetail.as_view(),
