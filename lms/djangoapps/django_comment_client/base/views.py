@@ -39,7 +39,8 @@ from django_comment_client.utils import (
     get_discussion_categories_ids,
     permalink,
     add_thread_group_name,
-    get_group_id_for_comments_service
+    get_group_id_for_comments_service,
+    get_discussion_id_map,
 )
 from util.html import strip_tags
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
@@ -288,6 +289,7 @@ def update_thread(request, course_id, thread_id):
         return JsonError(_("Title can't be empty"))
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
+
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.body = request.POST["body"]
@@ -968,6 +970,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         }
     })
 
+
 @require_GET
 @login_required
 def users(request, course_id):
@@ -994,7 +997,7 @@ def users(request, course_id):
     try:
         matched_user = User.objects.get(username=username)
         cc_user = cc.User.from_django_user(matched_user)
-        cc_user.course_id=course_key
+        cc_user.course_id = course_key
         cc_user.retrieve(complete=False)
         if (cc_user['threads_count'] + cc_user['comments_count']) > 0:
             user_objs.append({
