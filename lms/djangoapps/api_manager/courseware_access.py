@@ -1,4 +1,5 @@
 """ Centralized access to LMS courseware app """
+from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 
 from courseware import courses, module_render
@@ -11,6 +12,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
+def _anonymous_known_flag(user):
+    if isinstance(user, AnonymousUser):
+        user.known = False
+
 def get_modulestore():
     return modulestore()
 
@@ -19,6 +24,7 @@ def get_course(request, user, course_id, depth=0, load_content=False):
     """
     Utility method to obtain course components
     """
+    _anonymous_known_flag(user)
     course_descriptor = None
     course_content = None
     course_key = get_course_key(course_id)
@@ -33,6 +39,7 @@ def get_course_child(request, user, course_key, content_id, load_content=False):
     """
     Return a course xmodule/xblock to the caller
     """
+    _anonymous_known_flag(user)
     child_descriptor = None
     child_content = None
     child_key = get_course_child_key(content_id)
