@@ -5,7 +5,7 @@ if Backbone?
       "keypress .forum-nav-browse-filter-input": (event) => DiscussionUtil.ignoreEnterKey(event)
       "keyup .forum-nav-browse-filter-input": "filterTopics"
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
-      "click .forum-nav-browse-title": "selectTopic"
+      "click .forum-nav-browse-title": "selectTopicHandler"
       "keydown .forum-nav-search-input": "performSearch"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
@@ -130,12 +130,12 @@ if Backbone?
       )
       @$(".forum-nav-sort-control").val(@collection.sort_preference)
 
-      $(window).bind "load", @updateSidebar
-      $(window).bind "scroll", @updateSidebar
-      $(window).bind "resize", @updateSidebar
+      $(window).bind "load scroll resize", @updateSidebar
 
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
+      @displayedCollection.on "change:commentable_id", (model, commentable_id) =>
+        @retrieveDiscussions @discussionIds.split(",") if @mode is "commentables"
       @renderThreads()
       @
 
@@ -185,7 +185,7 @@ if Backbone?
         when 'search'
           options.search_text = @current_search
           if @group_id
-            options.group_id = @group_id          
+            options.group_id = @group_id
         when 'followed'
           options.user_id = window.user.id
           options.group_id = "all"
@@ -196,8 +196,7 @@ if Backbone?
         when 'all'
           if @group_id
             options.group_id = @group_id
-        
-    
+
       lastThread = @collection.last()?.get('id')
       if lastThread
         # Pagination; focus the first thread after what was previously the last thread
@@ -262,7 +261,7 @@ if Backbone?
             else
               $('input.email-setting').removeAttr('checked')
       thread_id = null
-      @trigger("thread:removed")  
+      @trigger("thread:removed")
       #select all threads
 
     isBrowseMenuVisible: =>
@@ -359,12 +358,15 @@ if Backbone?
         name =  prefix + rawName + gettext("…")
       return name
 
-    selectTopic: (event) ->
+    selectTopicHandler: (event) ->
       event.preventDefault()
+      @selectTopic $(event.target)
+
+    selectTopic: ($target) ->
       @hideBrowseMenu()
       @clearSearch()
 
-      item = $(event.target).closest('.forum-nav-browse-menu-item')
+      item = $target.closest('.forum-nav-browse-menu-item')
       @setCurrentTopicDisplay(@getPathText(item))
       if item.hasClass("forum-nav-browse-menu-all")
         @discussionIds = ""
@@ -388,7 +390,7 @@ if Backbone?
     chooseCohort: (event) =>
       @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
       @retrieveFirstPage()
-      
+
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
       DiscussionUtil.safeAjax
@@ -403,7 +405,7 @@ if Backbone?
           if callback?
             callback()
 
-    
+
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'

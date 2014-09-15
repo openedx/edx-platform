@@ -54,9 +54,9 @@
 % endfor
 
 <script aria-hidden="true" type="text/template" id="thread-edit-template">
-  <div class="discussion-post edit-post-form">
     <h1>${_("Editing post")}</h1>
-    <ul class="edit-post-form-errors"></ul>
+    <ul class="post-errors"></ul>
+    <div class="forum-edit-post-form-wrapper"></div>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
       <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="${_('Title') | h}">
@@ -66,7 +66,6 @@
     </div>
     <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
-  </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="thread-response-template">
@@ -408,31 +407,7 @@
                 ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
             </span>
         </div>
-        ${'<% if (mode=="tab") { %>'}
-        <div class="post-field">
-            ## Using div here instead of label because we are using a non-native control
-            <div class="field-label">
-                <span class="field-label-text">
-                    ${_("Topic Area:")}
-                </span><div class="field-input post-topic">
-                    <a href="#" class="post-topic-button">
-                        <span class="sr">${_("Discussion topics; current selection is: ")}</span>
-                        <span class="js-selected-topic"></span>
-                        <span class="drop-arrow" aria-hidden="true">▾</span>
-                    </a>
-                    <div class="topic-menu-wrapper">
-                        <label class="topic-filter-label">
-                            <span class="sr">${_("Filter topics")}</span>
-                            <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
-                        </label>
-                        <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
-                   </div>
-               </div>
-            </div><span class="field-help">
-                ${_("Add your post to a relevant topic to help others find it.")}
-            </span>
-        </div>
-        ${'<% } %>'}
+        <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
         <div class="post-field">
             <label class="field-label">
@@ -495,6 +470,28 @@
         <span class="topic-title">${'<%- text %>'}</span>
         <ul role="menu" class="topic-submenu">${'<%= entries %>'}</ul>
     </li>
+</script>
+
+<script aria-hidden="true" type="text/template" id="topic-template">
+    ## Using div here instead of label because we are using a non-native control
+    <div class="field-label">
+        <span class="field-label-text">${_("Topic Area:")}</span><div class="field-input post-topic">
+            <a href="#" class="post-topic-button">
+                <span class="sr">${_("Discussion topics; current selection is: ")}</span>
+                <span class="js-selected-topic"></span>
+                <span class="drop-arrow" aria-hidden="true">▾</span>
+            </a>
+            <div class="topic-menu-wrapper">
+                <label class="topic-filter-label">
+                    <span class="sr">${_("Filter topics")}</span>
+                    <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                </label>
+                <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
+           </div>
+       </div>
+    </div><span class="field-help">
+        ${_("Add your post to a relevant topic to help others find it.")}
+    </span>
 </script>
 
 <%def name="primaryAction(action_class, icon, sr_label, unchecked_label, checked_label)">

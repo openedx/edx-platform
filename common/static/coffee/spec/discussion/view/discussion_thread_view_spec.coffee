@@ -6,6 +6,7 @@ describe "DiscussionThreadView", ->
         jasmine.Clock.useMock()
         @threadData = DiscussionViewSpecHelper.makeThreadWithProps({})
         @thread = new Thread(@threadData)
+        @discussion = new Discussion(@thread)
         spyOn($, "ajax")
         # Avoid unnecessary boilerplate
         spyOn(DiscussionThreadShowView.prototype, "convertMath")
@@ -44,6 +45,7 @@ describe "DiscussionThreadView", ->
         checkCommentForm = (originallyClosed, mode) ->
             threadData = DiscussionViewSpecHelper.makeThreadWithProps({closed: originallyClosed})
             thread = new Thread(threadData)
+            discussion = new Discussion(thread)
             view = new DiscussionThreadView({ model: thread, el: $("#fixture-element"), mode: mode})
             renderWithContent(view, {resp_total: 1, children: [{}]})
             if mode == "inline"

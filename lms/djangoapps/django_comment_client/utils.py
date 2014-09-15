@@ -71,7 +71,7 @@ def _get_discussion_modules(course):
     return filter(has_required_keys, all_modules)
 
 
-def _get_discussion_id_map(course):
+def get_discussion_id_map(course):
     def get_entry(module):
         discussion_id = module.discussion_id
         title = module.discussion_target
@@ -352,7 +352,7 @@ def extend_content(content):
 
 
 def add_courseware_context(content_list, course):
-    id_map = _get_discussion_id_map(course)
+    id_map = get_discussion_id_map(course)
 
     for content in content_list:
         commentable_id = content['commentable_id']
