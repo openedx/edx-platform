@@ -9,3 +9,17 @@
 
     this.CohortModel = CohortModel;
 }).call(this, Backbone);
+
+
+(function(Backbone) {
+    var CohortMessageModel = Backbone.Model.extend({
+        defaults: {
+            added: [],
+            changed: [],
+            present: [],
+            unknown: []
+        }
+    });
+
+    this.CohortMessageModel = CohortMessageModel;
+}).call(this, Backbone);
