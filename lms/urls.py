@@ -73,13 +73,13 @@ urlpatterns = ('',  # nopep8
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
-    #edxval
-    url(r'^edxval/', include('edxval.urls')),
 )
 
 if settings.FEATURES["ENABLE_PUBLIC_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
+        # TODO: find a better location for this
+        url(r'^api/private/', include('edxval.urls')),
         url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     )
 
