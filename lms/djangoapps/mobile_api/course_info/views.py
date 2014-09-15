@@ -8,6 +8,7 @@ from courseware.module_render import get_module
 from courseware.courses import get_course_about_section
 from opaque_keys.edx.keys import CourseKey
 
+from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment, User
 
 
