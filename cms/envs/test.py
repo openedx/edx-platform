@@ -73,17 +73,6 @@ STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 PIPELINE_ENABLED=False
 
-# Add split as another store for testing
-MODULESTORE['default']['OPTIONS']['stores'].append(
-    {
-        'NAME': 'split',
-        'ENGINE': 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': {
-            'render_template': 'edxmako.shortcuts.render_to_string',
-        }
-    },
-)
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,

@@ -200,12 +200,14 @@ class TestCourseListing(ModuleStoreTestCase):
         self.assertGreaterEqual(iteration_over_courses_time_2.elapsed, iteration_over_groups_time_2.elapsed)
 
         # Now count the db queries
-        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         with check_mongo_calls(USER_COURSES_COUNT):
             _accessible_courses_list_from_groups(self.request)
 
-        # TODO: LMS-11220: Document why this takes 6 calls
-        with check_mongo_calls(6):
+        # Calls:
+        #    1) query old mongo
+        #    2) get_more on old mongo
+        #    3) query split (but no courses so no fetching of data)
+        with check_mongo_calls(3):
             _accessible_courses_list(self.request)
 
     def test_get_course_list_with_same_course_id(self):
@@ -276,7 +278,7 @@ class TestCourseListing(ModuleStoreTestCase):
         course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
         course = self._create_course_with_access_groups(course_location, self.user)
         course_db_record = store._find_one(course.location)
-        course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki" })
+        course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki"})
         store.collection.update(
             {'_id': course.location.to_deprecated_son()},
             {'$set': {

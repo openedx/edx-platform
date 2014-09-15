@@ -681,6 +681,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             version_guids.append(version_guid)
             id_version_map[version_guid] = course_index
 
+        if not version_guids:
+            return []
+
         matching_structures = self.find_structures_by_id(version_guids)
 
         # get the blocks for each course index (s/b the root)
