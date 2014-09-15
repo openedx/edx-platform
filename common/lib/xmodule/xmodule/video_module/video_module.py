@@ -43,6 +43,10 @@ from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
+try:
+    import edxval.api as edxval_api
+except ImportError:
+    edxval_api = None
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
@@ -160,7 +164,6 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
     ]}
     js_module_name = "Video"
 
-
     def get_html(self):
         download_video_link = None
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
@@ -179,7 +182,13 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
                     sources[index] = new_url
 
         if self.download_video:
-            if self.source:
+            if self.edx_video_id:
+                video_info = edxval_api.get_video_info(self.edx_video_id)
+                encoded_videos = video_info.get("encoded_videos")
+                for item in encoded_videos:
+                    if item.get("profile") == "desktop":
+                        download_video_link = item.get("url")
+            elif self.source:
                 download_video_link = self.source
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]

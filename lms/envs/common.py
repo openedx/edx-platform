@@ -1714,7 +1714,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # edxval
+    'edxval'
 )
 
 for app_name in OPTIONAL_APPS:

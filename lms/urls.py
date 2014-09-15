@@ -72,6 +72,9 @@ urlpatterns = ('',  # nopep8
 
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
+
+    #edxval
+    url(r'^edxval/', include('edxval.urls')),
 )
 
 if settings.FEATURES["ENABLE_PUBLIC_REST_API"]:
