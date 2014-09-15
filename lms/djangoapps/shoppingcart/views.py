@@ -15,7 +15,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, \
-    CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException
+    RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,\
+    MultipleCouponsNotAllowedException
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption
 from .processors import process_postpay_callback, render_purchase_form_html
 import json
@@ -154,9 +155,8 @@ def use_code(request):
     Valid Code can be either coupon or registration code.
     """
     code = request.POST["code"]
-    try:
-        coupon = Coupon.objects.get(code=code, is_active=True)
-    except Coupon.DoesNotExist:
+    coupons = Coupon.objects.filter(code=code, is_active=True)
+    if not coupons:
         # If not coupon code then we check that code against course registration code
         try:
             course_reg = CourseRegistrationCode.objects.get(code=code)
@@ -165,7 +165,7 @@ def use_code(request):
 
         return use_registration_code(course_reg, request.user)
 
-    return use_coupon_code(coupon, request.user)
+    return use_coupon_code(coupons, request.user)
 
 
 def use_registration_code(course_reg, user):
@@ -183,17 +183,23 @@ def use_registration_code(course_reg, user):
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
 
-def use_coupon_code(coupon, user):
+def use_coupon_code(coupons, user):
     """
     This method utilize course coupon code
     """
-    try:
-        cart = Order.get_cart_for_user(user)
-        CouponRedemption.add_coupon_redemption(coupon, cart)
-    except CouponAlreadyExistException:
-        return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon.code)))
-    except ItemDoesNotExistAgainstCouponException:
-        return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon.code)))
+    cart = Order.get_cart_for_user(user)
+    cart_items = cart.orderitem_set.all().select_subclasses()
+    is_redemption_applied = False
+    for coupon in coupons:
+        try:
+            if CouponRedemption.add_coupon_redemption(coupon, cart, cart_items):
+                is_redemption_applied = True
+        except MultipleCouponsNotAllowedException:
+            return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
+
+    if not is_redemption_applied:
+        log.warning("Course item does not exist for coupon '{0}'".format(coupons[0].code))
+        return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupons[0].code)))
 
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
