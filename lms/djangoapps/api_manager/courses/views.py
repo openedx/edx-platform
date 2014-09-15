@@ -1503,15 +1503,16 @@ class CoursesMetrics(SecureAPIView):
             'users_started': users_started_qs.values('user').distinct().count(),
             'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
-        thread_stats = {}
-        try:
-            thread_stats = get_course_thread_stats(slash_course_id)
-        except CommentClientRequestError, e:
-            data = {
-                "err_msg": str(e)
-            }
-            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        data.update(thread_stats)
+        # TODO: (mattdrayer) Uncomment after comment service has been updated
+        # thread_stats = {}
+        # try:
+        #     thread_stats = get_course_thread_stats(slash_course_id)
+        # except CommentClientRequestError, e:
+        #     data = {
+        #         "err_msg": str(e)
+        #     }
+        #     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # data.update(thread_stats)
         return Response(data, status=status.HTTP_200_OK)
 
 
