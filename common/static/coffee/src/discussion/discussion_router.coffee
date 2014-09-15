@@ -27,9 +27,9 @@ if Backbone?
           mode: "tab"
         )
         @newPostView.render()
+        @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
-        @newPostView.$('.cancel').bind "click", @hideNewPost
 
     allThreads: ->
       @nav.updateSidebar()
@@ -74,10 +74,9 @@ if Backbone?
           $('.new-post-title').focus()
       )
 
-    hideNewPost: (event) =>
+    hideNewPost: =>
       @newPost.fadeOut(
         duration: 200
         complete: =>
           $('.forum-content').fadeIn(200)
       )
-
