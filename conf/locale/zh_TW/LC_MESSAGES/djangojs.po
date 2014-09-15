@@ -47,6 +47,7 @@
 # 
 # Translators:
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
+# LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2014 edX
@@ -63,7 +64,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"POT-Creation-Date: 2014-09-15 09:18-0400\n"
 "PO-Revision-Date: 2014-08-29 15:41+0000\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"

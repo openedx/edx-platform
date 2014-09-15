@@ -18,6 +18,7 @@
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
+# Nikolay K Medvedev <elsin16@gmail.com>, 2014
 # Olga <olg.makarova@gmail.com>, 2014
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Katerina <rosemaily@gmail.com>, 2014
@@ -67,7 +68,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-08 10:56-0400\n"
+"POT-Creation-Date: 2014-09-15 09:18-0400\n"
 "PO-Revision-Date: 2014-08-31 21:22+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
