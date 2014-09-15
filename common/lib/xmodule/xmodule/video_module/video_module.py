@@ -15,16 +15,15 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
+import copy
 import json
 import logging
 import os.path
+from collections import OrderedDict
 from operator import itemgetter
 
 from lxml import etree
 from pkg_resources import resource_string
-import copy
-
-from collections import OrderedDict
 
 from django.conf import settings
 
