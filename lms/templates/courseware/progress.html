@@ -58,7 +58,7 @@ from django.conf import settings
         %if success_cutoff and grade_summary['percent'] > success_cutoff:
           <div id="course-success">
             <a href="${SUCCESS_BUTTON_URL}">
-              ${settings.PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE or _("Descarga tu certificado")}
+              Descarga tu certificado en PDF
             </a>
           </div>
         %endif
