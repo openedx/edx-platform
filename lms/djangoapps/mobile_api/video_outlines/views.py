@@ -31,7 +31,7 @@ class VideoSummaryList(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         course_id = CourseKey.from_string(kwargs['course_id'])
-        course = get_mobile_course(course_id)
+        course = get_mobile_course(course_id, request.user)
 
         transcripts_cache_key = "VideoSummaryList.transcripts.langs.{}".format(course_id)
         original_transcripts_langs_cache = cache.get(transcripts_cache_key, {})
