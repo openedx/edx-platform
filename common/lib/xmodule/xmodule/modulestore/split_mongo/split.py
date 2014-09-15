@@ -2135,14 +2135,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # should this recurse down dicts and lists just in case they contain datetime?
                 elif not isinstance(value, datetime.datetime):  # don't convert datetimes!
                     fields[field_name] = xblock_class.fields[field_name].to_json(value)
-
-        # I think these are obsolete conditions; so, I want to confirm that. Thus the warnings
-        if 'location' in fields:
-            log.warn('attempt to persist location')
-            del fields['location']
-        if 'block_type' in fields:
-            log.warn('attempt to persist category')
-            del fields['block_type']
         return fields
 
     def _new_structure(self, user_id, root_block_key, block_fields=None, definition_id=None):
