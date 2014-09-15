@@ -3,7 +3,6 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 """
 import re
 import pymongo
-from bson import son
 from contracts import check
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
@@ -58,13 +57,6 @@ def structure_to_mongo(structure):
         new_structure['blocks'].append(new_block)
 
     return new_structure
-
-
-def definition_from_mongo(definition):
-    """
-    Converts 'fields.children' from a list [[block_type, block_id]] to [BlockKey]
-    """
-    new_def = dict(definition)
 
 
 class MongoConnection(object):
