@@ -285,6 +285,11 @@ FEATURES = {
     # Enables the new navigation template and styles. This should be enabled
     # when the styles appropriately match the edX.org website.
     'ENABLE_NEW_EDX_HEADER': False,
+    
+     # When a logged in user goes to the homepage ('/') should the user be
+    # redirected to the dashboard - this is default Open edX behavior. Set to
+    # False to not redirect the user
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,    
 
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,
@@ -1764,10 +1769,7 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock',
-
-    # mckinsey apps
-    'gradebook',
+    'openassessment.xblock'
 )
 
 for app_name in OPTIONAL_APPS:
