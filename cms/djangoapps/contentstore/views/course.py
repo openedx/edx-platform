@@ -212,8 +212,10 @@ def course_handler(request, course_key_string=None):
         response_format = request.REQUEST.get('format', 'html')
         if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
             if request.method == 'GET':
-                course_module = _get_course_module(CourseKey.from_string(course_key_string), request.user, depth=None)
-                return JsonResponse(_course_outline_json(request, course_module))
+                course_key = CourseKey.from_string(course_key_string)
+                with modulestore().bulk_operations(course_key):
+                    course_module = _get_course_module(course_key, request.user, depth=None)
+                    return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
             elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
@@ -248,15 +250,16 @@ def course_rerun_handler(request, course_key_string):
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user, depth=3)
-    if request.method == 'GET':
-        return render_to_response('course-create-rerun.html', {
-            'source_course_key': course_key,
-            'display_name': course_module.display_name,
-            'user': request.user,
-            'course_creator_status': _get_course_creator_status(request.user),
-            'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
-        })
+    with modulestore().bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user, depth=3)
+        if request.method == 'GET':
+            return render_to_response('course-create-rerun.html', {
+                'source_course_key': course_key,
+                'display_name': course_module.display_name,
+                'user': request.user,
+                'course_creator_status': _get_course_creator_status(request.user),
+                'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
+            })
 
 def _course_outline_json(request, course_module):
     """
@@ -644,20 +647,20 @@ def course_info_handler(request, course_key_string):
         html: return html for editing the course info handouts and updates.
     """
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user)
-    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-
-        return render_to_response(
-            'course_info.html',
-            {
-                'context_course': course_module,
-                'updates_url': reverse_course_url('course_info_update_handler', course_key),
-                'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
-                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
-            }
-        )
-    else:
-        return HttpResponseBadRequest("Only supports html requests")
+    with modulestore().bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user)
+        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+            return render_to_response(
+                'course_info.html',
+                {
+                    'context_course': course_module,
+                    'updates_url': reverse_course_url('course_info_update_handler', course_key),
+                    'handouts_locator': course_key.make_usage_key('course_info', 'handouts'),
+                    'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_module.id)
+                }
+            )
+        else:
+            return HttpResponseBadRequest("Only supports html requests")
 
 
 # pylint: disable=unused-argument
@@ -727,42 +730,43 @@ def settings_handler(request, course_key_string):
         json: update the Course and About xblocks through the CourseDetails model
     """
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user)
-    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        upload_asset_url = reverse_course_url('assets_handler', course_key)
+    with modulestore().bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user)
+        if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            upload_asset_url = reverse_course_url('assets_handler', course_key)
 
-        # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
-        # course about page should be editable in Studio
-        about_page_editable = not microsite.get_value_for_org(
-            course_module.location.org,
-            'ENABLE_MKTG_SITE',
-            settings.FEATURES.get('ENABLE_MKTG_SITE', False)
-        )
-
-        short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
-
-        return render_to_response('settings.html', {
-            'context_course': course_module,
-            'course_locator': course_key,
-            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
-            'course_image_url': utils.course_image_url(course_module),
-            'details_url': reverse_course_url('settings_handler', course_key),
-            'about_page_editable': about_page_editable,
-            'short_description_editable': short_description_editable,
-            'upload_asset_url': upload_asset_url
-        })
-    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
-        if request.method == 'GET':
-            return JsonResponse(
-                CourseDetails.fetch(course_key),
-                # encoder serializes dates, old locations, and instances
-                encoder=CourseSettingsEncoder
+            # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
+            # course about page should be editable in Studio
+            about_page_editable = not microsite.get_value_for_org(
+                course_module.location.org,
+                'ENABLE_MKTG_SITE',
+                settings.FEATURES.get('ENABLE_MKTG_SITE', False)
             )
-        else:  # post or put, doesn't matter.
-            return JsonResponse(
-                CourseDetails.update_from_json(course_key, request.json, request.user),
-                encoder=CourseSettingsEncoder
-            )
+
+            short_description_editable = settings.FEATURES.get('EDITABLE_SHORT_DESCRIPTION', True)
+
+            return render_to_response('settings.html', {
+                'context_course': course_module,
+                'course_locator': course_key,
+                'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
+                'course_image_url': utils.course_image_url(course_module),
+                'details_url': reverse_course_url('settings_handler', course_key),
+                'about_page_editable': about_page_editable,
+                'short_description_editable': short_description_editable,
+                'upload_asset_url': upload_asset_url
+            })
+        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+            if request.method == 'GET':
+                return JsonResponse(
+                    CourseDetails.fetch(course_key),
+                    # encoder serializes dates, old locations, and instances
+                    encoder=CourseSettingsEncoder
+                )
+            else:  # post or put, doesn't matter.
+                return JsonResponse(
+                    CourseDetails.update_from_json(course_key, request.json, request.user),
+                    encoder=CourseSettingsEncoder
+                )
 
 
 @login_required
@@ -781,41 +785,42 @@ def grading_handler(request, course_key_string, grader_index=None):
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user)
+    with modulestore().bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user)
 
-    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
-        course_details = CourseGradingModel.fetch(course_key)
+        if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+            course_details = CourseGradingModel.fetch(course_key)
 
-        return render_to_response('settings_graders.html', {
-            'context_course': course_module,
-            'course_locator': course_key,
-            'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
-            'grading_url': reverse_course_url('grading_handler', course_key),
-        })
-    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
-        if request.method == 'GET':
-            if grader_index is None:
-                return JsonResponse(
-                    CourseGradingModel.fetch(course_key),
-                    # encoder serializes dates, old locations, and instances
-                    encoder=CourseSettingsEncoder
-                )
-            else:
-                return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
-        elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-            # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
-            if grader_index is None:
-                return JsonResponse(
-                    CourseGradingModel.update_from_json(course_key, request.json, request.user),
-                    encoder=CourseSettingsEncoder
-                )
-            else:
-                return JsonResponse(
-                    CourseGradingModel.update_grader_from_json(course_key, request.json, request.user)
-                )
-        elif request.method == "DELETE" and grader_index is not None:
-            CourseGradingModel.delete_grader(course_key, grader_index, request.user)
-            return JsonResponse()
+            return render_to_response('settings_graders.html', {
+                'context_course': course_module,
+                'course_locator': course_key,
+                'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
+                'grading_url': reverse_course_url('grading_handler', course_key),
+            })
+        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+            if request.method == 'GET':
+                if grader_index is None:
+                    return JsonResponse(
+                        CourseGradingModel.fetch(course_key),
+                        # encoder serializes dates, old locations, and instances
+                        encoder=CourseSettingsEncoder
+                    )
+                else:
+                    return JsonResponse(CourseGradingModel.fetch_grader(course_key, grader_index))
+            elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+                # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
+                if grader_index is None:
+                    return JsonResponse(
+                        CourseGradingModel.update_from_json(course_key, request.json, request.user),
+                        encoder=CourseSettingsEncoder
+                    )
+                else:
+                    return JsonResponse(
+                        CourseGradingModel.update_grader_from_json(course_key, request.json, request.user)
+                    )
+            elif request.method == "DELETE" and grader_index is not None:
+                CourseGradingModel.delete_grader(course_key, grader_index, request.user)
+                return JsonResponse()
 
 
 # pylint: disable=invalid-name
@@ -892,41 +897,42 @@ def advanced_settings_handler(request, course_key_string):
             metadata dicts.
     """
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user)
-    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+    with modulestore().bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user)
+        if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
-        return render_to_response('settings_advanced.html', {
-            'context_course': course_module,
-            'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
-            'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
-        })
-    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
-        if request.method == 'GET':
-            return JsonResponse(CourseMetadata.fetch(course_module))
-        else:
-            try:
-                # Whether or not to filter the tabs key out of the settings metadata
-                filter_tabs = _config_course_advanced_components(request, course_module)
+            return render_to_response('settings_advanced.html', {
+                'context_course': course_module,
+                'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
+                'advanced_settings_url': reverse_course_url('advanced_settings_handler', course_key)
+            })
+        elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+            if request.method == 'GET':
+                return JsonResponse(CourseMetadata.fetch(course_module))
+            else:
+                try:
+                    # Whether or not to filter the tabs key out of the settings metadata
+                    filter_tabs = _config_course_advanced_components(request, course_module)
 
-                # validate data formats and update
-                is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
-                    course_module,
-                    request.json,
-                    filter_tabs=filter_tabs,
-                    user=request.user,
-                )
+                    # validate data formats and update
+                    is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(
+                        course_module,
+                        request.json,
+                        filter_tabs=filter_tabs,
+                        user=request.user,
+                    )
 
-                if is_valid:
-                    return JsonResponse(updated_data)
-                else:
-                    return JsonResponseBadRequest(errors)
+                    if is_valid:
+                        return JsonResponse(updated_data)
+                    else:
+                        return JsonResponseBadRequest(errors)
 
-            # Handle all errors that validation doesn't catch
-            except (TypeError, ValueError) as err:
-                return HttpResponseBadRequest(
-                    django.utils.html.escape(err.message),
-                    content_type="text/plain"
-                )
+                # Handle all errors that validation doesn't catch
+                except (TypeError, ValueError) as err:
+                    return HttpResponseBadRequest(
+                        django.utils.html.escape(err.message),
+                        content_type="text/plain"
+                    )
 
 
 class TextbookValidationError(Exception):
@@ -1004,63 +1010,64 @@ def textbooks_list_handler(request, course_key_string):
         json: overwrite all textbooks in the course with the given list
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = _get_course_module(course_key, request.user)
     store = modulestore()
+    with store.bulk_operations(course_key):
+        course = _get_course_module(course_key, request.user)
 
-    if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
-        # return HTML page
-        upload_asset_url = reverse_course_url('assets_handler', course_key)
-        textbook_url = reverse_course_url('textbooks_list_handler', course_key)
-        return render_to_response('textbooks.html', {
-            'context_course': course,
-            'textbooks': course.pdf_textbooks,
-            'upload_asset_url': upload_asset_url,
-            'textbook_url': textbook_url,
-        })
+        if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
+            # return HTML page
+            upload_asset_url = reverse_course_url('assets_handler', course_key)
+            textbook_url = reverse_course_url('textbooks_list_handler', course_key)
+            return render_to_response('textbooks.html', {
+                'context_course': course,
+                'textbooks': course.pdf_textbooks,
+                'upload_asset_url': upload_asset_url,
+                'textbook_url': textbook_url,
+            })
 
-    # from here on down, we know the client has requested JSON
-    if request.method == 'GET':
-        return JsonResponse(course.pdf_textbooks)
-    elif request.method == 'PUT':
-        try:
-            textbooks = validate_textbooks_json(request.body)
-        except TextbookValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
+        # from here on down, we know the client has requested JSON
+        if request.method == 'GET':
+            return JsonResponse(course.pdf_textbooks)
+        elif request.method == 'PUT':
+            try:
+                textbooks = validate_textbooks_json(request.body)
+            except TextbookValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
 
-        tids = set(t["id"] for t in textbooks if "id" in t)
-        for textbook in textbooks:
-            if not "id" in textbook:
-                tid = assign_textbook_id(textbook, tids)
-                textbook["id"] = tid
-                tids.add(tid)
+            tids = set(t["id"] for t in textbooks if "id" in t)
+            for textbook in textbooks:
+                if not "id" in textbook:
+                    tid = assign_textbook_id(textbook, tids)
+                    textbook["id"] = tid
+                    tids.add(tid)
 
-        if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-            course.tabs.append(PDFTextbookTabs())
-        course.pdf_textbooks = textbooks
-        store.update_item(course, request.user.id)
-        return JsonResponse(course.pdf_textbooks)
-    elif request.method == 'POST':
-        # create a new textbook for the course
-        try:
-            textbook = validate_textbook_json(request.body)
-        except TextbookValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-        if not textbook.get("id"):
-            tids = set(t["id"] for t in course.pdf_textbooks if "id" in t)
-            textbook["id"] = assign_textbook_id(textbook, tids)
-        existing = course.pdf_textbooks
-        existing.append(textbook)
-        course.pdf_textbooks = existing
-        if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
-            course.tabs.append(PDFTextbookTabs())
-        store.update_item(course, request.user.id)
-        resp = JsonResponse(textbook, status=201)
-        resp["Location"] = reverse_course_url(
-            'textbooks_detail_handler',
-            course.id,
-            kwargs={'textbook_id': textbook["id"]}
-        )
-        return resp
+            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
+                course.tabs.append(PDFTextbookTabs())
+            course.pdf_textbooks = textbooks
+            store.update_item(course, request.user.id)
+            return JsonResponse(course.pdf_textbooks)
+        elif request.method == 'POST':
+            # create a new textbook for the course
+            try:
+                textbook = validate_textbook_json(request.body)
+            except TextbookValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
+            if not textbook.get("id"):
+                tids = set(t["id"] for t in course.pdf_textbooks if "id" in t)
+                textbook["id"] = assign_textbook_id(textbook, tids)
+            existing = course.pdf_textbooks
+            existing.append(textbook)
+            course.pdf_textbooks = existing
+            if not any(tab['type'] == PDFTextbookTabs.type for tab in course.tabs):
+                course.tabs.append(PDFTextbookTabs())
+            store.update_item(course, request.user.id)
+            resp = JsonResponse(textbook, status=201)
+            resp["Location"] = reverse_course_url(
+                'textbooks_detail_handler',
+                course.id,
+                kwargs={'textbook_id': textbook["id"]}
+            )
+            return resp
 
 
 @login_required
@@ -1079,45 +1086,46 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
         json: remove textbook
     """
     course_key = CourseKey.from_string(course_key_string)
-    course_module = _get_course_module(course_key, request.user)
     store = modulestore()
-    matching_id = [tb for tb in course_module.pdf_textbooks
-                   if unicode(tb.get("id")) == unicode(textbook_id)]
-    if matching_id:
-        textbook = matching_id[0]
-    else:
-        textbook = None
-
-    if request.method == 'GET':
-        if not textbook:
-            return JsonResponse(status=404)
-        return JsonResponse(textbook)
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                        # django is rewriting one to the other
-        try:
-            new_textbook = validate_textbook_json(request.body)
-        except TextbookValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-        new_textbook["id"] = textbook_id
-        if textbook:
-            i = course_module.pdf_textbooks.index(textbook)
-            new_textbooks = course_module.pdf_textbooks[0:i]
-            new_textbooks.append(new_textbook)
-            new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
-            course_module.pdf_textbooks = new_textbooks
+    with store.bulk_operations(course_key):
+        course_module = _get_course_module(course_key, request.user)
+        matching_id = [tb for tb in course_module.pdf_textbooks
+                       if unicode(tb.get("id")) == unicode(textbook_id)]
+        if matching_id:
+            textbook = matching_id[0]
         else:
-            course_module.pdf_textbooks.append(new_textbook)
-        store.update_item(course_module, request.user.id)
-        return JsonResponse(new_textbook, status=201)
-    elif request.method == 'DELETE':
-        if not textbook:
-            return JsonResponse(status=404)
-        i = course_module.pdf_textbooks.index(textbook)
-        remaining_textbooks = course_module.pdf_textbooks[0:i]
-        remaining_textbooks.extend(course_module.pdf_textbooks[i + 1:])
-        course_module.pdf_textbooks = remaining_textbooks
-        store.update_item(course_module, request.user.id)
-        return JsonResponse()
+            textbook = None
+
+        if request.method == 'GET':
+            if not textbook:
+                return JsonResponse(status=404)
+            return JsonResponse(textbook)
+        elif request.method in ('POST', 'PUT'):  # can be either and sometimes
+                                            # django is rewriting one to the other
+            try:
+                new_textbook = validate_textbook_json(request.body)
+            except TextbookValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
+            new_textbook["id"] = textbook_id
+            if textbook:
+                i = course_module.pdf_textbooks.index(textbook)
+                new_textbooks = course_module.pdf_textbooks[0:i]
+                new_textbooks.append(new_textbook)
+                new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+                course_module.pdf_textbooks = new_textbooks
+            else:
+                course_module.pdf_textbooks.append(new_textbook)
+            store.update_item(course_module, request.user.id)
+            return JsonResponse(new_textbook, status=201)
+        elif request.method == 'DELETE':
+            if not textbook:
+                return JsonResponse(status=404)
+            i = course_module.pdf_textbooks.index(textbook)
+            remaining_textbooks = course_module.pdf_textbooks[0:i]
+            remaining_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+            course_module.pdf_textbooks = remaining_textbooks
+            store.update_item(course_module, request.user.id)
+            return JsonResponse()
 
 
 class GroupConfigurationsValidationError(Exception):
@@ -1314,42 +1322,43 @@ def group_configurations_list_handler(request, course_key_string):
         json: create new group configuration
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = _get_course_module(course_key, request.user)
     store = modulestore()
+    with store.bulk_operations(course_key):
+        course = _get_course_module(course_key, request.user)
 
-    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
-        course_outline_url = reverse_course_url('course_handler', course_key)
-        split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+            group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
+            course_outline_url = reverse_course_url('course_handler', course_key)
+            split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
 
-        configurations = GroupConfiguration.add_usage_info(course, store)
+            configurations = GroupConfiguration.add_usage_info(course, store)
 
-        return render_to_response('group_configurations.html', {
-            'context_course': course,
-            'group_configuration_url': group_configuration_url,
-            'course_outline_url': course_outline_url,
-            'configurations': configurations if split_test_enabled else None,
-        })
-    elif "application/json" in request.META.get('HTTP_ACCEPT'):
-        if request.method == 'POST':
-        # create a new group configuration for the course
-            try:
-                new_configuration = GroupConfiguration(request.body, course).get_user_partition()
-            except GroupConfigurationsValidationError as err:
-                return JsonResponse({"error": err.message}, status=400)
+            return render_to_response('group_configurations.html', {
+                'context_course': course,
+                'group_configuration_url': group_configuration_url,
+                'course_outline_url': course_outline_url,
+                'configurations': configurations if split_test_enabled else None,
+            })
+        elif "application/json" in request.META.get('HTTP_ACCEPT'):
+            if request.method == 'POST':
+            # create a new group configuration for the course
+                try:
+                    new_configuration = GroupConfiguration(request.body, course).get_user_partition()
+                except GroupConfigurationsValidationError as err:
+                    return JsonResponse({"error": err.message}, status=400)
 
-            course.user_partitions.append(new_configuration)
-            response = JsonResponse(new_configuration.to_json(), status=201)
+                course.user_partitions.append(new_configuration)
+                response = JsonResponse(new_configuration.to_json(), status=201)
 
-            response["Location"] = reverse_course_url(
-                'group_configurations_detail_handler',
-                course.id,
-                kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
-            )
-            store.update_item(course, request.user.id)
-            return response
-    else:
-        return HttpResponse(status=406)
+                response["Location"] = reverse_course_url(
+                    'group_configurations_detail_handler',
+                    course.id,
+                    kwargs={'group_configuration_id': new_configuration.id}  # pylint: disable=no-member
+                )
+                store.update_item(course, request.user.id)
+                return response
+        else:
+            return HttpResponse(status=406)
 
 
 @login_required
@@ -1364,46 +1373,47 @@ def group_configurations_detail_handler(request, course_key_string, group_config
         json: update group configuration based on provided information
     """
     course_key = CourseKey.from_string(course_key_string)
-    course = _get_course_module(course_key, request.user)
     store = modulestore()
-    matching_id = [p for p in course.user_partitions
-                   if unicode(p.id) == unicode(group_configuration_id)]
-    if matching_id:
-        configuration = matching_id[0]
-    else:
-        configuration = None
-
-    if request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                        # django is rewriting one to the other
-        try:
-            new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
-        except GroupConfigurationsValidationError as err:
-            return JsonResponse({"error": err.message}, status=400)
-
-        if configuration:
-            index = course.user_partitions.index(configuration)
-            course.user_partitions[index] = new_configuration
+    with store.bulk_operations(course_key):
+        course = _get_course_module(course_key, request.user)
+        matching_id = [p for p in course.user_partitions
+                       if unicode(p.id) == unicode(group_configuration_id)]
+        if matching_id:
+            configuration = matching_id[0]
         else:
-            course.user_partitions.append(new_configuration)
-        store.update_item(course, request.user.id)
-        configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
-        return JsonResponse(configuration, status=201)
-    elif request.method == "DELETE":
-        if not configuration:
-            return JsonResponse(status=404)
+            configuration = None
 
-        # Verify that group configuration is not already in use.
-        usages = GroupConfiguration.get_usage_info(course, store)
-        if usages.get(int(group_configuration_id)):
-            return JsonResponse(
-                {"error": _("This Group Configuration is already in use and cannot be removed.")},
-                status=400
-            )
+        if request.method in ('POST', 'PUT'):  # can be either and sometimes
+                                            # django is rewriting one to the other
+            try:
+                new_configuration = GroupConfiguration(request.body, course, group_configuration_id).get_user_partition()
+            except GroupConfigurationsValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
 
-        index = course.user_partitions.index(configuration)
-        course.user_partitions.pop(index)
-        store.update_item(course, request.user.id)
-        return JsonResponse(status=204)
+            if configuration:
+                index = course.user_partitions.index(configuration)
+                course.user_partitions[index] = new_configuration
+            else:
+                course.user_partitions.append(new_configuration)
+            store.update_item(course, request.user.id)
+            configuration = GroupConfiguration.update_usage_info(store, course, new_configuration)
+            return JsonResponse(configuration, status=201)
+        elif request.method == "DELETE":
+            if not configuration:
+                return JsonResponse(status=404)
+
+            # Verify that group configuration is not already in use.
+            usages = GroupConfiguration.get_usage_info(course, store)
+            if usages.get(int(group_configuration_id)):
+                return JsonResponse(
+                    {"error": _("This Group Configuration is already in use and cannot be removed.")},
+                    status=400
+                )
+
+            index = course.user_partitions.index(configuration)
+            course.user_partitions.pop(index)
+            store.update_item(course, request.user.id)
+            return JsonResponse(status=204)
 
 
 def _get_course_creator_status(user):

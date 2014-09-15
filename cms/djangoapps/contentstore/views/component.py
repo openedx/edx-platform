@@ -141,74 +141,75 @@ def container_handler(request, usage_key_string):
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
         usage_key = UsageKey.from_string(usage_key_string)
-        try:
-            course, xblock, lms_link = _get_item_in_course(request, usage_key)
-        except ItemNotFoundError:
-            return HttpResponseBadRequest()
+        with modulestore().bulk_operations(usage_key.course_key):
+            try:
+                course, xblock, lms_link = _get_item_in_course(request, usage_key)
+            except ItemNotFoundError:
+                return HttpResponseBadRequest()
 
-        component_templates = get_component_templates(course)
-        ancestor_xblocks = []
-        parent = get_parent_xblock(xblock)
-        action = request.REQUEST.get('action', 'view')
+            component_templates = get_component_templates(course)
+            ancestor_xblocks = []
+            parent = get_parent_xblock(xblock)
+            action = request.REQUEST.get('action', 'view')
 
-        is_unit_page = is_unit(xblock)
-        unit = xblock if is_unit_page else None
+            is_unit_page = is_unit(xblock)
+            unit = xblock if is_unit_page else None
 
-        while parent and parent.category != 'course':
-            if unit is None and is_unit(parent):
-                unit = parent
-            ancestor_xblocks.append(parent)
-            parent = get_parent_xblock(parent)
-        ancestor_xblocks.reverse()
+            while parent and parent.category != 'course':
+                if unit is None and is_unit(parent):
+                    unit = parent
+                ancestor_xblocks.append(parent)
+                parent = get_parent_xblock(parent)
+            ancestor_xblocks.reverse()
 
-        assert unit is not None, "Could not determine unit page"
-        subsection = get_parent_xblock(unit)
-        assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
-        section = get_parent_xblock(subsection)
-        assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
+            assert unit is not None, "Could not determine unit page"
+            subsection = get_parent_xblock(unit)
+            assert subsection is not None, "Could not determine parent subsection from unit " + unicode(unit.location)
+            section = get_parent_xblock(subsection)
+            assert section is not None, "Could not determine ancestor section from unit " + unicode(unit.location)
 
-        # Fetch the XBlock info for use by the container page. Note that it includes information
-        # about the block's ancestors and siblings for use by the Unit Outline.
-        xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
+            # Fetch the XBlock info for use by the container page. Note that it includes information
+            # about the block's ancestors and siblings for use by the Unit Outline.
+            xblock_info = create_xblock_info(xblock, include_ancestor_info=is_unit_page)
 
-        # Create the link for preview.
-        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
-        # need to figure out where this item is in the list of children as the
-        # preview will need this
-        index = 1
-        for child in subsection.get_children():
-            if child.location == unit.location:
-                break
-            index += 1
-        preview_lms_link = (
-            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
-        ).format(
-            preview_lms_base=preview_lms_base,
-            lms_base=settings.LMS_BASE,
-            org=course.location.org,
-            course=course.location.course,
-            course_name=course.location.name,
-            section=section.location.name,
-            subsection=subsection.location.name,
-            index=index
-        )
+            # Create the link for preview.
+            preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
+            # need to figure out where this item is in the list of children as the
+            # preview will need this
+            index = 1
+            for child in subsection.get_children():
+                if child.location == unit.location:
+                    break
+                index += 1
+            preview_lms_link = (
+                u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
+            ).format(
+                preview_lms_base=preview_lms_base,
+                lms_base=settings.LMS_BASE,
+                org=course.location.org,
+                course=course.location.course,
+                course_name=course.location.name,
+                section=section.location.name,
+                subsection=subsection.location.name,
+                index=index
+            )
 
-        return render_to_response('container.html', {
-            'context_course': course,  # Needed only for display of menus at top of page.
-            'action': action,
-            'xblock': xblock,
-            'xblock_locator': xblock.location,
-            'unit': unit,
-            'is_unit_page': is_unit_page,
-            'subsection': subsection,
-            'section': section,
-            'new_unit_category': 'vertical',
-            'ancestor_xblocks': ancestor_xblocks,
-            'component_templates': json.dumps(component_templates),
-            'xblock_info': xblock_info,
-            'draft_preview_link': preview_lms_link,
-            'published_preview_link': lms_link,
-        })
+            return render_to_response('container.html', {
+                'context_course': course,  # Needed only for display of menus at top of page.
+                'action': action,
+                'xblock': xblock,
+                'xblock_locator': xblock.location,
+                'unit': unit,
+                'is_unit_page': is_unit_page,
+                'subsection': subsection,
+                'section': section,
+                'new_unit_category': 'vertical',
+                'ancestor_xblocks': ancestor_xblocks,
+                'component_templates': json.dumps(component_templates),
+                'xblock_info': xblock_info,
+                'draft_preview_link': preview_lms_link,
+                'published_preview_link': lms_link,
+            })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
