@@ -25,9 +25,9 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     def setUp(self):
-
-        self.test_course = CourseFactory.create(display_name='Robot_Sub_Course')
-        self.course = CourseFactory.create(display_name='Robot_Super_Course')
+        super(TestNavigation, self).setUp()
+        self.test_course = CourseFactory.create()
+        self.course = CourseFactory.create()
         self.chapter0 = ItemFactory.create(parent=self.course,
                                            display_name='Overview')
         self.chapter9 = ItemFactory.create(parent=self.course,
@@ -57,7 +57,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                                     chrome='accordion,tabs')
         self.tabtest = ItemFactory.create(parent=self.chapterchrome,
                                           display_name='progress_tab',
-                                          default_tab = 'progress')
+                                          default_tab='progress')
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
@@ -73,7 +73,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for line in response.content.split('\n'):
             if tabname in line and 'active' in line:
                 return
-        raise AssertionError("assertTabActive failed: "+tabname+" not active")
+        raise AssertionError("assertTabActive failed: {} not active".format(tabname))
 
     def assertTabInactive(self, tabname, response):
         ''' Check if the progress tab is active in the tab set '''
@@ -98,7 +98,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('fullchrome', True, True),
             ('accordion', True, False),
             ('fullchrome', True, True)
-            )
+        )
         for (displayname, accordion, tabs) in test_data:
             response = self.client.get(reverse('courseware_section', kwargs={
                 'course_id': self.course.id.to_deprecated_string(),

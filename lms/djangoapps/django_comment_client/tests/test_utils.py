@@ -42,7 +42,7 @@ class DictionaryTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class AccessUtilsTestCase(TestCase):
+class AccessUtilsTestCase(ModuleStoreTestCase):
     def setUp(self):
         self.course = CourseFactory.create()
         self.course_id = self.course.id

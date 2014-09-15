@@ -441,19 +441,19 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
     def setUp(self):
         CourseTestCase.setUp(self)
-        self.fullcourse = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        self.fullcourse = CourseFactory.create()
         self.course_setting_url = get_url(self.course.id, 'advanced_settings_handler')
         self.fullcourse_setting_url = get_url(self.fullcourse.id, 'advanced_settings_handler')
 
     def test_fetch_initial_fields(self):
         test_model = CourseMetadata.fetch(self.course)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
 
         test_model = CourseMetadata.fetch(self.fullcourse)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.fullcourse.display_name)
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
@@ -554,7 +554,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         checks that updates were made
         """
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
         self.assertIn('advertised_start', test_model, 'Missing new advertised_start metadata field')
         self.assertEqual(test_model['advertised_start']['value'], 'start A', "advertised_start not expected value")
         self.assertIn('days_early_for_beta', test_model, 'Missing days_early_for_beta metadata field')
@@ -564,13 +564,13 @@ class CourseMetadataEditingTest(CourseTestCase):
         response = self.client.get_json(self.course_setting_url)
         test_model = json.loads(response.content)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.course.display_name)
 
         response = self.client.get_json(self.fullcourse_setting_url)
         test_model = json.loads(response.content)
         self.assertNotIn('graceperiod', test_model, 'blacklisted field leaked in')
         self.assertIn('display_name', test_model, 'full missing editable metadata field')
-        self.assertEqual(test_model['display_name']['value'], 'Robot Super Course', "not expected value")
+        self.assertEqual(test_model['display_name']['value'], self.fullcourse.display_name)
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         self.assertIn('showanswer', test_model, 'showanswer field ')
         self.assertIn('xqa_key', test_model, 'xqa_key field ')

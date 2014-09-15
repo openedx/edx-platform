@@ -82,11 +82,11 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
-        self.course = CourseFactory()
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
-        self.component = ItemFactory(category='problem', parent_location=self.vertical.location)
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
+        self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
         self.user = User.objects.create(username='dummy', password='123456',
@@ -383,11 +383,11 @@ class BaseDueDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(**course_kwargs)
-        chapter = ItemFactory(category='chapter', parent_location=course.location)  # pylint: disable=no-member
-        section = ItemFactory(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
-        vertical = ItemFactory(category='vertical', parent_location=section.location)
-        ItemFactory(category='problem', parent_location=vertical.location)
+        course = CourseFactory.create(**course_kwargs)
+        chapter = ItemFactory.create(category='chapter', parent_location=course.location)  # pylint: disable=no-member
+        section = ItemFactory.create(category='sequential', parent_location=chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
+        vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+        ItemFactory.create(category='problem', parent_location=vertical.location)
 
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         self.assertIsNotNone(course.get_children()[0].get_children()[0].due)
@@ -499,7 +499,7 @@ class StartDateTests(ModuleStoreTestCase):
 
         :param course_kwargs: All kwargs are passed to through to the :class:`CourseFactory`
         """
-        course = CourseFactory(start=datetime(2013, 9, 16, 7, 17, 28))
+        course = CourseFactory.create(start=datetime(2013, 9, 16, 7, 17, 28))
         course = modulestore().get_course(course.id)  # pylint: disable=no-member
         return course
 
@@ -548,18 +548,18 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         MakoMiddleware().process_request(self.request)
 
-        course = CourseFactory(
+        course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
         )
         self.course = modulestore().get_course(course.id)  # pylint: disable=no-member
 
-        self.chapter = ItemFactory(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
-        self.section = ItemFactory(category='sequential', parent_location=self.chapter.location)
-        self.vertical = ItemFactory(category='vertical', parent_location=self.section.location)
+        self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
+        self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
+        self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
     def test_pure_ungraded_xblock(self):
-        ItemFactory(category='acid', parent_location=self.vertical.location)
+        ItemFactory.create(category='acid', parent_location=self.vertical.location)
 
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)

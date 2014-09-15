@@ -54,7 +54,6 @@ from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReve
 from certificates.models import CertificateStatuses, certificate_status_for_student
 from dark_lang.models import DarkLangConfig
 
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -697,6 +696,13 @@ def change_enrollment(request, auto_register=False, check_access=True):
             del request.session['auto_register']
 
     if action == "enroll":
+        # Make sure the course exists
+        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
+        if not modulestore().has_course(course_id):
+            log.warning("User {0} tried to enroll in non-existent course {1}"
+                        .format(user.username, course_id))
+            return HttpResponseBadRequest(_("Course id is invalid"))
+
         # We use this flag to determine which condition of an AB-test
         # for auto-registration we're currently in.
         # (We have two URLs that both point to this view, but vary the

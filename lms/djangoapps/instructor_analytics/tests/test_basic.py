@@ -103,10 +103,12 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
 
 class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
     """ Test basic course registration codes analytics functions. """
+
     def setUp(self):
         """
         Fixtures.
         """
+        super(TestCourseRegistrationCodeAnalyticsBasic, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')

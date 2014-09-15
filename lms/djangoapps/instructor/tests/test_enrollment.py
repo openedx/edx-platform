@@ -26,6 +26,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class TestSettableEnrollmentState(TestCase):
@@ -431,7 +432,7 @@ class TestSendBetaRoleEmail(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestGetEmailParams(TestCase):
+class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
     production-like conditions.
