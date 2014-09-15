@@ -141,19 +141,26 @@ describe "NewPostView", ->
           mode: "tab"
         )
 
-      expectCohortSelectorVisible = (view, visible) ->
-        expect(view.$(".js-group-select").is(":visible")).toEqual(visible)
+      checkVisibility = (view, expectedVisible) =>
+        view.render()
+        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
+        if expectedVisible
+          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
 
       it "is not visible to students", ->
-        @view.render()
-        expectCohortSelectorVisible(@view, false)
+        checkVisibility(@view, false)
 
-      it "allows moderators to select visibility", ->
+      it "allows TAs to see the cohort selector", ->
+        DiscussionSpecHelper.makeTA()
+        checkVisibility(@view, true)
+
+      it "allows moderators to see the cohort selector", ->
+        DiscussionSpecHelper.makeModerator()
+        checkVisibility(@view, true)
+
+      it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
         @view.render()
-        expectCohortSelectorVisible(@view, true)
-        expect(@view.$(".js-group-select").prop("disabled")).toEqual(false)
-
         expectedGroupId = null
         DiscussionSpecHelper.makeAjaxSpy(
           (params) -> expect(params.data.group_id).toEqual(expectedGroupId)

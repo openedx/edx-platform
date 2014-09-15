@@ -41,7 +41,7 @@ if Backbone?
           html
 
       getCohortOptions: () ->
-          if @course_settings.get("is_cohorted") and DiscussionUtil.isStaff()
+          if @course_settings.get("is_cohorted") and DiscussionUtil.isPrivilegedUser()
               user_cohort_id = $("#discussion-container").data("user-cohort-id")
               _.map @course_settings.get("cohorts"), (cohort) ->
                   {value: cohort.id, text: cohort.name, selected: cohort.id==user_cohort_id}
