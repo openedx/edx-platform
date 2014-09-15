@@ -89,7 +89,8 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
-        descriptor.location = self._map_revision_to_branch(descriptor.location)
+        old_descriptor_locn = descriptor.location
+        descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
         with self.bulk_operations(descriptor.location.course_key):
             item = super(DraftVersioningModuleStore, self).update_item(
                 descriptor,
@@ -99,6 +100,7 @@ class DraftVersioningModuleStore(ModuleStoreDraftAndPublished, SplitMongoModuleS
                 **kwargs
             )
             self._auto_publish_no_children(item.location, item.location.category, user_id, **kwargs)
+            descriptor.location = old_descriptor_locn
             return item
 
     def create_item(

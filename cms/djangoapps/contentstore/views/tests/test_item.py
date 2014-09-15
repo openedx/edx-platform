@@ -117,7 +117,6 @@ class GetItemTest(ItemTest):
         with check_mongo_calls(problem_queries):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
 
-
     def test_get_vertical(self):
         # Add a vertical
         resp = self.create_xblock(category='vertical')
@@ -196,7 +195,6 @@ class GetItemTest(ItemTest):
         html, __ = self._get_container_preview(split_test_usage_key)
         self.assertIn('Announcement', html)
         self.assertIn('Zooming', html)
-
 
     def test_split_test_edited(self):
         """

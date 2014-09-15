@@ -314,7 +314,7 @@ def _update_with_callback(xblock, user, old_metadata=None, old_content=None):
         xblock.editor_saved(user, old_metadata, old_content)
 
     # Update after the callback so any changes made in the callback will get persisted.
-    modulestore().update_item(xblock, user.id)
+    return modulestore().update_item(xblock, user.id)
 
 
 def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, nullout=None,
@@ -356,7 +356,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                 if old_parent_location:
                     old_parent = store.get_item(old_parent_location)
                     old_parent.children.remove(new_child)
-                    _update_with_callback(old_parent, user)
+                    old_parent = _update_with_callback(old_parent, user)
                 else:
                     # the Studio UI currently doesn't present orphaned children, so assume this is an error
                     return JsonResponse({"error": "Invalid data, possibly caused by concurrent authors."}, 400)
@@ -411,7 +411,7 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                         field.write_to(xblock, value)
 
         # update the xblock and call any xblock callbacks
-        _update_with_callback(xblock, user, old_metadata, old_content)
+        xblock = _update_with_callback(xblock, user, old_metadata, old_content)
 
         # for static tabs, their containing course also records their display name
         if xblock.location.category == 'static_tab':
@@ -550,7 +550,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             dest_module.children.append(dupe)
         store.update_item(dest_module, user.id)
 
-    if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
+    if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
         parent = store.get_item(parent_usage_key)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
