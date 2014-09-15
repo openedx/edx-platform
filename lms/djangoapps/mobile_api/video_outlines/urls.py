@@ -5,7 +5,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 from .views import VideoSummaryList, VideoTranscripts
 
-urlpatterns = patterns('public_api.video_outlines.views',
+urlpatterns = patterns('mobile_api.video_outlines.views',
     url(
         r'^courses/{}$'.format(settings.COURSE_ID_PATTERN),
         VideoSummaryList.as_view(),

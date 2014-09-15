@@ -1385,10 +1385,10 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries',
-    
+
     # edX Public API
-    'public_api',
-    'public_api.users',
+    'mobile_api',
+#    'public_api.users',
 
     # OAuth2
     'provider',
