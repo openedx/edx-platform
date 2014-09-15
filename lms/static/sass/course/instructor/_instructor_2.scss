@@ -221,7 +221,7 @@ section.instructor-dashboard-content-2 {
   .message {
     margin-bottom: $baseline;
     display: none;
-    border-radius: ($baseline/$baseline);
+    border-radius: 1px;
     padding: ($baseline*0.75) $baseline;
 
     &.is-shown {
@@ -455,22 +455,22 @@ section.instructor-dashboard-content-2 {
       margin-bottom: ($baseline/2);
       border-bottom: 1px solid $gray-l4;
       padding-bottom: ($baseline/2);
+    }
 
-      .title-value, .group-count {
-        display: inline-block;
-        vertical-align: middle;
-      }
+    .title-value, .group-count {
+      display: inline-block;
+      vertical-align: middle;
+    }
 
-      .title-value {
-        @extend %t-title5;
-        @extend %t-weight4;
-        margin-right: ($baseline/4);
-      }
+    .title-value {
+      @extend %t-title5;
+      @extend %t-weight4;
+      margin-right: ($baseline/4);
+    }
 
-      .group-count {
-        @extend %t-title7;
-        @extend %t-weight4;
-      }
+    .group-count {
+      @extend %t-title7;
+      @extend %t-weight4;
     }
   }
 
