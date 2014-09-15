@@ -49,8 +49,6 @@ from opaque_keys import InvalidKeyError
 from contentstore.tests.utils import get_url
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 
-from unittest import skipIf
-
 from course_action_state.managers import CourseActionStateItemNotFoundError
 
 
@@ -63,7 +61,7 @@ class ContentStoreTestCase(CourseTestCase):
     """
     Base class for Content Store Test Cases
     """
-    pass
+
 
 class ContentStoreToyCourseTest(ContentStoreTestCase):
     """
@@ -317,7 +315,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_delete(self):
         store = self.store
-        course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create()
 
         chapterloc = ItemFactory.create(parent_location=course.location, display_name="Chapter").location
         ItemFactory.create(parent_location=chapterloc, category='sequential', display_name="Sequential")
@@ -567,7 +565,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
     def test_illegal_draft_crud_ops(self):
         draft_store = self.store
 
-        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create()
 
         location = course.id.make_usage_key('chapter', 'neuvo')
         # Ensure draft mongo store does not create drafts for things that shouldn't be draft
@@ -1186,7 +1184,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
-        CourseFactory.create(display_name='Robot Super Educational Course')
+        CourseFactory.create(, display_name='Robot Super Educational Course')
         resp = self.client.get_html('/course/')
         self.assertContains(
             resp,
@@ -1197,13 +1195,14 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
-        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course_cat_num = self.random_course_name()
+        course = CourseFactory.create(org='MITx', course=course_cat_num, display_name='Robot Super Course')
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
             '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(
-                locator='i4x://MITx/999/course/Robot_Super_Course',
-                course_key='MITx/999/Robot_Super_Course',
+                locator=unicode(course.location),
+                course_key=unicode(course.id),
             ),
             status_code=200,
             html=True
@@ -1211,7 +1210,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_create_item(self):
         """Test creating a new xblock instance."""
-        course = _course_factory_create_course()
+        course = CourseFactory.create()()
 
         section_data = {
             'parent_locator': unicode(course.location),
@@ -1223,14 +1222,12 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertRegexpMatches(
-            data['locator'],
-            r"MITx/999/chapter/([0-9]|[a-f]){3,}$"
-        )
+        retarget = unicode(course.id.make_usage_key('chapter', 'REPLACE')).replace('REPLACE', r'([0-9]|[a-f]){3,}')
+        self.assertRegexpMatches(data['locator'], retarget)
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        course = _course_factory_create_course()
+        course = CourseFactory.create()()
 
         problem_data = {
             'parent_locator': unicode(course.location),
@@ -1382,7 +1379,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertTrue(did_load_item)
 
     def test_forum_id_generation(self):
-        course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create()
 
         # crate a new module and add it as a child to a vertical
         new_discussion_item = self.store.create_item(self.user.id, course.id, 'discussion', 'new_component')
@@ -1501,8 +1498,7 @@ class MetadataSaveTestCase(ContentStoreTestCase):
     def setUp(self):
         super(MetadataSaveTestCase, self).setUp()
 
-        course = CourseFactory.create(
-            org='edX', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create()
 
         video_sample_xml = '''
         <video display_name="Test Video"
@@ -1640,7 +1636,6 @@ class RerunCourseTest(ContentStoreTestCase):
         self.assertInCourseListing(source_course_key)
         self.assertInCourseListing(destination_course_key)
 
-
     def test_rerun_course_success(self):
         source_course = CourseFactory.create()
         destination_course_key = self.post_rerun_request(source_course.id)
@@ -1753,13 +1748,6 @@ def _create_course(test, course_key, course_data):
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
     test.assertEqual(data['url'], course_url)
-
-
-def _course_factory_create_course():
-    """
-    Creates a course via the CourseFactory and returns the locator for it.
-    """
-    return CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
 
 def _get_course_id(course_data, key_class=SlashSeparatedCourseKey):

@@ -101,7 +101,9 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_check')
 
-        answer_key_prefix = 'input_i4x-' + self.course.org + '-{}-problem-{}_'.format(self.COURSE_SLUG, problem_url_name)
+        answer_key_prefix = 'input_i4x-{}-{}-problem-{}_'.format(
+            self.course.org, self.course.id.course, problem_url_name
+        )
 
         # format the response dictionary to be sent in the post request by adding the above prefix to each key
         response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}

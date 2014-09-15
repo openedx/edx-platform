@@ -8,6 +8,7 @@ from pytz import UTC
 from contentstore.views.tests.utils import StudioPageTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory
+from django.utils import http
 
 
 class ContainerPageTestCase(StudioPageTestCase):
@@ -59,8 +60,8 @@ class ContainerPageTestCase(StudioPageTestCase):
                 course=re.escape(unicode(self.course.id)),
                 unit=re.escape(unicode(self.vertical.location)),
                 classes='navigation-item navigation-link navigation-parent',
-                section_parameters=re.escape(u'?show=i4x%3A//MITx/999/chapter/Week_1'),
-                subsection_parameters=re.escape(u'?show=i4x%3A//MITx/999/sequential/Lesson_1'),
+                section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
+                subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
             ),
         )
 
@@ -89,8 +90,8 @@ class ContainerPageTestCase(StudioPageTestCase):
                     unit=re.escape(unicode(self.vertical.location)),
                     split_test=re.escape(unicode(self.child_container.location)),
                     classes='navigation-item navigation-link navigation-parent',
-                    section_parameters=re.escape(u'?show=i4x%3A//MITx/999/chapter/Week_1'),
-                    subsection_parameters=re.escape(u'?show=i4x%3A//MITx/999/sequential/Lesson_1'),
+                    section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
+                    subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
                 ),
             )
 

@@ -590,6 +590,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
         descriptor = ItemFactory.create(
             category='vertical',
+            parent_location=course.location,
         )
 
         child_descriptor = ItemFactory.create(

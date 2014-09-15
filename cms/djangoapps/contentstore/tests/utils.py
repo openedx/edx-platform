@@ -78,11 +78,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = AjaxEnabledTestClient()
         self.client.login(username=self.user.username, password=user_password)
 
-        self.course = CourseFactory.create(
-            org='MITx',
-            number='999',
-            display_name='Robot Super Course',
-        )
+        self.course = CourseFactory.create()
 
         # initialize the Notification subsystem
         startup.startup_notification_subsystem()
