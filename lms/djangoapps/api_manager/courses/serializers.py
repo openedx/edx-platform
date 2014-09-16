@@ -29,6 +29,7 @@ class CourseLeadersSerializer(serializers.Serializer):
     avatar_url = serializers.CharField(source='user__profile__avatar_url')
     # Percentage grade (versus letter grade)
     grade = serializers.FloatField(source='grade')
+    created = serializers.DateTimeField()
 
 
 class CourseCompletionsLeadersSerializer(serializers.Serializer):
