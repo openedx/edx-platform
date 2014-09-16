@@ -222,7 +222,6 @@ class CoursesApiTests(TestCase):
                 grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
                 module.system.publish(module, 'grade', grade_dict)
 
-            for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     course_id=self.course.id,
                     module_type='sequential',
@@ -1603,17 +1602,60 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['leaders'][0]['username'], 'testuser4')
         self.assertEqual(response.data['course_avg'], expected_course_average)
 
-        count_filter_test_uri = '{}?{}'.format(test_uri, 'count=4')
+        count_filter_test_uri = '{}?count=4'.format(test_uri)
         response = self.do_get(count_filter_test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
 
-        # Filter by user_id
-        user_filter_uri = '{}?user_id={}'.format(test_uri, self.users[1].id)
+        # Filter by user_id, include a user with the exact same score
+        user200 = UserFactory.create(username="testuser200", profile='test')
+        CourseEnrollmentFactory.create(user=user200, course_id=self.course.id)
+
+        self.midterm = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem 200',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
+        )
+        points_scored = 100
+        points_possible = 100
+        module = self.get_module_for_user(user200, self.course, self.midterm)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+        module.system.publish(module, 'grade', grade_dict)
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_type='sequential',
+            module_state_key=self.midterm.location,
+        )
+        self.final = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='problem',
+            data=StringResponseXMLFactory().build_xml(answer='bar'),
+            display_name='Problem 201',
+            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
+        )
+        points_scored = 100
+        points_possible = 100
+        module = self.get_module_for_user(user200, self.course, self.final)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+        module.system.publish(module, 'grade', grade_dict)
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_type='sequential',
+            module_state_key=self.final.location,
+        )
+        points_scored = 50
+        points_possible = 100
+        module = self.get_module_for_user(user200, self.course, item)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+        module.system.publish(module, 'grade', grade_dict)
+
+        user_filter_uri = '{}?user_id={}&count=10'.format(test_uri, self.users[1].id)
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['course_avg'], expected_course_average)
+        self.assertEqual(len(response.data['leaders']), 6)
+        self.assertEqual(response.data['course_avg'], 0.378)
         self.assertEqual(response.data['user_position'], 4)
         self.assertEqual(response.data['user_grade'], 0.28)
 
@@ -1624,11 +1666,11 @@ class CoursesApiTests(TestCase):
         response = self.do_get(user_filter_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['user_grade'], 0)
-        self.assertEqual(response.data['user_position'], 6)
+        self.assertEqual(response.data['user_position'], 7)
         # Also, with this new user now added the course average should be different
         self.assertNotEqual(response.data['course_avg'], expected_course_average)
         rounded_avg = float("{0:.2f}".format(response.data['course_avg']))
-        self.assertEqual(rounded_avg, 0.33)
+        self.assertEqual(rounded_avg, 0.32)
 
         # test with bogus course
         bogus_test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
