@@ -7,11 +7,11 @@ from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from student.tests.factories import UserFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon
+from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedemption, Order, Invoice, Coupon, PaidCourseRegistration
 
 from instructor_analytics.basic import (
-    sale_record_features, enrolled_students_features, course_registration_features, coupon_codes_features,
-    AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+    sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
+    coupon_codes_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 )
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -98,6 +98,59 @@ class TestCourseSaleRecordsAnalyticsBasic(TestCase):
             self.assertEqual(sale_record['created_by'], self.instructor)
             self.assertEqual(sale_record['total_used_codes'], 0)
             self.assertEqual(sale_record['total_codes'], 5)
+
+    def test_sale_order_features(self):
+        """
+         Test Order Sales Report CSV
+        """
+        query_features = [
+            ('id', 'Order Id'),
+            ('company_name', 'Company Name'),
+            ('company_contact_name', 'Company Contact Name'),
+            ('company_contact_email', 'Company Contact Email'),
+            ('total_amount', 'Total Amount'),
+            ('total_codes', 'Total Codes'),
+            ('total_used_codes', 'Total Used Codes'),
+            ('logged_in_username', 'Account Username'),
+            ('logged_in_email', 'Account Email'),
+            ('purchase_time', 'Date of Sale'),
+            ('customer_reference_number', 'Customer Reference Number'),
+            ('recipient_name', 'Recipient Name'),
+            ('recipient_email', 'Recipient Email'),
+            ('company_address_line_1', 'Address Line 1'),
+            ('company_address_line_2', 'Address Line 2'),
+            ('company_city', 'City'),
+            ('company_state', 'State'),
+            ('company_zip', 'Zip'),
+            ('company_country', 'Country'),
+            ('order_type', 'Order Type'),
+            ('codes', 'Codes'),
+            ('course_id', 'Course Id')
+        ]
+
+        order = Order.get_cart_for_user(self.instructor)
+        order.order_type = 'business'
+        order.save()
+        order.add_billing_details(company_name='Test Company', company_contact_name='Test',
+                                  company_contact_email='test@123', recipient_name='R1',
+                                  recipient_email='', company_address_line_1='', company_address_line_2='S1',
+                                  company_city='NY', company_state='NY', company_zip='4234', company_country='US',
+                                  customer_reference_number='PO#23')
+        PaidCourseRegistration.add_to_order(order, self.course.id)
+        order.purchase()
+
+        db_columns = [x[0] for x in query_features]
+        sale_order_records_list = sale_order_record_features(self.course.id, db_columns)
+
+        for sale_order_record in sale_order_records_list:
+            self.assertEqual(sale_order_record['recipient_email'], order.recipient_email)
+            self.assertEqual(sale_order_record['recipient_name'], order.recipient_name)
+            self.assertEqual(sale_order_record['company_name'], order.company_name)
+            self.assertEqual(sale_order_record['company_contact_name'], order.company_contact_name)
+            self.assertEqual(sale_order_record['company_contact_email'], order.company_contact_email)
+            self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
+            self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
+            self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
 
 
 class TestCourseRegistrationCodeAnalyticsBasic(TestCase):

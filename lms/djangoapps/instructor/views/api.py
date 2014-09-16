@@ -586,7 +586,47 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
         return JsonResponse(response_payload)
     else:
         header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_records.csv", header, datarows)
+        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_sale_order_records(request, course_id):  # pylint: disable=W0613, W0621
+    """
+    return the summary of all sales records for a particular course
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    query_features = [
+        ('id', 'Order Id'),
+        ('company_name', 'Company Name'),
+        ('company_contact_name', 'Company Contact Name'),
+        ('company_contact_email', 'Company Contact Email'),
+        ('total_amount', 'Total Amount'),
+        ('total_codes', 'Total Codes'),
+        ('total_used_codes', 'Total Used Codes'),
+        ('logged_in_username', 'Login Username'),
+        ('logged_in_email', 'Login User Email'),
+        ('purchase_time', 'Date of Sale'),
+        ('customer_reference_number', 'Customer Reference Number'),
+        ('recipient_name', 'Recipient Name'),
+        ('recipient_email', 'Recipient Email'),
+        ('company_address_line_1', 'Address Line 1'),
+        ('company_address_line_2', 'Address Line 2'),
+        ('company_city', 'City'),
+        ('company_state', 'State'),
+        ('company_zip', 'Zip'),
+        ('company_country', 'Country'),
+        ('order_type', 'Order Type'),
+        ('codes', 'Registration Codes'),
+        ('course_id', 'Course Id')
+    ]
+
+    db_columns = [x[0] for x in query_features]
+    csv_columns = [x[1] for x in query_features]
+    sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
+    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)
+    return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
 @require_level('staff')
@@ -749,7 +789,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=W0613
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, invoice):
+def save_registration_codes(user, course_id, generated_codes_list, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -759,16 +799,16 @@ def save_registration_codes(request, course_id, generated_codes_list, invoice):
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_codes(user, course_id, generated_codes_list, invoice, order)
 
     course_registration = CourseRegistrationCode(
-        code=code, course_id=course_id.to_deprecated_string(), created_by=request.user, invoice=invoice
+        code=code, course_id=course_id.to_deprecated_string(), created_by=user, invoice=invoice, order=order
     )
     try:
         course_registration.save()
         generated_codes_list.append(course_registration)
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_codes(user, course_id, generated_codes_list, invoice, order)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -872,7 +912,7 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference, customer_reference_number=customer_reference_number
     )
     for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, sale_invoice)
+        save_registration_codes(request.user, course_id, course_registration_codes, sale_invoice, order=None)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
     course = get_course_by_id(course_id, depth=None)

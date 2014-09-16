@@ -17,6 +17,7 @@ if settings.FEATURES['ENABLE_SHOPPING_CART']:
         url(r'^register/redeem/(?P<registration_code>[0-9A-Za-z]+)/$', 'register_code_redemption', name='register_code_redemption'),
         url(r'^use_code/$', 'use_code'),
         url(r'^reset_code_redemption/$', 'reset_code_redemption'),
+        url(r'^billing_details/$', 'billing_details', name='billing_details'),
         url(r'^register_courses/$', 'register_courses'),
     )
 
