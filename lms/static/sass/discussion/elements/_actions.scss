@@ -1,0 +1,313 @@
+.discussion.container, .discussion-module {
+
+  // discussion - elements - actions
+  // ====================
+
+  // UI: general action list
+  .post-actions-list,
+  .response-actions-list,
+  .comment-actions-list {
+    @extend %ui-no-list;
+    text-align: right;
+
+    .actions-item {
+      @include box-sizing(border-box);
+      display: block;
+      margin: ($baseline/4) 0;
+
+      &.is-hidden {
+        display: none;
+      }
+    }
+
+    .more-wrapper {
+      position: relative;
+    }
+  }
+
+  // ====================
+
+  // UI: general actions dropdown layout
+  .actions-dropdown {
+    @extend %ui-no-list;
+    @extend %ui-depth1;
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    pointer-events: none;
+    min-width: ($baseline*6.5);
+
+    &.is-expanded {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .actions-dropdown-list {
+      @include box-sizing(border-box);
+      box-shadow: 0 1px 1px $shadow-l1;
+      position: relative;
+      width: 100%;
+      border-radius: 3px;
+      margin: 5px 0 0 0;
+      border: 1px solid $gray-l3;
+      padding: ($baseline/2) ($baseline*0.75);
+      background: $white;
+
+      // ui triangle/nub
+      &:after,
+      &:before {
+        bottom: 100%;
+        right: 3px;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      &:after {
+        border-color: $transparent;
+        border-bottom-color: $white;
+        border-width: 6px;
+        margin-right: 1px;
+      }
+
+      &:before {
+        border-color: $transparent;
+        border-bottom-color: $gray-l3;
+        border-width: 7px;
+      }
+    }
+
+    .actions-item {
+      display: block;
+      margin: 0;
+
+      &.is-hidden {
+        display: none;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: general action
+  .action-button {
+    @include transition(border .5s linear 0s);
+    @include box-sizing(border-box);
+    display: inline-block;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: $gray-l1;
+
+    .action-icon {
+      @extend %t-icon7;
+      display: inline-block;
+      height: $baseline;
+      width: $baseline;
+      border: 1px solid $gray-l3;
+      border-radius: 3px;
+      text-align: center;
+      color: $gray-l1;
+
+      .icon {
+        vertical-align: middle;
+      }
+    }
+
+    .action-label {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      vertical-align: middle;
+      padding: 0 8px;
+      color: $gray-l1;
+      opacity: 0;
+    }
+
+
+    &:hover, &:focus {
+
+      .action-label {
+        opacity: 1;
+      }
+
+      .action-icon {
+        border-radius: 0 3px 3px 0;
+      }
+    }
+
+    // specific button styles
+    &.action-follow {
+
+      .action-label {
+        color: $blue-d1;
+      }
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $forum-color-following;
+          border: 1px solid $blue-d1;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $forum-color-following;
+      }
+    }
+
+    &.action-vote {
+
+      .action-label {
+        opacity: 1;
+      }
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $green-d1;
+          border: 1px solid $green-d2;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $green-d2;
+
+        .action-label {
+          color: $green-d2;
+        }
+      }
+    }
+
+    &.action-endorse {
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $blue-d1;
+          border: 1px solid $blue-d2;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $blue-d2;
+
+        .action-label {
+          color: $blue-d2;
+        }
+      }
+    }
+
+    &.action-answer {
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          border: 1px solid $green-d1;
+          background-color: $green-d1;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $green-d1;
+
+        .action-label {
+          color: $green-d2;
+        }
+      }
+    }
+
+    // more drop-down menu
+    &.action-more {
+      position: relative;
+
+      &:hover, &:focus {
+        border-color: $gray;
+
+        .action-icon {
+          border: 1px solid $gray;
+          background-color: $gray;
+          color: $white;
+        }
+
+        .action-label {
+          opacity: 1;
+          color: $black;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  .actions-dropdown {
+
+    // UI: secondary action
+    .action-list-item {
+      @extend %t-copy-sub2;
+      display: block;
+      padding: ($baseline/10) 0;
+      white-space: nowrap;
+      text-align: right;
+      color: $gray-l1;
+
+      &:hover, &:focus {
+        color: $link-color;
+      }
+
+      .action-icon {
+        display: inline-block;
+        width: ($baseline/2);
+        margin-left: ($baseline/4);
+        color: inherit;
+      }
+
+      .action-label {
+        display: inline-block;
+        color: inherit;
+      }
+
+      // CASE: checked
+      &.is-checked {
+        // CASE: pin action
+        &.action-pin {
+          color: $pink;
+        }
+
+        // CASE: report action
+        &.action-report {
+          color: $pink;
+        }
+
+        // CASE: hover for any action
+        &:hover, &:focus {
+          color: $link-color;
+        }
+      }
+    }
+  }
+
+  .action-button, .action-list-item {
+    .action-label {
+      .label-checked {
+        display: none;
+      }
+    }
+
+    &.is-checked {
+      .label-unchecked {
+        display: none;
+      }
+
+      .label-checked {
+        display: inline;
+      }
+    }
+  }
+}

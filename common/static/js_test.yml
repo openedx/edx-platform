@@ -31,6 +31,7 @@ lib_paths:
     - js/vendor/jquery.min.js
     - js/vendor/jasmine-jquery.js
     - js/vendor/jasmine-imagediff.js
+    - js/vendor/jquery.truncate.js
     - js/vendor/mustache.js
     - js/vendor/underscore-min.js
     - js/vendor/backbone-min.js
@@ -78,4 +79,4 @@ spec_paths:
 fixture_paths:
     - js/fixtures
     - js/capa/fixtures
-
+    - templates/discussion

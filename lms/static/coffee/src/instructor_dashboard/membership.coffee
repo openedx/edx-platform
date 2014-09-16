@@ -197,6 +197,7 @@ class BetaTesterBulkAddition
 
       $.ajax
         dataType: 'json'
+        type: 'POST'
         url: @$btn_beta_testers.data 'endpoint'
         data: send_data
         success: (data) => @display_response data
@@ -287,6 +288,7 @@ class BatchEnrollment
 
       $.ajax
         dataType: 'json'
+        type: 'POST'
         url: $(event.target).data 'endpoint'
         data: send_data
         success: (data) => @display_response data

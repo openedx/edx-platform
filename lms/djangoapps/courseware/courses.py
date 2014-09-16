@@ -119,7 +119,7 @@ def course_image_url(course):
             url += '/images/course_image.jpg'
     else:
         loc = StaticContent.compute_location(course.id, course.course_image)
-        url = loc.to_deprecated_string()
+        url = StaticContent.serialize_asset_key_with_slash(loc)
     return url
 
 
@@ -377,14 +377,15 @@ def get_cms_block_link(block, page):
     return u"//{}/{}/{}".format(settings.CMS_BASE, page, block.location)
 
 
-def get_studio_url(course_key, page):
+def get_studio_url(course, page):
     """
     Get the Studio URL of the page that is passed in.
+
+    Args:
+        course (CourseDescriptor)
     """
-    assert(isinstance(course_key, CourseKey))
-    course = get_course_by_id(course_key)
     is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course_key) == ModuleStoreEnum.Type.mongo
+    is_mongo_course = modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml
     studio_link = None
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_course_link(course, page)

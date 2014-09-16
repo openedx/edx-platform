@@ -2,62 +2,8 @@ describe "DiscussionThreadListView", ->
 
     beforeEach ->
         DiscussionSpecHelper.setUpGlobals()
-        setFixtures """
-        <script type="text/template" id="thread-list-item-template">
-          <li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
-            <a href="#" class="forum-nav-thread-link">
-              <div class="forum-nav-thread-wrapper-1">
-                <span class="forum-nav-thread-title"><%- title %></span>
-                <%
-                var labels = "";
-                if (pinned) {
-                    labels += '<li class="forum-nav-thread-label-pinned"><i class="icon icon-pushpin"></i>Pinned</li> ';
-                }
-                if (typeof(subscribed) != "undefined" && subscribed) {
-                    labels += '<li class="forum-nav-thread-label-following"><i class="icon icon-star"></i>Following</li> ';
-                }
-                if (staff_authored) {
-                    labels += '<li class="forum-nav-thread-label-staff"><i class="icon icon-user"></i>By: Staff</li> ';
-                }
-                if (community_ta_authored) {
-                    labels += '<li class="forum-nav-thread-label-community-ta"><i class="icon icon-user"></i>By: Community TA</li> ';
-                }
-                if (labels != "") {
-                    print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
-                }
-                %>
-              </div><div class="forum-nav-thread-wrapper-2">
-                <% if (endorsed) { %>
-                  <span class="forum-nav-thread-endorsed"><i class="icon icon-ok"></i><span class="sr">Endorsed response</span></span>
-                <% } %>
-                <span class="forum-nav-thread-votes-count">+<%=
-                    interpolate(
-                        '%(votes_up_count)s%(span_sr_open)s votes %(span_close)s',
-                        {'span_sr_open': '<span class="sr">', 'span_close': '</span>', 'votes_up_count': votes['up_count']},
-                        true
-                        )
-                %></span>
-                <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
-                    <%
-                var fmt;
-                var data = {
-                    'span_sr_open': '<span class="sr">',
-                    'span_close': '</span>',
-                    'unread_comments_count': unread_comments_count,
-                    'comments_count': comments_count
-                    };
-                if (unread_comments_count > 0) {
-                    fmt = '%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s';
-                } else {
-                    fmt = '%(comments_count)s %(span_sr_open)scomments %(span_close)s';
-                }
-                print(interpolate(fmt, data, true));
-                %>
-                </span>
-              </div>
-            </a>
-          </li>
-        </script>
+        DiscussionSpecHelper.setUnderscoreFixtures()
+        appendSetFixtures("""
         <script type="text/template" id="thread-list-template">
             <div class="forum-nav-header">
                 <a href="#" class="forum-nav-browse" aria-haspopup="true">
@@ -84,9 +30,6 @@ describe "DiscussionThreadListView", ->
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
                         <a href="#" class="forum-nav-browse-title">All Discussions</a>
                     </li>
-                    <li class="forum-nav-browse-menu-item forum-nav-browse-menu-flagged">
-                        <a href="#" class="forum-nav-browse-title"><i class="icon icon-flag"></i>Flagged Discussions</a>
-                    </li>
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
                         <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>Posts I'm Following</a>
                     </li>
@@ -98,7 +41,7 @@ describe "DiscussionThreadListView", ->
                                 <ul class="forum-nav-browse-submenu">
                                     <li
                                         class="forum-nav-browse-menu-item"
-                                        data-discussion-id='{"sort_key": null, "id": "child"}'
+                                        data-discussion-id="child"
                                         data-cohorted="false"
                                     >
                                         <a href="#" class="forum-nav-browse-title">Child</a>
@@ -106,7 +49,7 @@ describe "DiscussionThreadListView", ->
                                 </ul>
                             <li
                                 class="forum-nav-browse-menu-item"
-                                data-discussion-id='{"sort_key": null, "id": "sibling"}'
+                                data-discussion-id="sibling"
                                 data-cohorted="false"
                             >
                                 <a href="#" class="forum-nav-browse-title">Sibling</a>
@@ -115,8 +58,8 @@ describe "DiscussionThreadListView", ->
                     </li>
                     <li
                         class="forum-nav-browse-menu-item"
-                        data-discussion-id='{"sort_key": null, "id": "other"}'
-                        data-cohorted="false"
+                        data-discussion-id="other"
+                        data-cohorted="true"
                     >
                         <a href="#" class="forum-nav-browse-title">Other Category</a>
                     </li>
@@ -124,47 +67,53 @@ describe "DiscussionThreadListView", ->
             </div>
             <div class="forum-nav-thread-list-wrapper">
                 <div class="forum-nav-refine-bar">
-                    <span class="forum-nav-sort">
+                    <label class="forum-nav-filter-main">
+                        <select class="forum-nav-filter-main-control">
+                            <option value="all">Show all</option>
+                            <option value="unread">Unread</option>
+                            <option value="unanswered">Unanswered</option>
+                            <option value="flagged">Flagged</option>
+                        </select>
+                    </label>
+                    <% if (isCohorted && isPrivilegedUser) { %>
+                    <label class="forum-nav-filter-cohort">
+                        <span class="sr">Cohort:</span>
+                        <select class="forum-nav-filter-cohort-control">
+                            <option value="">in all cohorts</option>
+                            <option value="1">Cohort1</option>
+                            <option value="2">Cohort2</option>
+                        </select>
+                    </label>
+                    <% } %>
+                    <label class="forum-nav-sort">
                         <select class="forum-nav-sort-control">
                             <option value="date">by recent activity</option>
                             <option value="comments">by most activity</option>
                             <option value="votes">by most votes</option>
                         </select>
-                    </span>
+                    </label>
                 </div>
             </div>
             <div class="search-alerts"></div>
             <ul class="forum-nav-thread-list"></ul>
         </script>
-        <script aria-hidden="true" type="text/template" id="search-alert-template">
-            <div class="search-alert" id="search-alert-<%- cid %>">
-                <div class="search-alert-content">
-                  <p class="message"><%- message %></p>
-                </div>
-
-                <div class="search-alert-controls">
-                  <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
-                </div>
-            </div>
-        </script>
-        <div class="forum-nav"></div>
-        """
+        """)
         @threads = [
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "1",
             title: "Thread1",
             votes: {up_count: '20'},
             comments_count: 1,
             created_at: '2013-04-03T20:08:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "2",
             title: "Thread2",
             votes: {up_count: '42'},
             comments_count: 2,
             created_at: '2013-04-03T20:07:39Z',
           }),
-          makeThreadWithProps({
+          DiscussionViewSpecHelper.makeThreadWithProps({
             id: "3",
             title: "Thread3",
             votes: {up_count: '12'},
@@ -176,29 +125,78 @@ describe "DiscussionThreadListView", ->
         spyOn($, "ajax")
 
         @discussion = new Discussion([])
-        @view = new DiscussionThreadListView({collection: @discussion, el: $(".forum-nav")})
+        @view = new DiscussionThreadListView(
+          collection: @discussion,
+          el: $("#fixture-element"),
+          courseSettings: new DiscussionCourseSettings({is_cohorted: true})
+        )
         @view.render()
 
-    makeThreadWithProps = (props) ->
-      # Minimal set of properties necessary for rendering
-      thread = {
-        id: "dummy_id",
-        pinned: false,
-        endorsed: false,
-        votes: {up_count: '0'},
-        unread_comments_count: 0,
-        comments_count: 0,
-      }
-      $.extend(thread, props)
+    setupAjax = (callback) ->
+      $.ajax.andCallFake(
+        (params) =>
+          if callback
+            callback(params)
+          params.success({discussion_data: [], page: 1, num_pages: 1})
+          {always: ->}
+      )
 
     renderSingleThreadWithProps = (props) ->
-      makeView(new Discussion([new Thread(makeThreadWithProps(props))])).render()
+      makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render()
 
     makeView = (discussion) ->
       return new DiscussionThreadListView(
-          el: $(".forum-nav"),
-          collection: discussion
+          el: $("#fixture-element"),
+          collection: discussion,
+          courseSettings: new DiscussionCourseSettings({is_cohorted: true})
       )
+
+    expectFilter = (filterVal) ->
+        $.ajax.andCallFake((params) ->
+            _.each(["unread", "unanswered", "flagged"], (paramName)->
+                if paramName == filterVal
+                    expect(params.data[paramName]).toEqual(true)
+                else
+                    expect(params.data[paramName]).toBeUndefined()
+            )
+            {always: ->}
+        )
+
+    describe "should filter correctly", ->
+        _.each(["all", "unread", "unanswered", "flagged"], (filterVal) ->
+            it "for #{filterVal}", ->
+                expectFilter(filterVal)
+                @view.$(".forum-nav-filter-main-control").val(filterVal).change()
+                expect($.ajax).toHaveBeenCalled()
+        )
+
+    describe "cohort selector", ->
+        it "should not be visible to students", ->
+            expect(@view.$(".forum-nav-filter-cohort-control:visible")).not.toExist()
+
+        it "should allow moderators to select visibility", ->
+            DiscussionSpecHelper.makeModerator()
+            @view.render()
+            expectedGroupId = null
+            setupAjax((params) => expect(params.data.group_id).toEqual(expectedGroupId))
+            _.each(
+                [
+                    {val: "", expectedGroupId: undefined},
+                    {val: "1", expectedGroupId: "1"},
+                    {val: "2", expectedGroupId: "2"}
+                ],
+                (optionInfo) =>
+                    expectedGroupId = optionInfo.expectedGroupId
+                    @view.$(".forum-nav-filter-cohort-control").val(optionInfo.val).change()
+                    expect($.ajax).toHaveBeenCalled()
+                    $.ajax.reset()
+            )
+
+    it "search should clear filter", ->
+        expectFilter(null)
+        @view.$(".forum-nav-filter-main-control").val("flagged")
+        @view.searchFor("foobar")
+        expect(@view.$(".forum-nav-filter-main-control").val()).toEqual("all")
 
     checkThreadsOrdering =  (view, sort_order, type) ->
       expect(view.$el.find(".forum-nav-thread").children().length).toEqual(3)
@@ -384,14 +382,21 @@ describe "DiscussionThreadListView", ->
             expect($.ajax).toHaveBeenCalled()
             expect(@view.addSearchAlert).not.toHaveBeenCalled()
 
-    describe "endorsed renders correctly", ->
-      it "when absent", ->
-        renderSingleThreadWithProps({})
-        expect($(".forum-nav-thread-endorsed").length).toEqual(0)
+    describe "post type renders correctly", ->
+      it "for discussion", ->
+        renderSingleThreadWithProps({thread_type: "discussion"})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-comments")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("discussion")
 
-      it "when present", ->
-        renderSingleThreadWithProps({endorsed: true})
-        expect($(".forum-nav-thread-endorsed").length).toEqual(1)
+      it "for answered question", ->
+        renderSingleThreadWithProps({thread_type: "question", endorsed: true})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-ok")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("answered question")
+
+      it "for unanswered question", ->
+        renderSingleThreadWithProps({thread_type: "question", endorsed: false})
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-question")
+        expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("unanswered question")
 
     describe "post labels render correctly", ->
       beforeEach ->
@@ -406,38 +411,29 @@ describe "DiscussionThreadListView", ->
 
       it "for pinned", ->
         renderSingleThreadWithProps({pinned: true})
-        expect($(".forum-nav-thread-label-pinned").length).toEqual(1)
+        expect($(".post-label-pinned").length).toEqual(1)
 
       it "for following", ->
         renderSingleThreadWithProps({subscribed: true})
-        expect($(".forum-nav-thread-label-following").length).toEqual(1)
+        expect($(".post-label-following").length).toEqual(1)
 
       it "for moderator", ->
         renderSingleThreadWithProps({user_id: @moderatorId})
-        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+        expect($(".post-label-by-staff").length).toEqual(1)
 
       it "for administrator", ->
         renderSingleThreadWithProps({user_id: @administratorId})
-        expect($(".forum-nav-thread-label-staff").length).toEqual(1)
+        expect($(".post-label-by-staff").length).toEqual(1)
 
       it "for community TA", ->
         renderSingleThreadWithProps({user_id: @communityTaId})
-        expect($(".forum-nav-thread-label-community-ta").length).toEqual(1)
+        expect($(".post-label-by-community-ta").length).toEqual(1)
 
       it "when none should be present", ->
         renderSingleThreadWithProps({})
         expect($(".forum-nav-thread-labels").length).toEqual(0)
 
     describe "browse menu", ->
-      setupAjax = (callback) ->
-        $.ajax.andCallFake(
-          (params) =>
-            if callback
-              callback(params)
-            params.success({discussion_data: [], page: 1, num_pages: 1})
-            {always: ->}
-        )
-
       afterEach ->
         # Remove handler added to make browse menu disappear
         $("body").unbind("click")
@@ -487,7 +483,7 @@ describe "DiscussionThreadListView", ->
             expect(visibleItems).toEqual(expectedItems)
 
           it "should be case-insensitive", ->
-            checkFilter("flagged", ["Flagged Discussions"])
+            checkFilter("other", ["Other Category"])
 
           it "should match partial words", ->
             checkFilter("ateg", ["Other Category"])
@@ -513,23 +509,35 @@ describe "DiscussionThreadListView", ->
           $(".forum-nav-browse-menu-following .forum-nav-browse-title").click()
           expect($(".forum-nav-browse-current").text()).toEqual("Posts I'm Following")
 
+        it "should show/hide the cohort selector", ->
+          DiscussionSpecHelper.makeModerator()
+          @view.render()
+          setupAjax()
+          _.each(
+            [
+              {selector: ".forum-nav-browse-menu-all", cohortVisibility: true},
+              {selector: ".forum-nav-browse-menu-following", cohortVisibility: false},
+              {
+                selector: ".forum-nav-browse-menu-item:has(.forum-nav-browse-menu-item .forum-nav-browse-menu-item)",
+                cohortVisibility: false
+              },
+              {selector: "[data-discussion-id=child]", cohortVisibility: false},
+              {selector: "[data-discussion-id=other]", cohortVisibility: true}
+            ],
+            (itemInfo) =>
+              @view.$("#{itemInfo.selector} > .forum-nav-browse-title").click()
+              expect(@view.$(".forum-nav-filter-cohort").is(":visible")).toEqual(itemInfo.cohortVisibility)
+          )
+
         testSelectionRequest = (callback, itemText) ->
           setupAjax(callback)
           $(".forum-nav-browse-title:contains(#{itemText})").click()
+          expect($.ajax).toHaveBeenCalled()
 
         it "should get all discussions", ->
           testSelectionRequest(
             (params) -> expect(params.url.path()).toEqual(DiscussionUtil.urlFor("threads")),
             "All"
-          )
-
-        it "should get flagged threads", ->
-          testSelectionRequest(
-            (params) ->
-              expect(params.url.path()).toEqual(DiscussionUtil.urlFor("search"))
-              expect(params.data.flagged).toEqual(true)
-            ,
-            "Flagged"
           )
 
         it "should get followed threads", ->

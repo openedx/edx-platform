@@ -91,7 +91,10 @@ def test_lib(options):
     }
 
     if test_id:
-        lib = '/'.join(test_id.split('/')[0:3])
+        if '/' in test_id:
+            lib = '/'.join(test_id.split('/')[0:3])
+        else:
+            lib = 'common/lib/' + test_id.split('.')[0]
         opts['test_id'] = test_id
         lib_tests = [suites.LibTestSuite(lib, **opts)]
     else:

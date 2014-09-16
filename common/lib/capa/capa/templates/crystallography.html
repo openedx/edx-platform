@@ -11,7 +11,7 @@
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
         <div class="status ${status.classname}" id="status_${id}">
-
+    % endif
 
     <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
 

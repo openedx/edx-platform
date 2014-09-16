@@ -118,15 +118,24 @@ urlpatterns += ((
 # Semi-static views only used by edX, not by themes
 if not settings.FEATURES["USE_CUSTOM_THEME"]:
     urlpatterns += (
-        url(r'^jobs$', 'static_template_view.views.render',
-            {'template': 'jobs.html'}, name="jobs"),
-        url(r'^press$', 'student.views.press', name="press"),
-        url(r'^media-kit$', 'static_template_view.views.render',
-            {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^blog$', 'static_template_view.views.render',
+            {'template': 'blog.html'}, name="blog"),
+        url(r'^contact$', 'static_template_view.views.render',
+            {'template': 'contact.html'}, name="contact"),
+        url(r'^donate$', 'static_template_view.views.render',
+            {'template': 'donate.html'}, name="donate"),
         url(r'^faq$', 'static_template_view.views.render',
-            {'template': 'faq.html'}, name="faq_edx"),
+            {'template': 'faq.html'}, name="faq"),
         url(r'^help$', 'static_template_view.views.render',
             {'template': 'help.html'}, name="help_edx"),
+        url(r'^jobs$', 'static_template_view.views.render',
+            {'template': 'jobs.html'}, name="jobs"),
+        url(r'^news$', 'static_template_view.views.render',
+            {'template': 'news.html'}, name="news"),
+        url(r'^press$', 'static_template_view.views.render',
+            {'template': 'press.html'}, name="press"),
+        url(r'^media-kit$', 'static_template_view.views.render',
+            {'template': 'media-kit.html'}, name="media-kit"),
 
         # TODO: (bridger) The copyright has been removed until it is updated for edX
         # url(r'^copyright$', 'static_template_view.views.render',
@@ -180,7 +189,7 @@ if settings.WIKI_ENABLED:
         # never be returned by a reverse() so they come after the other url patterns
         url(r'^courses/{}/course_wiki/?$'.format(settings.COURSE_ID_PATTERN),
             'course_wiki.views.course_wiki_redirect', name="course_wiki"),
-        url(r'^courses/(?:[^/]+/[^/]+/[^/]+)/wiki/', include(wiki_pattern())),
+        url(r'^courses/{}/wiki/'.format(settings.COURSE_ID_PATTERN), include(wiki_pattern())),
     )
 
 if settings.COURSEWARE_ENABLED:
@@ -226,6 +235,17 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^course_sneakpeek/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'student.views.setup_sneakpeek', name="course_sneakpeek"),
+
+        # Used for an AB-test of auto-registration
+        # TODO (ECOM-16): Based on the AB-test, update the default behavior and change
+        # this URL to point to the original view.  Eventually, this URL
+        # should be removed, but not the AB test completes.
+        url(
+            r'^change_enrollment_autoreg$',
+            'student.views.change_enrollment',
+            {'auto_register': True},
+            name="change_enrollment_autoreg",
+        ),
 
         #About the course
         url(r'^courses/{}/about$'.format(settings.COURSE_ID_PATTERN),

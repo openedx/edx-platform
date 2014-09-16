@@ -1,0 +1,143 @@
+## mako
+<%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+# App that handles subdomain specific branding
+import branding
+# app that handles site status messages
+from status.status import get_site_status_msg
+%>
+
+<%! from microsite_configuration import microsite %>
+<%! from microsite_configuration.templatetags.microsite import platform_name %>
+
+## Provide a hook for themes to inject branding on top.
+<%block name="navigation_top" />
+
+<%block cached="False">
+<%
+try:
+    course_id = course.id.to_deprecated_string()
+except:
+    # can't figure out a better way to get at a possibly-defined course var
+    course_id = None
+site_status_msg = get_site_status_msg(course_id)
+%>
+% if site_status_msg:
+<div class="site-status">
+  <div class="inner-wrapper">
+    <span class="white-error-icon"></span>
+    <p>${site_status_msg}</p>
+  </div>
+</div>
+% endif
+</%block>
+
+  <header class="global ${"slim" if course else ""}" aria-label="${_('Global Navigation')}">
+    <nav>
+    <h1 class="logo">
+      <a href="${marketing_link('ROOT')}">
+        <%block name="navigation_logo">
+            <img src="${static.url(branding.get_logo_url())}" alt="${platform_name()}"/>
+        </%block>
+      </a>
+    </h1>
+
+    % if course:
+    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    % endif
+
+    % if user.is_authenticated():
+    <ol class="left nav-global authenticated">
+      <%block name="navigation_global_links_authenticated">
+        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+          <li class="nav-global-01">
+            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+          </li>
+        % endif
+      </%block>
+    </ol>
+    <ol class="user">
+      <li class="primary">
+        <a href="${reverse('dashboard')}" class="user-link">
+          <span class="avatar"></span>
+          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
+        </a>
+      </li>
+      <li class="primary">
+        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+        <ul class="dropdown-menu" aria-label="More Options" role="menu">
+          <%block name="navigation_dropdown_menu_links" >
+            % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+              <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+            % endif
+          </%block>
+          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+        </ul>
+      </li>
+    </ol>
+      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
+        <ol class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <i class="icon-shopping-cart"></i> ${_("Shopping Cart")}
+            </a>
+          </li>
+        </ol>
+      % endif
+    % else:
+    <ol class="left nav-global">
+      <%block name="navigation_global_links">
+        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+          <li class="nav-global-01">
+            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+          </li>
+          <li class="nav-global-02">
+            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
+          </li>
+          <li class="nav-global-03">
+            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
+          </li>
+        % endif
+      </%block>
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register Now")}</a>
+          </li>
+          % else:
+          <li class="nav-global-04">
+            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
+          </li>
+          % endif
+      % endif
+    </ol>
+
+    <ol class="right nav-courseware">
+    <li class="nav-courseware-01">
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Log in")}</a>
+          % else:
+          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+          % endif
+      % endif
+    </li>
+    </ol>
+    % endif
+  </nav>
+</header>
+% if course:
+<!--[if lte IE 8]>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
+<![endif]-->
+% endif
+
+%if not user.is_authenticated():
+  <%include file="forgot_password_modal.html" />
+%endif
+
+<%include file="help_modal.html"/>

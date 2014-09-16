@@ -3,11 +3,9 @@
 """
 Acceptance tests for Video.
 """
-
-import json
+from nose.plugins.attrib import attr
 from unittest import skipIf, skip
-import requests
-from ..helpers import UniqueCourseTest, is_youtube_available
+from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.course_nav import CourseNavPage
@@ -18,8 +16,6 @@ from ..helpers import skip_if_browser
 
 
 VIDEO_SOURCE_PORT = 8777
-YOUTUBE_STUB_PORT = 9080
-YOUTUBE_STUB_URL = 'http://127.0.0.1:{}/'.format(YOUTUBE_STUB_PORT)
 
 HTML5_SOURCES = [
     'http://localhost:{0}/gizmo.mp4'.format(VIDEO_SOURCE_PORT),
@@ -32,13 +28,7 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
-class YouTubeConfigError(Exception):
-    """
-    Error occurred while configuring YouTube Stub Server.
-    """
-    pass
-
-
+@attr('shard_2')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """
@@ -68,7 +58,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.youtube_configuration = {}
 
         # reset youtube stub server
-        self.addCleanup(self._reset_youtube_stub_server)
+        self.addCleanup(YouTubeStubConfig.reset)
 
     def navigate_to_video(self):
         """ Prepare the course and get to the video and render it """
@@ -96,7 +86,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.course_fixture.install()
 
         if len(self.youtube_configuration) > 0:
-            self._configure_youtube_stub_server(self.youtube_configuration)
+            YouTubeStubConfig.configure(self.youtube_configuration)
 
     def _add_course_verticals(self):
         """
@@ -147,39 +137,6 @@ class VideoBaseTest(UniqueCourseTest):
         """ Wait for the video Xmodule but not for rendering """
         self._navigate_to_courseware_video()
         self.video.wait_for_video_class()
-
-    def _configure_youtube_stub_server(self, config):
-        """
-        Allow callers to configure the stub server using the /set_config URL.
-        :param config: Configuration dictionary.
-        The request should have PUT data, such that:
-            Each PUT parameter is the configuration key.
-            Each PUT value is a JSON-encoded string value for the configuration.
-        :raise YouTubeConfigError:
-        """
-        youtube_stub_config_url = YOUTUBE_STUB_URL + 'set_config'
-
-        config_data = {param: json.dumps(value) for param, value in config.items()}
-        response = requests.put(youtube_stub_config_url, data=config_data)
-
-        if not response.ok:
-            raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL {0}, Configuration Data: {1}, Status was {2}'.format(
-                    youtube_stub_config_url, config, response.status_code))
-
-    def _reset_youtube_stub_server(self):
-        """
-        Reset YouTube Stub Server Configurations using the /del_config URL.
-        :raise YouTubeConfigError:
-        """
-        youtube_stub_config_url = YOUTUBE_STUB_URL + 'del_config'
-
-        response = requests.delete(youtube_stub_config_url)
-
-        if not response.ok:
-            raise YouTubeConfigError(
-                'YouTube Server Configuration Failed. URL: {0} Status was {1}'.format(
-                    youtube_stub_config_url, response.status_code))
 
     def metadata_for_mode(self, player_mode, additional_data=None):
         """
@@ -837,7 +794,7 @@ class Html5VideoTest(VideoBaseTest):
 
         self.assertIn(unicode_text, self.video.captions_text)
 
-        #Then I can download transcript in "srt" format that has text "好 各位同学"
+        # Then I can download transcript in "srt" format that has text "好 各位同学"
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 

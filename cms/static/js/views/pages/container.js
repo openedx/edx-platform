@@ -9,6 +9,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
     function ($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
               EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
               XBlockUtils) {
+        'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
 
@@ -88,14 +89,22 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
                 // Render the xblock
                 xblockView.render({
-                    success: function() {
-                        xblockView.xblock.runtime.notify("page-shown", self);
+                    done: function() {
+                        // Show the xblock and hide the loading indicator
                         xblockView.$el.removeClass(hiddenCss);
-                        self.renderAddXBlockComponents();
-                        self.onXBlockRefresh(xblockView);
-                        self.refreshDisplayName();
                         loadingElement.addClass(hiddenCss);
+
+                        // Notify the runtime that the page has been successfully shown
+                        xblockView.notifyRuntime('page-shown', self);
+
+                        // Render the add buttons
+                        self.renderAddXBlockComponents();
+
+                        // Refresh the views now that the xblock is visible
+                        self.onXBlockRefresh(xblockView);
                         unitLocationTree.removeClass(hiddenCss);
+
+                        // Re-enable Backbone events for any updated DOM elements
                         self.delegateEvents();
                     }
                 });
@@ -107,11 +116,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             getURLRoot: function() {
                 return this.xblockView.model.urlRoot;
-            },
-
-            refreshDisplayName: function() {
-                var displayName = this.$('.xblock-header .header-details .xblock-display-name').first().text().trim();
-                this.model.set('display_name', displayName);
             },
 
             onXBlockRefresh: function(xblockView) {
@@ -159,6 +163,10 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
             },
 
+            createPlaceholderElement: function() {
+                return $("<div/>", { class: "studio-xblock-wrapper" });
+            },
+
             createComponent: function(template, target) {
                 // A placeholder element is created in the correct location for the new xblock
                 // and then onNewXBlock will replace it with a rendering of the xblock. Note that
@@ -168,7 +176,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                     buttonPanel = target.closest('.add-xblock-component'),
                     listPanel = buttonPanel.prev(),
                     scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
-                    placeholderElement = $('<div class="studio-xblock-wrapper"></div>').appendTo(listPanel),
+                    placeholderElement = this.createPlaceholderElement().appendTo(listPanel),
                     requestData = _.extend(template, {
                         parent_locator: parentLocator
                     });
@@ -189,7 +197,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 ViewUtils.runOperationShowingMessage(gettext('Duplicating&hellip;'),
                     function() {
                         var scrollOffset = ViewUtils.getScrollOffset(xblockElement),
-                            placeholderElement = $('<div class="studio-xblock-wrapper"></div>').insertAfter(xblockElement),
+                            placeholderElement = self.createPlaceholderElement().insertAfter(xblockElement),
                             parentElement = self.findXBlockElement(parent),
                             requestData = {
                                 duplicate_source_locator: xblockElement.data('locator'),
@@ -217,10 +225,13 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             onDelete: function(xblockElement) {
                 // get the parent so we can remove this component from its parent.
                 var xblockView = this.xblockView,
-                    xblock = xblockView.xblock,
                     parent = this.findXBlockElement(xblockElement.parent());
                 xblockElement.remove();
-                xblock.runtime.notify('deleted-child', parent.data('locator'));
+
+                // Inform the runtime that the child has been deleted in case
+                // other views are listening to deletion events.
+                xblockView.notifyRuntime('deleted-child', parent.data('locator'));
+
                 // Update publish and last modified information from the server.
                 this.model.fetch();
             },

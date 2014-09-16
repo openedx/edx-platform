@@ -224,6 +224,18 @@ section.instructor-dashboard-content-2 {
     .basic-data {
       padding: 6px;
     }
+
+    .running-tasks-section {
+      display: none;
+    }
+
+    .no-pending-tasks-message {
+      display: none;
+      p {
+        color: #a2a2a2;
+        font-style: italic;
+      }
+    }
   }
 }
 
@@ -819,27 +831,32 @@ input[name="subject"] {
 
 }
 #e-commerce{
-  .coupon-errors {
+  input {
+    margin-bottom: 1em;
+    line-height: 1.3em;
+  }
+  .error-msgs {
     background: #FFEEF5;color:#B72667;text-align: center;padding: 10px 0px;
     font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
     border-bottom: 1px solid #B72667;
     margin-bottom: 20px;
     display: none;
     }
+  .success-msgs {
+    background: #D0F5D5;color:#008801;text-align: center;padding: 10px 0px;
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+    border-bottom: 1px solid #008801;
+    margin-bottom: 20px;
+    display: none;
+    }
   .content{
     padding: 0 !important;
   }
-  input[name="course_registration_code_number"] {
-    margin-right: 10px;
-    height: 34px;
-    width: 258px;
-    border-radius: 3px;
-  }
-  input[name="transaction_group_name"], input[name="download_transaction_group_name"],
-  input[name="active_transaction_group_name"], input[name="spent_transaction_group_name"] {
+  input[name="download_company_name"],
+  input[name="active_company_name"], input[name="spent_company_name"] {
     margin-right: 8px;
     height: 36px;
-    width: 300px;
+    width: 254px;
     border-radius: 3px;
   }
   .coupons-table {
@@ -943,11 +960,20 @@ input[name="subject"] {
       }
     }
   }
-
+  section#registration_code_generation_modal {
+      margin-left: -442px;
+      width: 930px;
+    }
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal{
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
     .inner-wrapper {
       background: #fff;
+    }
+    span.tip-text {
+      font-size: 12px;
+      display: block;
+      margin-top: 5px;
+      color: #646464
     }
     top:-95px !important;
     width: 650px;
@@ -958,6 +984,10 @@ input[name="subject"] {
       @extend .button-reset;
     }
     input[type="submit"]#add_coupon_button{
+      @include button(simple, $blue);
+      @extend .button-reset;
+    }
+    input[name="generate-registration-codes-csv"]{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -1002,6 +1032,61 @@ input[name="subject"] {
         margin-bottom: 0px !important;
       }
     }
+    form#generate_codes ol.list-input{
+      li{
+        width: 278px;
+        float: left;
+        label.required:after {
+          content: "*";
+          margin-left: 5px;
+        }
+        min-height: 120px;
+      }
+      li.address_fields {
+        min-height: 45px !important;
+      }
+      li#generate-registration-modal-field-city, li#generate-registration-modal-field-state,
+      li#generate-registration-modal-field-zipcode{
+        width: 205px;
+      }
+      li#generate-registration-modal-field-country {
+        width: 204px;
+        margin-left: 15px !important;
+        margin-bottom: 20px;
+      }
+      li:nth-child(even){
+        margin-left: 0px !important;
+      }
+      li:nth-child(3n) {
+        margin-left: 15px !important;
+      }
+      li#generate-registration-modal-field-company-contact-name,
+      li#generate-registration-modal-field-address-line-3,
+      li#generate-registration-modal-field-zipcode {
+        margin-left: 15px !important;
+      }
+      li:last-child{
+        label {
+          float: right;
+          margin-top: -5px;
+          right: 27px;
+        }
+        min-height: 5px;
+        margin-left: 0px !important;
+        input[type='checkbox'] {
+          width: auto;
+          height: auto;
+        }
+      }
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-total-price,
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
+        margin-left: 0px !important;
+        margin-right: 15px !important;
+      }
+      li#generate-registration-modal-field-custom-reference-number {
+        width: auto;
+      }
+    }
     li#set-course-mode-modal-field-price{
       width: 100%;
       label.required:after {
@@ -1015,7 +1100,13 @@ input[name="subject"] {
         width: 100%;
       }
     }
-    #coupon-content, #course-content {
+    #registration-content form .field.text input {
+          background: #fff;
+          margin-bottom: 0;
+          height: 40px;
+          border-radius: 3px;
+        }
+    #coupon-content, #course-content, #registration-content {
       padding: 20px;
       header {
         margin: 0;
@@ -1073,6 +1164,19 @@ input[name="subject"] {
           padding: 10px 15px;
         }
       }
+    }
+    #registration-content form .group-form {
+
+    }
+    #registration-content form {
+      .field {
+        margin: 0;
+      }
+    .group-form {
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0px;
+    }
     }
   }
 
@@ -1159,5 +1263,47 @@ input[name="subject"] {
       float: right;
     }
   }
+  span.code_tip {
+    background: none repeat scroll 0 0 #F8F4EC;
+    border-bottom: 1px solid #DDDDDD;
+    border-top: 1px solid #DDDDDD;
+    color: #3C3C3C;
+    display: block;
+    line-height: 30px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 20px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+      float: right;
+    }
+  }
+    span.csv_tip {
 
+    display: block;
+    line-height: 30px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 1px;
+    .add{
+      font-size: em(13);
+      float: right;
+    }
+  }
+   span.invalid_sale {
+    background: none repeat scroll 0 0 #F8F4EC;
+    color: #3C3C3C;
+    display: block;
+    line-height: 30px;
+    height: 37px;
+    margin-bottom: 6px;
+    padding: 10px 15px 10px 1px;
+    .add{
+      @include button(simple, $blue);
+      @extend .button-reset;
+      font-size: em(13);
+
+    }
+  }
 }
+

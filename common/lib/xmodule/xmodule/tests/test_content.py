@@ -1,13 +1,76 @@
 import unittest
-from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 
+SAMPLE_STRING = """
+This is a sample string with more than 1024 bytes, the default STREAM_DATA_CHUNK_SIZE
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+when an unknown printer took a galley of type and scrambled it to make a type
+specimen book. It has survived not only five centuries, but also the leap into
+electronic typesetting, remaining essentially unchanged. It was popularised in
+the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+nd more recently with desktop publishing software like Aldus PageMaker including
+versions of Lorem Ipsum.
+
+It is a long established fact that a reader will be distracted by the readable
+content of a page when looking at its layout. The point of using Lorem Ipsum is
+that it has a more-or-less normal distribution of letters, as opposed to using
+'Content here, content here', making it look like readable English. Many desktop
+ublishing packages and web page editors now use Lorem Ipsum as their default model
+text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
+Various versions have evolved over the years, sometimes by accident, sometimes on purpose
+injected humour and the like).
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+when an unknown printer took a galley of type and scrambled it to make a type
+specimen book. It has survived not only five centuries, but also the leap into
+electronic typesetting, remaining essentially unchanged. It was popularised in
+the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+nd more recently with desktop publishing software like Aldus PageMaker including
+versions of Lorem Ipsum.
+
+It is a long established fact that a reader will be distracted by the readable
+content of a page when looking at its layout. The point of using Lorem Ipsum is
+that it has a more-or-less normal distribution of letters, as opposed to using
+'Content here, content here', making it look like readable English. Many desktop
+ublishing packages and web page editors now use Lorem Ipsum as their default model
+text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
+Various versions have evolved over the years, sometimes by accident, sometimes on purpose
+injected humour and the like).
+"""
 
 class Content:
     def __init__(self, location, content_type):
         self.location = location
         self.content_type = content_type
+
+
+class FakeGridFsItem:
+    """
+    This class provides the basic methods to get data from a GridFS item
+    """
+    def __init__(self, string_data):
+        self.cursor = 0
+        self.data = string_data
+        self.length = len(string_data)
+
+    def seek(self, position):
+        """
+        Set the cursor at "position"
+        """
+        self.cursor = position
+
+    def read(self, chunk_size):
+        """
+        Read "chunk_size" bytes of data at position cursor and move the cursor
+        """
+        chunk = self.data[self.cursor:(self.cursor + chunk_size)]
+        self.cursor += chunk_size
+        return chunk
 
 
 class ContentTest(unittest.TestCase):
@@ -46,3 +109,39 @@ class ContentTest(unittest.TestCase):
             AssetLocation(u'foo', u'bar', None, u'asset', u'images_course_image.jpg', None),
             asset_location
         )
+
+    def test_static_content_stream_stream_data(self):
+        """
+        Test StaticContentStream stream_data function, asserts that we get all the bytes
+        """
+        data = SAMPLE_STRING
+        item = FakeGridFsItem(data)
+        static_content_stream = StaticContentStream('loc', 'name', 'type', item, length=item.length)
+
+        total_length = 0
+        stream = static_content_stream.stream_data()
+        for chunck in stream:
+            total_length += len(chunck)
+
+        self.assertEqual(total_length, static_content_stream.length)
+
+    def test_static_content_stream_stream_data_in_range(self):
+        """
+        Test StaticContentStream stream_data_in_range function,
+        asserts that we get the requested number of bytes
+        first_byte and last_byte are chosen to be simple but non trivial values
+        and to have total_length > STREAM_DATA_CHUNK_SIZE (1024)
+        """
+        data = SAMPLE_STRING
+        item = FakeGridFsItem(data)
+        static_content_stream = StaticContentStream('loc', 'name', 'type', item, length=item.length)
+
+        first_byte = 100
+        last_byte = 1500
+
+        total_length = 0
+        stream = static_content_stream.stream_data_in_range(first_byte, last_byte)
+        for chunck in stream:
+            total_length += len(chunck)
+
+        self.assertEqual(total_length, last_byte - first_byte + 1)

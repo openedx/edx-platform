@@ -1,6 +1,7 @@
 """
 Model Managers for Course Actions
 """
+import traceback
 from django.db import models, transaction
 
 
@@ -113,7 +114,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
         FAILED = "failed"
         SUCCEEDED = "succeeded"
 
-    def initiated(self, source_course_key, destination_course_key, user):
+    def initiated(self, source_course_key, destination_course_key, user, display_name):
         """
         To be called when a new rerun is initiated for the given course by the given user.
         """
@@ -123,6 +124,7 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
             user=user,
             allow_not_found=True,
             source_course_key=source_course_key,
+            display_name=display_name,
         )
 
     def succeeded(self, course_key):
@@ -134,14 +136,14 @@ class CourseRerunUIStateManager(CourseActionUIStateManager):
             new_state=self.State.SUCCEEDED,
         )
 
-    def failed(self, course_key, exception):
+    def failed(self, course_key):
         """
-        To be called when an existing rerun for the given course has failed with the given exception.
+        To be called within an exception handler when an existing rerun for the given course has failed.
         """
         self.update_state(
             course_key=course_key,
             new_state=self.State.FAILED,
-            message=exception.message,
+            message=traceback.format_exc(),
         )
 
 

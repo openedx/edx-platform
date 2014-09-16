@@ -29,6 +29,9 @@
 % if launch_url and launch_url !=  'http://www.example.com' and not hide_launch:
     % if open_in_a_new_page:
         <div class="wrapper-lti-link">
+            <div class="ltiTextBox">
+                <span>${text_box}</span>
+            </div>
             <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
                 ${_('View resource in a new window')}
                  <i class="icon-external-link"></i>
@@ -46,7 +49,7 @@
     <h3 class="error_message">
         ${_('Please provide launch_url. Click "Edit", and fill in the required fields.')}
     </h3>
-%endif
+% endif
 
 % if has_score and comment:
     % if grader_feedback_label:

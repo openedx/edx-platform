@@ -11,41 +11,51 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 import datetime
 import pytz
+from request_cache.middleware import RequestCache
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 
-def mixed_store_config(data_dir, mappings):
+def mixed_store_config(data_dir, mappings, include_xml=True):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo- and XML-backed courses.
 
-    `data_dir` is the directory from which to load XML-backed courses.
-    `mappings` is a dictionary mapping course IDs to modulestores, for example:
+    Args:
+        data_dir (string): the directory from which to load XML-backed courses.
+        mappings (string): a dictionary mapping course IDs to modulestores, for example:
 
-        {
-            'MITx/2.01x/2013_Spring': 'xml',
-            'edx/999/2013_Spring': 'default'
-        }
+            {
+                'MITx/2.01x/2013_Spring': 'xml',
+                'edx/999/2013_Spring': 'default'
+            }
 
-    where 'xml' and 'default' are the two options provided by this configuration,
-    mapping (respectively) to XML-backed and Mongo-backed modulestores..
+        where 'xml' and 'default' are the two options provided by this configuration,
+        mapping (respectively) to XML-backed and Mongo-backed modulestores..
+
+    Keyword Args:
+
+        include_xml (boolean): If True, include an XML modulestore in the configuration.
+            Note that this will require importing multiple XML courses from disk,
+            so unless your tests really needs XML course fixtures or is explicitly
+            testing mixed modulestore, set this to False.
+
     """
-    draft_mongo_config = draft_mongo_store_config(data_dir)
-    xml_config = xml_store_config(data_dir)
-    split_mongo = split_mongo_store_config(data_dir)
+    stores = [
+        draft_mongo_store_config(data_dir)['default'],
+        split_mongo_store_config(data_dir)['default']
+    ]
+
+    if include_xml:
+        stores.append(xml_store_config(data_dir)['default'])
 
     store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': mappings,
-                'stores': [
-                    draft_mongo_config['default'],
-                    split_mongo['default'],
-                    xml_config['default'],
-                ]
+                'stores': stores,
             }
         }
     }
@@ -267,6 +277,8 @@ class ModuleStoreTestCase(TestCase):
         # the next time they are accessed.
         # We do this at *both* setup and teardown just to be safe.
         clear_existing_modulestores()
+        # clear RequestCache to emulate its clearance after each http request.
+        RequestCache().clear_request_cache()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
@@ -279,7 +291,7 @@ class ModuleStoreTestCase(TestCase):
             course_loc: the CourseKey for the created course
         """
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-#             with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#             with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
                 course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
                 self.course_loc = course.location
 
@@ -306,7 +318,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Create an equivalent to the toy xml course
         """
-#        with self.store.bulk_write_operations(self.store.make_course_key(org, course, run)):
+#        with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
         self.toy_loc = self.create_sample_course(
             org, course, run, TOY_BLOCK_INFO_TREE,
             {
@@ -352,12 +364,6 @@ class ModuleStoreTestCase(TestCase):
             self.store.create_item(
                 self.user.id, self.toy_loc, "about", block_id="end_date",
                 fields={"data": "TBD"}
-            )
-            self.store.create_item(
-                self.user.id, self.toy_loc, "about", block_id="overview",
-                fields={
-                    "data": "<section class=\"about\">\n  <h2>About This Course</h2>\n  <p>Include your long course description here. The long course description should contain 150-400 words.</p>\n\n  <p>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.</p>\n</section>\n\n<section class=\"prerequisites\">\n  <h2>Prerequisites</h2>\n  <p>Add information about course prerequisites here.</p>\n</section>\n\n<section class=\"course-staff\">\n  <h2>Course Staff</h2>\n  <article class=\"teacher\">\n    <div class=\"teacher-image\">\n      <img src=\"/static/images/pl-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #1\">\n    </div>\n\n    <h3>Staff Member #1</h3>\n    <p>Biography of instructor/staff member #1</p>\n  </article>\n\n  <article class=\"teacher\">\n    <div class=\"teacher-image\">\n      <img src=\"/static/images/pl-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #2\">\n    </div>\n\n    <h3>Staff Member #2</h3>\n    <p>Biography of instructor/staff member #2</p>\n  </article>\n</section>\n\n<section class=\"faq\">\n  <section class=\"responses\">\n    <h2>Frequently Asked Questions</h2>\n    <article class=\"response\">\n      <h3>Do I need to buy a textbook?</h3>\n      <p>No, a free online version of Chemistry: Principles, Patterns, and Applications, First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase a printed version (published by FlatWorld Knowledge) if you’d like.</p>\n    </article>\n\n    <article class=\"response\">\n      <h3>Question #2</h3>\n      <p>Your answer would be displayed here.</p>\n    </article>\n  </section>\n</section>\n"
-                }
             )
             self.store.create_item(
                 self.user.id, self.toy_loc, "course_info", "handouts",

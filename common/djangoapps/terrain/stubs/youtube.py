@@ -55,7 +55,10 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             "Youtube provider received GET request to path {}".format(self.path)
         )
 
-        if 'test_transcripts_youtube' in self.path:
+        if 'get_config' in self.path:
+            self.send_json_response(self.server.config)
+
+        elif 'test_transcripts_youtube' in self.path:
 
             if 't__eq_exist' in self.path:
                 status_message = "".join([

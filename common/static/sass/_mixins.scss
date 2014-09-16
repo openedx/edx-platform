@@ -182,11 +182,11 @@
 %ui-btn-primary {
   @extend %ui-btn;
   @extend %ui-btn-pill;
+  @extend %t-strong;
   padding:($baseline/2) $baseline;
   border-width: 1px;
   border-style: solid;
   box-shadow: none;
-  font-weight: 600;
   line-height: 1.5em;
   text-align: center;
 
@@ -224,9 +224,9 @@
 }
 
 %ui-btn-flat-outline {
-  @extend %t-action4;
   @include transition(all .15s);
-  font-weight: 600;
+  @extend %t-strong;
+  @extend %t-action4;
   text-align: center;
   border-radius: ($baseline/4);
   border: 1px solid $blue-l2;
@@ -297,7 +297,7 @@
   .button,
   .action {
     @extend %btn-primary-green;
-    @include font-size(14);
+    @extend %t-action3;
     margin-left: $baseline;
 
     [class^="icon-"] {
@@ -365,9 +365,6 @@
 
 // extends - content - wrapping
 %cont-text-wrap {
-  text-wrap: wrap;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
   word-wrap: break-word;
 }
 

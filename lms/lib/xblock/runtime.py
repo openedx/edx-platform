@@ -3,6 +3,7 @@ Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
 
 import re
+import xblock.reference.plugins
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -193,4 +194,5 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
             course_id=kwargs.get('course_id', None),
             track_function=kwargs.get('track_function', None),
         )
+        services['fs'] = xblock.reference.plugins.FSService()
         super(LmsModuleSystem, self).__init__(**kwargs)

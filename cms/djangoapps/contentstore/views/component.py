@@ -11,7 +11,6 @@ from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from edxmako.shortcuts import render_to_response
 
-from xmodule.modulestore import PublishState
 from xmodule.modulestore.django import modulestore
 
 from xblock.core import XBlock
@@ -28,6 +27,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from .access import has_course_access
 from django.utils.translation import ugettext as _
+from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -96,11 +96,7 @@ def subsection_handler(request, usage_key_string):
 
         can_view_live = False
         subsection_units = item.get_children()
-        for unit in subsection_units:
-            has_published = modulestore().compute_publish_state(unit) != PublishState.private
-            if has_published:
-                can_view_live = True
-                break
+        can_view_live = any([modulestore().has_published_version(unit) for unit in subsection_units])
 
         return render_to_response(
             'edit_subsection.html',

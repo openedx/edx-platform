@@ -6,6 +6,7 @@ from xmodule.studio_editable import StudioEditableModule, StudioEditableDescript
 from pkg_resources import resource_string
 from copy import copy
 
+
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']

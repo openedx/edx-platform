@@ -34,7 +34,7 @@
       color: $gray;
 
       [class^="icon-"] {
-        @include font-size(14);
+        @extend %t-icon6;
         margin-right: ($baseline/4);
       }
 
@@ -96,7 +96,7 @@
             display: block;
 
             [class^="icon-"] {
-              @include font-size(18);
+              @extend %t-icon4;
               vertical-align: middle;
               margin-right: $baseline/4;
 

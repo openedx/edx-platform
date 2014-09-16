@@ -25,11 +25,11 @@
 
 %ui-badge {
   @extend %t-title9;
+  @extend %t-strong;
   position: relative;
   border-bottom-right-radius: ($baseline/10);
   border-bottom-left-radius: ($baseline/10);
   padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
-  font-weight: 600;
   text-transform: uppercase;
 
   * [class^="icon-"] {

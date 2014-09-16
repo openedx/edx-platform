@@ -1,17 +1,18 @@
 """
 Instructor Dashboard Views
 """
-from django.views.decorators.http import require_POST
 
-from django.contrib.auth.decorators import login_required
 import logging
 import datetime
+import uuid
 import pytz
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404, HttpResponse, HttpResponseNotFound
@@ -25,7 +26,7 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link, get_course_with_access
+from courseware.courses import get_course_by_id, get_cms_course_link
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -33,11 +34,10 @@ from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole
 
-from bulk_email.models import CourseAuthorization
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
-from analyticsclient.client import RestClient, ClientError
-from analyticsclient.course import Course
+from analyticsclient.client import Client
+from analyticsclient.exceptions import ClientError
 
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -156,15 +156,19 @@ def _section_e_commerce(course_key, access):
         'course_id': course_key.to_deprecated_string(),
         'ajax_remove_coupon_url': reverse('remove_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'ajax_get_coupon_info': reverse('get_coupon_info', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_user_invoice_preference_url': reverse('get_user_invoice_preference', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'sale_validation_url': reverse('sale_validation', kwargs={'course_id': course_key.to_deprecated_string()}),
         'ajax_update_coupon': reverse('update_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'ajax_add_coupon': reverse('add_coupon', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_purchase_transaction_url': reverse('get_purchase_transaction', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_sale_records_url': reverse('get_sale_records', kwargs={'course_id': course_key.to_deprecated_string()}),
         'instructor_url': reverse('instructor_dashboard', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_registration_code_csv_url': reverse('get_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'generate_registration_code_csv_url': reverse('generate_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'active_registration_code_csv_url': reverse('active_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'spent_registration_code_csv_url': reverse('spent_registration_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': course_key.to_deprecated_string()}),
         'coupons': coupons,
         'total_amount': total_amount,
         'course_price': course_price
@@ -308,6 +312,7 @@ def _section_data_download(course_key, access):
 
 def _section_send_email(course_key, access, course):
     """ Provide data for the corresponding bulk email section """
+    # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
         DictFieldData({'data': ''}),
@@ -317,7 +322,10 @@ def _section_send_email(course_key, access, course):
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
         extra_data={"course-id": course_key.to_deprecated_string()},
-        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+        usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+        # Generate a new request_token here at random, because this module isn't connected to any other
+        # xblock rendering.
+        request_token=uuid.uuid1().get_hex()
     )
     email_editor = fragment.content
     section_data = {
@@ -380,16 +388,17 @@ def _update_active_students(course_key, section_data):
     section_data['active_student_count_end'] = 'N/A'
 
     try:
-        client = RestClient(base_url=base_url, auth_token=auth_token)
-        course = Course(client, course_key.to_deprecated_string())
+        client = Client(base_url=base_url, auth_token=auth_token)
+        course = client.courses(unicode(course_key))
 
-        section_data['active_student_count'] = course.recent_active_user_count['count']
+        recent_activity = course.recent_activity()
+        section_data['active_student_count'] = recent_activity['count']
 
         def format_date(value):
             return value.split('T')[0]
 
-        start = course.recent_active_user_count['interval_start']
-        end = course.recent_active_user_count['interval_end']
+        start = recent_activity['interval_start']
+        end = recent_activity['interval_end']
 
         section_data['active_student_count_start'] = format_date(start)
         section_data['active_student_count_end'] = format_date(end)

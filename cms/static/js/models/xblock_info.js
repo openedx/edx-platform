@@ -59,7 +59,7 @@ function(Backbone, _, str, ModuleUtils) {
              */
             "visibility_state": null,
             /**
-             * True iff the release date of the xblock is in the past.
+             * True if the release date of the xblock is in the past.
              */
             'released_to_students': null,
             /**
@@ -102,7 +102,25 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The same as `due_date` but as an ISO-formatted date string.
              */
-            'due': null
+            'due': null,
+            /**
+             * True iff this xblock is explicitly staff locked.
+             */
+            'has_explicit_staff_lock': null,
+            /**
+             * True iff this any of this xblock's ancestors are staff locked.
+             */
+            'ancestor_has_staff_lock': null,
+            /**
+             * The xblock which is determining the staff lock value. For instance, for a unit,
+             * this will either be the parent subsection or the grandparent section.
+             * This can be null if the xblock has no inherited staff lock.
+             */
+            'staff_lock_from': null,
+            /**
+             * True iff this xblock should display a "Contains staff only content" message.
+             */
+            'staff_only_message': null
         },
 
         initialize: function () {
@@ -135,6 +153,10 @@ function(Backbone, _, str, ModuleUtils) {
             return childInfo && childInfo.children.length > 0;
         },
 
+        isPublishable: function(){
+            return !this.get('published') || this.get('has_changes');
+        },
+
         /**
          * Return a list of convenience methods to check affiliation to the category.
          * @return {Array}
@@ -157,7 +179,7 @@ function(Backbone, _, str, ModuleUtils) {
          * @return {Boolean}
          */
         isEditableOnCourseOutline: function() {
-            return this.isSequential() || this.isChapter();
+            return this.isSequential() || this.isChapter() || this.isVertical();
         }
     });
     return XBlockInfo;

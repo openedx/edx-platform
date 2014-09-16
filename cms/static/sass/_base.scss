@@ -30,7 +30,7 @@ a {
 
 h1 {
   @extend %t-title4;
-  font-weight: 300;
+  @extend %t-light;
 }
 
 .waiting {
@@ -52,23 +52,23 @@ h1 {
 // typography - basic
 .page-header {
   @extend %t-title3;
+  @extend %t-strong;
   display: block;
-  font-weight: 600;
   color: $gray-d3;
 
   .navigation, .subtitle {
     @extend %t-title7;
+    @extend %t-regular;
     position: relative;
     top: ($baseline/4);
     display: block;
     color: $gray-l2;
-    font-weight: 400;
   }
 }
 
 .section-header {
   @extend %t-title4;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title7;
@@ -77,7 +77,7 @@ h1 {
 
 .area-header {
   @extend %t-title6;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title8;
@@ -86,7 +86,7 @@ h1 {
 
 .area-subheader {
   @extend %t-title7;
-  font-weight: 600;
+  @extend %t-strong;
 
   .subtitle {
     @extend %t-title9;
@@ -163,7 +163,7 @@ h1 {
 
 // typography - loose headings (BT: needs to be removed once html is clean)
 .title-1, .title-2, .title-3, .title-4, .title-5, .title-6 {
-  font-weight: 600;
+  @extend %t-strong;
 }
 
 // typography - primary content
@@ -214,22 +214,22 @@ h1 {
 
 .title-4 {
   @extend %t-title7;
+  @extend %t-regular;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 .title-5 {
   @extend %t-title7;
+  @extend %t-regular;
   color: $gray-l1;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 .title-6 {
   @extend %t-title7;
+  @extend %t-regular;
   color: $gray-l2;
   margin-bottom: $baseline;
-  font-weight: 500
 }
 
 p, ul, ol, dl {
@@ -240,6 +240,282 @@ p, ul, ol, dl {
   }
 }
 
+// ====================
+
+// layout - basic
+.wrapper-view {
+
+}
+
+// ====================
+
+// layout - basic page header
+.wrapper-mast {
+  margin: ($baseline*1.5) 0 0 0;
+  padding: 0 $baseline;
+  position: relative;
+
+  .mast, .metadata {
+    @include clearfix();
+    position: relative;
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto $baseline auto;
+    color: $gray-d2;
+  }
+
+  .mast {
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+
+    // layout with actions
+    .page-header {
+      width: flex-grid(12);
+    }
+
+    // layout with actions
+    &.has-actions {
+      @include clearfix();
+
+      .page-header {
+        float: left;
+        width: flex-grid(6,12);
+        margin-right: flex-gutter();
+      }
+
+      .nav-actions {
+        position: relative;
+        bottom: -($baseline*0.75);
+        float: right;
+        width: flex-grid(6,12);
+        text-align: right;
+
+        .nav-item {
+          display: inline-block;
+          vertical-align: top;
+          margin-right: ($baseline/2);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // buttons
+        .button {
+          padding: ($baseline/4) ($baseline/2) ($baseline/3) ($baseline/2);
+        }
+
+        .new-button {
+
+        }
+
+        .view-button {
+
+        }
+      }
+    }
+
+    // layout with actions
+    &.has-subtitle {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+    }
+
+    // layout with navigation
+    &.has-navigation {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+
+      .navigation-link {
+        @extend %cont-truncated;
+        display: inline-block;
+        vertical-align: bottom; // correct for extra padding in FF
+        max-width: 250px;
+
+        &.navigation-current {
+          @extend %ui-disabled;
+          color: $gray;
+          max-width: 250px;
+
+          &:before {
+            color: $gray;
+          }
+        }
+      }
+
+      .navigation-link:before {
+        content: " / ";
+        margin: ($baseline/4);
+        color: $gray;
+
+        &:hover {
+          color: $gray;
+        }
+      }
+
+      .navigation .navigation-link:first-child:before {
+        content: "";
+        margin: 0;
+      }
+    }
+  }
+
+  // CASE: wizard-based mast
+  .mast-wizard {
+
+    .page-header-sub {
+      @extend %t-title4;
+      color: $gray;
+      font-weight: 300;
+    }
+
+    .page-header-super {
+      @extend %t-title4;
+      float: left;
+      width: flex-grid(12,12);
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/2);
+      font-weight: 600;
+    }
+  }
+
+  // page metadata/action bar
+  .metadata {
+
+  }
+}
+
+// layout - basic page content
+.wrapper-content {
+  margin: 0;
+  padding: 0 $baseline;
+  position: relative;
+}
+
+.content {
+  @include clearfix();
+  @extend %t-copy-base;
+  max-width: $fg-max-width;
+  min-width: $fg-min-width;
+  width: flex-grid(12);
+  margin: 0 auto;
+  color: $gray-d2;
+
+  header {
+    position: relative;
+    margin-bottom: $baseline;
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+
+    .title-sub {
+      @extend %t-copy-sub1;
+      display: block;
+      margin: 0;
+      color: $gray-l2;
+    }
+
+    .title-1 {
+      @extend %t-title3;
+      margin: 0;
+      padding: 0;
+      font-weight: 600;
+      color: $gray-d3;
+    }
+  }
+}
+
+.content-primary, .content-supplementary {
+  @include box-sizing(border-box);
+}
+
+// layout - primary content
+.content-primary {
+
+  .title-1 {
+    @extend %t-title3;
+  }
+
+  .title-2 {
+    @extend %t-title4;
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  .title-3 {
+    @extend %t-title6;
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  header {
+    @include clearfix();
+
+    .title-2 {
+      width: flex-grid(5, 12);
+      margin: 0 flex-gutter() 0 0;
+      float: left;
+    }
+
+    .tip {
+      @extend %t-copy-sub2;
+      width: flex-grid(7, 12);
+      float: right;
+      margin-top: ($baseline/2);
+      text-align: right;
+      color: $gray-l2;
+    }
+  }
+}
+
+// layout - supplemental content
+.content-supplementary {
+
+  > section {
+    margin: 0 0 $baseline 0;
+  }
+}
+
+// ====================
+
+// layout - grandfathered
+.main-wrapper {
+  position: relative;
+  margin: 0 ($baseline*2);
+}
+
+.inner-wrapper {
+  @include clearfix();
+  position: relative;
+  max-width: 1280px;
+  margin: auto;
+
+  > article {
+    clear: both;
+  }
+}
+
+.main-column {
+  clear: both;
+  float: left;
+  width: 70%;
+}
+
+.sidebar {
+  float: right;
+  width: 28%;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
 
 // ====================
 
@@ -247,8 +523,8 @@ p, ul, ol, dl {
 .new-unit-item,
 .new-subsection-item,
 .new-policy-item {
-  @include grey-button;
-  @include font-size(10);
+  @include grey-button();
+  @extend %t-action5;
   margin: ($baseline/2);
   padding: 3px ($baseline/2) 4px ($baseline/2);
 
@@ -287,9 +563,9 @@ hr.divide {
 }
 
 .details {
+    @extend %t-copy-sub1;
     display: none;
     margin-bottom: 30px;
-    font-size: 14px;
 }
 
 .window {
@@ -304,31 +580,30 @@ hr.divide {
   }
 
   .header {
+    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
+    @extend %t-title7;
     padding: 6px 14px;
     border-bottom: 1px solid $mediumGrey;
     border-radius: 2px 2px 0 0;
-    @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     background-color: $lightBluishGrey;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
-    font-size: 14px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   label {
     display: block;
     margin-bottom: 6px;
-    font-weight: 700;
+    @extend %t-strong;
 
     &.inline-label {
       display: inline;
     }
 
     .description {
+      @extend %t-copy-sub2;
+      @extend %t-regular;
       display: block;
-      font-size: 11px;
-      font-weight: 400;
       font-style: italic;
-      line-height: 1.3;
       color: #999;
     }
   }
@@ -345,6 +620,8 @@ hr.divide {
 // system notifications
 .toast-notification {
   @include transition(all $tmg-f2 linear 0s);
+  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
+  @extend %t-copy-sub1;
   display: none;
   position: fixed;
   top: 20px;
@@ -354,10 +631,8 @@ hr.divide {
   padding: 15px 20px 17px;
   border-radius: 3px;
   border: 1px solid #333;
-  @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   background-color: rgba(30, 30, 30, .92);
   box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
-  font-size: 13px;
   text-align: center;
   color: #fff;
 
@@ -366,37 +641,37 @@ hr.divide {
   }
 
   strong {
+    @extend %t-copy-base;
+    @extend %t-strong;
     display: block;
     margin-bottom: 10px;
-    font-size: 16px;
-    font-weight: 700;
     text-align: center;
   }
 
   .close-button {
+    @extend %t-action1;
+    @extend %t-strong;
     position: absolute;
     top: 0;
     right: 0;
     width: 27px;
     height: 27px;
-    font-size: 22px;
-    font-weight: 700;
     line-height: 25px;
     color: #aaa;
     text-align: center;
 
     .close-icon {
-      font-size: 16px;
-      font-weight: 700;
+      @extend %t-action2;
+      @extend %t-strong;
     }
   }
 
   .action-button {
     @include blue-button;
     @include box-sizing(border-box);
+    @extend %t-action4;
     width: 100%;
     margin-top: 10px;
-    font-size: 12px;
     text-align: center;
   }
 }
@@ -418,8 +693,8 @@ hr.divide {
   }
 
   &:after {
-    content: '';
     @extend .spinner-icon;
+    content: '';
     display: block;
     position: absolute;
     top: 50%;
@@ -463,7 +738,7 @@ hr.divide {
   }
 
   .icon-eye-open {
-    @include font-size(16);
+    @extend %t-action2;
     display: inline-block;
     vertical-align: middle;
     margin-right: 8px;
@@ -475,12 +750,12 @@ hr.divide {
 .edit-button.standard,
 .delete-button.standard,
 .duplicate-button.standard {
-  @extend %t-action4;
   @include white-button;
+  @extend %t-regular;
+  @extend %t-action4;
   float: left;
   padding: 3px 10px 4px;
   margin-left: 7px;
-  font-weight: 400;
 
   .edit-icon,
   .delete-icon,
@@ -497,8 +772,9 @@ hr.divide {
 }
 
 .tooltip {
-  @include font-size(12);
   @include transition(opacity $tmg-f3 ease-out 0s);
+  @include font-size(12);
+  @extend %t-regular;
   @extend %ui-depth5;
   position: absolute;
   top: 0;
@@ -506,20 +782,19 @@ hr.divide {
   padding: 0 10px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.85);
-  font-weight: normal;
   line-height: 26px;
   color: $white;
   pointer-events: none;
   opacity: 0.0;
 
   &:after {
+    @include font-size(20);
     content: '▾';
     display: block;
     position: absolute;
     bottom: -14px;
     left: 50%;
     margin-left: -7px;
-    font-size: 20px;
     color: rgba(0, 0, 0, 0.85);
   }
 }
@@ -563,7 +838,7 @@ hr.divider {
 
 // ui - skipnav
 .nav-skip {
-  @include font-size(13);
+  @extend %t-action3;
   display: block;
   position: absolute;
   left: 0px;
@@ -615,7 +890,7 @@ body.js {
       }
 
       [class^="icon-"] {
-        @include font-size(18);
+        @extend %t-action1;
         color: $white;
       }
 
@@ -635,8 +910,8 @@ body.js {
 
     .title {
       @extend %t-title5;
+      @extend %t-strong;
       margin: 0 0 ($baseline/2) 0;
-      font-weight: 600;
       color: $gray-d3;
     }
 

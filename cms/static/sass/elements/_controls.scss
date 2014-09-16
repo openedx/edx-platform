@@ -133,6 +133,27 @@
   }
 }
 
+// white secondary button
+%btn-secondary-white {
+  @extend %ui-btn-secondary;
+  border-color: $white-t2;
+  color: $white-t3;
+
+  &:hover, &:active {
+    border-color: $white;
+    color: $white;
+  }
+
+  &.current, &.active {
+    background: $gray-d2;
+    color: $gray-l5;
+
+    &:hover, &:active {
+      background: $gray-d2;
+    }
+  }
+}
+
 // green secondary button
 %btn-secondary-green {
   @extend %ui-btn-secondary;
@@ -213,17 +234,6 @@
 
 // ====================
 
-// calls-to-action
-
-// ====================
-
-// specific buttons - view live
-%view-live-button {
-  @extend %t-action4;
-}
-
-// ====================
-
 // UI: element actions list
 
 %actions-list {
@@ -290,7 +300,7 @@
 
   .ui-toggle-expansion {
     @include transition(all $tmg-f2 ease-in-out 0s);
-    @include font-size(18);
+    @extend %t-action1;
     display: inline-block;
     margin-right: ($baseline/4);
     color: $gray-l3;

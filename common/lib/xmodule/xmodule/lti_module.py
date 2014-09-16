@@ -206,7 +206,37 @@ class LTIFields(object):
         default="",
         scope=Scope.settings
     )
+    """
+        Users will be presented with a message indicating that their e-mail/username would be sent to a third 
+        party application. When "Open in new Page" is not selected, the tool automatically appears without any user action.
+    """
+    request_username = False  # Jason Bau nuking this for now, PII to external parties is bad
+    request_email = False  # Jason Bau nuking this for now, PII to external parties is bad
+    # request_username = Boolean(
+    #     display_name=_("Request user's username"),
+    #     help=_(
+    #         "Requesting user's username will only work if 'Open in a new page' is set to True"
+    #     ),
+    #     default=False,
+    #     scope=Scope.settings
+    # )
+    # request_email = Boolean(
+    #     display_name=_("Request user's email"),
+    #     help=_(
+    #         "Requesting user's email will only work if 'Open in a new page' is set to True"
+    #     ),
+    #     default=False,
+    #     scope=Scope.settings
+    # )
 
+    text_box = String(
+        display_name=_("LTI Application Information"),
+        help=_(
+            "Provide a description of the third party application. If requesting username and/or email, use this text box to inform users "
+            "that their username and/or email will be forwarded to a third party application."),
+        default="",
+        scope=Scope.settings
+    )
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
@@ -332,6 +362,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         # parsing custom parameters to dict
         custom_parameters = {}
+
         for custom_parameter in self.custom_parameters:
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
@@ -392,6 +423,9 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'title_postscript': self.title_postscript,
             'grader_feedback_label': self.grader_feedback_label,
             'instruction_text': self.instruction_text,
+            'text_box': self.text_box,
+            'request_username': self.request_username,
+            'request_email': self.request_email,
         }
 
     def get_html(self):
@@ -536,6 +570,26 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         if self.has_score:
             body.update({
                 u'lis_outcome_service_url': self.get_outcome_service_url()
+            })
+
+        self.user_email = ""
+        self.user_username = ""
+
+        # Username and email can't be sent in studio mode, because the user object is not defined.
+        # To test functionality test in LMS
+        
+        if self.runtime.get_real_user is not None:
+            real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+            self.user_email = real_user_object.email
+            self.user_username  = real_user_object.username
+
+        if self.request_username and self.user_username and self.open_in_a_new_page:
+            body.update({
+                u'lis_person_sourcedid': self.user_username
+            })
+        if self.request_email and self.user_email and self.open_in_a_new_page:
+            body.update({
+                u'lis_person_contact_email_primary': self.user_email
             })
 
         # Appending custom parameter for signing.
@@ -716,7 +770,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
         root = etree.fromstring(data, parser=parser)
 
-        imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text
+        imsx_messageIdentifier = root.xpath("//def:imsx_messageIdentifier", namespaces=namespaces)[0].text or ''
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
         action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')

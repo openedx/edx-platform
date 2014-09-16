@@ -72,7 +72,7 @@ def delete_course_and_groups(course_key, user_id):
     """
     module_store = modulestore()
 
-    with module_store.bulk_write_operations(course_key):
+    with module_store.bulk_operations(course_key):
         module_store.delete_course(course_key, user_id)
 
         print 'removing User permissions from course....'
@@ -146,7 +146,7 @@ def get_lms_link_for_about_page(course_key):
 def course_image_url(course):
     """Returns the image url for the course."""
     loc = StaticContent.compute_location(course.location.course_key, course.course_image)
-    path = loc.to_deprecated_string()
+    path = StaticContent.serialize_asset_key_with_slash(loc)
     return path
 
 
@@ -195,6 +195,44 @@ def find_release_date_source(xblock):
         return xblock
     else:
         return find_release_date_source(parent)
+
+
+def find_staff_lock_source(xblock):
+    """
+    Returns the xblock responsible for setting this xblock's staff lock, or None if the xblock is not staff locked.
+    If this xblock is explicitly locked, return it, otherwise find the ancestor which sets this xblock's staff lock.
+    """
+
+    # Stop searching if this xblock has explicitly set its own staff lock
+    if xblock.fields['visible_to_staff_only'].is_set_on(xblock):
+        return xblock
+
+    # Stop searching at the section level
+    if xblock.category == 'chapter':
+        return None
+
+    parent_location = modulestore().get_parent_location(xblock.location,
+                                                        revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+    # Orphaned xblocks set their own staff lock
+    if not parent_location:
+        return None
+
+    parent = modulestore().get_item(parent_location)
+    return find_staff_lock_source(parent)
+
+
+def ancestor_has_staff_lock(xblock, parent_xblock=None):
+    """
+    Returns True iff one of xblock's ancestors has staff lock.
+    Can avoid mongo query by passing in parent_xblock.
+    """
+    if parent_xblock is None:
+        parent_location = modulestore().get_parent_location(xblock.location,
+                                                            revision=ModuleStoreEnum.RevisionOption.draft_preferred)
+        if not parent_location:
+            return False
+        parent_xblock = modulestore().get_item(parent_location)
+    return parent_xblock.visible_to_staff_only
 
 
 def add_extra_panel_tab(tab_type, course):
