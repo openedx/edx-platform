@@ -15,7 +15,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException, \
-    CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException
+    ItemDoesNotExistAgainstCouponException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,\
+    MultipleCouponsNotAllowedException
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption
 from .processors import process_postpay_callback, render_purchase_form_html
 import json
@@ -190,8 +191,8 @@ def use_coupon_code(coupon, user):
     try:
         cart = Order.get_cart_for_user(user)
         CouponRedemption.add_coupon_redemption(coupon, cart)
-    except CouponAlreadyExistException:
-        return HttpResponseBadRequest(_("Coupon '{0}' already used.".format(coupon.code)))
+    except MultipleCouponsNotAllowedException:
+        return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
     except ItemDoesNotExistAgainstCouponException:
         return HttpResponseNotFound(_("Coupon '{0}' is not valid for any course in the shopping cart.".format(coupon.code)))
 

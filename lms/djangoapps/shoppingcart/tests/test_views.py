@@ -84,11 +84,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         val = Decimal("{0:.2f}".format(Decimal(self.percentage_discount / 100.00) * self.cost))
         return self.cost - val
 
-    def add_coupon(self, course_key, is_active):
+    def add_coupon(self, course_key, is_active, code):
         """
         add dummy coupon into models
         """
-        coupon = Coupon(code=self.coupon_code, description='testing code', course_id=course_key,
+        coupon = Coupon(code=code, description='testing code', course_id=course_key,
                         percentage_discount=self.percentage_discount, created_by=self.user, is_active=is_active)
         coupon.save()
 
@@ -122,7 +122,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('The course {0} is already in your cart.'.format(self.course_key.to_deprecated_string()), resp.content)
 
     def test_course_discount_invalid_coupon(self):
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         self.add_course_to_user_cart()
         non_existing_code = "non_existing_code"
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': non_existing_code})
@@ -138,7 +138,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn("Discount does not exist against code '{0}'.".format(non_existing_code), resp.content)
 
     def test_course_discount_inactive_coupon(self):
-        self.add_coupon(self.course_key, False)
+        self.add_coupon(self.course_key, False, self.coupon_code)
         self.add_course_to_user_cart()
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 404)
@@ -146,7 +146,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def test_course_does_not_exist_in_cart_against_valid_coupon(self):
         course_key = self.course_key.to_deprecated_string() + 'testing'
-        self.add_coupon(course_key, True)
+        self.add_coupon(course_key, True, self.coupon_code)
         self.add_course_to_user_cart()
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
@@ -164,7 +164,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def test_course_discount_for_valid_active_coupon_code(self):
 
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         self.add_course_to_user_cart()
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
@@ -177,13 +177,33 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # after getting 10 percent discount
         self.assertEqual(self.cart.total_cost, self.get_discount())
 
-        # now testing coupon code already used scenario, reusing the same coupon code
+        # now using the same coupon code against the same order.
+        # Only one coupon redemption should be allowed per order.
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 400)
-        self.assertIn("Coupon '{0}' already used.".format(self.coupon_code), resp.content)
+        self.assertIn("Only one coupon redemption is allowed against an order", resp.content)
+
+    def test_course_discount_against_two_distinct_coupon_codes(self):
+
+        self.add_coupon(self.course_key, True, self.coupon_code)
+        self.add_course_to_user_cart()
+
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
+        self.assertEqual(resp.status_code, 200)
+
+        # unit price should be updated for that course
+        item = self.cart.orderitem_set.all().select_subclasses()[0]
+        self.assertEquals(item.unit_cost, self.get_discount())
+
+        # now using another valid active coupon code.
+        # Only one coupon redemption should be allowed per order.
+        self.add_coupon(self.course_key, True, 'abxyz')
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'abxyz'})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Only one coupon redemption is allowed against an order", resp.content)
 
     def test_soft_delete_coupon(self):  # pylint: disable=E1101
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         coupon = Coupon(code='TestCode', description='testing', course_id=self.course_key,
                         percentage_discount=12, created_by=self.user, is_active=True)
         coupon.save()
@@ -248,7 +268,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.log.info')
     def test_existing_coupon_redemption_on_removing_item(self, info_log):
 
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         reg_item = self.add_course_to_user_cart()
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
@@ -283,7 +303,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_coupon_discount_for_multiple_courses_in_cart(self, info_log):
 
         reg_item = self.add_course_to_user_cart()
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
@@ -358,7 +378,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
@@ -506,7 +526,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_total_amount_of_purchased_course(self):
         self.add_course_to_user_cart()
         self.assertEquals(self.cart.orderitem_set.count(), 1)
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
@@ -527,7 +547,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_valid_coupon_code(self):
         self.add_course_to_user_cart()
-        self.add_coupon(self.course_key, True)
+        self.add_coupon(self.course_key, True, self.coupon_code)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
