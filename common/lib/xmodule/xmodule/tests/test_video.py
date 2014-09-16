@@ -202,6 +202,40 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'transcripts': {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
         })
 
+    def test_constructor_for_download_video(self):
+        """
+        Test that "download_video" field is False (default value) if not explicitly set in xml
+        """
+        sample_xml = '''
+            <video display_name="Test Video" youtube="1.0:p2Q6BrNhdh8">
+              <source src="http://www.example.com/source.mp4"/>
+            </video>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml)
+        self.assert_attributes_equal(descriptor, {
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'download_video': False,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
+
+        # Now construct video from xml with explicitly set download_video and check that
+        # resulting video descriptor has same value for "download_video"
+        sample_xml = '''
+            <video display_name="Test Video"
+                youtube="1.0:p2Q6BrNhdh8"
+                download_video="true">
+              <source src="http://www.example.com/source.mp4"/>
+            </video>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml)
+        self.assert_attributes_equal(descriptor, {
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'download_video': True,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
+
     def test_from_xml(self):
         module_system = DummySystem(load_error_modules=True)
         xml_data = '''
@@ -262,7 +296,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'track': '',
             'handout': None,
             'download_track': False,
-            'download_video': True,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -292,7 +326,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': 'http://www.example.com/track',
             'download_track': True,
-            'download_video': True,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': '',
             'transcripts': {},
