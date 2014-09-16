@@ -1,13 +1,13 @@
-define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers", "js/views/utils/view_utils",
+define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helpers", "js/views/utils/view_utils",
         "js/views/unit_outline", "js/models/xblock_info"],
-    function ($, create_sinon, view_helpers, ViewUtils, UnitOutlineView, XBlockInfo) {
+    function ($, AjaxHelpers, view_helpers, ViewUtils, UnitOutlineView, XBlockInfo) {
 
         describe("UnitOutlineView", function() {
             var createUnitOutlineView, createMockXBlockInfo,
                 requests, model, unitOutlineView;
 
             createUnitOutlineView = function(test, unitJSON, createOnly) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(unitJSON, { parse: true });
                 unitOutlineView = new UnitOutlineView({
                     model: model,
@@ -93,12 +93,12 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
                 redirectSpy = spyOn(ViewUtils, 'redirect');
                 unitOutlineView.$('.outline-subsection > .outline-content  > .add-unit .button-new').click();
-                create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                     category: 'vertical',
                     display_name: 'Unit',
                     parent_locator: 'mock-subsection'
                 });
-                create_sinon.respondWithJson(requests, {
+                AjaxHelpers.respondWithJson(requests, {
                     locator: "new-mock-unit",
                     courseKey: "slashes:MockCourse"
                 });
@@ -109,8 +109,8 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/view_helpers"
                 var updatedDisplayName = 'Mock Unit Updated', unitHeader;
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));
                 unitOutlineView.refresh();
-                create_sinon.expectJsonRequest(requests, 'GET', '/xblock/mock-unit');
-                create_sinon.respondWithJson(requests,
+                AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/mock-unit');
+                AjaxHelpers.respondWithJson(requests,
                     createMockXBlockInfo(updatedDisplayName));
                 expect(unitOutlineView.$('.outline-unit .unit-title').first().text().trim()).toBe(updatedDisplayName);
             });

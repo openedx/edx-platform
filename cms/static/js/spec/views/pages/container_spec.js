@@ -1,6 +1,6 @@
-define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
         "js/views/pages/container", "js/models/xblock_info", "jquery.simulate"],
-    function ($, _, str, create_sinon, edit_helpers, ContainerPage, XBlockInfo) {
+    function ($, _, str, AjaxHelpers, edit_helpers, ContainerPage, XBlockInfo) {
 
         describe("ContainerPage", function() {
             var lastRequest, renderContainerPage, expectComponents, respondWithHtml,
@@ -44,7 +44,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             respondWithHtml = function(html) {
                 var requestIndex = requests.length - 1;
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     { html: html, "resources": [] },
                     requestIndex
@@ -52,7 +52,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             renderContainerPage = function(test, html, options) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 containerPage = new ContainerPage(_.extend(options || {}, {
                     model: model,
                     templates: edit_helpers.mockComponentTemplates,
@@ -79,7 +79,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                 });
 
                 it('shows a loading indicator', function() {
-                    requests = create_sinon.requests(this);
+                    requests = AjaxHelpers.requests(this);
                     containerPage.render();
                     expect(containerPage.$('.ui-loading')).not.toHaveClass('is-hidden');
                     respondWithHtml(mockContainerXBlockHtml);
@@ -131,7 +131,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Expect a request to be made to show the studio view for the container
                     expect(str.startsWith(lastRequest().url, '/xblock/locator-container/studio_view')).toBeTruthy();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockContainerXBlockHtml,
                         resources: []
                     });
@@ -142,19 +142,19 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     // Press the save button and respond with a success message to the save
                     edit_helpers.pressModalButton('.action-save');
-                    create_sinon.respondWithJson(requests, { });
+                    AjaxHelpers.respondWithJson(requests, { });
                     expect(edit_helpers.isShowingModal()).toBeFalsy();
 
                     // Expect the last request be to refresh the container page
                     expect(str.startsWith(lastRequest().url,
                         '/xblock/locator-container/container_preview')).toBeTruthy();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockUpdatedContainerXBlockHtml,
                         resources: []
                     });
 
                     // Respond to the subsequent xblock info fetch request.
-                    create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
+                    AjaxHelpers.respondWithJson(requests, {"display_name":  updatedDisplayName});
 
                     // Expect the title to have been updated
                     expect(displayNameElement.text().trim()).toBe(updatedDisplayName);
@@ -167,9 +167,9 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     displayNameInput = edit_helpers.inlineEdit(displayNameWrapper, updatedDisplayName);
                     displayNameInput.change();
                     // This is the response for the change operation.
-                    create_sinon.respondWithJson(requests, { });
+                    AjaxHelpers.respondWithJson(requests, { });
                     // This is the response for the subsequent fetch operation.
-                    create_sinon.respondWithJson(requests, {"display_name":  updatedDisplayName});
+                    AjaxHelpers.respondWithJson(requests, {"display_name":  updatedDisplayName});
                     edit_helpers.verifyInlineEditChange(displayNameWrapper, updatedDisplayName);
                     expect(containerPage.model.get('display_name')).toBe(updatedDisplayName);
                 });
@@ -189,7 +189,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     editButtons[0].click();
                     // Make sure that the correct xblock is requested to be edited
                     expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/studio_view')).toBeTruthy();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []
                     });
@@ -201,7 +201,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     renderContainerPage(this, mockBadContainerXBlockHtml);
                     editButtons = containerPage.$('.wrapper-xblock .edit-button');
                     editButtons[0].click();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXBlockEditorHtml,
                         resources: []
                     });
@@ -235,7 +235,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     // The container should have rendered six mock xblocks
                     expect(editButtons.length).toBe(6);
                     editButtons[0].click();
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         html: mockXModuleEditor,
                         resources: []
                     });
@@ -249,7 +249,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     // Press the save button
                     modal.find('.action-save').click();
                     // Respond to the save
-                    create_sinon.respondWithJson(requests, {
+                    AjaxHelpers.respondWithJson(requests, {
                         id: model.id
                     });
 
@@ -296,15 +296,15 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     deleteComponent = function(componentIndex) {
                         clickDelete(componentIndex);
-                        create_sinon.respondWithJson(requests, {});
+                        AjaxHelpers.respondWithJson(requests, {});
 
                         // second to last request contains given component's id (to delete the component)
-                        create_sinon.expectJsonRequest(requests, 'DELETE',
+                        AjaxHelpers.expectJsonRequest(requests, 'DELETE',
                             '/xblock/locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
                             null, requests.length - 2);
 
                         // final request to refresh the xblock info
-                        create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                     };
 
                     deleteComponentWithSuccess = function(componentIndex) {
@@ -336,12 +336,12 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockBadContainerXBlockHtml);
                         containerPage.$('.delete-button').first().click();
                         edit_helpers.confirmPrompt(promptSpy);
-                        create_sinon.respondWithJson(requests, {});
+                        AjaxHelpers.respondWithJson(requests, {});
                         // expect the second to last request to be a delete of the xblock
-                        create_sinon.expectJsonRequest(requests, 'DELETE', '/xblock/locator-broken-javascript',
+                        AjaxHelpers.expectJsonRequest(requests, 'DELETE', '/xblock/locator-broken-javascript',
                             null, requests.length - 2);
                         // expect the last request to be a fetch of the xblock info for the parent container
-                        create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                     });
 
                     it('does not delete when clicking No in prompt', function () {
@@ -365,7 +365,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         clickDelete(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-                        create_sinon.respondWithJson(requests, {});
+                        AjaxHelpers.respondWithJson(requests, {});
                         edit_helpers.verifyNotificationHidden(notificationSpy);
                     });
 
@@ -374,7 +374,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         clickDelete(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
                         expectComponents(getGroupElement(), allComponentsInGroup);
                     });
@@ -400,13 +400,13 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         clickDuplicate(componentIndex);
 
                         // verify content of request
-                        create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                             'duplicate_source_locator': 'locator-component-' + GROUP_TO_TEST + (componentIndex + 1),
                             'parent_locator': 'locator-group-' + GROUP_TO_TEST
                         });
 
                         // send the response
-                        create_sinon.respondWithJson(requests, {
+                        AjaxHelpers.respondWithJson(requests, {
                             'locator': 'locator-duplicated-component'
                         });
 
@@ -432,7 +432,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     it("can duplicate an xblock with broken JavaScript", function() {
                         renderContainerPage(this, mockBadContainerXBlockHtml);
                         containerPage.$('.duplicate-button').first().click();
-                        create_sinon.expectJsonRequest(requests, 'POST', '/xblock/', {
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/', {
                             'duplicate_source_locator': 'locator-broken-javascript',
                             'parent_locator': 'locator-container'
                         });
@@ -443,7 +443,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         clickDuplicate(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
-                        create_sinon.respondWithJson(requests, {"locator": "new_item"});
+                        AjaxHelpers.respondWithJson(requests, {"locator": "new_item"});
                         edit_helpers.verifyNotificationHidden(notificationSpy);
                     });
 
@@ -453,7 +453,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         refreshXBlockSpies = spyOn(containerPage, "refreshXBlock");
                         clickDuplicate(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         expectComponents(getGroupElement(), allComponentsInGroup);
                         expect(refreshXBlockSpies).not.toHaveBeenCalled();
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Duplicating/);
@@ -482,7 +482,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         clickNewComponent(0);
                         edit_helpers.verifyNotificationShowing(notificationSpy, /Adding/);
-                        create_sinon.respondWithJson(requests, { });
+                        AjaxHelpers.respondWithJson(requests, { });
                         edit_helpers.verifyNotificationHidden(notificationSpy);
                     });
 
@@ -491,7 +491,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         clickNewComponent(0);
                         requestCount = requests.length;
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         // No new requests should be made to refresh the view
                         expect(requests.length).toBe(requestCount);
                         expectComponents(getGroupElement(), allComponentsInGroup);
@@ -512,7 +512,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             xblockCount = containerPage.$('.studio-xblock-wrapper').length;
                             containerPage.$('.new-component-html a')[templateIndex].click();
                             edit_helpers.verifyXBlockRequest(requests, expectedRequest);
-                            create_sinon.respondWithJson(requests, {"locator": "new_item"});
+                            AjaxHelpers.respondWithJson(requests, {"locator": "new_item"});
                             respondWithHtml(mockXBlockHtml);
                             expect(containerPage.$('.studio-xblock-wrapper').length).toBe(xblockCount + 1);
                         };

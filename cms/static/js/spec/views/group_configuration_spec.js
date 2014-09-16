@@ -5,13 +5,13 @@ define([
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
     'js/views/group_configuration_item', 'js/models/group',
     'js/collections/group', 'js/views/group_edit',
-    'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
+    'js/views/feedback_notification', 'js/common_helpers/ajax_helpers',
     'js/spec_helpers/edit_helpers', 'jasmine-stealth'
 ], function(
     _, Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
     GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
-    Notification, create_sinon, view_helpers
+    Notification, AjaxHelpers, view_helpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -304,7 +304,7 @@ define([
         });
 
         it('should save properly', function() {
-            var requests = create_sinon.requests(this),
+            var requests = AjaxHelpers.requests(this),
                 notificationSpy = view_helpers.createNotificationSpy(),
                 groups;
 
@@ -331,13 +331,13 @@ define([
         });
 
         it('does not hide saving message if failure', function() {
-            var requests = create_sinon.requests(this),
+            var requests = AjaxHelpers.requests(this),
                 notificationSpy = view_helpers.createNotificationSpy();
 
             setValuesToInputs(this.view, { inputName: 'New Configuration' });
             this.view.$('form').submit();
             view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            create_sinon.respondWithError(requests);
+            AjaxHelpers.respondWithError(requests);
             view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
         });
 
@@ -373,7 +373,7 @@ define([
         });
 
         it('should be possible to correct validation errors', function() {
-            var requests = create_sinon.requests(this);
+            var requests = AjaxHelpers.requests(this);
 
             // Set incorrect value
             setValuesToInputs(this.view, { inputName: '' });
@@ -564,7 +564,7 @@ define([
         });
 
         it('should destroy itself on confirmation of deleting', function () {
-            var requests = create_sinon.requests(this),
+            var requests = AjaxHelpers.requests(this),
                 promptSpy = view_helpers.createPromptSpy(),
                 notificationSpy = view_helpers.createNotificationSpy();
 
@@ -572,16 +572,16 @@ define([
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
             view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondToDelete(requests);
+            AjaxHelpers.respondToDelete(requests);
             view_helpers.verifyNotificationHidden(notificationSpy);
             expect($(SELECTORS.itemView)).not.toExist();
         });
 
         it('does not hide deleting message if failure', function() {
-            var requests = create_sinon.requests(this),
+            var requests = AjaxHelpers.requests(this),
                 promptSpy = view_helpers.createPromptSpy(),
                 notificationSpy = view_helpers.createNotificationSpy();
 
@@ -589,10 +589,10 @@ define([
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
             view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondWithError(requests);
+            AjaxHelpers.respondWithError(requests);
             view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
             expect($(SELECTORS.itemView)).toExist();
         });

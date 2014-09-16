@@ -1,7 +1,7 @@
-define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define([ "jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
     "js/views/container", "js/models/xblock_info", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function ($, create_sinon, edit_helpers, ContainerView, XBlockInfo) {
+    function ($, AjaxHelpers, edit_helpers, ContainerView, XBlockInfo) {
 
         describe("Container View", function () {
 
@@ -30,7 +30,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
 
                 respondWithMockXBlockFragment = function (requests, response) {
                     var requestIndex = requests.length - 1;
-                    create_sinon.respondWithJson(requests, response, requestIndex);
+                    AjaxHelpers.respondWithJson(requests, response, requestIndex);
                 };
 
                 beforeEach(function () {
@@ -57,7 +57,7 @@ define([ "jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers
                 });
 
                 init = function (caller) {
-                    var requests = create_sinon.requests(caller);
+                    var requests = AjaxHelpers.requests(caller);
                     containerView.render();
 
                     respondWithMockXBlockFragment(requests, {

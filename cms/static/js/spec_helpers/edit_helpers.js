@@ -1,10 +1,10 @@
 /**
  * Provides helper methods for invoking Studio editors in Jasmine tests.
  */
-define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers",
+define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpers/modal_helpers",
     "js/views/modals/edit_xblock", "js/collections/component_template",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
-    function($, _, create_sinon, modal_helpers, EditXBlockModal, ComponentTemplates) {
+    function($, _, AjaxHelpers, modal_helpers, EditXBlockModal, ComponentTemplates) {
 
         var installMockXBlock, uninstallMockXBlock, installMockXModule, uninstallMockXModule,
             mockComponentTemplates, installEditTemplates, showEditModal, verifyXBlockRequest;
@@ -90,7 +90,7 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
         showEditModal = function(requests, xblockElement, model, mockHtml, options) {
             var modal = new EditXBlockModal({});
             modal.edit(xblockElement, model, options);
-            create_sinon.respondWithJson(requests, {
+            AjaxHelpers.respondWithJson(requests, {
                 html: mockHtml,
                 "resources": []
             });
