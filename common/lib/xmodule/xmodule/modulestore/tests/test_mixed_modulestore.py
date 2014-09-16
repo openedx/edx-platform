@@ -27,7 +27,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, ModuleStoreDraftAndPublished
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
@@ -1789,9 +1789,11 @@ def create_modulestore_instance(engine, contentstore, doc_store_config, options,
     """
     class_ = load_function(engine)
 
+    if issubclass(class_, ModuleStoreDraftAndPublished):
+        options['branch_setting_func'] = lambda: ModuleStoreEnum.Branch.draft_preferred
+
     return class_(
         doc_store_config=doc_store_config,
         contentstore=contentstore,
-        branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
         **options
     )
