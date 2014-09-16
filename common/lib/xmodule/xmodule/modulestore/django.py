@@ -18,6 +18,8 @@ import threading
 
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.draft_and_published import BranchSettingMixin
 from xmodule.contentstore.django import contentstore
 import xblock.reference.plugins
 
@@ -66,6 +68,12 @@ def create_modulestore_instance(engine, content_store, doc_store_config, options
     except InvalidCacheBackendError:
         metadata_inheritance_cache = get_cache('default')
 
+    if issubclass(class_, MixedModuleStore):
+        _options['create_modulestore_instance'] = create_modulestore_instance
+
+    if issubclass(class_, BranchSettingMixin):
+        _options['branch_setting_func'] = _get_modulestore_branch_setting
+
     return class_(
         contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
@@ -75,8 +83,6 @@ def create_modulestore_instance(engine, content_store, doc_store_config, options
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
-        branch_setting_func=_get_modulestore_branch_setting,
-        create_modulestore_instance=create_modulestore_instance,
         **_options
     )
 
