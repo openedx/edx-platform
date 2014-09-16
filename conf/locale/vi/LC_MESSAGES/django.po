@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -41,7 +41,7 @@
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Hung The Hung <hoangthehung92@gmail.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)
+# edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -116,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:20-0400\n"
+"POT-Creation-Date: 2014-09-16 08:59-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Minh Tue Vo <mvo@edx.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
@@ -5314,6 +5314,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry!  Your payment could not be processed because an unexpected exception "
 "occurred.  Please contact us at {email} for assistance."
 msgstr ""
@@ -6619,71 +6627,6 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-"Tại sao tôi phải trả phí? Sẽ thế nào nếu tôi muốn một chứng nhận cam kết "
-"danh dự miễn phí ?"
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "Tại sao tôi phải trả tiền? "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"Là tổ chức phi lợi nhuận, edX sử dụng đóng góp của bạn để hỗ trợ sứ mệnh của"
-" chúng tôi là cung cấp giáo dục chất lượng cho tất cả mọi người trên toàn "
-"thế giới, và để cải tiến việc học thông qua nghiên cứu. Chúng tôi đã lập một"
-" khoản phí tối thiểu nhưng mong quý vị có thể đóng góp hết sức của mình.."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr ""
-"Tôi muốn trả nhiều hơn mức tối thiểu. Đóng góp của tôi có được khấu trừ "
-"thuế?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"Vui lòng kiểm tra với nhà tư vấn thuế của bạn để xác định xem đóng góp của "
-"bạn có được khấu trừ thuế không."
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr ""
-"Sẽ thế nào nếu tôi không thể trả tiền hoặc không có các thiết bị cần thiết?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-"Nếu không thể trả khoản phí tối thiểu hoặc không đáp ứng được các yêu cầu, "
-"bạn có thể theo dõi  khóa học hoặc chọn nhận giấy chứng nhận cam kết danh dự"
-" miễn phí."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-"Nếu bạn muốn theo đuổi giấy chứng nhận cam kết danh dự, xin vui lòng chọn ô "
-"giấy chứng nhận cam kết danh dự rồi nhấp chuột vào nút 'Chọn Giấy Chứng "
-"Nhận\" để hoàn tất đăng ký."
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "Chọn Giấy Chứng Nhận Cam Kết Danh Dự"
-
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "Hủy Đăng Ký"
@@ -6733,10 +6676,13 @@ msgid "Audit This Course"
 msgstr "Học không chứng chỉ khóa học này"
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"Đăng ký để học không chứng chỉ khóa học này miễn phí và theo dõi sự tiến bộ "
-"của bạn."
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -6773,16 +6719,6 @@ msgstr ""
 "nghiệp hay đăng ký học  lên không? Hãy nâng cấp lên hệ theo học nhằm đạt "
 "Giấy Chứng Nhận Thành Tích Xác Thực để có giấy tờ chứng thực thành tích. Bạn"
 " sẽ phải trả một khoản phí tối thiểu."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
-msgstr ""
-"Bạn có thể chọn theo dõi khóa học này và vẫn truy cập được vào toàn bộ học "
-"liệu. Nếu bạn hoàn thành và đủ điểm đỗ, bạn sẽ tự động nhận được Giấy Chứng "
-"Nhận Cam Kết Danh Dự miễn phí."
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
@@ -13441,51 +13377,53 @@ msgid "Loading&hellip;"
 msgstr ""
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
-msgstr "Những tập tin được liệt kê ở đây là gì?"
-
-#: cms/templates/asset_index.html
-msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
-msgstr ""
-"Ngoài những tập tin bạn tải lên trong trang này, mọi tập tin mà bạn thêm vào"
-" khóa học xuất hiện trong danh sách này. Những tập tin này bao gồm hình ảnh "
-"khóa học của bạn, các chương sách, và tập tin xuất hiện trong thanh sidebar "
-"của Tài Liệu Phát Tay Khóa Học của bạn."
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
+msgid "Adding Files for Your Course"
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
-
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "Tôi có thể làm gì trong trang này?"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
-"Bạn có thể tải lên tập tin mới hoặc xem, tải về, hoặc xóa tập tin đã có. Bạn"
-" có thể khóa một tập tin khiến người không tham gia vào khóa học của bạn "
-"không thể truy cập tập tin này."
+
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -13558,6 +13496,11 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Preview Changes"
 msgstr ""
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "Tôi có thể làm gì trong trang này?"
 
 #: cms/templates/container.html
 msgid ""
@@ -13826,9 +13769,8 @@ msgid ""
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
 msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
@@ -14155,6 +14097,10 @@ msgid ""
 "You can delete a group configuration only if it is not in use in an "
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -15407,6 +15353,10 @@ msgstr ""
 "Nếu giáo trình của bạn không có các chương riêng biệt, bạn có thể tải lên "
 "toàn bộ văn bản như một chương sách và đặt một tên theo ý bạn trong trường "
 "Tên Chương."
+
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

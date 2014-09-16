@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -42,7 +42,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)
+# edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:20-0400\n"
+"POT-Creation-Date: 2014-09-16 08:59-0400\n"
 "PO-Revision-Date: 2014-09-02 00:40+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -5743,6 +5743,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry!  Your payment could not be processed because an unexpected exception "
 "occurred.  Please contact us at {email} for assistance."
 msgstr ""
@@ -7039,68 +7047,6 @@ msgid "):"
 msgstr "): "
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-"لماذا ينبغي أن أدفع؟ ماذا لو أردت الحصول على شهادة ميثاق الشرف الأكاديمي "
-"مجانية؟"
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "لماذا علي أن أدفع؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"كمؤسسة غير ربحية، تقوم edx باستعمال مساهمتك لدعم مهمتنا التي تتمثّل في توفير"
-" تعليم عالي الجودة للجميع حول العالم، ولتطوير عملية التعلم عن طريق البحث. "
-"وفي حين أننا قمنا بفرض الحد الأدنى كرسم تسجيل، إلا أننا نطلب لطفاً مساهمتك "
-"على قدر الاستطاعة. "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr "أود دفع مبلغٍ سيزيد عن الحد الأدنى. هل يتم خصم مساهمتي من الضرائب؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"الرجاء مراجعة استشاري الضرائب الخاص بك لمعرفة ما إذا كانت مساهمتك قابلة "
-"للخصم من الضرائب. "
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr "ماذا إن كنت لا أستطيع تحمل تكاليفه أو أنني لا أملك المعدات اللازمة؟ "
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-"إذا كنت لا تستطيع تحمل الحد الأدنى من الرسوم أو أنك لا تلبي متطلبات "
-"البرنامج، تستطيع حضور المساق كمستمع أو قد تختار الحصول على شهادة ميثاق الشرف"
-" الأكاديمي دون أية تكلفة."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-"إذا رغبت في الحصول على شهادة ميثاق الشرف الأكاديمي، الرجاء تحقق من مربع "
-"شهادة ميثاق الشرف الأكاديمي في الطلب، و من ثمّ الضغط على زر \"اختيار "
-"الشهادة\" لإكمال عملية التسجيل."
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "اختر شهادة ميثاق الشرف الأكاديمي "
-
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "إجراء عملية ترقية للتسجيل الخاص بك"
@@ -7149,10 +7095,13 @@ msgid "Audit This Course"
 msgstr "سجل في هذا المساق كمستمع "
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"قم بالتسجيل لدخول هذا المساق كمستمع بشكلٍ مجاني وتمكّن من تتبّع التقدّم الذي"
-" تحققه. "
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -7180,13 +7129,6 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -14311,53 +14253,53 @@ msgid "Loading&hellip;"
 msgstr "التحميل والمساعدة"
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
-msgstr "ما هي الملفات المدرجة هنا؟"
+msgid "Adding Files for Your Course"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
-"بالإضافة إلى الملفات التي تقوم بتحميلها على هذه الصفحة، تظهر أية ملفات تقوم "
-"بإضافتها على المساق في هذه القائمة. تتضمّن هذه الملفّات صورة المساق، وفصول "
-"الكتب، والملفات التي تظهر على جانب الأوراق الموزّعة للمساق."
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
-msgstr "الروابط للملفّ"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
-"استخدام قيمة الرابط التي تمّ تضمينها للارتباط بالملفّ أو الصورة من مكوِّن، "
-"أو تحديث للمساق، أو الأوراق المزّعة للمساق. "
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
-"استخدام قيمة الرابط الخارجية للرجوع إلى الملف أو الصورة من خارج المساق. يرجى"
-" عدم استخدام الرابط الإلكتروني الخارجي بمثابة قيمة رابط ضمن مساقك."
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "ما الذي يمكنني فعله على هذه الصفحة؟ "
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
 msgstr ""
-"يمكن تحميل ملفات جديدة، أو عرض أو تنزيل أو حذف الملفات الموجودة. ويمكن إقفال"
-" ملف لمنع من هو ليس مسجلاً في المساق من الوصول إليه. "
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -14434,6 +14376,11 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Preview Changes"
 msgstr ""
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "ما الذي يمكنني فعله على هذه الصفحة؟ "
 
 #: cms/templates/container.html
 msgid ""
@@ -14704,10 +14651,9 @@ msgid ""
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
-msgstr "معرفة المزيد"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
+msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -15072,6 +15018,10 @@ msgid ""
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
 msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "معرفة المزيد"
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -16479,6 +16429,10 @@ msgid ""
 msgstr ""
 "إذا لم يتضمّن كتابك فصول منفردة، يمكنك تحميل النص بأكمله كفصل واحد وإدخال "
 "اسم من اختيارك في حقل إسم الفصل."
+
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

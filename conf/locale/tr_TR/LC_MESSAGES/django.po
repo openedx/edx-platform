@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -25,7 +25,7 @@
 # Hakan Şenel <hgsenel@gmail.com>, 2014
 # Hakan Şenel <hgsenel@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)
+# edX translation file
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -34,6 +34,7 @@
 # baris <brscvs@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
 # Burak Özalp <realburq@gmail.com>, 2013
+# Caner Başaran <basaran.caner@gmail.com>, 2014
 # emreusta <emreusta7@gmail.com>, 2014
 # Hakan Şenel <hgsenel@gmail.com>, 2014
 # Hakan Şenel <hgsenel@gmail.com>, 2014
@@ -83,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:20-0400\n"
+"POT-Creation-Date: 2014-09-16 08:59-0400\n"
 "PO-Revision-Date: 2014-08-25 20:21+0000\n"
 "Last-Translator: Hakan Şenel <hgsenel@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
@@ -5394,6 +5395,14 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry!  Your payment could not be processed because an unexpected exception "
 "occurred.  Please contact us at {email} for assistance."
 msgstr ""
@@ -6697,62 +6706,6 @@ msgid "):"
 msgstr "):"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "Neden ödeme yapmalıyım?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"Kar etmediği için, edX dünyadaki herkese yüksek kalitede eğitim verme ve "
-"araştırma üzerinden eğitimi ilerletme misyonumuzu desteklemek için "
-"katkılarınızı kullanıyoruz. Minimum katkı miktarı belirlerken, daha fazla "
-"katkı yapmak isteyip istemediğiniz size soruyoruz."
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr ""
-"Minimum değerden daha fazla ödemek istiyorum. Ödemeyi vergiden düşebilir "
-"miyim?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"Vergi danışmanınıza katkılarınızın vergi indirimi sağlayıp sağlamadığına "
-"dair danışınız."
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr "Eğer param yoksa veya gerekli cihazların bulunmuyorsa?"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "Onur Kodu Sertifikasını Seçiniz"
-
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "Kaydınızı Yükseltiniz"
@@ -6801,10 +6754,13 @@ msgid "Audit This Course"
 msgstr "Bu Dersi İzleyin"
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"Bu dersi izlemek için ücretsiz kaydolun ve ilerlemenizi kendiniz kontrol "
-"edin."
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -6832,13 +6788,6 @@ msgid ""
 "Plan to use your completed coursework for job applications, career "
 "advancement, or school applications? Then work toward a Verified Certificate"
 " of Achievement to document your accomplishment. A minimum fee applies."
-msgstr ""
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
 msgstr ""
 
 #: common/templates/course_modes/choose.html
@@ -13810,55 +13759,53 @@ msgid "Loading&hellip;"
 msgstr "Yükleniyor&hellip;"
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
-msgstr "Burada hangi dosyalar listelenmiş?"
+msgid "Adding Files for Your Course"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
-"Bu sayfaya yüklediğiniz dosyalara ek olarak, derse eklediğiniz diğer "
-"dosyalar da bu listede görünecektir. Bu dosyalar arasında ders imgesi, kitap"
-" üniteleri ve Ders Bildirileri yan bölümünde görünenler bulunmaktadır. "
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
-msgstr "Dosya URL'leri"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
-"Bir bileşendeki dosyaya veya imgeye, ders güncellemesine veya ders "
-"materyallerine link vermek için URL Göm kullanın."
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
-"Dosyaya veya dersinizin dışındaki resme atıfta bulunmak için Dış URL "
-"kullanabilirsiniz. Dersinizin içindeki yerlere bağlantı değeri olarak Dış "
-"URL kullanmayınız."
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "Bu sayfada ne yapabilirim?"
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
 msgstr ""
-"Yeni dosyalar yükleyebilir veya görebilir, var olan dosyaları indirebilir "
-"veya silebilirsiniz. Hatta bir dosyayı kilitleyerek derse üye olmamış "
-"kişilerin bu dosyaya erişimlerini engelleyebilirsiniz."
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
+msgstr ""
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -13936,6 +13883,11 @@ msgstr ""
 #: cms/templates/container.html
 msgid "Preview Changes"
 msgstr ""
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "Bu sayfada ne yapabilirim?"
 
 #: cms/templates/container.html
 msgid ""
@@ -14204,9 +14156,8 @@ msgid ""
 "subsection, or unit, then select {em_start}Hide from students{em_end}."
 msgstr ""
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
 msgstr ""
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
@@ -14574,6 +14525,10 @@ msgid ""
 "You can delete a group configuration only if it is not in use in an "
 "experiment. To delete a configuration, hover over its box and click the "
 "delete icon."
+msgstr ""
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
 msgstr ""
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
@@ -15965,6 +15920,10 @@ msgid ""
 msgstr ""
 "Eğer ders kitabınızda ünite yoksa, bütün kitabı tek bir ünite olarak "
 "yükleyebilir ve tercihinizi Ünite İsmi alanında belirtebilirsiniz."
+
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""

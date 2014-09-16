@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -31,6 +31,7 @@
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # Joey Chiou <Joeyc0916@gmail.com>, 2014
 # Joey Chiou <Joeyc0916@gmail.com>, 2013
+# KUN-MIN SYU <qwer20108@gmail.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # bhsfmiao <mkr_mkr@163.com>, 2014
@@ -64,9 +65,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:18-0400\n"
-"PO-Revision-Date: 2014-08-29 15:41+0000\n"
-"Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
+"POT-Creation-Date: 2014-09-16 08:57-0400\n"
+"PO-Revision-Date: 2014-09-16 04:59+0000\n"
+"Last-Translator: KUN-MIN SYU <qwer20108@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1851,6 +1852,10 @@ msgstr "您確定要刪除這篇文章？"
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr "載入您請求的頁面時遇到了一些麻煩，請再試一次。"
 
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr ""
+
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
 msgstr "匿名"
@@ -3343,7 +3348,7 @@ msgstr ""
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Component"
-msgstr ""
+msgstr "組件"
 
 #: cms/static/js/views/modals/edit_xblock.js
 msgid "Editing: %(title)s"
@@ -3462,7 +3467,7 @@ msgstr "組織、課程編號、課程單元等欄位內容，總長度不能超
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "component"
-msgstr ""
+msgstr "組件"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Delete this %(xblock_type)s?"
@@ -3544,7 +3549,7 @@ msgstr "常見問題類型"
 
 #: cms/templates/js/add-xblock-component.underscore
 msgid "Add New Component"
-msgstr ""
+msgstr "新增組件"
 
 #: cms/templates/js/advanced_entry.underscore
 msgid "Deprecated"

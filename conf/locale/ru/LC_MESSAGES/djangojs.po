@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -52,6 +52,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -68,7 +69,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:18-0400\n"
+"POT-Creation-Date: 2014-09-16 08:57-0400\n"
 "PO-Revision-Date: 2014-08-31 21:22+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
@@ -1906,6 +1907,10 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
+msgstr ""
+
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js

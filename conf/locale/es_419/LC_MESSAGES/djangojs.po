@@ -1,5 +1,5 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/).
+# edX translation file.
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -60,7 +60,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:18-0400\n"
+"POT-Creation-Date: 2014-09-16 08:57-0400\n"
 "PO-Revision-Date: 2014-08-28 20:51+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -1932,6 +1932,10 @@ msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Ocurrió un problema al cargar la página solicitada. Por favor intente "
 "nuevamente."
+
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr ""
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"

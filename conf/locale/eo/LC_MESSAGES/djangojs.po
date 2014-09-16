@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:48-0400\n"
-"PO-Revision-Date: 2014-09-15 13:49:58.443827\n"
+"POT-Creation-Date: 2014-09-16 10:49-0400\n"
+"PO-Revision-Date: 2014-09-16 14:50:40.693688\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1932,6 +1932,10 @@ msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Wé häd sömé tröüßlé löädïng thé pägé ýöü réqüéstéd. Pléäsé trý ägäïn. Ⱡ'σяєм"
 " ιρѕυм ∂σłσя ѕ#"
+
+#: common/static/coffee/src/discussion/views/new_post_view.js
+msgid "Your post will be discarded."
+msgstr "Ýöür pöst wïll ßé dïsçärdéd. Ⱡ'σяєм #"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js
 msgid "anonymous"
