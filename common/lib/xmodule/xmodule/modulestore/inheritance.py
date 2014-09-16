@@ -153,9 +153,9 @@ class InheritanceMixin(XBlockMixin):
         default=True,
         scope=Scope.settings
     )
-    video_link_transience = String(
-        help=_("Enter the AWS access key, secret key and bucket name used for creating a transient video URLs in the following format: \"bucket_name\":\"access_key:secret_key\"."),
-        display_name=_("Video Link Transience Credentials"),
+    video_link_transience = Boolean(
+        display_name=_("Enable Video Link Transience"),
+        help=_("Enter true or false. If true, Amazon S3 hosted video URLs will be temporary."),
         scope=Scope.settings
     )
 

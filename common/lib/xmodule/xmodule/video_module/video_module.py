@@ -117,7 +117,10 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         if getattr(self, 'video_link_transience', False):
             for index, source_url in enumerate(sources):
                 if 'amazonaws.com' in source_url:
-                    new_url = get_s3_transient_url(source_url, self.video_link_transience)
+                    query = 'source={}'.format(source_url)
+                    new_url = self.runtime.handler_url(
+                        self, 'url', 'temporary', query
+                    ).rstrip('/?')
                     if new_url:
                         sources[index] = new_url
 
@@ -202,6 +205,7 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    url = module_attr('url')
 
     tabs = [
         {

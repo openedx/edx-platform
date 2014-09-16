@@ -5,8 +5,10 @@ import json
 import logging
 import urllib
 import requests
+import re
 from urlparse import urlparse
 
+from django.conf import settings
 from requests.exceptions import RequestException
 from boto.s3.connection import S3Connection
 
@@ -71,33 +73,31 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
     else:
         return None
 
-def get_s3_transient_url(video_url, video_link_transience, expires_in=10):
+def get_s3_transient_url(video_url, expires_in=60):
     """
     Get S3 transient video url.
     """
-
-    try:
-        bucket_name, access_key, secret_key = [i.strip() for i in video_link_transience.split(':')]
-    except ValueError:
-        log.info(
-            'Could not parse Video Link Transience Credentials: \
-            %s. Should be "bucket_name:aws_access_key:aws_secret_key" string.',
-            video_link_transience,
-            exc_info=True
-        )
+    if not getattr(settings, 'VIDEO_LINK_TRANSIENCE'):
+        log.info("No Video Link Transience Credentials are present")
         return None
 
-    conn = S3Connection(access_key, secret_key)
-    url = urlparse(video_url)
+    conn = S3Connection(
+        settings.VIDEO_LINK_TRANSIENCE["AWS_ACCESS_KEY"],
+        settings.VIDEO_LINK_TRANSIENCE["AWS_SECRET_KEY"]
+    )
 
-    # Get bucket name from video_url.
+    # Get bucket and video name from video_url.
     # Valid patterns for constructing S3 URLs:
     # http(s)://<bucket>.s3.amazonaws.com/<object>
     # http(s)://s3.amazonaws.com/<bucket>/<object>
+    # http(s)://s3-region.amazonaws.com/<bucket>/<object>
 
-    if bucket_name in url.path:
-        bucket, sep, video_name = url.path.strip('/').partition('/')
-    elif bucket_name in url.netloc:
-        video_name = url.path.strip('/')
+    for pattern in [r's3(?:.*).amazonaws.com\/(?P<bucket_name>[^\/]+)\/(?P<video_name>.+)',
+                    r':\/\/(?P<bucket_name>.+).s3(?:.*).amazonaws.com\/(?P<video_name>.+)']:
+        names = re.compile(pattern)
+        result = names.search(video_url)
+        if result:
+            bucket_name, video_name = result.groups()[0], result.groups()[1]
+            return conn.generate_url(expires_in, 'GET', bucket_name, video_name)
 
-    return conn.generate_url(expires_in, 'GET', bucket_name, video_name)
+    return None

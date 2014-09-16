@@ -24,7 +24,7 @@ from .transcripts_utils import (
     save_to_store,
     subs_filename
 )
-
+from .video_utils import get_s3_transient_url
 
 log = logging.getLogger(__name__)
 
@@ -303,6 +303,32 @@ class VideoStudentViewHandlers(object):
             else:
                 response = Response(status=404)
         else:  # unknown dispatch
+            log.debug("Dispatch is not allowed")
+            response = Response(status=404)
+
+        return response
+
+    @XBlock.handler
+    def url(self, request, dispatch):
+        """
+        Handler for creating temporary video URLs in Student View.
+        """
+        if dispatch.startswith('temporary'):
+            source_url = request.GET.get('source')
+
+            if not source_url:
+                log.info("Invalid /transient request: no original video url in request")
+                return Response(status=400)
+
+            temporary_url = get_s3_transient_url(source_url)
+
+            if not temporary_url:
+                return Response(status=404)
+
+            response = Response(status=301)
+            response.location = temporary_url
+
+        else:
             log.debug("Dispatch is not allowed")
             response = Response(status=404)
 
