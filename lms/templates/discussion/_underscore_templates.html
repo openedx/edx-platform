@@ -518,13 +518,16 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item">
+        <span aria-hidden="true" class="display-vote" >
+          <span class="vote-count"></span>
+        </span>
         <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
             ## Vote counts are populated by JS
             <span class="sr">${_("Vote")}</span>
             <span class="sr js-sr-vote-count"></span>
 
             <span class="action-label" aria-hidden="true">
-              <span class="js-visual-vote-count"></span>
+              <span class="vote-count"></span>
             </span>
 
             <span class="action-icon" aria-hidden="true">

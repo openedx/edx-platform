@@ -118,13 +118,13 @@ if Backbone?
             true
           )
         )
-        button.find(".js-visual-vote-count").html(
-          interpolate(
-            ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
-            {numVotes: numVotes},
-            true
-          )
-        )
+        votesHtml = interpolate(
+                      ngettext("%(numVotes)s Vote", "%(numVotes)s Votes", numVotes),
+                      {numVotes: numVotes},
+                      true
+                    )
+        button.find(".vote-count").html(votesHtml)
+        @$el.find('.display-vote .vote-count').html(votesHtml)
 
       pinned: (pinned) ->
         @updateButtonState(".action-pin", pinned)
