@@ -170,23 +170,25 @@ def calculate_proforma_grade(grade_summary, grading_policy):
         - Remaining Weight: 0.15 (unscored Lab section), assume 100%, of 15% =>     0.150
         - Proforma Grade = 0.105 + 0.240 + 0.380 + 0.150 = 0.875  (87.5%)
     """
+
     remaining_weight = 1.00
     proforma_grade = 0.00
     totaled_scores = grade_summary['totaled_scores']
     grade = 0.00
     for section in totaled_scores:
-        points_earned = 0.00
-        points_possible = 0.00
+        section_score = 0.00
+        section_count = 0.00
         # totaled_scores is a collection of currently-recored scores for a given section
         # we need to iterate through and combine the scores to create an overall score for the section
         # This loop does not take into account dropped assignments (eg, homeworks)
         for score in totaled_scores[section]:
             # Only count grades where points have been scored, or where the due date has passed
             if score.earned or (score.due and score.due < timezone.now()):
-                points_earned = points_earned + score.earned
-                points_possible = points_possible + score.possible
-        if points_possible:
-            grade = points_earned / points_possible
+                score_percentage = score.earned / score.possible
+                section_score += score_percentage
+                section_count += 1
+        if section_score:
+            grade = section_score / section_count
             section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
             if section_policy is not None:
                 section_weight = section_policy['weight']
