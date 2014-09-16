@@ -155,20 +155,20 @@ def check_raw_editor_text(step):
     assert_equal(step.multiline, get_codemirror_value(0))
 
 
-@step('the src link is rewritten to "(.*)"$')
+@step('the src link is rewritten to the asset link "(.*)"$')
 def image_static_link_is_rewritten(step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         image = tinymce.find_by_tag('img').first
-        assert_in(path, image['src'])
+        assert_in(unicode(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), image['src'])
 
 
-@step('the href link is rewritten to "(.*)"$')
+@step('the href link is rewritten to the asset link "(.*)"$')
 def link_static_link_is_rewritten(step, path):
     # Find the TinyMCE iframe within the main window
     with world.browser.get_iframe('mce_0_ifr') as tinymce:
         link = tinymce.find_by_tag('a').first
-        assert_in(path, link['href'])
+        assert_in(unicode(world.scenario_dict['COURSE'].id.make_asset_key('asset', path)), link['href'])
 
 
 @step('the expected toolbar buttons are displayed$')
