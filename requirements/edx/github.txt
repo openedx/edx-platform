@@ -34,3 +34,4 @@
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.2.1#egg=oauth2-provider
 -e git+https://github.com/edx/edx-val.git@42d1a0c2b589af8893bf6e4430db5a2c3f8098f5#egg=edx-val
+
