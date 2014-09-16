@@ -1,4 +1,4 @@
-define(["sinon", "underscore"], function(sinon, _) {
+define(['sinon', 'underscore'], function(sinon, _) {
     var fakeServer, fakeRequests, expectJsonRequest, respondWithJson, respondWithError, respondToDelete;
 
     /* These utility methods are used by Jasmine tests to create a mock server or

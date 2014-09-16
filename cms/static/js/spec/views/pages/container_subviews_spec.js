@@ -1,7 +1,7 @@
-define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers",
+define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
         "js/views/feedback_prompt", "js/views/pages/container", "js/views/pages/container_subviews",
         "js/models/xblock_info", "js/views/utils/xblock_utils"],
-    function ($, _, str, create_sinon, edit_helpers, Prompt, ContainerPage, ContainerSubviews,
+    function ($, _, str, AjaxHelpers, edit_helpers, Prompt, ContainerPage, ContainerSubviews,
               XBlockInfo, XBlockUtils) {
         var VisibilityState = XBlockUtils.VisibilityState;
 
@@ -38,7 +38,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             createContainerPage = function (test, options) {
-                requests = create_sinon.requests(test);
+                requests = AjaxHelpers.requests(test);
                 model = new XBlockInfo(createXBlockInfo(options), { parse: true });
                 containerPage = new ContainerPage({
                     model: model,
@@ -56,7 +56,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
             respondWithHtml = function(html) {
                 var requestIndex = requests.length - 1;
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     { html: html, "resources": [] },
                     requestIndex
@@ -64,7 +64,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
             };
 
             respondWithJson = function(json, requestIndex) {
-                create_sinon.respondWithJson(
+                AjaxHelpers.respondWithJson(
                     requests,
                     json,
                     requestIndex
@@ -142,7 +142,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     expect(promptSpies.constructor).toHaveBeenCalled();
                     promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(promptSpies);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "discard_changes"}
                     );
                 };
@@ -229,7 +229,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     containerPage.$(publishButtonCss).click();
                     edit_helpers.verifyNotificationShowing(notificationSpy, /Publishing/);
 
-                    create_sinon.expectJsonRequest(requests, "POST", "/xblock/locator-container",
+                    AjaxHelpers.expectJsonRequest(requests, "POST", "/xblock/locator-container",
                         {"publish": "make_public"}
                     );
 
@@ -237,7 +237,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     respondWithJson({"id": "locator-container", "data": null, "metadata":{}});
                     edit_helpers.verifyNotificationHidden(notificationSpy);
 
-                    create_sinon.expectJsonRequest(requests, "GET", "/xblock/locator-container");
+                    AjaxHelpers.expectJsonRequest(requests, "GET", "/xblock/locator-container");
                     // Response to fetch
                     respondWithJson(createXBlockInfo({
                         published: true, has_changes: false, visibility_state: VisibilityState.ready
@@ -258,7 +258,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
 
                     var numRequests = requests.length;
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
 
@@ -297,7 +297,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                     numRequests = requests.length;
 
                     // Respond with failure
-                    create_sinon.respondWithError(requests);
+                    AjaxHelpers.respondWithError(requests);
 
                     expect(requests.length).toEqual(numRequests);
                     expect(containerPage.$(discardChangesButtonCss)).not.toHaveClass('is-disabled');
@@ -396,11 +396,11 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             edit_helpers.confirmPrompt(promptSpy);
                         }
 
-                        create_sinon.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
+                        AjaxHelpers.expectJsonRequest(requests, 'POST', '/xblock/locator-container', {
                             publish: 'republish',
                             metadata: { visible_to_staff_only: isStaffOnly ? true : null }
                         });
-                        create_sinon.respondWithJson(requests, {
+                        AjaxHelpers.respondWithJson(requests, {
                             data: null,
                             id: "locator-container",
                             metadata: {
@@ -408,13 +408,13 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                             }
                         });
 
-                        create_sinon.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
+                        AjaxHelpers.expectJsonRequest(requests, 'GET', '/xblock/locator-container');
                         if (isStaffOnly || containerPage.model.get('ancestor_has_staff_lock')) {
                             newVisibilityState = VisibilityState.staffOnly;
                         } else {
                             newVisibilityState = VisibilityState.live;
                         }
-                        create_sinon.respondWithJson(requests, createXBlockInfo({
+                        AjaxHelpers.respondWithJson(requests, createXBlockInfo({
                             published: containerPage.model.get('published'),
                             has_explicit_staff_lock: isStaffOnly,
                             visibility_state: newVisibilityState,
@@ -551,7 +551,7 @@ define(["jquery", "underscore", "underscore.string", "js/spec_helpers/create_sin
                         renderContainerPage(this, mockContainerXBlockHtml);
                         containerPage.$('.lock-checkbox').click();
                         requestCount = requests.length;
-                        create_sinon.respondWithError(requests);
+                        AjaxHelpers.respondWithError(requests);
                         expect(requests.length).toBe(requestCount);
                         verifyStaffOnly(false);
                     });

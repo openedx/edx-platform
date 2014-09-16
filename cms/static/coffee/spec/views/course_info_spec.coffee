@@ -1,5 +1,5 @@
-define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/spec_helpers/create_sinon"],
-(CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, create_sinon) ->
+define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/common_helpers/ajax_helpers"],
+(CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, AjaxHelpers) ->
 
     describe "Course Updates and Handouts", ->
         courseInfoPage = """
@@ -101,7 +101,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                         modalCover.click()
 
             it "does not rewrite links on save", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 # Create a new update, verifying that the model is created
                 # in the collection and save is called.
@@ -168,7 +168,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @handoutsEdit.render()
 
             it "does not rewrite links on save", ->
-                requests = create_sinon["requests"](this)
+                requests = AjaxHelpers["requests"](this)
 
                 # Enter something in the handouts section, verifying that the model is saved
                 # when "Save" is clicked.

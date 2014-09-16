@@ -16,7 +16,7 @@
 
 test_suite_name: lms
 
-test_runner: jasmine
+test_runner: jasmine_requirejs
 
 # Path prepended to source files in the coverage report (optional)
 # For example, if the source path
@@ -48,15 +48,14 @@ lib_paths:
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
-    - js/models/cohort.js
-    - js/collections/cohort.js
-    - js/views/cohort_editor.js
-    - js/views/cohorts.js
 
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
     - js
+    - js/common_helpers
+    - xmodule_js
+    - xmodule_js/common_static
 
 # Paths to spec (test) JavaScript files
 spec_paths:
@@ -76,20 +75,11 @@ fixture_paths:
     - coffee/fixtures
     - templates/instructor/instructor_dashboard_2
 
-# Regular expressions used to exclude *.js files from
-# appearing in the test runner page.
-# Files are included by default, which means that they
-# are loaded using a <script> tag in the test runner page.
-# When loading many files, this can be slow, so
-# exclude any files you don't need.
-#exclude_from_page:
-#    - path/to/lib/exclude/*
+requirejs:
+  paths:
+    main: js/spec/main
 
-# Regular expression used to guarantee that a *.js file
-# is included in the test runner page.
-# If a file name matches both `exclude_from_page` and
-# `include_in_page`, the file WILL be included.
-# You can use this to exclude all files in a directory,
-# but make an exception for particular files.
-#include_in_page:
-#    - path/to/lib/include/*
+# Because require.js is responsible for loading all dependencies, we exclude
+# all files from being included in <script> tags
+exclude_from_page:
+    - .*
