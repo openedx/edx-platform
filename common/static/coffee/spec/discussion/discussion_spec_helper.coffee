@@ -6,8 +6,11 @@ class @DiscussionSpecHelper
         window.user = new DiscussionUser({username: "test_user", id: "567", upvoted_ids: []})
         DiscussionUtil.setUser(window.user)
 
+    @makeTA = () ->
+        DiscussionUtil.roleIds["Community TA"].push(parseInt(DiscussionUtil.getUser().id))
+
     @makeModerator = () ->
-        DiscussionUtil.roleIds["Moderator"].push(parseInt(window.user.id))
+        DiscussionUtil.roleIds["Moderator"].push(parseInt(DiscussionUtil.getUser().id))
 
     @makeAjaxSpy = (fakeAjax) ->
         spyOn($, "ajax").andCallFake(
