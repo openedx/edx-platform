@@ -14,12 +14,13 @@ from fs.osfs import OSFS
 from .definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.inheritance import inheriting_field_data, InheritanceMixin
-from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 
 log = logging.getLogger(__name__)
 
 new_contract('BlockUsageLocator', BlockUsageLocator)
 new_contract('BlockKey', BlockKey)
+new_contract('CourseEnvelope', CourseEnvelope)
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
@@ -29,6 +30,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
     Computes the settings (nee 'metadata') inheritance upon creation.
     """
+    @contract(course_entry=CourseEnvelope)
     def __init__(self, modulestore, course_entry, default_class, module_data, lazy, **kwargs):
         """
         Computes the settings inheritance and sets up the cache.
@@ -44,10 +46,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             underlying modulestore
         """
         # needed by capa_problem (as runtime.filestore via this.resources_fs)
-        if 'course' in course_entry:
-            root = modulestore.fs_root / course_entry['org'] / course_entry['course'] / course_entry['run']
+        if course_entry.course_key.course:
+            root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run
         else:
-            root = modulestore.fs_root / course_entry['structure']['_id']
+            root = modulestore.fs_root / course_entry.structure['_id']
         root.makedirs_p()  # create directory if it doesn't exist
 
         super(CachingDescriptorSystem, self).__init__(
@@ -67,12 +69,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     @contract(returns="dict(BlockKey: BlockKey)")
     def _parent_map(self):
         parent_map = {}
-        for block_key, block in self.course_entry['structure']['blocks'].iteritems():
+        for block_key, block in self.course_entry.structure['blocks'].iteritems():
             for child in block['fields'].get('children', []):
                 parent_map[child] = block_key
         return parent_map
 
-    @contract(usage_key="BlockUsageLocator | BlockKey")
+    @contract(usage_key="BlockUsageLocator | BlockKey", course_entry_override="CourseEnvelope | None")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
         # usage_key is either a UsageKey or just the block_key. if a usage_key,
         if isinstance(usage_key, BlockUsageLocator):
@@ -92,18 +94,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             block_key = usage_key
 
             course_info = course_entry_override or self.course_entry
-            course_key = CourseLocator(
-                version_guid=course_info['structure']['_id'],
-                org=course_info.get('org'),
-                course=course_info.get('course'),
-                run=course_info.get('run'),
-                branch=course_info.get('branch'),
-            )
+            course_key = course_info.course_key
 
         if course_entry_override:
-            structure_id = course_entry_override.get('_id')
+            structure_id = course_entry_override.structure.get('_id')
         else:
-            structure_id = self.course_entry.get('_id')
+            structure_id = self.course_entry.structure.get('_id')
 
         json_data = self.get_module_data(block_key, course_key)
 
@@ -147,10 +143,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             course_entry_override = self.course_entry
         else:
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
-            self.course_entry['branch'] = course_entry_override['branch']
-            self.course_entry['org'] = course_entry_override['org']
-            self.course_entry['course'] = course_entry_override['course']
-            self.course_entry['run'] = course_entry_override['run']
+            self.course_entry = CourseEnvelope(course_entry_override.course_key, self.course_entry.structure)
 
         definition_id = json_data.get('definition')
 
@@ -163,7 +156,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 self.modulestore, block_key.type, definition_id,
                 lambda fields: self.modulestore.convert_references_to_keys(
                     course_key, self.load_block_type(block_key.type),
-                    fields, self.course_entry['structure']['blocks'],
+                    fields, self.course_entry.structure['blocks'],
                 )
             )
         else:
@@ -180,7 +173,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         )
 
         converted_fields = self.modulestore.convert_references_to_keys(
-            block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry['structure']['blocks'],
+            block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry.structure['blocks'],
         )
         if block_key in self._parent_map:
             parent_key = self._parent_map[block_key]
@@ -210,8 +203,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             return ErrorDescriptor.from_json(
                 json_data,
                 self,
-                BlockUsageLocator(
-                    CourseLocator(version_guid=course_entry_override['structure']['_id']),
+                course_entry_override.course_key.make_usage_key(
                     block_type='error',
                     block_id=block_key.id
                 ),
