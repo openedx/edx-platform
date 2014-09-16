@@ -84,11 +84,10 @@ class StudentGradebook(TimeStampedModel):
                     course_avg = course_avg / total_user_count * gradebook_user_count
 
                 # Fill up the response container
-                data['course_avg'] = course_avg
+                data['course_avg'] = float("{0:.3f}".format(course_avg))
                 data['course_max'] = queryset.aggregate(Max('grade'))['grade__max']
                 data['course_min'] = queryset.aggregate(Min('grade'))['grade__min']
                 data['course_count'] = queryset.aggregate(Count('grade'))['grade__count']
-
                 # Construct the leaderboard as a queryset
                 data['queryset'] = queryset.values(
                     'user__id',
@@ -98,7 +97,6 @@ class StudentGradebook(TimeStampedModel):
                     'grade',
                     'created')\
                     .order_by('-grade', 'created')[:count]
-
                 # If a user_id value was provided, we need to provide some additional user-specific data to the caller
                 if user_id:
                     user_grade = 0
@@ -112,7 +110,7 @@ class StudentGradebook(TimeStampedModel):
                         user_time_scored = user_queryset.created
                     users_above = queryset.filter(grade__gte=user_grade)\
                         .exclude(user__id=user_id)\
-                        .exclude(grade=user_grade, created__lt=user_time_scored)
+                        .exclude(grade=user_grade, created__gt=user_time_scored)
                     data['user_position'] = len(users_above) + 1
                     data['user_grade'] = user_grade
 
