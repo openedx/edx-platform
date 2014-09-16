@@ -137,38 +137,57 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=first_byte, last=last_byte, length=self.length_unlocked))
         self.assertEqual(resp['Content-Length'], str(last_byte - first_byte + 1))
 
+    def test_range_request_multiple_ranges(self):
+        """
+        Test that multiple ranges in request outputs the full content.
+        """
+        first_byte = self.length_unlocked / 4
+        last_byte = self.length_unlocked / 2
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}, -100'.format(
+            first=first_byte, last=last_byte)
+        )
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
+        self.assertEqual(resp['Content-Length'], str(self.length_unlocked))
+
     def test_range_request_malformed_missing_equal(self):
         """
-        Test that a range request with malformed Range (missing '=') outputs status 400.
+        Test that a range request with malformed Range (missing '=') outputs a 200 OK full content response.
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes 0-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
 
     def test_range_request_malformed_not_bytes(self):
         """
-        Test that a range request with malformed Range (not "bytes") outputs status 400.
+        Test that a range request with malformed Range (not "bytes") outputs a 200 OK full content response.
         "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bits=0-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
 
     def test_range_request_malformed_missing_minus(self):
         """
-        Test that a range request with malformed Range (missing '-') outputs status 400.
+        Test that a range request with malformed Range (missing '-') outputs a 200 OK full content response.
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
 
     def test_range_request_malformed_first_not_integer(self):
         """
-        Test that a range request with malformed Range (first is not an integer) outputs status 400.
+        Test that a range request with malformed Range (first is not an integer) outputs a 200 OK full content response.
         """
         resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=one-')
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn('Content-Range', resp)
 
     def test_range_request_malformed_invalid_range(self):
         """
-        Test that a range request with malformed Range (first_byte > last_byte) outputs status 400.
+        Test that a range request with malformed Range (first_byte > last_byte) outputs
+        416 Requested Range Not Satisfiable.
         """
         first_byte = self.length_unlocked / 2
         last_byte = self.length_unlocked / 4
@@ -176,16 +195,16 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             first=first_byte, last=last_byte)
         )
 
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 416)
 
     def test_range_request_malformed_out_of_bounds(self):
         """
-        Test that a range request with malformed Range (last_byte == totalLength, offset by 1 error)
-        outputs status 400.
+        Test that a range request with malformed Range (first_byte, last_byte == totalLength, offset by 1 error)
+        outputs 416 Requested Range Not Satisfiable.
         """
         last_byte = self.length_unlocked
-        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes=0-{last}'.format(
-            last=last_byte)
+        resp = self.client.get(self.url_unlocked, HTTP_RANGE='bytes={first}-{last}'.format(
+            first=last_byte, last=last_byte)
         )
 
-        self.assertEqual(resp.status_code, 400)  # HTTP_400_BAD_REQUEST
+        self.assertEqual(resp.status_code, 416)
