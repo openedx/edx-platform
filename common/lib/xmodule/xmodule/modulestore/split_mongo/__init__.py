@@ -20,3 +20,5 @@ class BlockKey(namedtuple('BlockKey', 'type id')):
     def from_usage_key(cls, usage_key):
         return cls(usage_key.block_type, usage_key.block_id)
 
+
+CourseEnvelope = namedtuple('CourseEnvelope', 'course_key structure')
