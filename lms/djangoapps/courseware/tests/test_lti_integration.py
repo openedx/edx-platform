@@ -92,9 +92,6 @@ class TestLTI(BaseTestXmodule):
             'grader_feedback_label': 'Feedback on your work from the grader:',
             'instruction_text': '',
             'title_postscript': '(External Resource)',
-#            'request_username': self.item_descriptor.request_username,  # JBAU COMMENTED OUT 9-15-2014
-#            'request_email': self.item_descriptor.request_email,
-#            'text_box': self.item_descriptor.text_box,
         }
 
         def mocked_sign(self, *args, **kwargs):
