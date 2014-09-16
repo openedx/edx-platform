@@ -20,6 +20,7 @@ from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.forum import views
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.courses import UserNotEnrolled
 from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock, ANY, call
 
@@ -913,3 +914,26 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class EnrollmentTestCase(ModuleStoreTestCase):
+    """
+    Tests for the behavior of views depending on if the student is enrolled
+    in the course
+    """
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        super(EnrollmentTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_unenrolled(self, mock_request):
+        mock_request.side_effect = make_mock_request_impl('dummy')
+        request = RequestFactory().get('dummy_url')
+        request.user = self.student
+        with self.assertRaises(UserNotEnrolled):
+            views.forum_form_discussion(request, course_id=self.course.id.to_deprecated_string())
