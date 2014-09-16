@@ -32,8 +32,7 @@ from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
                          AlreadyEnrolledInCourseException, CourseDoesNotExistException,
-                         CouponAlreadyExistException, ItemDoesNotExistAgainstCouponException,
-                         RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
+                         MultipleCouponsNotAllowedException, RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException)
 
 from microsite_configuration import microsite
 
@@ -498,31 +497,33 @@ class CouponRedemption(models.Model):
         return value - discount
 
     @classmethod
-    def add_coupon_redemption(cls, coupon, order):
+    def add_coupon_redemption(cls, coupon, order, cart_items):
         """
         add coupon info into coupon_redemption model
         """
-        cart_items = order.orderitem_set.all().select_subclasses()
+        is_redemption_applied = False
+        coupon_redemptions = cls.objects.filter(order=order, user=order.user)
+        for coupon_redemption in coupon_redemptions:
+            if coupon_redemption.coupon.code != coupon.code or coupon_redemption.coupon.id == coupon.id:
+                log.exception("Coupon redemption already exist for user '{0}' against order id '{1}'"
+                              .format(order.user.username, order.id))
+                raise MultipleCouponsNotAllowedException
 
         for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == coupon.course_id:
-                    coupon_redemption, created = cls.objects.get_or_create(order=order, user=order.user, coupon=coupon)
-                    if not created:
-                        log.exception("Coupon '{0}' already exist for user '{1}' against order id '{2}'"
-                                      .format(coupon.code, order.user.username, order.id))
-                        raise CouponAlreadyExistException
-
+                    coupon_redemption = cls(order=order, user=order.user, coupon=coupon)
+                    coupon_redemption.save()
                     discount_price = cls.get_discount_price(coupon.percentage_discount, item.unit_cost)
                     item.list_price = item.unit_cost
                     item.unit_cost = discount_price
                     item.save()
                     log.info("Discount generated for user {0} against order id '{1}' "
                              .format(order.user.username, order.id))
-                    return coupon_redemption
+                    is_redemption_applied = True
+                    return is_redemption_applied
 
-        log.warning("Course item does not exist for coupon '{0}'".format(coupon.code))
-        raise ItemDoesNotExistAgainstCouponException
+        return is_redemption_applied
 
 
 class PaidCourseRegistration(OrderItem):
