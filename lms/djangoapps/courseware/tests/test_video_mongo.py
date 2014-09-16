@@ -505,7 +505,7 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
         """
         Test if sources got from S3.
         """
-        mocked_transience.return_value = 'bucket:test_key:test_secret'
+        mocked_transience.return_value = True
 
         SOURCE_XML = """
             <video show_captions="true"
@@ -527,12 +527,6 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
                 """,
                 'result': {
                     'download_video_link': u'example_source.mp4',
-                    'sources': json.dumps(
-                        [
-                            u'https://bucket.s3.amazonaws.com/example.mp4?Expires=%5B%27test_expire%27%5D&AWSAccessKeyId=%5B%27test_key%27%5D&Signature=%5B%27test_signature%27%5D',
-                            u'http://example.com/example.webm'
-                        ]
-                    ),
                 },
             },
         ]
@@ -582,6 +576,14 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
                 ).rstrip('/?'),
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'id': self.item_descriptor.location.html_id(),
+                'sources': json.dumps(
+                    [
+                        self.item_descriptor.xmodule_runtime.handler_url(
+                            self.item_descriptor, 'url', 'temporary', 'source=http://bucket-name.s3.amazonaws.com/example.mp4'
+                        ),
+                        u'http://example.com/example.webm'
+                    ]
+                ),
             })
             expected_context.update(data['result'])
 
