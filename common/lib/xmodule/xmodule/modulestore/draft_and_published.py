@@ -113,7 +113,7 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
         raise NotImplementedError
 
 
-class   UnsupportedRevisionError(ValueError):
+class UnsupportedRevisionError(ValueError):
     """
     This error is raised if a method is called with an unsupported revision parameter.
     """
