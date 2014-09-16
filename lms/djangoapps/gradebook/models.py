@@ -95,8 +95,8 @@ class StudentGradebook(TimeStampedModel):
                     'user__profile__title',
                     'user__profile__avatar_url',
                     'grade',
-                    'created')\
-                    .order_by('-grade', 'created')[:count]
+                    'modified')\
+                    .order_by('-grade', 'modified')[:count]
                 # If a user_id value was provided, we need to provide some additional user-specific data to the caller
                 if user_id:
                     user_grade = 0
@@ -110,7 +110,7 @@ class StudentGradebook(TimeStampedModel):
                         user_time_scored = user_queryset.created
                     users_above = queryset.filter(grade__gte=user_grade)\
                         .exclude(user__id=user_id)\
-                        .exclude(grade=user_grade, created__gt=user_time_scored)
+                        .exclude(grade=user_grade, modified__gt=user_time_scored)
                     data['user_position'] = len(users_above) + 1
                     data['user_grade'] = user_grade
 
