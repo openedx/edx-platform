@@ -78,12 +78,14 @@ def create_course(_step, course):
         parent_location=world.scenario_dict['COURSE'].location,
         category='chapter',
         display_name='Test Chapter',
+        publish_item=True,  # Not needed for direct-only but I'd rather the test didn't know that
     )
 
     world.scenario_dict['SECTION'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['CHAPTER'].location,
         category='sequential',
         display_name='Test Section',
+        publish_item=True,
     )
 
 
@@ -118,12 +120,10 @@ def go_into_course(step):
     step.given('And I click on View Courseware')
 
 
+# Do we really use these 3 w/ a different course than is in the scenario_dict? if so, why? If not,
+# then get rid of the override arg
 def course_id(course_num):
-    return SlashSeparatedCourseKey(
-        world.scenario_dict['COURSE'].org,
-        course_num,
-        world.scenario_dict['COURSE'].url_name
-    )
+    return world.scenario_dict['COURSE'].id.replace(course=course_num)
 
 
 def course_location(course_num):
@@ -143,8 +143,8 @@ def visit_scenario_item(item_key):
     url = django_url(reverse(
         'jump_to',
         kwargs={
-            'course_id': world.scenario_dict['COURSE'].id.to_deprecated_string(),
-            'location': world.scenario_dict[item_key].location.to_deprecated_string(),
+            'course_id': unicode(world.scenario_dict['COURSE'].id),
+            'location': unicode(world.scenario_dict[item_key].location),
         }
     ))
 
@@ -157,8 +157,8 @@ def get_courses():
     Courses are sorted by course.number.
     '''
     courses = [c for c in modulestore().get_courses()
-               if isinstance(c, CourseDescriptor)]
-    courses = sorted(courses, key=lambda course: course.number)
+               if isinstance(c, CourseDescriptor)]  # skip error descriptors
+    courses = sorted(courses, key=lambda course: course.location.course)
     return courses
 
 
@@ -223,13 +223,16 @@ def get_courseware_with_tabs(course_id):
 
     course = get_course_by_id(course_id)
     chapters = [chapter for chapter in course.get_children() if not chapter.hide_from_toc]
-    courseware = [{'chapter_name': c.display_name_with_default,
-                   'sections': [{'section_name': s.display_name_with_default,
-                                'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
-                                'tabs': [{'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
-                                         'class': t.__class__.__name__}
-                                         for t in s.get_children()]}
-                                for s in c.get_children() if not s.hide_from_toc]}
-                  for c in chapters]
+    courseware = [{
+        'chapter_name': c.display_name_with_default,
+        'sections': [{
+            'section_name': s.display_name_with_default,
+            'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
+            'tabs': [{
+                'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
+                'class': t.__class__.__name__} for t in s.get_children()
+            ]
+        } for s in c.get_children() if not s.hide_from_toc]
+    } for c in chapters]
 
     return courseware
