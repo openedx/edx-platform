@@ -18,6 +18,7 @@ from mock import Mock, patch
 
 from . import LogicTest
 from lxml import etree
+from django.conf import settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.video_module import (VideoDescriptor, create_youtube_string,
                                     get_video_from_cdn, get_s3_transient_url)
@@ -593,13 +594,12 @@ class VideoLinkTransienceTest(unittest.TestCase):
         """
         Test if bucket name and object name is present in transient URL.
         """
-        credentials = 'bucket:test_key:test_secret'
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/video.mp4",
             "http://bucket.s3.amazonaws.com/video.mp4",
         ]
         for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url, credentials)
+            url = get_s3_transient_url(origin_url)
             self.assertIn("https://bucket.s3.amazonaws.com/video.mp4", url)
             self.assertIn('AWSAccessKeyId=test_key', url)
             self.assertNotIn('test_secret', url)
@@ -609,16 +609,7 @@ class VideoLinkTransienceTest(unittest.TestCase):
             "http://bucket.s3.amazonaws.com/subfolder/video.mp4",
         ]
         for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url, credentials)
+            url = get_s3_transient_url(origin_url)
             self.assertIn("https://bucket.s3.amazonaws.com/subfolder/video.mp4", url)
             self.assertIn('AWSAccessKeyId=test_key', url)
             self.assertNotIn('test_secret', url)
-
-    def test_url_create_wrong_credentials(self):
-        """
-        Test if wrong credentials provided.
-        """
-        credentials = ['', 'wo_delimiters', 'one:delimiter']
-        video_url = "http://s3.amazonaws.com/bucket/video.mp4"
-        for credential in credentials:
-            self.assertIsNone(get_s3_transient_url(video_url, credential))

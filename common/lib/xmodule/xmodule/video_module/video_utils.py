@@ -92,7 +92,7 @@ def get_s3_transient_url(video_url, expires_in=60):
     # http(s)://s3.amazonaws.com/<bucket>/<object>
     # http(s)://s3-region.amazonaws.com/<bucket>/<object>
 
-    for pattern in [r's3(?:.*).amazonaws.com\/(?P<bucket_name>[^\/]+)\/(?P<video_name>.+)',
+    for pattern in [r':\/\/s3(?:.*).amazonaws.com\/(?P<bucket_name>[^\/]+)\/(?P<video_name>.+)',
                     r':\/\/(?P<bucket_name>.+).s3(?:.*).amazonaws.com\/(?P<video_name>.+)']:
         names = re.compile(pattern)
         result = names.search(video_url)

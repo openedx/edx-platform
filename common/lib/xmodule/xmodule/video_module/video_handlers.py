@@ -317,7 +317,7 @@ class VideoStudentViewHandlers(object):
             source_url = request.GET.get('source')
 
             if not source_url:
-                log.info("Invalid /transient request: no original video url in request")
+                log.info("Invalid /temporary request: no original video url in request")
                 return Response(status=400)
 
             temporary_url = get_s3_transient_url(source_url)
