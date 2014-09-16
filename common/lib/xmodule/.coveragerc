@@ -5,6 +5,9 @@ source = common/lib/xmodule
 
 [report]
 ignore_errors = True
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
 
 [html]
 title = XModule Python Test Coverage Report

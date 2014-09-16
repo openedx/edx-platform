@@ -69,9 +69,6 @@ class ModuleStoreDraftAndPublished(BranchSettingMixin):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, *args, **kwargs):
-        super(ModuleStoreDraftAndPublished, self).__init__(*args, **kwargs)
-
     @abstractmethod
     def delete_item(self, location, user_id, revision=None, **kwargs):
         raise NotImplementedError
