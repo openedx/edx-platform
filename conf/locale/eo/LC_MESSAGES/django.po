@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-15 09:49-0400\n"
-"PO-Revision-Date: 2014-09-15 13:49:58.396995\n"
+"POT-Creation-Date: 2014-09-16 10:50-0400\n"
+"PO-Revision-Date: 2014-09-16 14:50:40.650430\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -6001,6 +6001,19 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"Sorry! Our payment processor sent us back a message saying that you have "
+"cancelled this transaction. The items in your shopping cart will exist for "
+"future purchase. If you feel that this is in error, please contact us with "
+"payment-specific questions at {email}."
+msgstr ""
+"Sörrý! Öür päýmént pröçéssör sént üs ßäçk ä méssägé säýïng thät ýöü hävé "
+"çänçélléd thïs tränsäçtïön. Thé ïtéms ïn ýöür shöppïng çärt wïll éxïst för "
+"fütüré pürçhäsé. Ìf ýöü féél thät thïs ïs ïn érrör, pléäsé çöntäçt üs wïth "
+"päýmént-spéçïfïç qüéstïöns ät {email}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ι#"
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry!  Your payment could not be processed because an unexpected exception "
 "occurred.  Please contact us at {email} for assistance."
 msgstr ""
@@ -7380,74 +7393,6 @@ msgid "):"
 msgstr "): Ⱡ'#"
 
 #: common/templates/course_modes/choose.html
-msgid "Why do I have to pay? What if I want a free honor code certificate?"
-msgstr ""
-"Whý dö Ì hävé tö päý? Whät ïf Ì wänt ä fréé hönör çödé çértïfïçäté? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕ#"
-
-#: common/templates/course_modes/choose.html
-msgid "Why do I have to pay?"
-msgstr "Whý dö Ì hävé tö päý? Ⱡ'σя#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"As a not-for-profit, edX uses your contribution to support our mission to "
-"provide quality education to everyone around the world, and to improve "
-"learning through research. While we have established a minimum fee, we ask "
-"that you contribute as much as you can."
-msgstr ""
-"Às ä nöt-för-pröfït, édX üsés ýöür çöntrïßütïön tö süppört öür mïssïön tö "
-"prövïdé qüälïtý édüçätïön tö évérýöné äröünd thé wörld, änd tö ïmprövé "
-"léärnïng thröügh réséärçh. Whïlé wé hävé éstäßlïshéd ä mïnïmüm féé, wé äsk "
-"thät ýöü çöntrïßüté äs müçh äs ýöü çän. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"I'd like to pay more than the minimum.  Is my contribution tax deductible?"
-msgstr ""
-"Ì'd lïké tö päý möré thän thé mïnïmüm.  Ìs mý çöntrïßütïön täx dédüçtïßlé? "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"Please check with your tax advisor to determine whether your contribution is"
-" tax deductible."
-msgstr ""
-"Pléäsé çhéçk wïth ýöür täx ädvïsör tö détérmïné whéthér ýöür çöntrïßütïön ïs"
-" täx dédüçtïßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/templates/course_modes/choose.html
-msgid "What if I can't afford it or don't have the necessary equipment?"
-msgstr ""
-"Whät ïf Ì çän't äfförd ït ör dön't hävé thé néçéssärý éqüïpmént? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you can't afford the minimum fee or don't meet the requirements, you can "
-"audit the course or elect to pursue an honor code certificate at no cost."
-msgstr ""
-"Ìf ýöü çän't äfförd thé mïnïmüm féé ör dön't méét thé réqüïréménts, ýöü çän "
-"äüdït thé çöürsé ör éléçt tö pürsüé än hönör çödé çértïfïçäté ät nö çöst. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"If you would like to pursue the honor code certificate, please check the "
-"honor code certificate box and then click the 'Select Certificate' button to"
-" complete your registration."
-msgstr ""
-"Ìf ýöü wöüld lïké tö pürsüé thé hönör çödé çértïfïçäté, pléäsé çhéçk thé "
-"hönör çödé çértïfïçäté ßöx änd thén çlïçk thé 'Séléçt Çértïfïçäté' ßüttön tö"
-" çömplété ýöür régïsträtïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłι#"
-
-#: common/templates/course_modes/choose.html
-msgid "Select Honor Code Certificate"
-msgstr "Séléçt Hönör Çödé Çértïfïçäté Ⱡ'σяєм #"
-
-#: common/templates/course_modes/choose.html
 #: common/templates/course_modes/choose.html
 msgid "Upgrade Your Registration"
 msgstr "Ûpgrädé Ýöür Régïsträtïön Ⱡ'σяєм#"
@@ -7499,10 +7444,18 @@ msgid "Audit This Course"
 msgstr "Àüdït Thïs Çöürsé Ⱡ'σ#"
 
 #: common/templates/course_modes/choose.html
-msgid "Sign up to audit this course for free and track your own progress."
+#: common/templates/course_modes/choose.html
+msgid ""
+"Audit this course for free and have complete access to all the course "
+"material, activities, tests, and forums. If your work is satisfactory and "
+"you abide by the Honor Code, you'll receive a personalized Honor Code "
+"Certificate to showcase your achievement."
 msgstr ""
-"Sïgn üp tö äüdït thïs çöürsé för fréé änd träçk ýöür öwn prögréss. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
+"Àüdït thïs çöürsé för fréé änd hävé çömplété äççéss tö äll thé çöürsé "
+"mätérïäl, äçtïvïtïés, tésts, änd förüms. Ìf ýöür wörk ïs sätïsfäçtörý änd "
+"ýöü äßïdé ßý thé Hönör Çödé, ýöü'll réçéïvé ä pérsönälïzéd Hönör Çödé "
+"Çértïfïçäté tö shöwçäsé ýöür äçhïévémént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ι#"
 
 #: common/templates/course_modes/choose.html
 msgid "Select Audit"
@@ -7540,17 +7493,6 @@ msgstr ""
 "ädvänçémént, ör sçhööl äpplïçätïöns? Thén wörk töwärd ä Vérïfïéd Çértïfïçäté"
 " öf Àçhïévémént tö döçümént ýöür äççömplïshmént. À mïnïmüm féé äpplïés. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єι#"
-
-#: common/templates/course_modes/choose.html
-msgid ""
-"You can audit this course and still have complete access to the course "
-"material. If you complete and pass the course you will automatically earn an"
-" Honor Code Certificate free of charge."
-msgstr ""
-"Ýöü çän äüdït thïs çöürsé änd stïll hävé çömplété äççéss tö thé çöürsé "
-"mätérïäl. Ìf ýöü çömplété änd päss thé çöürsé ýöü wïll äütömätïçällý éärn än"
-" Hönör Çödé Çértïfïçäté fréé öf çhärgé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
 
 #: common/templates/course_modes/choose.html
 msgid "Pursue an Honor Code Certificate"
@@ -14998,56 +14940,70 @@ msgid "Loading&hellip;"
 msgstr "Löädïng&hellip; Ⱡ#"
 
 #: cms/templates/asset_index.html
-msgid "What files are listed here?"
-msgstr "Whät fïlés äré lïstéd héré? Ⱡ'σяєм#"
+msgid "Adding Files for Your Course"
+msgstr "Àddïng Fïlés för Ýöür Çöürsé Ⱡ'σяєм #"
 
 #: cms/templates/asset_index.html
 msgid ""
-"In addition to the files you upload on this page, any files that you add to "
-"the course appear in this list. These files include your course image, "
-"textbook chapters, and files that appear on your Course Handouts sidebar."
+"To add files to use in your course, click {em_start}Upload New File{em_end}."
+" Then follow the prompts to upload a file from your computer."
 msgstr ""
-"Ìn äddïtïön tö thé fïlés ýöü üplöäd ön thïs pägé, äný fïlés thät ýöü ädd tö "
-"thé çöürsé äppéär ïn thïs lïst. Thésé fïlés ïnçlüdé ýöür çöürsé ïmägé, "
-"téxtßöök çhäptérs, änd fïlés thät äppéär ön ýöür Çöürsé Händöüts sïdéßär. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕ#"
-
-#: cms/templates/asset_index.html
-msgid "File URLs"
-msgstr "Fïlé ÛRLs #"
+"Tö ädd fïlés tö üsé ïn ýöür çöürsé, çlïçk {em_start}Ûplöäd Néw Fïlé{em_end}."
+" Thén föllöw thé prömpts tö üplöäd ä fïlé fröm ýöür çömpütér. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the Embed URL value to link to the file or image from a component, a"
-" course update, or a course handout."
+"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
+"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
+"You should use a third party service to host multimedia files."
 msgstr ""
-"Ýöü üsé thé Émßéd ÛRL välüé tö lïnk tö thé fïlé ör ïmägé fröm ä çömpönént, ä"
-" çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"{em_start}Çäütïön{em_end}: édX réçömménds thät ýöü lïmït thé fïlé sïzé tö "
+"{em_start}10 MB{em_end}. Ìn äddïtïön, dö nöt üplöäd vïdéö ör äüdïö fïlés. "
+"Ýöü shöüld üsé ä thïrd pärtý sérvïçé tö höst mültïmédïä fïlés. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, #"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You use the External URL value to reference the file or image from outside "
-"of your course. Do not use the External URL as a link value within your "
-"course."
+"The course image, textbook chapters, and files that appear on your Course "
+"Handouts sidebar also appear in this list."
 msgstr ""
-"Ýöü üsé thé Éxtérnäl ÛRL välüé tö référénçé thé fïlé ör ïmägé fröm öütsïdé "
-"öf ýöür çöürsé. Dö nöt üsé thé Éxtérnäl ÛRL äs ä lïnk välüé wïthïn ýöür "
-"çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+"Thé çöürsé ïmägé, téxtßöök çhäptérs, änd fïlés thät äppéär ön ýöür Çöürsé "
+"Händöüts sïdéßär älsö äppéär ïn thïs lïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
-#: cms/templates/asset_index.html cms/templates/container.html
-#: cms/templates/group_configurations.html cms/templates/settings_graders.html
-msgid "What can I do on this page?"
-msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
+#: cms/templates/asset_index.html
+msgid "Using File URLs"
+msgstr "Ûsïng Fïlé ÛRLs Ⱡ'#"
 
 #: cms/templates/asset_index.html
 msgid ""
-"You can upload new files or view, download, or delete existing files. You "
-"can lock a file so that people who are not enrolled in your course cannot "
-"access that file."
+"Use the {em_start}Embed URL{em_end} value to link to the file or image from "
+"a component, a course update, or a course handout."
 msgstr ""
-"Ýöü çän üplöäd néw fïlés ör vïéw, döwnlöäd, ör délété éxïstïng fïlés. Ýöü "
-"çän löçk ä fïlé sö thät péöplé whö äré nöt énrölléd ïn ýöür çöürsé çännöt "
-"äççéss thät fïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg#"
+"Ûsé thé {em_start}Émßéd ÛRL{em_end} välüé tö lïnk tö thé fïlé ör ïmägé fröm "
+"ä çömpönént, ä çöürsé üpdäté, ör ä çöürsé händöüt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢#"
+
+#: cms/templates/asset_index.html
+msgid ""
+"Use the {em_start}External URL{em_end} value to reference the file or image "
+"only from outside of your course."
+msgstr ""
+"Ûsé thé {em_start}Éxtérnäl ÛRL{em_end} välüé tö référénçé thé fïlé ör ïmägé "
+"önlý fröm öütsïdé öf ýöür çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: cms/templates/asset_index.html
+msgid ""
+"Click in the Embed URL or External URL column to select the value, then copy"
+" it."
+msgstr ""
+"Çlïçk ïn thé Émßéd ÛRL ör Éxtérnäl ÛRL çölümn tö séléçt thé välüé, thén çöpý"
+" ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/asset_index.html
+msgid "Learn more about managing files"
+msgstr "Léärn möré äßöüt mänägïng fïlés Ⱡ'σяєм ι#"
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -15126,6 +15082,11 @@ msgstr "Vïéw Lïvé Vérsïön Ⱡ'σ#"
 #: cms/templates/container.html
 msgid "Preview Changes"
 msgstr "Prévïéw Çhängés Ⱡ'#"
+
+#: cms/templates/container.html cms/templates/group_configurations.html
+#: cms/templates/settings_graders.html
+msgid "What can I do on this page?"
+msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
 
 #: cms/templates/container.html
 msgid ""
@@ -15447,10 +15408,9 @@ msgstr ""
 "süßséçtïön, ör ünït, thén séléçt {em_start}Hïdé fröm stüdénts{em_end}. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
-#: cms/templates/course_outline.html cms/templates/group_configurations.html
-#: cms/templates/textbooks.html
-msgid "Learn More"
-msgstr "Léärn Möré Ⱡ#"
+#: cms/templates/course_outline.html
+msgid "Learn more about the course outline"
+msgstr "Léärn möré äßöüt thé çöürsé öütlïné Ⱡ'σяєм ιρ#"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -15842,6 +15802,10 @@ msgstr ""
 "Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs nöt ïn üsé ïn än "
 "éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk thé "
 "délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
+
+#: cms/templates/group_configurations.html
+msgid "Learn More"
+msgstr "Léärn Möré Ⱡ#"
 
 #: cms/templates/group_configurations.html cms/templates/settings.html
 #: cms/templates/settings_advanced.html cms/templates/settings_graders.html
@@ -17331,6 +17295,10 @@ msgstr ""
 "Ìf ýöür téxtßöök döésn't hävé ïndïvïdüäl çhäptérs, ýöü çän üplöäd thé éntïré"
 " téxt äs ä sïnglé çhäptér änd éntér ä nämé öf ýöür çhöïçé ïn thé Çhäptér "
 "Nämé fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: cms/templates/textbooks.html
+msgid "Learn more about textbooks"
+msgstr "Léärn möré äßöüt téxtßööks Ⱡ'σяєм#"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
