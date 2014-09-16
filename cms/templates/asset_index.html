@@ -3,6 +3,7 @@
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
+  from django.conf import settings
 %>
 <%block name="title">${_("Files &amp; Uploads")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-uploads</%block>
@@ -106,6 +107,7 @@
     </div>
 </div>
 
+% if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
 <div class="change-license-modal modal">
     <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
@@ -114,6 +116,7 @@
     <a href="#" class="save-license-button button">${_("Save License")}</a>
     <div class="button-spacer"></div>
 </div>
+% endif
 
 
 </%block>

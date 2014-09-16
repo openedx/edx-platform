@@ -317,11 +317,14 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                     self.download_video = True
 
         # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
-        if not(self.license):
-            course = self.system.modulestore._get_course_for_item(self.scope_ids.usage_id)
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
+            course = modulestore().get_course(course_id)
 
             self.license = course.license
             self.license_version = course.license_version
+        else:
+            self.license = None
+            self.license_version = None
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,

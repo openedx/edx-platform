@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, Http404
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 
 from xblock.fields import Scope
 from xblock.fragment import Fragment
@@ -482,7 +483,7 @@ def _create_item(request):
         if display_name is not None:
             metadata['display_name'] = display_name
 
-    if license is not None:
+    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and license is not None:
         metadata['license'] = license
         metadata['license_version'] = parse_license(license).version
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts

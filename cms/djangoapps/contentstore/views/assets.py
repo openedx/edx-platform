@@ -130,7 +130,7 @@ def _assets_json(request, course_key):
 
         _license = asset.get('license', None)
         asset_locked = asset.get('locked', False)
-        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, _license, thumbnail_location, asset_locked))
+        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked, _license))
 
     return JsonResponse({
         'start': start,
@@ -203,9 +203,13 @@ def _upload_asset(request, course_key):
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
 
-    # Set default license
-    content.license = course_module.license
-    content.license_version = course_module.license_version
+    if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+        # Set default license
+        content.license = course_module.license
+        content.license_version = course_module.license_version
+    else:
+        content.license = None
+        content.license_version = None
 
     # then commit the content
     contentstore().save(content)
@@ -216,7 +220,7 @@ def _upload_asset(request, course_key):
 
     locked = getattr(content, 'locked', False)
     response_payload = {
-        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.license, content.thumbnail_location, locked),
+        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked, content.license, content.license_version),
         'msg': _('Upload completed')
     }
 
@@ -273,26 +277,35 @@ def _update_asset(request, course_key, asset_key):
                 modified_asset = json.loads(request.body)
             except ValueError:
                 return HttpResponseBadRequest()
+
             contentstore().set_attr(asset_key, 'locked', modified_asset['locked'])
-            contentstore().set_attr(asset_key, 'license', modified_asset['license'])
-            contentstore().set_attr(asset_key, 'license_version', parse_license(modified_asset['license']).version)
+
+            if settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False):
+                contentstore().set_attr(asset_key, 'license', modified_asset['license'])
+                contentstore().set_attr(asset_key, 'license_version', parse_license(modified_asset['license']).version)
+
             # Delete the asset from the cache so we check the lock status the next time it is requested.
             del_cached_content(asset_key)
             return JsonResponse(modified_asset, status=201)
 
 
-def _get_asset_json(display_name, date, location, license, thumbnail_location, locked):
+def _get_asset_json(display_name, date, location, thumbnail_location, locked, license=None, license_version=None):
     """
     Helper method for formatting the asset information to send to client.
     """
     asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = settings.LMS_BASE + asset_url
+    if license_version is None and license is not None:
+        license_version = parse_license(license).version
+
     return {
         'display_name': display_name,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,
         'license': license,
+        'license_version': license_version,
+        'license_editable': settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False),
         'portable_url': StaticContent.get_static_path_from_location(location),
         'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,

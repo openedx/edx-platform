@@ -27,9 +27,11 @@
         <li class="action-item action-delete">
             <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
         </li>
-        <li class="action-item action-change-license">
-            <a href="#" data-tooltip="<%= gettext('Change the license for this asset') %>" class="change-asset-license-button action-button"><i class="icon-tasks"></i> <span class="sr"><%= gettext('Change asset license') %></span></a>
-        </li>
+        <% if (license_editable === true) { %>
+            <li class="action-item action-change-license">
+                <a href="#" data-tooltip="<%= gettext('Change the license for this asset') %>" class="change-asset-license-button action-button"><i class="icon-tasks"></i> <span class="sr"><%= gettext('Change asset license') %></span></a>
+            </li>
+        <% } %>
         <li class="action-item action-lock">
             <label for="<%= uniqueId %>"><span class="sr"><%= gettext('Lock this asset') %></span></label>
             <input type="checkbox" id="<%= uniqueId %>" class="lock-checkbox" data-tooltip="<%= gettext('Lock/unlock file') %>" />

@@ -118,7 +118,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var self = assetsView;
                 event.preventDefault();
                 self.resetUploadModal();
-                ModalUtils.showModal();
+                ModalUtils.showModal(".upload-modal");
                 $('.file-input').bind('change', self.startUpload);
                 $('.upload-modal .file-chooser').fileupload({
                     dataType: 'json',

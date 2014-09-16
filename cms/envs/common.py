@@ -107,6 +107,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': False,
 }
 ENABLE_JASMINE = False
 
