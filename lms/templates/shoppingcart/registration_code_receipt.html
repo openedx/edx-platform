@@ -1,0 +1,81 @@
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+%>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="pagetitle">${_("Confirm Enrollment")}</%block>
+
+<%block name="content">
+<div class="container">
+  <section class="wrapper confirm-enrollment">
+    <header class="page-header">
+      <h1 class="title">
+        ${_("{site_name} -  Confirm Enrollment").format(site_name=site_name)}
+      </h1>
+    </header>
+    <section>
+      <div class="course-image">
+        <img style="width: 100%; height: auto;" src="${course_image_url(course)}"
+             alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image"/>
+      </div>
+      <div class="enrollment-details">
+        <div class="sub-title">${_("Confirm your enrollment for:")}
+          <span class="course-date-label">${_("course dates")}</span>
+
+          <div class="clearfix"></div>
+        </div>
+
+        <div class="course-title">
+          <h1>
+            ${_("{course_name}").format(course_name=course.display_name)}
+              <span class="course-dates">${_("{start_date}").format(start_date=course.start_date_text)} -  ${_("{end_date}").format(end_date=course.end_date_text)}
+              </span>
+          </h1>
+        </div>
+        <hr>
+        <div>
+          % if reg_code_already_redeemed:
+          <% dashboard_url = reverse('dashboard')%>
+          <p class="enrollment-text">
+            ${_("You've clicked a link for an enrollment code that has already been used."
+            " Check your <a href={dashboard_url}>course dashboard</a> to see if you're enrolled in the course,"
+            " or contact your company's administrator.").format(dashboard_url=dashboard_url)}
+          </p>
+          % elif redemption_success:
+          <p class="enrollment-text">
+            ${_("You have successfully enrolled in {course_name}."
+            " This course has now been added to your dashboard.").format(course_name=course.display_name)}
+          </p>
+          % elif registered_for_course:
+          <% dashboard_url = reverse('dashboard')%>
+          <p class="enrollment-text">
+            ${_("You're already registered for this course."
+            " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url)}
+          </p>
+          % else:
+          <p class="enrollment-text">
+            ${_("You're about to activate an enrollment code for {course_name} by {site_name}. "
+            "This code can only be used one time, so you should only activate this code if you're its intended"
+            " recipient.").format(course_name=course.display_name, site_name=site_name)}
+          </p>
+          % endif
+        </div>
+      </div>
+      % if not reg_code_already_redeemed:
+        %if redemption_success:
+          <% course_url = reverse('info', args=[course.id.to_deprecated_string()]) %>
+          <a href="${course_url}" class="link-button course-link-bg-color">${_("View Course &nbsp; &nbsp; &#x25b8;")}</a>
+        %elif not registered_for_course:
+          <form method="post">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+            <input type="submit" value="Activate Course Enrollment     &#x25b8;" id="id_active_course_enrollment"
+               name="active_course_enrollment">
+          </form>
+        %endif
+      %endif
+    </section>
+  </section>
+</div>
+</%block>
