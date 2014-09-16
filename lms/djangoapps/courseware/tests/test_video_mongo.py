@@ -148,7 +148,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             <video show_captions="true"
             display_name="A Name"
                 sub="{sub}" download_track="{download_track}"
-            start_time="01:00:03" end_time="01:00:10"
+            start_time="01:00:03" end_time="01:00:10" download_video="true"
             >
                 <source src="example.mp4"/>
                 <source src="example.webm"/>
@@ -487,7 +487,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertIn('source', fields)
         self.assertEqual(self.item_descriptor.source, 'http://example.org/video.mp4')
-        self.assertTrue(self.item_descriptor.download_video)
+        self.assertFalse(self.item_descriptor.download_video)
         self.assertTrue(self.item_descriptor.source_visible)
 
     def test_source_in_html5sources(self):
@@ -500,7 +500,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         fields = self.item_descriptor.editable_metadata_fields
 
         self.assertNotIn('source', fields)
-        self.assertTrue(self.item_descriptor.download_video)
+        self.assertFalse(self.item_descriptor.download_video)
         self.assertFalse(self.item_descriptor.source_visible)
 
     def test_download_video_is_explicitly_set(self):
