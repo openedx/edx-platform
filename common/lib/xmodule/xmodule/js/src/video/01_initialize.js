@@ -76,6 +76,7 @@ function (VideoPlayer, VideoStorage, i18n) {
         setSpeed: setSpeed,
         speedToString: speedToString,
         trigger: trigger,
+        registerCallback: registerCallback,
         youtubeId: youtubeId
     },
 
@@ -481,7 +482,21 @@ function (VideoPlayer, VideoStorage, i18n) {
             id: id,
             isFullScreen: false,
             isTouch: isTouch,
-            storage: storage
+            storage: storage,
+
+            // Some methods of some objects support attaching callbacks to them.
+            // These callbacks will be executed after the method finishes running.
+            // Callbacks will be executed if the method is successful.
+            // Callbacks will be executed with parameters appropriate to each method.
+            // Not all methods will support callbacks. The following is a hierarchy
+            // of objects/methods that support attaching callbacks to them.
+            // This list can be extended by modifying objects/methods to allow for
+            // attaching of callbacks.
+            methodCallbacks: {
+                videoPlayer: {
+                    update: []
+                }
+            }
         });
 
         console.log(
@@ -866,6 +881,68 @@ function (VideoPlayer, VideoStorage, i18n) {
         tmpObj.apply(this, extraParameters);
 
         return true;
+    }
+
+    /*
+     * Function:
+     *     registerCallback
+     *
+     * Description:
+     *     Allow arbitrary JavaScript callback function be attached to methods of
+     *     `state` object. Since the `state` object is accessible via the
+     *     video DOM element data attribute "video-player-state", this function
+     *     can be used by external JavaScript code on the page to synchronize
+     *     with the video player by attaching callbacks to methods (which are configured
+     *     to have attached callbacks). For a list of available methods see the
+     *     definition of `methodCallbacks` in `initialize()` function in this file.
+     *
+     * Parameters:
+     *     objName [string]:
+     *         The name of the object in the `state` object.
+     *     methodName [string]:
+     *         The name of the method in the object `state[objName]` for which the
+     *         callback should be registered.
+     *     callback [function]:
+     *         The callback function.
+     *
+     * Returns:
+     *     -1, -2, -3, -4, -5 [number]:
+     *         In case of error. For example if `objName` refers to an undefined object, or
+     *         if method named `methodName` does not support attaching of callbacks. See
+     *         function implementation for case-by-case return error values.
+     *     0 [number]:
+     *         In case the function is successful.
+     */
+    function registerCallback(objName, methodName, callback) {
+        if (typeof objName !== 'string' ) {
+            console.log('[Video info]: registerCallback: parameter "objName" is not a string!');
+
+            return -1;
+        }
+        if (typeof methodName !== 'string') {
+            console.log('[Video info]: registerCallback: parameter "methodName" is not a string!');
+
+            return -2;
+        }
+        if (!$.isFunction(callback)) {
+            console.log('[Video info]: registerCallback: parameter "callback" is not a function!');
+
+            return -3;
+        }
+        if (!this.methodCallbacks[objName]) {
+            console.log('[Video info]: registerCallback: the object "' + objName + '" does not have methods which you can attach callback to!');
+
+            return -4;
+        }
+        if (!this.methodCallbacks[objName][methodName]) {
+            console.log('[Video info]: registerCallback: the method "' + methodName + '" does not support attaching callbacks to it!');
+
+            return -5;
+        }
+
+        this.methodCallbacks[objName][methodName].push(callback);
+
+        return 0;
     }
 });
 

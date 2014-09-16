@@ -458,6 +458,36 @@ function (Initialize) {
             });
         });
 
+        describe('Registering callbacks', function () {
+            var callback = function (t) {
+                var x = 1; return x + t;
+            };
+
+            it('regiter callback for videoPlayer.update method - direct function call', function () {
+                var state = {
+                        methodCallbacks: {
+                            videoPlayer: {
+                                update: []
+                            }
+                        }
+                    },
+                    registerCallback = Initialize.prototype.registerCallback;
+
+                registerCallback.call(state, 'videoPlayer', 'update', callback);
+                expect(state.methodCallbacks.videoPlayer.update[0]).toBe(callback);
+            });
+
+            it('regiter callback for videoPlayer.update method - call through DOM element', function () {
+                var state;
+
+                jasmine.initializePlayer();
+                state = $('.video').data('video-player-state');
+
+                state.registerCallback('videoPlayer', 'update', callback);
+                expect(state.methodCallbacks.videoPlayer.update[0]).toBe(callback);
+            });
+        });
+
         describe('isHtml5Mode', function () {
             it('returns `true` if player in `html5` mode', function () {
                 var state = {
