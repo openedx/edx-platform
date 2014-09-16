@@ -68,8 +68,12 @@
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
-            <span class="csv_tip">${_("Click to generate a CSV file for all sales records in this course")}
-                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All e-Commerce Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true"></p></td>
+            <span class="csv_tip">
+              <div >
+              ${_("Click to generate a CSV file for all sales records in this course")}
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoice Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Order Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+              </div>
             </span>
              <hr>
              <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>

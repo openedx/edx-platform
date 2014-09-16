@@ -19,9 +19,10 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from shoppingcart.models import (
     Order, OrderItem, CertificateItem,
-    InvalidCartItem, PaidCourseRegistration,
+    InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration,
     Donation, OrderItemSubclassPK
 )
 from student.tests.factories import UserFactory
@@ -325,6 +326,15 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         )
 
         self.assertEqual(self.cart.total_cost, self.cost)
+
+    def test_cart_type_business(self):
+        self.cart.order_type = 'business'
+        self.cart.save()
+        item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        self.cart.purchase()
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+        # check that the registration codes are generated against the order
+        self.assertEqual(len(CourseRegistrationCode.objects.filter(order=self.cart)), item.qty)
 
     def test_add_with_default_mode(self):
         """

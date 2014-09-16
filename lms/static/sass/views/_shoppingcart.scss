@@ -267,6 +267,24 @@
 }
 
 .shopping-cart{
+  input[type="text"], input[type="email"] , select{
+        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+        font-style: normal;
+        border: 2px solid $dark-gray2;
+        height: auto;
+        padding: 8px 12px;
+        font-weight: 600;
+        width: 260px;
+        font-size: 16px;
+        &:focus{
+          border-color: $dark-gray2;
+          box-shadow: none;
+          outline: none;
+        }
+         &.error{
+            border-color: $red1;
+          }
+      }
   .hidden{display: none;}
   .show{display: inline-block;}
   h1{
@@ -326,6 +344,7 @@
         font-size: 16px;
         text-transform: uppercase;
         color: $light-gray2;
+        padding: 0;
       }
       h1, h1 span{
         font-size: 24px;
@@ -475,12 +494,6 @@
             border-color: $red1;
           }
       }
-      .error-text{
-        color: $red1;
-        font-size: 12px;
-        display: block;
-        padding-bottom: 0;
-       }
     input[type="submit"]{
       padding: 9px 35px;
     }
@@ -577,7 +590,7 @@
           i{
             position: absolute;
             right: 30px;
-            top: 25px;
+            top: 21px;
             color: white;
             font-size: 24px;
           }
@@ -600,7 +613,58 @@
     text-align: right;
     font-weight: 300;
   }
- }
+  h3{
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 30px 20px;
+    color: $dark-gray1;
+  }
+  .billing-data{
+    display: table;
+    padding: 0px 20px;
+    h3{
+      padding: 12px 0px;
+      color: $dark-gray2;
+    }
+    .row{
+      display: table-row;
+      .data-group{
+      width: 262px;
+      float: left;
+      margin-right: 30px;
+      margin-bottom: 15px;
+        label{
+        display: block;
+        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        color: $dark-gray2;
+      }
+      input{width: 100%;margin-bottom: 5px;}
+      select{
+        width: 100%;
+        background: white;
+        border-radius: 3px;
+        appearance:none;
+        background: url('../../static/images/drop-arrow.png') no-repeat 238px 14px;
+        -moz-appearance:none; /* Firefox */
+        -webkit-appearance:none; /* Safari and Chrome */
+      }
+      &:nth-child(4n){
+        margin-right: 0px;
+      }
+    }
+    }
+  }
+  .error-text{
+    color: $red1;
+    font-size: 12px;
+    display: block;
+    padding-bottom: 0;
+  }
+}
   .empty-cart{
     padding: 20px 0px;
     background: $light-gray1;
@@ -631,3 +695,4 @@
       }
     }
   }
+
