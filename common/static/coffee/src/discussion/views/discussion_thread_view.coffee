@@ -79,6 +79,9 @@ if Backbone?
       closed: (closed) ->
         @$(".discussion-reply-new").toggle(not closed)
         @$('.comment-form').closest('li').toggle(not closed)
+        @$(".action-vote").toggle(not closed)
+        @$(".display-vote").toggle(closed)
+#        @$(".display-vote").toggle(closed)
         @renderAddResponseButton()
     })
 
@@ -311,6 +314,7 @@ if Backbone?
     closeEditView: (event) =>
       @createShowView()
       @renderShowView()
+      @renderAttrs()
       # next call is necessary to re-render the post action controls after
       # submitting or cancelling a thread edit in inline mode.
       @$el.find(".post-extended-content").show()
