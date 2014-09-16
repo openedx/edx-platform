@@ -108,7 +108,8 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         # CountryMiddleware disabled for Studio.
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
 
-        if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+        if (getattr(self, 'video_speed_optimizations', True) and cdn_url and
+            not getattr(self, 'video_link_transience', False)):
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:

@@ -613,3 +613,17 @@ class VideoLinkTransienceTest(unittest.TestCase):
             self.assertIn("https://bucket.s3.amazonaws.com/subfolder/video.mp4", url)
             self.assertIn('AWSAccessKeyId=test_key', url)
             self.assertNotIn('test_secret', url)
+
+    def test_wrong_source_url(self):
+        """
+        Test if wrong source url is passed.
+        """
+        # URL is not from amazonaws.com domain
+        wrong_origin_video_urls = [
+            "https://example.com/video.mp4",
+            "https://example.com/subfolder/video.mp4",
+            "https://s3.example.com/video.mp4",
+            "https://s3.amazonaws.com/bucket/",
+        ]
+        for origin_url in wrong_origin_video_urls:
+            self.assertIsNone(get_s3_transient_url(origin_url))
