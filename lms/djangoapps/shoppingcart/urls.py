@@ -15,6 +15,7 @@ if settings.FEATURES['ENABLE_SHOPPING_CART']:
         url(r'^remove_item/$', 'remove_item'),
         url(r'^add/course/{}/$'.format(settings.COURSE_ID_PATTERN), 'add_course_to_cart', name='add_course_to_cart'),
         url(r'^use_code/$', 'use_code'),
+        url(r'^reset_code_redemption/$', 'reset_code_redemption'),
         url(r'^register_courses/$', 'register_courses'),
     )
 
