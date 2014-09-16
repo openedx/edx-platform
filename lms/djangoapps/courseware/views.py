@@ -658,15 +658,15 @@ def course_about(request, course_id):
     Assumes the course_id is in a valid format.
     """
 
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'see_exists', course_key)
+
     if microsite.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     ):
-        raise Http404
+        return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-
-    course = get_course_with_access(request.user, 'see_exists', course_key)
     registered = registered_for_course(course, request.user)
     staff_access = has_access(request.user, 'staff', course)
     studio_url = get_studio_url(course, 'settings/details')
