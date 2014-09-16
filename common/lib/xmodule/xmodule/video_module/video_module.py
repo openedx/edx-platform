@@ -43,6 +43,28 @@ from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
+
+# The following import/except block for edxval is a lesser-of-evils compromise.
+#
+# Here's the deal: the VideoModule should be able to take advantage of edx-val
+# (https://github.com/edx/edx-val) to figure out what URL to give for video
+# resources that have an edx_video_id specified. edx-val is a Django app, and
+# including it causes tests to fail because we run common/lib tests standalone
+# without Django dependencies. The alternatives seem to be:
+#
+# 1. Move VideoModule out of edx-platform.
+# 2. Accept the Django dependency in common/lib.
+# 3. Try to import, catch the exception on failure, and check for the existence
+#    of edxval_api before invoking it in the code.
+#
+# (1) is the long term goal. VideoModule should be made into an XBlock and
+# extracted from edx-platform entirely. But that's expensive to do because of
+# the various dependencies (like templates). Need to sort this out.
+# (2) is explicitly discouraged.
+# (3) is what we're doing. The code is still functional when called within the
+# context of the LMS, but does not cause failure on import when running
+# standalone tests. Most VideoModule tests tend to be in the LMS anyway,
+# probably for historical reasons.
 try:
     import edxval.api as edxval_api
 except ImportError:
