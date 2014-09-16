@@ -279,6 +279,11 @@ FEATURES = {
     # when the styles appropriately match the edX.org website.
     'ENABLE_NEW_EDX_HEADER': False,
 
+    # When a logged in user goes to the homepage ('/') should the user be
+    # redirected to the dashboard - this is default Open edX behavior. Set to
+    # False to not redirect the user
+    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
+
 }
 
 # Ignore static asset files on import which match this pattern

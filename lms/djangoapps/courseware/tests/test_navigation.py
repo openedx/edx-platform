@@ -59,7 +59,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
                                           display_name='progress_tab',
                                           default_tab = 'progress')
 
-
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
             email, password = self.STUDENT_INFO[i]
