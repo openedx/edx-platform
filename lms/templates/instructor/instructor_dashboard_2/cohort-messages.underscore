@@ -1,0 +1,65 @@
+<div class="message message-confirmation <%= (numAdded > 0 || numPresent > 0) ? 'is-shown' : '' %>">
+    <h3 class="message-title">
+        <%= _.template(
+            ngettext("{numAdded} student has been added to this cohort group",
+                "{numAdded} students have been added to this cohort group", numAdded),
+            {numAdded: numAdded},
+            {interpolate: /\{(.+?)\}/g})
+        %>
+    </h3>
+
+    <div class="message-copy">
+        <ul class="list-summary summary-items">
+            <% for (oldCohort in moved) { %>
+                <li class="summary-item">
+                    <%= _.template(
+                        ngettext("{numMoved} student was removed from {oldCohort}",
+                            "{numMoved} students were removed from {oldCohort}", moved[oldCohort]),
+                        {numMoved: moved[oldCohort], oldCohort: oldCohort},
+                        {interpolate: /\{(.+?)\}/g})
+                    %>
+                </li>
+            <% } %>
+            <% if (numPresent > 0) { %>
+                <li class="summary-item">
+                    <%= _.template(
+                        ngettext("{numPresent} student was already in the cohort group",
+                            "{numPresent} students were already in the cohort group", numPresent),
+                        {numPresent: numPresent},
+                        {interpolate: /\{(.+?)\}/g})
+                    %>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+</div>
+
+<div class="message message-error <%= unknown.length > 0 ? 'is-shown' : '' %>">
+    <h3 class="message-title">
+        <%= _.template(
+            ngettext("There was {numErrors} error when trying to add students:",
+                "There were {numErrors} errors when trying to add students:", unknown.length),
+            {numErrors: unknown.length},
+            {interpolate: /\{(.+?)\}/g})
+        %>
+    </h3>
+
+    <div class="message-copy">
+        <ul class="list-summary summary-items">
+            <% for (var i = 0; i < (showAllErrors ? unknown.length : Math.min(5, unknown.length)); i++) { %>
+                <li class="summary-item">
+                <%= _.template(gettext("Unknown user: {user}"),
+                    {user: unknown[i]},
+                    {interpolate: /\{(.+?)\}/g})
+                %>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+
+    <% if (!showAllErrors) { %>
+        <div class="message-actions">
+            <a href="" class="action-primary action-expand"><%= gettext("View all errors") %></a>
+        </div>
+    <% } %>
+</div>
