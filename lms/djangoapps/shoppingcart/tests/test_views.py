@@ -120,6 +120,30 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
+    def test_billing_details(self):
+        billing_url = reverse('billing_details')
+        self.login_user()
+
+        # page not found error because order_type is not business
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 404)
+
+        #chagne the order_type to business
+        self.cart.order_type = 'business'
+        self.cart.save()
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 200)
+
+        data = {'company_name': 'Test Company', 'company_contact_name': 'JohnDoe',
+                'company_contact_email': 'john@est.com', 'recipient_name': 'Mocker',
+                'recipient_email': 'mock@germ.com', 'company_address_line_1': 'DC Street # 1',
+                'company_address_line_2': '',
+                'company_city': 'DC', 'company_state': 'NY', 'company_zip': '22003', 'company_country': 'US',
+                'customer_reference_number': 'PO#23'}
+
+        resp = self.client.post(billing_url, data)
+        self.assertEqual(resp.status_code, 200)
+
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         self.login_user()
@@ -491,7 +515,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)

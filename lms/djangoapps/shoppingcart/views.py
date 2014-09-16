@@ -6,17 +6,16 @@ from django.contrib.auth.models import Group
 from django.http import (HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
     HttpResponseBadRequest, HttpResponseForbidden, Http404)
 from django.utils.translation import ugettext as _
+from util.json_request import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
-from microsite_configuration import microsite
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from django.contrib.auth.decorators import login_required
 from microsite_configuration import microsite
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.courses import get_course_by_id
 from courseware.views import registered_for_course
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
@@ -175,6 +174,7 @@ def reset_code_redemption(request):
     CouponRedemption.delete_coupon_redemption(request.user, cart)
     RegistrationCodeRedemption.delete_registration_redemption(request.user, cart)
     return HttpResponse('reset')
+
 
 @login_required
 def use_code(request):
@@ -433,6 +433,60 @@ def postpay_callback(request):
     else:
         return render_to_response('shoppingcart/error.html', {'order': result['order'],
                                                               'error_html': result['error_html']})
+
+
+@require_http_methods(["GET", "POST"])
+@login_required
+def billing_details(request):
+    """
+    This is the view for capturing additional billing details
+    in case of the business purchase workflow.
+    """
+
+    cart = Order.get_cart_for_user(request.user)
+    cart_items = cart.orderitem_set.all()
+
+    # uncomment these two lines to see the billing information workflow
+    # cart.order_type = 'business'
+    # cart.save()
+
+    if getattr(cart, 'order_type') != 'business':
+        raise Http404('Page not found!')
+
+    if request.method == "GET":
+        callback_url = request.build_absolute_uri(
+            reverse("shoppingcart.views.postpay_callback")
+        )
+        form_html = render_purchase_form_html(cart, callback_url=callback_url)
+        total_cost = cart.total_cost
+        context = {
+            'shoppingcart_items': cart_items,
+            'amount': total_cost,
+            'form_html': form_html,
+            'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        }
+        return render_to_response("shoppingcart/billing_details.html", context)
+    elif request.method == "POST":
+
+        company_name = request.POST.get("company_name", "")
+        company_contact_name = request.POST.get("company_contact_name", "")
+        company_contact_email = request.POST.get("company_contact_email", "")
+        recipient_name = request.POST.get("recipient_name", "")
+        recipient_email = request.POST.get("recipient_email", "")
+        company_address_line_1 = request.POST.get("company_address_line_1", "")
+        company_address_line_2 = request.POST.get("company_address_line_2", "")
+        company_city = request.POST.get("company_city", "")
+        company_state = request.POST.get("company_state", "")
+        company_zip = request.POST.get("company_zip", "")
+        company_country = request.POST.get("company_country", "")
+        customer_reference_number = request.POST.get("customer_reference_number", "")
+
+        cart.add_billing_details(company_name, company_contact_name, company_contact_email, recipient_name,
+                                 recipient_email, company_address_line_1, company_address_line_2, company_city,
+                                 company_state, company_zip, company_country, customer_reference_number)
+        return JsonResponse({
+            'response': _('success')
+        })  # status code 200: OK by default
 
 @login_required
 def show_receipt(request, ordernum):

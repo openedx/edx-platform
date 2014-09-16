@@ -1429,6 +1429,23 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.client.get(url + '/csv', {})
         self.assertEqual(response['Content-Type'], 'text/csv')
 
+    def test_get_sale_order_records_features_csv(self):
+        """
+        Test that the response from get_sale_order_records is in csv format.
+        """
+        self.cart.order_type = 'business'
+        self.cart.save()
+        self.cart.add_billing_details(company_name='Test Company', company_contact_name='Test',
+                                      company_contact_email='test@123', recipient_name='R1',
+                                      recipient_email='', company_address_line_1='', company_address_line_2='S1',
+                                      company_city='NY', company_state='NY', company_zip='4234', company_country='US',
+                                      customer_reference_number='PO#23')
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        self.cart.purchase()
+        sale_order_url = reverse('get_sale_order_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(sale_order_url)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+
     def test_get_sale_records_features_csv(self):
         """
         Test that the response from get_sale_records is in csv format.
