@@ -57,3 +57,32 @@ committers should expect to spend about one hour per week doing other tasks
 related to the open source community: reading/responding to questions on the
 mailing list and/or IRC channel, disseminating information about what edX is
 working on, and so on.
+
+Review Comments Terminology
+---------------------------
+In order to expedite the review process and to have a clear and mutual understanding
+between reviewers and contributors, the following terminology is strongly suggested
+when submitting comments on a PR:
+
+* **Must** - A comment tagged with "Must" indicates the reviewer feels strongly about
+  their requested change to the code and feels the PR should not be merged unless
+  their concern is satisfactorily addressed.
+
+* **Opt(ional)** - A comment tagged with "Optional" indicates the reviewer strongly
+  favors their suggestion, but may be agreeable to the current behavior, especially
+  with a persuasive response.
+
+* **Nit(pick)** - A comment tagged with "Nitpick" indicates the reviewer has a minor
+  criticism that *may* not be critical to address, but considers important to share
+  in the given context. Contributors should still seriously consider and weigh these
+  nits and address them in the spirit of maintaining high quality code.
+
+* **FYI** - A comment tagged with "FYI" is a related side comment that is
+  informative, but with the intention of having no required immediate action.
+
+**Note:** Unless stated or implied otherwise, all comments are assumed to be tagged
+with "Must".
+
+**Note 2:** It is possible that after further discussion and review, the reviewer
+chooses to amend the labelling of their comment, thereby changing its severity to be
+higher or lower than what was originally set.
