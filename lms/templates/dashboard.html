@@ -73,7 +73,7 @@
           $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')}"
+          xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}"
         ).stop().css("display", "block");
       }
     });
@@ -106,10 +106,10 @@
                {"new_email" : new_email, "password" : new_password},
                function(data) {
                  if (data.success) {
-                   $("#change_email_title").html("${_('Please verify your new email')}");
-                   $("#change_email_form").html("<p>${_('You\'ll receive a confirmation in your inbox.'
-                                                    ' Please click the link in the email to confirm'
-                                                    ' the email change.')}</p>");
+                   $("#change_email_title").html("${_("Please verify your new email address")}");
+                   $("#change_email_form").html("<p>${_("You'll receive a confirmation in your inbox."
+                                                    " Please follow the link in the email to confirm"
+                                                    " your email address change.")}</p>");
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -195,7 +195,7 @@
   % if duplicate_provider:
     <section class="dashboard-banner third-party-auth">
       ## Translators: this message is displayed when a user tries to link their account with a third-party authentication provider (for example, Google or LinkedIn) with a given edX account, but their third-party account is already associated with another edX account. provider_name is the name of the third-party authentication provider, and platform_name is the name of the edX deployment.
-      <p>${_('The {provider_name} account you selected is already linked to another {platform_name} account.').format(provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
+      <p>${_("The {provider_name} account you selected is already linked to another {platform_name} account.").format(provider_name='<strong>%s</strong>' % duplicate_provider.NAME, platform_name=platform_name)}
     </section>
   % endif
 
@@ -235,9 +235,9 @@
 
               <div class="status">
                 % if state.has_account:
-                <i class="icon icon-link"></i> <span class="copy">${_('Linked')}</span>
+                <i class="icon icon-link"></i> <span class="copy">${_("Linked")}</span>
                 % else:
-                <i class="icon icon-unlink"></i><span class="copy">${_('Not Linked')}</span>
+                <i class="icon icon-unlink"></i><span class="copy">${_("Not Linked")}</span>
                 % endif
               </div>
 
@@ -275,7 +275,7 @@
           <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
-            <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->
+            <!-- <input type="submit" id="pwd_reset_button" value="${_("Reset Password")}" /> -->
           </form>
         </li>
         % endif
@@ -345,13 +345,13 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_("Close")}
       </span>
     </button>
 
     <header>
       <h2 id="email-settings-title">
-        ${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}
+        ${_("Email Settings for {course_number}").format(course_number='<span id="email_settings_course_number"></span>')}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
@@ -364,7 +364,7 @@
       <input name="course_id" id="email_settings_course_id" type="hidden" />
       <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
       <div class="submit">
-        <input type="submit" id="submit" value="${_('Save Settings')}" />
+        <input type="submit" id="submit" value="${_("Save Settings")}" />
       </div>
     </form>
   </div>
@@ -378,13 +378,13 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_("Close")}
       </span>
     </button>
 
     <header>
       <h2 id="password-reset-email">
-        ${_('Password Reset Email Sent')}
+        ${_("Password Reset Email Sent")}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
@@ -395,7 +395,7 @@
     <div>
       <form> <!-- Here for styling reasons -->
         <section>
-          <p>${_('An email has been sent to {email}. Follow the link in the email to change your password.').format(email=user.email)}</p>
+          <p>${_("An email has been sent to {email}. Follow the link in the email to change your password.").format(email=user.email)}</p>
         </section>
       </form>
     </div>
@@ -408,7 +408,7 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_("Close")}
       </span>
     </button>
 
@@ -427,16 +427,16 @@
         <div id="change_email_error" class="modal-form-error"> </div>
         <fieldset>
           <div class="input-group">
-            <label>${_('Please enter your new email address:')}</label>
+            <label>${_("Please enter your new email address:")}</label>
             <input id="new_email_field" type="email" value="" />
-            <label>${_('Please confirm your password:')}</label>
+            <label>${_("Please confirm your password:")}</label>
             <input id="new_email_password" value="" type="password" />
           </div>
           <section>
-            <p>${_('We will send a confirmation to both {email} and your new email as part of the process.').format(email=user.email)}</p>
+            <p>${_("We will send a confirmation to both {email} and your new email address as part of the process.").format(email=user.email)}</p>
           </section>
           <div class="submit">
-            <input type="submit" id="submit_email_change" value="${_('Change Email')}"/>
+            <input type="submit" id="submit_email_change" value="${_("Change Email")}"/>
           </div>
         </fieldset>
       </form>
@@ -452,7 +452,7 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_("Close")}
       </span>
     </button>
 
@@ -470,7 +470,7 @@
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
         ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
-        <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
+        <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
         <br/>
         <fieldset>
           <div class="input-group">
@@ -481,7 +481,7 @@
             <textarea id="name_rationale_field" value=""></textarea>
           </div>
           <div class="submit">
-            <input type="submit" id="submit" value="${_('Change My Name')}">
+            <input type="submit" id="submit" value="${_("Change My Name")}">
           </div>
         </fieldset>
       </form>
@@ -495,13 +495,13 @@
       <i class="icon-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
-        ${_('Close')}
+        ${_("Close")}
       </span>
     </button>
 
     <header>
       <h2 id="unenrollment-modal-title">
-        ${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}
+        ${_("<span id='track-info'></span> {course_number}?  <span id='refund-info'></span>").format(course_number="<span id='unenroll_course_number'></span>")}
         <span class="sr">,
           ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
           ${_("window open")}
@@ -514,7 +514,7 @@
       <input name="course_id" id="unenroll_course_id" type="hidden" />
       <input name="enrollment_action" type="hidden" value="unenroll" />
       <div class="submit">
-        <input name="submit" type="submit" value="${_('Unregister')}" />
+        <input name="submit" type="submit" value="${_("Unregister")}" />
       </div>
     </form>
   </div>
