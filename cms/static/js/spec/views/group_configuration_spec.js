@@ -5,13 +5,13 @@ define([
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
     'js/views/group_configuration_item', 'js/models/group',
     'js/collections/group', 'js/views/group_edit',
-    'js/views/feedback_notification', 'js/spec_helpers/create_sinon',
-    'js/spec_helpers/edit_helpers', 'jasmine-stealth'
+    'js/views/feedback_notification', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
+    'js/spec_helpers/view_helpers', 'jasmine-stealth'
 ], function(
     _, Course, GroupConfigurationModel, GroupConfigurationCollection,
     GroupConfigurationDetails, GroupConfigurationsList, GroupConfigurationEdit,
     GroupConfigurationItem, GroupModel, GroupCollection, GroupEdit,
-    Notification, create_sinon, view_helpers
+    Notification, AjaxHelpers, TemplateHelpers, ViewHelpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -92,7 +92,7 @@ define([
 
     describe('GroupConfigurationDetails', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-configuration-details', true);
+            TemplateHelpers.installTemplate('group-configuration-details', true);
 
             this.model = new GroupConfigurationModel({
                 name: 'Configuration',
@@ -270,8 +270,8 @@ define([
         };
 
         beforeEach(function() {
-            view_helpers.installViewTemplates();
-            view_helpers.installTemplates([
+            ViewHelpers.installViewTemplates();
+            TemplateHelpers.installTemplates([
                 'group-configuration-edit', 'group-edit'
             ]);
 
@@ -304,8 +304,8 @@ define([
         });
 
         it('should save properly', function() {
-            var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy(),
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy(),
                 groups;
 
             this.view.$('.action-add-group').click();
@@ -315,9 +315,9 @@ define([
             });
 
             this.view.$('form').submit();
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
             requests[0].respond(200);
-            view_helpers.verifyNotificationHidden(notificationSpy);
+            ViewHelpers.verifyNotificationHidden(notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Configuration',
@@ -331,14 +331,14 @@ define([
         });
 
         it('does not hide saving message if failure', function() {
-            var requests = create_sinon.requests(this),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             setValuesToInputs(this.view, { inputName: 'New Configuration' });
             this.view.$('form').submit();
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            create_sinon.respondWithError(requests);
-            view_helpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            AjaxHelpers.respondWithError(requests);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
         });
 
         it('does not save on cancel', function() {
@@ -373,7 +373,7 @@ define([
         });
 
         it('should be possible to correct validation errors', function() {
-            var requests = create_sinon.requests(this);
+            var requests = AjaxHelpers.requests(this);
 
             // Set incorrect value
             setValuesToInputs(this.view, { inputName: '' });
@@ -494,7 +494,7 @@ define([
         var emptyMessage = 'You haven\'t created any group configurations yet.';
 
         beforeEach(function() {
-            view_helpers.installTemplate('no-group-configurations', true);
+            TemplateHelpers.installTemplate('no-group-configurations', true);
 
             this.model = new GroupConfigurationModel({ id: 0 });
             this.collection = new GroupConfigurationCollection();
@@ -533,7 +533,7 @@ define([
         var clickDeleteItem;
 
         beforeEach(function() {
-            view_helpers.installTemplates([
+            TemplateHelpers.installTemplates([
                 'group-configuration-edit', 'group-configuration-details'
             ], true);
             this.model = new GroupConfigurationModel({ id: 0 });
@@ -547,9 +547,9 @@ define([
 
         clickDeleteItem = function (view, promptSpy) {
             view.$('.delete').click();
-            view_helpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
-            view_helpers.confirmPrompt(promptSpy);
-            view_helpers.verifyPromptHidden(promptSpy);
+            ViewHelpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
+            ViewHelpers.confirmPrompt(promptSpy);
+            ViewHelpers.verifyPromptHidden(promptSpy);
         };
 
         it('should render properly', function() {
@@ -564,43 +564,43 @@ define([
         });
 
         it('should destroy itself on confirmation of deleting', function () {
-            var requests = create_sinon.requests(this),
-                promptSpy = view_helpers.createPromptSpy(),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                promptSpy = ViewHelpers.createPromptSpy(),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             clickDeleteItem(this.view, promptSpy);
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondToDelete(requests);
-            view_helpers.verifyNotificationHidden(notificationSpy);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            AjaxHelpers.respondToDelete(requests);
+            ViewHelpers.verifyNotificationHidden(notificationSpy);
             expect($(SELECTORS.itemView)).not.toExist();
         });
 
         it('does not hide deleting message if failure', function() {
-            var requests = create_sinon.requests(this),
-                promptSpy = view_helpers.createPromptSpy(),
-                notificationSpy = view_helpers.createNotificationSpy();
+            var requests = AjaxHelpers.requests(this),
+                promptSpy = ViewHelpers.createPromptSpy(),
+                notificationSpy = ViewHelpers.createNotificationSpy();
 
             clickDeleteItem(this.view, promptSpy);
             // Backbone.emulateHTTP is enabled in our system, so setting this
             // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
             // setting the X-HTTP-Method-Override header with the true method.
-            create_sinon.expectJsonRequest(requests, 'POST', '/group_configurations/0');
+            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
             expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            create_sinon.respondWithError(requests);
-            view_helpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+            AjaxHelpers.respondWithError(requests);
+            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
             expect($(SELECTORS.itemView)).toExist();
         });
     });
 
     describe('GroupEdit', function() {
         beforeEach(function() {
-            view_helpers.installTemplate('group-edit', true);
+            TemplateHelpers.installTemplate('group-edit', true);
 
             this.model = new GroupModel({
                 name: 'Group A'

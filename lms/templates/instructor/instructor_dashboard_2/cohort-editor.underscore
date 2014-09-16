@@ -23,8 +23,7 @@
 
                 <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students"
                           class="input cohort-management-group-add-students"
-                          placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>">
-                </textarea>
+                          placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"></textarea>
             </div>
         </div>
 
