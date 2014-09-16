@@ -5,12 +5,13 @@ Tests for the certificates models.
 from django.test import TestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.tests.factories import UserFactory
 from certificates.models import CertificateStatuses, GeneratedCertificate, certificate_status_for_student
 
 
-class CertificatesModelTest(TestCase):
+class CertificatesModelTest(ModuleStoreTestCase):
     """
     Tests for the GeneratedCertificate model
     """
