@@ -25,8 +25,6 @@ from operator import itemgetter
 from lxml import etree
 from pkg_resources import resource_string
 
-from django.conf import settings
-
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
@@ -223,6 +221,16 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
+            course = modulestore().get_course(course_id)
+
+            self.license = course.license
+            self.license_version = course.license_version
+        else:
+            self.license = None
+            self.license_version = None
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -315,16 +323,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.source_visible = True
                 if not download_video['explicitly_set']:
                     self.download_video = True
-
-        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
-            course = modulestore().get_course(course_id)
-
-            self.license = course.license
-            self.license_version = course.license_version
-        else:
-            self.license = None
-            self.license_version = None
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
