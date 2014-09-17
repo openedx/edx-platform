@@ -42,9 +42,9 @@
   </div>
   {% if IS_EDX_DOMAIN %}
     {% if ENABLE_NEW_EDX_FOOTER %}
-        {% include "edx_footer.html" %}
+        {% include "footer-edx-new.html" %}
     {% else %}
-        {% include "original_edx_footer.html" %}
+        {% include "footer-edx.html" %}
     {% endif %}
   {% else %}
     {% include "footer.html" %}
