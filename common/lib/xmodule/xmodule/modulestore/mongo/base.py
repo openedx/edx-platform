@@ -57,6 +57,8 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
     name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
 ))
 
+METADATA_INHERITENCE_EXEMPT_CATEGORIES = ['course', 'about']
+
 # Allow us to call _from_deprecated_(son|string) throughout the file
 # pylint: disable=protected-access
 
@@ -204,7 +206,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                         del metadata[old_name]
 
                 children = [
-                    self._convert_reference_to_key(childloc)
+                    self._convert_reference_to_key(childloc, course_key=self.course_id)
                     for childloc in definition.get('children', [])
                 ]
                 data = definition.get('data', {})
@@ -256,12 +258,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
 
-    def _convert_reference_to_key(self, ref_string):
+    def _convert_reference_to_key(self, ref_string, course_key=None):
         """
         Convert a single serialized UsageKey string in a ReferenceField into a UsageKey.
         """
         key = Location.from_string(ref_string)
-        return key.replace(run=self.modulestore.fill_in_run(key.course_key).run)
+        return key.replace(run=self.modulestore.fill_in_run(course_key if course_key else key.course_key).run)
 
     def __setattr__(self, name, value):
         return super(CachingDescriptorSystem, self).__setattr__(name, value)
@@ -767,12 +769,12 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_key = self.fill_in_run(course_key)
         data_cache = self._cache_children(course_key, items, depth)
 
-        # if we are loading a course object, if we're not prefetching children (depth != 0) then don't
+        # if we are loading a course object or an about object, if we're not prefetching children (depth != 0) then don't
         # bother with the metadata inheritance
         return [
             self._load_item(
                 course_key, item, data_cache,
-                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)
+                apply_cached_metadata=(item['location']['category'] not in METADATA_INHERITENCE_EXEMPT_CATEGORIES  or depth != 0)
             )
             for item in items
         ]
