@@ -795,10 +795,16 @@
       }
 
       .actions {
+        margin-top: ($baseline/2);
 
         .action {
           float: left;
-          margin: 0 15px 0 0;
+          margin: 0 ($baseline*0.75) ($baseline/2) 0;
+
+          &:last-child {
+            margin-right: 0;
+            margin-left: 0;
+          }
 
           .btn, .cta {
             display: inline-block;
@@ -813,17 +819,20 @@
             padding: 6px 12px;
             text-align: center;
 
+            // STATE: disabled
             &.disabled {
               cursor: default !important;
+            }
 
-              &:hover, &:focus {
-                background: #eee;
-                background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -ms-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -o-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-              }
+            .ico, .label {
+              display: inline-block;
+              vertical-align: middle;
+              color: $white;
+            }
+
+            .ico {
+              @extend %t-icon4;
+              margin-right: ($baseline/4);
             }
           }
 
@@ -903,6 +912,13 @@
 
           .btn {
             @extend %btn-inherited-primary;
+          }
+        }
+
+        .action-linkedin {
+
+          .btn {
+            @extend %btn-inherited-linkedin;
           }
         }
       }
