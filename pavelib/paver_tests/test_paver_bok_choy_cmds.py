@@ -14,8 +14,8 @@ class TestPaverBokChoy(unittest.TestCase):
     def _expected_command(self, expected_text_append):
         if expected_text_append:
             expected_text_append = "/" + expected_text_append
-        expected_statement = ("SCREENSHOT_DIR='{repo_dir}/test_root/log' "
-                                       "HAR_DIR='{repo_dir}/test_root/log/hars' "
+        expected_statement = ("DEFAULT_STORE=None SCREENSHOT_DIR='{repo_dir}/test_root/log' "
+                                       "BOK_CHOY_HAR_DIR='{repo_dir}/test_root/log/hars' "
                                        "SELENIUM_DRIVER_LOG_DIR='{repo_dir}/test_root/log' "
                                        "nosetests {repo_dir}/common/test/acceptance/tests{exp_text} "
                                        "--with-xunit "
