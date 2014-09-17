@@ -584,21 +584,24 @@ class VideoCdnTest(unittest.TestCase):
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
-FAKE_SETTINGS = {
-    "AWS_ACCESS_KEY": "test_key",
-    "AWS_SECRET_KEY": "test_secret"
-}
 
-@patch.dict(settings.VIDEO_LINK_TRANSIENCE, FAKE_SETTINGS)
+FAKE_SETTINGS = {
+        "AWS_ACCESS_KEY": "test_key",
+        "AWS_SECRET_KEY": "test_secret"
+    }
+
+
 class VideoLinkTransienceTest(unittest.TestCase):
     """
     Tests for temporary video links.
     """
 
-    def test_url_create(self):
+    @patch('xmodule.video_module.video_utils.settings')
+    def test_url_create(self, patched_settings):
         """
         Test if bucket name and object name is present in transient URL.
         """
+        patched_settings.VIDEO_LINK_TRANSIENCE = FAKE_SETTINGS
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/video.mp4",
             "http://bucket.s3.amazonaws.com/video.mp4",
@@ -620,10 +623,12 @@ class VideoLinkTransienceTest(unittest.TestCase):
             self.assertIn('AWSAccessKeyId=test_key', url)
             self.assertNotIn('test_secret', url)
 
-    def test_wrong_source_url(self):
+    @patch('xmodule.video_module.video_utils.settings')
+    def test_wrong_source_url(self, patched_settings):
         """
         Test if wrong source url is passed.
         """
+        patched_settings.VIDEO_LINK_TRANSIENCE = FAKE_SETTINGS
         # URL is not from amazonaws.com domain
         wrong_origin_video_urls = [
             "https://example.com/video.mp4",
