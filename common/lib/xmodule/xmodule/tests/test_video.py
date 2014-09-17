@@ -584,7 +584,12 @@ class VideoCdnTest(unittest.TestCase):
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
+FAKE_SETTINGS = {
+    "AWS_ACCESS_KEY": "test_key",
+    "AWS_SECRET_KEY": "test_secret"
+}
 
+@patch.dict(settings.VIDEO_LINK_TRANSIENCE, FAKE_SETTINGS)
 class VideoLinkTransienceTest(unittest.TestCase):
     """
     Tests for temporary video links.
