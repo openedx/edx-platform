@@ -1,7 +1,7 @@
 """
 Tests for the bulk settings page
 """
-
+import unittest
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import BulkSettingsUtil
 
@@ -10,6 +10,7 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from datetime import datetime
 import random
 
+@unittest.skip("Bulk Settings are currently disabled")
 class BulkSettingsTests(CourseTestCase):
     """
     Redefine setting type constants for easier testing
