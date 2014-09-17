@@ -597,6 +597,7 @@ class VideoLinkTransienceTest(unittest.TestCase):
         origin_video_urls = [
             "http://s3.amazonaws.com/bucket/video.mp4",
             "http://bucket.s3.amazonaws.com/video.mp4",
+            "http://s3-region.amazonaws.com/bucket/video.mp4"
         ]
         for origin_url in origin_video_urls:
             url = get_s3_transient_url(origin_url)
