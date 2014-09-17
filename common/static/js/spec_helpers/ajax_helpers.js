@@ -1,5 +1,6 @@
 define(['sinon', 'underscore'], function(sinon, _) {
-    var fakeServer, fakeRequests, expectJsonRequest, respondWithJson, respondWithError, respondToDelete;
+    var fakeServer, fakeRequests, expectRequest, expectJsonRequest,
+        respondWithJson, respondWithError, respondToDelete;
 
     /* These utility methods are used by Jasmine tests to create a mock server or
      * get reference to mock requests. In either case, the cleanup (restore) is done with
@@ -45,6 +46,17 @@ define(['sinon', 'underscore'], function(sinon, _) {
         return requests;
     };
 
+    expectRequest = function(requests, method, url, body, requestIndex) {
+        var request;
+        if (_.isUndefined(requestIndex)) {
+            requestIndex = requests.length - 1;
+        }
+        request = requests[requestIndex];
+        expect(request.url).toEqual(url);
+        expect(request.method).toEqual(method);
+        expect(request.requestBody).toEqual(body);
+    };
+
     expectJsonRequest = function(requests, method, url, jsonRequest, requestIndex) {
         var request;
         if (_.isUndefined(requestIndex)) {
@@ -61,7 +73,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
             requestIndex = requests.length - 1;
         }
         requests[requestIndex].respond(200,
-            { "Content-Type": "application/json" },
+            { 'Content-Type': 'application/json' },
             JSON.stringify(jsonResponse));
     };
 
@@ -70,7 +82,7 @@ define(['sinon', 'underscore'], function(sinon, _) {
             requestIndex = requests.length - 1;
         }
         requests[requestIndex].respond(500,
-            { "Content-Type": "application/json" },
+            { 'Content-Type': 'application/json' },
             JSON.stringify({ }));
     };
 
@@ -79,15 +91,16 @@ define(['sinon', 'underscore'], function(sinon, _) {
             requestIndex = requests.length - 1;
         }
         requests[requestIndex].respond(204,
-            { "Content-Type": "application/json" });
+            { 'Content-Type': 'application/json' });
     };
 
     return {
-        "server": fakeServer,
-        "requests": fakeRequests,
-        "expectJsonRequest": expectJsonRequest,
-        "respondWithJson": respondWithJson,
-        "respondWithError": respondWithError,
-        "respondToDelete": respondToDelete
+        'server': fakeServer,
+        'requests': fakeRequests,
+        'expectRequest': expectRequest,
+        'expectJsonRequest': expectJsonRequest,
+        'respondWithJson': respondWithJson,
+        'respondWithError': respondWithError,
+        'respondToDelete': respondToDelete
     };
 });

@@ -63,18 +63,42 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             });
 
             describe("Add Students Button", function () {
-                it('can add a student', function() {
+                it('shows an error when adding with no students specified', function() {
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    cohortsView.$('.cohort-management-group-add-students').text('    ');
+                    cohortsView.$('.cohort-management-group-add-form').submit();
+                    expect(requests.length).toBe(0);
+                    // TODO: verify that an error message is shown
+                });
+
+                it('can add a single student', function() {
                     createCohortsView(this);
                     cohortsView.$('.cohort-select').val("1").change();
                     cohortsView.$('.cohort-management-group-add-students').text('student@sample.com');
                     cohortsView.$('.cohort-management-group-add-form').submit();
-                    // TODO: get this to work...
-                    /*
-                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/mock_service/1/add', {
-                        'users': 'student@sample.com'
-                    });
+                    AjaxHelpers.expectRequest(requests, 'POST', '/mock_service/1/add', 'users=student%40sample.com');
                     AjaxHelpers.respondWithJson(requests, {});
-                    */
+                    // TODO: verify that the 'View All Errors' button is hidden
+                });
+
+                it('shows an error when adding a student that does not exist', function() {
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    cohortsView.$('.cohort-management-group-add-students').text('student@sample.com');
+                    cohortsView.$('.cohort-management-group-add-form').submit();
+                    AjaxHelpers.expectRequest(requests, 'POST', '/mock_service/1/add', 'users=student%40sample.com');
+                    AjaxHelpers.respondWithJson(requests, {});
+                    // TODO: verify that the 'View All Errors' button is hidden as only one error is shown
+                });
+
+                it('shows a message when the add fails', function() {
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    cohortsView.$('.cohort-management-group-add-students').text('student@sample.com');
+                    cohortsView.$('.cohort-management-group-add-form').submit();
+                    AjaxHelpers.respondWithError(requests);
+                    // TODO: verify that an error message is shown
                 });
             });
         });

@@ -68,11 +68,19 @@
             event.preventDefault();
             var input = this.$('.cohort-management-group-add-students'),
                 add_url = this.model.url() + '/add',
-                data = {'users': input.val()},
+                students = input.val().trim(),
                 addNotifications = this.addNotifications;
-            $.post(add_url, data).done(function(modifiedUsers) {
-                addNotifications(modifiedUsers);
-            });
+            if (students.length > 0) {
+                $.post(
+                    add_url, {'users': students}
+                ).done(function(modifiedUsers) {
+                    addNotifications(modifiedUsers);
+                }).fail(function() {
+                    // TODO: show a failure message
+                });
+            } else {
+                // TODO: show a 'no students specified' message
+            }
         },
 
         addNotifications: function(modifiedUsers) {
