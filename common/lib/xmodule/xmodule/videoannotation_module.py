@@ -107,7 +107,10 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         if self.runtime.get_user_role() in ['instructor', 'staff']:
             self.is_course_staff = True
         if self.runtime.get_real_user is not None:
-            self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
+            try:
+                self.user_email = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
+            except:  # pylint: disable=broad-except
+                self.user_email = _("No email address found.")
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
