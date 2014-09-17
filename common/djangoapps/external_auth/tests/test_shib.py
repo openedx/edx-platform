@@ -299,9 +299,6 @@ class ShibSPTest(ModuleStoreTestCase):
         else:
             self.assertNotContains(response, fullname_input_html)
 
-        # clean up b/c we don't want existing ExternalAuthMap for the next run
-        client.session['ExternalAuthMap'].delete()
-
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data(*gen_all_identities())
     def test_registration_form_submit(self, identity):
@@ -380,12 +377,6 @@ class ShibSPTest(ModuleStoreTestCase):
         else:
             self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
             self.assertEqual(profile.name, identity.get('displayName').decode('utf-8'))
-
-        # clean up for next loop
-        request2.session['ExternalAuthMap'].delete()
-        UserProfile.objects.filter(user=user).delete()
-        Registration.objects.filter(user=user).delete()
-        user.delete()
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data("", "shib:https://idp.stanford.edu/")
@@ -532,8 +523,6 @@ class ShibSPTest(ModuleStoreTestCase):
                 if course is open_enroll_course or student is shib_student:
                     self.assertEqual(response.status_code, 200)
                     self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
-                    # Clean up
-                    CourseEnrollment.unenroll(student, course.id)
                 else:
                     self.assertEqual(response.status_code, 400)
                     self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
