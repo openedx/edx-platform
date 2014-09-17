@@ -56,9 +56,37 @@ def lti_is_rendered(_step, rendered_in):
         assert not world.is_css_present('iframe', wait_time=2)
         assert world.is_css_present('.link_lti_new_window', wait_time=0)
         assert not world.is_css_present('.error_message', wait_time=0)
-        check_lti_popup()
+        click_and_check_lti_popup()
     else:  # incorrent rendered_in parameter
         assert False
+
+
+@step('I view the permission alert$')
+def view_lti_permission_alert(_step):
+    assert not world.is_css_present('iframe', wait_time=2)
+    assert world.is_css_present('.link_lti_new_window', wait_time=0)
+    assert not world.is_css_present('.error_message', wait_time=0)
+    world.css_find('.link_lti_new_window').first.click()
+    alert = world.browser.get_alert()
+    assert alert is not None
+    assert len(world.browser.windows) == 1
+
+
+@step('I accept the permission alert and view the LTI$')
+def accept_lti_permission_alert(_step):
+    parent_window = world.browser.current_window  # Save the parent window
+    assert len(world.browser.windows) == 1
+    alert = world.browser.get_alert()
+    alert.accept()
+    assert len(world.browser.windows) != 1
+    check_lti_popup(parent_window)
+
+
+@step('I reject the permission alert and do not view the LTI$')
+def reject_lti_permission_alert(_step):
+    alert = world.browser.get_alert()
+    alert.dismiss()
+    assert len(world.browser.windows) == 1
 
 
 @step('I view the LTI but incorrect_signature warning is rendered$')
@@ -216,10 +244,7 @@ def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
     world.log_in(username=user.username, password='test')
 
 
-def check_lti_popup():
-    parent_window = world.browser.current_window # Save the parent window
-    world.css_find('.link_lti_new_window').first.click()
-
+def check_lti_popup(parent_window):
     assert len(world.browser.windows) != 1
 
     for window in world.browser.windows:
@@ -239,6 +264,12 @@ def check_lti_popup():
     world.browser.switch_to_window(parent_window) # Switch to the main window again
 
 
+def click_and_check_lti_popup():
+    parent_window = world.browser.current_window  # Save the parent window
+    world.css_find('.link_lti_new_window').first.click()
+    check_lti_popup(parent_window)
+
+
 @step('visit the LTI component')
 def visit_lti_component(_step):
     visit_scenario_item('LTI')
@@ -249,7 +280,9 @@ def see_elem_text(_step, elem, text):
     selector_map = {
         'progress': '.problem-progress',
         'feedback': '.problem-feedback',
-        'module title': '.problem-header'
+        'module title': '.problem-header',
+        'button': '.link_lti_new_window',
+        'description': '.lti-description'
     }
     assert_in(elem, selector_map)
     assert_true(world.css_has_text(selector_map[elem], text))

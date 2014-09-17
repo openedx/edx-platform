@@ -21,13 +21,18 @@
 <div
     id="${element_id}"
     class="${element_class}"
+    data-ask-to-send-username="${ask_to_send_username}"
+    data-ask-to-send-email="${ask_to_send_email}"
 >
 
 % if launch_url and launch_url !=  'http://www.example.com' and not hide_launch:
     % if open_in_a_new_page:
         <div class="wrapper-lti-link">
+            % if description:
+                <div class="lti-description">${description}</div>
+            % endif
             <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
-                ${_('View resource in a new window')}
+                ${button_text or _('View resource in a new window')}
                  <i class="icon-external-link"></i>
             </a></p>
         </div>
@@ -43,7 +48,7 @@
     <h3 class="error_message">
         ${_('Please provide launch_url. Click "Edit", and fill in the required fields.')}
     </h3>
-%endif
+% endif
 
 % if has_score and comment:
     <h4 class="problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
