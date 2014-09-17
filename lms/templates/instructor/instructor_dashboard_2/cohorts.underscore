@@ -32,4 +32,15 @@
 
     <!-- individual group -->
     <div class="cohort-management-group"></div>
+
+    <div class="cohort-management-supplemental">
+        <p class="">
+            <i class="icon icon-info-sign"></i>
+            <%= interpolate(
+                gettext('You may view individual student information for each cohort via your entire course profile data download on %(a_start)s the data download view %(a_end)s'),
+                {a_start: '<a href="" class="link-cross-reference" data-section="data_download">', a_end: '</a>'},
+                true
+            ) %>
+        </p>
+    </div>
 <% } %>
