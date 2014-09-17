@@ -1593,7 +1593,7 @@ class TestInheritance(SplitModuleTest):
 
         # unset on parent, retrieve child, verify unset
         chapter = modulestore().get_item(chapter.location.version_agnostic())
-        chapter.fields['visible_to_staff_only'].delete_from(chapter)
+        del chapter.visible_to_staff_only
         modulestore().update_item(chapter, self.user_id)
 
         problem = modulestore().get_item(problem.location.version_agnostic())
