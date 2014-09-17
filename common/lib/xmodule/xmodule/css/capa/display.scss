@@ -19,6 +19,22 @@ h2 {
   }
 }
 
+div.feedback_hint_correct {
+    color: green;
+}
+
+div.feedback_hint_incorrect {
+    color: red;
+}
+
+div.feedback_hint_text {
+    color: black;
+}
+
+div.problem_hint {
+    color: #808080;
+    margin-bottom: 20px;
+}
 
 iframe[seamless]{
   overflow: hidden;
@@ -608,7 +624,7 @@ div.problem {
   div.action {
     margin-top: $baseline;
 
-    .save, .check, .show, .reset {
+    .save, .check, .show, .reset, .hint_button {
       height: ($baseline*2);
       vertical-align: middle;
       font-weight: 600;
