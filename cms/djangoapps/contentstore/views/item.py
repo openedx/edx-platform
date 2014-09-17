@@ -644,6 +644,9 @@ def _get_module_info(xblock, rewrite_static_links=True):
             course_id=xblock.location.course_key
         )
 
+    # Pre-cache has changes for the entire course because we'll need it for the ancestor info
+    modulestore().has_changes(modulestore().get_course(xblock.location.course_key, depth=None))
+
     # Note that children aren't being returned until we have a use case.
     return create_xblock_info(xblock, data=data, metadata=own_metadata(xblock), include_ancestor_info=True)
 
