@@ -228,7 +228,7 @@
           <li class="field required text" id="field-name">
             <label for="name">${_('Full Name')}</label>
             <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" aria-describedby="name-tip" />
-            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you earn")}</span>
           </li>
 
           % endif
@@ -239,7 +239,7 @@
       </div>
 
       <div class="group group-form group-form-secondary group-form-personalinformation">
-        <h2 class="sr">${_("Additional Personal Information")}</h2>
+        <h2 class="sr">${_("Extra Personal Information")}</h2>
 
         <ol class="list-input">
           % if settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden':
