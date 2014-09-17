@@ -2,7 +2,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
         'js/views/cohorts', 'js/collections/cohort'],
     function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection) {
         describe("Cohorts View", function () {
-            var createMockCohorts, createCohortsView;
+            var createMockCohorts, createCohortsView, cohortsView, requests;
 
             createMockCohorts = function () {
                 return {
@@ -21,14 +21,14 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 };
             };
 
-            createCohortsView = function () {
-                var cohorts, view;
-                cohorts = new CohortCollection(createMockCohorts(), {parse: true});
-                view = new CohortsView({
+            createCohortsView = function (test) {
+                var cohorts = new CohortCollection(createMockCohorts(), {parse: true});
+                cohorts.url = '/mock_service';
+                requests = AjaxHelpers.requests(test);
+                cohortsView = new CohortsView({
                     model: cohorts
                 });
-                view.render();
-                return view;
+                cohortsView.render();
             };
 
             beforeEach(function () {
@@ -39,26 +39,42 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
             describe("Cohort Selector", function () {
                 it('has no initial selection', function () {
-                    var view = createCohortsView();
-                    expect(view.$('.cohort-select').val()).toBe('');
-                    expect(view.$('.cohort-management-group-header .title-value').text()).toBe('');
+                    createCohortsView(this);
+                    expect(cohortsView.$('.cohort-select').val()).toBe('');
+                    expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('');
                 });
 
                 it('can select a cohort', function () {
-                    var view = createCohortsView();
-                    view.$('.cohort-select').val("1").change();
-                    expect(view.$('.cohort-select').val()).toBe('1');
-                    expect(view.$('.cohort-management-group-header .title-value').text()).toBe('Cat Lovers');
-                    expect(view.$('.cohort-management-group-header .group-count').text()).toBe('123');
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    expect(cohortsView.$('.cohort-select').val()).toBe('1');
+                    expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('Cat Lovers');
+                    expect(cohortsView.$('.cohort-management-group-header .group-count').text()).toBe('123');
                 });
 
                 it('can switch cohort', function () {
-                    var view = createCohortsView();
-                    view.$('.cohort-select').val("1").change();
-                    view.$('.cohort-select').val("2").change();
-                    expect(view.$('.cohort-select').val()).toBe('2');
-                    expect(view.$('.cohort-management-group-header .title-value').text()).toBe('Dog Lovers');
-                    expect(view.$('.cohort-management-group-header .group-count').text()).toBe('456');
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    cohortsView.$('.cohort-select').val("2").change();
+                    expect(cohortsView.$('.cohort-select').val()).toBe('2');
+                    expect(cohortsView.$('.cohort-management-group-header .title-value').text()).toBe('Dog Lovers');
+                    expect(cohortsView.$('.cohort-management-group-header .group-count').text()).toBe('456');
+                });
+            });
+
+            describe("Add Students Button", function () {
+                it('can add a student', function() {
+                    createCohortsView(this);
+                    cohortsView.$('.cohort-select').val("1").change();
+                    cohortsView.$('.cohort-management-group-add-students').text('student@sample.com');
+                    cohortsView.$('.cohort-management-group-add-form').submit();
+                    // TODO: get this to work...
+                    /*
+                    AjaxHelpers.expectJsonRequest(requests, 'POST', '/mock_service/1/add', {
+                        'users': 'student@sample.com'
+                    });
+                    AjaxHelpers.respondWithJson(requests, {});
+                    */
                 });
             });
         });

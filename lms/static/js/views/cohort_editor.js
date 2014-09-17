@@ -1,7 +1,7 @@
 (function(Backbone) {
     var CohortEditorView = Backbone.View.extend({
         events : {
-            "click .form-submit": "addStudents"
+            "submit .cohort-management-group-add-form": "addStudents"
         },
 
         initialize: function() {
