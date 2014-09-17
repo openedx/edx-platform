@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-E2E tests for the LMS.
+End-to-end tests for the LMS.
 """
 import time
 
-from .helpers import UniqueCourseTest
-from ..pages.studio.auto_auth import AutoAuthPage
-from ..pages.studio.overview import CourseOutlinePage
-from ..pages.lms.courseware import CoursewarePage
-from ..pages.lms.problem import ProblemPage
-from ..pages.common.logout import LogoutPage
-from ..fixtures.course import CourseFixture, XBlockFixtureDesc
+from ..helpers import UniqueCourseTest
+from ...pages.studio.auto_auth import AutoAuthPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...pages.lms.courseware import CoursewarePage
+from ...pages.lms.problem import ProblemPage
+from ...pages.common.logout import LogoutPage
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class CoursewareTest(UniqueCourseTest):
@@ -76,7 +76,6 @@ class CoursewareTest(UniqueCourseTest):
         """
         AutoAuthPage(self.browser, username=username, email=email,
                      course_id=self.course_id, staff=staff).visit()
-
 
     def test_courseware(self):
         """
