@@ -264,7 +264,7 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
 
         # Access the page multiple times, but expect that we hit
         # the database to check the user's profile only once
-        with self.assertNumQueries(12):
+        with self.assertNumQueries(13):
             self.client.get(self.embargoed_page)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': False})
