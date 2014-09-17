@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-17 18:34+0000\n"
-"PO-Revision-Date: 2014-09-17 18:34:42.614943\n"
+"POT-Creation-Date: 2014-09-17 20:49+0000\n"
+"PO-Revision-Date: 2014-09-17 20:49:46.218598\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -8656,7 +8656,7 @@ msgstr "Pröçéssïng ýöür äççöünt ïnförmätïön … Ⱡ'σяєм ι
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr "Wélçömé {username}!  Pléäsé sét ýöür préférénçés ßélöw Ⱡ'σяєм ιρѕυм #"
 
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html lms/templates/register.html
 msgid ""
 "We're sorry, {platform_name} enrollment is not available in your region"
 msgstr ""
@@ -8669,7 +8669,8 @@ msgstr ""
 "Thé föllöwïng érrörs öççürréd whïlé pröçéssïng ýöür régïsträtïön: Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
-#: lms/templates/register-shib.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -8687,6 +8688,7 @@ msgid "example: JaneDoe"
 msgstr "éxämplé: JänéDöé Ⱡ'σ#"
 
 #: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr ""
 "Wïll ßé shöwn ïn äný dïsçüssïöns ör förüms ýöü pärtïçïpäté ïn Ⱡ'σяєм ιρѕυм "
@@ -8719,19 +8721,19 @@ msgid "Already registered?"
 msgstr "Àlréädý régïstéréd? Ⱡ'σя#"
 
 #: lms/templates/register-sidebar.html
-msgid "Welcome to {platform_name}!"
-msgstr "Wélçömé tö {platform_name}! Ⱡ'#"
+msgid "Welcome to {platform_name}"
+msgstr "Wélçömé tö {platform_name} Ⱡ'#"
 
 #: lms/templates/register-sidebar.html
 msgid ""
 "Registering with {platform_name} gives you access to all of our current and "
-"future free courses. Not ready to take a course just yet? Registering also "
-"adds you to our mailing list - we will update you as courses are added."
+"future free courses. Not ready to take a course just yet? Registering puts "
+"you on our mailing list - we will update you as courses are added."
 msgstr ""
 "Régïstérïng wïth {platform_name} gïvés ýöü äççéss tö äll öf öür çürrént änd "
-"fütüré fréé çöürsés. Nöt réädý tö täké ä çöürsé jüst ýét? Régïstérïng älsö "
-"ädds ýöü tö öür mäïlïng lïst - wé wïll üpdäté ýöü äs çöürsés äré äddéd. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ є#"
+"fütüré fréé çöürsés. Nöt réädý tö täké ä çöürsé jüst ýét? Régïstérïng püts "
+"ýöü ön öür mäïlïng lïst - wé wïll üpdäté ýöü äs çöürsés äré äddéd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ#"
 
 #: lms/templates/register-sidebar.html
 msgid "Next Steps"
@@ -8752,22 +8754,20 @@ msgstr ""
 
 #: lms/templates/register-sidebar.html
 msgid ""
-"As part of registering with {platform_name}, you will receive an activation "
-"email.  You must click on the activation link to complete the registration "
-"process.  Don't see the email?  Check your spam folder and mark "
-"{platform_name} emails as 'not spam'.  At {platform_name}, we communicate "
-"mostly through email."
+"As part of joining {platform_name}, you will receive an activation email.  "
+"You must click on the activation link to complete the process.  Don't see "
+"the email?  Check your spam folder and mark {platform_name} emails as 'not "
+"spam'.  At {platform_name}, we communicate mostly through email."
 msgstr ""
-"Às pärt öf régïstérïng wïth {platform_name}, ýöü wïll réçéïvé än äçtïvätïön "
-"émäïl.  Ýöü müst çlïçk ön thé äçtïvätïön lïnk tö çömplété thé régïsträtïön "
-"pröçéss.  Dön't séé thé émäïl?  Çhéçk ýöür späm földér änd märk "
-"{platform_name} émäïls äs 'nöt späm'.  Àt {platform_name}, wé çömmünïçäté "
-"möstlý thröügh émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
-"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂#"
+"Às pärt öf jöïnïng {platform_name}, ýöü wïll réçéïvé än äçtïvätïön émäïl.  "
+"Ýöü müst çlïçk ön thé äçtïvätïön lïnk tö çömplété thé pröçéss.  Dön't séé "
+"thé émäïl?  Çhéçk ýöür späm földér änd märk {platform_name} émäïls äs 'nöt "
+"späm'.  Àt {platform_name}, wé çömmünïçäté möstlý thröügh émäïl. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя #"
 
 #: lms/templates/register-sidebar.html
-msgid "Need help registering with {platform_name}?"
-msgstr "Nééd hélp régïstérïng wïth {platform_name}? Ⱡ'σяєм ι#"
+msgid "Need help in registering with {platform_name}?"
+msgstr "Nééd hélp ïn régïstérïng wïth {platform_name}? Ⱡ'σяєм ιρ#"
 
 #: lms/templates/register-sidebar.html
 msgid "View our FAQs for answers to commonly asked questions."
@@ -8776,11 +8776,11 @@ msgstr ""
 
 #: lms/templates/register-sidebar.html
 msgid ""
-"After you register, you can find answers to most of your questions in "
-"course-specific FAQs and discussions."
+"Once registered, most questions can be answered in the course specific "
+"discussion forums or through the FAQs."
 msgstr ""
-"Àftér ýöü régïstér, ýöü çän fïnd änswérs tö möst öf ýöür qüéstïöns ïn "
-"çöürsé-spéçïfïç FÀQs änd dïsçüssïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"Önçé régïstéréd, möst qüéstïöns çän ßé änswéréd ïn thé çöürsé spéçïfïç "
+"dïsçüssïön förüms ör thröügh thé FÀQs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/register.html
 msgid "Register for {platform_name}"
@@ -8798,30 +8798,15 @@ msgstr "Wélçömé! #"
 msgid "Register below to create your {platform_name} account"
 msgstr "Régïstér ßélöw tö çréäté ýöür {platform_name} äççöünt Ⱡ'σяєм ιρѕυ#"
 
-#: lms/templates/register.html
-msgid ""
-"We're sorry. Unfortunately, {platform_name} is not available in your region."
-msgstr ""
-"Wé'ré sörrý. Ûnförtünätélý, {platform_name} ïs nöt äväïläßlé ïn ýöür régïön."
-" Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
 #: lms/templates/register.html
-msgid "Register with {provider_name}"
-msgstr "Régïstér wïth {provider_name} Ⱡ'σ#"
+msgid "Sign up with {provider_name}"
+msgstr "Sïgn üp wïth {provider_name} Ⱡ'σ#"
 
 #: lms/templates/register.html
 msgid "Create your own {platform_name} account below"
 msgstr "Çréäté ýöür öwn {platform_name} äççöünt ßélöw Ⱡ'σяєм ι#"
-
-#: lms/templates/register.html lms/templates/register.html
-msgid ""
-"Required fields are indicated by <strong class=\"indicator\">bold text and "
-"an asterisk (*)</strong>."
-msgstr ""
-"Réqüïréd fïélds äré ïndïçätéd ßý <strong class=\"indicator\">ßöld téxt änd "
-"än ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #. Translators: selected_provider is the name of an external, third-party user
 #. authentication service (like Google or LinkedIn).
@@ -8849,10 +8834,6 @@ msgstr "éxämplé: Jäné Döé Ⱡ'σ#"
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/register.html
-msgid "The name that will identify you in your courses"
-msgstr "Thé nämé thät wïll ïdéntïfý ýöü ïn ýöür çöürsés Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"

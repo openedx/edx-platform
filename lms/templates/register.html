@@ -108,7 +108,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're sorry. Unfortunately, {platform_name} is not available in your region.").format(platform_name=platform_name)}</h3>
+        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=platform_name)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
@@ -124,7 +124,7 @@
 
         % for enabled in provider.Registry.enabled():
           ## Translators: provider_name is the name of an external, third-party user authentication service (like Google or LinkedIn).
-          <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Register with {provider_name}').format(provider_name=enabled.NAME)}</button>
+          <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_REGISTER)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign up with {provider_name}').format(provider_name=enabled.NAME)}</button>
         % endfor
 
         </div>
@@ -137,7 +137,7 @@
 
         <p class="instructions">
           ${_('Create your own {platform_name} account below').format(platform_name=platform_name)}
-          <span class="note">${_('Required fields are indicated by <strong class="indicator">bold text and an asterisk (*)</strong>.')}</span>
+          <span class="note">${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}</span>
         </p>
 
 
@@ -155,7 +155,7 @@
 
       <p class="instructions">
         ${_("Please complete the following fields to register for an account. ")}<br />
-        ${_('Required fields are indicated by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
+        ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
       </p>
 
       % endif
@@ -179,7 +179,7 @@
           <li class="field required text" id="field-username">
             <label for="username">${_('Public Username')}</label>
             <input id="username" type="text" name="username" value="${username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
-            <span class="tip tip-input" id="username-tip">${_('The name that will identify you in your courses')} <strong>(${_('cannot be changed later')})</strong></span>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
 
           % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and running_pipeline:
