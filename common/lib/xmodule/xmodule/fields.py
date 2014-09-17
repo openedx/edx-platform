@@ -101,6 +101,10 @@ class Timedelta(Field):
         """
         if time_str is None:
             return None
+
+        if isinstance(time_str, datetime.timedelta):
+            return time_str
+
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return
@@ -181,6 +185,9 @@ class RelativeTime(Field):
         """
         if not value:
             return datetime.timedelta(seconds=0)
+
+        if isinstance(value, datetime.timedelta):
+            return value
 
         # We've seen serialized versions of float in this field
         if isinstance(value, float):
