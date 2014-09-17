@@ -21,12 +21,11 @@ from django.conf import settings
 from lms.lib.xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -51,7 +50,6 @@ def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_by_id(course_key, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_key) != ModuleStoreEnum.Type.xml)
 
     access = {
         'admin': request.user.is_staff,
@@ -67,11 +65,11 @@ def instructor_dashboard_2(request, course_id):
         raise Http404()
 
     sections = [
-        _section_course_info(course_key, access),
-        _section_membership(course_key, access),
-        _section_student_admin(course_key, access),
-        _section_data_download(course_key, access),
-        _section_analytics(course_key, access),
+        _section_course_info(course, access),
+        _section_membership(course, access),
+        _section_student_admin(course, access),
+        _section_data_download(course, access),
+        _section_analytics(course, access),
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
@@ -85,19 +83,15 @@ def instructor_dashboard_2(request, course_id):
 
     # Gate access to course email by feature flag & by course-specific authorization
     if bulk_email_is_enabled_for_course(course_key):
-        sections.append(_section_send_email(course_key, access, course))
+        sections.append(_section_send_email(course, access))
 
     # Gate access to Metrics tab by featue flag and staff authorization
     if settings.FEATURES['CLASS_DASHBOARD'] and access['staff']:
-        sections.append(_section_metrics(course_key, access))
+        sections.append(_section_metrics(course, access))
 
      # Gate access to Ecommerce tab
     if course_mode_has_price:
-        sections.append(_section_e_commerce(course_key, access))
-
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link(course)
+        sections.append(_section_e_commerce(course, access))
 
     enrollment_count = sections[0]['enrollment_count']['total']
     disable_buttons = False
@@ -117,7 +111,7 @@ def instructor_dashboard_2(request, course_id):
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard_legacy', kwargs={'course_id': course_key.to_deprecated_string()}),
-        'studio_url': studio_url,
+        'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
         'analytics_dashboard_message': analytics_dashboard_message
@@ -139,8 +133,9 @@ section_display_name will be used to generate link titles in the nav bar.
 """  # pylint: disable=W0105
 
 
-def _section_e_commerce(course_key, access):
+def _section_e_commerce(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
     total_amount = None
     course_price = None
@@ -209,9 +204,9 @@ def set_course_mode_price(request, course_id):
     return HttpResponse(_("CourseMode price updated successfully"))
 
 
-def _section_course_info(course_key, access):
+def _section_course_info(course, access):
     """ Provide data for the corresponding dashboard section """
-    course = get_course_by_id(course_key, depth=None)
+    course_key = course.id
 
     section_data = {
         'section_key': 'course_info',
@@ -240,8 +235,9 @@ def _section_course_info(course_key, access):
     return section_data
 
 
-def _section_membership(course_key, access):
+def _section_membership(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'membership',
         'section_display_name': _('Membership'),
@@ -254,12 +250,14 @@ def _section_membership(course_key, access):
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_key.to_deprecated_string()}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_key.to_deprecated_string()}),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': course_key.to_deprecated_string()}),
+        'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
     }
     return section_data
 
 
-def _section_student_admin(course_key, access):
+def _section_student_admin(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     is_small_course = False
     enrollment_count = CourseEnrollment.num_enrolled_in(course_key)
     max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
@@ -296,8 +294,9 @@ def _section_extensions(course):
     return section_data
 
 
-def _section_data_download(course_key, access):
+def _section_data_download(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
@@ -312,8 +311,10 @@ def _section_data_download(course_key, access):
     return section_data
 
 
-def _section_send_email(course_key, access, course):
+def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
+    course_key = course.id
+
     # This HtmlDescriptor is only being used to generate a nice text editor.
     html_module = HtmlDescriptor(
         course.system,
@@ -349,8 +350,9 @@ def _section_send_email(course_key, access, course):
     return section_data
 
 
-def _section_analytics(course_key, access):
+def _section_analytics(course, access):
     """ Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'instructor_analytics',
         'section_display_name': _('Analytics'),
@@ -365,8 +367,9 @@ def _section_analytics(course_key, access):
     return section_data
 
 
-def _section_metrics(course_key, access):
+def _section_metrics(course, access):
     """Provide data for the corresponding dashboard section """
+    course_key = course.id
     section_data = {
         'section_key': 'metrics',
         'section_display_name': _('Metrics'),
