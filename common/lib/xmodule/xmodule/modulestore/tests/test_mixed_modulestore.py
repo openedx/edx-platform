@@ -18,6 +18,7 @@ from uuid import uuid4
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
 
 if not settings.configured:
     settings.configure()
@@ -58,7 +59,7 @@ class TestMixedModuleStore(unittest.TestCase):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin,)
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,

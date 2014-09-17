@@ -28,12 +28,17 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.split_mongo.split_draft import DraftVersioningModuleStore
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
 
 
 COMMON_DOCSTORE_CONFIG = {
     'host': MONGO_HOST,
     'port': MONGO_PORT_NUM,
 }
+
+
+XBLOCK_MIXINS = (InheritanceMixin, XModuleMixin)
 
 
 class MemoryCache(object):
@@ -95,6 +100,7 @@ class MongoModulestoreBuilder(object):
             render_template=repr,
             branch_setting_func=lambda: ModuleStoreEnum.Branch.draft_preferred,
             metadata_inheritance_cache_subsystem=MemoryCache(),
+            xblock_mixins=XBLOCK_MIXINS,
         )
         modulestore.ensure_indexes()
 
@@ -139,6 +145,7 @@ class VersioningModulestoreBuilder(object):
             doc_store_config,
             fs_root,
             render_template=repr,
+            xblock_mixins=XBLOCK_MIXINS,
         )
         modulestore.ensure_indexes()
 
@@ -189,7 +196,13 @@ class MixedModulestoreBuilder(object):
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
 
-            modulestore = MixedModuleStore(contentstore, self.mappings, stores, create_modulestore_instance=create_modulestore_instance)
+            modulestore = MixedModuleStore(
+                contentstore,
+                self.mappings,
+                stores,
+                create_modulestore_instance=create_modulestore_instance,
+                xblock_mixins=XBLOCK_MIXINS,
+            )
 
             yield modulestore
 
