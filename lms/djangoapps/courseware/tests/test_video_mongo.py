@@ -7,8 +7,6 @@ import boto
 
 from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
-from urlparse import urlparse, urlunparse, parse_qs
-from urllib import urlencode
 
 from django.conf import settings
 
@@ -480,25 +478,6 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
 
     def setUp(self):
         self.setup_course()
-
-        original_generate = boto.s3.connection.S3Connection.generate_url
-
-        def mocked_generate_url(self, *args, **kwargs):
-            """
-            Mocked boto.s3.connection.S3Connection.generate_url.
-            """
-            original_generate_url = original_generate(self, *args, **kwargs)
-            # Replace expire and signature here:
-            original_url = urlparse(original_generate_url)
-            query = parse_qs(original_url.query)
-            query['Expires'] = ['test_expire']
-            query['Signature'] = ['test_signature']
-            return urlunparse(original_url._replace(query=urlencode(query)))
-
-        patcher = mock.patch.object(boto.s3.connection.S3Connection, "generate_url", mocked_generate_url)
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
 
     @patch('xmodule.video_module.video_module.VideoModule.video_link_transience', new_callable=PropertyMock)
     def test_get_html_s3_source(self, mocked_transience):

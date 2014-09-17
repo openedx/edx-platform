@@ -6,9 +6,13 @@ import os
 import tempfile
 import textwrap
 import json
+import boto
+import mock
 from datetime import timedelta
 from webob import Request
 from mock import MagicMock, Mock
+from urlparse import urlparse, urlunparse, parse_qs
+from urllib import urlencode
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
@@ -777,3 +781,52 @@ class TestGetTranscript(TestVideo):
 
         with self.assertRaises(KeyError):
             self.item.get_transcript()
+
+class TestVideoLinkTransience(TestVideo):
+    """
+    Test video handler that provide temporary video links.
+    """
+
+    DATA = """
+        <video show_captions="true"
+        display_name="A Name"
+        sub='OEoXaMPEzfM'
+        >
+            <source src="http://s3.amazonaws.com/bucket/video.mp4"/>
+            <source src="example.webm"/>
+        </video>
+    """
+
+    MODEL_DATA = {
+        'data': DATA
+    }
+
+    def setUp(self):
+        super(TestVideoLinkTransience, self).setUp()
+
+        original_generate = boto.s3.connection.S3Connection.generate_url
+
+        def mocked_generate_url(self, *args, **kwargs):
+            """
+            Mocked boto.s3.connection.S3Connection.generate_url.
+            """
+            original_generate_url = original_generate(self, *args, **kwargs)
+            # Replace expire and signature here:
+            original_url = urlparse(original_generate_url)
+            query = parse_qs(original_url.query)
+            query['Expires'] = ['test_expire']
+            query['Signature'] = ['test_signature']
+            return urlunparse(original_url._replace(query=urlencode(query)))
+
+        patcher = mock.patch.object(boto.s3.connection.S3Connection, "generate_url", mocked_generate_url)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.item_descriptor.render(STUDENT_VIEW)
+        self.item = self.item_descriptor.xmodule_runtime.xmodule_instance
+
+    def test_temporary_video_url_success(self):
+        request = Request.blank('/temporary?source=http://s3.amazonaws.com/bucket/video.mp4')
+        response = self.item.url(request=request, dispatch='temporary')
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.location, 'https://bucket.s3.amazonaws.com/video.mp4?Expires=%5B%27test_expire%27%5D&AWSAccessKeyId=%5Bu%27test_key%27%5D&Signature=%5B%27test_signature%27%5D')
