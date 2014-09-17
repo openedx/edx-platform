@@ -380,6 +380,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
+
+    # Allows the open edX footer to be leveraged in Django Templates.
+    'edxmako.shortcuts.microsite_footer_context_processor',
 )
 
 # use the ratelimit backend to prevent brute force attacks
