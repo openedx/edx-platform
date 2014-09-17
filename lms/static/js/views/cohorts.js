@@ -7,7 +7,8 @@
             'change .cohort-select': 'onCohortSelected',
             'click .action-create': 'showAddCohortForm',
             'click .action-cancel': 'cancelAddCohortForm',
-            'click .action-save': 'saveAddCohortForm'
+            'click .action-save': 'saveAddCohortForm',
+            'click .link-cross-reference': 'showSection'
         },
 
         initialize: function(options) {
@@ -170,6 +171,12 @@
             event.preventDefault();
             this.removeNotification();
             this.onSync();
+        },
+
+        showSection: function(event) {
+            event.preventDefault();
+            var section = $(event.currentTarget).data("section");
+            $(".instructor-nav .nav-item a[data-section='" + section + "']").click();
         }
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView);
