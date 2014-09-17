@@ -597,6 +597,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
 
+    @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
         """
         Check if the subtree rooted at xblock has any drafts and thus may possibly have changes
