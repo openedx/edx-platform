@@ -335,7 +335,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 self.source_visible = True
                 if not download_video['explicitly_set']:
                     self.download_video = True
-        
+
         # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
         if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
             course = modulestore().get_course(course_id)
