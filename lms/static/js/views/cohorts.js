@@ -4,8 +4,9 @@
             "change .cohort-select": "showCohortEditor"
         },
 
-        initialize: function() {
+        initialize: function(options) {
             this.template = _.template($('#cohorts-tpl').text());
+            this.advanced_settings_url = options.advanced_settings_url;
         },
 
         render: function() {
@@ -25,7 +26,8 @@
             var selectedCohort = this.getSelectedCohort();
             this.editor = new CohortEditorView({
                 el: this.$('.cohort-management-group'),
-                model: selectedCohort
+                model: selectedCohort,
+                advanced_settings_url: this.advanced_settings_url
             });
             this.editor.render();
         }
