@@ -221,7 +221,10 @@
 
 %if course.is_cohorted:
 <hr class="divider" />
-<div class="cohort-management membership-section" data-ajax_url="${section_data['cohorts_ajax_url']}">
+<div class="cohort-management membership-section"
+     data-ajax_url="${section_data['cohorts_ajax_url']}"
+     data-advanced-settings-url="${section_data['advanced_settings_url']}"
+>
 </div>
 % endif
 
@@ -234,7 +237,8 @@
             cohorts.url = cohortManagementElement.data('ajax_url');
             var cohortsView = new CohortsView({
                 el: cohortManagementElement,
-                model: cohorts
+                model: cohorts,
+                advanced_settings_url: cohortManagementElement.data('advanced-settings-url')
             });
             cohortsView.render();
             cohorts.fetch().done(function() {
