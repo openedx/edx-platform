@@ -192,6 +192,48 @@ class LTIFields(object):
         scope=Scope.settings
     )
 
+    # Users will be presented with a message indicating that their e-mail/username would be sent to a third
+    # party application. When "Open in New Page" is not selected, the tool automatically appears without any user action.
+    ask_to_send_username = Boolean(
+        display_name=_("Request user's username"),
+        # Translators: This is used to request the user's username for a third party service.
+        # Usernames can only be requested if "Open in New Page" is set to True.
+        help=_(
+            "Select True to request the user's username. You must also set Open in New Page to True to get the user's information."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+    ask_to_send_email = Boolean(
+        display_name=_("Request user's email"),
+        # Translators: This is used to request the user's email for a third party service.
+        # Emails can only be requested if "Open in New Page" is set to True.
+        help=_(
+            "Select True to request the user's email address. You must also set Open in New Page to True to get the user's information."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
+    description = String(
+        display_name=_("LTI Application Information"),
+        help=_(
+            "Enter a description of the third party application. If requesting username and/or email, use this text box to inform users "
+            "why their username and/or email will be forwarded to a third party application."
+        ),
+        default="",
+        scope=Scope.settings
+    )
+
+    button_text = String(
+        display_name=_("Button Text"),
+        help=_(
+            "Enter the text on the button used to launch the third party application."
+        ),
+        default="",
+        scope=Scope.settings
+    )
+
 
 class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
     """
@@ -274,7 +316,13 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         Otherwise error message from LTI provider is generated.
     """
 
+    js = {
+        'js': [
+            resource_string(__name__, 'js/src/lti/lti.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
+    js_module_name = "LTI"
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -317,6 +365,7 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
 
         # parsing custom parameters to dict
         custom_parameters = {}
+
         for custom_parameter in self.custom_parameters:
             try:
                 param_name, param_value = [p.strip() for p in custom_parameter.split('=', 1)]
@@ -370,6 +419,11 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             'weight': self.weight,
             'module_score': self.module_score,
             'comment': sanitized_comment,
+            'description': self.description,
+            'ask_to_send_username': self.ask_to_send_username,
+            'ask_to_send_email': self.ask_to_send_email,
+            'button_text': self.button_text,
+
         }
 
     def get_html(self):
@@ -515,6 +569,29 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
             body.update({
                 u'lis_outcome_service_url': self.get_outcome_service_url()
             })
+
+        self.user_email = ""
+        self.user_username = ""
+
+        # Username and email can't be sent in studio mode, because the user object is not defined.
+        # To test functionality test in LMS
+
+        if callable(self.runtime.get_real_user):
+            real_user_object = self.runtime.get_real_user(self.runtime.anonymous_student_id)
+            try:
+                self.user_email = real_user_object.email
+            except AttributeError:
+                self.user_email = ""
+            try:
+                self.user_username = real_user_object.username
+            except AttributeError:
+                self.user_username = ""
+
+        if self.open_in_a_new_page:
+            if self.ask_to_send_username and self.user_username:
+                body["lis_person_sourcedid"] = self.user_username
+            if self.ask_to_send_email and self.user_email:
+                body["lis_person_contact_email_primary"] = self.user_email
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)
