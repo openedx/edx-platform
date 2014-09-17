@@ -28,7 +28,7 @@ class BokChoyTestSuite(TestSuite):
         self.cache = Env.BOK_CHOY_CACHE
         self.fasttest = kwargs.get('fasttest', False)
         self.test_spec = kwargs.get('test_spec', None)
-        self.default_store = kwargs.get('default_store')
+        self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', 2)
         self.extra_args = kwargs.get('extra_args', '')
         self.ptests = kwargs.get('ptests', False)
