@@ -123,6 +123,9 @@ FEATURES = {
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
 
+    # Toggles OAuth2 authentication provider
+    'ENABLE_OAUTH2_PROVIDER': False,
+
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
@@ -334,6 +337,28 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
+
+############################ OAUTH2 Provider ###################################
+
+# OpenID Connect issuer ID. Normally the URL of the authentication endpoint.
+
+OAUTH_OIDC_ISSUER = 'https:/example.com/oauth2'
+
+# OpenID Connect claim handlers
+
+OAUTH_OIDC_ID_TOKEN_HANDLERS = (
+    'oauth2_provider.oidc.handlers.BasicIDTokenHandler',
+    'oauth2_provider.oidc.handlers.ProfileHandler',
+    'oauth2_provider.oidc.handlers.EmailHandler',
+    'oauth2_handler.IDTokenHandler'
+)
+
+OAUTH_OIDC_USERINFO_HANDLERS = (
+    'oauth2_provider.oidc.handlers.BasicUserInfoHandler',
+    'oauth2_provider.oidc.handlers.ProfileHandler',
+    'oauth2_provider.oidc.handlers.EmailHandler',
+    'oauth2_handler.UserInfoHandler'
+)
 
 ################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
@@ -1310,6 +1335,11 @@ INSTALLED_APPS = (
     # External auth (OpenID, shib)
     'external_auth',
     'django_openid_auth',
+
+    # OAuth2 Provider
+    'provider',
+    'provider.oauth2',
+    'oauth2_provider',
 
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
