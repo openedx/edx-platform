@@ -208,7 +208,7 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
                 video_info = edxval_api.get_video_info(self.edx_video_id)
                 encoded_videos = video_info.get("encoded_videos")
                 for item in encoded_videos:
-                    if item.get("profile") == "desktop":
+                    if item.get("profile") == "desktop_mp4":
                         download_video_link = item.get("url")
             elif self.source:
                 download_video_link = self.source
