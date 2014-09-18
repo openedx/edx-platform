@@ -32,8 +32,6 @@
             'tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min',
             'jquery.tinymce': 'xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce',
             'xmodule': 'xmodule_js/src/xmodule',
-            'xblock/cms.runtime.v1': 'coffee/src/xblock/cms.runtime.v1',
-            'xblock': 'xmodule_js/common_static/coffee/src/xblock',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
             'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.7.1',
@@ -49,10 +47,21 @@
             'youtube': '//www.youtube.com/player_api?noext',
             'tender': '//edxedge.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'xblock/core': 'xmodule_js/common_static/coffee/src/xblock/core',
+            'xblock/runtime.v1': 'xmodule_js/common_static/coffee/src/xblock/runtime.v1',
+            'xblock/lms.runtime.v1': 'coffee/src/xblock/lms.runtime.v1',
 
             // Manually specify LMS files that are not converted to RequireJS
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
+            'coffee/src/modules/tab': 'coffee/src/modules/tab',
+            'coffee/src/calculator': 'coffee/src/calculator',
+            'coffee/src/courseware': 'coffee/src/courseware',
+            'coffee/src/feedback_form': 'coffee/src/feedback_form',
+            'coffee/src/histogram': 'coffee/src/histogram',
+            'coffee/src/logger': 'xmodule_js/common_static/coffee/src/logger',
+            'coffee/src/navigation': 'coffee/src/navigation',
+            'coffee/src/staff_grading/staff_grading': 'coffee/src/staff_grading/staff_grading',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/cohort': 'js/models/cohort',
@@ -185,8 +194,12 @@
                 deps: ['jquery', 'jquery.immediateDescendents']
             },
             'xblock/runtime.v1': {
-                exports: 'XBlock',
+                exports: 'XBlock.Runtime.v1',
                 deps: ['xblock/core']
+            },
+            'xblock/lms.runtime.v1': {
+                exports: 'LmsRuntime.v1',
+                deps: ['xblock/runtime.v1']
             },
 
             // LMS class loaded explicitly until they are converted to use RequireJS
@@ -196,6 +209,32 @@
             'js/staff_debug_actions': {
                 exports: 'js/staff_debug_actions',
                 deps: ['gettext']
+            },
+            'coffee/src/calculator': {
+                exports: 'Calculator'
+            },
+            'coffee/src/courseware': {
+                exports: 'Courseware',
+                deps: ['xblock/lms.runtime.v1']
+            },
+            'coffee/src/feedback_form': {
+                exports: 'FeedbackForm'
+            },
+            'coffee/src/histogram': {
+                exports: 'Histogram'
+            },
+            'coffee/src/logger': {
+                exports: 'Logger'
+            },
+            'coffee/src/navigation': {
+                exports: 'Navigation'
+            },
+            'coffee/src/modules/tab': {
+                exports: 'Tab'
+            },
+            'coffee/src/staff_grading/staff_grading': {
+                exports: 'StaffGrading',
+                deps: ['coffee/src/ajax_prefix', 'coffee/src/logger']
             },
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
@@ -220,6 +259,15 @@
 
     // TODO: why does this need 'lms/include' at the front but the CMS version doesn't?
     define([
+        'lms/include/coffee/spec/helper.js',
+        'lms/include/coffee/spec/modules/tab_spec.js',
+        'lms/include/coffee/spec/calculator_spec.js',
+        'lms/include/coffee/spec/courseware_spec.js',
+        'lms/include/coffee/spec/feedback_form_spec.js',
+        'lms/include/coffee/spec/histogram_spec.js',
+        'lms/include/coffee/spec/navigation_spec.js',
+        'lms/include/coffee/spec/requirejs_spec.js',
+        'lms/include/coffee/spec/staff_grading_spec.js',
         'lms/include/js/spec/views/cohorts_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js'
