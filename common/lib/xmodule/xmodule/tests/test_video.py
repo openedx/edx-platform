@@ -638,3 +638,21 @@ class VideoLinkTransienceTest(unittest.TestCase):
         ]
         for origin_url in wrong_origin_video_urls:
             self.assertIsNone(get_s3_transient_url(origin_url))
+
+    @patch('xmodule.video_module.video_utils.settings')
+    def test_wrong_keys(self, patched_settings):
+        """
+        Test if there are no key or secret.
+        """
+        # No secret. Only key is present.
+        patched_settings.VIDEO_LINK_TRANSIENCE = {"AWS_ACCESS_KEY": "test_key"}
+        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
+
+        # No key. Only secret is present.
+        patched_settings.VIDEO_LINK_TRANSIENCE = {"AWS_SECRET_KEY": "test_secret"}
+        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
+
+        # No key and secret are present.
+        patched_settings.VIDEO_LINK_TRANSIENCE = {}
+        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
+
