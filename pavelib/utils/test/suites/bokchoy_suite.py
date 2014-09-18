@@ -18,6 +18,14 @@ __test__ = False  # do not collect
 class BokChoyTestSuite(TestSuite):
     """
     TestSuite for running Bok Choy tests
+    Properties (below is a subset):
+      test_dir - parent directory for tests
+      log_dir - directory for test output
+      report_dir - directory for reports (e.g., coverage) related to test execution
+      xunit_report - directory for xunit-style output (xml)
+      fasttest - when set, skip various set-up tasks (e.g., DB migrations)
+      test_spec - when set, specifies test files, classes, cases, etc. See platform doc.
+      default_store - modulestore to use when running tests (split or draft)
     """
     def __init__(self, *args, **kwargs):
         super(BokChoyTestSuite, self).__init__(*args, **kwargs)
