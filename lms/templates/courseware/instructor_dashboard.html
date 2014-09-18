@@ -208,10 +208,6 @@ function goto( mode)
     </p>
 
     <p>
-    <a href="${reverse('grade_summary_legacy', kwargs=dict(course_id=course.id.to_deprecated_string()))}" class="${'is-disabled' if disable_buttons else ''}">${_("Grade summary")}</a>
-    </p>
-
-    <p>
     <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
     </p>
 
