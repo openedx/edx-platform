@@ -26,7 +26,7 @@ edX Learning Management System
 
 * If a student changed the playback speed of a video in Firefox, the video did not play. This bug has been fixed. (BLD-1221)
 
-* To help course teams protect video assets, the edX video player now hides video URLs from students by default. This functionality is now in effect for all video files, including those that are not hosted on YouTube. Students can still download videos if you have selected the **Downloadable** option for your Video components. (TNL-302)
+* To help course teams protect video assets, the edX video player now hides video URLs from students by default. This functionality is now in effect for all video files, including those that are not hosted on YouTube. Students can still download videos if you have selected the **Video Download Allowed** option for your Video components. (TNL-302)
 
 
 *******************************
