@@ -76,7 +76,7 @@ class WorkgroupSubmission(TimeStampedModel):
     workgroup = models.ForeignKey(Workgroup, related_name="submissions")
     user = models.ForeignKey(User, related_name="submissions")
     document_id = models.CharField(max_length=255)
-    document_url = models.CharField(max_length=255)
+    document_url = models.CharField(max_length=2048)
     document_mime_type = models.CharField(max_length=255)
     document_filename = models.CharField(max_length=255, blank=True, null=True)
 
