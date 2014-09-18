@@ -300,6 +300,28 @@ class CoursesApiTests(TestCase):
                 matched_course = True
         self.assertTrue(matched_course)
 
+    def test_courses_list_get_with_filter(self):
+        test_uri = self.base_courses_uri
+        courses = [self.test_course_id, unicode(self.empty_course.id)]
+        params = {'course_id': ','.join(courses).encode('utf-8')}
+        response = self.do_get('{}/?{}'.format(test_uri, urlencode(params)))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertIsNotNone(response.data['count'])
+        self.assertIsNotNone(response.data['num_pages'])
+        courses_in_result = []
+        for course in response.data['results']:
+            courses_in_result.append(course['id'])
+            if course['id'] == self.test_course_id:
+                self.assertEqual(course['name'], self.test_course_name)
+                self.assertEqual(course['number'], self.test_course_number)
+                self.assertEqual(course['org'], self.test_course_org)
+                confirm_uri = self.test_server_prefix + test_uri + '/' + course['id']
+                self.assertEqual(course['uri'], confirm_uri)
+                self.assertIsNotNone(course['course_image_url'])
+        self.assertItemsEqual(courses, courses_in_result)
+
+
     def test_course_detail_without_date_values(self):
         create_course_with_out_date_values = CourseFactory.create()  # pylint: disable=C0103
         test_uri = self.base_courses_uri + '/' + unicode(create_course_with_out_date_values.id)
@@ -323,8 +345,8 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['uri'], confirm_uri)
 
     def test_courses_detail_get_with_child_content(self):
-        test_uri = self.base_courses_uri + '/' + self.test_course_id + '?depth=100'
-        response = self.do_get(test_uri)
+        test_uri = self.base_courses_uri + '/' + self.test_course_id
+        response = self.do_get('{}?depth=100'.format(test_uri))
         self.assertEqual(response.status_code, 200)
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data['id'], self.test_course_id)
