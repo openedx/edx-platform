@@ -145,8 +145,11 @@ def inline_discussion(request, course_id, discussion_id):
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
         annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
+    threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        add_courseware_context(threads, course)
     return utils.JsonResponse({
-        'discussion_data': [utils.prepare_content(thread, course_key, is_staff) for thread in threads],
+        'discussion_data': threads,
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
         'page': query_params['page'],

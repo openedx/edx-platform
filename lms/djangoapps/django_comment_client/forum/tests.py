@@ -4,7 +4,7 @@ import logging
 from django.http import Http404
 from django.test.utils import override_settings
 from django.test.client import Client, RequestFactory
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -96,13 +96,13 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(text, thread_id, include_children, group_id=None, group_name=None):
+def make_mock_thread_data(text, thread_id, include_children, group_id=None, group_name=None, commentable_id=None):
     thread_data = {
         "id": thread_id,
         "type": "thread",
         "title": text,
         "body": text,
-        "commentable_id": "dummy_commentable_id",
+        "commentable_id": commentable_id or "dummy_commentable_id",
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
@@ -119,13 +119,13 @@ def make_mock_thread_data(text, thread_id, include_children, group_id=None, grou
     return thread_data
 
 
-def make_mock_request_impl(text, thread_id="dummy_thread_id", group_id=None):
+def make_mock_request_impl(text, thread_id="dummy_thread_id", group_id=None, commentable_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
         data = None
         if url.endswith("threads") or url.endswith("user_profile"):
             data = {
-                "collection": [make_mock_thread_data(text, thread_id, False, group_id=group_id)]
+                "collection": [make_mock_thread_data(text, thread_id, False, group_id=group_id, commentable_id=commentable_id)]
             }
         elif thread_id and url.endswith(thread_id):
             data = make_mock_thread_data(text, thread_id, True, group_id=group_id)
@@ -636,6 +636,36 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, Cohorted
         self._assert_json_response_contains_group_info(
             response, lambda d: d['discussion_data'][0]
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class InlineDiscussionTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+        self.discussion1 = ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="discussion1",
+            display_name='Discussion1',
+            discussion_category="Chapter",
+            discussion_target="Discussion1"
+        )
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_courseware_data(self, mock_request):
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        mock_request.side_effect = make_mock_request_impl("dummy content", commentable_id=self.discussion1.discussion_id)
+
+        response = views.inline_discussion(request, self.course.id.to_deprecated_string(), "dummy_discussion_id")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
+        expected_courseware_title = 'Chapter / Discussion1'
+        self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
+        self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
