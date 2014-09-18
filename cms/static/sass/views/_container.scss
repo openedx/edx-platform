@@ -25,6 +25,10 @@
 
         .is-editable {
 
+          .incontext-editor-value {
+            @extend %cont-truncated;
+          }
+
           // TOOD: abstract this out into a Sass placeholder
           .incontext-editor-input {
             @include transition(box-shadow $tmg-f1 ease-in-out 0, color $tmg-f1 ease-in-out 0);

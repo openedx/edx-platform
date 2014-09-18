@@ -362,7 +362,6 @@ form {
 
   .incontext-editor-value,
   .incontext-editor-action-wrapper {
-    @extend %cont-truncated;
     display: inline-block;
     vertical-align: middle;
     max-width: 80%;
