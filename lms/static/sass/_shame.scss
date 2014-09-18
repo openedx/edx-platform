@@ -65,6 +65,9 @@
   &:hover, &:active, &:focus {
     background: $action-primary-focused-bg;
   }
+  &:focus {
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
+  }
 
   &.current, &.active {
     box-shadow: inset 0 2px 1px 1px $action-primary-active-shadow;
@@ -92,6 +95,9 @@
 
   &:hover, &:active, &:focus {
     background: $action-secondary-focused-bg;
+  }
+  &:focus {
+    box-shadow: 0 0 6px 0 $action-primary-active-focused-shadow;
   }
 
   &.current, &.active {

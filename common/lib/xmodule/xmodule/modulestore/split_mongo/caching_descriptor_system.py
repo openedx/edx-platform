@@ -2,18 +2,21 @@ import sys
 import logging
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
-from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator
+from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, DefinitionLocator
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.split_mongo import encode_key_for_mongo
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
+from fs.osfs import OSFS
+from .definition_lazy_loader import DefinitionLazyLoader
+from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 
 log = logging.getLogger(__name__)
 
 
-class CachingDescriptorSystem(MakoDescriptorSystem):
+class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     """
     A system that has a cache of a course version's json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data.
@@ -34,9 +37,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
+        # needed by capa_problem (as runtime.filestore via this.resources_fs)
+        if 'course' in course_entry:
+            root = modulestore.fs_root / course_entry['org'] / course_entry['course'] / course_entry['run']
+        else:
+            root = modulestore.fs_root / course_entry['structure']['_id']
+        root.makedirs_p()  # create directory if it doesn't exist
+
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
             load_item=self._load_item,
+            resources_fs = OSFS(root),
             **kwargs
         )
         self.modulestore = modulestore
@@ -53,31 +64,54 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.default_class = default_class
         self.local_modules = {}
 
-    def _load_item(self, block_id, course_entry_override=None):
-        if isinstance(block_id, BlockUsageLocator):
-            if isinstance(block_id.block_id, LocalId):
+    def _load_item(self, usage_key, course_entry_override=None, **kwargs):
+        # usage_key is either a UsageKey or just the block_id. if a usage_key,
+        if isinstance(usage_key, BlockUsageLocator):
+            if isinstance(usage_key.block_id, LocalId):
                 try:
-                    return self.local_modules[block_id]
+                    return self.local_modules[usage_key]
                 except KeyError:
                     raise ItemNotFoundError
             else:
-                block_id = block_id.block_id
+                block_id = usage_key.block_id
+        else:
+            block_id = usage_key
 
+        if isinstance(usage_key, BlockUsageLocator):
+            # trust the passed in key to know the caller's expectations of which fields are filled in.
+            # particularly useful for strip_keys so may go away when we're version aware
+            course_key = usage_key.course_key
+        else:
+            course_info = course_entry_override or self.course_entry
+            course_key = CourseLocator(
+                version_guid=course_info['structure']['_id'],
+                org=course_info.get('org'),
+                course=course_info.get('course'),
+                run=course_info.get('run'),
+                branch=course_info.get('branch'),
+            )
+        json_data = self.get_module_data(block_id, course_key)
+
+        class_ = self.load_block_type(json_data.get('category'))
+        new_item = self.xblock_from_json(class_, course_key, block_id, json_data, course_entry_override, **kwargs)
+        return new_item
+
+    def get_module_data(self, block_id, course_key):
+        """
+        Get block from module_data adding it to module_data if it's not already there but is in the structure
+
+        Raises:
+            ItemNotFoundError if block is not in the structure
+        """
         json_data = self.module_data.get(block_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            course_info = course_entry_override or self.course_entry
-            course_key = CourseLocator(
-                course_info.get('org'), course_info.get('course'), course_info.get('run'), course_info.get('branch'),
-                course_info['structure']['_id']
-            )
             self.modulestore.cache_items(self, [block_id], course_key, lazy=self.lazy)
             json_data = self.module_data.get(block_id)
             if json_data is None:
                 raise ItemNotFoundError(block_id)
 
-        class_ = self.load_block_type(json_data.get('category'))
-        return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
+        return json_data
 
     # xblock's runtime does not always pass enough contextual information to figure out
     # which named container (course x branch) or which parent is requesting an item. Because split allows
@@ -90,7 +124,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
-    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None):
+    def xblock_from_json(self, class_, course_key, block_id, json_data, course_entry_override=None, **kwargs):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
@@ -99,23 +133,32 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             self.course_entry['org'] = course_entry_override['org']
             self.course_entry['course'] = course_entry_override['course']
             self.course_entry['run'] = course_entry_override['run']
-        # most likely a lazy loader or the id directly
-        definition = json_data.get('definition', {})
-        definition_id = self.modulestore.definition_locator(definition)
+
+        definition_id = json_data.get('definition')
+        block_type = json_data['category']
+
+        if definition_id is not None and not json_data.get('definition_loaded', False):
+            definition_loader = DefinitionLazyLoader(
+                self.modulestore, block_type, definition_id,
+                lambda fields: self.modulestore.convert_references_to_keys(
+                    course_key, self.load_block_type(block_type),
+                    fields, self.course_entry['structure']['blocks'],
+                )
+            )
+        else:
+            definition_loader = None
+
+        # If no definition id is provide, generate an in-memory id
+        if definition_id is None:
+            definition_id = LocalId()
 
         # If no usage id is provided, generate an in-memory id
         if block_id is None:
             block_id = LocalId()
 
         block_locator = BlockUsageLocator(
-            CourseLocator(
-                version_guid=course_entry_override['structure']['_id'],
-                org=course_entry_override.get('org'),
-                course=course_entry_override.get('course'),
-                run=course_entry_override.get('run'),
-                branch=course_entry_override.get('branch'),
-            ),
-            block_type=json_data.get('category'),
+            course_key,
+            block_type=block_type,
             block_id=block_id,
         )
 
@@ -123,16 +166,17 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             block_locator.course_key, class_, json_data.get('fields', {}), self.course_entry['structure']['blocks'],
         )
         kvs = SplitMongoKVS(
-            definition,
+            definition_loader,
             converted_fields,
             json_data.get('_inherited_settings'),
+            **kwargs
         )
         field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(
                 class_,
-                ScopeIds(None, json_data.get('category'), definition_id, block_locator),
+                ScopeIds(None, block_type, definition_id, block_locator),
                 field_data,
             )
         except Exception:
@@ -149,12 +193,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             )
 
         edit_info = json_data.get('edit_info', {})
-        module.edited_by = edit_info.get('edited_by')
-        module.edited_on = edit_info.get('edited_on')
+        module._edited_by = edit_info.get('edited_by')
+        module._edited_on = edit_info.get('edited_on')
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
         module.source_version = edit_info.get('source_version', None)
-        module.definition_locator = definition_id
+        module.definition_locator = DefinitionLocator(block_type, definition_id)
         # decache any pending field settings
         module.save()
 
@@ -163,3 +207,79 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             self.local_modules[block_locator] = module
 
         return module
+
+    def get_edited_by(self, xblock):
+        """
+        See :meth: cms.lib.xblock.runtime.EditInfoRuntimeMixin.get_edited_by
+        """
+        return xblock._edited_by
+
+    def get_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        return xblock._edited_on
+
+    def get_subtree_edited_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        if not hasattr(xblock, '_subtree_edited_by'):
+            json_data = self.module_data[xblock.location.block_id]
+            if '_subtree_edited_by' not in json_data.setdefault('edit_info', {}):
+                self._compute_subtree_edited_internal(
+                    xblock.location.block_id, json_data, xblock.location.course_key
+                )
+            setattr(xblock, '_subtree_edited_by', json_data['edit_info']['_subtree_edited_by'])
+
+        return getattr(xblock, '_subtree_edited_by')
+
+    def get_subtree_edited_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        if not hasattr(xblock, '_subtree_edited_on'):
+            json_data = self.module_data[xblock.location.block_id]
+            if '_subtree_edited_on' not in json_data.setdefault('edit_info', {}):
+                self._compute_subtree_edited_internal(
+                    xblock.location.block_id, json_data, xblock.location.course_key
+                )
+            setattr(xblock, '_subtree_edited_on', json_data['edit_info']['_subtree_edited_on'])
+
+        return getattr(xblock, '_subtree_edited_on')
+
+    def get_published_by(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        if not hasattr(xblock, '_published_by'):
+            self.modulestore.compute_published_info_internal(xblock)
+
+        return getattr(xblock, '_published_by', None)
+
+    def get_published_on(self, xblock):
+        """
+        See :class: cms.lib.xblock.runtime.EditInfoRuntimeMixin
+        """
+        if not hasattr(xblock, '_published_on'):
+            self.modulestore.compute_published_info_internal(xblock)
+
+        return getattr(xblock, '_published_on', None)
+
+    def _compute_subtree_edited_internal(self, block_id, json_data, course_key):
+        """
+        Recurse the subtree finding the max edited_on date and its concomitant edited_by. Cache it
+        """
+        max_date = json_data['edit_info']['edited_on']
+        max_by = json_data['edit_info']['edited_by']
+
+        for child in json_data.get('fields', {}).get('children', []):
+            child_data = self.get_module_data(child, course_key)
+            if '_subtree_edited_on' not in json_data.setdefault('edit_info', {}):
+                self._compute_subtree_edited_internal(child, child_data, course_key)
+            if child_data['edit_info']['_subtree_edited_on'] > max_date:
+                max_date = child_data['edit_info']['_subtree_edited_on']
+                max_by = child_data['edit_info']['_subtree_edited_by']
+
+        json_data['edit_info']['_subtree_edited_on'] = max_date
+        json_data['edit_info']['_subtree_edited_by'] = max_by

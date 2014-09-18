@@ -1218,8 +1218,12 @@ class NumericalResponse(LoncapaResponse):
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
                 if boundary.imag != 0:
+                    # Translators: This is an error message for a math problem. If the instructor provided a boundary
+                    # (end limit) for a variable that is a complex number (a + bi), this message displays.
                     raise StudentInputError(_("There was a problem with the staff answer to this problem: complex boundary."))
                 if isnan(boundary):
+                    # Translators: This is an error message for a math problem. If the instructor did not provide
+                    # a boundary (end limit) for a variable, this message displays.
                     raise StudentInputError(_("There was a problem with the staff answer to this problem: empty boundary."))
                 boundaries.append(boundary.real)
                 if compare_with_tolerance(
@@ -1875,7 +1879,7 @@ class CodeResponse(LoncapaResponse):
 
         # matlab api key can be defined in course settings. if so, add it to the grader payload
         api_key = getattr(self.capa_system, 'matlab_api_key', None)
-        if self.xml.find('matlabinput') and api_key:
+        if api_key and self.xml.find('matlabinput') is not None:
             self.payload['token'] = api_key
             self.payload['endpoint_version'] = "2"
             self.payload['requestor_id'] = self.capa_system.anonymous_student_id

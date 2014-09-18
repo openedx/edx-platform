@@ -372,9 +372,17 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
         if xmodule_instance_args is not None else ''
 
-    return get_module_for_descriptor_internal(student, module_descriptor, field_data_cache, course_id,
-                                              make_track_function(), xqueue_callback_url_prefix,
-                                              grade_bucket_type=grade_bucket_type)
+    return get_module_for_descriptor_internal(
+        user=student,
+        descriptor=module_descriptor,
+        field_data_cache=field_data_cache,
+        course_id=course_id,
+        track_function=make_track_function(),
+        xqueue_callback_url_prefix=xqueue_callback_url_prefix,
+        grade_bucket_type=grade_bucket_type,
+        # This module isn't being used for front-end rendering
+        request_token=None,
+    )
 
 
 @transaction.autocommit
@@ -539,7 +547,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # possible for a student to have a 0.0 show up in their row but
             # still have 100% for the course.
             row_percents = [percents.get(label, 0.0) for label in header]
-            rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
+            rows.append([student.id, student.email.encode('utf-8'), student.username, gradeset['percent']] + row_percents)
         else:
             # An empty gradeset means we failed to grade a student.
             num_failed += 1

@@ -145,6 +145,39 @@ class TestTrackViews(TestCase):
         self.mock_tracker.send.assert_called_once_with(expected_event)
 
     @freeze_time(expected_time)
+    def test_server_track_with_middleware_and_google_analytics_cookie(self):
+        middleware = TrackMiddleware()
+        request = self.request_factory.get(self.path_with_course)
+        request.COOKIES['_ga'] = 'GA1.2.1033501218.1368477899'
+        middleware.process_request(request)
+        # The middleware emits an event, reset the mock to ignore it since we aren't testing that feature.
+        self.mock_tracker.reset_mock()
+        try:
+            views.server_track(request, str(sentinel.event_type), '{}')
+
+            expected_event = {
+                'username': 'anonymous',
+                'ip': '127.0.0.1',
+                'event_source': 'server',
+                'event_type': str(sentinel.event_type),
+                'event': '{}',
+                'agent': '',
+                'page': None,
+                'time': expected_time,
+                'host': 'testserver',
+                'context': {
+                    'user_id': '',
+                    'course_id': u'foo/bar/baz',
+                    'org_id': 'foo',
+                    'path': u'/courses/foo/bar/baz/xmod/'
+                },
+            }
+        finally:
+            middleware.process_response(request, None)
+
+        self.mock_tracker.send.assert_called_once_with(expected_event)
+
+    @freeze_time(expected_time)
     def test_server_track_with_no_request(self):
         request = None
         views.server_track(request, str(sentinel.event_type), '{}')

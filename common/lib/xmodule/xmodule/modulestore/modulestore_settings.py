@@ -3,6 +3,7 @@ This file contains helper functions for configuring module_store_setting setting
 """
 
 import warnings
+import copy
 
 
 def convert_module_store_setting_if_needed(module_store_setting):
@@ -42,7 +43,6 @@ def convert_module_store_setting_if_needed(module_store_setting):
                 "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
                 "OPTIONS": {
                     "mappings": {},
-                    "reference_type": "Location",
                     "stores": []
                 }
             }
@@ -66,6 +66,27 @@ def convert_module_store_setting_if_needed(module_store_setting):
         )
 
         assert isinstance(module_store_setting['default']['OPTIONS']['stores'], list)
+
+    # If Split is not defined but the DraftMongoModuleStore is configured, add Split as a copy of Draft
+    mixed_stores = module_store_setting['default']['OPTIONS']['stores']
+    is_split_defined = any((store['ENGINE'].endswith('.DraftVersioningModuleStore')) for store in mixed_stores)
+    if not is_split_defined:
+        # find first setting of mongo store
+        mongo_store = next(
+            (store for store in mixed_stores if (
+                store['ENGINE'].endswith('.DraftMongoModuleStore') or store['ENGINE'].endswith('.DraftModuleStore')
+            )),
+            None
+        )
+        if mongo_store:
+            # deepcopy mongo -> split
+            split_store = copy.deepcopy(mongo_store)
+            # update the ENGINE and NAME fields
+            split_store['ENGINE'] = 'xmodule.modulestore.split_mongo.split_draft.DraftVersioningModuleStore'
+            split_store['NAME'] = 'split'
+            # add split to the end of the list
+            mixed_stores.append(split_store)
+
     return module_store_setting
 
 

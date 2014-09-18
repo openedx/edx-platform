@@ -1,101 +1,64 @@
 class @DiscussionViewSpecHelper
-    @expectVoteRendered = (view, voted) ->
-        button = view.$el.find(".vote-btn")
-        if voted
-            expect(button.hasClass("is-cast")).toBe(true)
-            expect(button.attr("aria-pressed")).toEqual("true")
-            expect(button.attr("data-tooltip")).toEqual("remove vote")
-            expect(button.text()).toEqual("43 votes (click to remove your vote)")
-        else
-            expect(button.hasClass("is-cast")).toBe(false)
-            expect(button.attr("aria-pressed")).toEqual("false")
-            expect(button.attr("data-tooltip")).toEqual("vote")
-            expect(button.text()).toEqual("42 votes (click to vote)")
+    @makeThreadWithProps = (props) ->
+        # Minimal set of properties necessary for rendering
+        thread = {
+          id: "dummy_id",
+          thread_type: "discussion",
+          pinned: false,
+          endorsed: false,
+          votes: {up_count: '0'},
+          read: false,
+          unread_comments_count: 0,
+          comments_count: 0,
+          abuse_flaggers: [],
+          body: "",
+          title: "dummy title",
+          created_at: "2014-08-18T01:02:03Z"
+        }
+        $.extend(thread, props)
+
+    @expectVoteRendered = (view, model, user) ->
+        button = view.$el.find(".action-vote")
+        expect(button.hasClass("is-checked")).toBe(user.voted(model))
+        expect(button.attr("aria-checked")).toEqual(user.voted(model).toString())
+        expect(button.find(".js-visual-vote-count").text()).toMatch("^#{model.get('votes').up_count} Votes?$")
+        expect(button.find(".sr.js-sr-vote-count").text()).toMatch("^currently #{model.get('votes').up_count} votes?$")
 
     @checkRenderVote = (view, model) ->
-        view.renderVote()
-        DiscussionViewSpecHelper.expectVoteRendered(view, false)
+        view.render()
+        DiscussionViewSpecHelper.expectVoteRendered(view, model, window.user)
         window.user.vote(model)
-        view.renderVote()
-        DiscussionViewSpecHelper.expectVoteRendered(view, true)
+        view.render()
+        DiscussionViewSpecHelper.expectVoteRendered(view, model, window.user)
         window.user.unvote(model)
-        view.renderVote()
-        DiscussionViewSpecHelper.expectVoteRendered(view, false)
+        view.render()
+        DiscussionViewSpecHelper.expectVoteRendered(view, model, window.user)
 
-    @checkVote = (view, model, modelData, checkRendering) ->
-        view.renderVote()
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, false)
-
+    triggerVoteEvent = (view, event, expectedUrl) ->
+        deferred = $.Deferred()
         spyOn($, "ajax").andCallFake((params) =>
-            newModelData = {}
-            $.extend(newModelData, modelData, {votes: {up_count: "43"}})
-            params.success(newModelData, "success")
-            # Caller invokes always function on return value but it doesn't matter here
-            {always: ->}
+            expect(params.url.toString()).toEqual(expectedUrl)
+            return deferred
         )
-
-        view.vote()
-        expect(window.user.voted(model)).toBe(true)
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, true)
+        view.render()
+        view.$el.find(".action-vote").trigger(event)
         expect($.ajax).toHaveBeenCalled()
-        $.ajax.reset()
+        deferred.resolve()
 
-        # Check idempotence
-        view.vote()
-        expect(window.user.voted(model)).toBe(true)
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, true)
-        expect($.ajax).toHaveBeenCalled()
+    @checkUpvote = (view, model, user, event) ->
+        expect(model.id in user.get('upvoted_ids')).toBe(false)
+        initialVoteCount = model.get('votes').up_count
+        triggerVoteEvent(view, event, DiscussionUtil.urlFor("upvote_#{model.get('type')}", model.id) + "?ajax=1")
+        expect(model.id in user.get('upvoted_ids')).toBe(true)
+        expect(model.get('votes').up_count).toEqual(initialVoteCount + 1)
 
-    @checkUnvote = (view, model, modelData, checkRendering) ->
-        window.user.vote(model)
-        expect(window.user.voted(model)).toBe(true)
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, true)
-
-        spyOn($, "ajax").andCallFake((params) =>
-            newModelData = {}
-            $.extend(newModelData, modelData, {votes: {up_count: "42"}})
-            params.success(newModelData, "success")
-            # Caller invokes always function on return value but it doesn't matter here
-            {always: ->}
-        )
-
-        view.unvote()
-        expect(window.user.voted(model)).toBe(false)
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, false)
-        expect($.ajax).toHaveBeenCalled()
-        $.ajax.reset()
-
-        # Check idempotence
-        view.unvote()
-        expect(window.user.voted(model)).toBe(false)
-        if checkRendering
-            DiscussionViewSpecHelper.expectVoteRendered(view, false)
-        expect($.ajax).toHaveBeenCalled()
-
-    @checkToggleVote = (view, model) ->
-        event = {preventDefault: ->}
-        spyOn(event, "preventDefault")
-        spyOn(view, "vote").andCallFake(() -> window.user.vote(model))
-        spyOn(view, "unvote").andCallFake(() -> window.user.unvote(model))
-
-        expect(window.user.voted(model)).toBe(false)
-        view.toggleVote(event)
-        expect(view.vote).toHaveBeenCalled()
-        expect(view.unvote).not.toHaveBeenCalled()
-        expect(event.preventDefault.callCount).toEqual(1)
-
-        view.vote.reset()
-        view.unvote.reset()
-        expect(window.user.voted(model)).toBe(true)
-        view.toggleVote(event)
-        expect(view.vote).not.toHaveBeenCalled()
-        expect(view.unvote).toHaveBeenCalled()
-        expect(event.preventDefault.callCount).toEqual(2)
+    @checkUnvote = (view, model, user, event) ->
+        user.vote(model)
+        expect(model.id in user.get('upvoted_ids')).toBe(true)
+        initialVoteCount = model.get('votes').up_count
+        triggerVoteEvent(view, event, DiscussionUtil.urlFor("undo_vote_for_#{model.get('type')}", model.id) + "?ajax=1")
+        expect(user.get('upvoted_ids')).toEqual([])
+        expect(model.get('votes').up_count).toEqual(initialVoteCount - 1)
 
     @checkButtonEvents = (view, viewFunc, buttonSelector) ->
         spy = spyOn(view, viewFunc)
@@ -111,7 +74,7 @@ class @DiscussionViewSpecHelper
         expect(spy).toHaveBeenCalled()
         
     @checkVoteButtonEvents = (view) ->
-        @checkButtonEvents(view, "toggleVote", ".vote-btn")
+        @checkButtonEvents(view, "toggleVote", ".action-vote")
 
     @setNextResponseContent = (content) ->
         $.ajax.andCallFake(

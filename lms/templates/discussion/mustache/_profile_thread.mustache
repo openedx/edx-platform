@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <article class="discussion-article" data-id="{{id}}">
-    <div class="discussion-post local">
+    <div class="discussion-post">
         <header>
             <h3>{{title}}</h3>
             <p class="posted-details">                
@@ -18,9 +18,9 @@
                 </span>
             </p>
         </header>
-        <div class="post-body">{{abbreviatedBody}}</div>
+        <div class="post-body">{{{abbreviatedBody}}}</div>
     </div>
-    <div class="local post-tools">
+    <div class="post-tools">
         <a href="{{permalink}}">${_("View discussion")}</a>
     </div>
 

@@ -10,7 +10,7 @@
 <%block name="bodyclass">is-signedin course advanced view-settings</%block>
 
 <%block name="jsextra">
-% for template_name in ["advanced_entry"]:
+% for template_name in ["advanced_entry", "basic-modal", "modal-button", "validation-error-modal"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -126,7 +126,7 @@ require(["domReady!", "jquery", "gettext", "js/models/settings/advanced", "js/vi
             <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-          % if settings.FEATURES.get('ENABLE_GROUP_CONFIGURATIONS') and "split_test" in context_course.advanced_modules:
+          % if "split_test" in context_course.advanced_modules:
             <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
           % endif
           </ul>

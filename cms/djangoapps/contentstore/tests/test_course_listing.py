@@ -201,10 +201,11 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # Now count the db queries
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        with check_mongo_calls(store, USER_COURSES_COUNT):
+        with check_mongo_calls(USER_COURSES_COUNT):
             _accessible_courses_list_from_groups(self.request)
 
-        with check_mongo_calls(store, 1):
+        # TODO: LMS-11220: Document why this takes 6 calls
+        with check_mongo_calls(6):
             _accessible_courses_list(self.request)
 
     def test_get_course_list_with_same_course_id(self):
@@ -329,7 +330,9 @@ class TestCourseListing(ModuleStoreTestCase):
 
         # simulate initiation of course actions
         for course in courses_in_progress:
-            CourseRerunState.objects.initiated(sourse_course_key, destination_course_key=course.id, user=self.user)
+            CourseRerunState.objects.initiated(
+                sourse_course_key, destination_course_key=course.id, user=self.user, display_name="test course"
+            )
 
         # verify return values
         for method in (_accessible_courses_list_from_groups, _accessible_courses_list):

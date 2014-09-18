@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
 from django.core.files.storage import get_storage_class
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
@@ -18,7 +18,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
+from course_groups.models import CourseUserGroup
+from course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,
@@ -26,8 +27,8 @@ from django_comment_client.utils import (
     get_ability,
     JsonError,
     JsonResponse,
-    safe_content
-)
+    safe_content,
+    add_thread_group_name)
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
 
@@ -53,11 +54,11 @@ def permitted(fn):
     return wrapper
 
 
-def ajax_content_response(request, course_id, content):
+def ajax_content_response(request, course_key, content):
     user_info = cc.User.from_django_user(request.user).to_dict()
-    annotated_content_info = get_annotated_content_info(course_id, content, request.user, user_info)
+    annotated_content_info = get_annotated_content_info(course_key, content, request.user, user_info)
     return JsonResponse({
-        'content': safe_content(content),
+        'content': safe_content(content, course_key),
         'annotated_content_info': annotated_content_info,
     })
 
@@ -71,8 +72,8 @@ def create_thread(request, course_id, commentable_id):
     """
 
     log.debug("Creating new thread in %r, id %r", course_id, commentable_id)
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'load', course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(request.user, 'load', course_key)
     post = request.POST
 
     if course.allow_anonymous:
@@ -94,8 +95,9 @@ def create_thread(request, course_id, commentable_id):
         anonymous=anonymous,
         anonymous_to_peers=anonymous_to_peers,
         commentable_id=commentable_id,
-        course_id=course_id.to_deprecated_string(),
+        course_id=course_key.to_deprecated_string(),
         user_id=request.user.id,
+        thread_type=post["thread_type"],
         body=post["body"],
         title=post["title"]
     )
@@ -107,15 +109,19 @@ def create_thread(request, course_id, commentable_id):
     #not anymore, only for admins
 
     # Cohort the thread if the commentable is cohorted.
-    if is_commentable_cohorted(course_id, commentable_id):
-        user_group_id = get_cohort_id(user, course_id)
+    if is_commentable_cohorted(course_key, commentable_id):
+        user_group_id = get_cohort_id(user, course_key)
 
         # TODO (vshnayder): once we have more than just cohorts, we'll want to
         # change this to a single get_group_for_user_and_commentable function
         # that can do different things depending on the commentable_id
-        if cached_has_permission(request.user, "see_all_cohorts", course_id):
+        if cached_has_permission(request.user, "see_all_cohorts", course_key):
             # admins can optionally choose what group to post as
-            group_id = post.get('group_id', user_group_id)
+            try:
+                group_id = int(post.get('group_id', user_group_id))
+                get_cohort_by_id(course_key, group_id)
+            except (ValueError, CourseUserGroup.DoesNotExist):
+                return HttpResponseBadRequest("Invalid cohort id")
         else:
             # regular users always post with their own id.
             group_id = user_group_id
@@ -133,11 +139,12 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
     data = thread.to_dict()
+    add_thread_group_name(data, course_key)
     add_courseware_context([data], course)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, data)
+        return ajax_content_response(request, course_key, data)
     else:
-        return JsonResponse(safe_content(data))
+        return JsonResponse(safe_content(data, course_key))
 
 
 @require_POST
@@ -151,19 +158,20 @@ def update_thread(request, course_id, thread_id):
         return JsonError(_("Title can't be empty"))
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.body = request.POST["body"]
     thread.title = request.POST["title"]
     thread.save()
     if request.is_ajax():
-        return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), thread.to_dict())
+        return ajax_content_response(request, course_key, thread.to_dict())
     else:
-        return JsonResponse(safe_content(thread.to_dict()))
+        return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 def _create_comment(request, course_key, thread_id=None, parent_id=None):
     """
-    given a course_id, thread_id, and parent_id, create a comment,
+    given a course_key, thread_id, and parent_id, create a comment,
     called from create_comment to do the actual creation
     """
     assert isinstance(course_key, CourseKey)
@@ -199,7 +207,7 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
-        return JsonResponse(safe_content(comment.to_dict()))
+        return JsonResponse(safe_content(comment.to_dict(), course.id))
 
 
 @require_POST
@@ -224,9 +232,10 @@ def delete_thread(request, course_id, thread_id):
     given a course_id and thread_id, delete this thread
     this is ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.delete()
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -237,15 +246,16 @@ def update_comment(request, course_id, comment_id):
     given a course_id and comment_id, update the comment with payload attributes
     handles static and ajax submissions
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     comment = cc.Comment.find(comment_id)
     if 'body' not in request.POST or not request.POST['body'].strip():
         return JsonError(_("Body can't be empty"))
     comment.body = request.POST["body"]
     comment.save()
     if request.is_ajax():
-        return ajax_content_response(request, SlashSeparatedCourseKey.from_deprecated_string(course_id), comment.to_dict())
+        return ajax_content_response(request, course_key, comment.to_dict())
     else:
-        return JsonResponse(safe_content(comment.to_dict()))
+        return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -256,10 +266,12 @@ def endorse_comment(request, course_id, comment_id):
     given a course_id and comment_id, toggle the endorsement of this comment,
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     comment = cc.Comment.find(comment_id)
     comment.endorsed = request.POST.get('endorsed', 'false').lower() == 'true'
+    comment.endorsement_user_id = request.user.id
     comment.save()
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -270,13 +282,14 @@ def openclose_thread(request, course_id, thread_id):
     given a course_id and thread_id, toggle the status of this thread
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     thread = cc.Thread.find(thread_id)
     thread.closed = request.POST.get('closed', 'false').lower() == 'true'
     thread.save()
     thread = thread.to_dict()
     return JsonResponse({
-        'content': safe_content(thread),
-        'ability': get_ability(SlashSeparatedCourseKey.from_deprecated_string(course_id), thread, request.user),
+        'content': safe_content(thread, course_key),
+        'ability': get_ability(course_key, thread, request.user),
     })
 
 
@@ -302,9 +315,10 @@ def delete_comment(request, course_id, comment_id):
     given a course_id and comment_id delete this comment
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     comment = cc.Comment.find(comment_id)
     comment.delete()
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -314,10 +328,11 @@ def vote_for_comment(request, course_id, comment_id, value):
     """
     given a course_id and comment_id,
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.vote(comment, value)
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -328,10 +343,11 @@ def undo_vote_for_comment(request, course_id, comment_id):
     given a course id and comment id, remove vote
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     user.unvote(comment)
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -342,10 +358,11 @@ def vote_for_thread(request, course_id, thread_id, value):
     given a course id and thread id vote for this thread
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -356,10 +373,11 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     given a course_id and thread_id flag this thread for abuse
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -371,12 +389,12 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
     ajax only
     """
     user = cc.User.from_django_user(request.user)
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_by_id(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key)
     thread = cc.Thread.find(thread_id)
-    remove_all = cached_has_permission(request.user, 'openclose_thread', course_id) or has_access(request.user, 'staff', course)
+    remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
     thread.unFlagAbuse(user, thread, remove_all)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -387,10 +405,11 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     given a course and comment id, flag comment for abuse
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -407,7 +426,7 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     remove_all = cached_has_permission(request.user, 'openclose_thread', course_key) or has_access(request.user, 'staff', course)
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
-    return JsonResponse(safe_content(comment.to_dict()))
+    return JsonResponse(safe_content(comment.to_dict(), course_key))
 
 
 @require_POST
@@ -418,10 +437,11 @@ def undo_vote_for_thread(request, course_id, thread_id):
     given a course id and thread id, remove users vote for thread
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.unvote(thread)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -432,10 +452,11 @@ def pin_thread(request, course_id, thread_id):
     given a course id and thread id, pin this thread
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.pin(user, thread_id)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST
@@ -446,10 +467,11 @@ def un_pin_thread(request, course_id, thread_id):
     given a course id and thread id, remove pin from this thread
     ajax only
     """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.un_pin(user, thread_id)
-    return JsonResponse(safe_content(thread.to_dict()))
+    return JsonResponse(safe_content(thread.to_dict(), course_key))
 
 
 @require_POST

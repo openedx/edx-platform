@@ -1,8 +1,13 @@
 class @DiscussionFilter
+
+  # TODO: this helper class duplicates functionality in DiscussionThreadListView.filterTopics
+  # for use with a very similar category dropdown in the New Post form.  The two menus' implementations
+  # should be merged into a single reusable view.
+
   @filterDrop: (e) ->
-    $drop = $(e.target).parents('.topic_menu_wrapper, .browse-topic-drop-menu-wrapper')
+    $drop = $(e.target).parents('.topic-menu-wrapper')
     query = $(e.target).val()
-    $items = $drop.find('a')
+    $items = $drop.find('.topic-menu-item')
 
     if(query.length == 0)
       $items.removeClass('hidden')
@@ -10,19 +15,14 @@ class @DiscussionFilter
 
     $items.addClass('hidden')
     $items.each (i) ->
-      thisText = $(this).not('.unread').text()
-      $(this).parents('ul').siblings('a').not('.unread').each (i) ->
-        thisText = thisText  + ' ' + $(this).text();
 
-      test = true
-      terms = thisText.split(' ')
+      path = $(this).parents(".topic-menu-item").andSelf()
+      pathTitles = path.children(".topic-title").map((i, elem) -> $(elem).text()).get()
+      pathText = pathTitles.join(" / ").toLowerCase()
 
-      if(thisText.toLowerCase().search(query.toLowerCase()) == -1)
-        test = false
-
-      if(test)
+      if query.split(" ").every((term) -> pathText.search(term.toLowerCase()) != -1)
         $(this).removeClass('hidden')
         # show children
-        $(this).parent().find('a').removeClass('hidden');
+        $(this).find('.topic-menu-item').removeClass('hidden');
         # show parents
-        $(this).parents('ul').siblings('a').removeClass('hidden');
+        $(this).parents('.topic-menu-item').removeClass('hidden');

@@ -1,7 +1,7 @@
 .. _Discussions:
 
 ##################################
-Managing the Course Discussions
+Managing Course Discussions
 ##################################
 
 Discussions, or discussion forums, foster interaction among your students and
@@ -31,13 +31,13 @@ sections:
 Overview
 ********************************
 
-Students and staff use course discussions to share ideas, exchange views, and
-consider different viewpoints. In a discussion, there are three hierarchical
-levels of interaction.
+Students and staff use course discussions to share ideas, exchange views,
+consider different viewpoints, and ask questions. In a discussion, there are
+three hierarchical levels of interaction.
 
 * A *post* is the first level of interaction. A post opens a new subject. Posts
   are often posed as questions, either to start a conversation or to surface an
-  issue that requires some action.
+  issue that requires some action. When you add a post, you categorize it as a **Question** or as a **Discussion**.  
 
 * A *response* is the second level of interaction. A response is a reply made
   directly to a post to provide a solution or continue the conversation.
@@ -46,13 +46,15 @@ levels of interaction.
   clarification or side note made to a specific response, rather than to the
   post as a whole.
  
-The dialog created by a post, its responses, and the comments on those
-responses is called a *thread*.
+The dialogue created by a post, its responses, and the comments on those
+responses is sometimes called a thread.
 
 All course staff members and enrolled students can add posts, responses, and
 comments, and view all of the posts, responses, and comments made by other
-course participants. Discussion threads are saved as part of the course
-history.
+course participants. Members of the course community, both staff and students,
+can be given permission to moderate or administer course discussions through a
+set of discussion administration roles. Discussion threads are saved as part of
+the course history.
 
 .. note:: 
   The :ref:`Discussions for Students and Staff` chapter describes features that
@@ -64,7 +66,7 @@ history.
 .. _Organizing_discussions:
 
 *************************************************
-Set Up Discussions for Your Course
+Set Up Discussion Topics for Your Course
 *************************************************
 
 Discussions in an edX course include both the specific topics that you add to
@@ -77,11 +79,12 @@ Add Units With a Discussion Component
 ============================================
 
 Typically, all units are added during the design and creation of your course in
-Studio. To add a component to a unit, follow the instructions in :ref:`Working
-with Discussion Components`.
+Studio. To add a discussion topic to a unit, you add a discussion component.
+Follow the instructions in :ref:`Working with Discussion Components`.
 
-This type of discussion is subject to the release date of the section that
-contains it. Students cannot contribute to these discussions until that date.
+This type of discussion topic is subject to the release date of the section
+that contains it. Students cannot contribute to these discussion topics until
+that date.
 
 =====================================
 Create Course-Wide Discussion Topics
@@ -150,24 +153,27 @@ You can designate a team of people to help you run course discussions.
 Different options for working with discussions are available through
 these roles:
 
-* Discussion moderators can edit and delete messages at any level, review
+* *Discussion moderators* can edit and delete messages at any level, review
   messages flagged for misuse, close and reopen posts, pin posts, and endorse
   responses. Posts made by moderators are marked as "By: Staff" in the list of
   posts. Responses and comments made by moderators have a colored "Staff"
-  banner. This role is often given to course team members who already have the
-  Course Staff role.
+  identifier. This role is often given to course team members who already have
+  the Course Staff role.
 
 .. removed this clause from 1st sentence per JAAkana and MHoeber: , and, if the
 .. course is cohorted, see posts from all cohorts
 
-* Discussion community TAs have the same options for working with discussions
+* *Discussion community TAs* have the same options for working with discussions
   as moderators. Posts made by community TAs are marked as "By: Community TA"
-  in the list of posts. Responses and comments made by community TAs have a
-  colored "Community TA" banner. This role is often given to students.
+  in the list of posts on the **Discussion** page. Responses and comments made
+  by community TAs have a colored "Community TA" identifier. This role is often
+  given to students.
 
-* Discussion admins have the same options for working with discussions as
+.. put this comment in to make the formatting of this bulleted list consistent when output using the spinx template
+
+* *Discussion admins* have the same options for working with discussions as
   moderators, and their posts, responses, and comments have the same "Staff"
-  identifier. This role can be reserved for assignment to course team members
+  identifiers. This role can be reserved for assignment to course team members
   who have the Instructor role only: the discussion admins can then both
   moderate discussions and give other users these discussion management roles
   whenever necessary.
@@ -179,7 +185,7 @@ addresses or usernames.
   click **Membership** and then select **Course Staff** or **Instructor** from
   the drop-down list.
 
-* To get this information for any enrolled student, on the Instructor Dashboard
+* To get this information for an enrolled student, on the Instructor Dashboard
   click **Data Download**, then **Download profile information as a CSV**.
 
 To assign a role, you must be the course author or an Instructor (that is, you
@@ -206,9 +212,9 @@ Run a Discussion
 *********************
 
 On an ongoing basis, the members of your discussion team run the course
-discussion by making contributions, endorsing responses, and guiding student
-messages into pertinent threads. Techniques that you can use throughout your
-course to make discussions successful follow.
+discussion by making contributions, endorsing responses, marking answers as
+correct, and guiding student messages into pertinent threads. Techniques that
+you can use throughout your course to make discussions successful follow.
 
 ==========================================
 Use Conventions in Discussion Subjects
@@ -229,13 +235,21 @@ body of a response or comment. Examples follow.
 Both your discussion team and your students can use tags like these to search
 the discussions more effectively.
 
+When a post is created its type must be selected: either "question" or
+"discussion". Members of the discussion team should be thoughtful when
+selecting the type for their posts, and encourage students to do the same. See
+:ref:`Find Question Posts and Discussion Posts`.
+
+.. future: changing the type of a post, maybe resequence or separate  conventions from post types
+
 ========================
-Seed Discussions
+Seed Discussion Topics
 ========================
 
-To help students learn how to get the most of course discussions, and find the
-best discussion topic to use for their questions, you can seed discussions by
-adding posts before your course starts. Some examples follow.
+To help students learn how to get the most out of course discussions, and find
+the best discussion topic to use for their questions and conversations, you can
+seed discussion topics by adding posts before your course starts. Some examples
+follow.
 
 * In the General topic (which is included in every course by default), add an
   [INTRO] post to initiate a thread for student and staff introductions.
@@ -246,8 +260,8 @@ adding posts before your course starts. Some examples follow.
   create their own posts.
 
 * If you include discussion components along with problem components in a unit,
-  you can add a post that encourages students to use the discussion topic to
-  ask for help with the problems, but reminds them not to post the answers.
+  you can add a post that encourages students to use the topic to ask for help
+  with the problems, but reminds them not to post the answers.
 
 ======================================
 Minimize Thread Proliferation
@@ -259,30 +273,35 @@ long threads (with more than 200 responses and comments) can be difficult to
 read, and can therefore result in an unsatisfactory experience in the
 discussion.
 
-* Pin a post. Pinning a post makes it appear at the top of the list of posts.
-  As a result, it is more likely that students will see and respond to pinned
-  posts. You can write your own post and then pin it, or pin a post by any
-  author. Click **Pin Thread**.
+* Pin a post. Pinning a post makes it appear at the top of the list of posts on
+  the **Discussion** page. As a result, it is more likely that students will
+  see and respond to pinned posts. You can write your own post and then pin it,
+  or pin a post by any author. Select the "More" icon and then **Pin**.
 
     .. image:: ../Images/Pin_Discussion.png
      :alt: Image of the pin icon for discussion posts
 
 * Endorse a response. Endorsing a response indicates that it provides value to
-  the discussion, such as a correct answer to a question. Click the **check
-  mark** that displays at upper right of the response.
+  the discussion. Click the "check mark" (or tick mark) icon for the response.
 
     .. image:: ../Images/Endorse_Discussion.png
      :alt: Image of the Endorse button for discussion posts
 
+* Mark a question as answered. You use the same procedure to mark a response as
+  the correct answer to a question as you do to endorse contributions to a
+  discussion: click the "check mark" (or tick mark) icon for correct answers.
+
 * Close a post. You can respond to a redundant post by (optionally) pasting in
   a link to the post that you prefer students to contribute to, and prevent
-  further interaction by closing the post. Click the **Close** button that
-  displays below the post to close it.
+  further interaction by closing the post. Select the "More" icon and then
+  **Close** to close it.
 
-* Provide post/response/comment guidelines. A set of :ref:`Guidance for
-  Discussion Moderators` or a post in a course-wide discussion topic (such
-  as **General**) can provide guidance about when to start a new thread by
-  adding a post, responding to an existing post, or commenting on a response.
+* Provide post/response/comment guidelines. You can post information from the
+  :ref:`overview<Overview_discussions>` in this chapter, or the :ref:`anatomy
+  of edX discussions<Anatomy of edX Course Discussions>` in the next chapter,
+  in a course-wide discussion topic (such as General) to provide guidance about
+  when to start a new thread by adding a post, responding to an existing post,
+  or commenting on a response.
 
 .. _Moderating_discussions:
 
@@ -313,6 +332,11 @@ them available to students as a course handout file or on a defined page in
 your course. These guidelines can define your expectations and optionally
 introduce features of edX discussions.
 
+You can also share the :ref:`Discussions for Students and Staff` chapter with
+your students. It describes features that are available to all discussion
+participants, and may be useful to students who are new to online discussion
+forums.
+
 .. For a template that you can use to develop your own guidelines, see
 .. :ref:`Discussion Forum Guidelines`.
 
@@ -320,8 +344,8 @@ introduce features of edX discussions.
 Develop a Positive Discussion Culture
 ========================================
 
-Monitors can cultivate qualities in their own discussion interactions to make
-their influence positive and their time productive.
+Discussion monitors can cultivate qualities in their own discussion
+interactions to make their influence positive and their time productive.
 
 * Encourage quality contributions: thank students whose posts have a positive
   impact and who answer questions.
@@ -352,8 +376,34 @@ their influence positive and their time productive.
 For a template that you can use to develop guidelines for your course
 moderators, see :ref:`Guidance for Discussion Moderators`.
 
+.. _Find Question Posts and Discussion Posts:
+
+==========================================
+Find Questions and Discussions
+==========================================
+
+When students create posts, they specify the type of post to indicate whether
+they are asking for concrete information (a question) or starting an open-ended
+conversation (a discussion). 
+
+On the **Discussion** page, a question mark image identifies posts that ask
+questions, and a conversation bubble image identifies posts that start
+discussions. When an answer is provided and marked as correct for a question, a
+check or tick mark image replaces the question mark image. See :ref:`Answer
+Questions`.
+
+In addition to these visual cues, filters can help you find questions and
+discussions that need review. Above the list of posts on the **Discussion**
+page, the **Show all** filter is selected by default. You can also select:
+
+* **Unread**, to list only the discussions and questions that you have not yet
+  viewed.
+
+* **Unanswered**, to list only questions that do not yet have any responses
+  marked as answers.
+
 ==================
-Edit Messages 
+Edit Messages
 ==================
 
 Discussion moderators, community TAs, and admins can edit the content of posts,
@@ -364,8 +414,12 @@ text, images, or links.
 #. Log in to the site and then select the course on your **Current Courses**
    dashboard.
 
-#. Click the **Edit** button below the post or response or the pencil icon for
-   the comment.
+#. Open the **Discussion** page and then open the post with the content that
+   requires editing. You can select a single topic from the drop-down list of
+   discussion topics, apply a filter, or search to locate the post.
+
+#. For the post or for the response or comment that you want to edit, click the
+   "More" icon and then **Edit**.
 
 #. Remove the problematic portion of the message, or replace it with standard
    text such as "[REMOVED BY MODERATOR]".
@@ -384,33 +438,41 @@ language may need to be deleted, rather than edited.
 #. Log in to the site and then select the course on your **Current Courses**
    dashboard.
 
-#. Click the **Delete** button below the post or response or the "X" icon for
-   the comment.
+#. Open the **Discussion** page and then open the post with the content that
+   requires deletion. You can select a single topic from the drop-down list of
+   discussion topics, apply a filter, or search to locate the post.
+
+#. For the post or for the response or comment that you want to delete, click
+   the "More" icon and then **Delete**.
 
 #. Click **OK** to confirm the deletion.
 
 .. how to communicate with the poster?
 
-.. important:: If a message is threatening or indicates serious harmful intent, contact campus security at your institution. Report the incident before taking any other action.
+.. important:: If a message is threatening or indicates serious harmful 
+ intent, contact campus security at your institution. Report the incident
+ before taking any other action.
 
 ==================================
 Respond to Reports of Misuse
 ==================================
 
-Students can use the **Report Misuse** flag to indicate messages that they find
-inappropriate. Moderators, community TAs, and admins can check for messages
-that have been flagged in this way and edit or delete them as needed.
+Students have the option to report contributions that they find inappropriate.
+Moderators, community TAs, and admins can check for messages that have been
+flagged in this way and edit or delete them as needed.
 
 #. View the live version of your course and click **Discussion** at the top of
    the page.
 
-#. On the drop-down Discussion list click **Flagged Discussions**.
+#. In the list of posts on the left side of the page, use the filter drop-down
+   list (set to **Show all** by default) to select **Flagged**.
 
-#. Review each post listed as a flagged discussion. Posts and responses show a
-   flag and **Misuse Reported** in red font; comments show only a red flag.
+#. Review listed posts. A post is listed if it or any of its responses or
+   comments has been reported. The reported contribution includes a
+   **Reported** identifier.
 
-#. Edit or delete the post, response, or comment. Alternatively, to remove the
-   misuse flag from a message click **Misuse Reported** or the red flag icon.
+#. Edit or delete the post, response, or comment. Alternatively, remove the
+   flag: click the "More" icon and then **Unreport**.
 
 ===============
 Block Users
@@ -443,7 +505,9 @@ course units and all of the course-wide topics are affected.
   and Discussion Community TAs are not affected when you close the discussions
   for a course. Users with these roles can continue to add to discussions. 
 
-.. note:: To assure that your students understand why they cannot add to  discussions, you can add the dates that discussions are closed to the **Course Info** page and post them to a General discussion.
+.. note:: To assure that your students understand why they cannot add to 
+  discussions, you can add the dates that discussions are closed to the
+  **Course Info** page and post them to a General discussion.
 
 =====================================
 Start-End Date Format Specification
@@ -518,4 +582,6 @@ reopen:
      :alt: Same policy value but with a line feed after each bracket and comma,
          and an indent before each date
 
-.. For examples of email messages that you can send to let students know when the course discussions are closed (or open), see :ref:`Example Messages to Students`.
+For examples of email messages that you can send to let students know when the
+course discussions are closed (or open), see :ref:`Example Messages to
+Students`.

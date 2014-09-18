@@ -20,12 +20,6 @@ data: |
           height: 350,
           lightbox: false
         });
-        $(document).keydown(function(event) {
-          if (event.keyCode == 32) {
-            event.preventDefault();
-            $('.loupe img').click();
-          }
-        });
       });
       // ]]></script>
       <div id="ap_listener_added"></div>

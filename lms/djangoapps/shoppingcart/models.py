@@ -317,6 +317,31 @@ class OrderItem(models.Model):
         return ''
 
 
+class Invoice(models.Model):
+    """
+         This table capture all the information needed to support "invoicing"
+         which is when a user wants to purchase Registration Codes,
+         but will not do so via a Credit Card transaction.
+    """
+    company_name = models.CharField(max_length=255, db_index=True)
+    company_contact_name = models.CharField(max_length=255)
+    company_contact_email = models.CharField(max_length=255)
+    recipient_name = models.CharField(max_length=255)
+    recipient_email = models.CharField(max_length=255)
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, null=True)
+    address_line_3 = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    state = models.CharField(max_length=255, null=True)
+    zip = models.CharField(max_length=15, null=True)
+    country = models.CharField(max_length=64, null=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
+    total_amount = models.FloatField()
+    internal_reference = models.CharField(max_length=255, null=True)
+    customer_reference_number = models.CharField(max_length=63, null=True)
+    is_valid = models.BooleanField(default=True)
+
+
 class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
@@ -324,9 +349,9 @@ class CourseRegistrationCode(models.Model):
     """
     code = models.CharField(max_length=32, db_index=True, unique=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
-    transaction_group_name = models.CharField(max_length=255, db_index=True, null=True, blank=True)
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
+    invoice = models.ForeignKey(Invoice, null=True)
 
     @classmethod
     @transaction.commit_on_success
@@ -478,8 +503,11 @@ class PaidCourseRegistration(OrderItem):
         """
         Is the course defined by course_id contained in the order?
         """
-        return course_id in [item.paidcourseregistration.course_id
-                             for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
+        return course_id in [
+            item.course_id
+            for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")
+            if isinstance(item, cls)
+        ]
 
     @classmethod
     def get_total_amount_of_purchased_item(cls, course_key):
@@ -571,7 +599,7 @@ class PaidCourseRegistration(OrderItem):
         Generates instructions when the user has purchased a PaidCourseRegistration.
         Basically tells the user to visit the dashboard to see their new classes
         """
-        notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a> to see your new enrollments.')
+        notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a>  to see your new course.')
                         .format(dashboard_link=reverse('dashboard')))
 
         return self.pk_with_subclass, set([notification])

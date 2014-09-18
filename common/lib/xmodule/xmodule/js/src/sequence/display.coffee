@@ -1,5 +1,6 @@
 class @Sequence
   constructor: (element) ->
+    @requestToken = $(element).data('request-token')
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @content_container = @$('#seq_content')
@@ -102,7 +103,7 @@ class @Sequence
       current_tab = @contents.eq(new_position - 1)
       @content_container.html(current_tab.text()).attr("aria-labelledby", current_tab.attr("aria-labelledby"))
 
-      XBlock.initializeBlocks(@content_container)
+      XBlock.initializeBlocks(@content_container, @requestToken)
 
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 

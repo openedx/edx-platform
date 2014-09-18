@@ -26,14 +26,16 @@ class FakeContentTask(FakeInfo):
     FEATURES = [
         'task_input',
         'task_output',
+        'requester',
     ]
 
-    def __init__(self, email_id, num_sent, sent_to):
+    def __init__(self, email_id, num_sent, num_failed, sent_to):
         super(FakeContentTask, self).__init__()
         self.task_input = {'email_id': email_id, 'to_option': sent_to}
         self.task_input = json.dumps(self.task_input)
-        self.task_output = {'total': num_sent}
+        self.task_output = {'succeeded': num_sent, 'failed': num_failed}
         self.task_output = json.dumps(self.task_output)
+        self.requester = 'expected'
 
     def make_invalid_input(self):
         """Corrupt the task input field to test errors"""
@@ -67,7 +69,8 @@ class FakeEmailInfo(FakeInfo):
         u'created',
         u'sent_to',
         u'email',
-        u'number_sent'
+        u'number_sent',
+        u'requester',
     ]
 
     EMAIL_FEATURES = [
@@ -76,9 +79,15 @@ class FakeEmailInfo(FakeInfo):
         u'id'
     ]
 
-    def __init__(self, fake_email, num_sent):
+    def __init__(self, fake_email, num_sent, num_failed):
         super(FakeEmailInfo, self).__init__()
         self.created = get_default_time_display(fake_email.created)
-        self.number_sent = num_sent
+
+        number_sent = str(num_sent) + ' sent'
+        if num_failed > 0:
+            number_sent += ', ' + str(num_failed) + " failed"
+
+        self.number_sent = number_sent
         fake_email_dict = fake_email.to_dict()
         self.email = {feature: fake_email_dict[feature] for feature in self.EMAIL_FEATURES}
+        self.requester = u'expected'

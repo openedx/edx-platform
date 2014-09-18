@@ -220,7 +220,7 @@ var CohortManager = (function ($) {
                 });
             } else if (state == state_detail) {
                 detail_header.text("Members of " + cohort_title);
-                $.ajax(detail_url).done(show_users).fail(function() {
+                $.ajax(detail_url, {data: {page: 1}}).done(show_users).fail(function() {
                     log_error("Error trying to load users in cohort");
                 });
             }

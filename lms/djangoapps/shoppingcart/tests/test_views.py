@@ -96,8 +96,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         """
         add dummy registration code into models
         """
-        course_reg_code = CourseRegistrationCode(code=self.reg_code, course_id=course_key,
-                                                 transaction_group_name='A', created_by=self.user)
+        course_reg_code = CourseRegistrationCode(code=self.reg_code, course_id=course_key, created_by=self.user)
         course_reg_code.save()
 
     def add_course_to_user_cart(self):
@@ -758,7 +757,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertFalse(context['date_fmt_error'])
-        self.assertIn(_("Download CSV Reports"), response.content)
+        self.assertIn(_("Download CSV Reports"), response.content.decode('UTF-8'))
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_report_csv_bad_date(self):
@@ -771,7 +770,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertFalse(context['total_count_error'])
         self.assertTrue(context['date_fmt_error'])
         self.assertIn(_("There was an error in your date input.  It should be formatted as YYYY-MM-DD"),
-                      response.content)
+                      response.content.decode('UTF-8'))
 
     CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
 

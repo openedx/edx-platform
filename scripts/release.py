@@ -4,19 +4,26 @@ a release-master multitool
 """
 from __future__ import print_function, unicode_literals
 import sys
-from path import path
-from git import Repo, Commit
-from git.refs.symbolic import SymbolicReference
 import argparse
 from datetime import date, timedelta
-from dateutil.parser import parse as parse_datestring
 import re
 import collections
 import functools
 import textwrap
-import requests
 import json
 import getpass
+
+try:
+    from path import path
+    from git import Repo, Commit
+    from git.refs.symbolic import SymbolicReference
+    from dateutil.parser import parse as parse_datestring
+    import requests
+except ImportError:
+    print("Error: missing dependencies! Please run this command to install them:")
+    print("pip install path.py requests python-dateutil GitPython==0.3.2.RC1")
+    sys.exit(1)
+
 try:
     from pygments.console import colorize
 except ImportError:
@@ -149,8 +156,56 @@ def create_github_creds():
             headers=headers, data=json.dumps(payload),
         )
     if not response.ok:
-        raise requests.exceptions.RequestException(response.json()["message"])
+        message = response.json()["message"]
+        if message != "Validation Failed":
+            raise requests.exceptions.RequestException(message)
+        else:
+            # A token called "edx-release" already exists on Github.
+            # Delete it, and try again.
+            token_id = get_github_auth_id(username, password, "edx-release")
+            if token_id:
+                delete_github_auth_token(username, password, token_id)
+            response = requests.post(
+                "https://api.github.com/authorizations",
+                auth=(username, password),
+                headers=headers, data=json.dumps(payload),
+            )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
+
     return (username, response.json()["token"])
+
+
+def get_github_auth_id(username, password, note):
+    """
+    Return the ID associated with the Github auth token with the given note.
+    If no such auth token exists, return None.
+    """
+    response = requests.get(
+        "https://api.github.com/authorizations",
+        auth=(username, password),
+        headers={"User-Agent": "edx-release"},
+    )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
+
+    for auth_token in response.json():
+        if auth_token["note"] == "edx-release":
+            return auth_token["id"]
+    return None
+
+
+def delete_github_auth_token(username, password, token_id):
+    response = requests.delete(
+        "https://api.github.com/authorizations/{id}".format(id=token_id),
+        auth=(username, password),
+        headers={"User-Agent": "edx-release"},
+    )
+    if not response.ok:
+        message = response.json()["message"]
+        raise requests.exceptions.RequestException(message)
 
 
 def ensure_github_creds(attempts=3):

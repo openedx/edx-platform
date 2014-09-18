@@ -5,6 +5,7 @@
 import copy
 import mock
 import shutil
+import lxml
 
 from datetime import timedelta
 from fs.osfs import OSFS
@@ -28,9 +29,9 @@ from xmodule.exceptions import NotFoundError, InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation, CourseLocator
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 
@@ -48,19 +49,13 @@ from opaque_keys import InvalidKeyError
 from contentstore.tests.utils import get_url
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 
+from unittest import skipIf
+
+from course_action_state.managers import CourseActionStateItemNotFoundError
+
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
-
-
-class MongoCollectionFindWrapper(object):
-    def __init__(self, original):
-        self.original = original
-        self.counter = 0
-
-    def find(self, query, *args, **kwargs):
-        self.counter = self.counter + 1
-        return self.original(query, *args, **kwargs)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -88,13 +83,13 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         component_types should cause 'Video' to be present.
         """
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course = course_items[0]
         course.advanced_modules = component_types
         store.update_item(course, self.user.id)
 
         # just pick one vertical
-        descriptor = store.get_items(course.id, category='vertical',)
+        descriptor = store.get_items(course.id, qualifiers={'category': 'vertical'})
         resp = self.client.get_html(get_url('container_handler', descriptor[0].location))
         self.assertEqual(resp.status_code, 200)
 
@@ -115,7 +110,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_malformed_edit_unit_request(self):
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
 
         # just pick one vertical
         usage_key = course_items[0].id.make_usage_key('vertical', None)
@@ -125,9 +120,9 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def check_edit_unit(self, test_course_name):
         """Verifies the editing HTML in all the verticals in the given test course"""
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', [test_course_name])
 
-        items = self.store.get_items(course_items[0].id, category='vertical')
+        items = self.store.get_items(course_items[0].id, qualifiers={'category': 'vertical'})
         self._check_verticals(items)
 
     def test_edit_unit_toy(self):
@@ -147,7 +142,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         both draft and non-draft copies.
         '''
         store = self.store
-        _, course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
         html_usage_key = course_key.make_usage_key('html', 'test_html')
 
@@ -262,7 +257,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertEqual(num_drafts, 1)
 
     def test_no_static_link_rewrites_on_import(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course = course_items[0]
 
         handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
@@ -286,10 +281,10 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         self.assertGreater(len(course.textbooks), 0)
 
     def test_import_polls(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
 
-        items = self.store.get_items(course_key, category='poll_question')
+        items = self.store.get_items(course_key, qualifiers={'category': 'poll_question'})
         found = len(items) > 0
 
         self.assertTrue(found)
@@ -306,7 +301,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         Tests the ajax callback to render an XModule
         """
         direct_store = self.store
-        _, course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(direct_store, self.user.id, 'common/test/data/', ['toy'])
         usage_key = course_items[0].id.make_usage_key('vertical', 'vertical_test')
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         resp = self.client.get_json(
@@ -356,7 +351,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_key = course_items[0].id
         effort = self.store.get_item(course_key.make_usage_key('about', 'effort'))
         self.assertEqual(effort.data, '6 hours')
@@ -459,7 +454,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         content_store = contentstore()
         trash_store = contentstore('trashcan')
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
         location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
@@ -617,7 +612,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         course_id = course_items[0].id
 
@@ -643,7 +638,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         filesystem = OSFS(root_dir / 'test_export')
         self.assertTrue(filesystem.exists(dirname))
 
-        items = store.get_items(course_id, category=category_name)
+        items = store.get_items(course_id, qualifiers={'category': category_name})
 
         for item in items:
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
@@ -742,7 +737,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -768,7 +763,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['word_cloud'])
         course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
 
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -795,7 +790,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        verticals = self.store.get_items(course_id, category='vertical')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
         self.assertGreater(len(verticals), 0)
 
@@ -844,7 +839,7 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
     def test_course_handouts_rewrites(self):
         # import a test course
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         handouts_location = course_id.make_usage_key('course_info', 'handouts')
@@ -863,18 +858,17 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
         import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
-        wrapper = MongoCollectionFindWrapper(mongo_store.collection.find)
-        mongo_store.collection.find = wrapper.find
-
+        # make sure we haven't done too many round trips to DB
+        # note we say 4 round trips here for:
+        # 1) to get the run id
+        # 2) the course,
+        # 3 & 4) for the chapters and sequentials
+        # Because we're querying from the top of the tree, we cache information needed for inheritance,
+        # so we don't need to make an extra query to compute it.
         # set the branch to 'publish' in order to prevent extra lookups of draft versions
         with mongo_store.branch_setting(ModuleStoreEnum.Branch.published_only):
-            course = mongo_store.get_course(course_id, depth=2)
-
-            # make sure we haven't done too many round trips to DB
-            # note we say 3 round trips here for 1) the course, and 2 & 3) for the chapters and sequentials
-            # Because we're querying from the top of the tree, we cache information needed for inheritance,
-            # so we don't need to make an extra query to compute it.
-            self.assertEqual(wrapper.counter, 3)
+            with check_mongo_calls(4, 0):
+                course = mongo_store.get_course(course_id, depth=2)
 
             # make sure we pre-fetched a known sequential which should be at depth=2
             self.assertTrue(course_id.make_usage_key('sequential', 'vertical_sequential') in course.system.module_data)
@@ -882,19 +876,16 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
             # make sure we don't have a specific vertical which should be at depth=3
             self.assertFalse(course_id.make_usage_key('vertical', 'vertical_test') in course.system.module_data)
 
-        # Now, test with the branch set to draft.  We should have one extra round trip call to check for
-        # the existence of the draft versions
-        wrapper.counter = 0
-        mongo_store.get_course(course_id, depth=2)
-        self.assertEqual(wrapper.counter, 4)
-
+        # Now, test with the branch set to draft. No extra round trips b/c it doesn't go deep enough to get
+        # beyond direct only categories
+        with mongo_store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+            with check_mongo_calls(4, 0):
+                mongo_store.get_course(course_id, depth=2)
 
     def test_export_course_without_content_store(self):
-        content_store = contentstore()
-
         # Create toy course
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
         course_id = course_items[0].id
 
         root_dir = path(mkdtemp_clean())
@@ -916,8 +907,10 @@ class ContentStoreToyCourseTest(ContentStoreTestCase):
 
         items = self.store.get_items(
             course_id,
-            category='sequential',
-            name='vertical_sequential'
+            qualifiers={
+                'category': 'sequential',
+                'name': 'vertical_sequential',
+            }
         )
         self.assertEqual(len(items), 1)
 
@@ -1115,8 +1108,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
-        self.assert_course_creation_failed(
-            r"(?s)Unable to create course 'Robot Super Course'.*: Invalid characters in u'University of California, Berkeley'")
+        self.assert_course_creation_failed(r"(?s)Unable to create course 'Robot Super Course'.*")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
@@ -1209,7 +1201,7 @@ class ContentStoreTest(ContentStoreTestCase):
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
-            '<article class="outline outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(
+            '<article class="outline outline-complex outline-course" data-locator="{locator}" data-course-key="{course_key}">'.format(
                 locator='i4x://MITx/999/course/Robot_Super_Course',
                 course_key='MITx/999/Robot_Super_Course',
             ),
@@ -1269,7 +1261,7 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['simple'])
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
@@ -1398,10 +1390,10 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
-        _, course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
+        course_items = import_from_xml(self.store, self.user.id, 'common/test/data/', ['toy'])
 
         course = course_items[0]
-        verticals = self.store.get_items(course.id, category='vertical')
+        verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
@@ -1410,35 +1402,32 @@ class ContentStoreTest(ContentStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = course.id.make_usage_key('html', 'new_component')
-
         # crate a new module and add it as a child to a vertical
-        new_object = self.store.create_xmodule(new_component_location)
-        self.store.update_item(new_object, self.user.id, allow_not_found=True)
         parent = verticals[0]
-        parent.children.append(new_component_location)
-        self.store.update_item(parent, self.user.id)
+        new_block = self.store.create_child(
+            self.user.id, parent.location, 'html', 'new_component'
+        )
 
         # flush the cache
-        new_module = self.store.get_item(new_component_location)
+        new_block = self.store.get_item(new_block.location)
 
         # check for grace period definition which should be defined at the course level
-        self.assertEqual(parent.graceperiod, new_module.graceperiod)
-        self.assertEqual(parent.start, new_module.start)
-        self.assertEqual(course.start, new_module.start)
+        self.assertEqual(parent.graceperiod, new_block.graceperiod)
+        self.assertEqual(parent.start, new_block.start)
+        self.assertEqual(course.start, new_block.start)
 
-        self.assertEqual(course.xqa_key, new_module.xqa_key)
+        self.assertEqual(course.xqa_key, new_block.xqa_key)
 
         #
         # now let's define an override at the leaf node level
         #
-        new_module.graceperiod = timedelta(1)
-        self.store.update_item(new_module, self.user.id)
+        new_block.graceperiod = timedelta(1)
+        self.store.update_item(new_block, self.user.id)
 
         # flush the cache and refetch
-        new_module = self.store.get_item(new_component_location)
+        new_block = self.store.get_item(new_block.location)
 
-        self.assertEqual(timedelta(1), new_module.graceperiod)
+        self.assertEqual(timedelta(1), new_block.graceperiod)
 
     def test_default_metadata_inheritance(self):
         course = CourseFactory.create()
@@ -1467,7 +1456,7 @@ class ContentStoreTest(ContentStoreTestCase):
         content_store = contentstore()
 
         # Use conditional_and_poll, as it's got an image already
-        __, courses = import_from_xml(
+        courses = import_from_xml(
             self.store,
             self.user.id,
             'common/test/data/',
@@ -1572,85 +1561,135 @@ class RerunCourseTest(ContentStoreTestCase):
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
         }
-        self.destination_course_key = _get_course_id(self.destination_course_data)
 
-    def post_rerun_request(self, source_course_key, response_code=200):
+    def post_rerun_request(
+            self, source_course_key, destination_course_data=None, response_code=200, expect_error=False
+    ):
         """Create and send an ajax post for the rerun request"""
 
         # create data to post
         rerun_course_data = {'source_course_key': unicode(source_course_key)}
-        rerun_course_data.update(self.destination_course_data)
+        if not destination_course_data:
+            destination_course_data = self.destination_course_data
+        rerun_course_data.update(destination_course_data)
+        destination_course_key = _get_course_id(destination_course_data)
 
         # post the request
-        course_url = get_url('course_handler', self.destination_course_key, 'course_key_string')
+        course_url = get_url('course_handler', destination_course_key, 'course_key_string')
         response = self.client.ajax_post(course_url, rerun_course_data)
 
         # verify response
         self.assertEqual(response.status_code, response_code)
-        if response_code == 200:
-            self.assertNotIn('ErrMsg', parse_json(response))
+        if not expect_error:
+            json_resp = parse_json(response)
+            self.assertNotIn('ErrMsg', json_resp)
+            destination_course_key = CourseKey.from_string(json_resp['destination_course_key'])
+        return destination_course_key
 
-    def create_course_listing_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the course listing section"""
-        return '<a class="course-link" href="/course/{}"'.format(course_key)
+    def get_course_listing_elements(self, html, course_key):
+        """Returns the elements in the course listing section of html that have the given course_key"""
+        return html.cssselect('.course-item[data-course-key="{}"]'.format(unicode(course_key)))
 
-    def create_unsucceeded_course_action_html(self, course_key):
-        """Creates html fragment that is created for the given course_key in the unsucceeded course action section"""
-        # TODO LMS-11011 Update this once the Rerun UI is implemented.
-        return '<div class="unsucceeded-course-action" href="/course/{}"'.format(course_key)
+    def get_unsucceeded_course_action_elements(self, html, course_key):
+        """Returns the elements in the unsucceeded course action section that have the given course_key"""
+        return html.cssselect('.courses-processing li[data-course-key="{}"]'.format(unicode(course_key)))
 
     def assertInCourseListing(self, course_key):
         """
         Asserts that the given course key is in the accessible course listing section of the html
         and NOT in the unsucceeded course action section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertIn(self.create_course_listing_html(course_key), course_listing_html.content)
-        self.assertNotIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 1)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
     def assertInUnsucceededCourseActions(self, course_key):
         """
         Asserts that the given course key is in the unsucceeded course action section of the html
         and NOT in the accessible course listing section of the html.
         """
-        course_listing_html = self.client.get_html('/course/')
-        self.assertNotIn(self.create_course_listing_html(course_key), course_listing_html.content)
-        # TODO Uncomment this once LMS-11011 is implemented.
-        # self.assertIn(self.create_unsucceeded_course_action_html(course_key), course_listing_html.content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
+        self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
+
+    def verify_rerun_course(self, source_course_key, destination_course_key, destination_display_name):
+        """
+        Verify the contents of the course rerun action
+        """
+        rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+        expected_states = {
+            'state': CourseRerunUIStateManager.State.SUCCEEDED,
+            'display_name': destination_display_name,
+            'source_course_key': source_course_key,
+            'course_key': destination_course_key,
+            'should_display': True,
+        }
+        for field_name, expected_value in expected_states.iteritems():
+            self.assertEquals(getattr(rerun_state, field_name), expected_value)
+
+        # Verify that the creator is now enrolled in the course.
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, destination_course_key))
+
+        # Verify both courses are in the course listing section
+        self.assertInCourseListing(source_course_key)
+        self.assertInCourseListing(destination_course_key)
+
 
     def test_rerun_course_success(self):
         source_course = CourseFactory.create()
-        self.post_rerun_request(source_course.id)
+        destination_course_key = self.post_rerun_request(source_course.id)
+        self.verify_rerun_course(source_course.id, destination_course_key, self.destination_course_data['display_name'])
 
-        # Verify that the course rerun action is marked succeeded
-        rerun_state = CourseRerunState.objects.find_first(course_key=self.destination_course_key)
-        self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.SUCCEEDED)
+    def test_rerun_of_rerun(self):
+        source_course = CourseFactory.create()
+        rerun_course_key = self.post_rerun_request(source_course.id)
+        rerun_of_rerun_data = {
+            'org': rerun_course_key.org,
+            'number': rerun_course_key.course,
+            'display_name': 'rerun of rerun',
+            'run': 'rerun2'
+        }
+        rerun_of_rerun_course_key = self.post_rerun_request(rerun_course_key, rerun_of_rerun_data)
+        self.verify_rerun_course(rerun_course_key, rerun_of_rerun_course_key, rerun_of_rerun_data['display_name'])
 
-        # Verify that the creator is now enrolled in the course.
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.destination_course_key))
+    def test_rerun_course_fail_no_source_course(self):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ALLOW_COURSE_RERUNS': True}):
+            existent_course_key = CourseFactory.create().id
+            non_existent_course_key = CourseLocator("org", "non_existent_course", "non_existent_run")
+            destination_course_key = self.post_rerun_request(non_existent_course_key)
 
-        # Verify both courses are in the course listing section
-        self.assertInCourseListing(source_course.id)
-        self.assertInCourseListing(self.destination_course_key)
+            # Verify that the course rerun action is marked failed
+            rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+            self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+            self.assertIn("Cannot find a course at", rerun_state.message)
 
-    def test_rerun_course_fail(self):
+            # Verify that the creator is not enrolled in the course.
+            self.assertFalse(CourseEnrollment.is_enrolled(self.user, non_existent_course_key))
+
+            # Verify that the existing course continues to be in the course listings
+            self.assertInCourseListing(existent_course_key)
+
+            # Verify that the failed course is NOT in the course listings
+            self.assertInUnsucceededCourseActions(destination_course_key)
+
+    def test_rerun_course_fail_duplicate_course(self):
         existent_course_key = CourseFactory.create().id
-        non_existent_course_key = CourseLocator("org", "non_existent_course", "run")
-        self.post_rerun_request(non_existent_course_key)
+        destination_course_data = {
+            'org': existent_course_key.org,
+            'number': existent_course_key.course,
+            'display_name': 'existing course',
+            'run': existent_course_key.run
+        }
+        destination_course_key = self.post_rerun_request(
+            existent_course_key, destination_course_data, expect_error=True
+        )
 
-        # Verify that the course rerun action is marked failed
-        rerun_state = CourseRerunState.objects.find_first(course_key=self.destination_course_key)
-        self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
-        self.assertIn("Cannot find a course at", rerun_state.message)
+        # Verify that the course rerun action doesn't exist
+        with self.assertRaises(CourseActionStateItemNotFoundError):
+            CourseRerunState.objects.find_first(course_key=destination_course_key)
 
-        # Verify that the creator is not enrolled in the course.
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, non_existent_course_key))
-
-        # Verify that the existing course continues to be in the course listings
+        # Verify that the existing course continues to be in the course listing
         self.assertInCourseListing(existent_course_key)
-
-        # Verify that the failed course is NOT in the course listings
-        self.assertInUnsucceededCourseActions(non_existent_course_key)
 
     def test_rerun_with_permission_denied(self):
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
@@ -1658,7 +1697,19 @@ class RerunCourseTest(ContentStoreTestCase):
             auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.user.is_staff = False
             self.user.save()
-            self.post_rerun_request(source_course.id, 403)
+            self.post_rerun_request(source_course.id, response_code=403, expect_error=True)
+
+    def test_rerun_error(self):
+        error_message = "Mock Error Message"
+        with mock.patch(
+                'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
+                mock.Mock(side_effect=Exception(error_message))
+        ):
+            source_course = CourseFactory.create()
+            destination_course_key = self.post_rerun_request(source_course.id)
+            rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+            self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+            self.assertIn(error_message, rerun_state.message)
 
 
 class EntryPageTestCase(TestCase):
@@ -1705,6 +1756,6 @@ def _course_factory_create_course():
     return CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
 
-def _get_course_id(course_data):
+def _get_course_id(course_data, key_class=SlashSeparatedCourseKey):
     """Returns the course ID (org/number/run)."""
-    return SlashSeparatedCourseKey(course_data['org'], course_data['number'], course_data['run'])
+    return key_class(course_data['org'], course_data['number'], course_data['run'])

@@ -87,7 +87,7 @@ class TrackMiddleware(object):
         Extract information from the request and add it to the tracking
         context.
 
-        The following fields are injected in to the context:
+        The following fields are injected into the context:
 
         * session - The Django session key that identifies the user's session.
         * user_id - The numeric ID for the logged in user.
@@ -96,6 +96,7 @@ class TrackMiddleware(object):
         * host - The "SERVER_NAME" header, which should be the name of the server running this code.
         * agent - The client browser identification string.
         * path - The path part of the requested URL.
+        * client_id - The unique key used by Google Analytics to identify a user
         """
         context = {
             'session': self.get_session_key(request),
@@ -104,6 +105,14 @@ class TrackMiddleware(object):
         }
         for header_name, context_key in META_KEY_TO_CONTEXT_KEY.iteritems():
             context[context_key] = request.META.get(header_name, '')
+
+        # Google Analytics uses the clientId to keep track of unique visitors. A GA cookie looks like 
+        # this: _ga=GA1.2.1033501218.1368477899. The clientId is this part: 1033501218.1368477899.
+        google_analytics_cookie = request.COOKIES.get('_ga')
+        if google_analytics_cookie is None:
+            context['client_id'] = None
+        else:
+            context['client_id'] = '.'.join(google_analytics_cookie.split('.')[2:])
 
         context.update(contexts.course_context_from_url(request.build_absolute_uri()))
 

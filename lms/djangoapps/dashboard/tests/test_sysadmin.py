@@ -538,8 +538,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             with (override_settings(TIME_ZONE=timezone)):
                 date_text = get_time_display(date, tz_format, settings.TIME_ZONE)
                 response = self.client.get(reverse('gitlogs'))
-
-                self.assertIn(date_text, response.content)
+                self.assertIn(date_text, response.content.decode('UTF-8'))
 
         self._rm_edx4edx()
 

@@ -16,7 +16,6 @@ from edxmako.shortcuts import render_to_response
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from student.models import CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 
@@ -30,20 +29,52 @@ class ChooseModeView(View):
         from the selection page, parses the response, and then sends user
         to the next step in the flow
     """
+
     @method_decorator(login_required)
     def get(self, request, course_id, error=None):
-        """ Displays the course mode choice page """
+        """ Displays the course mode choice page
 
+        Args:
+            request (`Request`): The Django Request object.
+            course_id (unicode): The slash-separated course key.
+
+        Keyword Args:
+            error (unicode): If provided, display this error message
+                on the page.
+
+        Returns:
+            Response
+
+        """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         upgrade = request.GET.get('upgrade', False)
         request.session['attempting_upgrade'] = upgrade
 
+        # TODO (ECOM-16): Remove once the AB-test of auto-registration completes
+        auto_register = request.session.get('auto_register', False)
+
         # Inactive users always need to re-register
-        # verified and professional users do not need to register or upgrade
-        # registered users who are not trying to upgrade do not need to re-register
-        if is_active and (upgrade is False or enrollment_mode == 'verified' or enrollment_mode == 'professional'):
+        # Verified and professional users do not need to register or upgrade
+        # Registered users who are not trying to upgrade do not need to re-register
+        if not auto_register:
+            go_to_dashboard = (
+                is_active and
+                (not upgrade or enrollment_mode in ['verified', 'professional'])
+            )
+
+        # If auto-registration is enabled, then students might already be registered,
+        # but we should still show them the "choose your track" page so they have
+        # the option to enter the verification/payment flow.
+        # TODO (ECOM-16): Based on the results of the AB-test, set the default behavior to
+        # either enable or disable auto-registration.
+        else:
+            go_to_dashboard = (
+                not upgrade and enrollment_mode in ['verified', 'professional']
+            )
+
+        if go_to_dashboard:
             return redirect(reverse('dashboard'))
 
         modes = CourseMode.modes_for_course_dict(course_key)
@@ -60,7 +91,7 @@ class ChooseModeView(View):
             )
 
         donation_for_course = request.session.get("donation_for_course", {})
-        chosen_price = donation_for_course.get(course_key, None)
+        chosen_price = donation_for_course.get(unicode(course_key), None)
 
         course = modulestore().get_course(course_key)
         context = {
@@ -73,6 +104,7 @@ class ChooseModeView(View):
             "error": error,
             "upgrade": upgrade,
             "can_audit": "audit" in modes,
+            "autoreg": auto_register
         }
         if "verified" in modes:
             context["suggested_prices"] = [
@@ -109,7 +141,9 @@ class ChooseModeView(View):
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
         if requested_mode in ("audit", "honor"):
-            CourseEnrollment.enroll(user, course_key, requested_mode)
+            # TODO (ECOM-16): Skip enrollment if we're in the experimental branch
+            if not request.session.get('auto_register', False):
+                CourseEnrollment.enroll(user, course_key, requested_mode)
             return redirect('dashboard')
 
         mode_info = allowed_modes[requested_mode]
@@ -131,7 +165,7 @@ class ChooseModeView(View):
                 return self.get(request, course_id, error=error_msg)
 
             donation_for_course = request.session.get("donation_for_course", {})
-            donation_for_course[course_key] = amount_value
+            donation_for_course[unicode(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
             return redirect(

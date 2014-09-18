@@ -10,6 +10,7 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 from django_startup import autostartup
 import edxmako
 import logging
+from monkey_patch import django_utils_translation
 import analytics
 
 log = logging.getLogger(__name__)
@@ -19,6 +20,13 @@ def run():
     """
     Executed during django startup
     """
+
+    # Patch the xml libs.
+    from safe_lxml import defuse_xml_libs
+    defuse_xml_libs()
+
+    django_utils_translation.patch()
+
     autostartup()
 
     add_mimetypes()
@@ -34,7 +42,7 @@ def run():
 
     # Initialize Segment.io analytics module. Flushes first time a message is received and 
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
-    if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
 
 

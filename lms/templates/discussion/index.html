@@ -23,8 +23,6 @@
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
 
-<article class="new-post-article"></article>
-
 <section class="discussion container" id="discussion-container"
          data-roles="${roles}"
          data-course-id="${course_id}"
@@ -39,6 +37,8 @@
     <div class="discussion-body">
         <div class="forum-nav"></div>
         <div class="discussion-column">
+          <article class="new-post-article" style="display: none"></article>
+          <div class="forum-content"></div>
         </div>
     </div>
 </section>

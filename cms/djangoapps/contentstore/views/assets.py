@@ -277,7 +277,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
-    asset_url = location.to_deprecated_string()
+    asset_url = StaticContent.serialize_asset_key_with_slash(location)
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
@@ -285,7 +285,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
         'url': asset_url,
         'external_url': external_url,
         'portable_url': StaticContent.get_static_path_from_location(location),
-        'thumbnail': thumbnail_location.to_deprecated_string() if thumbnail_location is not None else None,
+        'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
         'locked': locked,
         # Needed for Backbone delete/update.
         'id': unicode(location)

@@ -27,6 +27,8 @@ class PeerConfirmPage(PageObject):
         If `is_calibrating` is false, try to continue to peer grading.
         Otherwise, try to continue to calibration grading.
         """
-        self.q(css='input.calibration-interstitial-page-button'
-            if is_calibrating else 'input.interstitial-page-button'
-        ).first.click()
+        if is_calibrating:
+            css_selector = 'input.calibration-interstitial-page-button'
+        else:
+            css_selector = 'input.interstitial-page-button'
+        self.q(css=css_selector).first.click()

@@ -3,13 +3,14 @@ from collections import defaultdict
 import logging
 from datetime import datetime
 
+from course_groups.cohorts import get_cohort_by_id
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
-from django_comment_client.permissions import check_permissions_by_view
+from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 
 from edxmako import lookup_template
 import pystache_custom as pystache
@@ -57,7 +58,7 @@ def has_forum_access(uname, course_id, rolename):
 
 
 def _get_discussion_modules(course):
-    all_modules = modulestore().get_items(course.id, category='discussion')
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -258,7 +259,6 @@ def get_ability(course_id, content, user):
     return {
         'editable': check_permissions_by_view(user, course_id, content, "update_thread" if content['type'] == 'thread' else "update_comment"),
         'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
-        'can_endorse': check_permissions_by_view(user, course_id, content, "endorse_comment") if content['type'] == 'comment' else False,
         'can_delete': check_permissions_by_view(user, course_id, content, "delete_thread" if content['type'] == 'thread' else "delete_comment"),
         'can_openclose': check_permissions_by_view(user, course_id, content, "openclose_thread") if content['type'] == 'thread' else False,
         'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
@@ -293,7 +293,11 @@ def get_annotated_content_infos(course_id, thread, user, user_info):
 
     def annotate(content):
         infos[str(content['id'])] = get_annotated_content_info(course_id, content, user, user_info)
-        for child in content.get('children', []):
+        for child in (
+                content.get('children', []) +
+                content.get('endorsed_responses', []) +
+                content.get('non_endorsed_responses', [])
+        ):
             annotate(child)
     annotate(thread)
     return infos
@@ -361,23 +365,58 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def safe_content(content, is_staff=False):
+def safe_content(content, course_id, is_staff=False):
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
-        'stats', 'resp_skip', 'resp_limit', 'resp_total',
-
+        'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers',
+        'stats', 'resp_skip', 'resp_limit', 'resp_total', 'thread_type',
+        'endorsed_responses', 'non_endorsed_responses', 'non_endorsed_resp_total',
+        'endorsement',
     ]
 
     if (content.get('anonymous') is False) and ((content.get('anonymous_to_peers') is False) or is_staff):
         fields += ['username', 'user_id']
 
-    if 'children' in content:
-        safe_children = [safe_content(child) for child in content['children']]
-        content['children'] = safe_children
+    content = strip_none(extract(content, fields))
 
-    return strip_none(extract(content, fields))
+    if content.get("endorsement"):
+        endorsement = content["endorsement"]
+        endorser = None
+        if endorsement["user_id"]:
+            try:
+                endorser = User.objects.get(pk=endorsement["user_id"])
+            except User.DoesNotExist:
+                log.error("User ID {0} in endorsement for comment {1} but not in our DB.".format(
+                    content.get('user_id'),
+                    content.get('id'))
+                )
+
+        # Only reveal endorser if requester can see author or if endorser is staff
+        if (
+            endorser and
+            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_id))
+        ):
+            endorsement["username"] = endorser.username
+        else:
+            del endorsement["user_id"]
+
+    for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
+        if child_content_key in content:
+            safe_children = [
+                safe_content(child, course_id, is_staff) for child in content[child_content_key]
+            ]
+            content[child_content_key] = safe_children
+
+    return content
+
+
+def add_thread_group_name(thread_info, course_key):
+    """
+    Augment the specified thread info to include the group name if a group id is present.
+    """
+    if thread_info.get('group_id') is not None:
+        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name

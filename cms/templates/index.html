@@ -77,7 +77,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
       % if course_creator_status=='granted':
       <div class="wrapper-create-element wrapper-create-course">
-        <form class="create-course course-info" id="create-course-form" name="create-course-form">
+        <form class="form-create create-course course-info" id="create-course-form" name="create-course-form">
           <div class="wrap-error">
             <div id="course_creation_error" name="course_creation_error" class="message message-status message-status error" role="alert">
             <p>${_("Please correct the highlighted fields below.")}</p>
@@ -123,7 +123,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           </div>
 
           <div class="actions">
-            <input type="hidden" value="${ allow_unicode_course_id }" class="allow-unicode-course-id" />
+            <input type="hidden" value="${allow_unicode_course_id}" class="allow-unicode-course-id" />
             <input type="submit" value="${_('Create')}" class="action action-primary new-course-save" />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
@@ -131,35 +131,139 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
       </div>
       % endif
 
+      <!-- STATE: processing courses -->
+      %if allow_course_reruns and rerun_creator_status and len(in_process_course_actions) > 0:
+      <div class="courses courses-processing">
+          <h3 class="title">Courses Being Processed</h3>
+
+          <ul class="list-courses">
+            %for course_info in sorted(in_process_course_actions, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+            <!-- STATE: re-run is processing -->
+            %if course_info['is_in_progress']:
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
+              <div class="course-item course-rerun is-processing">
+                <div class="course-details" href="#">
+                  <h3 class="course-title">${course_info['display_name']}</h3>
+
+                  <div class="course-metadata">
+                    <span class="course-org metadata-item">
+                      <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
+                    </span>
+                    <span class="course-num metadata-item">
+                      <span class="label">${_("Course Number:")}</span>
+                      <span class="value">${course_info['number']}</span>
+                    </span>
+                    <span class="course-run metadata-item">
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <dl class="course-status">
+                  <dt class="label sr">This re-run processing status:</dt>
+                  <dd class="value">
+                    <i class="icon icon-refresh icon-spin"></i>
+                    <span class="copy">Configuring as re-run</span>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="status-message">
+                <p class="copy">${_('The new course will be added to your course list in 5-10 minutes. Return to this page or <a href="#" class="action-reload">refresh it</a> to update the course list. The new course will need some manual configuration.')}</p>
+              </div>
+            </li>
+            %endif
+
+            <!-- - - - -->
+
+            <!-- STATE: re-run has error -->
+            %if course_info['is_failed']:
+            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
+              <div class="course-item course-rerun has-error">
+                <div class="course-details" href="#">
+                  <h3 class="course-title">${course_info['display_name']}</h3>
+
+                  <div class="course-metadata">
+                    <span class="course-org metadata-item">
+                      <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
+                    </span>
+                    <span class="course-num metadata-item">
+                      <span class="label">${_("Course Number:")}</span>
+                      <span class="value">${course_info['number']}</span>
+                    </span>
+                    <span class="course-run metadata-item">
+                      <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <dl class="course-status">
+                  <dt class="label sr">This re-run processing status:</dt>
+                  <dd class="value">
+                    <i class="icon icon-warning-sign"></i>
+                    <span class="copy">Configuration Error</span>
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="status-message has-actions">
+                <p class="copy">${_("A system error occurred while your course was being processed. Please go to the original course to try the re-run again, or contact your PM for assistance.")}</p>
+
+                <ul  class="status-actions">
+                  <li class="action action-dismiss">
+                    <a href="#" class="button dismiss-button" data-dismiss-link="${course_info['dismiss_link']}">
+                      <i class="icon icon-remove-sign"></i>
+                      <span class="button-copy">${_("Dismiss")}</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            %endif
+            %endfor
+          </ul>
+      </div>
+      %endif
+
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-          <li class="course-item">
-            <a class="course-link" href="${url}">
-              <h3 class="course-title">${course}</h3>
+          %for course_info in sorted(courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+          <li class="course-item" data-course-key="${course_info['course_key']}">
+            <a class="course-link" href="${course_info['url']}">
+              <h3 class="course-title">${course_info['display_name']}</h3>
 
               <div class="course-metadata">
                 <span class="course-org metadata-item">
-                  <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
+                  <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
                 </span>
                 <span class="course-num metadata-item">
                   <span class="label">${_("Course Number:")}</span>
-                  <span class="value">${num}</span>
+                  <span class="value">${course_info['number']}</span>
                 </span>
                 <span class="course-run metadata-item">
-                  <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
+                  <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
                 </span>
               </div>
             </a>
 
             <ul  class="item-actions course-actions">
-              <li class="action">
-                <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+              % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
+              <li class="action action-rerun">
+                <a href="${course_info['rerun_link']}" class="button rerun-button">${_("Re-run Course")}</a>
+              </li>
+              % endif
+              <li class="action action-view">
+                <a href="${course_info['lms_link']}" rel="external" class="button view-button">${_("View Live")}</a>
               </li>
             </ul>
           </li>
           %endfor
+          % if allow_course_reruns and rerun_creator_status and course_creator_status=='granted':
+          <script type="text/javascript">
+              $('.course-item').addClass('can-rerun');
+          </script>
+          % endif
         </ul>
       </div>
 

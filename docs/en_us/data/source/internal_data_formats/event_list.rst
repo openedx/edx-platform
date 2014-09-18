@@ -1,11 +1,11 @@
 .. _event_list:
 
-##############
-Event List
-##############
+#######################
+Alphabetical Event List
+#######################
 
 .. list-table::
-   :widths: 30 30
+   :widths: 40 40
    :header-rows: 1
 
    * - Event
@@ -22,8 +22,6 @@ Event List
      - :ref:`Instructor_Event_Types`
    * - ``assigned_user_to_partition``
      - :ref:`AB_Event_Types`
-   * - ``peer_grading_show_question``
-     - :ref:`ora`
    * - ``book``
      - :ref:`pdf`
    * - ``calculate_grades_csv``
@@ -32,7 +30,17 @@ Event List
      - :ref:`AB_Event_Types`
    * - ``delete-student-module-state``
      - :ref:`Instructor_Event_Types`
-   * - ``dump_grades``
+   * - ``dump-answer-dist-csv``
+     - :ref:`Instructor_Event_Types`
+   * - ``dump-graded-assignments-config``
+     - :ref:`Instructor_Event_Types`
+   * - ``dump-grades``
+     - :ref:`Instructor_Event_Types`
+   * - ``dump-grades-csv``
+     - :ref:`Instructor_Event_Types`
+   * - ``dump-grades-csv-raw``
+     - :ref:`Instructor_Event_Types`
+   * - ``dump-grades-raw``
      - :ref:`Instructor_Event_Types`
    * - ``edx.course.enrollment.activated``
      - :ref:`enrollment` and :ref:`instructor_enrollment`
@@ -78,6 +86,22 @@ Event List
      - :ref:`ora`
    * - ``oe_show_respond_to_feedback``
      - :ref:`ora`
+   * - ``openassessmentblock.get_peer_submission``
+     - :ref:`ora2`
+   * - ``openassessmentblock.peer_assess``
+     - :ref:`ora2`
+   * - ``openassessmentblock.self_assess``
+     - :ref:`ora2`
+   * - ``openassessmentblock.submit_feedback_on_assessments``
+     - :ref:`ora2`
+   * - ``openassessment.create_submission``
+     - :ref:`ora2`
+   * - ``openassessment.save_submission``
+     - :ref:`ora2`
+   * - ``openassessment.student_training_assess_example``
+     - :ref:`ora2`
+   * - ``openassessment.upload_file``
+     - :ref:`ora2`
    * - ``page_close``
      - :ref:`navigational`
    * - ``pause_video``

@@ -1,8 +1,8 @@
 .. _Glossary:
 
-###################################################
+############
 Glossary
-###################################################
+############
 
 .. _A:
 
@@ -84,7 +84,9 @@ C
  
 **Component**
 
-  The part of a unit that contains your actual course content. A unit can contain one or more components. For more information, see :ref:`Components`.
+  The part of a unit that contains your actual course content. A unit can
+  contain one or more components. For more information, see :ref:`Developing
+  Course Components`.
 
 
 .. _Course Accordion:
@@ -152,15 +154,20 @@ D
   responsible for receiving course data from edX, and transferring it securely
   to researchers and other interested parties after it is received.
 
-  See `edX Research Guide`_.
-
-.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
+  See the `edX Research
+  Guide<http://edx.readthedocs.org/projects/devdata/en/latest/>`.
 
 .. _Discussion:
  
 **Discussion**
 
-  The set of topics defined to promote course-wide or unit-specific dialog. Students use the discussion topics to communicate with each other and the course staff in threaded excahnges. 
+  The set of topics defined to promote course-wide or unit-specific
+  conversation. Students use the discussion topics to communicate with each
+  other and the course staff in threaded exchanges.
+
+  A discussion is also a type of contribution that you can make to a topic to
+  start an open-ended dialogue. You can also contribute questions to the
+  discussion topics.
 
   See :ref:`Discussions` for more information.
 
@@ -229,7 +236,7 @@ F
 
 **Forum**
 
-  See :ref:`Discussion`.
+  See `Discussion`_.
 
 .. _G:
 
@@ -407,19 +414,11 @@ P
  
 **Preview Mode**
 
-  A view that allows you to see all the units of your course as students see them, regardless of whether the visibility of each unit is set to Public or Private and regardless of whether the release dates have passed.
+  A view that allows you to see all the units of your course as students see
+  them, regardless of the unit status and regardless of whether the release
+  dates have passed.
 
-  See :ref:`Preview Your Course` for more information.
-
-
-.. _Private Unit:
- 
-**Private Unit**
-
-  A unit whose **Visibility** option is set to Private so that students cannot see the unit, even if it is located in a subsection that has been released.
-
-  See :ref:`Public and Private Units` for more information.
-
+  See :ref:`Preview Course Content` for more information.
 
 
 
@@ -443,12 +442,28 @@ The page in the learning management system that shows students their scores on g
 
 .. _Public Unit:
  
-**Public Unit**
+.. **Public Unit**
 
-  A unit whose **Visibility** option is set to Public so that the unit is visible to students, if the subsection that contains the unit has been released.
+..  A unit whose **Visibility** option is set to Public so that the unit is
+..  visible to students, if the subsection that contains the unit has been
+..  released.
 
-  See :ref:`Public and Private Units` for more information.
+..  See :ref:`Public and Private Units` for more information.
 
+.. _Q:
+
+*****
+Q
+*****
+
+**Question**
+
+  A question is a type of contribution that you can make to a course discussion
+  topic to surface an issue that the course staff or other students can
+  resolve. 
+
+  See :ref:`Discussions` for more information.
+  
 .. _R:
 
 ****
@@ -480,7 +495,7 @@ S
 
   The topmost category in your course. A section can represent a time period in your course or another organizing principle.
 
-  See :ref:`Sections` for more information.
+  See :ref:`Developing Course Sections` for more information.
 
 
 .. _Short Course Description:
@@ -507,9 +522,7 @@ S
 
   A division that represents a topic in your course, or another organizing principle. Subsections are found inside sections and contain units. Subsections can also be called "lessons."
 
-  See :ref:`Subsections` for more information.
-
-
+  See :ref:`Developing Course Subsections` for more information.
 
 
 .. _T:
