@@ -55,11 +55,13 @@ class CourseCompletionsLeadersSerializer(serializers.Serializer):
 class CourseSerializer(serializers.Serializer):
     """ Serializer for Courses """
     id = serializers.CharField(source='id')
-    name = serializers.CharField(source='display_name')
-    category = serializers.CharField(source='location.category')
-    number = serializers.CharField(source='location.course')
-    org = serializers.CharField(source='location.org')
-    uri = serializers.SerializerMethodField('get_uri')
+    name = serializers.CharField(source='name')
+    category = serializers.CharField(source='category')
+    number = serializers.CharField(source='number')
+    org = serializers.CharField(source='org')
+    uri = serializers.CharField(source='uri')
+    course_image_url = serializers.CharField(source='course_image_url')
+    resources = serializers.CharField(source='resources')
     due = serializers.DateTimeField()
     start = serializers.DateTimeField()
     end = serializers.DateTimeField()
