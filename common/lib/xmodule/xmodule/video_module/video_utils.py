@@ -6,7 +6,6 @@ import logging
 import urllib
 import requests
 import re
-from urlparse import urlparse
 
 from django.conf import settings
 from requests.exceptions import RequestException

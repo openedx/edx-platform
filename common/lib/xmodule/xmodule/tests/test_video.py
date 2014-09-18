@@ -653,4 +653,3 @@ class VideoLinkTransienceTest(unittest.TestCase):
         # No key and secret are present.
         patched_settings.VIDEO_LINK_TRANSIENCE = {}
         self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
-
