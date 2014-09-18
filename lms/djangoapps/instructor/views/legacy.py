@@ -1427,18 +1427,6 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
 # Gradebook has moved to instructor.api.spoc_gradebook #
 
-
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def grade_summary(request, course_key):
-    """Display the grade summary for a course."""
-    course = get_course_with_access(request.user, 'staff', course_key)
-
-    # For now, just a page
-    context = {'course': course,
-               'staff_access': True, }
-    return render_to_response('courseware/grade_summary.html', context)
-
-
 #-----------------------------------------------------------------------------
 # enrollment
 

@@ -403,8 +403,6 @@ if settings.COURSEWARE_ENABLED:
 
 if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'):
     urlpatterns += (
-        url(r'^courses/{}/legacy_grade_summary$'.format(settings.COURSE_ID_PATTERN),
-            'instructor.views.legacy.grade_summary', name='grade_summary_legacy'),
         url(r'^courses/{}/legacy_instructor_dash$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard_legacy"),
     )
