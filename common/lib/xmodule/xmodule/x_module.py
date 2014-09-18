@@ -1273,15 +1273,19 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         # global function that the application can override.
         return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
-    def local_resource_url(self, block, uri):
+    def local_resource_url(self, block, uri, block_type=None):
         """
         See :meth:`xblock.runtime.Runtime:local_resource_url` for documentation.
         """
-        # Currently, Modulestore is responsible for instantiating DescriptorSystems
-        # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-        # that implements the correct local_resource_url. So, for now, instead, we will reference a
-        # global function that the application can override.
-        return descriptor_global_local_resource_url(block, uri)
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.local_resource_url(block, uri, block_type)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct local_resource_url. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
         """
