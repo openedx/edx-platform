@@ -287,6 +287,8 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
+    # Enable the new dashboard, account, and profile pages
+    'ENABLE_NEW_DASHBOARD': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -962,11 +964,24 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-main_vendor_js = [
+
+# Before a student accesses courseware, we do not
+# need many of the JS dependencies.  This includes
+# only the dependencies used everywhere in the LMS
+# (including the dashboard/account/profile pages)
+# Currently, this partially duplicates the "main vendor"
+# JavaScript file, so only one of the two should be included
+# on a page at any time.
+# In the future, we will likely refactor this to use
+# RequireJS and an optimizer.
+base_vendor_js = [
+    'js/vendor/jquery.min.js',
+]
+
+main_vendor_js = base_vendor_js + [
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
-    'js/vendor/jquery.min.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.cookie.js',
     'js/vendor/jquery.qtip.min.js',
@@ -998,6 +1013,12 @@ staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
+
+# JavaScript used by the student account and profile pages
+# These are not courseware, so they do not need many of the courseware-specific
+# JavaScript modules.
+student_account_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_account/**/*.js'))
+student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1079,9 +1100,6 @@ common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set
 project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 
 
-
-# test_order: Determines the position of this chunk of javascript on
-# the jasmine test page
 PIPELINE_JS = {
     'application': {
 
@@ -1097,53 +1115,54 @@ PIPELINE_JS = {
             'js/src/ie_shim.js',
         ],
         'output_filename': 'js/lms-application.js',
-
-        'test_order': 1,
     },
     'courseware': {
         'source_filenames': courseware_js,
         'output_filename': 'js/lms-courseware.js',
-        'test_order': 2,
+    },
+    'base_vendor': {
+        'source_filenames': base_vendor_js,
+        'output_filename': 'js/lms-base-vendor.js',
     },
     'main_vendor': {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
-        'test_order': 0,
     },
     'module-descriptor-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
         'output_filename': 'js/lms-module-descriptors.js',
-        'test_order': 8,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',
-        'test_order': 3,
     },
     'discussion': {
         'source_filenames': discussion_js,
         'output_filename': 'js/discussion.js',
-        'test_order': 4,
     },
     'staff_grading': {
         'source_filenames': staff_grading_js,
         'output_filename': 'js/staff_grading.js',
-        'test_order': 5,
     },
     'open_ended': {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js',
-        'test_order': 6,
     },
     'notes': {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
-        'test_order': 7
     },
     'instructor_dash': {
         'source_filenames': instructor_dash_js,
         'output_filename': 'js/instructor_dash.js',
-        'test_order': 9,
+    },
+    'student_account': {
+        'source_filenames': student_account_js,
+        'output_filename': 'js/student_account.js'
+    },
+    'student_profile': {
+        'source_filenames': student_profile_js,
+        'output_filename': 'js/student_profile.js'
     },
 }
 
@@ -1320,6 +1339,7 @@ INSTALLED_APPS = (
     'circuit',
     'courseware',
     'student',
+
     'static_template_view',
     'staticbook',
     'track',

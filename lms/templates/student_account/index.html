@@ -1,0 +1,14 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Student Account")}</%block>
+
+<%block name="js_extra">
+    <%static:js group='student_account'/>
+</%block>
+
+<h1>Student Account</h1>
+
+<p>This is a placeholder for the student's account page.</p>

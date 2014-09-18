@@ -4,6 +4,14 @@ from django.db import models
 
 from xmodule_django.models import CourseKeyField
 
+# Currently, the "student" app is responsible for
+# accounts, profiles, enrollments, and the student dashboard.
+# We are trying to move some of this functionality into separate apps,
+# but currently the rest of the system assumes that "student" defines
+# certain models.  For now we will leave the models in "student" and
+# create an alias in "user_api".
+from student.models import User, UserProfile  # pylint:disable=unused-import
+
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
