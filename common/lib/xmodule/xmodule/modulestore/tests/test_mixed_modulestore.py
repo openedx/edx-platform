@@ -660,12 +660,12 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Draft
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
     #         find parents of the parent (course), get inheritance items,
-    #         get errors, get item (to delete subtree), get inheritance again.
+    #         get item (to delete subtree), get inheritance again.
     #   Sends: delete item, update parent
     # Split
     #   Find: active_versions, 2 structures (published & draft), definition (unnecessary)
     #   Sends: updated draft and published structures and active_versions
-    @ddt.data(('draft', 8, 2), ('split', 4, 3))
+    @ddt.data(('draft', 7, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_item(self, default_ms, max_find, max_send):
         """
@@ -690,12 +690,12 @@ class TestMixedModuleStore(CourseComparisonTest):
 
     # Draft:
     #    queries: find parent (definition.children), count versions of item, get parent, count grandparents,
-    #             inheritance items, draft item, draft child, get errors, inheritance
+    #             inheritance items, draft item, draft child, inheritance
     #    sends: delete draft vertical and update parent
     # Split:
     #    queries: active_versions, draft and published structures, definition (unnecessary)
     #    sends: update published (why?), draft, and active_versions
-    @ddt.data(('draft', 9, 2), ('split', 4, 3))
+    @ddt.data(('draft', 8, 2), ('split', 4, 3))
     @ddt.unpack
     def test_delete_private_vertical(self, default_ms, max_find, max_send):
         """
@@ -741,12 +741,12 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertNotIn(vert_loc, course.children)
 
     # Draft:
-    #   find: find parent (definition.children) 2x, find draft item, check error state, get inheritance items
+    #   find: find parent (definition.children) 2x, find draft item, get inheritance items
     #   send: one delete query for specific item
     # Split:
     #   find: active_version & structure
     #   send: update structure and active_versions
-    @ddt.data(('draft', 5, 1), ('split', 2, 2))
+    @ddt.data(('draft', 4, 1), ('split', 2, 2))
     @ddt.unpack
     def test_delete_draft_vertical(self, default_ms, max_find, max_send):
         """
@@ -1294,7 +1294,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
 
     # Draft:
-    #    Find: find vertical, find children, get last error
+    #    Find: find vertical, find children
     #    Sends:
     #      1. delete all of the published nodes in subtree
     #      2. insert vertical as published (deleted in step 1) w/ the deleted problems as children
@@ -1303,7 +1303,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Sends:
     #    - insert structure
     #    - write index entry
-    @ddt.data(('draft', 3, 6), ('split', 3, 2))
+    @ddt.data(('draft', 2, 6), ('split', 3, 2))
     @ddt.unpack
     def test_unpublish(self, default_ms, max_find, max_send):
         """

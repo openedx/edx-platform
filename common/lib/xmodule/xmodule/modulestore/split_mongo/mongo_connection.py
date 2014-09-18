@@ -303,4 +303,3 @@ class MongoConnection(object):
             ],
             unique=True
         )
-

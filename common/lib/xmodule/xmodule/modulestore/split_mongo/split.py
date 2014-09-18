@@ -196,6 +196,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 course_key.replace(org=None, course=None, run=None, branch=None)
             ]
 
+        # handle ignore case and general use
         return super(SplitBulkWriteMixin, self)._get_bulk_ops_record(
             course_key.replace(branch=None, version_guid=None), ignore_case
         )

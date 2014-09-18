@@ -98,13 +98,12 @@ class TestPublish(SplitWMongoCourseBoostrapper):
         #   12-15 get each ancestor (count then get): (2 x 2),
         #   16 then fail count of course parent (1)
         #   17 compute inheritance
-        #   18 get last error
-        #   19-20 get draft and published vert
+        #   18-19 get draft and published vert
         # Sends:
         #   delete the subtree of drafts (1 call),
         #   update the published version of each node in subtree (4 calls),
         #   update the ancestors up to course (2 calls)
-        with check_mongo_calls(20, 7):
+        with check_mongo_calls(19, 7):
             self.draft_mongo.publish(item.location, self.user_id)
 
         # verify status
