@@ -586,9 +586,9 @@ class VideoCdnTest(unittest.TestCase):
 
 
 FAKE_SETTINGS = {
-        "AWS_ACCESS_KEY": "test_key",
-        "AWS_SECRET_KEY": "test_secret"
-    }
+    "AWS_ACCESS_KEY": "test_key",
+    "AWS_SECRET_KEY": "test_secret"
+}
 
 
 class VideoLinkTransienceTest(unittest.TestCase):
