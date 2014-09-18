@@ -670,6 +670,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 },
                 'transcripts': {},
                 'handout': {},
+                'video_link_transience': False,
             }
         ):
             metadata = {
