@@ -115,13 +115,14 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
                 if new_url:
                     sources[index] = new_url
 
-        if getattr(self, 'video_link_transience', False):
+        if (getattr(self, 'video_link_transience', False) and
+                not getattr(self.system, 'is_author_mode', False)):
             for index, source_url in enumerate(sources):
                 if 'amazonaws.com' in source_url:
                     query = 'source={}'.format(source_url)
                     new_url = self.runtime.handler_url(
                         self, 'url', 'temporary', query
-                    ).rstrip('/?')
+                    )
                     if new_url:
                         sources[index] = new_url
 
