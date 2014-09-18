@@ -13,12 +13,18 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group, User
 from django.contrib.messages.storage.fallback import FallbackStorage
 
+from django.core.cache import cache
+from pytz import UTC
+from freezegun import freeze_time
+from datetime import datetime, timedelta
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupon, CourseRegistrationCode
+from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Coupon, CourseRegistrationCode, RegistrationCodeRedemption
 from student.tests.factories import UserFactory, AdminFactory
+from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
@@ -113,6 +119,30 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_add_course_to_cart_anon(self):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
+
+    def test_billing_details(self):
+        billing_url = reverse('billing_details')
+        self.login_user()
+
+        # page not found error because order_type is not business
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 404)
+
+        #chagne the order_type to business
+        self.cart.order_type = 'business'
+        self.cart.save()
+        resp = self.client.get(billing_url)
+        self.assertEqual(resp.status_code, 200)
+
+        data = {'company_name': 'Test Company', 'company_contact_name': 'JohnDoe',
+                'company_contact_email': 'john@est.com', 'recipient_name': 'Mocker',
+                'recipient_email': 'mock@germ.com', 'company_address_line_1': 'DC Street # 1',
+                'company_address_line_2': '',
+                'company_city': 'DC', 'company_state': 'NY', 'company_zip': '22003', 'company_country': 'US',
+                'customer_reference_number': 'PO#23'}
+
+        resp = self.client.post(billing_url, data)
+        self.assertEqual(resp.status_code, 200)
 
     def test_add_course_to_cart_already_in_cart(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -447,7 +477,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args
+        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=W0621
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
@@ -723,6 +753,124 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         ((template, _context), _tmp) = render_mock.call_args
         self.assertEqual(template, cert_item.single_item_receipt_template)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
+    """
+    Test suite for RegistrationCodeRedemption Course Enrollments
+    """
+    def setUp(self, **kwargs):
+        self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
+        self.cost = 40
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course_key = self.course.id
+        self.course_mode = CourseMode(course_id=self.course_key,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=self.cost)
+        self.course_mode.save()
+
+    def login_user(self):
+        """
+        Helper fn to login self.user
+        """
+        self.client.login(username=self.user.username, password="password")
+
+    def test_registration_redemption_post_request_ratelimited(self):
+        """
+        Try (and fail) registration code redemption 30 times
+        in a row on an non-existing registration code post request
+        """
+        cache.clear()
+        url = reverse('register_code_redemption', args=['asdasd'])
+        self.login_user()
+        for i in xrange(30):  # pylint: disable=W0612
+            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
+            self.assertEquals(response.status_code, 404)
+
+        # then the rate limiter should kick in and give a HttpForbidden response
+        response = self.client.post(url)
+        self.assertEquals(response.status_code, 403)
+
+        # now reset the time to 5 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=300)
+        with freeze_time(reset_time):
+            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
+            self.assertEquals(response.status_code, 404)
+
+        cache.clear()
+
+    def test_registration_redemption_get_request_ratelimited(self):
+        """
+        Try (and fail) registration code redemption 30 times
+        in a row on an non-existing registration code get request
+        """
+        cache.clear()
+        url = reverse('register_code_redemption', args=['asdasd'])
+        self.login_user()
+        for i in xrange(30):  # pylint: disable=W0612
+            response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
+            self.assertEquals(response.status_code, 404)
+
+        # then the rate limiter should kick in and give a HttpForbidden response
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 403)
+
+        # now reset the time to 5 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=300)
+        with freeze_time(reset_time):
+            response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
+            self.assertEquals(response.status_code, 404)
+
+        cache.clear()
+
+    def test_course_enrollment_active_registration_code_redemption(self):
+        """
+        Test for active registration code course enrollment
+        """
+        cache.clear()
+        instructor = InstructorFactory(course_key=self.course_key)
+        self.client.login(username=instructor.username, password='test')
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {
+            'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
+            'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEquals(response.status_code, 200)
+        # get the first registration from the newly created registration codes
+        registration_code = CourseRegistrationCode.objects.all()[0].code
+        redeem_url = reverse('register_code_redemption', args=[registration_code])
+        self.login_user()
+
+        response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue('View Course' in response.content)
+
+        #now check that the registration code has already been redeemed and user is already registered in the course
+        RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
+        response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
+        self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
+        self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
+
+        #now check that the registration code has already been redeemed
+        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
