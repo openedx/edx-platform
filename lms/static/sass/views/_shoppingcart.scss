@@ -30,7 +30,7 @@
     font-size: 1.5em;
     color: $base-font-color;
   }
-  
+
   .cart-table {
     width: 100%;
     tr:nth-child(even){
@@ -66,7 +66,7 @@
       th {
         text-align: left;
         border-bottom: 1px solid $border-color-1;
-        
+
         &.qty {
           width: 100px;
         }
@@ -87,7 +87,7 @@
         }
       }
     }
-    
+
     .cart-items {
       td {
         padding: 10px 0px;
@@ -115,7 +115,7 @@
          padding-right: 20px;
       }
     }
-    
+
     .cart-totals {
       td {
         &.cart-total-cost {
@@ -127,10 +127,10 @@
       }
     }
   }
-  
+
   table.order-receipt {
     width: 100%;
-    
+
     .order-number {
       font-weight: bold;
     }
@@ -147,7 +147,7 @@
     th {
       text-align: left;
       padding: 25px 0 15px 0;
-      
+
       &.qty {
         width: 50px;
       }
@@ -648,7 +648,7 @@
         background: white;
         border-radius: 3px;
         appearance:none;
-        background: url('../../static/images/drop-arrow.png') no-repeat 238px 14px;
+        background: url('../../images/drop-arrow.png') no-repeat 238px 14px;
         -moz-appearance:none; /* Firefox */
         -webkit-appearance:none; /* Safari and Chrome */
       }
