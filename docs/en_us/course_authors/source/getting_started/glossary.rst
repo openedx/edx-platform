@@ -81,10 +81,15 @@ C
 
 .. _Cohort:
  
-.. **Cohort**
+**Cohort**
 
-..  A group of students that participate in the class together. A cohort can have forum discussions apart from the rest of the students.
+  A group of students who participate in a class together. Students who are in
+  the same cohort group can communicate and share experiences in private
+  discussions.
 
+  Cohorts are an optional feature of courses on the edX platform. For
+  information about how you enable the cohort feature, set up cohort groups,
+  and assign students to them, see :ref:`Cohorts Overview`.
 
 .. _Component_g:
  
@@ -103,6 +108,17 @@ C
   use content experiments to compare the performance of students who have been
   exposed to different versions of of the content. For more information, see
   :ref:`Creating Content Experiments`.
+
+**Content-Specific Discussion Topic**
+
+  A category within the course discussion that appears at a defined point in
+  the course to encourage questions and conversations. To add a 
+  content-specific discussion topic to your course, you add a discussion 
+  component to a unit. Students cannot contribute to a content-specific 
+  discussion topic until the release date of the section that contains it.
+
+  For more information, see :ref:`Working with Discussion Components` and
+  :ref:`Organizing_discussions`.
 
 .. _Course Accordion:
  
@@ -148,6 +164,14 @@ C
 
   The page where students access the primary instructional materials for your course. Sections, subsections, units, and components are all accessed from the Courseware page.
 
+**Course-Wide Discussion Topic**
+
+  Optional categories that you create to guide how students find and share
+  information in the course discussion. Examples of course-wide discussion
+  topics include Announcements and Frequently Asked Questions. Students can
+  contribute to these topics as soon as your course starts.
+
+  For more information, see :ref:`Organizing_discussions`.
 
 .. _Custom Response Problem:
  
@@ -191,7 +215,11 @@ D
  
 **Discussion Component**
 
-  Discussion topics that course staff add directly to units. For example, a Video component can be followed by a Discussion component so that students can discuss the video content without having to leave the page.
+  Discussion topics that course staff add directly to units. For example, a
+  Video component can be followed by a Discussion component so that students
+  can discuss the video content without having to leave the page. When you add
+  a dicussion component to a unit, you create a content-specific discussion
+  topic.
 
   See :ref:`Working with Discussion Components` for more information.
 
