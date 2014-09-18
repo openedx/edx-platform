@@ -40,7 +40,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
         self.request.test_spec = "test_foo.py:FooTest.test_bar"
         self.assertEqual(self.request.cmd, self._expected_command(self.request.test_spec))
 
-    def test_default_bokchoy_with_split_default_store(self):
+    def test_default_bokchoy_with_draft_default_store(self):
         self.request.test_spec = "test_foo.py"
         self.request.default_store = "draft"
         self.assertEqual(self.request.cmd, self._expected_command(self.request.test_spec, "draft"))
