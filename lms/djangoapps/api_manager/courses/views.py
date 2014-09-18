@@ -30,7 +30,7 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 from xmodule.modulestore.django import modulestore
 
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
-    course_exists, get_modulestore
+    course_exists, get_modulestore, get_course_descriptor
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -336,6 +336,44 @@ def _get_aggregate_exclusion_user_ids(course_key):
     return exclude_user_ids
 
 
+def _get_course_data(request, course_key, course_descriptor, depth=0):
+    """
+    creates a dict of course attributes
+    """
+
+    if depth > 0:
+        data = _serialize_content_with_children(
+            request,
+            course_key,
+            course_descriptor,  # Primer for recursive function
+            depth
+        )
+        data['content'] = data['children']
+        data.pop('children')
+    else:
+        data = _serialize_content(
+            request,
+            course_key,
+            course_descriptor
+        )
+    base_uri_without_qs = generate_base_uri(request, True)
+    data['course_image_url'] = request.build_absolute_uri(course_image_url(course_descriptor))
+    data['resources'] = []
+    resource_uri = '{}/content/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    resource_uri = '{}/groups/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    resource_uri = '{}/overview/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    resource_uri = '{}/updates/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    resource_uri = '{}/static_tabs/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    resource_uri = '{}/users/'.format(base_uri_without_qs)
+    data['resources'].append({'uri': resource_uri})
+    return data
+
+
 class CourseContentList(SecureAPIView):
     """
     **Use Case**
@@ -503,11 +541,13 @@ class CoursesList(SecureListAPIView):
     **Use Case**
 
         CoursesList returns paginated list of courses in the edX Platform. You can
-        use the uri value in the response to get details of the course.
+        use the uri value in the response to get details of the course. course list can be
+        filtered by course_id
 
     **Example Request**
 
           GET /api/courses
+          GET /api/courses/?course_id={course_id1},{course_id2}
 
     **Response Values**
 
@@ -528,8 +568,21 @@ class CoursesList(SecureListAPIView):
     serializer_class = CourseSerializer
 
     def get_queryset(self):
-        course_descriptors = get_modulestore().get_courses()
-        return course_descriptors
+        course_ids = self.request.QUERY_PARAMS.get('course_id', None)
+        depth = self.request.QUERY_PARAMS.get('depth', 0)
+        course_descriptors = []
+        if course_ids:
+            course_ids = course_ids.split(',')
+            for course_id in course_ids:
+                course_key = get_course_key(course_id)
+                course_descriptor = get_course_descriptor(course_key, 0)
+                course_descriptors.append(course_descriptor)
+        else:
+            course_descriptors = get_modulestore().get_courses()
+
+        results = [_get_course_data(self.request, descriptor.id, descriptor, depth)
+                   for descriptor in course_descriptors]
+        return results
 
 
 class CoursesDetail(SecureAPIView):
@@ -590,38 +643,7 @@ class CoursesDetail(SecureAPIView):
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id, depth=depth_int)  # pylint: disable=W0612
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        if depth_int > 0:
-            response_data = _serialize_content_with_children(
-                request,
-                course_key,
-                course_descriptor,  # Primer for recursive function
-                depth_int
-            )
-            response_data['content'] = response_data['children']
-            response_data.pop('children')
-        else:
-            response_data = _serialize_content(
-                request,
-                course_key,
-                course_descriptor
-            )
-        base_uri = generate_base_uri(request)
-        response_data['uri'] = base_uri
-        base_uri_without_qs = generate_base_uri(request, True)
-        response_data['course_image_url'] = request.build_absolute_uri(course_image_url(course_descriptor))
-        response_data['resources'] = []
-        resource_uri = '{}/content/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/groups/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/overview/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/updates/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/static_tabs/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/users/'.format(base_uri_without_qs)
-        response_data['resources'].append({'uri': resource_uri})
+        response_data = _get_course_data(request, course_key, course_descriptor, depth_int)
         return Response(response_data, status=status.HTTP_200_OK)
 
 
