@@ -278,12 +278,12 @@ A sample of the heading row and a data row in the ``auth_userprofile`` table fol
 .. code-block:: json
 
     id  user_id name  language  location  meta  courseware  gender  mailing_address 
-    year_of_birth level_of_education  goals allow_certificate
+    year_of_birth level_of_education  goals allow_certificate  country  city
 
     9999999  AAAAAAAA  AAAAAAAAA English MIT {"old_emails": [["aaaaa@xxxxx.xxx", 
     "2012-11-16T10:28:10.096489"]], "old_names": [["BBBBBBBBBBBBB", "I wanted 
     to test out the name-change functionality", "2012-10-22T12:23:10.598444"]]} 
-    course.xml  NULL  NULL  NULL  NULL  NULL  1
+    course.xml  NULL  NULL  NULL  NULL  NULL  1      NULL
 
 The ``auth_userprofile`` table has the following columns:
 
@@ -316,8 +316,12 @@ The ``auth_userprofile`` table has the following columns:
   +--------------------+--------------+------+-----+------------------------------------------+
   | allow_certificate  | tinyint(1)   | NO   |     |                                          |
   +--------------------+--------------+------+-----+------------------------------------------+
+  | country            | varchar(2)   | YES  |     |                                          |  
+  +--------------------+--------------+------+-----+------------------------------------------+
+  | city               | longtext     | YES  |     |                                          | 
+  +--------------------+--------------+------+-----+------------------------------------------+
 
-**History**: The organization of this table was different for the students who signed up for the MITx prototype phase in the spring of 2012, than for those who signed up afterwards. The column descriptions that follow detail the differences in the demographic data gathered.
+**History**: ``country`` and ``city`` added January 2014. The organization of this table was different for the students who signed up for the MITx prototype phase in the spring of 2012, than for those who signed up afterwards. The column descriptions that follow detail the differences in the demographic data gathered.
 
 ----
 id
@@ -527,7 +531,28 @@ allow_certificate
 -------------------
   Set to 1 (true). 
 
-  **History**: Prior to 10 Feb 2014, this field was set to 0 (false) if log analysis revealed that the student was accessing the edX site from a country that the U.S. had embargoed. This restriction is no longer in effect, and on 10 Feb 2014 this value was changed to 1 for all users. 
+  **History**: Prior to 10 Feb 2014, this field was set to 0 (false) if log
+  analysis revealed that the student was accessing the edX site from a country
+  that the U.S. had embargoed. This restriction is no longer in effect, and on
+  10 Feb 2014 this value was changed to 1 for all users.
+
+
+----------------------
+country
+----------------------
+  Stores a two-digit country code based on the selection made by the student
+  during registration. Set to an empty string for students who do not select a
+  country.
+
+  **History**: Added in Jan 2014, but not implemented until 18 Sep 2014. Null
+  for all user profiles created before 18 Sep 2014.
+
+------
+city
+------
+  Not currently used. Set to null for all user profiles.
+
+  **History**: Added in Jan 2014, not yet implemented.
 
 .. _student_courseenrollment:
 
