@@ -1146,7 +1146,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         '''
         return self.get_course(location.course_key, depth)
 
-    def _update_single_item(self, location, update):
+    def _update_single_item(self, location, update, allow_not_found=False):
         """
         Set update on the specified item, and raises ItemNotFoundError
         if the location doesn't exist
@@ -1159,10 +1159,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'_id': location.to_deprecated_son()},
             {'$set': update},
             multi=False,
-            upsert=True,
-            # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
-            # from overriding our default value set in the init method.
-            safe=self.collection.safe
+            upsert=allow_not_found,
+            w=1,  # wait until primary commits
         )
         if result['n'] == 0:
             raise ItemNotFoundError(location)
@@ -1214,7 +1212,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if xblock.has_children:
                 children = self._serialize_scope(xblock, Scope.children)
                 payload.update({'definition.children': children['children']})
-            self._update_single_item(xblock.scope_ids.usage_id, payload)
+            self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
 
             # update subtree edited info for ancestors
             # don't update the subtree info for descendants of the publish root for efficiency
