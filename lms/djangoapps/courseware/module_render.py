@@ -844,7 +844,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
-        fragment = instance.render(view_name)
+        fragment = instance.render(view_name, context=request.GET)
     except NoSuchViewError:
         log.exception("Attempt to render missing view on %s: %s", instance, view_name)
         raise Http404
