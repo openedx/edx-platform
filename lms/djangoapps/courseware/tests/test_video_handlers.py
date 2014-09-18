@@ -782,6 +782,7 @@ class TestGetTranscript(TestVideo):
         with self.assertRaises(KeyError):
             self.item.get_transcript()
 
+
 class TestVideoLinkTransience(TestVideo):
     """
     Test video handler that provide temporary video links.
@@ -816,7 +817,7 @@ class TestVideoLinkTransience(TestVideo):
             query = parse_qs(original_url.query)
             query['Expires'] = ['test_expire']
             query['Signature'] = ['test_signature']
-            return urlunparse(original_url._replace(query=urlencode(query)))
+            return urlunparse(original_url._replace(query=urlencode(query))) # pylint: disable=W0212
 
         patcher = mock.patch.object(boto.s3.connection.S3Connection, "generate_url", mocked_generate_url)
         patcher.start()

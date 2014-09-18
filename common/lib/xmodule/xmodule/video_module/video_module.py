@@ -36,7 +36,7 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
-from .video_utils import create_youtube_string, get_video_from_cdn, get_s3_transient_url
+from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -109,7 +109,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
 
         if (getattr(self, 'video_speed_optimizations', True) and cdn_url and
-            not getattr(self, 'video_link_transience', False)):
+                not getattr(self, 'video_link_transience', False)):
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:

@@ -2,8 +2,6 @@
 """Video xmodule tests in mongo."""
 import json
 import unittest
-import mock
-import boto
 
 from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
@@ -467,6 +465,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
+
 
 class TestS3GetHtmlMethod(BaseTestXmodule):
     '''

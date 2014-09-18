@@ -73,6 +73,7 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
     else:
         return None
 
+
 def get_s3_transient_url(video_url, expires_in=10):
     """
     Get S3 transient video url.

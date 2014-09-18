@@ -18,10 +18,8 @@ from mock import Mock, patch
 
 from . import LogicTest
 from lxml import etree
-from django.conf import settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.video_module import (VideoDescriptor, create_youtube_string,
-                                    get_video_from_cdn, get_s3_transient_url)
+from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn, get_s3_transient_url
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
