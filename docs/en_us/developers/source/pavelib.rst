@@ -69,7 +69,7 @@ Assets will compile Sass (CSS), CoffeeScript (Javascript) and XModule assets. Op
 
     *system* lms or studio
 
-    *--settings=* Django settings e.g. aws, dev
+    *--settings=* Django settings e.g. aws, dev, devstack (the default)
 
     *--debug* Disable Sass compression
 
@@ -88,7 +88,7 @@ Run Servers
 
     **lms**: runs LMS server
 
-     *--settings=* Django settings e.g. aws, dev
+     *--settings=* Django settings e.g. aws, dev, devstack (the default)
 
      *--fast*   Skip updating assets
 
@@ -101,7 +101,7 @@ Run Servers
 
     **studio**: runs Studio
 
-     *--settings=* Django settings e.g. aws, dev
+     *--settings=* Django settings e.g. aws, dev, devstack (the default)
 
      *--fast*   Skip updating assets
 
@@ -111,22 +111,10 @@ Run Servers
 
 ..
 
-    **devstack**: runs LMS or Studio (for use within a Vagrant devstack VM)
-
-     *system*   LMS or Studio
-
-     *--fast*   Skip updating assets
-
-::
-
-   paver devstack lms
-
-..
-
 
     **run_all_servers**: runs lms, cms and celery workers
 
-     *--settings=* Django settings e.g. aws, dev
+     *--settings=* Django settings e.g. aws, dev, devstack (the default)
 
      *--worker_settings=* Django settings for celery workers
 
@@ -142,7 +130,7 @@ Run Servers
 
      *--settings=* Environment settings e.g. aws, dev both for LMS and Studio
 
-     *--settings_lms=* Override django settings for LMS e.g. cms.dev
+     *--settings_lms=* Override django settings for LMS e.g. lms.dev
 
      *--settings_cms=* Override django settings for Studio
 
@@ -155,7 +143,7 @@ Run Servers
 
     **update_db**: runs syncdb and then migrate
 
-     *--settings=* Django settings e.g. aws, dev
+     *--settings=* Django settings e.g. aws, dev, devstack (the default)
 
 ::
 

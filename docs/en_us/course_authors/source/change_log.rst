@@ -1,6 +1,22 @@
 ############
 Change Log
 ############
+       
+*****************
+September, 2014
+*****************
+
+.. list-table::
+   :widths: 10 70
+   :header-rows: 1
+
+   * - Date
+     - Change
+   * - 09/04/14
+     - Updated the :ref:`Discussions` and :ref:`Discussions for Students and
+       Staff` chapters to include information about choosing the type of post
+       and to reflect changes in the user interface.
+
 
 **************
 August, 2014
@@ -12,12 +28,48 @@ August, 2014
 
    * - Date
      - Change
+   * - 08/28/14
+     - Updated documentation in :ref:`Developing Your Course Index`
+       for new capabilities to publish or hide multiple units 
+       from the outline.
+   * - 
+     - Added documentation for :ref:`Creating Content Experiments`.
+   * - 08/22/14
+     - Added warnings about the effects of changing the course grading policy,
+       graded subsections, or graded components after the course begins.
+   * - 08/20/14
+     - Added :ref:`Browsers` to the :ref:`Getting Started Index` section.
+   * - 08/18/14
+     - Expanded the :ref:`Example Messages to Students` in the :ref:`Launch`
+       chapter.
+   * - 08/12/14
+     - Updated documentation to address the new publishing workflow and user
+       interface. 
+
+       Created a new part, :ref:`Developing Your Course Index`,
+       which contains the following chapters:
+
+       * :ref:`Getting Started with Course Content Development`
+       * :ref:`Developing Your Course Outline`
+       * :ref:`Developing Course Sections`
+       * :ref:`Developing Course Subsections`
+       * :ref:`Developing Course Units`
+       * :ref:`Developing Course Components`
+       * :ref:`Controlling Content Visibility`
+       * :ref:`Testing Your Course Content`
+
    * - 08/07/14
      - Added information about reviewing and duplicating the contents of
        previously-sent messages to the :ref:`Bulk Email` section.
    * - 
      - Updated the :ref:`view_enrollment_count` section to include the
        breakdown by certification track in the enrollment section.
+
+.. note::
+ In several cases, older links to changed topics were made obsolete by
+ subsequent changes.
+
+
 
 ***********
 July, 2014
@@ -63,7 +115,7 @@ June, 2014
    * - Date
      - Change
    * - 06/20/14
-     - Added a :ref:`Preface` with resources for course teams, developers,
+     - Added a `Preface`_ with resources for course teams, developers,
        researchers, and students.
    * - 06/18/14    
      - In the :ref:`View and download student data` section, updated the
@@ -188,7 +240,8 @@ April, 2014
        * :ref:`Answer Pools in a Multiple Choice Problem`
 
    * - 04/15/14
-     - Updated :ref:`Testing Your Course` to include a section on how to :ref:`View Your Live Course`.
+     - Updated *Testing Your Course* to include a section on how to *View Your
+       Live Course*.
    * - 04/11/14
      - Expanded the :ref:`Grades` section to include a topic on interpreting the Student Answer Distribution report. 
    * - 04/08/14
@@ -199,8 +252,8 @@ April, 2014
    * - 04/03/14
      - Updated the :ref:`Adding Pages to a Course` chapter to reflect ability to :ref:`Show or Hide the Course Wiki Page`.
    * - 04/02/14
-     - Reorganized the sections :ref:`Building a Course Index` and
-       :ref:`Creating Course Content Index` to better reflect the workflow of
+     - Reorganized the sections Building a *Course Index* and
+       *Creating Course Content Index* to better reflect the workflow of
        building a new course.
    * - 04/01/14 
      - Update the :ref:`Establish a Grading Policy` chapter to emphasize that
@@ -236,7 +289,7 @@ March, 2014
 
        * :ref:`Getting Started Index`
 
-       * :ref:`Building a Course Index`
+       * Building a Course Index
 
        * :ref:`Creating Course Content Index`
 
@@ -337,7 +390,7 @@ January, 2014
      - Added info about scoring (:ref:`ORA Access Scores`) and due dates in
        :ref:`Open Response Assessment`.
    * - 01/13/2014
-     - Extensive updates to :ref:`Organizing Your Course Content` and
+     - Extensive updates to Organizing Your Course Content and
        :ref:`Working with HTML Components`.
    * - 01/08/2014
      - Updated :ref:`Add Files to a Course` to reflect addition of sorting to
@@ -354,8 +407,8 @@ January, 2014
    * - 01/06/2014
      - Created :ref:`Zooming image`
    * - 01/01/2014
-     - Updated the chapters :ref:`Organizing Your Course Content` and
-       :ref:`Testing Your Course` to reflect changes in the Course Outline
+     - Updated the chapters Organizing Your Course Content and
+       Testing Your Course to reflect changes in the Course Outline
        design.
 
 ***************
@@ -394,3 +447,5 @@ December, 2013
    * - 12/05/2013
      - Complete revision of edX Studio documentation and integration of edX101
        content.
+
+.. _Preface: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/

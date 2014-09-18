@@ -12,6 +12,15 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
+// Card Sizes
+// breakpoints for course cards
+$bp-xl-min: 1180px;
+$bp-l-min: 980px;
+$bp-m-min: 768px;
+$bp-s-min: 320px;
+$bp-s-max: 320px;
+$bp-m-max: 768px;
+
 // ====================
 
 // FONTS
@@ -32,6 +41,9 @@ $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: #fff;
 
 // ====================
+
+// COLORS - utility
+$transparent: rgba(0,0,0,0); // used when color value is needed for UI width/transitions but element is transparent
 
 // COLORS
 $black: rgb(0,0,0);
@@ -219,6 +231,10 @@ $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
+$courseware-border-bottom-color: #44a2de;
+$courseware-button-border-color: #e6e6e6;
+$courseware-hover-color: #333435;
+$courseware-navigation-color: #009ee7;
 
 // ====================
 
@@ -384,6 +400,7 @@ $homepage-bg-image: none;
 
 $login-banner-image: url(../images/bg-banner-account.png);
 $register-banner-image: url(../images/bg-banner-account.png);
+$passwordreset-banner-image: url(../images/bg-banner-account.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';
 
@@ -395,6 +412,9 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 $f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// Header specific sans-serif
+$header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 
 // SPLINT: colors
 

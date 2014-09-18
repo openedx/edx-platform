@@ -415,6 +415,57 @@
     }
   }
 
+  // CASE: page header - experiment variant A overrides
+  .page-header.exp-variant-A {
+    margin-bottom: 0;
+    border-bottom: none;
+
+    .title {
+      margin: 0;
+    }
+
+
+    .sts-label {
+      display: inline-block;
+      margin: 0;
+      border: none;
+      padding: 0;
+      text-transform: none;
+    }
+
+    .sts-course-org {
+      margin-right: 0;
+    }
+
+    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+      @extend %t-title5;
+      @extend %t-weight4;
+      @include font-size(14);
+      @include line-height(14);
+      display: inline-block;
+      color: $gray;
+      text-transform: none;
+    }
+
+    .wrapper-sts {
+      display: inline-block;
+      width: flex-grid(9,12);
+      margin-bottom: ($baseline/4);
+    }
+
+    .sts-course {
+      width: initial;
+    }
+
+    .title .sts-track {
+      display: inline-block;
+
+      .sts-track-value {
+        background: $m-blue-l1;
+      }
+    }
+  }
+
   // ====================
 
   // UI : progress
@@ -1123,6 +1174,14 @@
     }
   }
 
+  // CASE: supplemental content - experiment variant A overrides
+  .wrapper-content-supplementary.exp-variant-A {
+
+    .help-item-technical {
+      width: flex-grid(8,12);
+    }
+  }
+
   // ====================
 
   // VIEW: select a track
@@ -1192,11 +1251,11 @@
       border-color: $m-blue-d1;
 
       .wrapper-copy {
-        width: flex-grid(5,8);
+        width: flex-grid(8,8);
       }
 
       .list-actions {
-        width: flex-grid(3,8);
+        width: flex-grid(8,8);
       }
 
       .action-select input {
@@ -1221,7 +1280,6 @@
       .list-actions {
         margin: ($baseline/2) 0;
         border-top: ($baseline/10) solid $m-gray-t1;
-        padding-top: $baseline;
       }
 
       .action-intro, .action-select {
@@ -1332,6 +1390,39 @@
         .contribution-option-other1 label, .contribution-option-other2 label {
           @extend %text-sr;
         }
+      }
+    }
+  }
+
+  // CASE: select a track - experiment variant A overrides
+  .wrapper-register-choose.exp-variant-A {
+
+    .register-choice {
+      width: flex-grid(12,12);
+    }
+
+    .deco-divider{
+      width: flex-grid(12,12);
+    }
+
+    .contribution-options {
+      width: flex-grid(8,12);
+      margin: 0;
+
+      &:after{
+        clear: none;
+        display: none;
+      }
+    }
+
+    .register-choice-certificate .list-actions {
+      border-top: none;
+      width: flex-grid(4,12);
+      float: right;
+      margin: ($baseline/4) 0;
+
+      .action-select {
+        width: initial;
       }
     }
   }

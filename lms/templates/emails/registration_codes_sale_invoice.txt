@@ -1,0 +1,49 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Professional Education Invoicing Center")}
+
+${_("Portland Street, ")}
+${_("9th floor Cambridge, MA,")}
+${_("02139 finance@edx.org")}
+
+${_("---------------------------------")}
+
+${_("Bill To:")}
+
+${_("{company_name}").format(company_name=invoice.company_name)}
+
+${_("{purchaser_name}").format(purchaser_name=invoice.company_contact_name)}
+
+% if invoice.customer_reference_number:
+${_("Customer Reference Number: {customer_reference_number}").format(customer_reference_number=invoice.customer_reference_number)}
+%endif
+
+${_("---------------------------------")}
+
+${_("Registration codes:")}
+
+${_("Please distribute one of the following registration codes to each student who is going to enroll in the class.")}
+${_("A student can redeem one of these codes by registering an account on ({site_name}.edx.org), starting the purchase").format(site_name=site_name)}
+${_("process on this course by adding it to their shopping cart from this page ({course_url}), and").format(course_url=course_url)}
+${_("entering their registration code while in the shopping cart.")}
+
+%for registration_code in registration_codes:
+${registration_code.code}
+%endfor
+
+${_("---------------------------------")}
+
+${_("Thank you for your purchase! Failure to pay this invoice will result the invalidation of student enrollments")}
+${_("that use these codes. All purchases are final. Please refer to the cancellation policy")}
+${_("on {site_name} for more information.").format(site_name=site_name)}
+
+${_("---------------------------------")}
+
+${_("Course: {course_name} {start_date} - {end_date}").format(course_name=course.display_name, start_date=course.start_date_text, end_date=course.end_date_text)}
+${_("Price:     ${price}").format(price=course_price)}
+${_("Quantity:  ${quantity}").format(quantity=quantity)}
+${_("Sub-Total: ${sub_total}").format(sub_total=quantity*course_price)}
+${_("Discount:  ${discount}").format(discount=discount_price)}
+
+${_("---------  ------")}
+${_("Total Due: ${total_price}").format(total_price=sale_price)}

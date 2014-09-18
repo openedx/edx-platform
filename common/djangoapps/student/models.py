@@ -764,7 +764,7 @@ class CourseEnrollment(models.Model):
 
             else:
                 unenroll_done.send(sender=None, course_enrollment=self)
-                
+
                 self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
 
                 dog_stats_api.increment(
@@ -796,6 +796,7 @@ class CourseEnrollment(models.Model):
                 tracker.emit(event_name, data)
 
                 if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
+                    tracking_context = tracker.get_tracker().resolve_context()
                     analytics.track(self.user_id, event_name, {
                         'category': 'conversion',
                         'label': self.course_id.to_deprecated_string(),
@@ -803,7 +804,12 @@ class CourseEnrollment(models.Model):
                         'course': self.course_id.course,
                         'run': self.course_id.run,
                         'mode': self.mode,
+                    }, context={
+                        'Google Analytics': {
+                            'clientId': tracking_context.get('client_id')
+                        }
                     })
+
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
                 log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)

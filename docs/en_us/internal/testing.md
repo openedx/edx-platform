@@ -361,6 +361,13 @@ To view test coverage:
 generates HTML and XML (Cobertura format) reports.
 
 
+## Code Style Quality
+
+To view code style quality (e.g. pep8 and pylint violations):
+
+    paver run_quality
+
+
 ## Testing using queue servers
 
 When testing problems that use a queue server on AWS (e.g. sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like so.

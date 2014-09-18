@@ -233,9 +233,12 @@ define([
     "js/spec/views/pages/container_subviews_spec",
     "js/spec/views/pages/group_configurations_spec",
     "js/spec/views/pages/course_outline_spec",
+    "js/spec/views/pages/course_rerun_spec",
+    "js/spec/views/pages/index_spec",
 
     "js/spec/views/modals/base_modal_spec",
     "js/spec/views/modals/edit_xblock_spec",
+    "js/spec/views/modals/validation_error_modal_spec",
 
     "js/spec/xblock/cms.runtime.v1_spec",
 

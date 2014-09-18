@@ -19,10 +19,8 @@
       .page-header {
 
         .page-header-title {
-          @extend %t-title;
-          @include font-size(28);
-          @include line-height(32);
-          font-weight: 600;
+          @extend %t-title4;
+          @extend %t-strong;
         }
 
         .is-editable {
@@ -52,8 +50,8 @@
 
           .button {
             @extend %t-action3;
+            @extend %t-regular;
             padding: ($baseline/4) ($baseline*.75);
-            font-weight: 400;
           }
         }
       }
@@ -150,28 +148,44 @@
 
         .date,
         .user {
-          font-weight: 600;
+          @extend %t-strong;
+        }
+
+        .user {
+          @extend %cont-text-wrap;
         }
       }
 
       .wrapper-release {
 
         .release-date {
-          font-weight: 600;
+          @extend %t-strong;
+        }
+
+        .release-with {
+          @extend %t-title8;
+          display: block;
         }
       }
 
       .wrapper-visibility {
 
         .copy {
+          @extend %t-strong;
           margin-bottom: ($baseline/10);
-          font-weight: 600;
         }
 
         [class^="icon-"] {
           margin-left: ($baseline/4);
           color: $gray-d1;
         }
+
+        .inherited-from {
+          @extend %t-title8;
+          display: block;
+        }
+
+
       }
 
       .wrapper-pub-actions {
@@ -213,7 +227,11 @@
 
         .date,
         .user {
-          font-weight: 600;
+          @extend %t-strong;
+        }
+
+        .user {
+          @extend %cont-text-wrap;
         }
       }
     }
@@ -226,8 +244,10 @@
       .wrapper-unit-id {
 
         .unit-id-value {
+          @extend %cont-text-wrap;
           @extend %t-copy-sub1;
           display: inline-block;
+          width: 100%;
         }
 
         .tip {
@@ -239,29 +259,9 @@
       }
 
       .wrapper-unit-tree-location {
-        // tree location-specific styles should go here
 
-        .outline-section{
-          box-shadow: none;
-          border: 0;
-          padding: 0;
-        }
-
-        .outline-subsection {
-          border-left: 1px solid $gray-l4;
-          padding: ($baseline/2);
-
-          .subsection-header {
-            margin-bottom: ($baseline/2);
-          }
-        }
-
-        .item-title a {
-            color: $color-heading-base;
-
-          &:hover {
-            color: $blue;
-          }
+        .item-title {
+          @extend %cont-text-wrap;
         }
       }
     }

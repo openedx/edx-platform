@@ -46,8 +46,10 @@
         toggleSubmitButton(false);
       });
 
-      $('#login-form').on('ajax:error', function() {
+      $('#login-form').on('ajax:error', function(event, request, status_string) {
         toggleSubmitButton(true);
+        $('.third-party-signin.message').addClass('is-shown').focus();
+        $('.third-party-signin.message .instructions').html(request.responseText);
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
@@ -138,10 +140,14 @@
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occurred while logging you in:")} </h3>
+        <h3 class="message-title">${_("We couldn't log you in.")} </h3>
         <ul class="message-copy">
           <li>${_("Your email or password is incorrect")}</li>
         </ul>
+      </div>
+
+      <div role="alert" class="third-party-signin message" tabindex="-1">
+        <p class="instructions"> </p>
       </div>
 
       <p class="instructions sr">
@@ -188,21 +194,19 @@
       </div>
     </form>
 
-    % if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    % if microsite.get_value('ENABLE_THIRD_PARTY_AUTH', settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH')):
 
-    <hr />
-
-    <p class="instructions">
-      ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
-      ## Translators: this is the last choice of a number of choices of how to log in to the site.
-      ${_('or, if you have connected one of these providers, log in below.')}
-    </p>
+      <span class="deco-divider">
+        ## Developers: this is a sentence fragment, which is usually frowned upon.  The design of the pags uses this fragment to provide an "else" clause underneath a number of choices.  It's OK to leave it.
+        ## Translators: this is the last choice of a number of choices of how to log in to the site.
+        <span class="copy">${_('or')}</span>
+      </span>
 
     <div class="form-actions form-third-party-auth">
 
     % for enabled in provider.Registry.enabled():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+      <button type="submit" class="button button-primary button-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline.get_login_url(enabled.NAME, pipeline.AUTH_ENTRY_LOGIN)}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
     % endfor
 
     </div>

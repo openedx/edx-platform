@@ -1,0 +1,116 @@
+<div id="content">
+    <div class="wrapper-mast wrapper">
+        <header class="mast mast-wizard has-actions">
+            <h1 class="page-header">
+                <span class="page-header-sub">Create a re-run of a course</span>
+            </h1>
+
+            <nav class="nav-actions">
+                <h3 class="sr">Page Actions</h3>
+                <ul>
+                    <li class="nav-item">
+                        <a href="" class="button cancel-button">Cancel</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <h2 class="page-header-super course-original">
+                <span class="sr">You are creating a re-run from:</span>
+                <span class="course-original-title-id">edX Open_DemoX 2014_T1</span>
+                <span class="course-original-title">edX Demonstration Course</span>
+            </h2>
+        </header>
+    </div>
+
+    <div class="wrapper-content wrapper">
+        <div class="inner-wrapper">
+            <section class="content">
+                <article class="content-primary">
+                    <div class="introduction">
+                        <div class="copy">
+                            <p>
+                                Provide identifying information for this re-run of the course. The original course is not affected in any way by a re-run.
+                                <strong>Note: Together, the organization, course number, and course run must uniquely identify this new course instance.</strong>
+                            <p>
+                        </div>
+                    </div>
+
+                    <div class="wrapper-rerun-course">
+                        <form class="form-create rerun-course course-info" id="rerun-course-form"
+                              name="rerun-course-form">
+                            <div class="wrapper-error is-hidden">
+                                <div id="course_rerun_error" name="course_rerun_error"
+                                     class="message message-status error" role="alert">
+                                </div>
+                            </div>
+
+                            <div class="wrapper-form">
+                                <fieldset>
+                                    <legend class="sr">Required Information to Create a re-run of a course</legend>
+
+                                    <ol class="list-input">
+                                        <li class="field text required" id="field-course-name">
+                                            <label for="rerun-course-name">Course Name</label>
+                                            <input class="rerun-course-name" id="rerun-course-name" type="text"
+                                                   name="rerun-course-name" aria-required="true" value="edX Demonstration Course"
+                                                   placeholder="e.g. Introduction to Computer Science"/>
+                                            <span class="tip">
+                                                The public display name for the new course. (This name is often the same as the original course name.)
+                                            </span>
+                                            <span class="tip tip-error is-hidden"></span>
+                                        </li>
+                                        <li class="field text required" id="field-organization">
+                                            <label for="rerun-course-org">Organization</label>
+                                            <input class="rerun-course-org" id="rerun-course-org" type="text"
+                                                   name="rerun-course-org" aria-required="true"
+                                                   value="edX"
+                                                   placeholder="e.g. UniversityX or OrganizationX"/>
+                                            <span class="tip">
+                                              The name of the organization sponsoring the new course. (This name is often the same as the original organization name.)
+                                              <strong class="tip-note" class="tip-note">Note: No spaces or special characters are allowed.</strong>
+                                            </span>
+                                            <span class="tip tip-error is-hidden"></span>
+                                        </li>
+
+                                        <li class="row">
+                                            <div class="column field text required" id="field-course-number">
+                                                <label for="rerun-course-number">Course Number</label>
+                                                <input class="rerun-course-number" id="rerun-course-number" type="text"
+                                                       name="rerun-course-number" aria-required="true"
+                                                       value="Open_DemoX" placeholder="e.g. CS101"/>
+                                                <span class="tip">
+                                                  The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)
+                                                  <strong class="tip-note" class="tip-note">Note: No spaces or special characters are allowed.</strong>
+                                                </span>
+                                                <span class="tip tip-error is-hidden"></span>
+                                            </div>
+
+                                            <div class="column field text required" id="field-course-run">
+                                                <label for="rerun-course-run">Course Run</label>
+                                                <input class="rerun-course-run" id="rerun-course-run" type="text"
+                                                       name="rerun-course-run" aria-required="true"
+                                                       placeholder="e.g. 2014_T1"/>
+                                                <span class="tip">
+                                                  The term in which the new course will run. (This value is often different than the original course run value.)
+                                                  <strong class="tip-note" class="tip-note">Note: No spaces or special characters are allowed.</strong>
+                                                </span>
+                                                <span class="tip tip-error is-hidden"></span>
+                                            </div>
+                                        </li>
+                                    </ol>
+
+                                    <input type="hidden" value="false" class="allow-unicode-course-id"/>
+                                </fieldset>
+                            </div>
+
+                            <div class="actions">
+                                <button type="submit" class="action action-primary rerun-course-save is-disabled">Create Re-run</button>
+                                <button type="button" class="action action-secondary action-cancel rerun-course-cancel">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </div>
+</div>

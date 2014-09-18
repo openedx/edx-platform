@@ -1,11 +1,17 @@
-<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="VerticalDescriptor" tabindex="0">
+<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime"
+     data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
+     data-type="VerticalDescriptor" tabindex="0">
     <div class="wrapper-comp-editor is-active" id="editor-tab" data-base-asset-url="/c4x/AndyA/ABT101/asset/">
 <section class="editor-with-tabs">
      <div class="edit-header">
         <span class="component-name"></span>
         <ul class="editor-tabs">
-            <li class="inner_tab_wrap"><a href="#tab-i4x-testCourse-video-84c6bf5dc2a24bc7996771eb7a1a4ad1-0" class="tab current">Basic</a></li>
-            <li class="inner_tab_wrap"><a href="#tab-i4x-testCourse-video-84c6bf5dc2a24bc7996771eb7a1a4ad1-1" class="tab">Advanced</a></li>
+            <li class="inner_tab_wrap">
+                <a href="#tab-i4x-testCourse-video-84c6bf5dc2a24bc7996771eb7a1a4ad1-0" class="tab current">Basic</a>
+            </li>
+            <li class="inner_tab_wrap">
+                <a href="#tab-i4x-testCourse-video-84c6bf5dc2a24bc7996771eb7a1a4ad1-1" class="tab">Advanced</a>
+            </li>
         </ul>
       </div>
       <div class="tabs-wrapper">

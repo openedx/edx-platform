@@ -110,17 +110,40 @@
             .third-party-auth {
               color: inherit;
               font-weight: inherit;
+            }
 
-              .control {
-                float: right;
-              }
+            .auth-provider {
+              width: flex-grid(12);
+              display: block;
+              margin-top: ($baseline/4);
 
-              .icon {
-                margin-top: 4px;
+              .status {
+                width: flex-grid(1);
+                display: inline-block;
+                color: $gray-l2;
+
+                .icon-link {
+                  color: $base-font-color;
+                }
+
+                .copy {
+                  @extend %text-sr;
+                }
               }
 
               .provider {
-                display: inline;
+                width: flex-grid(9);
+                display: inline-block;
+              }
+
+              .control {
+                width: flex-grid(2);
+                display: inline-block;
+                text-align: right;
+
+                a:link, a:visited {
+                  @extend %t-copy-sub2;
+                }
               }
             }
           }
@@ -1085,4 +1108,61 @@
       @extend %t-copy;
     }
   }
-}
+   p.course-block{
+    border-style: solid;
+    border-color: #E3DC86;
+    padding: 5px;
+    border-width: 1px;
+    background: #FDFBE4;
+
+  }
+  .enter-course-blocked{
+
+    @include box-sizing(border-box);
+    display: block;
+    float: left;
+    font: normal 15px/1.6rem $sans-serif;
+    letter-spacing: 0;
+    padding: 6px 32px 7px;
+    text-align: center;
+    margin-top: 16px;
+    opacity:0.5;
+    background:#808080;
+    border:0;
+    color:white;
+    box-shadow:none;
+    &.archived {
+            @include button(simple, $button-archive-color);
+            font: normal 15px/1.6rem $sans-serif;
+            padding: 6px 32px 7px;
+
+            &:hover, &:focus {
+              text-decoration: none;
+            }
+          }
+  }
+  a.disable-look{
+    color: #808080;
+  }
+  a.disable-look-unregister{
+    color: #808080;
+    float: right;
+    display: block;
+    font-style: italic;
+    color: $lighter-base-font-color;
+    text-decoration: underline;
+    font-size: .8em;
+    margin-top: 32px;
+
+  }
+  a.disable-look-settings{
+    @extend a.disable-look-unregister;
+      margin-right: 10px;
+    }
+
+  }
+  a.fade-cover{
+    @extend .cover;
+    opacity: 0.5;
+  }
+

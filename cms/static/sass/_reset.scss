@@ -58,6 +58,7 @@ q:before, q:after {
 ins {
 	text-decoration: none;
 }
+
 del {
 	text-decoration: line-through;
 }
@@ -71,94 +72,4 @@ abbr[title] {
 	border-bottom: none;
 	text-decoration: none;
 	cursor: help;
-}
-
-// ====================
-
-// grandfathered styles
-
-// reset styles to remove ui-lightness jquery ui theme from the tabs component (used in the add component problem tab menu)
-.ui-tabs {
-	padding: 0;
-	white-space: normal;
-}
-
-.ui-corner-all, .ui-corner-bottom, .ui-corner-left, ui-corner-top, .ui-corner-br, .ui-corner-right {
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
-	border-top-right-radius: 0;
-	border-top-left-radius: 0;
-}
-
-
-.ui-widget-content {
-	border: 0;
-	background: none;
-}
-.ui-widget {
-	font-family: 'Open Sans', sans-serif;
-	font-size: 16px;
-}
-
-.ui-widget-header {
-	border:none;
-	background: none;
-}
-
-.ui-tabs .ui-tabs-nav {
-	padding: 0;
-}
-
-.ui-tabs .ui-tabs-nav li {
-	margin: 0;
-	padding: 0;
-	border: none;
-	top: 0;
-	margin: 0;
-	float: none;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
-}
-
-.ui-tabs-nav {
-
-	li {
-		top: 0;
-		margin: 0;
-	}
-	a {
-		float: none;
-		font-weight: normal;
-	}
-}
-
-.ui-tabs .ui-tabs-panel {
-	padding: 0;
-}
-
-// reapplying the tab styles from unit.scss after removing jquery ui ui-lightness styling
-.problem-type-tabs {
-	border:none;
-	list-style-type: none;
-	width: 100%;
-	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-	//background-color: $lightBluishGrey;
-	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
-
-	li:first-child {
-		margin-left: 20px;
-	}
-	li {
-		opacity: 0.8;
-
-		&:ui-state-active {
-			background-color: rgba(255, 255, 255, .3);
-			opacity: 1.0;
-			font-weight: 400;
-		}
-		a:focus {
-			outline: none;
-			border: 0px;
-		}
-	}
 }

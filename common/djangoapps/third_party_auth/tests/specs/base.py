@@ -123,8 +123,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         assert_duplicate_presence_fn = self.assertIn if duplicate else self.assertNotIn
 
         self.assertEqual(200, response.status_code)
-        self.assertIn(user.email, response.content)
-        self.assertIn(user.username, response.content)
+        self.assertIn(user.email, response.content.decode('UTF-8'))
+        self.assertIn(user.username, response.content.decode('UTF-8'))
         assert_duplicate_presence_fn(duplicate_account_error_needle, response.content)
 
         if linked is not None:
@@ -220,10 +220,8 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
 
     def assert_json_failure_response_is_missing_social_auth(self, response):
         """Asserts failure on /login for missing social auth looks right."""
-        self.assertEqual(200, response.status_code)  # Yes, it's a 200 even though it's a failure.
-        payload = json.loads(response.content)
-        self.assertFalse(payload.get('success'))
-        self.assertIn('associated with your %s account' % self.PROVIDER_CLASS.NAME, payload.get('value'))
+        self.assertEqual(401, response.status_code)
+        self.assertIn("successfully logged into your %s account, but this account isn't linked" % self.PROVIDER_CLASS.NAME, response.content)
 
     def assert_json_failure_response_is_username_collision(self, response):
         """Asserts the json response indicates a username collision."""
@@ -282,7 +280,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
     def assert_register_response_before_pipeline_looks_correct(self, response):
         """Asserts a GET of /register not in the pipeline looks correct."""
         self.assertEqual(200, response.status_code)
-        self.assertIn('Sign in with ' + self.PROVIDER_CLASS.NAME, response.content)
+        self.assertIn('Sign up with ' + self.PROVIDER_CLASS.NAME, response.content)
         self.assert_signin_button_looks_functional(response.content, pipeline.AUTH_ENTRY_REGISTER)
 
     def assert_signin_button_looks_functional(self, content, auth_entry):

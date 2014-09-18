@@ -1,0 +1,163 @@
+###################################
+August 28, 2014
+###################################
+
+The following information reflects what is new in the edX Platform as of August
+28, 2014. See previous pages in this document for a history of changes.
+
+****************************************
+edX Release Announcements Mailing List
+****************************************
+
+These edX Course Staff Release Notes are always available and are updated with
+each release of the edX Platform on `edx.org`_ and `edX Edge`_.
+
+You can also sign up for the `edX Release Announcements mailing list`_ to get
+an email message when we update the edX Course Staff Release Notes.
+
+***************************************
+edX Studio
+***************************************
+
+* This release further expands the recently redesigned Studio publishing
+  process. These features are available on the **Course Outline** page.
+
+  * You can now publish all unpublished content in an entire section or
+    subsection in a single step: on the **Course Outline** page, click the
+    "Publish" icon.
+
+     .. image:: images/outline-publish-icons.png
+       :alt: The Course Outline page showing an expanded section and subsection
+           with a unit that contains unpublished content.
+
+    The "Publish" icon is also available for individual units on the **Course
+    Outline** page.
+
+  * You can now hide all of the content in an entire section or subsection on
+    the **Course Outline** page. To ensure that students cannot see a part of
+    the course, select the "Settings" icon and in the dialog that opens select
+    **Hide from students**. The same feature is available for individual units.
+  
+  For more details, see our most recent `edX Product and Engineering
+  Newsletter`_.
+
+* You can now build content experiments (also known as A/B tests or split
+  tests) entirely within edX Studio.  With a content experiment, you show
+  different course content to different groups of students. Research teams can
+  compare the performance of students in different groups to gain insights into
+  the relative effectiveness of course content.
+
+* A defect in the drag and drop feature for course content on the **Course
+  Outline** page has been fixed. Dropping a unit into a collapsed subsection
+  now adds the unit without changing any existing content in that subsection.
+  (TNL-56)
+
+*******************************
+edX Learning Management System
+*******************************
+
+* When you click **Sent Email History** on the Instructor Dashboard **Email**
+  page, a new **Sent By** column in the list of messages identifies the sender
+  of each message.
+  
+* The Instructor Dashboard no longer displays instructions for accessing the
+  older version of the dashboard. However, users can still select **Revert to
+  Legacy Dashboard** to access the older version.
+  
+* The computations for demographic distributions that are reported on the
+  **Analytics** page of the Instructor Dashboard have been updated. The level
+  of education and gender distributions are now computed for currently enrolled
+  students only. Previously, these distributions were computed for all students
+  who were ever enrolled in the course. (LMS-11228)
+
+.. * Bulk email now available for all courses? Instructor Dashboard, Email page
+
+.. **************************
+.. edX Data & Analytics
+.. ************************** 
+
+**************************
+Coming Soon
+**************************
+
+We're pleased to announce these changes, which will be released in the next few
+weeks:
+
+* In addition to the existing Discussion post type, course discussions will
+  soon include a new Question post type. Students and course teams will also be
+  able to filter posts to find unanswered questions easily.
+  
+* A new design for course discussions is coming! New controls will provide
+  consistent ways to take action on posts. Additionally, a set of colorful
+  badges will make identifying posts easier.
+  
+* To make the process of registering faster and easier, students will soon be
+  able to both register and log in to the edX.org and edX Edge web sites with
+  their existing Google or Facebook accounts.
+
+**************************
+edX Documentation
+**************************
+
+All guides now include a section that lists browsers supported for use with the
+edX platform.
+
+The following documentation is available:
+
+* `Building and Running an edX Course`_ 
+
+  Update your bookmarks and links! To prepare for some upcoming additions to
+  the edX documentation set, we recently changed the location of this guide
+  and its URL changed as a result. You can always find `Building and Running an
+  edX Course`_  and the rest of our documentation set at `docs.edx.org`_.
+
+  You can also click **Help** in the upper-right corner of any page in the edX
+  Studio user interface to access relevant sections in this guide, and download
+  the entire guide as a PDF as needed.
+
+  Recent changes include: 
+
+  * The `Developing Your Course`_ chapter has been updated to include the new
+    capabilities for publishing and hiding multiple units on the **Course
+    Outline** page.
+
+  * A new `Add Content Experiments to Your Course`_ chapter is now available.
+
+  * An additional sample email message for students, announcing a new run of a
+    course, is now available. See `New Course Run Announcement`_.
+
+  * Messages about the effect of changes to the grading policy, graded
+    subsections, or graded components in a live course are now included in
+    relevant sections throughout the guide.
+
+* `Creating Peer Assessments`_
+
+* `edX Research Guide`_
+
+   Recent changes include: 
+
+   * The `Tracking Logs`_ chapter now includes a section that describes open
+     response assessment events.
+
+   * The "Course Grading" and "XML format of drag and drop input" chapters were
+     removed. These topics are covered in the `Building and Running an edX
+     Course`_  guide.
+
+* `edX Developer's Guide`_
+
+* `edX XBlock Documentation`_
+
+* `Installing, Configuring, and Running the edX Platform`_  
+
+**************************
+Other edX Resources
+**************************
+
+You can access the `edX Status`_ page to get an up-to-date status for all
+services on edx.org and edX Edge. The page also includes the Twitter feed for
+@edXstatus, which the edX Operations team uses to post updates.
+
+You can access the public `edX roadmap`_ for details about the currently
+planned product direction.
+
+.. include:: links.rst

@@ -80,6 +80,8 @@ class Date(Field):
         else:
             raise TypeError("Cannot convert {!r} to json".format(value))
 
+    enforce_type = from_json
+
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
 
@@ -116,6 +118,15 @@ class Timedelta(Field):
             if cur_value > 0:
                 values.append("%d %s" % (cur_value, attr))
         return ' '.join(values)
+
+    def enforce_type(self, value):
+        """
+        Ensure that when set explicitly the Field is set to a timedelta
+        """
+        if isinstance(value, datetime.timedelta) or value is None:
+            return value
+
+        return self.from_json(value)
 
 
 class RelativeTime(Field):
@@ -219,3 +230,12 @@ class RelativeTime(Field):
         if len(stringified) == 7:
             stringified = '0' + stringified
         return stringified
+
+    def enforce_type(self, value):
+        """
+        Ensure that when set explicitly the Field is set to a timedelta
+        """
+        if isinstance(value, datetime.timedelta) or value is None:
+            return value
+
+        return self.from_json(value)

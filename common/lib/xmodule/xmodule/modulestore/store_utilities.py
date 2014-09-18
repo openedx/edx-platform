@@ -1,73 +1,59 @@
 import re
 import logging
 
-from xmodule.contentstore.content import StaticContent
+import uuid
 
 
-def _prefix_only_url_replace_regex(prefix):
+def _prefix_only_url_replace_regex(pattern):
     """
-    Match static urls in quotes that don't end in '?raw'.
-
-    To anyone contemplating making this more complicated:
-    http://xkcd.com/1171/
+    Match urls in quotes pulling out the fields from pattern
     """
-    return ur"""
+    return re.compile(ur"""
         (?x)                      # flags=re.VERBOSE
         (?P<quote>\\?['"])        # the opening quotes
-        (?P<prefix>{prefix})      # the prefix
-        (?P<rest>.*?)             # everything else in the url
+        {}
         (?P=quote)                # the first matching closing quote
-        """.format(prefix=re.escape(prefix))
-
-
-def _prefix_and_category_url_replace_regex(prefix):
-    """
-    Match static urls in quotes that don't end in '?raw'.
-
-    To anyone contemplating making this more complicated:
-    http://xkcd.com/1171/
-    """
-    return ur"""
-        (?x)                      # flags=re.VERBOSE
-        (?P<quote>\\?['"])        # the opening quotes
-        (?P<prefix>{prefix})      # the prefix
-        (?P<category>[^/]+)/
-        (?P<rest>.*?)             # everything else in the url
-        (?P=quote)                # the first matching closing quote
-        """.format(prefix=re.escape(prefix))
+        """.format(pattern))
 
 
 def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     """
-    Does a regex replace on non-portable links:
+    rewrite any non-portable links to (->) relative links:
          /c4x/<org>/<course>/asset/<name> -> /static/<name>
          /jump_to/i4x://<org>/<course>/<category>/<name> -> /jump_to_id/<id>
-
     """
 
     def portable_asset_link_subtitution(match):
         quote = match.group('quote')
-        rest = match.group('rest')
-        return quote + '/static/' + rest + quote
+        block_id = match.group('block_id')
+        return quote + '/static/' + block_id + quote
 
     def portable_jump_to_link_substitution(match):
         quote = match.group('quote')
-        rest = match.group('rest')
+        rest = match.group('block_id')
         return quote + '/jump_to_id/' + rest + quote
 
-    # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
-    # the regex substitution, log the error and continue
-    c4x_link_base = StaticContent.get_base_url_path_for_course_assets(source_course_id)
-    try:
-        text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
-    except Exception as exc:  # pylint: disable=broad-except
-        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", c4x_link_base, text, str(exc))
+    # if something blows up, log the error and continue
 
-    jump_to_link_base = u'/courses/{course_key_string}/jump_to/i4x://{course_key.org}/{course_key.course}/'.format(
-        course_key_string=source_course_id.to_deprecated_string(), course_key=source_course_id
+    # create a serialized template for what the id will look like in the source_course but with
+    # the block_id as a regex pattern
+    placeholder_id = uuid.uuid4().hex
+    asset_block_pattern = unicode(source_course_id.make_asset_key('asset', placeholder_id))
+    asset_block_pattern = asset_block_pattern.replace(placeholder_id, r'(?P<block_id>.*?)')
+    try:
+        text = _prefix_only_url_replace_regex(asset_block_pattern).sub(portable_asset_link_subtitution, text)
+    except Exception as exc:  # pylint: disable=broad-except
+        logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", asset_block_pattern, text, str(exc))
+
+    placeholder_category = 'cat_{}'.format(uuid.uuid4().hex)
+    usage_block_pattern = unicode(source_course_id.make_usage_key(placeholder_category, placeholder_id))
+    usage_block_pattern = usage_block_pattern.replace(placeholder_category, r'(?P<category>[^/+@]+)')
+    usage_block_pattern = usage_block_pattern.replace(placeholder_id, r'(?P<block_id>.*?)')
+    jump_to_link_base = ur'/courses/{course_key_string}/jump_to/{usage_key_string}'.format(
+        course_key_string=unicode(source_course_id), usage_key_string=usage_block_pattern
     )
     try:
-        text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
+        text = _prefix_only_url_replace_regex(jump_to_link_base).sub(portable_jump_to_link_substitution, text)
     except Exception as exc:  # pylint: disable=broad-except
         logging.warning("Error producing regex substitution %r for text = %r.\n\nError msg = %s", jump_to_link_base, text, str(exc))
 

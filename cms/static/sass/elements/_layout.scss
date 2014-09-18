@@ -141,6 +141,26 @@
     }
   }
 
+  // CASE: wizard-based mast
+  .mast-wizard {
+
+    .page-header-sub {
+      @extend %t-title4;
+      color: $gray;
+      font-weight: 300;
+    }
+
+    .page-header-super {
+      @extend %t-title4;
+      float: left;
+      width: flex-grid(12,12);
+      margin-top: ($baseline/2);
+      border-top: 1px solid $gray-l4;
+      padding-top: ($baseline/2);
+      font-weight: 600;
+    }
+  }
+
   // page metadata/action bar
   .metadata {
 
@@ -178,9 +198,9 @@
 
     .title-1 {
       @extend %t-title3;
+      @extend %t-strong;
       margin: 0;
       padding: 0;
-      font-weight: 600;
       color: $gray-d3;
     }
   }

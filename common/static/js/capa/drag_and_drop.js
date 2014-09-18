@@ -1,7 +1,7 @@
 // Wrapper for RequireJS. It will make the standard requirejs(), require(), and
 // define() functions from Require JS available inside the anonymous function.
 //
-// See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
+// See https://openedx.atlassian.net/wiki/display/PLAT/Integration+of+Require+JS+into+the+system
 (function (requirejs, require, define) {
 
 // HACK: this should be removed when it is safe to do so

@@ -10,6 +10,9 @@
 %t-strong {
  font-weight: 600;
 }
+%t-demi-strong {
+ font-weight: 500;
+}
 %t-regular {
  font-weight: 400;
 }
@@ -136,6 +139,11 @@
 %t-action4 {
   @include font-size(12);
   @include line-height(12);
+}
+
+%t-action5 {
+  @include font-size(10);
+  @include line-height(10);
 }
 
 

@@ -28,7 +28,7 @@
     }
 
     .new-button {
-      @include font-size(14);
+      @extend %t-action3;
       margin-left: $baseline;
 
       [class^="icon-"] {
@@ -51,13 +51,11 @@
           }
 
           .group-configuration-title {
-            @extend %t-title;
-            @include font-size(22);
-            @include line-height(22);
+            @extend %t-title4;
+            @extend %t-strong;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
-            font-weight: bold;
 
             .group-toggle {
               display: inline-block;
@@ -109,7 +107,7 @@
 
           .ui-toggle-expansion {
             @include transition(rotate .15s ease-in-out .25s);
-            @include font-size(21);
+            @extend %t-action1;
             display: inline-block;
             width: ($baseline*0.75);
             vertical-align: baseline;
@@ -133,9 +131,7 @@
             margin-bottom: ($baseline*0.75);
 
             .group {
-              @extend %t-copy-sub2;
-              @include font-size(18);
-              @include line-height(16);
+              @extend %t-copy-lead1;
               padding: ($baseline/7) 0 ($baseline/4);
               border-top: 1px solid $gray-l4;
               white-space: nowrap;
@@ -193,19 +189,49 @@
         }
 
         .wrapper-group-configuration-usages {
-          @include font-size(14);
-          background-color: #f8f8f8;
+          @extend %t-copy-sub1;
           box-shadow: 0 2px 2px 0 $shadow inset;
           padding: $baseline ($baseline*1.5) $baseline ($baseline*2.5);
+          color: $gray-l1;
 
           .group-configuration-usage {
-            color: $gray-l1;
             margin-left: $baseline;
 
             .group-configuration-usage-unit {
               padding: ($baseline/4) 0;
+
+              a {
+                font-weight: 600;
+              }
+
+              .icon-warning-sign {
+                margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+                color: $orange;
+              }
+
+              .icon-exclamation-sign {
+                margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
+                color: $red-l2;
+              }
             }
           }
+        }
+      }
+
+      .wrapper-group-configuration-validation {
+        @extend %t-copy-sub1;
+        background-color: #f8f8f8;
+        margin-top: $baseline;
+        padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
+
+        .icon-warning-sign {
+          margin: ($baseline/2) $baseline 0 0;
+          color: $orange;
+          float: left;
+        }
+
+        .group-configuration-validation-text {
+          overflow: auto;
         }
       }
 
@@ -248,21 +274,21 @@
           // add a group is below with groups styling
           .action-primary {
             @include blue-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
             text-transform: uppercase;
           }
 
           .action-secondary {
             @include grey-button;
-            @extend %t-action2;
             @include transition(all .15s);
+            @extend %t-action2;
+            @extend %t-strong;
             display: inline-block;
             padding: ($baseline/5) $baseline;
-            font-weight: 600;
             text-transform: uppercase;
           }
 
@@ -282,7 +308,7 @@
           color: $gray;
 
           strong {
-            font-weight: 600;
+            @extend %t-strong;
           }
         }
 
@@ -300,7 +326,7 @@
             &.required {
 
               label {
-                font-weight: 600;
+                @extend %t-strong;
               }
 
               label:after {
@@ -393,7 +419,7 @@
               color: $gray-l1;
 
               .group-configuration-value {
-                font-weight: 600;
+                @extend %t-strong;
                 white-space: nowrap;
                 margin-left: ($baseline*0.5);
               }
@@ -405,7 +431,7 @@
           }
 
           label.required {
-            font-weight: 600;
+            @extend %t-strong;
 
             &:after {
               margin-left: ($baseline/4);
@@ -445,7 +471,7 @@
 
             .action-close {
               @include transition(color 0.25s ease-in-out);
-              @include font-size(22);
+              @extend %t-action1;
               display: inline-block;
               border: 0;
               padding: 0;
@@ -471,12 +497,12 @@
 
       .action-add-group {
         @extend %ui-btn-flat-outline;
-        @include font-size(16);
+        @extend %t-action2;
+        @extend %t-strong;
         display: block;
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
-        font-weight: 600;
       }
     }
   }

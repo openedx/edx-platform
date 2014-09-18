@@ -724,7 +724,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
         # definition_locator is only used by mongostores which separate definitions from blocks
-        self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
+        self.previous_version = self.update_version = self.definition_locator = None
         self.xmodule_runtime = None
 
     @classmethod

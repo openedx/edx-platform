@@ -16,8 +16,10 @@ Building and Running an edX Course
    change_log
    getting_started/index
    building_course/index
+   developing_course/index
    creating_content/index
    exercises_tools/index
+   content_experiments/index
    releasing_course/index
    running_course/index
    students/index

@@ -5,18 +5,22 @@ Integration tests of the payment flow, including course mode selection.
 from lxml.html import soupparser
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from django.conf import settings
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from verify_student.models import SoftwareSecurePhotoVerification
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+# Since we don't need any XML course fixtures, use a modulestore configuration
+# that disables the XML modulestore.
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
+
+
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestProfEdVerification(ModuleStoreTestCase):
     """
     Integration test for professional ed verification, including course mode selection.
@@ -94,6 +98,26 @@ class TestProfEdVerification(ModuleStoreTestCase):
 
         # On the verified page, expect that there's a link to payment page
         self.assertContains(resp, '/shoppingcart/payment_fake')
+
+    def test_do_not_auto_register(self):
+        # TODO (ECOM-16): Remove once we complete the AB-test of auto-registration.
+        session = self.client.session
+        session['auto_register'] = True
+        session.save()
+
+        # Go to the course mode page, expecting a redirect
+        # to the show requirements page.
+        resp = self.client.get(self.urls['course_modes_choose'], follow=True)
+        self.assertRedirects(resp, self.urls['verify_show_student_requirements'])
+
+        # For professional ed courses, expect that the student is NOT enrolled
+        # automatically in the course.
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
+
+        # Expect that the rendered page says that the student is "registering",
+        # not that they've already been registered.
+        self.assertIn("You are registering for", resp.content)
+        self.assertNotIn("You are now registered", resp.content)
 
     def _prices_on_page(self, page_content):
         """ Retrieve the available prices on the verify page. """

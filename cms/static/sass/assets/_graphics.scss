@@ -156,9 +156,9 @@
 .draft-tag,
 .public-tag,
 .private-tag {
+	@extend %t-action5;
+	@extend %t-strong;
 	margin-left: 3px;
-	font-size: 9px;
-	font-weight: 600;
 	text-transform: uppercase;
 	color: #a4aab7;
 }

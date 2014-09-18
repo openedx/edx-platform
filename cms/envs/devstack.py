@@ -40,6 +40,10 @@ FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
 
+################################ COURSE RERUNS ################################
+
+FEATURES['ALLOW_COURSE_RERUNS'] = True
+
 ################################ DEBUG TOOLBAR ################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)

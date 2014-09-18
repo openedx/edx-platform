@@ -13,6 +13,7 @@ Installing, Configuring, and Running the edX Platform
 
    read_me
    change_log
+   browsers
    install_options
    devstack/install_devstack
    devstack/run_devstack

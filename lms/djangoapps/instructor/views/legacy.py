@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from xmodule_modifiers import wrap_xblock
+from xmodule_modifiers import wrap_xblock, request_token
 import xmodule.graders as xmgraders
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -51,7 +51,7 @@ from django_comment_common.models import (
 )
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
-from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course
+from instructor.views.tools import strip_if_string, bulk_email_is_enabled_for_course, add_block_ids
 from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,
@@ -921,7 +921,9 @@ def instructor_dashboard(request, course_id):
         if res.status_code == codes.OK:
             # WARNING: do not use req.json because the preloaded json doesn't
             # preserve the order of the original record (hence OrderedDict).
-            return json.loads(res.content, object_pairs_hook=OrderedDict)
+            payload = json.loads(res.content, object_pairs_hook=OrderedDict)
+            add_block_ids(payload)
+            return payload
         else:
             log.error("Error fetching %s, code: %s, msg: %s",
                       url, res.status_code, res.content)
@@ -985,7 +987,8 @@ def instructor_dashboard(request, course_id):
         fragment = wrap_xblock(
             'LmsRuntime', html_module, 'studio_view', fragment, None,
             extra_data={"course-id": course_key.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string())
+            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            request_token=request_token(request),
         )
         email_editor = fragment.content
 

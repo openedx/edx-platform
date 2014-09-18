@@ -1,0 +1,130 @@
+// discussion - thread layout
+// ====================
+
+// general thread layout
+body.discussion, .discussion-module {
+
+  // post layout
+  .discussion-post {
+    padding: ($baseline*2) ($baseline*2) $baseline ($baseline*2);
+    border-radius: 3px 3px 0 0;
+    background-color: $white;
+
+    .post-header-content {
+      display: inline-block;
+      width: flex-grid(9,12);
+    }
+
+    .post-header-actions {
+      display: inline-block;
+      float: right;
+      vertical-align: middle;
+      width: flex-grid(3,12);
+    }
+  }
+
+  // response layout
+  .discussion-response {
+    min-height: ($baseline*7.5);
+
+    .username {
+      @include font-size(14);
+      @extend %t-weight5;
+    }
+
+    .posted-details .username {
+      font-size: inherit;
+    }
+
+    .response-header-content {
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9,12);
+    }
+
+    .response-header-actions {
+      width: flex-grid(3,12);
+      float: right;
+    }
+  }
+
+  // comments layout
+  .comments {
+    @extend %ui-no-list;
+    border-radius: 0 0 3px 3px;
+    background: $gray-l6;
+    box-shadow: 0 1px 3px -1px $shadow inset;
+
+    > li {
+      border-top: 1px solid $gray-l4;
+      padding: ($baseline/2) $baseline;
+    }
+
+
+    blockquote {
+      background: $gray-l4;
+      border-radius: 3px;
+      padding: ($baseline/4) ($baseline/2);
+      font-size: 14px;
+    }
+
+    .comment-form {
+      @include clearfix;
+
+      .comment-form-input {
+        padding: ($baseline/4) ($baseline/2);
+        background-color: $white;
+        font-size: 14px;
+      }
+
+      .discussion-submit-comment {
+        @include blue-button;
+        float: left;
+        margin-top: 8px;
+      }
+
+      .wmd-input {
+        height: 40px;
+      }
+
+      .discussion-errors {
+        margin: 0;
+      }
+    }
+
+    .response-body {
+      display: inline-block;
+      margin-bottom: ($baseline/2);
+      width: flex-grid(10,12);
+      font-size: 13px;
+
+      p + p {
+        margin-top: 12px;
+      }
+    }
+
+    .comment-actions-list {
+      display: inline-block;
+      width: flex-grid(2,12);
+      vertical-align: top;
+    }
+
+    //TO-DO : clean up posted-details styling, currently reused by responses and comments
+    .posted-details {
+      margin-top: 0;
+    }
+  }
+}
+
+.forum-thread-main-wrapper {
+  border-bottom: 1px solid $white; // Prevent collapsing margins
+  border-radius: 3px 3px 0 0;
+  background-color: $white;
+}
+
+body.discussion, .discussion-thread.expanded {
+  .forum-thread-main-wrapper {
+    box-shadow: 0 1px 3px $shadow;
+  }
+}
+

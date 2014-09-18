@@ -3,24 +3,24 @@
 
 .view-updates {
 
-	.course-info-wrapper {
-		display: table;
-		width: 100%;
-		clear: both;
-	}
+  .course-info-wrapper {
+    display: table;
+    width: 100%;
+    clear: both;
+  }
 
-	.main-column,
-	.course-handouts {
-		float: none;
-		display: table-cell;
-	}
+  .main-column,
+  .course-handouts {
+    float: none;
+    display: table-cell;
+  }
 
-	.main-column {
-		border-radius: 3px 0 0 3px;
-		border-right-color: $mediumGrey;
-	}
+  .main-column {
+    border-radius: 3px 0 0 3px;
+    border-right-color: $mediumGrey;
+  }
 
-	.CodeMirror {
+  .CodeMirror {
     border: 1px solid #3c3c3c;
     background: #fff;
     color: #3c3c3c;
@@ -28,185 +28,185 @@
 }
 
 .course-updates {
-	padding: 30px 40px;
-	margin: 0;
+  padding: 30px 40px;
+  margin: 0;
 
-	.update-list > li {
-		padding: 34px 0 42px;
-		border-top: 1px solid #cbd1db;
+  .update-list > li {
+    padding: 34px 0 42px;
+    border-top: 1px solid #cbd1db;
 
-		&:first-child {
-			padding-top: 0;
-			border: none;
-		}
+    &:first-child {
+      padding-top: 0;
+      border: none;
+    }
 
-		&.editing {
-			position: relative;
-			z-index: 1001;
-			padding: 0;
-			border-top: none;
-			border-radius: 3px;
-			background: #fff;
+    &.editing {
+      position: relative;
+      z-index: 1001;
+      padding: 0;
+      border-top: none;
+      border-radius: 3px;
+      background: #fff;
 
-			.post-preview {
-				display: none;
-			}
-		}
+      .post-preview {
+        display: none;
+      }
+    }
 
-		h1 {
-			float: none;
-			font-size: 24px;
-			font-weight: 300;
-		}
+    h1 {
+      @extend %t-title4;
+      @extend %t-light;
+      float: none;
+    }
 
-		h2 {
-			margin-bottom: 18px;
-			font-size: 14px;
-			font-weight: 700;
-			line-height: 30px;
-			color: #646464;
-			letter-spacing: 1px;
-			text-transform: uppercase;
-		}
+    h2 {
+      @extend %t-title7;
+      @extend %t-strong;
+      margin-bottom: 18px;
+      line-height: 30px;
+      color: #646464;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
 
-		h3 {
-			margin: 34px 0 11px;
-			font-size: 16px;
-			font-weight: 700;
-		}
-	}
+    h3 {
+      @extend %t-title6;
+      @extend %t-strong;
+      margin: 34px 0 11px;
+    }
+  }
 
-	.update-contents {
-		p {
-			font-size: 16px;
-			line-height: 25px;
-		}
+  .update-contents {
+    p {
+      @extend %t-copy-base;
+      line-height: 25px;
+    }
 
-		p + p {
-			margin-top: 25px;
-		}
+    p + p {
+      margin-top: 25px;
+    }
 
-		.primary {
-			border: 1px solid #ddd;
-			background: #f6f6f6;
-			padding: 20px;
-		}
+    .primary {
+      border: 1px solid #ddd;
+      background: #f6f6f6;
+      padding: 20px;
+    }
 
-		ol, ul {
-		  margin: 1em 0;
-		  padding: 0 0 0 1em;
-		  color: $baseFontColor;
+    ol, ul {
+      margin: 1em 0;
+      padding: 0 0 0 1em;
+      color: $baseFontColor;
 
-		  li {
-		    margin-bottom: 0.708em;
-		  }
-		}
+      li {
+        margin-bottom: 0.708em;
+      }
+    }
 
-		ol {
-		  list-style: decimal outside none;
-		}
+    ol {
+      list-style: decimal outside none;
+    }
 
-		ul {
-		  list-style: disc outside none;
-		}
+    ul {
+      list-style: disc outside none;
+    }
 
-		pre {
-		  margin: 1em 0;
-		  color: $baseFontColor;
-		  font-family: monospace, serif;
-		  font-size: 1em;
-		  white-space: pre-wrap;
-		  word-wrap: break-word;
-		}
+    pre {
+      @extend %t-copy-base;
+      margin: 1em 0;
+      color: $baseFontColor;
+      font-family: monospace, serif;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
 
-		code {
-		  color: $baseFontColor;
-		  font-family: monospace, serif;
-		  background: none;
-		  padding: 0;
-		}
-	}
+    code {
+      color: $baseFontColor;
+      font-family: monospace, serif;
+      background: none;
+      padding: 0;
+    }
+  }
 
 
-	.new-update-form {
-		@include edit-box;
-		margin-bottom: 24px;
-		padding: 30px;
-		border: none;
+  .new-update-form {
+    @include edit-box;
+    margin-bottom: 24px;
+    padding: 30px;
+    border: none;
 
-		textarea {
-			height: 180px;
-		}
-	}
+    textarea {
+      height: 180px;
+    }
+  }
 
-	.post-actions {
-		float: right;
+  .post-actions {
+    float: right;
 
-		.edit-button,
-		.delete-button{
-			float: left;
-			@include white-button;
-	    padding: 3px 10px 4px;
-	    margin-left: 7px;
-	    font-size: 12px;
-	    font-weight: 400;
+    .edit-button,
+    .delete-button {
+      @include white-button();
+      @extend %t-action4;
+      @extend %t-regular;
+      float: left;
+      padding: 3px 10px 4px;
+      margin-left: 7px;
 
-	    .edit-icon,
-	    .delete-icon {
-	      margin-right: 4px;
-	    }
-		}
-	}
+      .edit-icon,
+      .delete-icon {
+        margin-right: 4px;
+      }
+    }
+  }
 }
 
 .course-handouts {
-	@extend %ui-window;
-	width: 30%;
-	padding: 20px 30px;
-	margin: 0;
-	border-radius: 0 3px 3px 0;
-	border-left: none;
-	background: $lightGrey;
+  @extend %ui-window;
+  width: 30%;
+  padding: 20px 30px;
+  margin: 0;
+  border-radius: 0 3px 3px 0;
+  border-left: none;
+  background: $lightGrey;
 
-	.title {
-		margin-bottom: 24px;
-		font-size: 22px;
-		font-weight: 300;
-	}
+  .title {
+    @extend %t-title4;
+    @extend %t-light;
+    margin-bottom: 24px;
+  }
 
-	.edit-button {
-		float: right;
-		@include white-button;
+  .edit-button {
+    @include white-button();
+    @extend %t-action4;
+    @extend %t-regular;
+    float: right;
     padding: 3px 10px 4px;
     margin-left: 7px;
-    font-size: 12px;
-    font-weight: 400;
 
     .edit-icon,
     .delete-icon {
       margin-right: 4px;
     }
-	}
+  }
 
-	.handouts-content {
-		font-size: 14px;
-	}
+  .handouts-content {
+    @extend %t-copy-sub1;
+  }
 
-	.treeview-handoutsnav li {
-		margin-bottom: 12px;
-	}
+  .treeview-handoutsnav li {
+    margin-bottom: 12px;
+  }
 }
 
 .edit-handouts-form {
-	@include edit-box;
-	position: absolute;
-	right: 0;
-	top: 0;
-	z-index: 10001;
-	width: 800px;
-	padding: 30px;
+  @include edit-box;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10001;
+  width: 800px;
+  padding: 30px;
 
-	textarea {
-		height: 300px;
-	}
+  textarea {
+    height: 300px;
+  }
 }

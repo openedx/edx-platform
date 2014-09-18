@@ -12,11 +12,11 @@ from django.core.urlresolvers import reverse
 
 % if has_extauth_info is UNDEFINED:
 
-<div class="cta">
-  <h3>${_("Already registered?")}</h3>
+<div class="cta cta-login">
+  <h3 class="title">${_("Already registered?")}</h3>
   <p class="instructions">
-    <a href="${reverse('signin_user')}${login_query()}">
-      ${_("Click here to log in.")}
+    <a class="cta-login-action" href="${reverse('signin_user')}${login_query()}">
+      ${_("Log in")}
     </a>
   </p>
 </div>

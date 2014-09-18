@@ -183,15 +183,14 @@ define([
                 expect(model.isValid()).toBeTruthy();
             });
 
-            it('requires at least two groups', function() {
+            it('requires at least one group', function() {
                 var group1 = new GroupModel({ name: 'Group A' }),
-                    group2 = new GroupModel({ name: 'Group B' }),
                     model = new GroupConfigurationModel({ name: 'foo' });
 
-                model.get('groups').reset([group1]);
+                model.get('groups').reset([]);
                 expect(model.isValid()).toBeFalsy();
 
-                model.get('groups').add(group2);
+                model.get('groups').add(group1);
                 expect(model.isValid()).toBeTruthy();
             });
 

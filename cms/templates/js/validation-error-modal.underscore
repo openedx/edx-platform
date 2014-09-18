@@ -1,0 +1,30 @@
+<div class = "validation-error-modal-content">
+    <div class "error-header">
+        <p>
+        <%= _.template(
+        gettext("There were {strong_start}{num_errors} validation error(s){strong_end} while trying to save the course setting(s) in the database."),
+        {
+            strong_start:'<strong>',
+            num_errors: num_errors,
+            strong_end: '</strong>'
+        },
+        {interpolate: /\{(.+?)\}/g})%>
+        <%= gettext("Please check the following validation feedbacks and reflect them in your course settings:")%></p>
+    </div>
+
+    <hr>
+
+    <ul class = "error-list">
+        <% _.each(response, function(value, index, list) { %> 
+
+            <li class = "error-item">
+                <span class='error-item-title'>
+                    <i class="icon-warning-sign"></i> 
+                    <strong><%= value.model.display_name %></strong>:
+                </span>
+                <textarea class = "error-item-message" disabled='disabled'><%=value.message%></textarea>
+            </li>
+
+        <% }); %>
+    </ul>
+</div>

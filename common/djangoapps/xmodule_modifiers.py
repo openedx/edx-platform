@@ -6,6 +6,7 @@ import datetime
 import json
 import logging
 import static_replace
+import uuid
 
 from django.conf import settings
 from django.utils.timezone import UTC
@@ -32,7 +33,19 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
+def request_token(request):
+    """
+    Return a unique token for the supplied request.
+    This token will be the same for all calls to `request_token`
+    made on the same request object.
+    """
+    if not hasattr(request, '_xblock_token'):
+        request._xblock_token = uuid.uuid1().get_hex()
+
+    return request._xblock_token
+
+
+def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, request_token, display_name_only=False, extra_data=None):  # pylint: disable=unused-argument
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
@@ -44,6 +57,8 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
     :param context: The context passed to the view being rendered
     :param usage_id_serializer: A function to serialize the block's usage_id for use by the
         front-end Javascript Runtime.
+    :param request_token: An identifier that is unique per-request, so that only xblocks
+        rendered as part of this request will have their javascript initialized.
     :param display_name_only: If true, don't render the fragment content at all.
         Instead, just render the `display_name` of `block`
     :param extra_data: A dictionary with extra data values to be set on the wrapper
@@ -56,7 +71,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
 
     data = {}
     data.update(extra_data)
-    css_classes = ['xblock', 'xblock-' + view]
+    css_classes = ['xblock', 'xblock-{}'.format(view)]
 
     if isinstance(block, (XModule, XModuleDescriptor)):
         if view in PREVIEW_VIEWS:
@@ -76,6 +91,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         data['runtime-version'] = frag.js_init_version
         data['block-type'] = block.scope_ids.block_type
         data['usage-id'] = usage_id_serializer(block.scope_ids.usage_id)
+        data['request-token'] = request_token
 
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
@@ -84,6 +100,13 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
         'data_attributes': u' '.join(u'data-{}="{}"'.format(key, value)
                                      for key, value in data.iteritems()),
     }
+
+    if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:
+        template_context['js_init_parameters'] = json.dumps(frag.json_init_args)
+        template_context['js_pass_parameters'] = True
+    else:
+        template_context['js_init_parameters'] = ""
+        template_context['js_pass_parameters'] = False
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
 
@@ -169,7 +192,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     # TODO: make this more general, eg use an XModule attribute instead
     if isinstance(block, VerticalModule) and (not context or not context.get('child_of_vertical', False)):
         # check that the course is a mongo backed Studio course before doing work
-        is_mongo_course = modulestore().get_modulestore_type(block.location.course_key) == ModuleStoreEnum.Type.mongo
+        is_mongo_course = modulestore().get_modulestore_type(block.location.course_key) != ModuleStoreEnum.Type.xml
         is_studio_course = block.course_edit_method == "Studio"
 
         if is_studio_course and is_mongo_course:

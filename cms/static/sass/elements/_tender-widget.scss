@@ -61,11 +61,11 @@
 }
 
 .widget-layout h1, .widget-layout h2, .widget-layout h3, .widget-layout h4, .widget-layout h5, .widget-layout h6, .widget-layout label {
-  font-weight: 600;
+  @extend %t-strong;
 }
 
 .widget-layout .header h1 {
-  font-size: 22px;
+  @extend %t-title4;
 }
 
 .widget-layout .content {
@@ -86,15 +86,15 @@
 }
 
 .widget-layout label {
-  font-size: 14px;
+  @extend %t-copy-sub1;
+  @extend %t-strong;
   margin-bottom: 5px;
   color: #4c4c4c;
-  font-weight: 500;
 }
 
 .widget-layout input[type="text"], .widget-layout textarea {
+  @extend %t-copy-base;
   padding: 10px;
-  font-size: 16px;
   color: rgb(0,0,0) !important;
   border: 1px solid #b0b6c2;
   border-radius: 2px;
@@ -177,12 +177,12 @@
 }
 
 .widget-layout #discussion_body:before {
+  @extend %t-copy-sub1;
+  @extend %t-strong;
   content: "What Question or Feedback Would You Like to Share?";
   display: block;
-  font-size: 14px;
   margin-bottom: 5px;
   color: #4c4c4c;
-  font-weight: 500;
 }
 
 
@@ -203,8 +203,8 @@
 }
 
 .widget-layout dl#brain_buster_captcha dd label {
+  @extend %t-strong;
   display: block;
-  font-weight: 700;
   margin: 0 15px 5px 0 !important;
 }
 
@@ -214,11 +214,11 @@
 }
 
 .widget-layout .form-actions .btn-post_topic {
+  @extend %t-copy-base;
+  @extend %t-strong;
   display: block;
   width: 100%;
   height: auto !important;
-  font-size: 16px;
-  font-weight: 700;
   -webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset,0 0 0 rgba(0,0,0,0);
   -moz-box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset,0 0 0 rgba(0,0,0,0);
   box-shadow: 0 1px 0 rgba(255,255,255,0.3) inset,0 0 0 rgba(0,0,0,0);

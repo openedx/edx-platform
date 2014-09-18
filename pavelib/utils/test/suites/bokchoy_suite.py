@@ -103,6 +103,7 @@ class BokChoyTestSuite(TestSuite):
         cmd = [
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
             "HAR_DIR='{}'".format(self.har_dir),
+            "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
             "nosetests",
             test_spec,
             "--with-xunit",

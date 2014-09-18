@@ -84,7 +84,6 @@ class TabNavPage(PageObject):
         else:
             return current_tab_list[0].strip().split('\n')[0] == tab_name
 
-
     def _is_on_tab_promise(self, tab_name):
         """
         Return a `Promise` that the user is on the tab `tab_name`.
