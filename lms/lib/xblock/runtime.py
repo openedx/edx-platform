@@ -114,12 +114,12 @@ class LmsHandlerUrls(object):
 
         return url
 
-    def local_resource_url(self, block, uri):
+    def local_resource_url(self, block, uri, block_type=None):
         """
         local_resource_url for Studio
         """
         path = reverse('xblock_resource_url', kwargs={
-            'block_type': block.scope_ids.block_type,
+            'block_type': block_type or block.scope_ids.block_type,
             'uri': uri,
         })
         return '//{}{}'.format(settings.SITE_NAME, path)

@@ -91,8 +91,8 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             'suffix': suffix,
         }) + '?' + query
 
-    def local_resource_url(self, block, uri):
-        return local_resource_url(block, uri)
+    def local_resource_url(self, block, uri, block_type=None):
+        return local_resource_url(block, uri, block_type)
 
 
 class StudioUserService(object):
