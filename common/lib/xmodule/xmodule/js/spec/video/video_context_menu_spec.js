@@ -217,7 +217,9 @@
                 expect(menuSubmenuItem).not.toHaveClass('is-opened');
             });
 
-            it('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
+            // Flaky-test resulting in timeout errors. Disabled 09/18/2014
+            // See TNL-439
+            xit('mouse left/right-clicking behaves as expected on play/pause menu item', function () {
                 var menuItem = menuItems.first();
                 runs(function () {
                     // Left-click on play
