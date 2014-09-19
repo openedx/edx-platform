@@ -26,6 +26,7 @@ import xml.sax.saxutils as saxutils
 
 from . import test_capa_system
 from capa import inputtypes
+from capa.checker import DemoSystem
 from mock import ANY, patch
 from pyparsing import ParseException
 
@@ -726,6 +727,34 @@ class MatlabTest(unittest.TestCase):
         expected = fromstring(u'\n<div class="matlabResponse"><div class="commandWindowOutput" style="white-space: pre;"> <strong>if</strong> Conditionally execute statements.\nThe general form of the <strong>if</strong> statement is\n\n   <strong>if</strong> expression\n     statements\n   ELSEIF expression\n     statements\n   ELSE\n     statements\n   END\n\nThe statements are executed if the real part of the expression \nhas all non-zero elements. The ELSE and ELSEIF parts are optional.\nZero or more ELSEIF parts can be used as well as nested <strong>if</strong>\'s.\nThe expression is usually of the form expr rop expr where \nrop is ==, &lt;, &gt;, &lt;=, &gt;=, or ~=.\n<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjAAAAGkCAIAAACgj==">\n\nExample\n   if I == J\n     A(I,J) = 2;\n   elseif abs(I-J) == 1\n     A(I,J) = -1;\n   else\n     A(I,J) = 0;\n   end\n\nSee also <a>relop</a>, <a>else</a>, <a>elseif</a>, <a>end</a>, <a>for</a>, <a>while</a>, <a>switch</a>.\n\nReference page in Help browser\n   <a>doc if</a>\n\n</div><ul></ul></div>\n')
         received = fromstring(context['queue_msg'])
         html_tree_equal(received, expected)
+
+    def test_rendering_with_invalid_queue_msg(self):
+        self.the_input.queue_msg = (u"<div class='matlabResponse'><div style='white-space:pre' class='commandWindowOutput'>"
+                                    u"\nans =\n\n\u0002\n\n</div><ul></ul></div>")
+        context = self.the_input._get_render_context()  # pylint: disable=protected-access
+
+        self.maxDiff = None
+        expected = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'value': 'print "good evening"',
+            'status': inputtypes.Status('queued'),
+            'msg': self.the_input.submitted_msg,
+            'mode': self.mode,
+            'rows': self.rows,
+            'cols': self.cols,
+            'queue_msg': "<span>Error running code.</span>",
+            'linenumbers': 'true',
+            'hidden': '',
+            'tabsize': int(self.tabsize),
+            'button_enabled': True,
+            'queue_len': '3',
+            'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+        }
+
+        self.assertEqual(context, expected)
+        self.the_input.capa_system.render_template = DemoSystem().render_template
+        self.the_input.get_html()  # Should not raise an exception
 
     def test_matlab_queue_message_allowed_tags(self):
         """
