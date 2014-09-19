@@ -152,7 +152,7 @@ class VideoFields(object):
     )
     edx_video_id = String(
         help=_('Optional. Use this for videos where download and streaming URLs for the videos are completely managed by edX. This will override the settings for "Default Video URL", "Video File URLs", and all YouTube IDs. If you do not know what this setting is, you can leave it blank and continue to use these other settings.'),
-        display_name=_("edX Video ID"),
+        display_name=_("EdX Video ID"),
         scope=Scope.settings,
         default="",
     )
