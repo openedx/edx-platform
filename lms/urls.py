@@ -76,10 +76,6 @@ urlpatterns = ('',  # nopep8
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
-    )
-
-if settings.FEATURES["ENABLE_VIDEO_ABSTRACTION_LAYER_API"]:
-    urlpatterns += (
         url(r'^api/val/v0/', include('edxval.urls')),
     )
 
