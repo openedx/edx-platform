@@ -582,7 +582,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
             // the id is a substring of the thumbnail, which according to OpenSeaDragon API should be the case.
             var sourceId = this.viewer.source['@id'];
             var targetThumb = an.target.thumb;
-            if (isContainer) isSource = (targetThumb.indexOf(sourceId) !== -1);            
+            if (isContainer) {
+                isSource = (targetThumb.indexOf(sourceId) !== -1);
+            }            
             return (isOpenSeaDragon && isContainer && isImage && isRP && isSource);
         },
         
