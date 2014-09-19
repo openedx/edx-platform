@@ -808,6 +808,7 @@ class MatlabInput(CodeInput):
         Handle matlab-specific parsing
         """
         _ = self.capa_system.i18n.ugettext
+
         submitted_msg = _("Submitted. As soon as a response is returned, "
                           "this message will be replaced by that feedback.")
         self.submitted_msg = submitted_msg
@@ -889,9 +890,23 @@ class MatlabInput(CodeInput):
 
     def _extra_context(self):
         """ Set up additional context variables"""
+
+        _ = self.capa_system.i18n.ugettext
+
+        queue_msg = self.queue_msg
+        if len(self.queue_msg) > 0:  # An empty string cannot be parsed as XML but is okay to include in the template.
+            try:
+                etree.XML(u'<div>{0}</div>'.format(self.queue_msg))
+            except etree.XMLSyntaxError:
+                try:
+                    html5lib.parseFragment(self.queue_msg, treebuilder='lxml', namespaceHTMLElements=False)[0]
+                except (IndexError, ValueError):
+                    # If neither can parse queue_msg, it contains invalid xml.
+                    queue_msg = u"<span>{0}</span>".format(_("Error running code."))
+
         extra_context = {
             'queue_len': str(self.queue_len),
-            'queue_msg': self.queue_msg,
+            'queue_msg': queue_msg,
             'button_enabled': self.button_enabled(),
             'matlab_editor_js': '{static_url}js/vendor/CodeMirror/octave.js'.format(
                 static_url=self.capa_system.STATIC_URL),
