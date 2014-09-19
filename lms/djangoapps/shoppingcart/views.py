@@ -24,6 +24,7 @@ from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseExcep
 from .models import Order, PaidCourseRegistration, OrderItem, Coupon, CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption
 from .processors import process_postpay_callback, render_purchase_form_html
 import json
+from xmodule_django.models import CourseKeyField
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")
@@ -132,7 +133,14 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
     """
     try:
         # Try to remove redemption information of coupon code, If exist.
-        coupon_redemption = CouponRedemption.objects.get(user=user, order=item.order_id)
+        coupon_redemption = CouponRedemption.objects.get(
+            user=user,
+            coupon__course_id=order_item_course_id if order_item_course_id else CourseKeyField.Empty,
+            order=item.order_id
+        )
+        coupon_redemption.delete()
+        log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
+                 .format(coupon_redemption.coupon.code, user, item_id))
     except CouponRedemption.DoesNotExist:
         try:
             # Try to remove redemption information of registration code, If exist.
@@ -144,11 +152,7 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
                 reg_code_redemption.delete()
                 log.info('Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'
                          .format(reg_code_redemption.registration_code.code, user, item_id))
-    else:
-        if order_item_course_id == coupon_redemption.coupon.course_id:
-            coupon_redemption.delete()
-            log.info('Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'
-                     .format(coupon_redemption.coupon.code, user, item_id))
+
 
 @login_required
 def use_code(request):
