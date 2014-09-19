@@ -19,7 +19,7 @@ from mock import Mock, patch
 from . import LogicTest
 from lxml import etree
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn, get_s3_transient_url
+from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -581,75 +581,3 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response.return_value=Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
-
-
-FAKE_SETTINGS = {
-    "AWS_ACCESS_KEY": "test_key",
-    "AWS_SECRET_KEY": "test_secret"
-}
-
-
-class VideoLinkTransienceTest(unittest.TestCase):
-    """
-    Tests for temporary video links.
-    """
-
-    @patch('xmodule.video_module.video_utils.settings')
-    def test_url_create(self, patched_settings):
-        """
-        Test if bucket name and object name is present in transient URL.
-        """
-        patched_settings.VIDEO_LINK_TRANSIENCE = FAKE_SETTINGS
-        origin_video_urls = [
-            "http://s3.amazonaws.com/bucket/video.mp4",
-            "http://bucket.s3.amazonaws.com/video.mp4",
-            "http://s3-region.amazonaws.com/bucket/video.mp4"
-        ]
-        for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url)
-            self.assertIn("https://bucket.s3.amazonaws.com/video.mp4", url)
-            self.assertIn('AWSAccessKeyId=test_key', url)
-            self.assertNotIn('test_secret', url)
-
-        origin_video_urls = [
-            "http://s3.amazonaws.com/bucket/subfolder/video.mp4",
-            "http://bucket.s3.amazonaws.com/subfolder/video.mp4",
-        ]
-        for origin_url in origin_video_urls:
-            url = get_s3_transient_url(origin_url)
-            self.assertIn("https://bucket.s3.amazonaws.com/subfolder/video.mp4", url)
-            self.assertIn('AWSAccessKeyId=test_key', url)
-            self.assertNotIn('test_secret', url)
-
-    @patch('xmodule.video_module.video_utils.settings')
-    def test_wrong_source_url(self, patched_settings):
-        """
-        Test if wrong source url is passed.
-        """
-        patched_settings.VIDEO_LINK_TRANSIENCE = FAKE_SETTINGS
-        # URL is not from amazonaws.com domain
-        wrong_origin_video_urls = [
-            "https://example.com/video.mp4",
-            "https://example.com/subfolder/video.mp4",
-            "https://s3.example.com/video.mp4",
-            "https://s3.amazonaws.com/bucket/",
-        ]
-        for origin_url in wrong_origin_video_urls:
-            self.assertIsNone(get_s3_transient_url(origin_url))
-
-    @patch('xmodule.video_module.video_utils.settings')
-    def test_wrong_keys(self, patched_settings):
-        """
-        Test if there are no key or secret.
-        """
-        # No secret. Only key is present.
-        patched_settings.VIDEO_LINK_TRANSIENCE = {"AWS_ACCESS_KEY": "test_key"}
-        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
-
-        # No key. Only secret is present.
-        patched_settings.VIDEO_LINK_TRANSIENCE = {"AWS_SECRET_KEY": "test_secret"}
-        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))
-
-        # No key and secret are present.
-        patched_settings.VIDEO_LINK_TRANSIENCE = {}
-        self.assertIsNone(get_s3_transient_url("http://s3.amazonaws.com/bucket/video.mp4"))

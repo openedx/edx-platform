@@ -11,6 +11,7 @@ import mock
 from datetime import timedelta
 from webob import Request
 from mock import MagicMock, Mock
+from base64 import urlsafe_b64encode
 from urlparse import urlparse, urlunparse, parse_qs
 from urllib import urlencode
 
@@ -830,10 +831,12 @@ class TestVideoLinkTransience(TestVideo):
         """
         Temporary video url generated successfully.
         """
-        request = Request.blank('/temporary?source=http://s3.amazonaws.com/bucket/video.mp4')
+        source = urlsafe_b64encode('http://s3.amazonaws.com/bucket/video.mp4')
+
+        request = Request.blank('/temporary?source={}'.format(source))
         response = self.item.url(request=request, dispatch='temporary')
         self.assertEqual(response.status_code, 301)
-        self.assertEqual(response.location, 'https://bucket.s3.amazonaws.com/video.mp4?Expires=%5B%27test_expire%27%5D&AWSAccessKeyId=%5Bu%27test_key%27%5D&Signature=%5B%27test_signature%27%5D')
+        self.assertEqual(response.location, 'http://s3.amazonaws.com/bucket/video.mp4')
 
     def test_no_source_in_query(self):
         """
@@ -842,17 +845,6 @@ class TestVideoLinkTransience(TestVideo):
         request = Request.blank('/temporary?')
         response = self.item.url(request=request, dispatch='temporary')
         self.assertEqual(response.status_code, 400)
-
-    @patch('xmodule.video_module.video_handlers.get_s3_transient_url')
-    def test_no_temporary_url(self, patched_temp_url):
-        """
-        No temporary url.
-        """
-        patched_temp_url.return_value = None
-
-        request = Request.blank('/temporary?source=http://s3.amazonaws.com/bucket/video.mp4')
-        response = self.item.url(request=request, dispatch='temporary')
-        self.assertEqual(response.status_code, 404)
 
     def test_fake_dispatch(self):
         """

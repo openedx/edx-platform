@@ -71,34 +71,3 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
         return cdn_content['sources'][0]
     else:
         return None
-
-
-def get_s3_transient_url(video_url, expires_in=10):
-    """
-    Get S3 transient video url.
-    """
-    if (not getattr(settings, 'VIDEO_LINK_TRANSIENCE', {}).get("AWS_ACCESS_KEY") or
-            not getattr(settings, 'VIDEO_LINK_TRANSIENCE', {}).get("AWS_SECRET_KEY")):
-        log.info("Video Link Transience Credentials are not present")
-        return None
-
-    conn = S3Connection(
-        settings.VIDEO_LINK_TRANSIENCE["AWS_ACCESS_KEY"],
-        settings.VIDEO_LINK_TRANSIENCE["AWS_SECRET_KEY"]
-    )
-
-    # Get bucket and video name from video_url.
-    # Valid patterns for constructing S3 URLs:
-    # http(s)://<bucket>.s3.amazonaws.com/<object>
-    # http(s)://s3.amazonaws.com/<bucket>/<object>
-    # http(s)://s3-region.amazonaws.com/<bucket>/<object>
-
-    for pattern in [r':\/\/s3(?:.*).amazonaws.com\/(?P<bucket_name>[^\/]+)\/(?P<video_name>.+)',
-                    r':\/\/(?P<bucket_name>.+).s3(?:.*).amazonaws.com\/(?P<video_name>.+)']:
-        names = re.compile(pattern)
-        result = names.search(video_url)
-        if result:
-            bucket_name, video_name = result.groups()[0], result.groups()[1]
-            return conn.generate_url(expires_in, 'GET', bucket_name, video_name)
-
-    return None

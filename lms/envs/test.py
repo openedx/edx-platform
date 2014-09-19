@@ -371,7 +371,3 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
-VIDEO_LINK_TRANSIENCE = {
-    "AWS_ACCESS_KEY": "test_key",
-    "AWS_SECRET_KEY": "test_secret"
-}

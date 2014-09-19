@@ -2,6 +2,7 @@
 """Video xmodule tests in mongo."""
 import json
 import unittest
+from base64 import urlsafe_b64encode
 
 from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
@@ -467,9 +468,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
 
-class TestS3GetHtmlMethod(BaseTestXmodule):
+class TestTransienceGetHtmlMethod(BaseTestXmodule):
     '''
-    Make sure that `get_html` works correctly when creating S3 temporary URLs.
+    Make sure that `get_html` works correctly when creating temporary URLs.
     '''
     CATEGORY = "video"
     DATA = SOURCE_XML
@@ -479,9 +480,9 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
         self.setup_course()
 
     @patch('xmodule.video_module.video_module.VideoModule.video_link_transience', new_callable=PropertyMock)
-    def test_get_html_s3_source(self, mocked_transience):
+    def test_get_html(self, mocked_transience):
         """
-        Test if sources got from S3.
+        Test if sources properly generated.
         """
         mocked_transience.return_value = True
 
@@ -544,6 +545,7 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
             self.initialize_module(data=DATA)
             context = self.item_descriptor.render('student_view').content
 
+            query = 'source={}'.format(urlsafe_b64encode('http://bucket-name.s3.amazonaws.com/example.mp4'.encode('utf-8')))
             expected_context = dict(initial_context)
             expected_context.update({
                 'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
@@ -556,9 +558,7 @@ class TestS3GetHtmlMethod(BaseTestXmodule):
                 'id': self.item_descriptor.location.html_id(),
                 'sources': json.dumps(
                     [
-                        self.item_descriptor.xmodule_runtime.handler_url(
-                            self.item_descriptor, 'url', 'temporary', 'source=http://bucket-name.s3.amazonaws.com/example.mp4'
-                        ),
+                        self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'url', 'temporary', query),
                         u'http://example.com/example.webm'
                     ]
                 ),

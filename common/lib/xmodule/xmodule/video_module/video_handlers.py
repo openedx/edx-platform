@@ -7,6 +7,7 @@ StudioViewHandlers are handlers for video descriptor instance.
 import os
 import json
 import logging
+from base64 import urlsafe_b64decode
 from webob import Response
 
 from xblock.core import XBlock
@@ -24,7 +25,6 @@ from .transcripts_utils import (
     save_to_store,
     subs_filename
 )
-from .video_utils import get_s3_transient_url
 
 log = logging.getLogger(__name__)
 
@@ -320,10 +320,7 @@ class VideoStudentViewHandlers(object):
                 log.info("Invalid /temporary request: no original video url in request")
                 return Response(status=400)
 
-            temporary_url = get_s3_transient_url(source_url)
-
-            if not temporary_url:
-                return Response(status=404)
+            temporary_url = urlsafe_b64decode(source_url.encode('utf-8'))
 
             response = Response(status=301)
             response.location = temporary_url
