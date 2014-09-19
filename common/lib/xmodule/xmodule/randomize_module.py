@@ -59,22 +59,30 @@ class RandomizeModule(RandomizeFields, XModule):
 
     def pick_choice(self, use_randrange=False, no_repeats=False,
                     suspended=None):
-        choices = self.get_choices(no_repeats=no_repeats, suspended=suspended)
         all_choices = self.get_choices()
         current_child = all_choices.get(self.choice)
+        suspended = suspended or []
         if current_child:
             cloc = current_child.location
-            if cloc.url() not in choices and cloc.name not in (suspended or []):
-                # child exists but is not in the list of choices. dont
-                # reset suspended problems otherwise students that passed will
-                # lose their grade.
+            viewed = self.has_viewed(cloc.url())
+            if not viewed and cloc.name in suspended:
+                # reset choice if problem has been suspended and student has
+                # yet to visit the problem. don't reset suspended problems that
+                # have been viewed otherwise students that passed will lose
+                # their grade.
+                log.warn("Problem %s has been suspended and student hasn't "
+                         "viewed it yet - resetting" % cloc.url())
                 self.choice = None
+            elif viewed and cloc.name in suspended:
+                log.warn("Problem %s has been suspended but student already "
+                         "viewed the problem - *NOT* resetting" % cloc.url())
         elif self.choice is not None:
             log.warn("Problem removed from course XML: %s" % self.choice)
             # current choice no longer exists in course XML - reset
             self.choice = None
 
         if self.choice is None:
+            choices = self.get_choices(no_repeats=no_repeats, suspended=suspended)
             num_choices = len(choices)
             # choose one based on the system seed, or randomly if that's not
             # available
@@ -112,9 +120,12 @@ class RandomizeModule(RandomizeFields, XModule):
             self.child_descriptor = None
             self.child = None
 
+    def has_viewed(self, choice):
+        return choice in self.history
+
     def get_choices(self, no_repeats=None, suspended=None):
         children = self.descriptor.get_children()
-        if self.choice is None and no_repeats:
+        if no_repeats:
             children = [c for c in children if c.location.url() not in
                         self.history]
         if suspended:
