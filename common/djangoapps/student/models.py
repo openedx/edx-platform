@@ -37,6 +37,8 @@ from eventtracking import tracker
 from importlib import import_module
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 
 import lms.lib.comment_client as cc
 from util.query import use_read_replica_if_available
@@ -601,7 +603,7 @@ class CourseEnrollment(models.Model):
     """
     MODEL_TAGS = ['course_id', 'is_active', 'mode']
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name="course_enrollments")
     course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
@@ -1018,6 +1020,14 @@ class CourseEnrollment(models.Model):
         else:
             return True
 
+    @property
+    def username(self):
+        return self.user.username
+
+    @property
+    def course(self):
+        return modulestore().get_course(self.course_id)
+
 
 class CourseEnrollmentAllowed(models.Model):
     """
@@ -1064,7 +1074,7 @@ class CourseAccessRole(models.Model):
         convenience function to make eq overrides easier and clearer. arbitrary decision
         that role is primary, followed by org, course, and then user
         """
-        return (self.role, self.org, self.course_id, self.user)
+        return (self.role, self.org, self.course_id, self.user_id)
 
     def __eq__(self, other):
         """

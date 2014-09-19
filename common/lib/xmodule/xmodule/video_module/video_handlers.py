@@ -283,20 +283,7 @@ class VideoStudentViewHandlers(object):
                 response.content_type = transcript_mime_type
 
         elif dispatch == 'available_translations':
-            available_translations = []
-            if self.sub:  # check if sjson exists for 'en'.
-                try:
-                    Transcript.asset(self.location, self.sub, 'en')
-                except NotFoundError:
-                    pass
-                else:
-                    available_translations = ['en']
-            for lang in self.transcripts:
-                try:
-                    Transcript.asset(self.location, None, None, self.transcripts[lang])
-                except NotFoundError:
-                    continue
-                available_translations.append(lang)
+            available_translations = self.available_translations()
             if available_translations:
                 response = Response(json.dumps(available_translations))
                 response.content_type = 'application/json'

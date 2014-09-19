@@ -15,38 +15,131 @@ Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv
 """
+import copy
 import json
 import logging
+import os.path
+from collections import OrderedDict
 from operator import itemgetter
 
 from lxml import etree
 from pkg_resources import resource_string
-import copy
-
-from collections import OrderedDict
 
 from django.conf import settings
 
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
+from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore, own_metadata
 from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
+from .transcripts_utils import Transcript
 from .video_utils import create_youtube_string, get_video_from_cdn
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
 
+# The following import/except block for edxval is a lesser-of-evils compromise.
+#
+# Here's the deal: the VideoModule should be able to take advantage of edx-val
+# (https://github.com/edx/edx-val) to figure out what URL to give for video
+# resources that have an edx_video_id specified. edx-val is a Django app, and
+# including it causes tests to fail because we run common/lib tests standalone
+# without Django dependencies. The alternatives seem to be:
+#
+# 1. Move VideoModule out of edx-platform.
+# 2. Accept the Django dependency in common/lib.
+# 3. Try to import, catch the exception on failure, and check for the existence
+#    of edxval_api before invoking it in the code.
+#
+# (1) is the long term goal. VideoModule should be made into an XBlock and
+# extracted from edx-platform entirely. But that's expensive to do because of
+# the various dependencies (like templates). Need to sort this out.
+# (2) is explicitly discouraged.
+# (3) is what we're doing. The code is still functional when called within the
+# context of the LMS, but does not cause failure on import when running
+# standalone tests. Most VideoModule tests tend to be in the LMS anyway,
+# probably for historical reasons.
+try:
+    import edxval.api as edxval_api
+except ImportError:
+    edxval_api = None
+
 log = logging.getLogger(__name__)
 _ = lambda text: text
 
 
-class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
+def get_transcripts(video):
+    """
+    For the given video module, returns:
+    track_url -> subtitle download url
+    transcript_language -> default transcript language
+    sorted_languages -> dictionary of available transcript languages
+    """
+    track_url = None
+    if video.download_track:
+        if video.track:
+            track_url = video.track
+        elif video.sub or video.transcripts:
+            track_url = video.runtime.handler_url(video, 'transcript', 'download').rstrip('/?')
+
+    if not video.transcripts:
+        transcript_language = u'en'
+        languages = {'en': 'English'}
+    else:
+        if video.transcript_language in video.transcripts:
+            transcript_language = video.transcript_language
+        elif video.sub:
+            transcript_language = u'en'
+        else:
+            transcript_language = sorted(video.transcripts.keys())[0]
+
+        native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
+        languages = {
+            lang: native_languages.get(lang, display)
+            for lang, display in settings.ALL_LANGUAGES
+            if lang in video.transcripts
+        }
+
+        if video.sub:
+            languages['en'] = 'English'
+
+    # OrderedDict for easy testing of rendered context in tests
+    sorted_languages = sorted(languages.items(), key=itemgetter(1))
+    if 'table' in video.transcripts:
+        sorted_languages.insert(0, ('table', 'Table of Contents'))
+
+    sorted_languages = OrderedDict(sorted_languages)
+    return track_url, transcript_language, sorted_languages
+
+
+class VideoTranscripts(object):
+    def available_translations(self):
+        """Return a list of language codes for which we have transcripts."""
+        translations = []
+        if self.sub:  # check if sjson exists for 'en'.
+            try:
+                Transcript.asset(self.location, self.sub, 'en')
+            except NotFoundError:
+                pass
+            else:
+                translations = ['en']
+        for lang in self.transcripts:
+            try:
+                Transcript.asset(self.location, None, None, self.transcripts[lang])
+            except NotFoundError:
+                continue
+            translations.append(lang)
+
+        return translations
+
+
+class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModule):
     """
     XML source example:
 
@@ -97,9 +190,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
     js_module_name = "Video"
 
     def get_html(self):
-        track_url = None
-        download_video_link = None
-        transcript_download_format = self.transcript_download_format
+        transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
         sources = filter(None, self.html5_sources)
 
         # If the user comes from China use China CDN for html5 videos.
@@ -114,46 +205,29 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
                 if new_url:
                     sources[index] = new_url
 
-        if self.download_video:
+        download_video_link = ""
+        youtube_streams = ""
+
+        # If we have an edx_video_id, we prefer its values over what we store
+        # internally for download links (source, html5_sources) and the youtube
+        # stream.
+        if self.edx_video_id and edxval_api:
+            val_video_urls = edxval_api.get_urls_for_profiles(
+                self.edx_video_id, ["desktop_mp4", "youtube"]
+            )
+            download_video_link = val_video_urls["desktop_mp4"]
+            if val_video_urls["youtube"]:
+                youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
+
+        # If there was no edx_video_id, or if there was no download specified
+        # for it, we fall back on whatever we find in the VideoDescriptor
+        if not download_video_link and self.download_video:
             if self.source:
                 download_video_link = self.source
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
 
-        if self.download_track:
-            if self.track:
-                track_url = self.track
-                transcript_download_format = None
-            elif self.sub or self.transcripts:
-                track_url = self.runtime.handler_url(self, 'transcript', 'download').rstrip('/?')
-
-        if not self.transcripts:
-            transcript_language = u'en'
-            languages = {'en': 'English'}
-        else:
-            if self.transcript_language in self.transcripts:
-                transcript_language = self.transcript_language
-            elif self.sub:
-                transcript_language = u'en'
-            else:
-                transcript_language = sorted(self.transcripts.keys())[0]
-
-            native_languages = {lang: label for lang, label in settings.LANGUAGES if len(lang) == 2}
-            languages = {
-                lang: native_languages.get(lang, display)
-                for lang, display in settings.ALL_LANGUAGES
-                if lang in self.transcripts
-            }
-
-            if self.sub:
-                languages['en'] = 'English'
-
-        # OrderedDict for easy testing of rendered context in tests
-        sorted_languages = sorted(languages.items(), key=itemgetter(1))
-        if 'table' in self.transcripts:
-            sorted_languages.insert(0, ('table', 'Table of Contents'))
-
-        sorted_languages = OrderedDict(sorted_languages)
+        track_url, transcript_language, sorted_languages = get_transcripts(self)
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -174,7 +248,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
-            'youtube_streams': create_youtube_string(self),
+            'youtube_streams': youtube_streams or create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
@@ -189,7 +263,7 @@ class VideoModule(VideoFields, VideoStudentViewHandlers, XModule):
         })
 
 
-class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
+class VideoDescriptor(VideoFields, VideoTranscripts, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """
     Descriptor for `VideoModule`.
     """
@@ -403,6 +477,14 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
+            # First try a lookup in VAL
+            if self.edx_video_id and edxval_api:
+                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, "youtube")
+
+                if val_youtube_id:
+                    return 'http://youtu.be/{0}'.format(val_youtube_id)
+
+            # Fallback to our own attributes
             if video_id:
                 return 'http://youtu.be/{0}'.format(video_id)
             else:
@@ -527,3 +609,58 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
             field_data['download_track'] = True
 
         return field_data
+
+
+    # This is a temp interface -- name it better, and it should only exist in module, not
+    # descriptor
+    def api_summary(self):
+        return {
+            "url": self.html5_sources[0] if self.html5_sources else self.source,
+            "duration": None,
+            "display_name": self.display_name,
+            "category": self.category,
+        }
+
+    # FIXME: dormsbee
+    # Copying over for temporary expedience. Fix before actually opening a PR
+    def get_transcript(self, transcript_format='srt', lang=None):
+        """
+        Returns transcript, filename and MIME type.
+
+        Raises:
+            - NotFoundError if cannot find transcript file in storage.
+            - ValueError if transcript file is empty or incorrect JSON.
+            - KeyError if transcript file has incorrect format.
+
+        If language is 'en', self.sub should be correct subtitles name.
+        If language is 'en', but if self.sub is not defined, this means that we
+        should search for video name in order to get proper transcript (old style courses).
+        If language is not 'en', give back transcript in proper language and format.
+        """
+        from .transcripts_utils import Transcript
+
+        if not lang:
+            lang = self.transcript_language
+
+        if lang == 'en':
+            if self.sub:  # HTML5 case and (Youtube case for new style videos)
+                transcript_name = self.sub
+            elif self.youtube_id_1_0:  # old courses
+                transcript_name = self.youtube_id_1_0
+            else:
+                log.debug("No subtitles for 'en' language")
+                raise ValueError
+
+            data = Transcript.asset(self.location, transcript_name, lang).data
+            filename = u'{}.{}'.format(transcript_name, transcript_format)
+            content = Transcript.convert(data, 'sjson', transcript_format)
+        else:
+            data = Transcript.asset(self.location, None, None, self.transcripts[lang]).data
+            filename = u'{}.{}'.format(os.path.splitext(self.transcripts[lang])[0], transcript_format)
+            content = Transcript.convert(data, 'srt', transcript_format)
+
+        if not content:
+            log.debug('no subtitles produced in get_transcript')
+            raise ValueError
+
+        return content, filename, Transcript.mime_types[transcript_format]

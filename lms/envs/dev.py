@@ -211,6 +211,10 @@ FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 
 FEATURES['AUTH_USE_CERTIFICATES'] = False
 
+########################### External REST APIs #################################
+FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+
 ################################# CELERY ######################################
 
 # By default don't use a worker, execute tasks as if they were local functions
