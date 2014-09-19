@@ -382,6 +382,26 @@ function (VideoPlayer) {
                     }, 'video didn\'t start playing', WAIT_TIMEOUT);
                 });
 
+
+                it('call runTimer in seekTo on player', function () {
+                    runs(function () {
+                        spyOn(state.videoPlayer, 'stopTimer');
+                        spyOn(state.videoPlayer, 'runTimer');
+                        state.videoPlayer.seekTo(10);
+                    });
+
+                    waitsFor(function () {
+                        return state.videoPlayer.currentTime >= 10;
+                    }, 'currentTime is less than 10 seconds', WAIT_TIMEOUT);
+
+                    runs(function () {
+                        expect(state.videoPlayer.stopTimer)
+                            .toHaveBeenCalled();
+                        expect(state.videoPlayer.runTimer)
+                            .toHaveBeenCalled();
+                    });
+                });
+
                 // as per TNL-439 this test is deemed flaky and needs to be fixed.
                 // disabled 09/18/2014
                 xit('slider event causes log update', function () {
