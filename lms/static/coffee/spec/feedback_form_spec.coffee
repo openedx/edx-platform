@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/feedback_form"],
+define ["jquery", "coffee/src/feedback_form", "jquery.ui"],
     ($, FeedbackForm) ->
 
     describe 'FeedbackForm', ->

@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/navigation"],
+define ["jquery", "coffee/src/navigation", "jquery.ui"],
     ($, Navigation) ->
 
     describe 'Navigation', ->

@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/histogram"],
+define ["jquery", "coffee/src/histogram", "jquery.ui"],
     ($, Histogram) ->
 
     describe 'Histogram', ->

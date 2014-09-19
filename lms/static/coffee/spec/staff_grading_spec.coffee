@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/staff_grading/staff_grading"],
+define ["jquery", "coffee/src/staff_grading/staff_grading", "jquery.ui"],
     ($, StaffGrading) ->
     describe 'StaffGrading', ->
         beforeEach ->

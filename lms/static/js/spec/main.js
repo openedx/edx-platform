@@ -218,7 +218,8 @@
                 deps: ['xblock/lms.runtime.v1']
             },
             'coffee/src/feedback_form': {
-                exports: 'FeedbackForm'
+                exports: 'FeedbackForm',
+                deps: ['coffee/src/ajax_prefix']
             },
             'coffee/src/histogram': {
                 exports: 'Histogram'
@@ -227,7 +228,8 @@
                 exports: 'Logger'
             },
             'coffee/src/navigation': {
-                exports: 'Navigation'
+                exports: 'Navigation',
+                deps: ['coffee/src/logger']
             },
             'coffee/src/modules/tab': {
                 exports: 'Tab'
@@ -257,9 +259,13 @@
         }
     });
 
-    // TODO: why does this need 'lms/include' at the front but the CMS version doesn't?
+    // Install some pre-requisites
     define([
         'lms/include/coffee/spec/helper.js',
+    ]);
+
+    // TODO: why does this need 'lms/include' at the front but the CMS version doesn't?
+    define([
         'lms/include/coffee/spec/modules/tab_spec.js',
         'lms/include/coffee/spec/calculator_spec.js',
         'lms/include/coffee/spec/courseware_spec.js',

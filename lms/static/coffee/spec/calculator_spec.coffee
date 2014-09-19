@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/calculator"],
+define ["jquery", "coffee/src/calculator", "jquery.ui"],
     ($, Calculator) ->
 
     describe 'Calculator', ->

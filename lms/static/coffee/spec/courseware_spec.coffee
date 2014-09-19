@@ -1,4 +1,4 @@
-define ["jquery", "coffee/src/courseware"],
+define ["jquery", "coffee/src/courseware", "jquery.ui"],
     ($, Courseware) ->
 
     describe 'Courseware', ->
