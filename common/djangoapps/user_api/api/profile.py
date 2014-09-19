@@ -4,6 +4,7 @@ Profile information includes a student's demographic information and preferences
 but does NOT include basic account information such as username/password.
 
 """
+from user_api.models import User, UserProfile
 
 
 class ProfileRequestError(Exception):
@@ -11,27 +12,40 @@ class ProfileRequestError(Exception):
     pass
 
 
+# TODO: error subclasses
 class ProfileInternalError(Exception):
     """ An error occurred in an API call. """
     pass
 
+FULL_NAME_MAX_LENGTH = 255
 
-def profile_info(username=None, email=None):
+def profile_info(username):
     """Retrieve a user's profile information
 
     Searches either by username or email.
 
     At least one of the keyword args must be provided.
 
-    Keyword Arguments:
+    Arguments:
         username (unicode): The username of the account to retrieve.
-        email (unicode): The email associated with the account to retrieve.
 
     Returns:
-        dict or None
+        dict: If profile information was found.
+        None: If the provided username did not match any profiles.
 
     """
-    return {}
+    try:
+        profile = UserProfile.objects.get(user__username=username)
+    except UserProfile.DoesNotExist:
+        return None
+
+    profile_dict = {
+        'username': profile.user.username,
+        'email': profile.user.email,
+        'full_name': profile.name,
+    }
+    
+    return profile_dict
 
 
 def update_profile(username, full_name=None):
@@ -44,13 +58,25 @@ def update_profile(username, full_name=None):
         full_name (unicode): If provided, set the user's full name to this value.
 
     Returns:
-        dict
+        None
 
     Raises:
-        ProfileRequestError
+        ProfileRequestError: If there is not profile matching the provided username.
 
     """
-    pass
+    try:
+        profile = UserProfile.objects.get(user__username=username)
+    except UserProfile.DoesNotExist:
+        raise ProfileRequestError("TODO")
+    
+    if full_name is not None:
+        if len(full_name) > FULL_NAME_MAX_LENGTH:
+            raise ProfileRequestError("TODO")
+        else:
+            profile.name = full_name
+
+    # Assumption: Django won't save if nothing has changed.
+    profile.save()
 
 
 def preference_info(username, preference_name):

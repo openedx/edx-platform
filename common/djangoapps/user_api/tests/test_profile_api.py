@@ -27,19 +27,10 @@ class ProfileApiTest(TestCase):
             'full_name': u'',
         })
 
-    def test_retrieve_profile_email(self):
-        # We're implicitly testing username retrieval elsewhere,
-        # so this test only covers retrieval by email
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        profile = profile_api.profile_info(email=self.EMAIL)
-        self.assertEqual(profile['username'], self.USERNAME)
-        self.assertEqual(profile['email'], self.EMAIL)
-
     @ddt.data(
         (None, ''),
         ('', ''),
         (u'ȻħȺɍłɇs', u'ȻħȺɍłɇs'),
-        (u'𝓐' * 256, u'𝓐' * 255)
     )
     @ddt.unpack
     def test_update_full_name(self, new_full_name, expected_name):
@@ -49,17 +40,12 @@ class ProfileApiTest(TestCase):
         profile = profile_api.profile_info(username=self.USERNAME)
         self.assertEqual(profile['full_name'], expected_name)
 
-    def test_retrieve_profile_no_kwargs(self):
+    def test_update_full_name_too_long(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-
-        # Try to retrieve the profile, but don't provide the required args
+        
         with self.assertRaises(profile_api.ProfileRequestError):
-            profile_api.profile_info()
+            profile_api.update_profile(self.USERNAME, full_name=u'𝓐' * 256)
 
     def test_retrieve_profile_no_user(self):
-        profile = profile_api.profile_info(username="does not exist")
+        profile = profile_api.profile_info("does not exist")
         self.assertIs(profile, None)
-
-        profile = profile_api.profile_info(email="does@not.exist")
-        self.assertIs(profile, None)
-
