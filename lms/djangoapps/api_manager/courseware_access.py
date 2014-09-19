@@ -151,48 +151,57 @@ def get_course_child_content(request, user, course_key, child_descriptor):
 def calculate_proforma_grade(grade_summary, grading_policy):
     """
     Calculates a projected (proforma) final grade based on the current state
-    of grades using the provided grading policy.  Sections equate to grading policy
+    of grades using the provided grading policy.  Categories equate to grading policy
     'types' and have values such as 'Homework', 'Lab', 'MidtermExam', and 'FinalExam'
 
-    We invert the concepts here and use the section weights as the possible scores by
-    assuming that the section weights total 100 percent.  So, if a Homework section
-    is worth 15 percent of your overall grade, and you have currently scored 70 percent
-    for that section, the normalized score for the Homework section is 0.105.  Note that
+    We invert the concepts here and use the category weights as the possible scores by
+    assuming that the weights total 100 percent.  So, if a Homework category is worth 15
+    percent of your overall grade, and you have currently scored 70 percent for that
+    category, the normalized score for the Homework category is 0.105.  Note that
     we do not take into account dropped assignments/scores, such as lowest-two homeworks.
 
-    After all scored sections are processed we take the remaining weight at its full
-    value as a projection of the user obtaining 100 percent of the section potential.
+    After all scored categories are processed we apply the average category score to any
+    unscored categories using the value as a projection of the user's performance in each category.
 
     Example:
-        - Section: Homework,    Weight: 15%, Totaled Score: 70%,  Normalized Score: 0.105
-        - Section: MidtermExam, Weight: 30%, Totaled Score: 80%,  Normalized Score: 0.240
-        - Section: Final Exam,  Weight: 40%, Totaled Score: 95%,  Normalized Score: 0.380
-        - Remaining Weight: 0.15 (unscored Lab section), assume 100%, of 15% =>     0.150
-        - Proforma Grade = 0.105 + 0.240 + 0.380 + 0.150 = 0.875  (87.5%)
+        - Scored Category: Homework,    Weight: 15%, Totaled Score: 70%,  Normalized Score: 0.105
+        - Scored Category: MidtermExam, Weight: 30%, Totaled Score: 80%,  Normalized Score: 0.240
+        - Scored Category: Final Exam,  Weight: 40%, Totaled Score: 95%,  Normalized Score: 0.380
+        - Average Category Score: (70 + 80 + 95) / 3 = 81.7
+        - Unscored Category: Lab,       Weight: 15%, Totaled Score: 81.7%, Normalized Score: 0.123
+        - Proforma Grade = 0.105 + 0.240 + 0.380 + 0.123 = 0.8475  (84.8%)
     """
-
-    remaining_weight = 1.00
+    grade_breakdown = grade_summary['grade_breakdown']
     proforma_grade = 0.00
     totaled_scores = grade_summary['totaled_scores']
-    grade = 0.00
-    for section in totaled_scores:
-        section_score = 0.00
-        section_count = 0.00
-        # totaled_scores is a collection of currently-recored scores for a given section
-        # we need to iterate through and combine the scores to create an overall score for the section
-        # This loop does not take into account dropped assignments (eg, homeworks)
-        for score in totaled_scores[section]:
-            # Only count grades where points have been scored, or where the due date has passed
-            if score.earned or (score.due and score.due < timezone.now()):
-                score_percentage = score.earned / score.possible
-                section_score += score_percentage
-                section_count += 1
-        if section_score:
-            grade = section_score / section_count
-            section_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == section), None)
-            if section_policy is not None:
-                section_weight = section_policy['weight']
-                proforma_grade = proforma_grade + (section_weight * grade)
-                remaining_weight = remaining_weight - section_weight
-    proforma_grade = proforma_grade + remaining_weight
+    category_averages = []
+    categories_to_estimate = []
+    for grade_category in grade_breakdown:
+        category = grade_category['category']
+        item_scores = totaled_scores.get(category)
+        if item_scores is not None and len(item_scores):
+            total_item_score = 0.00
+            items_considered = 0
+            for item_score in item_scores:
+                if item_score.earned or (item_score.due and item_score.due < timezone.now()):
+                    normalized_item_score = item_score.earned / item_score.possible
+                    total_item_score += normalized_item_score
+                    items_considered += 1
+            if total_item_score:
+                category_average_score = total_item_score / items_considered
+                category_averages.append(category_average_score)
+                category_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == category), None)
+                category_weight = category_policy['weight']
+                category_grade = category_average_score * category_weight
+                proforma_grade += category_grade
+            else:
+                categories_to_estimate.append(category)
+        else:
+            categories_to_estimate.append(category)
+    assumed_category_average = sum(category_averages) / len(category_averages)
+    for category in categories_to_estimate:
+        category_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == category), None)
+        category_weight = category_policy['weight']
+        category_grade = assumed_category_average * category_weight
+        proforma_grade += category_grade
     return proforma_grade
