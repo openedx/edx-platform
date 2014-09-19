@@ -230,13 +230,21 @@ class VideoDescriptor(VideoFields, VideoStudioViewHandlers, TabsEditingDescripto
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
 
         self.source_visible = False
+        # Set download_video field to default value if its not explicitly set for backward compatibility.
+        download_video = editable_fields['download_video']
+        if not download_video['explicitly_set']:
+            self.download_video = self.download_video
+
         if self.source:
             # If `source` field value exist in the `html5_sources` field values,
             # then delete `source` field value and use value from `html5_sources` field.
             if self.source in self.html5_sources:
                 self.source = ''  # Delete source field value.
+                self.download_video = True
             else:  # Otherwise, `source` field value will be used.
                 self.source_visible = True
+                if not download_video['explicitly_set']:
+                    self.download_video = True
 
         # for backward compatibility.
         # If course was existed and was not re-imported by the moment of adding `download_track` field,
