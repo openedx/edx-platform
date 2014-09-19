@@ -1754,6 +1754,16 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.data['position'], 2)
         self.assertEqual(response.data['completions'], 28)
 
+        # with skipleaders filter
+        test_uri = '{}/{}/metrics/completions/leaders/?user_id={}&skipleaders=true'.format(self.base_courses_uri,
+                                                                                           self.test_course_id,
+                                                                                           self.users[1].id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data.get('leaders', None))
+        self.assertIsNone(response.data.get('position', None))
+        self.assertEqual(response.data['completions'], 28)
+
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
         response = self.do_get(test_uri)
