@@ -1366,7 +1366,7 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
         self.assertEqual(response.data['current_grade'], 0.7)
-        self.assertEqual(response.data['proforma_grade'], 0.95)
+        self.assertEqual(response.data['proforma_grade'], 0.9375)
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
