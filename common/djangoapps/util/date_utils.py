@@ -33,6 +33,22 @@ def get_default_time_display(dtime):
     localized = strftime_localized(dtime, "DATE_TIME")
     return (localized + timezone).strip()
 
+def set_time_zone(dtime, tz):
+    """
+    Sets the given date time object to the given timezone
+
+    Args:
+        dtime (datetime object) - the datetime object to be edited
+        tz (string) - the timezone to set the datetime object, expressed as a
+        pytz timezone string. Example: US/Pacific
+
+    If an unknown timezone is given, defaults to UTC
+    """
+    try:
+        to_tz = timezone(tz)
+    except UnknownTimeZoneError:
+        to_tz = UTC
+    return to_tz.normalize(dtime.astimezone(to_tz))
 
 def get_time_display(dtime, format_string=None, coerce_tz=None):
     """
@@ -49,11 +65,7 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
     format_string should be a unicode string that is a valid argument for datetime's strftime method.
     """
     if dtime is not None and dtime.tzinfo is not None and coerce_tz:
-        try:
-            to_tz = timezone(coerce_tz)
-        except UnknownTimeZoneError:
-            to_tz = UTC
-        dtime = to_tz.normalize(dtime.astimezone(to_tz))
+        dtime = set_time_zone(dtime, coerce_tz)
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
     try:
@@ -79,7 +91,7 @@ DEFAULT_TIME_FORMAT = "%I:%M:%S %p"
 DEFAULT_DATE_TIME_FORMAT = "%b %d, %Y at %H:%M"
 
 
-def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
+def strftime_localized(dtime, format, coerce_tz=None):      # pylint: disable=redefined-builtin
     """
     Format a datetime, just like the built-in strftime, but with localized words.
 
@@ -103,10 +115,15 @@ def strftime_localized(dtime, format):      # pylint: disable=redefined-builtin
         format (str): The format string to use, as specified by
             :ref:`datetime.strftime`.
 
+        coerce_tz (pytz timezone string): The timezone to use.
+
     Returns:
         A unicode string with the formatted datetime.
 
     """
+    # First convert date time convert to given time zone, if one given
+    if coerce_tz is not None:
+        dtime = set_time_zone(dtime, coerce_tz)
 
     if format == "SHORT_DATE":
         format = "%x"

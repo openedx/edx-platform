@@ -11,6 +11,7 @@ import xmodule.course_module
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from django.utils.timezone import UTC
+from xmodule.modulestore.django import ModuleI18nService
 
 
 ORG = 'test_org'
@@ -37,6 +38,7 @@ class DummySystem(ImportSystem):
         course_dir = "test_dir"
         error_tracker = Mock()
         parent_tracker = Mock()
+        services = {'i18n': ModuleI18nService()}
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
@@ -46,6 +48,7 @@ class DummySystem(ImportSystem):
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
             field_data=KvsFieldData(DictKeyValueStore()),
+            services=services,
         )
 
 
@@ -184,29 +187,6 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
-    start_advertised_settings = [
-        # start, advertised, result, is_still_default
-        ('2012-12-02T12:00', None, 'Dec 02, 2012', False),
-        ('2012-12-02T12:00', '2011-11-01T12:00', 'Nov 01, 2011', False),
-        ('2012-12-02T12:00', 'Spring 2012', 'Spring 2012', False),
-        ('2012-12-02T12:00', 'November, 2011', 'November, 2011', False),
-        (xmodule.course_module.CourseFields.start.default, None, 'TBD', True),
-        (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False),
-    ]
-
-    @patch('xmodule.course_module.datetime.now')
-    def test_start_date_text(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-        for s in self.start_advertised_settings:
-            d = get_dummy_course(start=s[0], advertised_start=s[1])
-            print "Checking start=%s advertised=%s" % (s[0], s[1])
-            self.assertEqual(d.start_date_text, s[2])
-
-    def test_start_date_is_default(self):
-        for s in self.start_advertised_settings:
-            d = get_dummy_course(start=s[0], advertised_start=s[1])
-            self.assertEqual(d.start_date_is_still_default, s[3])
-
     def test_display_organization(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
         self.assertNotEqual(descriptor.location.org, descriptor.display_org_with_default)
@@ -238,14 +218,6 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         descriptor = get_dummy_course(start='2012-12-31T12:00')
         assert(descriptor.is_newish is True)
-
-    def test_end_date_text(self):
-        # No end date set, returns empty string.
-        d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', d.end_date_text)
-
-        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014', d.end_date_text)
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):
