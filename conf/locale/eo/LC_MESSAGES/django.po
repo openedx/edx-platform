@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-09-16 10:50-0400\n"
-"PO-Revision-Date: 2014-09-16 14:50:40.650430\n"
+"POT-Creation-Date: 2014-09-17 20:49+0000\n"
+"PO-Revision-Date: 2014-09-17 20:49:46.218598\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4487,10 +4487,6 @@ msgstr ""
 "∂σ#"
 
 #: lms/djangoapps/instructor/views/coupons.py
-msgid "coupon with the coupon code ({code}) already exist"
-msgstr "çöüpön wïth thé çöüpön çödé ({code}) älréädý éxïst Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/instructor/views/coupons.py
 msgid ""
 "The code ({code}) that you have tried to define is already in use as a "
 "registration code"
@@ -4512,6 +4508,12 @@ msgstr ""
 msgid "coupon with the coupon code ({code}) added successfully"
 msgstr ""
 "çöüpön wïth thé çöüpön çödé ({code}) äddéd süççéssfüllý Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "coupon with the coupon code ({code}) already exists for this course"
+msgstr ""
+"çöüpön wïth thé çöüpön çödé ({code}) älréädý éxïsts för thïs çöürsé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/instructor/views/coupons.py
 #: lms/djangoapps/instructor/views/coupons.py
@@ -5504,8 +5506,9 @@ msgstr ""
 "∂σłσ#"
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' already used."
-msgstr "Çöüpön '{0}' älréädý üséd. Ⱡ'σяєм#"
+msgid "Only one coupon redemption is allowed against an order"
+msgstr ""
+"Önlý öné çöüpön rédémptïön ïs ällöwéd ägäïnst än ördér Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Coupon '{0}' is not valid for any course in the shopping cart."
@@ -7647,16 +7650,17 @@ msgid "An error occurred. Please try again later."
 msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/dashboard.html
-msgid "Please verify your new email"
-msgstr "Pléäsé vérïfý ýöür néw émäïl Ⱡ'σяєм #"
+msgid "Please verify your new email address"
+msgstr "Pléäsé vérïfý ýöür néw émäïl äddréss Ⱡ'σяєм ιρ#"
 
 #: lms/templates/dashboard.html
 msgid ""
-"You'll receive a confirmation in your inbox. Please click the link in the "
-"email to confirm the email change."
+"You'll receive a confirmation in your inbox. Please follow the link in the "
+"email to confirm your email address change."
 msgstr ""
-"Ýöü'll réçéïvé ä çönfïrmätïön ïn ýöür ïnßöx. Pléäsé çlïçk thé lïnk ïn thé "
-"émäïl tö çönfïrm thé émäïl çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+"Ýöü'll réçéïvé ä çönfïrmätïön ïn ýöür ïnßöx. Pléäsé föllöw thé lïnk ïn thé "
+"émäïl tö çönfïrm ýöür émäïl äddréss çhängé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
 #. Translators: this message is displayed when a user tries to link their
 #. account with a third-party authentication provider (for example, Google or
@@ -7772,11 +7776,11 @@ msgstr "Pléäsé çönfïrm ýöür pässwörd: Ⱡ'σяєм #"
 
 #: lms/templates/dashboard.html
 msgid ""
-"We will send a confirmation to both {email} and your new email as part of "
-"the process."
+"We will send a confirmation to both {email} and your new email address as "
+"part of the process."
 msgstr ""
-"Wé wïll sénd ä çönfïrmätïön tö ßöth {email} änd ýöür néw émäïl äs pärt öf "
-"thé pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"Wé wïll sénd ä çönfïrmätïön tö ßöth {email} änd ýöür néw émäïl äddréss äs "
+"pärt öf thé pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/dashboard.html
 msgid "Change your name"
@@ -7788,10 +7792,10 @@ msgstr "Çhängé ýöür nämé Ⱡ'σ#"
 #: lms/templates/dashboard.html
 msgid ""
 "To uphold the credibility of your {platform} {cert_name_short}, all name "
-"changes will be logged and recorded."
+"changes will be recorded."
 msgstr ""
 "Tö üphöld thé çrédïßïlïtý öf ýöür {platform} {cert_name_short}, äll nämé "
-"çhängés wïll ßé löggéd änd réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+"çhängés wïll ßé réçördéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #. Translators: note that {platform} {cert_name_short} will look something
 #. like: "edX certificate". Please do not change the order of these
@@ -7815,11 +7819,11 @@ msgstr "Çhängé Mý Nämé Ⱡ'#"
 
 #: lms/templates/dashboard.html
 msgid ""
-"<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
-"info\"></span>"
+"<span id='track-info'></span> {course_number}?  <span id='refund-"
+"info'></span>"
 msgstr ""
-"<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
-"info\"></span> Ⱡ'σя#"
+"<span id='track-info'></span> {course_number}?  <span id='refund-"
+"info'></span> Ⱡ'σя#"
 
 #: lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -13457,6 +13461,77 @@ msgstr ""
 msgid "Billed To:"
 msgstr "Bïlléd Tö: Ⱡ#"
 
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm Enrollment"
+msgstr "Çönfïrm Énröllmént Ⱡ'σ#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{site_name} -  Confirm Enrollment"
+msgstr "{site_name} -  Çönfïrm Énröllmént Ⱡ'σяєм#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "Confirm your enrollment for:"
+msgstr "Çönfïrm ýöür énröllmént för: Ⱡ'σяєм #"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "course dates"
+msgstr "çöürsé dätés Ⱡ#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{course_name}"
+msgstr "{course_name} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{start_date}"
+msgstr "{start_date} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "{end_date}"
+msgstr "{end_date} Ⱡ'σя#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You've clicked a link for an enrollment code that has already been used. "
+"Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
+"enrolled in the course, or contact your company's administrator."
+msgstr ""
+"Ýöü'vé çlïçkéd ä lïnk för än énröllmént çödé thät häs älréädý ßéén üséd. "
+"Çhéçk ýöür <a href={dashboard_url}>çöürsé däshßöärd</a> tö séé ïf ýöü'ré "
+"énrölléd ïn thé çöürsé, ör çöntäçt ýöür çömpäný's ädmïnïsträtör. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕ#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You have successfully enrolled in {course_name}. This course has now been "
+"added to your dashboard."
+msgstr ""
+"Ýöü hävé süççéssfüllý énrölléd ïn {course_name}. Thïs çöürsé häs nöw ßéén "
+"äddéd tö ýöür däshßöärd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're already registered for this course. Visit your <a "
+"href={dashboard_url}>dashboard</a> to see the course."
+msgstr ""
+"Ýöü'ré älréädý régïstéréd för thïs çöürsé. Vïsït ýöür <a "
+"href={dashboard_url}>däshßöärd</a> tö séé thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт#"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid ""
+"You're about to activate an enrollment code for {course_name} by "
+"{site_name}. This code can only be used one time, so you should only "
+"activate this code if you're its intended recipient."
+msgstr ""
+"Ýöü'ré äßöüt tö äçtïväté än énröllmént çödé för {course_name} ßý "
+"{site_name}. Thïs çödé çän önlý ßé üséd öné tïmé, sö ýöü shöüld önlý "
+"äçtïväté thïs çödé ïf ýöü'ré ïts ïnténdéd réçïpïént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
+
+#: lms/templates/shoppingcart/registration_code_receipt.html
+msgid "View Course &nbsp; &nbsp; &#x25b8;"
+msgstr "Vïéw Çöürsé &nbsp; &nbsp; &#x25b8; Ⱡ'σяє#"
+
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Receipt (Order"
 msgstr "Réçéïpt (Ördér Ⱡ'#"
@@ -13775,15 +13850,15 @@ msgstr "Hävïng Téçhnïçäl Tröüßlé? Ⱡ'σяєм#"
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
 "Please make sure your browser is updated to the <strong>{a_start}most recent"
-" version possible{a_end}</strong>. Also, please make sure your <strong>web "
-"cam is plugged in, turned on, and allowed to function in your web browser "
-"(commonly adjustable in your browser settings)</strong>"
+" version possible{a_end}</strong>. Also, please make sure your "
+"<strong>webcam is plugged in, turned on, and allowed to function in your web"
+" browser (commonly adjustable in your browser settings)</strong>"
 msgstr ""
 "Pléäsé mäké süré ýöür ßröwsér ïs üpdätéd tö thé <strong>{a_start}möst réçént"
-" vérsïön pössïßlé{a_end}</strong>. Àlsö, pléäsé mäké süré ýöür <strong>wéß "
-"çäm ïs plüggéd ïn, türnéd ön, änd ällöwéd tö fünçtïön ïn ýöür wéß ßröwsér "
-"(çömmönlý ädjüstäßlé ïn ýöür ßröwsér séttïngs)</strong> Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσ#"
+" vérsïön pössïßlé{a_end}</strong>. Àlsö, pléäsé mäké süré ýöür "
+"<strong>wéßçäm ïs plüggéd ïn, türnéd ön, änd ällöwéd tö fünçtïön ïn ýöür wéß"
+" ßröwsér (çömmönlý ädjüstäßlé ïn ýöür ßröwsér séttïngs)</strong> Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσ#"
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -13865,15 +13940,15 @@ msgstr "Téçhnïçäl Réqüïréménts Ⱡ'σяє#"
 #: lms/templates/verify_student/_verification_support.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
-" possible{a_end}. Also, please make sure your <strong>web cam is plugged in,"
-" turned on, and allowed to function in your web browser (commonly adjustable"
-" in your browser settings).</strong>"
+" possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
+"turned on, and allowed to function in your web browser (commonly adjustable "
+"in your browser settings).</strong>"
 msgstr ""
 "Pléäsé mäké süré ýöür ßröwsér ïs üpdätéd tö thé {a_start}möst réçént vérsïön"
-" pössïßlé{a_end}. Àlsö, pléäsé mäké süré ýöür <strong>wéß çäm ïs plüggéd ïn,"
-" türnéd ön, änd ällöwéd tö fünçtïön ïn ýöür wéß ßröwsér (çömmönlý ädjüstäßlé"
-" ïn ýöür ßröwsér séttïngs).</strong> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρ#"
+" pössïßlé{a_end}. Àlsö, pléäsé mäké süré ýöür <strong>wéßçäm ïs plüggéd ïn, "
+"türnéd ön, änd ällöwéd tö fünçtïön ïn ýöür wéß ßröwsér (çömmönlý ädjüstäßlé "
+"ïn ýöür ßröwsér séttïngs).</strong> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя"
+" α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тєм#"
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
@@ -14695,11 +14770,12 @@ msgstr "Çhéçk ýöür émäïl Ⱡ'σ#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"you need an active edX account before registering - check your email for "
-"instructions"
+"You need to activate your {platform_name} account before you can register "
+"for courses. Check your inbox for an activation email."
 msgstr ""
-"ýöü nééd än äçtïvé édX äççöünt ßéföré régïstérïng - çhéçk ýöür émäïl för "
-"ïnstrüçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+"Ýöü nééd tö äçtïväté ýöür {platform_name} äççöünt ßéföré ýöü çän régïstér "
+"för çöürsés. Çhéçk ýöür ïnßöx för än äçtïvätïön émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Identification"
@@ -14712,10 +14788,10 @@ msgstr "À phötö ïdéntïfïçätïön döçümént Ⱡ'σяєм ι#"
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
 "A driver's license, passport, or other government or school-issued ID with "
-"your name and picture on it"
+"your name and picture on it."
 msgstr ""
 "À drïvér's lïçénsé, pässpört, ör öthér gövérnmént ör sçhööl-ïssüéd ÌD wïth "
-"ýöür nämé änd pïçtüré ön ït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"ýöür nämé änd pïçtüré ön ït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Webcam"
@@ -14725,12 +14801,19 @@ msgstr "Wéßçäm Ⱡ'σяєм ιρѕ#"
 msgid "A webcam and a modern browser"
 msgstr "À wéßçäm änd ä mödérn ßröwsér Ⱡ'σяєм #"
 
+#. Translators: This phrase will look like this: "Internet Explorer 9 or
+#. later"
+#: lms/templates/verify_student/show_requirements.html
+msgid "{internet_explorer_version} or later"
+msgstr "{internet_explorer_version} ör lätér Ⱡ#"
+
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Please make sure your browser is updated to the most recent version possible"
+"Please make sure your browser is updated to the most recent version "
+"possible."
 msgstr ""
-"Pléäsé mäké süré ýöür ßröwsér ïs üpdätéd tö thé möst réçént vérsïön pössïßlé"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+"Pléäsé mäké süré ýöür ßröwsér ïs üpdätéd tö thé möst réçént vérsïön "
+"pössïßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid "Credit or Debit Card"
@@ -14742,11 +14825,11 @@ msgstr "À mäjör çrédït ör déßït çärd Ⱡ'σяєм #"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
-"Visa, Master Card, American Express, Discover, Diners Club, JCB with "
-"Discover logo"
+"Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the "
+"Discover logo."
 msgstr ""
-"Vïsä, Mästér Çärd, Àmérïçän Éxpréss, Dïsçövér, Dïnérs Çlüß, JÇB wïth "
-"Dïsçövér lögö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+"Vïsä, MästérÇärd, Àmérïçän Éxpréss, Dïsçövér, Dïnérs Çlüß, ör JÇB wïth thé "
+"Dïsçövér lögö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
