@@ -109,6 +109,13 @@
             "SOCIAL_AUTH_FACEBOOK_SECRET": "test"
         }
     },
+    "DJFS": {
+            "type": "s3fs",
+            "bucket": "test",
+            "prefix": "test",
+            "aws_access_key_id": "test",
+            "aws_secret_access_key": "test"
+    },
     "XQUEUE_INTERFACE": {
         "basic_auth": [
             "edx",
