@@ -340,6 +340,13 @@ class PendingEmailChange(models.Model):
     new_email = models.CharField(blank=True, max_length=255, db_index=True)
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
+    def request_change(self, email):
+        """ TODO """
+        self.new_email = email
+        self.activation_key = uuid.uuid4().hex
+        self.save()
+        return self.activation_key
+
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'

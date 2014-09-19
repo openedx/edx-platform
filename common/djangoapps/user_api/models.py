@@ -10,7 +10,7 @@ from xmodule_django.models import CourseKeyField
 # but currently the rest of the system assumes that "student" defines
 # certain models.  For now we will leave the models in "student" and
 # create an alias in "user_api".
-from student.models import User, UserProfile, Registration  # pylint:disable=unused-import
+from student.models import UserProfile, Registration, PendingEmailChange  # pylint:disable=unused-import
 
 
 class UserPreference(models.Model):

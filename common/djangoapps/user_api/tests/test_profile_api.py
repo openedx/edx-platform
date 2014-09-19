@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Add tests for the profile API. """
+""" Tests for the profile API. """
 
 
 from django.test import TestCase
