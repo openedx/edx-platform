@@ -10,7 +10,7 @@
 }
 
 %ui-badge {
-  @extend %t-title9;
+  @extend %t-title-9;
   @extend %t-weight3;
   position: relative;
   border-bottom-right-radius: ($baseline/10);

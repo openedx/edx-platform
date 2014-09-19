@@ -19,7 +19,6 @@
   }
 
   .icon-inline {
-    @extend %t-icon-inline;
     display: inline-block;
     vertical-align: middle;
     margin-right: ($baseline/4);
