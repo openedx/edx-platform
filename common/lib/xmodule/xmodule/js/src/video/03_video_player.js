@@ -489,6 +489,11 @@ function (HTML5Video, Resizer) {
 
         this.videoPlayer.updatePlayTime(time, true);
         this.el.trigger('seek', arguments);
+
+        // the timer is stopped above; restart it.
+        if (this.videoPlayer.isPlaying()) {
+            this.videoPlayer.runTimer();
+        }
     }
 
     function runTimer() {
