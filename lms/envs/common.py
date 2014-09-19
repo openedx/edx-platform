@@ -287,8 +287,8 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # Expose public REST APIs (mostly used for mobile at the moment)
-    'ENABLE_PUBLIC_REST_API': True,
+    # Expose Mobile REST API
+    'ENABLE_MOBILE_REST_API': False,
 }
 
 # Ignore static asset files on import which match this pattern

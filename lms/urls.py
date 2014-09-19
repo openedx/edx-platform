@@ -73,7 +73,7 @@ urlpatterns = ('',  # nopep8
 
 )
 
-if settings.FEATURES["ENABLE_PUBLIC_REST_API"]:
+if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
         # TODO: find a better location for this
