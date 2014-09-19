@@ -1,5 +1,4 @@
-"""
-Python API for user profiles.
+"""Python API for user profiles.
 
 Profile information includes a student's demographic information and preferences,
 but does NOT include basic account information such as username/password.
@@ -7,10 +6,20 @@ but does NOT include basic account information such as username/password.
 """
 
 
+class ProfileRequestError(Exception):
+    """ The request to the API was not valid. """
+    pass
+
+
+class ProfileInternalError(Exception):
+    """ An error occurred in an API call. """
+    pass
+
+
 def profile_info(username=None, email=None):
-    """
-    Retrieve a user's profile information, searching
-    by either username or email.
+    """Retrieve a user's profile information
+
+    Searches either by username or email.
 
     At least one of the keyword args must be provided.
 
@@ -22,12 +31,11 @@ def profile_info(username=None, email=None):
         dict or None
 
     """
-    pass
+    return {}
 
 
 def update_profile(username, full_name=None):
-    """
-    Update a user's profile.
+    """Update a user's profile.
 
     Args:
         username (unicode): The username associated with the account.
@@ -38,13 +46,15 @@ def update_profile(username, full_name=None):
     Returns:
         dict
 
+    Raises:
+        ProfileRequestError
+
     """
     pass
 
 
 def preference_info(username, preference_name):
-    """
-    Retrieve information about a user's preferences.
+    """Retrieve information about a user's preferences.
 
     Arguments:
         username (unicode): The username of the account to retrieve.
@@ -58,8 +68,7 @@ def preference_info(username, preference_name):
 
 
 def update_preference(username, preference_name, preference_value):
-    """
-    Update a user's preference.
+    """Update a user's preference.
 
     Arguments:
         username (unicode): The username of the account to retrieve.
