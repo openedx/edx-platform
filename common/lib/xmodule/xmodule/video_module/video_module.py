@@ -212,20 +212,12 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
         # internally for download links (source, html5_sources) and the youtube
         # stream.
         if self.edx_video_id and edxval_api:
-            try:
-                video_info = edxval_api.get_video_info(self.edx_video_id)
-            except edxval_api.ValVideoNotFoundError:
-                log.error(
-                    u"Video {} has non-existent edx_video_id {}"
-                    .format(self.location, self.edx_video_id)
-                )
-            else:
-                encoded_videos = video_info.get("encoded_videos")
-                for encoded_video in encoded_videos:
-                    if encoded_video["profile"] == "desktop_mp4":
-                        download_video_link = encoded_video.get("url")
-                    elif encoded_video["profile"] == "youtube":
-                        youtube_streams = "1.00:{}".format(encoded_video["url"])
+            val_video_urls = edxval_api.get_urls_for_profiles(
+                self.edx_video_id, ["desktop_mp4", "youtube"]
+            )
+            download_video_link = val_video_urls["desktop_mp4"]
+            if val_video_urls["youtube"]:
+                youtube_streams = "1.00:{}".format(val_video_urls["youtube"])
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
@@ -487,17 +479,10 @@ class VideoDescriptor(VideoFields, VideoTranscripts, VideoStudioViewHandlers, Ta
         def get_youtube_link(video_id):
             # First try a lookup in VAL
             if self.edx_video_id and edxval_api:
-                try:
-                    video_info = edxval_api.get_video_info(self.edx_video_id)
-                    encoded_videos = video_info.get("encoded_videos")
-                    for encoded_video in encoded_videos:
-                        if encoded_video["profile"] == "youtube":
-                            return 'http://youtu.be/{0}'.format(encoded_video["url"])
-                except edxval_api.ValVideoNotFoundError:
-                    log.error(
-                        u"Video {} has non-existent edx_video_id {}"
-                        .format(self.location, self.edx_video_id)
-                    )
+                val_youtube_id = edxval_api.get_url_for_profile(self.edx_video_id, "youtube")
+
+                if val_youtube_id:
+                    return 'http://youtu.be/{0}'.format(val_youtube_id)
 
             # Fallback to our own attributes
             if video_id:

@@ -97,7 +97,7 @@ class BlockOutline(object):
 
 def video_summary(course, course_id, video_descriptor, request, local_cache):
     duration = None
-    size = 200000000
+    size = 0
     video_url = ''
 
     if video_descriptor.edx_video_id:
@@ -109,7 +109,7 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
             for enc in video_info['encoded_videos']:
                 video_url = enc['url']
                 size = enc['file_size']
-                if enc['profile'] == 'mobile':
+                if enc['profile'] == 'mobile_low':
                     break
             transcripts = {sub['lang']: sub['content_url'] for sub in video_info['subtitles']}
             duration = video_info['duration']
