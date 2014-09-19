@@ -46,6 +46,19 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # Check that registration button is present
         self.assertIn(REG_STR, resp.content)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})    
+    def test_logged_in_marketing(self):
+        self.setup_user()
+        url = reverse('about_course', args=[self.course.id.to_deprecated_string()])
+        resp = self.client.get(url)
+        # should be redirected
+        self.assertEqual(resp.status_code, 302)
+        # follow this time, and check we're redirected to the course info page
+        resp = self.client.get(url, follow=True)
+        target_url = resp.redirect_chain[-1][0]
+        info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
+        self.assertTrue(target_url.endswith(info_url))
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):

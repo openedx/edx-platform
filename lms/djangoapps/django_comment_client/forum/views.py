@@ -163,7 +163,7 @@ def forum_form_discussion(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
-    course = get_course_with_access(request.user, 'load_forum', course_key)
+    course = get_course_with_access(request.user, 'load_forum', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, include_category_map=True)
 
     user = cc.User.from_django_user(request.user)
