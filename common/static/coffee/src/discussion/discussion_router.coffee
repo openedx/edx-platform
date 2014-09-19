@@ -46,6 +46,9 @@ if Backbone?
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
+      @showMain()
+
+    showMain: =>
       if(@main)
         @main.cleanup()
         @main.undelegateEvents()
@@ -63,6 +66,7 @@ if Backbone?
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
+      @thread.on "thread:thread_type_updated", @showMain
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
