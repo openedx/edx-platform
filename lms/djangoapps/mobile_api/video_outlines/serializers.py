@@ -2,7 +2,9 @@ from rest_framework.reverse import reverse
 
 from courseware.access import has_access
 
-from edxval.api import get_videos_for_course, get_video_info, ValInternalError, ValVideoNotFoundError
+from edxval.api import (
+    get_video_info_for_course_and_profile, ValInternalError
+)
 
 
 class BlockOutline(object):
@@ -17,13 +19,17 @@ class BlockOutline(object):
         self.course_id = course_id
         self.request = request # needed for making full URLS
         self.local_cache = local_cache
+        try:
+            self.local_cache['course_videos'] = get_video_info_for_course_and_profile(
+                unicode(course_id), "mobile_low"
+            )
+        except ValInternalError:
+            self.local_cache['course_videos'] = {}
 
 
     def __iter__(self):
         child_to_parent = {}
         stack = [self.start_block]
-
-        self.local_cache['course_videos'] = {v['edx_video_id']: v for v in get_videos_for_course(self.course_id)}
 
         # path should be optional
         def path(block):
@@ -96,52 +102,46 @@ class BlockOutline(object):
 
 
 def video_summary(course, course_id, video_descriptor, request, local_cache):
-    duration = None
-    size = 0
-    video_url = ''
+    # First try to check VAL for the URLs we want...
+    val_video_info = local_cache['course_videos'].get(video_descriptor.edx_video_id)
+    if val_video_info:
+        video_url = val_video_info['url']
+    # Then fall back to VideoDescriptor fields for video URLs
+    elif video_descriptor.html5_sources:
+        video_url = video_descriptor.html5_sources[0]
+    else:
+        video_url = video_descriptor.source
 
-    if video_descriptor.edx_video_id:
-        try:
-            video_info = local_cache['course_videos'][video_descriptor.edx_video_id]
-        except KeyError:
-            print 'could not find', video_descriptor.edx_video_id
-        else:
-            for enc in video_info['encoded_videos']:
-                video_url = enc['url']
-                size = enc['file_size']
-                if enc['profile'] == 'mobile_low':
-                    break
-            transcripts = {sub['lang']: sub['content_url'] for sub in video_info['subtitles']}
-            duration = video_info['duration']
+    # If we have the video information from VAL, we also have duration and size.
+    if val_video_info:
+        duration = val_video_info['duration']
+        size = val_video_info['file_size']
+    else:
+        duration = None
+        size = 0
 
-    if not video_url:
-        if video_descriptor.html5_sources:
-            video_url = video_descriptor.html5_sources[0]
-        else:
-            video_url = video_descriptor.source
+    # Transcripts...
+    usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
+    transcripts_langs_cache = local_cache['transcripts_langs']
 
-        usage_id_str = video_descriptor.scope_ids.usage_id._to_string()
-        transcripts_langs_cache = local_cache['transcripts_langs']
+    if usage_id_str in transcripts_langs_cache:
+        transcript_langs = transcripts_langs_cache[usage_id_str]
+    else:
+        transcript_langs = video_descriptor.available_translations()
+        transcripts_langs_cache[usage_id_str] = transcript_langs
 
-        if usage_id_str in transcripts_langs_cache:
-            transcript_langs = transcripts_langs_cache[usage_id_str]
-        else:
-            transcript_langs = video_descriptor.available_translations()
-            transcripts_langs_cache[usage_id_str] = transcript_langs
-
-        transcripts = {
-            lang: reverse(
-                'video-transcripts-detail',
-                kwargs={
-                    'course_id': unicode(course_id),
-                    'block_id': video_descriptor.scope_ids.usage_id.block_id,
-                    'lang': lang
-                },
-                request=request,
-            )
-            for lang in transcript_langs
-        }
-    # import pdb; pdb.set_trace()
+    transcripts = {
+        lang: reverse(
+            'video-transcripts-detail',
+            kwargs={
+                'course_id': unicode(course_id),
+                'block_id': video_descriptor.scope_ids.usage_id.block_id,
+                'lang': lang
+            },
+            request=request,
+        )
+        for lang in transcript_langs
+    }
 
     return {
         "video_url": video_url,
