@@ -494,6 +494,12 @@
             border-color: $red1;
           }
       }
+      .error-text{
+        color: $red1;
+        font-size: 12px;
+        display: block;
+        padding-bottom: 0;
+      }
     input[type="submit"]{
       padding: 9px 35px;
     }
@@ -648,7 +654,7 @@
         background: white;
         border-radius: 3px;
         appearance:none;
-        background: url('../../images/drop-arrow.png') no-repeat 238px 14px;
+        background: url('../images/drop-arrow.png') no-repeat 238px 14px;
         -moz-appearance:none; /* Firefox */
         -webkit-appearance:none; /* Safari and Chrome */
       }
@@ -665,34 +671,34 @@
     padding-bottom: 0;
   }
 }
-  .empty-cart{
-    padding: 20px 0px;
-    background: $light-gray1;
-    text-align: center;
+.empty-cart{
+  padding: 20px 0px;
+  background: $light-gray1;
+  text-align: center;
+  border-radius: 3px;
+  margin: 20px 0px;
+  h2{
+    font-size: 24PX;
+      font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+      font-weight: 600;
+      letter-spacing: 0;
+      color: #9b9b9b;
+      text-align: center;
+      margin-top: 20px;
+      text-transform: initial;
+  }
+  a.blue{
+    display: inline-block;
+    background: $blue2;
+    color: white;
+    padding: 20px 40px;
     border-radius: 3px;
-    margin: 20px 0px;
-    h2{
-      font-size: 24PX;
-        font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
-        font-weight: 600;
-        letter-spacing: 0;
-        color: #9b9b9b;
-        text-align: center;
-        margin-top: 20px;
-        text-transform: initial;
-    }
-    a.blue{
-      display: inline-block;
-      background: $blue2;
-      color: white;
-      padding: 20px 40px;
-      border-radius: 3px;
-      font-size: 24px;
-      font-weight: 400;
-      margin: 10px 0px 20px;
-      &:hover{
-        text-decoration: none;
-      }
+    font-size: 24px;
+    font-weight: 400;
+    margin: 10px 0px 20px;
+    &:hover{
+      text-decoration: none;
     }
   }
+}
 
