@@ -447,8 +447,8 @@ def billing_details(request):
     cart_items = cart.orderitem_set.all()
 
     # uncomment these two lines to see the billing information workflow
-    # cart.order_type = 'business'
-    # cart.save()
+    #cart.order_type = 'business'
+    #cart.save()
 
     if getattr(cart, 'order_type') != 'business':
         raise Http404('Page not found!')
