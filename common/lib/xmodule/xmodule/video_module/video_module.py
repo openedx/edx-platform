@@ -221,11 +221,11 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
                 )
             else:
                 encoded_videos = video_info.get("encoded_videos")
-                for item in encoded_videos:
-                    if item.get("profile") == "desktop_mp4":
-                        download_video_link = item.get("url")
-                    elif item.get("profile") == "youtube":
-                        youtube_streams = "1.00:{}".format(item.get("url"))
+                for encoded_video in encoded_videos:
+                    if encoded_video["profile"] == "desktop_mp4":
+                        download_video_link = encoded_video.get("url")
+                    elif encoded_video["profile"] == "youtube":
+                        youtube_streams = "1.00:{}".format(encoded_video["url"])
 
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
@@ -485,6 +485,21 @@ class VideoDescriptor(VideoFields, VideoTranscripts, VideoStudioViewHandlers, Ta
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
+            # First try a lookup in VAL
+            if self.edx_video_id and edxval_api:
+                try:
+                    video_info = edxval_api.get_video_info(self.edx_video_id)
+                    encoded_videos = video_info.get("encoded_videos")
+                    for encoded_video in encoded_videos:
+                        if encoded_video["profile"] == "youtube":
+                            return 'http://youtu.be/{0}'.format(encoded_video["url"])
+                except edxval_api.ValVideoNotFoundError:
+                    log.error(
+                        u"Video {} has non-existent edx_video_id {}"
+                        .format(self.location, self.edx_video_id)
+                    )
+
+            # Fallback to our own attributes
             if video_id:
                 return 'http://youtu.be/{0}'.format(video_id)
             else:
