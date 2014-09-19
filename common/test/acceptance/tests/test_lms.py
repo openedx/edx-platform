@@ -3,6 +3,7 @@
 E2E tests for the LMS.
 """
 
+from textwrap import dedent
 from unittest import skip
 
 from .helpers import UniqueCourseTest, load_data_str
@@ -14,6 +15,7 @@ from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.progress import ProgressPage
 from ..pages.lms.dashboard import DashboardPage
+from ..pages.lms.problem import ProblemPage
 from ..pages.lms.video.video import VideoPage
 from ..pages.xblock.acid import AcidView
 from ..pages.lms.courseware import CoursewarePage
@@ -543,3 +545,80 @@ class TooltipTest(UniqueCourseTest):
         self.tab_nav.go_to_tab('Courseware')
 
         self.assertTrue(self.courseware_page.tooltips_displayed())
+
+
+class ProblemExecutionTest(UniqueCourseTest):
+    """
+    Tests of problems.
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(ProblemExecutionTest, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.course_nav = CourseNavPage(self.browser)
+        self.tab_nav = TabNavPage(self.browser)
+
+        # Install a course with sections and problems.
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        course_fix.add_asset(['python_lib.zip'])
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('problem', 'Python Problem', data=dedent("""\
+                        <problem>
+                        <script type="loncapa/python">
+                        from number_helpers import seventeen, fortytwo
+                        oneseven = seventeen()
+
+                        def check_function(expect, ans):
+                            if int(ans) == fortytwo(-22):
+                                return True
+                            else:
+                                return False
+                        </script>
+
+                        <p>What is the sum of $oneseven and 3?</p>
+
+                        <customresponse expect="20" cfn="check_function">
+                            <textline/>
+                        </customresponse>
+                        </problem>
+                        """
+                    )),
+                )
+            )
+        ).install()
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_python_execution_in_problem(self):
+        # Navigate to the problem page
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+        self.course_nav.go_to_section('Test Section', 'Test Subsection')
+
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'PYTHON PROBLEM')
+
+        # Does the page have computation results?
+        self.assertIn("What is the sum of 17 and 3?", problem_page.problem_text)
+
+        # Fill in the answer correctly.
+        problem_page.fill_answer("20")
+        problem_page.click_check()
+        self.assertTrue(problem_page.is_correct())
+
+        # Fill in the answer incorrectly.
+        problem_page.fill_answer("4")
+        problem_page.click_check()
+        self.assertFalse(problem_page.is_correct())
