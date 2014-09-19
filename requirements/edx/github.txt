@@ -33,5 +33,6 @@
 -e git+https://github.com/edx/ease.git@97de68448e5495385ba043d3091f570a699d5b5f#egg=ease
 -e git+https://github.com/edx/i18n-tools.git@56f048af9b6868613c14aeae760548834c495011#egg=i18n-tools
 -e git+https://github.com/edx/edx-oauth2-provider.git@0.2.1#egg=oauth2-provider
--e git+https://github.com/edx/edx-val.git@42d1a0c2b589af8893bf6e4430db5a2c3f8098f5#egg=edx-val
+-e git+https://github.com/edx/edx-val.git@8bae0aefa648f0d53b83162363db4a0b699648b1#egg=edx-val
+
 
