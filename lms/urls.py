@@ -76,11 +76,12 @@ urlpatterns = ('',  # nopep8
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
-        # TODO: find a better location for this
-        url(r'^api/private/', include('edxval.urls')),
-        url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     )
 
+if settings.FEATURES["ENABLE_VIDEO_ABSTRACTION_LAYER_API"]:
+    urlpatterns += (
+        url(r'^api/val/v0/', include('edxval.urls')),
+    )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (

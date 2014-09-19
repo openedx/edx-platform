@@ -287,8 +287,13 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # Expose Mobile REST API
+    # Expose Mobile REST API. Note that if you use this, you must also set 
+    # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
+
+    # Video Abstraction Layer used to allow video teams to manage video assets
+    # independently of courseware. https://github.com/edx/edx-val
+    'ENABLE_VIDEO_ABSTRACTION_LAYER_API': False,
 }
 
 # Ignore static asset files on import which match this pattern
