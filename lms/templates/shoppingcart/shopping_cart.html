@@ -112,14 +112,12 @@ $(function() {
    $('#submit-code').click(function(event){
       event.preventDefault();
       var post_url = "${reverse('shoppingcart.views.use_code')}";
+      if($('#input_code').val() == "") {
+        showErrorMsgs('Must enter a valid code');
+        return;
+      }
       $.post(post_url,{
-                  "code" :  $('#input_code').val(),
-                  beforeSend: function(xhr, options){
-                      if($('#input_code').val() == "") {
-                          showErrorMsgs('Must enter a valid code')
-                          xhr.abort();
-                      }
-                  }
+                  "code" :  $('#input_code').val()
               }
       )
       .success(function(data) {

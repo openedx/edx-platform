@@ -346,8 +346,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.log.info')
     def test_reset_redemption_for_coupon(self, info_log):
 
-        self.add_coupon(self.course_key, True)
-        reg_item = self.add_course_to_user_cart()
+        self.add_coupon(self.course_key, True, self.coupon_code)
+        reg_item = self.add_course_to_user_cart(self.course_key)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
@@ -362,7 +362,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     def test_reset_redemption_for_registration_code(self, info_log):
 
         self.add_reg_code(self.course_key)
-        reg_item = self.add_course_to_user_cart()
+        reg_item = self.add_course_to_user_cart(self.course_key)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
