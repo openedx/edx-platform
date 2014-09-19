@@ -32,8 +32,8 @@ class OrderTest(ModuleStoreTestCase):
         course = CourseFactory.create()
         self.course_key = course.id
         self.other_course_keys = []
-        for i in xrange(1, 5):
-            self.other_course_keys.append(CourseFactory.create())
+        for __ in xrange(1, 5):
+            self.other_course_keys.append(CourseFactory.create().id)
         self.cost = 40
 
     def test_get_cart_for_user(self):

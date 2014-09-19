@@ -1184,7 +1184,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
-        CourseFactory.create(, display_name='Robot Super Educational Course')
+        CourseFactory.create(display_name='Robot Super Educational Course')
         resp = self.client.get_html('/course/')
         self.assertContains(
             resp,
@@ -1195,8 +1195,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
-        course_cat_num = self.random_course_name()
-        course = CourseFactory.create(org='MITx', course=course_cat_num, display_name='Robot Super Course')
+        course = CourseFactory.create()
         resp = self._show_course_overview(course.id)
         self.assertContains(
             resp,
@@ -1210,7 +1209,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_create_item(self):
         """Test creating a new xblock instance."""
-        course = CourseFactory.create()()
+        course = CourseFactory.create()
 
         section_data = {
             'parent_locator': unicode(course.location),
@@ -1227,7 +1226,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        course = CourseFactory.create()()
+        course = CourseFactory.create()
 
         problem_data = {
             'parent_locator': unicode(course.location),

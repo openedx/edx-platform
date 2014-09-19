@@ -305,8 +305,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -653,7 +653,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from {}'.format(display_name=self.course.display_name,)
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
@@ -702,7 +702,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been un-enrolled from {}'.format(display_name=self.course.display_name,)
+            'You have been un-enrolled from {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
@@ -728,7 +728,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for {}'.format(display_name=self.course.display_name,)
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
@@ -757,7 +757,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join {} at edx.org by a member of the course staff.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org".format(
-                display_name=self.course.display_name,
+                self.course.display_name,
             )
         )
 
@@ -778,7 +778,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to register for {}'.format(display_name=self.course.display_name,)
+            'You have been invited to register for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
@@ -823,8 +823,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
             'SITE_NAME',
             settings.SITE_NAME
         )
-        self.about_path = '/courses/MITx/999/Robot_Super_Course/about'
-        self.course_path = '/courses/MITx/999/Robot_Super_Course/'
+        self.about_path = '/courses/{}/about'.format(self.course.id)
+        self.course_path = '/courses/{}/'.format(self.course.id)
 
         # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
@@ -926,7 +926,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for {}'.format(display_name=self.course.display_name,)
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
 
         self.assertEqual(
@@ -973,7 +973,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            'You have been invited to a beta test for {}'.format(display_name=self.course.display_name)
+            'You have been invited to a beta test for {display_name}'.format(display_name=self.course.display_name)
         )
 
         self.assertEqual(
@@ -1089,7 +1089,7 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            u'You have been removed from a beta test for {}'.format(display_name=self.course.display_name,)
+            u'You have been removed from a beta test for {display_name}'.format(display_name=self.course.display_name,)
         )
         self.assertEqual(
             mail.outbox[0].body,
