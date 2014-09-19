@@ -275,6 +275,7 @@ if Backbone?
         topicId: @model.get('commentable_id')
       )
       @editView.bind "thread:updated thread:cancel_edit", @closeEditView
+      @editView.bind "comment:endorse", @endorseThread
 
     renderSubView: (view) ->
       view.setElement(@$('.thread-content-wrapper'))

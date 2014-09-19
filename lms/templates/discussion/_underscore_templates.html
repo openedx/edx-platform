@@ -383,30 +383,6 @@
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
-            <div class="field-label">
-                <span class="field-label-text">
-                    ## Translators: This is the label for a control to
-                    ## select a forum post type
-                    ${_("Post type:")}
-                </span><fieldset class="field-input">
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
-                    <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
-                        <i class="icon icon-question"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Question")}
-                    </label>
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
-                    <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
-                        <i class="icon icon-comments"></i>
-                        ## Translators: This is a forum post type
-                        ${_("Discussion")}
-                    </label>
-                </fieldset>
-            </div><span class="field-help">
-                ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
-            </span>
-        </div>
         <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
         <div class="post-field">
@@ -457,6 +433,33 @@
             <a href="#" class="cancel">${_('Cancel')}</a>
         </div>
     </form>
+</script>
+
+<script aria-hidden="true" type="text/template" id="thread-type-template">
+    <div class="post-field">
+        <div class="field-label">
+            <span class="field-label-text">
+                ## Translators: This is the label for a control to
+                ## select a forum post type
+                ${_("Post type:")}
+            </span><fieldset class="field-input">
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
+                <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
+                    <i class="icon icon-question"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Question")}
+                </label>
+                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
+                <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
+                    <i class="icon icon-comments"></i>
+                    ## Translators: This is a forum post type
+                    ${_("Discussion")}
+                </label>
+            </fieldset>
+        </div><span class="field-help">
+            ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
+        </span>
+    </div>
 </script>
 
 <script aria-hidden="true" type="text/template" id="new-post-menu-entry-template">

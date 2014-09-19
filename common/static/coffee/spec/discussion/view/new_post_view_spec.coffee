@@ -115,7 +115,7 @@ describe "NewPostView", ->
         eventSpy = jasmine.createSpy('eventSpy')
         view.listenTo(view, "newPost:cancel", eventSpy)
         view.$(".post-errors").html("<li class='post-error'>Title can't be empty</li>")
-        view.$("#tab-post-type-discussion").click()
+        view.$("label[for$='post-type-discussion']").click()
         view.$(".js-post-title").val("Test Title")
         view.$(".js-post-body textarea").val("Test body")
         view.$(".wmd-preview p").html("Test body")
@@ -127,13 +127,14 @@ describe "NewPostView", ->
         view.$(".cancel").click()
         expect(eventSpy).toHaveBeenCalled()
         expect(view.$(".post-errors").html()).toEqual("");
-        expect($("##{mode}-post-type-question").prop("checked")).toBe(true)
-        expect($("##{mode}-post-type-discussion").prop("checked")).toBe(false)
+        if mode == "tab"
+          expect($("input[id$='post-type-question']")).toBeChecked()
+          expect($("input[id$='post-type-discussion']")).not.toBeChecked()
         expect(view.$(".js-post-title").val()).toEqual("");
         expect(view.$(".js-post-body textarea").val()).toEqual("");
-        expect(view.$(".js-follow").prop("checked")).toBe(true)
-        expect(view.$(".js-anon").prop("checked")).toBe(false)
-        expect(view.$(".js-anon-peers").prop("checked")).toBe(false)
+        expect(view.$(".js-follow")).toBeChecked()
+        expect(view.$(".js-anon")).not.toBeChecked()
+        expect(view.$(".js-anon-peers")).not.toBeChecked()
         if mode == "tab"
           expect(view.$(".js-selected-topic").text()).toEqual("General")
 

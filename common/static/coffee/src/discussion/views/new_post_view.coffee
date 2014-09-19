@@ -17,6 +17,8 @@ if Backbone?
           })
           @$el.html(_.template($("#new-post-template").html(), context))
           if @isTabMode()
+              threadTypeTemplate = _.template($("#thread-type-template").html());
+              @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
               @topicView = new DiscussionTopicMenuView {
                   topicId:  @topicId
                   course_settings: @course_settings
