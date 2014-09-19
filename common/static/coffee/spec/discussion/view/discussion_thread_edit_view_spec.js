@@ -117,6 +117,7 @@
             var view;
             spyOn($, 'ajax').andCallFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
+                expect(params.data.thread_type).toBe('discussion');
                 expect(params.data.commentable_id).toBe('topic');
                 expect(params.data.title).toBe('new_title');
                 params.success();
@@ -125,11 +126,13 @@
             this.createEditView();
             this.view.$el.find('a.topic-title').first().click(); // set new topic
             this.view.$('.edit-post-title').val('new_title'); // set new title
+            this.view.$("label[for$='post-type-discussion']").click(); // set new thread type
             this.view.$('.post-update').click();
             expect($.ajax).toHaveBeenCalled();
 
             expect(this.thread.get('title')).toBe('new_title');
             expect(this.thread.get('commentable_id')).toBe('topic');
+            expect(this.thread.get('thread_type')).toBe('discussion');
             expect(this.thread.get('courseware_title')).toBe('Topic');
 
             expect(this.view.$('.edit-post-title')).toHaveValue('');

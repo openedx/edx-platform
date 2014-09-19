@@ -23,6 +23,8 @@ if Backbone?
               $('.group-selector-wrapper').hide()
           @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
           if @isTabMode()
+              threadTypeTemplate = _.template($("#thread-type-template").html());
+              @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
               @topicView = new DiscussionTopicMenuView {
                   topicId:  @topicId
                   course_settings: @course_settings,
