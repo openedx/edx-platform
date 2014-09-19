@@ -689,7 +689,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
     query_features = [
@@ -697,8 +698,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
         'goals',
     ]
-
-    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -717,9 +716,15 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'goals': _('Goals'),
     }
 
+    if course.is_cohorted:
+        query_features.append('cohort')
+        query_features_names['cohort'] = _('Cohort')
+
+    student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
+
     if not csv:
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': course_key.to_deprecated_string(),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,

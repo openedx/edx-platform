@@ -1,7 +1,8 @@
-(function(Backbone, CohortEditorView) {
+(function($, Backbone, CohortEditorView) {
     var CohortsView = Backbone.View.extend({
         events : {
-            "change .cohort-select": "showCohortEditor"
+            "change .cohort-select": "showCohortEditor",
+            "click .link-cross-reference": "showSection"
         },
 
         initialize: function() {
@@ -28,8 +29,14 @@
                 model: selectedCohort
             });
             this.editor.render();
+        },
+
+        showSection: function(event) {
+            event.preventDefault();
+            var section = $(event.currentTarget).data("section");
+            $(".instructor-nav .nav-item a[data-section='" + section + "']").click();
         }
     });
 
     this.CohortsView = CohortsView;
-}).call(this, Backbone, CohortEditorView);
+}).call(this, jQuery, Backbone, CohortEditorView);
