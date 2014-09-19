@@ -208,8 +208,6 @@ def check_transcripts(request):
         subs: string, new value of item.sub field, that should be set in module;
         command: string, action to front-end what to do and what to show to user.
     """
-    # import pdb; pdb.set_trace()
-
     transcripts_presence = {
         'html5_local': [],
         'html5_equal': False,
