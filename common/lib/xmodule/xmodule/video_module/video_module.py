@@ -187,7 +187,6 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
     js_module_name = "Video"
 
     def get_html(self):
-        download_video_link = None
         transcript_download_format = self.transcript_download_format if not (self.download_track and self.track) else None
         sources = filter(None, self.html5_sources)
 
@@ -203,14 +202,32 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
                 if new_url:
                     sources[index] = new_url
 
-        if self.download_video:
-            if self.edx_video_id:
+        download_video_link = ""
+        youtube_streams = ""
+
+        # If we have an edx_video_id, we prefer its values over what we store
+        # internally for download links (source, html5_sources) and the youtube
+        # stream.
+        if self.edx_video_id and edxval_api:
+            try:
                 video_info = edxval_api.get_video_info(self.edx_video_id)
+            except edxval_api.ValVideoNotFoundError:
+                log.error(
+                    u"Video {} has non-existent edx_video_id {}"
+                    .format(self.location, self.edx_video_id)
+                )
+            else:
                 encoded_videos = video_info.get("encoded_videos")
-                for item in encoded_videos:
-                    if item.get("profile") == "desktop":
-                        download_video_link = item.get("url")
-            elif self.source:
+                for encoded_video in encoded_videos:
+                    if encoded_video["profile"] == "desktop_mp4":
+                        download_video_link = encoded_video.get("url")
+                    elif encoded_video["profile"] == "youtube":
+                        youtube_streams = "1.00:{}".format(encoded_video["url"])
+
+        # If there was no edx_video_id, or if there was no download specified
+        # for it, we fall back on whatever we find in the VideoDescriptor
+        if not download_video_link and self.download_video:
+            if self.source:
                 download_video_link = self.source
             elif self.html5_sources:
                 download_video_link = self.html5_sources[0]
@@ -236,7 +253,7 @@ class VideoModule(VideoFields, VideoTranscripts, VideoStudentViewHandlers, XModu
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
-            'youtube_streams': create_youtube_string(self),
+            'youtube_streams': youtube_streams or create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
@@ -465,6 +482,21 @@ class VideoDescriptor(VideoFields, VideoTranscripts, VideoStudioViewHandlers, Ta
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
+            # First try a lookup in VAL
+            if self.edx_video_id and edxval_api:
+                try:
+                    video_info = edxval_api.get_video_info(self.edx_video_id)
+                    encoded_videos = video_info.get("encoded_videos")
+                    for encoded_video in encoded_videos:
+                        if encoded_video["profile"] == "youtube":
+                            return 'http://youtu.be/{0}'.format(encoded_video["url"])
+                except edxval_api.ValVideoNotFoundError:
+                    log.error(
+                        u"Video {} has non-existent edx_video_id {}"
+                        .format(self.location, self.edx_video_id)
+                    )
+
+            # Fallback to our own attributes
             if video_id:
                 return 'http://youtu.be/{0}'.format(video_id)
             else:
