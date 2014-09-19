@@ -35,7 +35,7 @@ from api_manager.models import CourseGroupRelationship, CourseContentGroupRelati
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
-from api_manager.utils import generate_base_uri
+from api_manager.utils import generate_base_uri, str2bool
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from .serializers import CourseModuleCompletionSerializer, CourseSerializer
@@ -1588,6 +1588,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
     ```/api/courses/{course_id}/metrics/completions/leaders/?content_id={content_id}```
     To get more than 3 users use count parameter
     ```/api/courses/{course_id}/metrics/completions/leaders/?count=6```
+    To get only percentage of a user and course average skipleaders parameter can be used
+    ```/api/courses/{course_id}/metrics/completions/leaders/?user_id={user_id}&skipleaders=true```
     ### Use Cases/Notes:
     * Example: Display leaders in terms of completions in a given course
     * Example: Display top 3 users leading in terms of completions in a given course
@@ -1599,6 +1601,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         """
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
         count = self.request.QUERY_PARAMS.get('count', 3)
+        skipleaders = str2bool(self.request.QUERY_PARAMS.get('skipleaders', 'false'))
         data = {}
         course_avg = 0
         if not course_exists(request, request.user, course_id):
@@ -1617,13 +1620,14 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
             user_queryset = CourseModuleCompletion.objects.filter(course_id=course_key, user__id=user_id)\
                 .exclude(cat_list)
             user_completions = user_queryset.count()
-            user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
-            user_time_completed = user_time_completed['time_completed'] or timezone.now()
-            completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
-                .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
-                .filter(Q(completions__gt=user_completions) | Q(completions=user_completions,
-                                                                time_completed__lt=user_time_completed)).count()
-            data['position'] = completions_above_user + 1
+            if not skipleaders:
+                user_time_completed = user_queryset.aggregate(time_completed=Max('created'))
+                user_time_completed = user_time_completed['time_completed'] or timezone.now()
+                completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
+                    .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
+                    .filter(Q(completions__gt=user_completions) | Q(completions=user_completions,
+                                                                    time_completed__lt=user_time_completed)).count()
+                data['position'] = completions_above_user + 1
             completion_percentage = 0
             if total_possible_completions > 0:
                 completion_percentage = int(round(100 * user_completions/total_possible_completions))
@@ -1634,14 +1638,15 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
             course_avg = round(total_actual_completions / float(total_users), 1)
             course_avg = int(round(100 * course_avg / total_possible_completions))  # avg in percentage
         data['course_avg'] = course_avg
-
-        queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
-                                                                'user__profile__avatar_url')\
-                       .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
-                       .order_by('-completions', 'time_completed')[:count]
-        serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
-                                                        context={'total_completions': total_possible_completions})
-        data['leaders'] = serializer.data  # pylint: disable=E1101
+        if not skipleaders:
+            queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username',
+                                                                    'user__profile__title',
+                                                                    'user__profile__avatar_url')\
+                           .annotate(completions=Count('content_id')).annotate(time_completed=Max('created'))\
+                           .order_by('-completions', 'time_completed')[:count]
+            serializer = CourseCompletionsLeadersSerializer(queryset, many=True,
+                                                            context={'total_completions': total_possible_completions})
+            data['leaders'] = serializer.data  # pylint: disable=E1101
         return Response(data, status=status.HTTP_200_OK)
 
 
