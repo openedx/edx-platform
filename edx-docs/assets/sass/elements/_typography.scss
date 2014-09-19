@@ -145,27 +145,19 @@
 // ====================
 
 // icons
-%t-icon {
-
-}
-
 %t-icon-s {
-  @extend %t-icon;
   @include font-size(12);
 }
 
 %t-icon-m {
-  @extend %t-icon;
   @include font-size(16);
 }
 
 %t-icon-l {
-  @extend %t-icon;
   @include font-size(24);
 }
 
 %t-icon-xl {
-  @extend %t-icon;
   @include font-size(36);
 }
 
