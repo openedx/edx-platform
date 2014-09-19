@@ -106,7 +106,7 @@ def instructor_dashboard_2(request, course_id):
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 
     analytics_dashboard_message = None
-    if settings.ANALYTICS_DASHBOARD_URL:
+    if settings.ANALYTICS_DASHBOARD_URL and access['admin']:
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
         link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
