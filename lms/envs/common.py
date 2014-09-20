@@ -383,6 +383,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'edxmako.shortcuts.marketing_link_context_processor',
 
+    # Include TEMPLATE_VISIBLE_SETTINGS in templates
+    'settings_context_processor.context_processors.settings',
+
     # Allows the open edX footer to be leveraged in Django Templates.
     'edxmako.shortcuts.open_source_footer_context_processor',
 
@@ -1430,6 +1433,12 @@ MKTG_URL_LINK_MAP = {
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
+
+######################### VISIBLE SETTINGS ###########################
+# These settings' values will be exposed to all templates
+TEMPLATE_VISIBLE_SETTINGS = [
+    'FEATURES',
+]
 
 ############################### CHAT ################################
 JABBER = {}
