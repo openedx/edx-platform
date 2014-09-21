@@ -25,6 +25,8 @@ from operator import itemgetter
 from lxml import etree
 from pkg_resources import resource_string
 
+from django.conf import settings
+
 from xblock.fields import ScopeIds
 from xblock.runtime import KvsFieldData
 
@@ -221,24 +223,15 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
-        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
-        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and not(self.license):
-            course = modulestore().get_course(course_id)
 
-            self.license = course.license
-            self.license_version = course.license_version
-        else:
-            self.license = None
-            self.license_version = None
 
-        return self.system.render_template('video.html', {
+        context = {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # This won't work when we move to data that
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
-            'license': parse_license(self.license, self.license_version),
             'end': self.end_time.total_seconds(),
             'handout': self.handout,
             'id': self.location.html_id(),
@@ -263,7 +256,27 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
-        })
+        }
+
+        # TODO: Unsure if this is the proper way to do this. Pleasy verify and update if necessary
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            if not(self.license):
+                course_id = module_attr('course_id')
+                if course_id is not None and hasattr(self.runtime, 'modulestore'):
+                    course = self.runtime.modulestore.get_course(course_id)
+
+                    self.license = course.license
+                    self.license_version = course.license_version
+
+            context['license'] = parse_license(
+                self.license, 
+                self.license_version
+            )
+        # else:
+        #     self.license = None
+        #     self.license_version = None
+
+        return self.system.render_template('video.html', context)
 
 
 class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
@@ -271,7 +284,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     Descriptor for `VideoModule`.
     """
     module_class = VideoModule
-    course_id = module_attr('course_id')
     transcript = module_attr('transcript')
 
     tabs = [
@@ -572,7 +584,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         license = xml.get('license')
         if license is not None:
-            field_data['license_version'] = None
+            field_data['license_version'] = parse_license(license).version
 
         sources = xml.findall('source')
         if sources:

@@ -319,6 +319,7 @@ class MongoContentStore(ContentStore):
                 source_content.read(),
                 _id=asset_id, filename=asset['filename'], content_type=asset['contentType'],
                 displayname=asset['displayname'], content_son=asset_key,
+                license=asset['license'],
                 # thumbnail is not technically correct but will be functionally correct as the code
                 # only looks at the name which is not course relative.
                 thumbnail_location=asset['thumbnail_location'],

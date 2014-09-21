@@ -528,7 +528,7 @@ def _create_or_rerun_course(request):
         if not settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID'):
             if _has_non_ascii_characters(org) or _has_non_ascii_characters(course) or _has_non_ascii_characters(run):
                 return JsonResponse(
-                    {'error': _('Special characters not allowed in organization, course number and course run.')},
+                    {'error': _('Special characters not allowed in organization, course number, and course run.')},
                     status=400
                 )
 
