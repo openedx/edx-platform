@@ -4,7 +4,7 @@ Profile information includes a student's demographic information and preferences
 but does NOT include basic account information such as username/password.
 
 """
-from user_api.models import User, UserProfile
+from user_api.models import UserProfile
 
 
 class ProfileRequestError(Exception):
@@ -17,7 +17,9 @@ class ProfileInternalError(Exception):
     """ An error occurred in an API call. """
     pass
 
+
 FULL_NAME_MAX_LENGTH = 255
+
 
 def profile_info(username):
     """Retrieve a user's profile information
@@ -44,7 +46,7 @@ def profile_info(username):
         'email': profile.user.email,
         'full_name': profile.name,
     }
-    
+
     return profile_dict
 
 
@@ -68,15 +70,12 @@ def update_profile(username, full_name=None):
         profile = UserProfile.objects.get(user__username=username)
     except UserProfile.DoesNotExist:
         raise ProfileRequestError("TODO")
-    
+
     if full_name is not None:
         if len(full_name) > FULL_NAME_MAX_LENGTH:
             raise ProfileRequestError("TODO")
         else:
-            profile.name = full_name
-
-    # Assumption: Django won't save if nothing has changed.
-    profile.save()
+            profile.update_name(full_name)
 
 
 def preference_info(username, preference_name):
