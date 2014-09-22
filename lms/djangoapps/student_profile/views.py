@@ -13,7 +13,7 @@ def index(request):
         request (HttpRequest)
 
     Returns:
-        HttpResponse
+        HttpResponse: 200
 
     Example usage:
 
@@ -35,6 +35,7 @@ def name_change_handler(request):
         request (HttpRequest)
 
     Returns:
+        HttpResponse: 204
 
     Example usage:
 
@@ -42,9 +43,11 @@ def name_change_handler(request):
 
     """
     put = QueryDict(request.body)
+
     username = request.user.username
-    proposed_name = put.get('proposed_name')
-    profile_api.update_profile(username, full_name=proposed_name)
+    new_name = put.get('new_name')
+    
+    profile_api.update_profile(username, full_name=new_name)
 
     # A 204 is intended to allow input for actions to take place
     # without causing a change to the user agent's active document view.

@@ -24,13 +24,13 @@ $.ajaxSetup({
     }
 });
 
-$("#name_change_form").submit(function(event) {
+$("#name-change-form").submit(function(event) {
     // perform validation?
     $.ajax({
         url: "name_change",
         type: "PUT",
         data: {
-            proposed_name: $("#new_name").val()
+            new_name: $("#new-name").val()
         }
     });
     event.preventDefault();

@@ -1,11 +1,8 @@
 """Python API for user accounts.
 
-Account information includes:
-* username
-* password
-* email
-
-Accounts do NOT include user profile information.
+Account information includes a student's username, password, and email
+address, but does NOT include user profile information (i.e., demographic 
+information and preferences).
 
 """
 from django.db import transaction, IntegrityError

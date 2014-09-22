@@ -12,3 +12,17 @@
 <h1>Student Account</h1>
 
 <p>This is a placeholder for the student's account page.</p>
+
+<form id="email-change-form" method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+    
+    <label for="new-email">${_('New Address')}</label>
+    <input id="new-email" type="text" name="new-email" value="" placeholder="xsy@edx.org" />
+    
+    <label for="password">${_('Password')}</label>
+    <input id="password" type="password" name="password" value="" />
+
+    <div class="submit-button">
+        <input type="submit" id="email-change-submit" value="${_('Change My Email Address')}">
+    </div>
+</form>
