@@ -242,21 +242,30 @@
             <div class="cohort-management-nav">
                 <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
 
-                    <div class="cohort-management-nav-form-select field field-select">
-                        <label for="cohort-select" class="label sr">Select a cohort to manage</label>
+                    <div class="form-fields">
+                        <div class="cohort-management-nav-form-select field field-select">
+                            <label for="cohort-select" class="label sr">Select a cohort to manage</label>
 
-                        <select class="input cohort-select" name="cohort-select" id="cohort-select">
-                            <option value="cohort-name-1">Cohort Name is Placed Here and Should Accommodate Almost Everything (12,546)</option>
-                            <option value="cohort-name-2" selected>Cras mattis consectetur purus sit amet fermentum (8,546)</option>
-                            <option value="cohort-name-3">Donec id elit non mi porta gravida at eget metus. (4)
-                            </option>
-                            <option value="cohort-name-4">Donec id elit non mi porta gravida at eget metus. (4)
-                            </option>
-                        </select>
+                            <select class="input cohort-select" name="cohort-select" id="cohort-select">
+                                <option value="cohort-name-1">Cohort Name is Placed Here and Should Accommodate Almost Everything (12,546)</option>
+                                <option value="cohort-name-2" selected>Cras mattis consectetur purus sit amet fermentum (8,546)</option>
+                                <option value="cohort-name-3">Donec id elit non mi porta gravida at eget metus. (4)
+                                </option>
+                                <option value="cohort-name-4">Donec id elit non mi porta gravida at eget metus. (4)
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
-                    <button class="form-submit button action-primary action-view sr">View cohort group</button>
+                    <div class="form-actions">
+                        <button class="form-submit button action-primary action-view sr">View cohort group</button>
+                    </div>
                 </form>
+
+                <a href="" class="action-primary action-create">
+                    <i class="icon-plus"></i>
+                    Add Cohort Group
+                </a>
             </div>
 
             <!-- message - error - no groups -->
@@ -268,7 +277,10 @@
                 </div>
 
                 <div class="message-actions">
-                    <a href="" class="action-primary action-review">Revise Configuration in Studio</a>
+                    <button class="action-primary action-create">
+                        <i class="icon icon-plus"></i>
+                        Add a Cohort Group
+                    </button>
                 </div>
             </div>
 
@@ -285,12 +297,77 @@
                 </div>
             </div>
 
+            <!-- adding new group -->
+            <div class="cohort-management-create">
+                <form action="" method="post" name="" id="cohort-management-create-form" class="cohort-management-create-form">
+
+                    <h3 class="form-title">Add a New Cohort Group</h3>
+
+                    <div class="form-fields">
+                        <div class="cohort-management-create-form-name field field-text">
+                            <label for="cohort-create-name" class="label">
+                                New Cohort Name *
+                                <span class="sr">(Required Field)</span>
+                            </label>
+                            <input type="text" name="cohort-create-name" value="" class=" input cohort-create-name" id="cohort-create-name" placeholder="Enter Your New Cohort Group's Name" required="required" />
+                            <span class="tip">No special characters or symbols are allowed in group names</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="form-submit button action-primary action-save">
+                            <i class="icon icon-plus"></i>
+                            Save
+                        </button>
+                        <a href="" class="form-cancel action-secondary action-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- editing group -->
+            <div class="cohort-management-edit">
+                <form action="" method="post" name="" id="cohort-management-edit-form" class="cohort-management-edit-form">
+
+                    <h3 class="form-title">Editing "Cohort Group's Name"</h3>
+
+                    <div class="form-fields">
+                        <div class="cohort-management-edit-form-name field field-text">
+                            <label for="cohort-create-name" class="label">
+                                Cohort Name *
+                                <span class="sr">(Required Field)</span>
+                            </label>
+                            <input type="text" name="cohort-edit-name" value="" class=" input cohort-edit-name" id="cohort-edit-name" placeholder="Enter Your Cohort Group's Name" required="required" />
+                            <span class="tip">No special characters or symbols are allowed in group names</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="form-submit button action-primary action-save">
+                            <i class="icon icon-plus"></i>
+                            Save
+                        </button>
+                        <a href="" class="form-cancel action-secondary action-cancel">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- create/edit cohort group messages -->
+            <div class="message message-confirmation is-shown">
+                <h3 class="message-title">New Cohort Name has been created. You may add students below.</h3>
+            </div>
+
+            <div class="message message-error is-shown">
+                <h3 class="message-title">Special characters are not allowed in cohort group names</h3>
+            </div>
+
             <!-- individual group -->
             <div class="cohort-management-group">
                 <header class="cohort-management-group-header">
                     <h3 class="group-header-title">
                         <span class="title-value">Cohort Name Can be Placed Here and Should Accommodate Almost Everything</span>
                         <span class="group-count">(contains 12,546 Students)</span>
+
+                        <a href="" class="action-secondary action-edit action-edit-name">Edit</a>
                     </h3>
 
                     <div class="cohort-management-group-setup">
@@ -350,15 +427,20 @@
 
                         <div class="form-fields">
                             <div class="field field-textarea is-required">
-                                <label for="cohort-management-group-add-students" class="label">Student ID or Email Address of Students to be added (one per line or comma-separated)</label>
+                                <label for="cohort-management-group-add-students" class="label">
+                                    Student ID or Email Address of Students to be added (one per line or comma-separated) *
+                                    <span class="sr">(Required Field)</span>
+                                </label>
 
-                                <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students" class="input cohort-management-group-add-students" placeholder="e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"></textarea>
+                                <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students" class="input cohort-management-group-add-students" placeholder="e.g. johndoe@example.com, JaneDoe, joeydoe@example.com" required="required"></textarea>
                             </div>
                         </div>
 
-                        <button class="form-submit button action-primary action-view">
-                            <i class="button-icon icon icon-plus"></i> Add Students
-                        </button>
+                        <div class="form-actions">
+                            <button class="form-submit button action-primary action-add">
+                                <i class="button-icon icon icon-plus"></i> Add Students
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
