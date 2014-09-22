@@ -198,7 +198,7 @@ def calculate_proforma_grade(grade_summary, grading_policy):
                 categories_to_estimate.append(category)
         else:
             categories_to_estimate.append(category)
-    assumed_category_average = sum(category_averages) / len(category_averages)
+    assumed_category_average = sum(category_averages) / len(category_averages) if len(category_averages) > 0 else 0
     for category in categories_to_estimate:
         category_policy = next((policy for policy in grading_policy['GRADER'] if policy['type'] == category), None)
         category_weight = category_policy['weight']
