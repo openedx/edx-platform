@@ -695,7 +695,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     query_features = [
         'id', 'username', 'name', 'email', 'language', 'location',
         'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-        'goals',
+        'goals', 'meta'
     ]
 
     student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
@@ -715,6 +715,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'level_of_education': _('Level of Education'),
         'mailing_address': _('Mailing Address'),
         'goals': _('Goals'),
+        'meta': _('Enhanced Profile Information'),
     }
 
     if not csv:
