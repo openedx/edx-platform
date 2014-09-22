@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """ Tests for the account API. """
 
+import unittest
 from nose.tools import raises
 import ddt
+from django.conf import settings
 from django.test import TestCase
 from user_api.api import account as account_api
 
@@ -102,6 +104,9 @@ class AccountApiTest(TestCase):
         with self.assertRaises(account_api.AccountUserAlreadyExists):
             account_api.create_account(self.USERNAME, self.PASSWORD, 'different+email@example.com')
 
+    # Email uniqueness constraints were introduced in a database migration,
+    # which we disable in the unit tests to improve the speed of the test suite.
+    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
     def test_create_account_duplicate_email(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         with self.assertRaises(account_api.AccountUserAlreadyExists):
