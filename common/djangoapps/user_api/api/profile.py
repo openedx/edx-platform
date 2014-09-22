@@ -61,7 +61,7 @@ def update_profile(username, full_name=None):
         None
 
     Raises:
-        ProfileRequestError: If there is not profile matching the provided username.
+        ProfileRequestError: If there is no profile matching the provided username.
 
     """
     try:

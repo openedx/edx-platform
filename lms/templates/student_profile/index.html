@@ -12,3 +12,12 @@
 <h1>Student Profile</h1>
 
 <p>This is a placeholder for the student's profile page.</p>
+
+<form id="name_change_form" method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+    <label for="name">${_('Full Name')}</label>
+    <input id="new_name" type="text" name="name" value="" placeholder="Xsy" />
+    <div class="submit-button">
+        <input type="submit" id="name-change-submit" value="${_('Change My Name')}">
+    </div>
+</form>
