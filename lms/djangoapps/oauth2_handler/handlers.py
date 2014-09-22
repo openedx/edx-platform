@@ -1,5 +1,7 @@
 """ Handlers for OpenID Connect provider. """
 
+from django.conf import settings
+
 import branding
 from courseware.access import has_access
 from student.models import anonymous_id_for_user
@@ -51,6 +53,11 @@ class ProfileHandler(object):
         """
 
         language = UserPreference.get_preference(data['user'], LANGUAGE_KEY)
+
+        # If the user has no language specified, return the default one.
+        if not language:
+            language = getattr(settings, 'LANGUAGE_CODE')
+
         return language
 
 

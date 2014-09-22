@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring
+from django.conf import settings
 from django.test.utils import override_settings
 from django.test import TestCase
 
@@ -52,12 +53,13 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
         self.assertEqual(claim_name, user_name)
 
+    @override_settings(LANGUAGE_CODE='en')
     def test_user_without_locale_claim(self):
         scopes, claims = self.get_new_id_token_values('openid profile')
         self.assertIn('profile', scopes)
-        self.assertNotIn('locale', claims)
+        self.assertEqual(claims['locale'], 'en')
 
-    def test_user_wit_locale_claim(self):
+    def test_user_with_locale_claim(self):
         language = 'en'
         UserPreference.set_preference(self.user, LANGUAGE_KEY, language)
         scopes, claims = self.get_new_id_token_values('openid profile')
