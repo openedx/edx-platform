@@ -3,19 +3,21 @@ Tests for StaticContentServer
 """
 import copy
 import logging
+import unittest
 from uuid import uuid4
 
 from django.conf import settings
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from student.models import CourseEnrollment
-
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
+
+from contentserver.middleware import parse_range_header
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
@@ -208,3 +210,59 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
 
         self.assertEqual(resp.status_code, 416)
+
+
+class ParseRangeHeaderTestCase(unittest.TestCase):
+    """
+    Tests for the parse_range_header function.
+    """
+
+    def setUp(self):
+        self.content_length = 10000
+
+    def test_bytes_unit(self):
+        unit, __ = parse_range_header('bytes=100-', self.content_length)
+        self.assertEqual(unit, 'bytes')
+
+    def test_invalid_syntax(self):
+        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes', self.content_length)
+        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=', self.content_length)
+        self.assertRaisesRegexp(
+            ValueError, 'too many values to unpack', parse_range_header, 'bytes=0=', self.content_length
+        )
+        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=0', self.content_length)
+        self.assertRaisesRegexp(ValueError, 'Invalid syntax', parse_range_header, 'bytes=0-10,0', self.content_length)
+
+    def test_byte_range_spec(self):
+        __, ranges = parse_range_header('bytes=100-', self.content_length)
+        self.assertEqual(len(ranges), 1)
+        self.assertEqual(ranges[0], (100, 9999))
+
+        __, ranges = parse_range_header('bytes=1000-', self.content_length)
+        self.assertEqual(len(ranges), 1)
+        self.assertEqual(ranges[0], (1000, 9999))
+
+        __, ranges = parse_range_header('bytes=100-199, 200-', self.content_length)
+        self.assertEqual(len(ranges), 2)
+        self.assertEqual(ranges, [(100, 199), (200, 9999)])
+
+        __, ranges = parse_range_header('bytes=100-199, 200-499', self.content_length)
+        self.assertEqual(len(ranges), 2)
+        self.assertEqual(ranges, [(100, 199), (200, 499)])
+
+        self.assertRaisesRegexp(
+            ValueError, 'invalid literal for int()', parse_range_header, 'bytes=one-20', self.content_length
+        )
+
+    def test_suffix_byte_range_spec(self):
+        __, ranges = parse_range_header('bytes=-100', self.content_length)
+        self.assertEqual(len(ranges), 1)
+        self.assertEqual(ranges[0], (9900, 9999))
+
+        __, ranges = parse_range_header('bytes=-100, -200', self.content_length)
+        self.assertEqual(len(ranges), 2)
+        self.assertEqual(ranges, [(9900, 9999), (9800, 9999)])
+
+        self.assertRaisesRegexp(
+            ValueError, 'invalid literal for int()', parse_range_header, 'bytes=-one', self.content_length
+        )
