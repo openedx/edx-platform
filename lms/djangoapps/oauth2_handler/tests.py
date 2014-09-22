@@ -6,6 +6,7 @@ from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import anonymous_id_for_user
+from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
 from user_api.models import UserPreference
@@ -41,6 +42,15 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
         expected_sub = anonymous_id_for_user(self.user, None)
         self.assertEqual(sub, expected_sub)
+
+    def test_user_name_claim(self):
+        _scopes, claims = self.get_new_id_token_values('openid profile')
+        claim_name = claims['name']
+
+        user_profile = UserProfile.objects.get(user=self.user)
+        user_name = user_profile.name
+
+        self.assertEqual(claim_name, user_name)
 
     def test_user_without_locale_claim(self):
         scopes, claims = self.get_new_id_token_values('openid profile')

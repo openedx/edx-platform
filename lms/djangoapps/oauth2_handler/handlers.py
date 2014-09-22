@@ -3,6 +3,7 @@
 import branding
 from courseware.access import has_access
 from student.models import anonymous_id_for_user
+from student.models import UserProfile
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
@@ -33,8 +34,14 @@ class ProfileHandler(object):
     """ Basic OpenID Connect `profile` scope handler with `locale` claim. """
 
     def scope_profile(self, _data):
-        """ Add the locale claim. """
-        return ['locale']
+        """ Add specialized claims. """
+        return ['name', 'locale']
+
+    def claim_name(self, data):
+        """ User displayable full name. """
+        user = data['user']
+        profile = UserProfile.objects.get(user=user)
+        return profile.name
 
     def claim_locale(self, data):
         """
