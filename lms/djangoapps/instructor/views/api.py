@@ -692,11 +692,16 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
-    query_features = [
-        'id', 'username', 'name', 'email', 'language', 'location',
-        'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
-        'goals',
-    ]
+
+    # Allow for microsites to be able to define additional columns (e.g. )
+    query_features = microsite.get_value('student_profile_download_fields')
+
+    if not query_features:
+        query_features = [
+            'id', 'username', 'name', 'email', 'language', 'location',
+            'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
+            'goals'
+        ]
 
     student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
