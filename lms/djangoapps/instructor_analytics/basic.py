@@ -11,7 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
-                    'level_of_education', 'mailing_address', 'goals')
+                    'level_of_education', 'mailing_address', 'goals', 'meta')
 ORDER_ITEM_FEATURES = ('list_price', 'unit_cost', 'order_id')
 ORDER_FEATURES = ('purchase_time',)
 
@@ -150,6 +150,7 @@ def enrolled_students_features(course_id, features):
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
+
         return student_dict
 
     return [extract_student(student, features) for student in students]
