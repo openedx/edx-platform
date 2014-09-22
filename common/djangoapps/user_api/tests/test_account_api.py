@@ -4,9 +4,11 @@
 import unittest
 from nose.tools import raises
 import ddt
+from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django.test import TestCase
 from user_api.api import account as account_api
+from user_api.models import UserProfile
 
 
 @ddt.ddt
@@ -207,3 +209,54 @@ class AccountApiTest(TestCase):
 
         # Verify that the email was NOT changed
         self.assertEqual(account_api.account_info(self.USERNAME)['email'], self.EMAIL)
+
+    def test_confirm_email_no_user_profile(self):
+        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        activation_key = account_api.request_email_change(
+            self.USERNAME, u"new+email@example.com", self.PASSWORD
+        )
+
+        # This should never happen, but just in case...
+        UserProfile.objects.get(user__username=self.USERNAME).delete()
+
+        with self.assertRaises(account_api.AccountInternalError):
+            account_api.confirm_email_change(activation_key)
+
+    def test_record_email_change_history(self):
+        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+
+        # Change the email once
+        activation_key = account_api.request_email_change(
+            self.USERNAME, u"new+email@example.com", self.PASSWORD
+        )
+        account_api.confirm_email_change(activation_key)
+
+        # Verify that the old email appears in the history
+        meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
+        self.assertEqual(len(meta['old_emails']), 1)
+        email, timestamp = meta['old_emails'][0]
+        self.assertEqual(email, self.EMAIL)
+        self._assert_is_datetime(timestamp)
+
+        # Change the email again
+        activation_key = account_api.request_email_change(
+            self.USERNAME, u"another_new+email@example.com", self.PASSWORD
+        )
+        account_api.confirm_email_change(activation_key)
+
+        # Verify that both emails appear in the history
+        meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
+        self.assertEqual(len(meta['old_emails']), 2)
+        email, timestamp = meta['old_emails'][1]
+        self.assertEqual(email, "new+email@example.com")
+        self._assert_is_datetime(timestamp)
+
+    def _assert_is_datetime(self, timestamp):
+        if not timestamp:
+            return False
+        try:
+            parse_datetime(timestamp)
+        except ValueError:
+            return False
+        else:
+            return True

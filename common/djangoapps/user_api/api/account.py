@@ -250,6 +250,7 @@ def confirm_email_change(activation_key):
     Raises:
         AccountNotAuthorized: The activation code is invalid.
         AccountEmailAlreadyExists: Someone else has already taken the email address.
+        AccountInternalError
 
     """
 
@@ -273,9 +274,17 @@ def confirm_email_change(activation_key):
         if User.objects.filter(email=new_email).exists():
             raise AccountEmailAlreadyExists
 
-        # Save the new email
-        pending_change.user.email = new_email
-        pending_change.user.save()
+        # Update the email history (in the user profile)
+        try:
+            profile = UserProfile.objects.get(user=pending_change.user)
+        except UserProfile.DoesNotExist:
+            raise AccountInternalError(
+                "No profile exists for the user '{username}'".format(
+                    username=pending_change.user.username
+                )
+            )
+        else:
+            profile.update_email(new_email)
 
         # Delete the pending change, so that the activation code
         # will be single-use
