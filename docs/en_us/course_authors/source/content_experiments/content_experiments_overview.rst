@@ -11,6 +11,11 @@ Also known as A/B or split tests, content experiments enable you to
 research and compare the performance of students in different groups to gain
 insight into the relative effectiveness of your course content.
 
+Information on analyzing events from content experiments is included in the
+`edX Researcher Guide`_.
+
+.. _edX Researcher Guide: http://edx.readthedocs.org/projects/devdata/en/latest/internal_data_formats/tracking_logs.html#a-b-testing-events
+
 .. caution::
   If you have graded problems within a content experiment, grade exports do not
   work for your course. This issue is currently being addressed.
