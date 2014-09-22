@@ -11,9 +11,9 @@ from user_api.api import profile as profile_api
 @ddt.ddt
 class ProfileApiTest(TestCase):
 
-    USERNAME = u"Ḟṛäṅḳ"
+    USERNAME = u"frank-underwood"
     PASSWORD = u"ṕáśśẃőŕd"
-    EMAIL = u"fŕáńḱ@éxáḿṕĺé.ćőḿ"
+    EMAIL = u"frank+underwood@example.com"
 
     def test_create_profile(self):
         # Create a new account, which should have an empty profile by default.
@@ -42,7 +42,7 @@ class ProfileApiTest(TestCase):
 
     def test_update_full_name_too_long(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        
+
         with self.assertRaises(profile_api.ProfileRequestError):
             profile_api.update_profile(self.USERNAME, full_name=u'𝓐' * 256)
 
