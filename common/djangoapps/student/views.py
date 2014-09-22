@@ -661,20 +661,19 @@ def change_enrollment(request, auto_register=False):
         Response
 
     """
+    # Get the user
     user = request.user
 
+    # Ensure we received a course_id
     action = request.POST.get("enrollment_action")
     if 'course_id' not in request.POST:
         return HttpResponseBadRequest(_("Course id not specified"))
 
-    try:
-        course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
-    except InvalidKeyError:
-        log.warning("User {username} tried to {action} with invalid course id: {course_id}".format(
-            username=user.username, action=action, course_id=request.POST.get("course_id")
-        ))
-        return HttpResponseBadRequest(_("Invalid course id"))
+    # Ensure the user is authenticated
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
 
+    # Sets the auto_register flag, if that's desired
     # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
     # If a user is in the experimental condition (auto-registration enabled),
     # immediately set a session flag so they stay in the experimental condition.
@@ -686,6 +685,7 @@ def change_enrollment(request, auto_register=False):
     if request.session.get('auto_register') and not auto_register:
         auto_register = True
 
+    # Don't execute auto-register for the set of courses excluded from auto-registration
     # TODO (ECOM-16): Remove this once the auto-registration A/B test completes
     # We've agreed to exclude certain courses from the A/B test.  If we find ourselves
     # registering for one of these courses, immediately switch to the control.
@@ -694,34 +694,7 @@ def change_enrollment(request, auto_register=False):
         if 'auto_register' in request.session:
             del request.session['auto_register']
 
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
-
     if action == "enroll":
-        # Make sure the course exists
-        # We don't do this check on unenroll, or a bad course id can't be unenrolled from
-        try:
-            course = modulestore().get_course(course_id)
-        except ItemNotFoundError:
-            log.warning("User {0} tried to enroll in non-existent course {1}"
-                        .format(user.username, course_id))
-            return HttpResponseBadRequest(_("Course id is invalid"))
-
-        if not has_access(user, 'enroll', course):
-            return HttpResponseBadRequest(_("Enrollment is closed"))
-
-        # see if we have already filled up all allowed enrollments
-        is_course_full = CourseEnrollment.is_course_full(course)
-
-        if is_course_full:
-            return HttpResponseBadRequest(_("Course is full"))
-
-        # check to see if user is currently enrolled in that course
-        if CourseEnrollment.is_enrolled(user, course_id):
-            return HttpResponseBadRequest(
-                _("Student is already enrolled")
-            )
-
         # We use this flag to determine which condition of an AB-test
         # for auto-registration we're currently in.
         # (We have two URLs that both point to this view, but vary the
@@ -747,7 +720,10 @@ def change_enrollment(request, auto_register=False):
                 # by its slug.  If they do, it's possible (based on the state of the database)
                 # for no such model to exist, even though we've set the enrollment type
                 # to "honor".
-                CourseEnrollment.enroll(user, course.id)
+                try:
+                    CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+                except Exception:
+                    return HttpResponseBadRequest(_("Could not enroll"))
 
             # If we have more than one course mode or professional ed is enabled,
             # then send the user to the choose your track page.
@@ -780,7 +756,10 @@ def change_enrollment(request, auto_register=False):
                     reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
                 )
 
-            CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+            try:
+                CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
+            except Exception:
+                return HttpResponseBadRequest(_("Could not enroll"))
 
             return HttpResponse()
 

@@ -589,6 +589,22 @@ class LoginFailures(models.Model):
             return
 
 
+class CourseEnrollmentException(Exception):
+    pass
+
+class NonExistentCourseError(CourseEnrollmentException):
+    pass
+
+class EnrollmentClosedError(CourseEnrollmentException):
+    pass
+
+class CourseFullError(CourseEnrollmentException):
+    pass
+
+class AlreadyEnrolledError(CourseEnrollmentException):
+    pass
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -795,10 +811,59 @@ class CourseEnrollment(models.Model):
                until we have these mapped out.
 
         It is expected that this method is called from a method which has already
-        verified the user authentication and access.
+        verified the user authentication.
 
         Also emits relevant events for analytics purposes.
         """
+
+        # All the server-side checks for whether a user is allowed to enroll.
+        try:
+            course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
+        except InvalidKeyError:
+            log.warning(
+                "User {username} tried to {action} with invalid course id: {course_id}".format(
+                    username=user.username,
+                    action=action,
+                    course_id=request.POST.get("course_id")
+                )
+            )
+            raise CourseEnrollmentException
+        try:
+            course = modulestore().get_course(course_id)
+        except ItemNotFoundError:
+            log.warning(
+                "User {0} failed to enroll in non-existent course {1}".format(
+                    user.username,
+                    course_id
+                )
+            )
+            raise NonExistentCourseError
+        if not has_access(user, 'enroll', course):
+            log.warning(
+                "User {0} failed to enroll in course {1} because enrollment is closed".format(
+                    user.username,
+                    course_id
+                )
+            )
+            raise EnrollmentClosedError
+        if CourseEnrollment.is_course_full(course):
+            log.warning(
+                "User {0} failed to enroll in full course {1}".format(
+                    user.username,
+                    course_id
+                )
+            )
+            raise CourseFullError
+        if CourseEnrollment.is_enrolled(user, course_id):
+            log.warning(
+                "User {0} attempted to enroll in {1}, but they were already enrolled".format(
+                    user.username,
+                    course_id
+                )
+            )
+            raise AlreadyEnrolledError
+
+        # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
         return enrollment
