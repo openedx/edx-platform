@@ -34,7 +34,8 @@ body.discussion, .discussion-course, div.discussion-body {
     }
 
     .new-post-icon {
-      margin: 8px 7px 0 0;
+      margin-top: 8px;
+      #{$margin-right}: 7px;
       font-size: 16px;
       vertical-align: middle;
       color: $white;
@@ -278,7 +279,7 @@ body.discussion, .discussion-course, div.discussion-body {
   }
 
   .discussion-column {
-    float: right;
+    float: flip(right, left);
     @include box-sizing(border-box);
     width: 68%;
     max-width: 800px;
@@ -405,7 +406,7 @@ body.discussion, .discussion-course, div.discussion-body {
         .notification-checkbox {
           display: inline-block;
           padding: $baseline/4 0 $baseline/2 0;
-          margin-right: $baseline/2;
+          #{$margin-right}: $baseline/2;
           border-radius: 5px;
           border: 1px solid gray;
 
@@ -413,7 +414,7 @@ body.discussion, .discussion-course, div.discussion-body {
             display: inline-block;
             text-align: center;
             vertical-align: middle;
-            margin-left: $baseline/2;
+            #{$margin-left}: $baseline/2;
           }
 
           .icon {
@@ -568,6 +569,13 @@ body.discussion, .discussion-course, div.discussion-body {
       border-radius: 3px 3px 0 0;
       padding: $baseline;
       background-color: $white;
+
+      .response-body {
+        ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
+          #{$padding-left}: 40px;
+          #{$padding-right}: 0;
+        }
+      }
     }
     .posted-by {
       font-weight: 700;
@@ -586,11 +594,15 @@ body.discussion, .discussion-course, div.discussion-body {
       padding: 0 18px;
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
-      text-align: left;
+      text-align: $left;
       font-size: 13px;
 
+      .icon-reply:before {
+        content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
+      }
+
       span.add-response-btn-text {
-        padding-left: ($baseline/5);
+        #{$padding-left}: ($baseline/5);
       }
     }
   }
@@ -675,7 +687,7 @@ body.discussion, .discussion-course, div.discussion-body {
 
   .discussion-submit-post {
     @include blue-button;
-    float: left;
+    float: $left;
   }
 
   .wmd-button {
@@ -711,7 +723,11 @@ body.discussion, .discussion-course, div.discussion-body {
       padding-left: ($baseline*1.5);
       width: 100%;
       box-shadow: 0 1px 1px $shadow-l1;
-      text-align: left;
+      text-align: $left;
+
+      .icon-reply:before {
+        content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
+      }
 
       &:hover, &:focus {
         @include linear-gradient(top, $white 35%, #ddd);
@@ -932,9 +948,10 @@ body.discussion, .discussion-course, div.discussion-body {
     float: left;
     width: 16px;
     height: 17px;
-    margin: 8px 7px 0 0;
+    margin-top: 8px;
+    #{$margin-right}: 7px;
     font-size: 16px;
-    padding-right: $baseline/2;
+    #{$padding-right}: $baseline/2;
     vertical-align: middle;
     color: $white;
   }

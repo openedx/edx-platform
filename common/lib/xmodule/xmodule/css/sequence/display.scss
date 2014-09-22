@@ -293,23 +293,28 @@ nav.sequence-nav {
         }
       }
 
+      $prev-icon: url('../images/sequence-nav/previous-icon.png');
+      $next-icon: url('../images/sequence-nav/next-icon.png');
+
       &.prev {
-        left: -10px;
-        border-radius: 35px 0 0 35px;
+        left: flip(-10px, auto);
+        right: flip(auto, -10px);
+        border-radius: flip(35px 0 0 35px, 0 35px 35px 0);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
+          background-image: flip($prev-icon, $next-icon);
           background-position: center 15px;
         }
       }
 
       &.next {
-        right: -10px;
-        border-radius: 0 35px 35px 0;
+        left: flip(auto, -10px);
+        right: flip(-10px, auto);
+        border-radius: flip(0 35px 35px 0, 35px 0 0 35px);
 
         a {
-          margin-left: 30px;
-          background-image: url('../images/sequence-nav/next-icon.png');
+          #{$margin-left}: 30px;
+          background-image: flip($next-icon, $prev-icon);
           background-position: center 15px;
         }
       }
@@ -334,7 +339,7 @@ nav.sequence-bottom {
     display: inline-block;
 
     li {
-      float: left;
+      float: flip(left, right);
       width: 50px;
       height: 44px;
       border: 1px solid #ccc;
@@ -368,21 +373,24 @@ nav.sequence-bottom {
 */        }
       }
 
+      $prev-icon: url('../images/sequence-nav/previous-icon.png');
+      $next-icon: url('../images/sequence-nav/next-icon.png');
+
       &.prev {
-        border-radius: 35px 0 0 35px;
+        border-radius: flip(35px 0 0 35px, 0 35px 35px 0);
 
         a {
-          background-image: url('../images/sequence-nav/previous-icon.png');
+          background-image: flip($prev-icon, $next-icon);
           background-position: center 15px;
         }
       }
 
       &.next {
-        border-radius: 0 35px 35px 0;
-        border-left: none;
+        border-radius: flip(0 35px 35px 0, 35px 0 0 35px);
+        #{$border-left}: none;
 
         a {
-          background-image: url('../images/sequence-nav/next-icon.png');
+          background-image: flip($next-icon, $prev-icon);
           background-position: center 15px;
         }
       }
