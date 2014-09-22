@@ -47,7 +47,7 @@
         a {
           border-radius: 0;
           box-shadow: none;
-          padding-left: 19px;
+          #{$padding-left}: 19px;
           color: $link-color;
         }
 
@@ -61,9 +61,14 @@
         }
 
         span.ui-icon {
-          left: 0;
+          left: flip(0, auto);
+          right: flip(0, auto);
           background-image: url("/static/images/ui-icons_222222_256x240.png");
           opacity: 0.3;
+
+          &.ui-icon-triangle-1-e { // jQuery UI east arrow
+            background-position: flip(-32px -16px, -96px -16px); // flip(jQuery UI east arrow, jQuery UI west arrow)
+          }
         }
       }
     }
