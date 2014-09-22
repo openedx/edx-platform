@@ -61,7 +61,7 @@ div.problem {
     width: 100px;
 
     label {
-      float: left;
+      float: flip(left, right);
       clear: both;
       margin-bottom: 5px;
 
