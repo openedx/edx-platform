@@ -4,6 +4,7 @@
 Guidelines for Creating Accessible Content
 ###################################################
 
+..  add notes to any of this page
  
 EdX strives to create an innovative, online-learning platform that promotes accessibility for everyone, including learners with disabilities. 
 We intend for these guidelines to help the course teams understand the importance of considering accessibility when designing courses and provide guidance so that they can serve the widest possible audience. 
