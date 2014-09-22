@@ -18,12 +18,12 @@ from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import BlockUsageLocator
 
+from courseware.access import has_access
+from student.models import CourseEnrollment, User
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
-from student.models import CourseEnrollment, User
 
 from .serializers import BlockOutline, video_summary
-from mobile_api import get_mobile_course
 
 
 class VideoSummaryList(generics.ListAPIView):
@@ -74,3 +74,13 @@ class VideoTranscripts(generics.RetrieveAPIView):
         return response
 
 
+def get_mobile_course(course_id, user):
+    """
+    Return only a CourseDescriptor if the course is mobile-ready or if the
+    requesting user is a staff member.
+    """
+    course = modulestore().get_course(course_id, depth=None)
+    if course.mobile_available or has_access(user, 'staff', course):
+        return course
+
+    raise PermissionDenied(detail="Course not available on mobile.")

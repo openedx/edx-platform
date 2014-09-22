@@ -4,14 +4,16 @@ from django.shortcuts import redirect
 from rest_framework import generics, permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from courseware.access import has_access
 from student.forms import PasswordResetFormNoActive
 from student.models import CourseEnrollment, User
+from xmodule.modulestore.django import modulestore
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
-from mobile_api import mobile_course_enrollments
 
 
 class IsUser(permissions.BasePermission):
@@ -63,3 +65,15 @@ def my_user_info(request):
     if not request.user:
         raise PermissionDenied
     return redirect("user-detail", username=request.user.username)
+
+def mobile_course_enrollments(enrollments, user):
+    """
+    Return enrollments only if courses are mobile_available (or if the user has staff access)
+    enrollments is a list of CourseEnrollments.
+    """
+    for enr in enrollments:
+        course = enr.course
+        if course.mobile_available:
+            yield enr
+        elif has_access(user, 'staff', course):
+            yield enr
