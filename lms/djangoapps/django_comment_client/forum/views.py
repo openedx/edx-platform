@@ -251,7 +251,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
     # verify that the thread belongs to the requesting student's cohort
     if is_commentable_cohorted(course_key, discussion_id) and not is_moderator:
         user_group_id = get_cohort_id(request.user, course_key)
-        if hasattr(thread, "group_id") and user_group_id != thread.group_id:
+        if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
             raise Http404
 
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)

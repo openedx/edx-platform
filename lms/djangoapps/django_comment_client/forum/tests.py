@@ -18,6 +18,7 @@ from django_comment_client.tests.group_id import (
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedContentTestCase
 from django_comment_client.forum import views
+from django_comment_client.utils import strip_none
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from courseware.courses import UserNotEnrolled
@@ -106,9 +107,9 @@ def make_mock_thread_data(text, thread_id, include_children, group_id=None, grou
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
+        "group_id": group_id
     }
     if group_id is not None:
-        thread_data['group_id'] = group_id
         thread_data['group_name'] = group_name
     if include_children:
         thread_data["children"] = [{
@@ -194,9 +195,11 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
         self.assertEquals(response.status_code, 200)
         response_data = json.loads(response.content)
+        # strip_none is being used to perform the same transform that the
+        # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            make_mock_thread_data(text, thread_id, True)
+            strip_none(make_mock_thread_data(text, thread_id, True))
         )
         mock_request.assert_called_with(
             "get",
@@ -228,9 +231,11 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         )
         self.assertEquals(response.status_code, 200)
         response_data = json.loads(response.content)
+        # strip_none is being used to perform the same transform that the
+        # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            make_mock_thread_data(text, thread_id, True)
+            strip_none(make_mock_thread_data(text, thread_id, True))
         )
         mock_request.assert_called_with(
             "get",
@@ -363,6 +368,18 @@ class SingleThreadAccessTestCase(CohortedContentTestCase):
             self.student,
             self.student_cohort.id,
             thread_group_id=self.student_cohort.id
+        )
+        self.assertEqual(resp.status_code, 200)
+
+    # this test ensures that a thread response from the cs with group_id: null
+    # behaves the same as a thread response without a group_id (see: TNL-444)
+    def test_student_global_thread_in_cohorted_topic(self, mock_request):
+        resp = self.call_view(
+            mock_request,
+            "cohorted_topic",
+            self.student,
+            self.student_cohort.id,
+            thread_group_id=None
         )
         self.assertEqual(resp.status_code, 200)
 
