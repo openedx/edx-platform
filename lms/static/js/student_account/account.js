@@ -72,6 +72,8 @@ var edx = edx || {};
             },
 
             form: {
+                isValid: true,
+
                 submit: function( event ) {
                     var $email = $('#new-email'),
                         $password = $('#password'),
@@ -82,31 +84,16 @@ var edx = edx || {};
 
                     event.preventDefault();
 
-                    if ( _fn.form.validate( $email, $password, data ) ) {
+                    _fn.form.validate( $('#email-change-form') );
+
+                    if ( _fn.form.isValid ) {
                         _fn.ajax.put( 'email_change_request', data );
                     }
                 },
 
-                validate: function( $email, $password, data ) {
-                    var valid = true;
-
-                    // Clear errors
-                    $email.removeClass('error');
-                    $password.removeClass('error');
-
-                    if ( !_fn.valid.email( data.email ) ) {
-                        console.log('invalid email');
-                        $email.addClass('error');
-                        valid = false;
-                    }
-
-                    if ( !_fn.valid.password( data.password ) ) {
-                        console.log('invalid password');
-                        $password.addClass('error');
-                        valid = false;
-                    }
-
-                    return valid;
+                validate: function( $form ) {
+                    _fn.form.isValid = true;
+                    $form.find('input').each( _fn.valid.input );
                 }
             },
 
@@ -130,7 +117,36 @@ var edx = edx || {};
                     return valid;
                 },
 
-                password: function( str ) {
+                input: function() {
+                    var $el = $(this),
+                        validation = $el.data('validate'),
+                        value = $el.val(),
+                        valid = true;
+
+
+                    if ( validation && validation.length > 0 ) {
+                        $el.removeClass('error')
+                            .css('border-color', '#c8c8c8'); // temp. for development
+
+                        // Required field
+                        if ( validation.indexOf('required') > -1 ) {
+                            valid = _fn.valid.required( value );
+                        }
+
+                        // Email address
+                        if ( valid && validation.indexOf('email') > -1 ) {
+                            valid = _fn.valid.email( value );
+                        }
+
+                        if ( !valid ) {
+                            $el.addClass('error')
+                                .css('border-color', '#f00'); // temp. for development
+                            _fn.form.isValid = false;
+                        }
+                    }
+                },
+
+                required: function( str ) {
                     return ( str && str.length > 0 ) ? true : false;
                 }
             }
