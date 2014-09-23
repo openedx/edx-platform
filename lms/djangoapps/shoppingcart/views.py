@@ -287,90 +287,6 @@ def register_code_redemption(request, registration_code):
         return render_to_response(template_to_render, context)
 
 
-def get_reg_code_validity(registration_code, request, limiter):
-    """
-    This function checks if the registration code is valid, and then checks if it was already redeemed.
-    """
-    reg_code_already_redeemed = False
-    course_registration = None
-    try:
-        course_registration = CourseRegistrationCode.objects.get(code=registration_code)
-    except CourseRegistrationCode.DoesNotExist:
-        reg_code_is_valid = False
-    else:
-        reg_code_is_valid = True
-        try:
-            RegistrationCodeRedemption.objects.get(registration_code__code=registration_code)
-        except RegistrationCodeRedemption.DoesNotExist:
-            reg_code_already_redeemed = False
-        else:
-            reg_code_already_redeemed = True
-
-    if not reg_code_is_valid:
-        #tick the rate limiter counter
-        AUDIT_LOG.info("Redemption of a non existing RegistrationCode {code}".format(code=registration_code))
-        limiter.tick_bad_request_counter(request)
-        raise Http404()
-
-    return reg_code_is_valid, reg_code_already_redeemed, course_registration
-
-
-@require_http_methods(["GET", "POST"])
-@login_required
-def register_code_redemption(request, registration_code):
-    """
-    This view allows the student to redeem the registration code
-    and enroll in the course.
-    """
-
-    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
-    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-    limiter = BadRequestRateLimiter()
-    if limiter.is_rate_limit_exceeded(request):
-        AUDIT_LOG.warning("Rate limit exceeded in registration code redemption.")
-        return HttpResponseForbidden()
-
-    template_to_render = 'shoppingcart/registration_code_receipt.html'
-    if request.method == "GET":
-        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
-                                                                                                  request, limiter)
-        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
-        context = {
-            'reg_code_already_redeemed': reg_code_already_redeemed,
-            'reg_code_is_valid': reg_code_is_valid,
-            'reg_code': registration_code,
-            'site_name': site_name,
-            'course': course,
-            'registered_for_course': registered_for_course(course, request.user)
-        }
-        return render_to_response(template_to_render, context)
-    elif request.method == "POST":
-        reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
-                                                                                                  request, limiter)
-
-        course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
-        if reg_code_is_valid and not reg_code_already_redeemed:
-            #now redeem the reg code.
-            RegistrationCodeRedemption.create_invoice_generated_registration_redemption(course_registration, request.user)
-            CourseEnrollment.enroll(request.user, course.id)
-            context = {
-                'redemption_success': True,
-                'reg_code': registration_code,
-                'site_name': site_name,
-                'course': course,
-            }
-        else:
-            context = {
-                'reg_code_is_valid': reg_code_is_valid,
-                'reg_code_already_redeemed': reg_code_already_redeemed,
-                'redemption_success': False,
-                'reg_code': registration_code,
-                'site_name': site_name,
-                'course': course,
-            }
-        return render_to_response(template_to_render, context)
-
-
 def use_registration_code(course_reg, user):
     """
     This method utilize course registration code
@@ -508,16 +424,34 @@ def show_receipt(request, ordernum):
         raise Http404('Order not found!')
 
     order_items = OrderItem.objects.filter(order=order).select_subclasses()
+    shoppingcart_items = []
+    course_names_list = []
+    for order_item in order_items:
+        if hasattr(order_item, 'paidcourseregistration'):
+            course_key = order_item.paidcourseregistration.course_id
+        else:
+            course_key = order_item.certificateitem.course_id
+
+        course = get_course_by_id(course_key, depth=0)
+        shoppingcart_items.append((order_item, course))
+        course_names_list.append(course.display_name)
+
+    course_names = ", ".join(course_names_list)
     any_refunds = any(i.status == "refunded" for i in order_items)
     receipt_template = 'shoppingcart/receipt.html'
     __, instructions = order.generate_receipt_instructions()
+    order_type = getattr(order, 'order_type')
     # we want to have the ability to override the default receipt page when
     # there is only one item in the order
     context = {
         'order': order,
+        'shoppingcart_items': shoppingcart_items,
         'order_items': order_items,
         'any_refunds': any_refunds,
         'instructions': instructions,
+        'site_name': microsite.get_value('SITE_NAME', settings.SITE_NAME),
+        'order_type': order_type,
+        'course_names': course_names,
     }
 
     if order_items.count() == 1:
@@ -531,6 +465,21 @@ def show_receipt(request, ordernum):
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
         request.session['attempting_upgrade'] = False
 
+    recipient_list = list()
+    recipient_list.append(getattr(order.user, 'email'))
+    if order_type == 'business':
+        registration_codes = CourseRegistrationCode.objects.filter(order=order)
+        total_registration_codes = registration_codes.count()
+        context.update({'registration_codes': registration_codes})
+        context.update({'total_registration_codes': total_registration_codes})
+        if order.company_contact_email:
+            recipient_list.append(order.company_contact_email)
+        if order.recipient_email:
+            recipient_list.append(order.recipient_email)
+
+    emails = ", ".join(recipient_list)
+    context.update({'emails': emails})
+    # return render_to_response('shoppingcart/reciet.html', context)
     return render_to_response(receipt_template, context)
 
 
